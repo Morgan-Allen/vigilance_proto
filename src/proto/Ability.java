@@ -75,8 +75,13 @@ public abstract class Ability {
   }
   
   
+  int motionCostAP(int pathLength) {
+    return (pathLength - 1) / 2;
+  }
+  
+  
   int costAP(Action use) {
-    return minCostAP() + ((use.path.length - 1) / 2);
+    return minCostAP() + motionCostAP(use.path.length);
   }
   
   
@@ -91,14 +96,75 @@ public abstract class Ability {
   
   
   float rateUsage(Action use) {
+    Person acts = use.acting;
     float rating = 1, relation = 0;
+    
     if (use.target instanceof Person) {
       Person other = (Person) use.target;
-      if (other.isAlly (use.acting)) relation =  1;
-      if (other.isEnemy(use.acting)) relation = -1;
+      if (other.isAlly (acts)) relation =  1;
+      if (other.isEnemy(acts)) relation = -1;
     }
     rating = harmLevel * relation * -1 * powerLevel;
+    
+    Tile at = acts.scene.tileUnder(use.target);
+    rating *= 10f / (10 + at.scene.distance(acts.location, at));
+    
     return rating;
+  }
+  
+  
+  
+  /**  Configuring actions-
+    */
+  Action configAction(
+    Person acting, Tile dest, Object target,
+    Scene scene, Tile pathToTake[]
+  ) {
+    if (acting == null || ! allowsTarget(target)) return null;
+    if (requiresSight() && ! acting.canSee(dest)) return null;
+    
+    Tile path[] = null;
+    if (pathToTake != null) {
+      path = pathToTake;
+    }
+    else if (ranged()) {
+      path = new Tile[] { acting.location };
+    }
+    else {
+      MoveSearch search = new MoveSearch(acting, acting.location, dest);
+      search.doSearch();
+      if (! search.success()) return null;
+      else path = search.fullPath(Tile.class);
+    }
+    
+    Action newAction = new Action();
+    newAction.acting    = acting;
+    newAction.path      = path;
+    newAction.used      = this;
+    newAction.target    = target;
+    newAction.timeStart = scene.time;
+    newAction.progress  = -1;
+    
+    if (costAP(newAction) > acting.currentAP()) return null;
+    return newAction;
+  }
+  
+  
+  Action bestMotionToward(Object point, Person acting, Scene scene) {
+    Tile at = scene.tileUnder(point);
+    if (at == null || ! acting.canSee(at)) return null;
+    MoveSearch search = new MoveSearch(acting, acting.location, at);
+    search.doSearch();
+    if (! search.success()) return null;
+    
+    Tile path[] = search.fullPath(Tile.class);
+    for (int n = path.length; n-- > 0;) {
+      Tile shortPath[] = new Tile[n + 1], t = path[n];
+      System.arraycopy(path, 0, shortPath, 0, n + 1);
+      Action use = configAction(acting, t, t, scene, shortPath);
+      if (use != null) return use;
+    }
+    return null;
   }
   
   

@@ -10,9 +10,6 @@ public class Person {
   
   /**  Data fields and construction-
     */
-  Kind kind;
-  String name;
-  
   static class Stat extends Ability {
     public Stat(String name, String description) {
       super(name, description, IS_PASSIVE, 0, NO_HARM, MINOR_POWER);
@@ -25,10 +22,26 @@ public class Person {
     BRAIN  = new Stat("Brain" , ""),
     SPEED  = new Stat("Speed" , ""),
     SIGHT  = new Stat("Sight" , "");
+  final static int
+    STATE_INIT    = -1,
+    STATE_AS_PC   =  0,
+    STATE_UNAWARE =  1,
+    STATE_ACTIVE  =  2,
+    STATE_RETREAT =  3;
+  final static int
+    INIT_LUCK   = 3,
+    MAX_LUCK    = 3,
+    INIT_STRESS = 0,
+    MAX_STRESS  = 100;
+  
+  
+  Kind kind;
+  String name;
+  int AIstate = STATE_INIT;
+  int luck = INIT_LUCK, stress = INIT_STRESS;
   
   List <Ability> abilities = new List();
   Tally <Ability> abilityLevels = new Tally();
-  int luck, stress;
   
   float injury, fatigue;
   boolean alive, conscious;
@@ -38,6 +51,7 @@ public class Person {
   float posX, posY;
   int actionPoints;
   Action lastAction;
+  
   
   
   Person(Kind kind, String name) {
@@ -163,12 +177,20 @@ public class Person {
   }
   
   
+  boolean retreating() {
+    return AIstate == STATE_RETREAT;
+  }
+  
+  
   boolean canSee(Tile point) {
     if (scene == null) return false;
     
     //  TODO:  This may require some subsequent refinement!
     if (isPlayerOwned()) return scene.fogAt(point) > 0;
-    else return scene.distance(location, point) < sightRange();
+    else {
+      if (scene.fogAt(location) <= 0) return false;
+      return scene.distance(location, point) < (sightRange() * 2);
+    }
   }
   
   
@@ -176,25 +198,47 @@ public class Person {
     if (scene == null || ! conscious()) return null;
     Pick <Action> pick = new Pick(0);
     
-    //  TODO:  In the event that no action is viable, move towards known
-    //  enemies and/or take cover?  ...Yeah.
-    
-    //  Either take cover if you have ranged abilities, or get as close as
-    //  possible otherwise...
-    
-    
     for (Person p : scene.persons) for (Ability a : abilities) {
-      Action use = scene.configAction(this, p.location, p, a);
+      Action use = a.configAction(this, p.location, p, scene, null);
       if (use != null) pick.compare(use, a.rateUsage(use));
     }
+    
+    if (pick.empty()) {
+      Series <Person> foes = scene.playerTeam;
+      Action motion = retreating() ?
+        pickRetreatAction(foes) :
+        pickAdvanceAction(foes)
+      ;
+      pick.compare(motion, 1);
+    }
+    
     return pick.result();
   }
   
   
-  Tile selectVantage() {
-    
-    
+  
+  /**  Other supplementary action-creation methods-
+    */
+  Action pickAdvanceAction(Series <Person> foes) {
+    for (Person p : foes) {
+      Action motion = Common.MOVE.bestMotionToward(p, this, scene);
+      if (motion != null) return motion;
+    }
     return null;
+  }
+  
+  
+  Action pickRetreatAction(Series <Person> foes) {
+    int hS = scene.size / 2, sD = scene.size - 1;
+    Tile exits[] = {
+      scene.tileAt(0 , hS),
+      scene.tileAt(hS, 0 ),
+      scene.tileAt(sD, hS),
+      scene.tileAt(hS, sD)
+    };
+    final Pick <Tile> pick = new Pick();
+    for (Tile t : exits) pick.compare(t, 0 - scene.distance(t, location));
+    return Common.MOVE.bestMotionToward(pick.result(), this, scene);
   }
   
   

@@ -146,8 +146,12 @@ public class World {
   
   
   void beginNextMission() {
-    this.enteredScene = missions().first();
-    if (enteredScene != null) enteredScene.beginScene();
+    Scene toEnter = missions().first();
+    if (toEnter != null) {
+      toEnter.setupScene();
+      toEnter.beginScene();
+    }
+    this.enteredScene = toEnter;
   }
   
   

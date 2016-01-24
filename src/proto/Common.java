@@ -29,7 +29,8 @@ public class Common {
       }
       
       void applyEffect(Action use) {
-        return;
+        Scene s = use.acting.scene;
+        if (s.isExitPoint(use.target, use.acting)) s.removePerson(use.acting);
       }
       
       float animDuration() {

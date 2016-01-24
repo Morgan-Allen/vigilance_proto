@@ -17,6 +17,7 @@ public class Scene {
     TILE_SIZE = 64;
   final static int
     STATE_INIT  = -1,
+    STATE_SETUP =  0,
     STATE_BEGUN =  1,
     STATE_WON   =  2,
     STATE_LOST  =  3;
@@ -46,15 +47,6 @@ public class Scene {
   Scene(World world, int size) {
     this.world = world;
     this.size = size;
-    tiles = new Tile[size][size];
-    fog   = new byte[size][size];
-    
-    for (Coord c : Visit.grid(0, 0, size, size, 1)) {
-      Tile t = tiles[c.x][c.y] = new Tile();
-      t.scene = this;
-      t.x = c.x;
-      t.y = c.y;
-    }
   }
   
   
@@ -156,6 +148,15 @@ public class Scene {
   }
   
   
+  boolean isExitPoint(Object point, Person exits) {
+    Tile under = tileUnder(point);
+    if (under == null || exits == null || ! exits.retreating()) return false;
+    if (under.x == 0 || under.x == size - 1) return true;
+    if (under.y == 0 || under.y == size - 1) return true;
+    return false;
+  }
+  
+  
   
   /**  Supplementary population methods for use during initial setup-
     */
@@ -209,6 +210,21 @@ public class Scene {
   
   /**  Regular updates and activity cycle:
     */
+  void setupScene() {
+    this.state = STATE_SETUP;
+    
+    tiles = new Tile[size][size];
+    fog   = new byte[size][size];
+    
+    for (Coord c : Visit.grid(0, 0, size, size, 1)) {
+      Tile t = tiles[c.x][c.y] = new Tile();
+      t.scene = this;
+      t.x = c.x;
+      t.y = c.y;
+    }
+  }
+  
+  
   void beginScene() {
     this.state = STATE_BEGUN;
     
@@ -232,36 +248,6 @@ public class Scene {
   }
   
   
-  Action configAction(Person acting, Tile dest, Object target, Ability used) {
-    
-    if (used == null || acting == null) return null;
-    if (! used.allowsTarget(target)) return null;
-    if (used.requiresSight() && ! acting.canSee(dest)) return null;
-    
-    Tile path[] = null;
-    if (used.ranged()) {
-      path = new Tile[] { acting.location };
-    }
-    else {
-      MoveSearch search = new MoveSearch(acting, acting.location, dest);
-      search.doSearch();
-      if (! search.success()) return null;
-      else path = search.fullPath(Tile.class);
-    }
-    
-    Action newAction = new Action();
-    newAction.acting    = acting;
-    newAction.path      = path;
-    newAction.used      = used;
-    newAction.target    = target;
-    newAction.timeStart = time;
-    newAction.progress  = -1;
-    
-    if (used.costAP(newAction) > acting.currentAP()) return null;
-    return newAction;
-  }
-  
-  
   void queueNextAction(Action action) {
     currentAction = action;
     Person acting = action.acting;
@@ -281,35 +267,50 @@ public class Scene {
       Person acting = action.acting;
       action.used.applyEffect(action);
       acting.location.standing = action.acting;
-      if (acting.currentAP() > 0) return;
+      
+      //  TODO- have a 'wait for next action' phase instead, built into the
+      //  scene's update method.
+      if (acting.currentAP() > 0 && playerTurn) return;
     }
     
-    while (true) {
-      moveSelectionToNextActivePerson();
-      if (playerTurn || selected == null) break;
-      
-      Action picked = selected.selectActionAsAI();
-      if (picked != null) queueNextAction(picked);
-      else {
-        I.say(selected+" could not perform any action!");
-        selected.actionPoints = 0;
-      }
-    }
+    moveToNextPersonsTurn();
   }
   
   
-  void moveSelectionToNextActivePerson() {
+  void moveToNextPersonsTurn() {
+    
     for (int maxTries = 2; maxTries-- > 0;) {
-      
       Series <Person> team = playerTurn ? playerTeam : othersTeam;
       selected = null;
-      for (Person p : team) if (p.currentAP() > 0 && p.conscious()) {
-        selected = p;
-      }
       
       I.say("\n  Trying to find active person from ");
       if (playerTurn) I.add("player team"); else I.add("enemy team");
       I.say("  Active: "+selected);
+      
+      for (Person p : team) {
+        if (p.currentAP() == 0 || ! p.conscious()) continue;
+        
+        if (playerTurn) {
+          I.say("  ACTIVE PC: "+p);
+          selected = p;
+          break;
+        }
+        else {
+          I.say("  FOUND NPC: "+p);
+          Action taken = p.selectActionAsAI();
+          if (taken != null) {
+            I.say(p+" will take action: "+taken.used);
+            queueNextAction(taken);
+            selected = p;
+            break;
+          }
+          else {
+            I.say(p+" could not decide on action.");
+            p.actionPoints = 0;
+            continue;
+          }
+        }
+      }
       
       if (selected == null) {
         I.say("  Will refresh AP and try other team...");
@@ -545,7 +546,11 @@ public class Scene {
     if (hoverT != null) {
       renderAt(hoverT.x, hoverT.y, 1, 1, world.selectCircle, null, g);
       Object hovered = topObjectAt(hoverT);
-      Action action = configAction(selected, hoverT, hovered, activeAbility);
+      
+      Action action = null;
+      if (activeAbility != null) action = activeAbility.configAction(
+        selected, hoverT, hovered, this, null
+      );
       
       if (activeAbility != null && action != null) {
         int costAP = action.used.costAP(action);
@@ -606,7 +611,7 @@ public class Scene {
           s.append("\n  Pass Turn (X)");
           if (world.game.description.isPressed('x')) {
             p.actionPoints = 0;
-            moveSelectionToNextActivePerson();
+            moveToNextPersonsTurn();
           }
         }
         //  TODO:  Allow zooming to and tabbing through party members.

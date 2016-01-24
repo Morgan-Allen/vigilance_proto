@@ -52,7 +52,8 @@ public class UrbanScene extends Scene {
   }
   
   
-  void beginScene() {
+  void setupScene() {
+    super.setupScene();
     
     int cX = (size / 2) - 10, cY = 5;
     
@@ -79,10 +80,11 @@ public class UrbanScene extends Scene {
       addPerson(p, x, y);
     }
     
-    //  TODO:  Add mooks and objectives!  Check for completion!  And add
-    //  effects on crime/trust depending on success/failure/collateral!
-    
-    //  TODO:  Also, some patrol routes for goons would be nice?
+    //  TODO:  Some patrol routes for goons would be nice...?
+  }
+  
+  
+  void beginScene() {
     super.beginScene();
   }
   
