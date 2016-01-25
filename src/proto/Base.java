@@ -5,7 +5,7 @@ import util.*;
 
 
 
-public class Base {
+public class Base implements Session.Saveable {
   
   final static int
     MAX_FACILITIES = 8;
@@ -17,25 +17,41 @@ public class Base {
   
   int currentFunds = 0, income = 0;
   
-  //  TODO:  Introduce facility types!
-  //  Infirmary.      (Allows 2 league members to recover injury faster.)
-  //  Training room.  (Allows 2 league members to gain XP outside missions.)
-  //  Rec hall.       (Allows 2 league members to recover stress faster.)
-  //  Sensor array.   (Increases chance of detecting crises & ground intel.)
-  //  Generator.      (Increases no. of facilities that can be installed.)
-  //  Laboratory.     (Increases chance to analyse clues gathered?)
+  
+  Base() {
+    
+  }
+  
+  
+  public Base(Session s) throws Exception {
+    s.cacheInstance(this);
+    s.loadObjects(roster);
+    
+    for (int n = 0 ; n < MAX_FACILITIES; n++) {
+      facilities[n] = (Facility) s.loadObject();
+      facilityProgress[n] = s.loadFloat();
+    }
+    
+    currentFunds = s.loadInt();
+    income = s.loadInt();
+  }
+  
+  
+  public void saveState(Session s) throws Exception {
+    s.saveObjects(roster);
+
+    for (int n = 0 ; n < MAX_FACILITIES; n++) {
+      s.saveObject(facilities[n]);
+      s.saveFloat(facilityProgress[n]);
+    }
+    
+    s.saveInt(currentFunds);
+    s.saveInt(income);
+  }
   
 }
 
 
-class Facility {
-  
-  int powerCost;
-  
-  
-  
-  
-}
 
 
 

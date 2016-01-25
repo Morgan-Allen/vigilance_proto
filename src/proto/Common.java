@@ -17,7 +17,8 @@ public class Common {
   final static Ability
     
     MOVE = new Ability(
-      "Move", "Move to the chosen point.",
+      "Move", "move_ability",
+      "Move to the chosen point.",
       NONE, 1, NO_HARM, MINOR_POWER
     ) {
       
@@ -39,7 +40,7 @@ public class Common {
     },
     
     STRIKE = new Ability(
-      "Strike",
+      "Strike", "strike_ability",
       "Strike a melee target.  (Deals base of 2-7 damage, scaling with "+
       "strength.)",
       NONE, 1, MINOR_HARM, MINOR_POWER
@@ -60,7 +61,7 @@ public class Common {
     },
     
     BATARANG = new Ability(
-      "Batarang",
+      "Batarang", "batarang_ability",
       "Throw a Batarang for light damage and chance to disarm.",
       IS_RANGED, 1, MINOR_HARM, MINOR_POWER
     ) {
@@ -82,7 +83,7 @@ public class Common {
   
   final static Kind
     NOCTURNE = Kind.ofPerson(
-      "Nocturne", IMG_DIR+"sprite_batman.png",
+      "Nocturne", "hero_kind_nocturne", IMG_DIR+"sprite_batman.png",
       Kind.TYPE_HERO,
       HEALTH, 30 ,
       ARMOUR, 2  ,
@@ -94,7 +95,7 @@ public class Common {
       BATARANG, 1
     ),
     KESTREL  = Kind.ofPerson(
-      "Kestrel", IMG_DIR+"sprite_robin.png",
+      "Kestrel", "hero_kind_kestrel", IMG_DIR+"sprite_robin.png",
       Kind.TYPE_HERO, 
       HEALTH, 20 ,
       ARMOUR, 0  ,
@@ -106,7 +107,7 @@ public class Common {
       BATARANG, 1
     ),
     CORONA   = Kind.ofPerson(
-      "Corona", IMG_DIR+"sprite_superman.png",
+      "Corona", "hero_kind_corona", IMG_DIR+"sprite_superman.png",
       Kind.TYPE_HERO,
       HEALTH, 250,
       ARMOUR, 8  ,
@@ -117,7 +118,7 @@ public class Common {
       MOVE, 1, STRIKE, 1
     ),
     GALATEA  = Kind.ofPerson(
-      "Galatea", IMG_DIR+"sprite_wonder_woman.png",
+      "Galatea", "hero_kind_galatea", IMG_DIR+"sprite_wonder_woman.png",
       Kind.TYPE_HERO,
       HEALTH, 180,
       ARMOUR, 2  ,

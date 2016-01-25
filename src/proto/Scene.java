@@ -8,7 +8,7 @@ import java.awt.Color;
 
 
 
-public class Scene {
+public class Scene implements Session.Saveable {
   
   
   /**  Data fields, constructors and save/load methods-
@@ -32,21 +32,89 @@ public class Scene {
   int state = STATE_INIT;
   
   int size;
-  Tile tiles[][];
-  byte fog[][];
+  int time;
+  Tile tiles[][] = new Tile[0][0];
+  byte fog  [][] = new byte[0][0];
   List <Prop> props = new List();
   List <Person> persons = new List();
-  int time;
   
   boolean playerTurn;
   Person selected;
   Ability activeAbility;
   Action currentAction;
   
+  Tile zoomTile;
+  int zoomX, zoomY;
+  
   
   Scene(World world, int size) {
     this.world = world;
     this.size = size;
+  }
+  
+  
+  public Scene(Session s) throws Exception {
+    s.cacheInstance(this);
+    name       = s.loadString();
+    expireTime = s.loadInt();
+    world      = (World) s.loadObject();
+    site       = (Nation) s.loadObject();
+    s.loadObjects(playerTeam);
+    s.loadObjects(othersTeam);
+    state = s.loadInt();
+    
+    size   = s.loadInt();
+    time   = s.loadInt();
+    int tS = s.loadInt();
+    tiles  = new Tile[tS][tS];
+    fog    = new byte[tS][tS];
+    for (Coord c : Visit.grid(0, 0, tS, tS, 1)) {
+      tiles[c.x][c.y] = (Tile) s.loadObject();
+    }
+    s.loadByteArray(fog);
+    s.loadObjects(props);
+    s.loadObjects(persons);
+    
+    playerTurn    = s.loadBool();
+    selected      = (Person) s.loadObject();
+    activeAbility = (Ability) s.loadObject();
+    currentAction = (Action) s.loadObject();
+    
+    zoomTile = (Tile) s.loadObject();
+    zoomX    = s.loadInt();
+    zoomY    = s.loadInt();
+  }
+  
+  
+  public void saveState(Session s) throws Exception {
+    
+    s.saveString(name);
+    s.saveInt(expireTime);
+    s.saveObject(world);
+    s.saveObject(site);
+    s.saveObjects(playerTeam);
+    s.saveObjects(othersTeam);
+    s.saveInt(state);
+    
+    s.saveInt(size);
+    s.saveInt(time);
+    int tS = tiles.length;
+    s.saveInt(tS);
+    for (Coord c : Visit.grid(0, 0, tS, tS, 1)) {
+      s.saveObject(tiles[c.x][c.y]);
+    }
+    s.saveByteArray(fog);
+    s.saveObjects(props);
+    s.saveObjects(persons);
+    
+    s.saveBool(playerTurn);
+    s.saveObject(selected);
+    s.saveObject(activeAbility);
+    s.saveObject(currentAction);
+    
+    s.saveObject(zoomTile);
+    s.saveInt(zoomX);
+    s.saveInt(zoomY);
   }
   
   
@@ -161,15 +229,13 @@ public class Scene {
   /**  Supplementary population methods for use during initial setup-
     */
   boolean addProp(Kind type, int x, int y) {
-    Prop prop = new Prop();
+    Prop prop = new Prop(type);
     for (Coord c : Visit.grid(x, y, type.wide, type.high, 1)) {
       Tile under = tileAt(c.x, c.y);
       if (under == null) return false;
       else under.prop = prop;
     }
-    prop.kind = type;
     prop.origin = tileAt(x, y);
-    prop.bounds = new Box2D(x, y, type.wide, type.high);
     props.add(prop);
     return true;
   }
@@ -472,9 +538,6 @@ public class Scene {
   
   /**  Graphical/display routines:
     */
-  Tile zoomTile;
-  int zoomX, zoomY;
-  
   void renderTo(Surface surface, Graphics2D g) {
     
     //
@@ -626,6 +689,15 @@ public class Scene {
       }
     }
     
+    //
+    //  General options-
+    s.append("\n");
+    s.append("\n  Save (S)");
+    if (world.game.description.isPressed('s')) try {
+      Session.saveSession(world.savePath, world);
+    }
+    catch (Exception e) { I.report(e); }
+    
     return s.toString();
   }
   
@@ -720,112 +792,5 @@ public class Scene {
     }
   }
 }
-
-
-class Tile {
-  Scene scene;
-  int x, y;
-  
-  Prop prop;
-  Person standing;
-  
-  Object flag;
-  
-  
-  public String toString() {
-    return "Tile at "+x+"|"+y;
-  }
-}
-
-
-class Prop {
-  Kind kind;
-  Tile origin;
-  Box2D bounds;
-  
-  
-  public String toString() {
-    return kind.name;
-  }
-}
-
-
-class Action {
-  
-  Person acting;
-  Tile path[];
-  Ability used;
-  Object target;
-  int timeStart;
-  float progress;
-}
-
-
-class MoveSearch extends Search <Tile> {
-  
-  Person moves;
-  Tile dest;
-  Tile temp[] = new Tile[8];
-  boolean getNear = false;
-  
-  
-  public MoveSearch(Person moves, Tile init, Tile dest) {
-    super(init, -1);
-    this.moves = moves;
-    this.dest = dest;
-    getNear = ! canEnter(dest);
-  }
-  
-  
-  protected Tile[] adjacent(Tile spot) {
-    for (int n : TileConstants.T_INDEX) {
-      temp[n] = dest.scene.tileAt(
-        spot.x + TileConstants.T_X[n],
-        spot.y + TileConstants.T_Y[n]
-      );
-    }
-    return temp;
-  }
-  
-  
-  protected boolean endSearch(Tile best) {
-    if (getNear) return dest.scene.distance(best, dest) < 2;
-    return best == dest;
-  }
-  
-  
-  protected boolean canEnter(Tile spot) {
-    if (spot.scene.blockedAt(spot)) return false;
-    if (spot.standing != null && spot.standing != moves) return false;
-    return true;
-  }
-  
-  
-  protected float cost(Tile prior, Tile spot) {
-    return spot.scene.distance(prior, spot);
-  }
-  
-  
-  protected float estimate(Tile spot) {
-    return dest.scene.distance(spot, dest);
-  }
-  
-  
-  protected void setEntry(Tile spot, Entry flag) {
-    spot.flag = flag;
-  }
-  
-  
-  protected Entry entryFor(Tile spot) {
-    return (Entry) spot.flag;
-  }
-}
-
-
-
-
-
-
-
 
 

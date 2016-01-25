@@ -8,7 +8,10 @@ import javax.imageio.ImageIO;
 
 
 
-public class Kind {
+public class Kind extends Index.Entry implements Session.Saveable {
+  
+  
+  final static Index <Kind> INDEX = new Index <Kind> ();
 
   final public static int
     TYPE_PROP     = 0,
@@ -21,7 +24,6 @@ public class Kind {
   Image sprite;
   
   int type;
-  
   int wide, high;
   boolean blockSight;
   boolean blockPath;
@@ -30,11 +32,28 @@ public class Kind {
   Integer baseAbilityLevels[] = new Integer[0];
   
   
+  Kind(String uniqueID) {
+    super(INDEX, uniqueID);
+  }
+  
+  
+  public static Kind loadConstant(Session s) throws Exception {
+    return INDEX.loadEntry(s.input());
+  }
+  
+  
+  public void saveState(Session s) throws Exception {
+    INDEX.saveEntry(this, s.output());
+  }
+  
+  
+  
+  
   static Kind ofPerson(
-    String name, String spritePath,
+    String name, String ID, String spritePath,
     int type, Object... initStats
   ) {
-    Kind k = new Kind();
+    Kind k = new Kind(ID);
     k.type = type;
     k.wide = k.high = 1;
     k.blockPath = k.blockSight = false;
@@ -67,10 +86,10 @@ public class Kind {
   
   
   static Kind ofProp(
-    String name, String spritePath,
+    String name, String ID, String spritePath,
     int wide, int high, boolean blockPath, boolean blockSight
   ) {
-    Kind k = new Kind();
+    Kind k = new Kind(ID);
     k.type = TYPE_PROP;
     k.wide = wide;
     k.high = high;

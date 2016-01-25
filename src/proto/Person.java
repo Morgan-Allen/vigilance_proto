@@ -5,23 +5,23 @@ import util.*;
 
 
 
-public class Person {
+public class Person implements Session.Saveable {
   
   
   /**  Data fields and construction-
     */
   static class Stat extends Ability {
-    public Stat(String name, String description) {
-      super(name, description, IS_PASSIVE, 0, NO_HARM, MINOR_POWER);
+    public Stat(String name, String ID, String description) {
+      super(name, ID, description, IS_PASSIVE, 0, NO_HARM, MINOR_POWER);
     }
   }
   final static Stat
-    HEALTH = new Stat("Health", ""),
-    ARMOUR = new Stat("Armour", ""),
-    MUSCLE = new Stat("Muscle", ""),
-    BRAIN  = new Stat("Brain" , ""),
-    SPEED  = new Stat("Speed" , ""),
-    SIGHT  = new Stat("Sight" , "");
+    HEALTH = new Stat("Health", "health_stat", ""),
+    ARMOUR = new Stat("Armour", "armour_stat", ""),
+    MUSCLE = new Stat("Muscle", "muscle_stat", ""),
+    BRAIN  = new Stat("Brain" , "brain_stat" , ""),
+    SPEED  = new Stat("Speed" , "speed_stat" , ""),
+    SIGHT  = new Stat("Sight" , "sight_stat" , "");
   final static int
     STATE_INIT    = -1,
     STATE_AS_PC   =  0,
@@ -64,6 +64,56 @@ public class Person {
     }
     alive = conscious = true;
   }
+  
+  
+  public Person(Session s) throws Exception {
+    s.cacheInstance(this);
+    kind    = (Kind) s.loadObject();
+    name    = s.loadString();
+    AIstate = s.loadInt();
+    luck    = s.loadInt();
+    stress  = s.loadInt();
+    
+    s.loadObjects(abilities);
+    s.loadTally(abilityLevels);
+    
+    injury    = s.loadFloat();
+    fatigue   = s.loadFloat();
+    alive     = s.loadBool();
+    conscious = s.loadBool();
+    
+    scene        = (Scene) s.loadObject();
+    location     = (Tile) s.loadObject();
+    posX         = s.loadFloat();
+    posY         = s.loadFloat();
+    actionPoints = s.loadInt();
+    lastAction   = (Action) s.loadObject();
+  }
+  
+  
+  public void saveState(Session s) throws Exception {
+    s.saveObject(kind);
+    s.saveString(name);
+    s.saveInt(AIstate);
+    s.saveInt(luck);
+    s.saveInt(stress);
+    
+    s.saveObjects(abilities);
+    s.saveTally(abilityLevels);
+    
+    s.saveFloat(injury);
+    s.saveFloat(fatigue);
+    s.saveBool(alive);
+    s.saveBool(conscious);
+    
+    s.saveObject(scene);
+    s.saveObject(location);
+    s.saveFloat(posX);
+    s.saveFloat(posY);
+    s.saveInt(actionPoints);
+    s.saveObject(lastAction);
+  }
+  
   
   
   /**  Stat interactions/adjustments-
@@ -200,7 +250,7 @@ public class Person {
     
     for (Person p : scene.persons) for (Ability a : abilities) {
       Action use = a.configAction(this, p.location, p, scene, null);
-      if (use != null) pick.compare(use, a.rateUsage(use));
+      if (use != null) pick.compare(use, a.rateUsage(use) * Rand.avgNums(2));
     }
     
     if (pick.empty()) {

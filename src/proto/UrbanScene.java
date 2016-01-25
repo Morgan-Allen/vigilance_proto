@@ -13,29 +13,29 @@ public class UrbanScene extends Scene {
   final static String IMG_DIR = "media assets/bar scene/";
   final static Kind
     KIND_WALL = Kind.ofProp(
-      "Wall", IMG_DIR+"sprite_wall.png",
+      "Wall", "prop_wall_urban", IMG_DIR+"sprite_wall.png",
       1, 1, true, true
     ),
     KIND_FLOOR = Kind.ofProp(
-      "Floor", IMG_DIR+"sprite_floor.png",
+      "Floor", "prop_floor_urban", IMG_DIR+"sprite_floor.png",
       1, 1, false, false
     ),
     KIND_DOOR = Kind.ofProp(
-      "Door", IMG_DIR+"sprite_door.png",
+      "Door", "prop_door_urban", IMG_DIR+"sprite_door.png",
       1, 1, false, true
     ),
     KIND_WINDOW = Kind.ofProp(
-      "Window", IMG_DIR+"sprite_window.png",
+      "Window", "prop_window_urban", IMG_DIR+"sprite_window.png",
       1, 1, true, false
     ),
     KIND_POOL_TABLE = Kind.ofProp(
-      "Pool Table", IMG_DIR+"sprite_pool_table.png",
+      "Pool Table", "prop_pool_table_urban", IMG_DIR+"sprite_pool_table.png",
       3, 2, true, false
     );
   
   final static Kind
     KIND_GOON = Kind.ofPerson(
-      "Goon", IMG_DIR+"sprite_big_goon.png",
+      "Goon", "prop_goon_urban", IMG_DIR+"sprite_big_goon.png",
       Kind.TYPE_MOOK,
       HEALTH, 20 ,
       ARMOUR, 0  ,
@@ -50,6 +50,18 @@ public class UrbanScene extends Scene {
   public UrbanScene(World world, int size) {
     super(world, size);
   }
+  
+  
+  public UrbanScene(Session s) throws Exception {
+    super(s);
+  }
+  
+  
+  public void saveState(Session s) throws Exception {
+    super.saveState(s);
+  }
+  
+  
   
   
   void setupScene() {

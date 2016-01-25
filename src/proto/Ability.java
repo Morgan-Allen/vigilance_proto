@@ -1,16 +1,19 @@
 
 
 package proto;
-
+import util.*;
 import java.awt.Graphics2D;
 import java.awt.Image;
 
 
-public abstract class Ability {
+
+public abstract class Ability extends Index.Entry implements Session.Saveable {
 
   
   /**  Data fields, construction and save/load methods-
     */
+  final static Index <Ability> INDEX = new Index <Ability> ();
+  
   final static int
     NONE          = 0,
     IS_RANGED     = 1,
@@ -37,10 +40,11 @@ public abstract class Ability {
   
   
   Ability(
-    String name, String description,
+    String name, String uniqueID, String description,
     int properties, int costAP,
     float harmLevel, float powerLevel
   ) {
+    super(INDEX, uniqueID);
     this.name        = name;
     this.description = description;
     this.properties  = properties;
@@ -48,6 +52,18 @@ public abstract class Ability {
     this.harmLevel   = harmLevel;
     this.powerLevel  = powerLevel;
   }
+  
+  
+  public static Ability loadConstant(Session s) throws Exception {
+    return INDEX.loadEntry(s.input());
+  }
+  
+  
+  public void saveState(Session s) throws Exception {
+    INDEX.saveEntry(this, s.output());
+  }
+  
+  
   
   
   boolean hasProperty(int p) {

@@ -15,6 +15,8 @@ public class RunGame extends JFrame implements ActionListener {
   
   final public static int
     FRAME_RATE = 25;
+  final public static String
+    DEFAULT_SAVE_PATH = "saves/main_save.vgl";
   
   
   public static void main(String[] args) {
@@ -27,21 +29,50 @@ public class RunGame extends JFrame implements ActionListener {
   }
   
   
+  public static boolean onMainThread() {
+    //  Filler method- replace later!
+    return true;
+  }
+  
+  
+  public static boolean mainThreadBegun() {
+    //  Filler method- replace later!
+    return true;
+  }
+  
+  
   Surface surface;
   Description description;
   World world;
   
   
   public RunGame() {
+    setupAssets();
     setupWorld();
     initUI();
   }
   
   
+  private void setupAssets() {
+    //  TODO:  Throw up a loading screen?
+    Assets.compileAssetList("proto");
+    Assets.advanceAssetLoading(-1);
+  }
+  
+  
   private void setupWorld() {
-    this.world = new World(this);
-    world.initDefaultNations();
-    world.initDefaultBase();
+    
+    if (Assets.exists(DEFAULT_SAVE_PATH)) {
+      Session s = Session.loadSession(DEFAULT_SAVE_PATH, true);
+      this.world = (World) s.loaded()[0];
+      world.game = this;
+      world.savePath = DEFAULT_SAVE_PATH;
+    }
+    else {
+      this.world = new World(this, DEFAULT_SAVE_PATH);
+      world.initDefaultNations();
+      world.initDefaultBase();
+    }
     
     Timer timer = new Timer(1000 / FRAME_RATE, this);
     timer.start();
@@ -49,7 +80,6 @@ public class RunGame extends JFrame implements ActionListener {
   
   
   private void initUI() {
-    
     this.setLayout(new BorderLayout());
     add(this.surface     = new Surface    (this), BorderLayout.CENTER);
     add(this.description = new Description(this), BorderLayout.EAST  );
