@@ -38,7 +38,9 @@ public class I {
   static {
     
     final java.net.URL toThis = I.class.getResource("I.class");
-    final boolean isJar = toThis.toString().startsWith("jar:");
+    final boolean isJar =
+      toThis.toString().startsWith("jar:" ) ||
+      toThis.toString().startsWith("rsrc:");
     AM_INSIDE_JAR = isJar;
     WRITE_TO_LOG  = isJar;
     

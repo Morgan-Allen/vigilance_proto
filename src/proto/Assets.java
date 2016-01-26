@@ -12,16 +12,16 @@ import java.security.CodeSource;
 
 
 
-//  TODO:  try using an Index for these?
-
 public class Assets {
   
   
   final static boolean EXCLUDE_BASE_DIR = false;
+  //  TODO:  TEMPORARY HACK BELOW, REMOVE!
+  final static String DEFAULT_JAR_NAME = "Vigilance_JAR.jar";
   final public static char REP_SEP = '/';
   private static boolean
-    callsVerbose = false,
-    extraVerbose = false;
+    callsVerbose = true ,
+    extraVerbose = true ;
   
   
   public static abstract class Loadable {
@@ -462,6 +462,7 @@ public class Assets {
     }
     
     String jarPath = code.getLocation().getFile();
+    if (jarPath.length() <= 2) jarPath = DEFAULT_JAR_NAME;
     //  NOTE:  CLASSES WILL NOT BE REGISTERED UNDER OSX FILEPATHS WITH SPACES
     //  UNLESS THIS SUBSTITUTION IS PERFORMED.  DO NOT DELETE.
     jarPath = jarPath.replace("%20", " ");
