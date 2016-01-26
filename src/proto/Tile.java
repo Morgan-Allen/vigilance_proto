@@ -60,7 +60,11 @@ public class Tile implements Session.Saveable {
   
   public boolean blocked() {
     if (prop != null && prop.kind.blockPath) return true;
-    if (standing != null && standing.conscious()) return true;
+    if (standing != null) return true;
+    
+    //  TODO:  ALLOW UNCONSCIOUS PERSONS TO NOT BLOCK PATHING- BUT FOR THAT TO
+    //  WORK YOU'LL NEED TO ALLOW MULTIPLE OBJECTS IN THE SAME TILE.?
+    
     return false;
   }
   
