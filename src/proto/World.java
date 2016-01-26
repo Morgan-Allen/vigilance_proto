@@ -94,6 +94,12 @@ public class World implements Session.Saveable {
   }
   
   
+  public void reloadFromSave() {
+    if (game == null || savePath == null) return;
+    game.attemptReload(savePath);
+  }
+  
+  
   
   /**  General query methods-
     */

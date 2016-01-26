@@ -388,8 +388,9 @@ public class WorldView {
       s.append("\n  Press M to pause monitoring.");
       if (print.isPressed('m')) world.stopMonitoring();
     }
-    s.append("\n  Press S to save.");
+    s.append("\n  Press S to save, R to reload.");
     if (print.isPressed('s')) world.performSave();
+    if (print.isPressed('r')) world.reloadFromSave();
     
     return s.toString();
   }

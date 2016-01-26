@@ -32,32 +32,37 @@ public class SceneView {
   
   
   public void loadState(Session s) throws Exception {
-    zoomTile = (Tile) s.loadObject();
-    zoomX    = s.loadInt();
-    zoomY    = s.loadInt();
-    selected = (Person) s.loadObject();
+    zoomTile      = (Tile) s.loadObject();
+    zoomX         = s.loadInt();
+    zoomY         = s.loadInt();
+    selected      = (Person) s.loadObject();
     activeAbility = (Ability) s.loadObject();
   }
   
   
   public void saveState(Session s) throws Exception {
     s.saveObject(zoomTile);
-    s.saveInt(zoomX);
-    s.saveInt(zoomY);
+    s.saveInt   (zoomX);
+    s.saveInt   (zoomY);
     s.saveObject(selected);
     s.saveObject(activeAbility);
   }
   
   
-  public void setViewpoint(Tile t) {
+  public void setZoomPoint(Tile t) {
     this.zoomTile = t;
   }
   
   
-  public void setSelection(Person acting, Ability ability) {
+  public void setSelection(Person acting, boolean keepActiveAbility) {
+    final Person old = selected;
     this.selected = acting;
+    if (acting != old || ! keepActiveAbility) this.activeAbility = null;
+  }
+  
+  
+  public void setActiveAbility(Ability ability) {
     this.activeAbility = ability;
-    if (acting != null) this.zoomTile = acting.location();
   }
   
 
@@ -86,18 +91,22 @@ public class SceneView {
     }
     for (Person p : scene.persons()) if (scene.fogAt(p.location()) > 0) {
       
-      Color teamColor = Color.GREEN;
-      if (p.isHero()) teamColor = Color.BLUE;
+      Color               teamColor = Color.GREEN;
+      if (p.isHero    ()) teamColor = Color.BLUE;
       if (p.isCriminal()) teamColor = Color.RED;
-
-      Vec3D pos = p.exactPosition();
-      float maxHealth = p.maxHealth();
-      float tireLevel = 1f - (p.injury() / maxHealth);
+      Vec3D pos         = p.exactPosition();
+      float maxHealth   = p.maxHealth();
+      float tireLevel   = 1f - (p.injury() / maxHealth);
       float healthLevel = 1f - ((p.injury() + p.fatigue()) / maxHealth);
+      
       renderAt(pos.x, pos.y + 0.9f, 1, 0.1f, null, Color.BLACK, g);
       renderAt(pos.x, pos.y + 0.9f, tireLevel, 0.1f, null, Color.WHITE, g);
       renderAt(pos.x, pos.y + 0.9f, healthLevel, 0.1f, null, teamColor, g);
       renderString(pos.x, pos.y + 0.5f, p.name(), Color.WHITE, g);
+      
+      if (p == selected) {
+        renderAt(pos.x, pos.y, 1, 1, hoverBox, null, g);
+      }
     }
     if (done != null && done.progress() >= 0) {
       done.used.renderMissile(done, scene, g);
@@ -150,8 +159,8 @@ public class SceneView {
       else if (surface.mouseClicked) {
         Person pickP = null;
         if (hovered instanceof Person) pickP = (Person) hovered;
-        if (pickP != null) selected = pickP;
-        else zoomTile = hoverT;
+        if (pickP != null) setSelection(pickP, true);
+        else setZoomPoint(hoverT);
       }
     }
   }
@@ -159,11 +168,11 @@ public class SceneView {
   
   String description() {
     final StringBuffer s = new StringBuffer();
-    final Person p = selected;
-    final Ability a = activeAbility;
-    final World world = scene.world();
-    final Action action = scene.currentAction();
-    final Printout print = world.game().print();
+    final Person   p      = selected;
+    final Ability  a      = activeAbility;
+    final World    world  = scene.world();
+    final Action   action = scene.currentAction();
+    final Printout print  = world.game().print();
     
     if (scene.finished()) {
       describeEndSummary(s);
@@ -180,19 +189,27 @@ public class SceneView {
       if (! p.alive()) s.append("\n  Dead");
       else if (! p.conscious()) s.append("\n  Unconscious");
       
+      Series <Equipped> equipped = p.equipment();
+      if (equipped.size() > 0) {
+        s.append("\n  Equipment:");
+        for (Equipped e : equipped) s.append(" "+e.name);
+      }
+      
       boolean canCommand =
         action == null && p.isPlayerOwned() && p.canTakeAction()
       ;
       if (canCommand) {
         s.append("\n\n  Abilities (Press 1-9):");
         char key = '1';
-        for (Ability r : p.abilities()) if (! r.passive()) {
+        for (Ability r : p.abilities())  {
+          if (r.passive()) continue;
           s.append("\n    "+r.name());
           
           boolean canUse = r.minCostAP() <= p.currentAP();
           if (canUse) s.append(" ("+key+") AP: "+r.minCostAP());
           if (print.isPressed(key) && canUse) {
-            setSelection(p, r);
+            setSelection(p, false);
+            setActiveAbility(r);
           }
           key++;
         }
@@ -209,7 +226,7 @@ public class SceneView {
           s.append("\n  Select target");
           s.append("\n  Cancel (X)");
           if (print.isPressed('x')) {
-            setSelection(p, null);
+            setSelection(p, false);
           }
         }
       }
@@ -218,8 +235,9 @@ public class SceneView {
     //
     //  General options-
     s.append("\n");
-    s.append("\n  Save (S)");
+    s.append("\n  Press S to save, R to reload.");
     if (print.isPressed('s')) world.performSave();
+    if (print.isPressed('r')) world.reloadFromSave();
     
     return s.toString();
   }
@@ -319,3 +337,5 @@ public class SceneView {
     }
   }
 }
+
+

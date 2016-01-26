@@ -15,10 +15,11 @@ public abstract class Ability extends Index.Entry implements Session.Saveable {
   final static Index <Ability> INDEX = new Index <Ability> ();
   
   final static int
-    NONE          = 0,
-    IS_RANGED     = 1,
-    IS_PASSIVE    = 2,
-    NO_NEED_SIGHT = 3;
+    NONE          = 0     ,
+    IS_RANGED     = 1 << 0,
+    IS_PASSIVE    = 1 << 1,
+    NO_NEED_SIGHT = 1 << 2,
+    IS_EQUIPPED   = 1 << 3;
   final static float
     MAJOR_HELP = -2.0f,
     REAL_HELP  = -1.0f,
@@ -102,31 +103,13 @@ public abstract class Ability extends Index.Entry implements Session.Saveable {
   }
   
   
-  public boolean allowsTarget(Object target) {
+  public boolean allowsTarget(Object target, Scene scene, Person acting) {
     return false;
   }
   
   
-  public void applyEffect(Action use) {
-    return;
-  }
-  
-  
-  public float rateUsage(Action use) {
-    Person acts = use.acting;
-    float rating = 1, relation = 0;
-    
-    if (use.target instanceof Person) {
-      Person other = (Person) use.target;
-      if (other.isAlly (acts)) relation =  1;
-      if (other.isEnemy(acts)) relation = -1;
-    }
-    rating = harmLevel * relation * -1 * powerLevel;
-    
-    Tile at = acts.currentScene().tileUnder(use.target);
-    rating *= 10f / (10 + at.scene.distance(acts.location, at));
-    
-    return rating;
+  public int maxRange() {
+    return -1;
   }
   
   
@@ -137,8 +120,12 @@ public abstract class Ability extends Index.Entry implements Session.Saveable {
     Person acting, Tile dest, Object target,
     Scene scene, Tile pathToTake[]
   ) {
-    if (acting == null || ! allowsTarget(target)) return null;
+    if (acting == null || ! allowsTarget(target, scene, acting)) return null;
     if (requiresSight() && ! acting.canSee(dest)) return null;
+    
+    final float range = scene.distance(acting.location, dest);
+    final int maxRange = maxRange();
+    if (maxRange > 0 && range > maxRange) return null;
     
     Tile path[] = null;
     if (pathToTake != null) {
@@ -184,6 +171,29 @@ public abstract class Ability extends Index.Entry implements Session.Saveable {
   }
   
   
+  public float rateUsage(Action use) {
+    Person acts = use.acting;
+    float rating = 1, relation = 0;
+    
+    if (use.target instanceof Person) {
+      Person other = (Person) use.target;
+      if (other.isAlly (acts)) relation =  1;
+      if (other.isEnemy(acts)) relation = -1;
+    }
+    rating = harmLevel * relation * -1 * powerLevel;
+    
+    Tile at = acts.currentScene().tileUnder(use.target);
+    rating *= 10f / (10 + at.scene.distance(acts.location, at));
+    
+    return rating;
+  }
+  
+  
+  public void applyEffect(Action use) {
+    return;
+  }
+  
+  
   
   /**  Rendering, interface and debug methods-
     */
@@ -198,7 +208,7 @@ public abstract class Ability extends Index.Entry implements Session.Saveable {
   
   
   float animDuration() {
-    return 0.5f;
+    return 0.25f;
   }
   
   

@@ -39,6 +39,11 @@ public class Person implements Session.Saveable {
     WEEK_STRESS_DECAY = 2   ,
     WEEK_TRAINING_XP  = 250 ,
     MIN_LEVEL_XP      = 1000;
+  final static int
+    SLOT_WEAPON = 0,
+    SLOT_ARMOUR = 1,
+    SLOT_ITEMS  = 2,
+    NUM_EQUIP_SLOTS = 4;
   
   
   Kind kind;
@@ -49,6 +54,7 @@ public class Person implements Session.Saveable {
   
   List <Ability> abilities = new List();
   Tally <Ability> abilityLevels = new Tally();
+  Equipped equipSlots[] = new Equipped[NUM_EQUIP_SLOTS];
   
   float injury, fatigue;
   boolean alive, conscious;
@@ -69,6 +75,9 @@ public class Person implements Session.Saveable {
       abilities.add(a);
       abilityLevels.set(a, kind.baseAbilityLevels[n]);
     }
+    for (int n = 0; n < kind.baseEquipment.length; n++) {
+      equipItem(kind.baseEquipment[n]);
+    }
     alive = conscious = true;
   }
   
@@ -85,6 +94,9 @@ public class Person implements Session.Saveable {
     
     s.loadObjects(abilities);
     s.loadTally(abilityLevels);
+    for (int i = 0 ; i < NUM_EQUIP_SLOTS; i++) {
+      equipSlots[i] = (Equipped) s.loadObject();
+    }
     
     injury    = s.loadFloat();
     fatigue   = s.loadFloat();
@@ -110,6 +122,9 @@ public class Person implements Session.Saveable {
     
     s.saveObjects(abilities);
     s.saveTally(abilityLevels);
+    for (int i = 0 ; i < NUM_EQUIP_SLOTS; i++) {
+      s.saveObject(equipSlots[i]);
+    }
     
     s.saveFloat(injury);
     s.saveFloat(fatigue);
@@ -226,6 +241,56 @@ public class Person implements Session.Saveable {
   public Vec3D exactPosition() {
     return new Vec3D(posX, posY, 0);
   }
+  
+  
+  public void setExactPosition(float x, float y, float z, Scene scene) {
+    final Tile oldLoc = location;
+    posX = x;
+    posY = y;
+    location = scene.tileAt((int) (x + 0.5f), (int) (y + 0.5f));
+    if (oldLoc != location) {
+      if (oldLoc   != null) oldLoc  .standing = null;
+      if (location != null) location.standing = this;
+    }
+  }
+  
+  
+  
+  /**  Assigning equipment loadout-
+    */
+  public void equipItem(Equipped item) {
+    equipSlots[item.slotID] = item;
+  }
+  
+  
+  public void emptyEquipSlot(int slotID) {
+    equipSlots[slotID] = null;
+  }
+  
+  
+  public int equipmentBonus(int slotID, int properties) {
+    Equipped item = equipSlots[slotID];
+    if (item == null || ! item.hasProperty(properties)) return 0;
+    return item.bonus;
+  }
+  
+  
+  public Equipped equippedInSlot(int slotID) {
+    return equipSlots[slotID];
+  }
+  
+  
+  public boolean hasEquipped(int slotID) {
+    return equipSlots[slotID] != null;
+  }
+  
+  
+  public Series <Equipped> equipment() {
+    Batch <Equipped> all = new Batch();
+    for (Equipped e : equipSlots) if (e != null) all.add(e);
+    return all;
+  }
+  
   
   
   

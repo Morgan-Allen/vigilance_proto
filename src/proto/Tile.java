@@ -1,6 +1,7 @@
 
 
 package proto;
+import static util.TileConstants.*;
 
 
 
@@ -57,7 +58,20 @@ public class Tile implements Session.Saveable {
   }
   
   
+  public boolean blocked() {
+    if (prop != null && prop.kind.blockPath) return true;
+    if (standing != null && standing.conscious()) return true;
+    return false;
+  }
   
+  
+  public Tile[] tilesAdjacent() {
+    final Tile t[] = new Tile[T_INDEX.length];
+    for (int n : T_INDEX) {
+      t[n] = scene.tileAt(x + T_X[n], y + T_Y[n]);
+    }
+    return t;
+  }
   
   
   

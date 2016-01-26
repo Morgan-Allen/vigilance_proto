@@ -28,8 +28,9 @@ public class Kind extends Index.Entry implements Session.Saveable {
   boolean blockSight;
   boolean blockPath;
   
-  Ability baseAbilities[] = new Ability[0];
-  Integer baseAbilityLevels[] = new Integer[0];
+  Ability  baseAbilities    [] = new Ability [0];
+  Integer  baseAbilityLevels[] = new Integer [0];
+  Equipped baseEquipment    [] = new Equipped[0];
   
   
   Kind(String uniqueID) {
@@ -65,8 +66,9 @@ public class Kind extends Index.Entry implements Session.Saveable {
     k.wide = k.high = 1;
     k.blockPath = k.blockSight = false;
     
-    Batch <Ability> allA = new Batch();
-    Batch <Integer> allL = new Batch();
+    Batch <Ability > allA = new Batch();
+    Batch <Integer > allL = new Batch();
+    Batch <Equipped> allE = new Batch();
     Ability readA = null;
     Integer readL = null;
     for (Object o : initStats) {
@@ -76,6 +78,9 @@ public class Kind extends Index.Entry implements Session.Saveable {
       if (o instanceof Integer) {
         readL = (Integer) o;
       }
+      if (o instanceof Equipped) {
+        allE.add((Equipped) o);
+      }
       if (readA != null && readL != null) {
         allA.add(readA);
         allL.add(readL);
@@ -83,8 +88,9 @@ public class Kind extends Index.Entry implements Session.Saveable {
         readL = null;
       }
     }
-    k.baseAbilities     = allA.toArray(Ability.class);
-    k.baseAbilityLevels = allL.toArray(Integer.class);
+    k.baseAbilities     = allA.toArray(Ability .class);
+    k.baseAbilityLevels = allL.toArray(Integer .class);
+    k.baseEquipment     = allE.toArray(Equipped.class);
     
     k.name = name;
     k.sprite = loadImage(spritePath);

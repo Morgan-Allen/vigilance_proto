@@ -278,10 +278,7 @@ public class Scene implements Session.Saveable, Assignment {
     Tile location = tileAt(x, y);
     if (location == null) return false;
     p.setAssignment(this);
-    p.location = location;
-    p.posX     = x;
-    p.posY     = y;
-    p.location.standing = p;
+    p.setExactPosition(x, y, 0, this);
     p.actionPoints = p.maxAP();
     persons.add(p);
     if (! playerTeam.includes(p)) othersTeam.add(p);
@@ -335,12 +332,13 @@ public class Scene implements Session.Saveable, Assignment {
     
     int numT = playerTeam.size();
     int x = (size - numT) / 2, y = 0;
-    view.setViewpoint(tileAt(x, y));
+    view.setZoomPoint(tileAt(x, y));
     for (Person p : playerTeam) {
       addPerson(p, x, y);
       x += 1;
     }
     nextActing = playerTeam.first();
+    view.setSelection(nextActing, false);
     playerTurn = true;
     
     updateFog();
@@ -350,8 +348,8 @@ public class Scene implements Session.Saveable, Assignment {
   public void queueNextAction(Action action) {
     currentAction = action;
     Person acting = action.acting;
+    nextActing = acting;
     acting.actionPoints -= action.used.costAP(action);
-    acting.location.standing = null;
     I.say(acting+" using "+action.used+" on "+action.target);
   }
   
@@ -360,26 +358,25 @@ public class Scene implements Session.Saveable, Assignment {
     I.say("Action completed: "+action.used);
     I.say("  Player's turn? "+playerTurn);
     
+    Person acting = action.acting;
+    action.used.applyEffect(action);
     this.currentAction = null;
-    view.setSelection(nextActing, null);
+    view.setSelection(acting, false);
     
-    if (action != null) {
-      Person acting = action.acting;
-      action.used.applyEffect(action);
-      acting.location.standing = action.acting;
-      
-      //  TODO- have a 'wait for next action' phase instead, built into the
-      //  scene's update method.
-      if (acting.currentAP() > 0 && playerTurn) return;
+    //  TODO- have a 'wait for next action' phase instead, built into the
+    //  scene's update method?
+    if (! (acting.canTakeAction() && playerTurn)) {
+      moveToNextPersonsTurn();
     }
-    
-    moveToNextPersonsTurn();
+    else {
+      I.say(acting+" not finished turn yet...");
+    }
   }
   
   
   public void moveToNextPersonsTurn() {
-    
-    for (int maxTries = 2; maxTries-- > 0;) {
+    final int numTeams = 2;
+    for (int maxTries = numTeams + 1; maxTries-- > 0;) {
       Series <Person> team = playerTurn ? playerTeam : othersTeam;
       nextActing = null;
       
@@ -422,35 +419,12 @@ public class Scene implements Session.Saveable, Assignment {
       }
       else {
         I.say("  Will zoom to "+nextActing);
-        view.setSelection(nextActing, null);
+        view.setSelection(nextActing, false);
+        view.setZoomPoint(nextActing.location);
         return;
       }
     }
     I.say("\nWARNING- COULD NOT FIND NEXT ACTIVE PERSON!");
-  }
-  
-  
-  void updateFog() {
-    for (Coord c : Visit.grid(0, 0, size, size, 1)) {
-      fog[c.x][c.y] = 0;
-    }
-    for (Person p : playerTeam) {
-      final int radius = p.sightRange();
-      
-      for (Coord c : Visit.grid(
-        p.location.x - radius,
-        p.location.y - radius,
-        radius * 2, radius * 2, 1
-      )) {
-        Tile t = tileAt(c.x, c.y);
-        if (t == null) continue;
-        float dist = distance(t, p.location);
-        if (dist >= radius) continue;
-        byte val = (byte) (100 * Nums.clamp(1.5f - (dist / radius), 0, 1));
-        val *= degreeOfSight(p.location, t, p);
-        fog[t.x][t.y] = (byte) Nums.max(val, fog[t.x][t.y]);
-      }
-    }
   }
   
   
@@ -462,23 +436,28 @@ public class Scene implements Session.Saveable, Assignment {
       time++;
       
       int elapsed = time - a.timeStart;
-      float timeSteps = elapsed * 2f / RunGame.FRAME_RATE;
+      float moveRate = 4;
+      float timeSteps = elapsed * moveRate / RunGame.FRAME_RATE;
       
-      float alpha = timeSteps % 1, extraTime = a.used.animDuration();
-      Tile l = a.path[Nums.clamp((int) timeSteps      , a.path.length)];
+      float alpha = timeSteps % 1;
+      Tile l = a.path[Nums.clamp((int)  timeSteps     , a.path.length)];
       Tile n = a.path[Nums.clamp((int) (timeSteps + 1), a.path.length)];
       
-      p.posX = (alpha * n.x) + ((1 - alpha) * l.x);
-      p.posY = (alpha * n.y) + ((1 - alpha) * l.y);
-      p.location = this.tileAt((int) (p.posX + 0.5f), (int) (p.posY + 0.5f));
+      Tile oldLoc = p.location;
+      p.setExactPosition(
+        (alpha * n.x) + ((1 - alpha) * l.x),
+        (alpha * n.y) + ((1 - alpha) * l.y),
+        0, this
+      );
+      if (p.location != oldLoc) updateFog();
       
       if (timeSteps > a.path.length) {
-        a.progress = (timeSteps - a.path.length) / extraTime;
+        float extraTime = a.used.animDuration();
+        a.progress = (timeSteps - a.path.length) / (extraTime * moveRate);
       }
-      if (timeSteps > a.path.length + extraTime) {
+      if (a.progress >= 1) {
         onCompletion(a);
       }
-      updateFog();
     }
     
     int nextState = checkCompletionStatus();
@@ -492,6 +471,38 @@ public class Scene implements Session.Saveable, Assignment {
   public void endScene() {
     for (Person p : persons) removePerson(p);
     world.exitFromMission(this);
+  }
+  
+
+  
+  /**  Fog and visibility updates-
+    */
+  void updateFog() {
+    for (Coord c : Visit.grid(0, 0, size, size, 1)) {
+      fog[c.x][c.y] = 0;
+    }
+    for (Person p : playerTeam) {
+      final int radius = p.sightRange();
+      liftFogAround(p.location, radius, p, true);
+    }
+  }
+  
+  
+  public void liftFogAround(
+    Tile point, int radius, Person looks, boolean checkSight
+  ) {
+    for (Coord c : Visit.grid(
+      point.x - radius, point.y - radius,
+      radius * 2      , radius * 2      , 1
+    )) {
+      Tile t = tileAt(c.x, c.y);
+      if (t == null) continue;
+      float dist = distance(t, point);
+      if (dist >= radius) continue;
+      byte val = (byte) (100 * Nums.clamp(1.5f - (dist / radius), 0, 1));
+      if (checkSight) val *= degreeOfSight(point, t, looks);
+      fog[t.x][t.y] = (byte) Nums.max(val, fog[t.x][t.y]);
+    }
   }
   
   

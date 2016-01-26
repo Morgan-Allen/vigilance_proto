@@ -39,8 +39,8 @@ public class MoveSearch extends Search <Tile> {
   
   
   protected boolean canEnter(Tile spot) {
-    if (spot.scene.blockedAt(spot)) return false;
-    if (spot.standing != null && spot.standing != moves) return false;
+    if (spot == moves.location) return true;
+    if (spot.blocked()) return false;
     return true;
   }
   

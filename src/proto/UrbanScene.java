@@ -3,6 +3,7 @@
 package proto;
 import static proto.Common.*;
 import static proto.Person.*;
+import static proto.Equipped.*;
 import util.*;
 
 
@@ -33,6 +34,15 @@ public class UrbanScene extends Scene {
       3, 2, true, false
     );
   
+  
+  final static Equipped
+    BASEBALL_BAT = new Equipped(
+      "Baseball bat", "item_baseball_bat",
+      "A simple, sturdy wooden bat.  +5 damage bonus.",
+      Person.SLOT_WEAPON, 0,
+      IS_WEAPON | IS_MELEE, 5
+    );
+  
   final static Kind
     KIND_GOON = Kind.ofPerson(
       "Goon", "prop_goon_urban", IMG_DIR+"sprite_big_goon.png",
@@ -43,7 +53,7 @@ public class UrbanScene extends Scene {
       BRAIN , 6  ,
       SPEED , 10 ,
       SIGHT , 6  ,
-      MOVE, 1, STRIKE, 1
+      MOVE, 1, STRIKE, 1, BASEBALL_BAT
     );
   
   

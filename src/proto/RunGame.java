@@ -42,6 +42,9 @@ public class RunGame extends JFrame implements ActionListener {
   }
   
   
+  
+  /**  Setup and construction-
+    */
   Surface surface;
   Printout print;
   World world;
@@ -63,13 +66,7 @@ public class RunGame extends JFrame implements ActionListener {
   
   private void setupWorld() {
     
-    if (Assets.exists(DEFAULT_SAVE_PATH)) {
-      Session s = Session.loadSession(DEFAULT_SAVE_PATH, true);
-      this.world = (World) s.loaded()[0];
-      world.game = this;
-      world.savePath = DEFAULT_SAVE_PATH;
-    }
-    else {
+    if (! attemptReload(DEFAULT_SAVE_PATH)) {
       this.world = new World(this, DEFAULT_SAVE_PATH);
       world.initDefaultNations();
       world.initDefaultBase();
@@ -99,6 +96,20 @@ public class RunGame extends JFrame implements ActionListener {
   }
   
   
+  boolean attemptReload(String savePath) {
+    if (! Assets.exists(savePath)) return false;
+    this.world = null;
+    Session s = Session.loadSession(savePath, true);
+    this.world = (World) s.loaded()[0];
+    world.game = this;
+    world.savePath = savePath;
+    return true;
+  }
+  
+  
+  
+  /**  Public access methods-
+    */
   public World world() {
     return world;
   }
