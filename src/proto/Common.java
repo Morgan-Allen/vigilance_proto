@@ -30,7 +30,7 @@ public class Common {
       }
       
       void applyEffect(Action use) {
-        Scene s = use.acting.scene;
+        Scene s = use.acting.currentScene();
         if (s.isExitPoint(use.target, use.acting)) s.removePerson(use.acting);
       }
       

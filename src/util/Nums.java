@@ -43,13 +43,13 @@ public final class Nums {
   }
   
   
-  public static float floor(float a) {
-    return (float) Math.floor(a);
+  public static int floor(float a) {
+    return (int) Math.floor(a);
   }
   
   
-  public static float ceil(float a) {
-    return (float) Math.ceil(a);
+  public static int ceil(float a) {
+    return (int) Math.ceil(a);
   }
   
   

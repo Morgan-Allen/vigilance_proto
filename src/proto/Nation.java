@@ -38,6 +38,7 @@ public class Nation implements Session.Saveable {
     crime   = s.loadFloat();
     member  = s.loadBool();
     funding = s.loadInt();
+    mission = (Scene) s.loadObject();
   }
   
   
@@ -47,6 +48,7 @@ public class Nation implements Session.Saveable {
     s.saveFloat(crime);
     s.saveBool(member);
     s.saveInt(funding);
+    s.saveObject(mission);
   }
   
   
@@ -58,6 +60,13 @@ public class Nation implements Session.Saveable {
     s.name = "Hostage situation in "+Rand.pickFrom(region.cities);
     s.expireTime = world.currentTime + 1 + Rand.index(3);
     s.site = this;
+    
+    if (Rand.num() < world.base.sensorChance()) {
+      s.dangerLevel = 0.75f * (Rand.avgNums(2) + 1.5f) / 2;
+    }
+    else {
+      s.dangerLevel = 1.25f * (Rand.avgNums(2) + 1.5f) / 2;
+    }
     return s;
   }
   
@@ -69,6 +78,8 @@ public class Nation implements Session.Saveable {
     return region.name;
   }
 }
+
+
 
 
 

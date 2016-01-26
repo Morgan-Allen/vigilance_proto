@@ -8,7 +8,7 @@ import java.awt.Color;
 
 
 
-public class Scene implements Session.Saveable {
+public class Scene implements Session.Saveable, Assignment {
   
   
   /**  Data fields, constructors and save/load methods-
@@ -24,6 +24,7 @@ public class Scene implements Session.Saveable {
   
   
   String name;
+  float dangerLevel;
   int expireTime;
   World world;
   Nation site;
@@ -55,10 +56,11 @@ public class Scene implements Session.Saveable {
   
   public Scene(Session s) throws Exception {
     s.cacheInstance(this);
-    name       = s.loadString();
-    expireTime = s.loadInt();
-    world      = (World) s.loadObject();
-    site       = (Nation) s.loadObject();
+    name        = s.loadString();
+    dangerLevel = s.loadFloat();
+    expireTime  = s.loadInt();
+    world       = (World) s.loadObject();
+    site        = (Nation) s.loadObject();
     s.loadObjects(playerTeam);
     s.loadObjects(othersTeam);
     state = s.loadInt();
@@ -89,6 +91,7 @@ public class Scene implements Session.Saveable {
   public void saveState(Session s) throws Exception {
     
     s.saveString(name);
+    s.saveFloat(dangerLevel);
     s.saveInt(expireTime);
     s.saveObject(world);
     s.saveObject(site);
@@ -243,14 +246,19 @@ public class Scene implements Session.Saveable {
   
   void addToTeam(Person p) {
     playerTeam.include(p);
-    p.scene = this;
+    p.setAssignment(this);
+  }
+  
+  
+  public boolean allowsAssignment(Person p) {
+    return true;
   }
   
   
   boolean addPerson(Person p, int x, int y) {
     Tile location = tileAt(x, y);
     if (location == null) return false;
-    p.scene    = this;
+    p.setAssignment(this);
     p.location = location;
     p.posX     = x;
     p.posY     = y;
@@ -263,8 +271,8 @@ public class Scene implements Session.Saveable {
   
   
   boolean removePerson(Person p) {
-    if (p.scene != this) return false;
-    p.scene    = null;
+    if (p.currentScene() != this) return false;
+    p.setAssignment(null);
     p.location = null;
     playerTeam.remove(p);
     othersTeam.remove(p);
@@ -354,7 +362,7 @@ public class Scene implements Session.Saveable {
       I.say("  Active: "+selected);
       
       for (Person p : team) {
-        if (p.currentAP() == 0 || ! p.conscious()) continue;
+        if (! p.canTakeAction()) continue;
         
         if (playerTurn) {
           I.say("  ACTIVE PC: "+p);
@@ -499,7 +507,7 @@ public class Scene implements Session.Saveable {
     float sum = 0, numC = 0;
     for (Person p : othersTeam) if (p.isCriminal()) {
       numC++;
-      if (p.conscious() || p.scene != this) sum++;
+      if (p.conscious() || p.currentScene() != this) sum++;
     }
     if (numC == 0) return 0;
     return sum / numC;
@@ -511,8 +519,8 @@ public class Scene implements Session.Saveable {
     float collateral = assessCollateral();
     float getaways   = assessGetaways  ();
     
-    site.trust += (1 - getaways) / 10;
-    site.crime += getaways       / 10;
+    site.trust += (1 - getaways) * dangerLevel / 10;
+    site.crime += getaways       * dangerLevel / 10;
     site.trust -= collateral / 10f;
     site.crime -= collateral / 10f;
     
@@ -521,8 +529,8 @@ public class Scene implements Session.Saveable {
       site.crime -= 0.5f / 10;
     }
     else {
-      site.trust -= 0.5f / 10;
-      site.crime += 0.5f / 10;
+      site.trust -= 0.5f * dangerLevel / 10;
+      site.crime += 0.5f * dangerLevel / 10;
     }
     site.trust = Nums.clamp(site.trust, -1, 1);
     site.crime = Nums.clamp(site.crime,  0, 2);
@@ -650,12 +658,13 @@ public class Scene implements Session.Saveable {
       
       int HP = (int) (p.maxHealth() - (p.injury + p.fatigue));
       s.append("\n  Health: "+HP+"/"+p.maxHealth());
+      if (p.fatigue > 0) s.append(" (Stun "+(int) p.fatigue+")");
       s.append("\n  AP: "+p.currentAP()+"/"+p.maxAP());
       if (! p.alive) s.append("\n  Dead");
       else if (! p.conscious) s.append("\n  Unconscious");
       
       boolean canCommand =
-        currentAction == null && p.actionPoints > 0 && playerTeam.includes(p)
+        currentAction == null && p.isPlayerOwned() && p.canTakeAction()
       ;
       if (canCommand) {
         s.append("\n\n  Abilities (Press 1-9):");
@@ -695,6 +704,7 @@ public class Scene implements Session.Saveable {
     s.append("\n  Save (S)");
     if (world.game.description.isPressed('s')) try {
       Session.saveSession(world.savePath, world);
+      I.say("Saving complete...");
     }
     catch (Exception e) { I.report(e); }
     
@@ -711,7 +721,7 @@ public class Scene implements Session.Saveable {
     s.append("\nTeam Status:");
     for (Person p : playerTeam) {
       s.append("\n  "+p.name);
-      if (p.scene != this) {
+      if (p.currentScene() != this) {
         s.append(" (escaped)");
       }
       else if (! p.alive()) {
@@ -725,7 +735,7 @@ public class Scene implements Session.Saveable {
     s.append("\nOther Forces:");
     for (Person p : othersTeam) {
       s.append("\n  "+p.name);
-      if (p.scene != this) {
+      if (p.currentScene() != this) {
         s.append(" (escaped)");
       }
       else if (! p.alive()) {
@@ -791,6 +801,19 @@ public class Scene implements Session.Saveable {
       g.fillRect(x - zoomX, y - zoomY, (int) w, (int) h);
     }
   }
+  
+  
+  public String toString() {
+    return name;
+  }
+  
+  
+  public String name() {
+    return name;
+  }
 }
+
+
+
 
 

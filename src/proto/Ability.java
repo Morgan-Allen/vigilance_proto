@@ -122,7 +122,7 @@ public abstract class Ability extends Index.Entry implements Session.Saveable {
     }
     rating = harmLevel * relation * -1 * powerLevel;
     
-    Tile at = acts.scene.tileUnder(use.target);
+    Tile at = acts.currentScene().tileUnder(use.target);
     rating *= 10f / (10 + at.scene.distance(acts.location, at));
     
     return rating;

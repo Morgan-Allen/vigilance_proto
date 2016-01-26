@@ -33,11 +33,18 @@ public class Person implements Session.Saveable {
     MAX_LUCK    = 3,
     INIT_STRESS = 0,
     MAX_STRESS  = 100;
+  final static int
+    FULL_HEAL_WEEKS   = 8   ,
+    WAKEUP_PERCENT    = 50  ,
+    WEEK_STRESS_DECAY = 2   ,
+    WEEK_TRAINING_XP  = 250 ,
+    MIN_LEVEL_XP      = 1000;
   
   
   Kind kind;
   String name;
   int AIstate = STATE_INIT;
+  int totalXP = 0;
   int luck = INIT_LUCK, stress = INIT_STRESS;
   
   List <Ability> abilities = new List();
@@ -46,7 +53,7 @@ public class Person implements Session.Saveable {
   float injury, fatigue;
   boolean alive, conscious;
   
-  Scene scene;
+  Assignment assignment;
   Tile location;
   float posX, posY;
   int actionPoints;
@@ -71,6 +78,8 @@ public class Person implements Session.Saveable {
     kind    = (Kind) s.loadObject();
     name    = s.loadString();
     AIstate = s.loadInt();
+    
+    totalXP = s.loadInt();
     luck    = s.loadInt();
     stress  = s.loadInt();
     
@@ -82,7 +91,7 @@ public class Person implements Session.Saveable {
     alive     = s.loadBool();
     conscious = s.loadBool();
     
-    scene        = (Scene) s.loadObject();
+    assignment   = (Assignment) s.loadObject();
     location     = (Tile) s.loadObject();
     posX         = s.loadFloat();
     posY         = s.loadFloat();
@@ -95,6 +104,7 @@ public class Person implements Session.Saveable {
     s.saveObject(kind);
     s.saveString(name);
     s.saveInt(AIstate);
+    s.saveInt(totalXP);
     s.saveInt(luck);
     s.saveInt(stress);
     
@@ -106,7 +116,7 @@ public class Person implements Session.Saveable {
     s.saveBool(alive);
     s.saveBool(conscious);
     
-    s.saveObject(scene);
+    s.saveObject(assignment);
     s.saveObject(location);
     s.saveFloat(posX);
     s.saveFloat(posY);
@@ -115,16 +125,62 @@ public class Person implements Session.Saveable {
   }
   
   
+
   
-  /**  Stat interactions/adjustments-
+  /**  Assigning jobs & missions-
+    */
+  boolean freeForAssignment() {
+    if (! conscious()) return false;
+    return assignment == null;
+  }
+  
+  
+  void setAssignment(Assignment assigned) {
+    this.assignment = assigned;
+  }
+  
+  
+  Scene currentScene() {
+    if (assignment instanceof Scene) return (Scene) assignment;
+    return null;
+  }
+  
+  
+  /**  State adjustments-
     */
   void takeDamage(float injury, float fatigue) {
-    this.injury  += injury;
-    this.fatigue += fatigue;
+    float total = injury + fatigue;
+    float scale = (total - levelFor(ARMOUR)) / total;
+    if (total <= 0 || scale <= 0) return;
+    this.injury  += injury  * scale;
+    this.fatigue += fatigue * scale;
     checkState();
   }
   
   
+  void liftInjury(float lift) {
+    injury = Nums.max(0, injury - lift);
+  }
+  
+  
+  void liftFatigue(float lift) {
+    fatigue = Nums.max(0, fatigue - lift);
+  }
+  
+  
+  void liftStress(int lift) {
+    stress = Nums.max(0, stress - lift);
+  }
+  
+  
+  void gainXP(int XP) {
+    totalXP += XP;
+  }
+  
+  
+  
+  /**  State queries-
+    */
   int levelFor(Ability ability) {
     return (int) abilityLevels.valueFor(ability);
   }
@@ -155,13 +211,18 @@ public class Person implements Session.Saveable {
   }
   
   
+  boolean breathing() {
+    return true;
+  }
+  
+  
   boolean conscious() {
     return conscious && alive;
   }
   
   
-  boolean availableForMission() {
-    return scene == null;
+  boolean canTakeAction() {
+    return conscious() && actionPoints > 0;
   }
   
   
@@ -173,8 +234,21 @@ public class Person implements Session.Saveable {
   }
   
   
-  void updateInWorld() {
+  void updateOnBase(float numWeeks) {
+    if (! alive) return;
+    if (conscious()) fatigue = 0;
     
+    int maxHealth = maxHealth();
+    float regen = maxHealth * numWeeks / FULL_HEAL_WEEKS;
+    injury = Nums.max(0, injury - regen);
+    
+    if (conscious) {
+      stress = Nums.max(0, stress - (int) (WEEK_STRESS_DECAY * numWeeks));
+    }
+    else {
+      float wakeUp = maxHealth * 100f / WAKEUP_PERCENT;
+      if (injury < wakeUp) conscious = true;
+    }
   }
   
   
@@ -233,6 +307,7 @@ public class Person implements Session.Saveable {
   
   
   boolean canSee(Tile point) {
+    Scene scene = currentScene();
     if (scene == null) return false;
     
     //  TODO:  This may require some subsequent refinement!
@@ -245,6 +320,7 @@ public class Person implements Session.Saveable {
   
   
   Action selectActionAsAI() {
+    Scene scene = currentScene();
     if (scene == null || ! conscious()) return null;
     Pick <Action> pick = new Pick(0);
     
@@ -270,6 +346,7 @@ public class Person implements Session.Saveable {
   /**  Other supplementary action-creation methods-
     */
   Action pickAdvanceAction(Series <Person> foes) {
+    Scene scene = currentScene();
     for (Person p : foes) {
       Action motion = Common.MOVE.bestMotionToward(p, this, scene);
       if (motion != null) return motion;
@@ -279,6 +356,7 @@ public class Person implements Session.Saveable {
   
   
   Action pickRetreatAction(Series <Person> foes) {
+    Scene scene = currentScene();
     int hS = scene.size / 2, sD = scene.size - 1;
     Tile exits[] = {
       scene.tileAt(0 , hS),

@@ -65,6 +65,9 @@ public class UrbanScene extends Scene {
   
   
   void setupScene() {
+    
+    //  TODO:  You need a separate pass for generating enemy forces!
+    
     super.setupScene();
     
     int cX = (size / 2) - 10, cY = 5;
@@ -84,7 +87,8 @@ public class UrbanScene extends Scene {
     }
     addProp(KIND_POOL_TABLE, cX + 10, cY + 10);
     
-    for (int n = 10; n-- > 0;) {
+    int numGoons = (int) (10 * dangerLevel);
+    for (int n = numGoons; n-- > 0;) {
       Person p = new Person(KIND_GOON, "Goon");
       int x = cX + 5 + Rand.index(10), y = cY + 5 + Rand.index(10);
       Tile under = tileAt(x, y);
