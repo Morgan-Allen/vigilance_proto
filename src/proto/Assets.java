@@ -20,8 +20,8 @@ public class Assets {
   final static String DEFAULT_JAR_NAME = "Vigilance_JAR.jar";
   final public static char REP_SEP = '/';
   private static boolean
-    callsVerbose = true ,
-    extraVerbose = true ;
+    callsVerbose = false,
+    extraVerbose = false;
   
   
   public static abstract class Loadable {
