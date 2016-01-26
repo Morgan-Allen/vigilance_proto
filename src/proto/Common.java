@@ -22,14 +22,14 @@ public class Common {
       NONE, 1, NO_HARM, MINOR_POWER
     ) {
       
-      boolean allowsTarget(Object target) {
+      public boolean allowsTarget(Object target) {
         if (target instanceof Prop) {
           return ! ((Prop) target).kind.blockPath;
         }
         return target instanceof Tile;
       }
       
-      void applyEffect(Action use) {
+      public void applyEffect(Action use) {
         Scene s = use.acting.currentScene();
         if (s.isExitPoint(use.target, use.acting)) s.removePerson(use.acting);
       }
@@ -45,11 +45,11 @@ public class Common {
       "strength.)",
       NONE, 1, MINOR_HARM, MINOR_POWER
     ) {
-      boolean allowsTarget(Object target) {
+      public boolean allowsTarget(Object target) {
         return target instanceof Person;
       }
       
-      void applyEffect(Action use) {
+      public void applyEffect(Action use) {
         final Person struck = (Person) use.target;
         float power = use.acting.levelFor(Person.MUSCLE);
         float damage = (Rand.index(6) + 2) * power / 10f;
@@ -66,11 +66,11 @@ public class Common {
       IS_RANGED, 1, MINOR_HARM, MINOR_POWER
     ) {
       
-      boolean allowsTarget(Object target) {
+      public boolean allowsTarget(Object target) {
         return target instanceof Person;
       }
       
-      void applyEffect(Action use) {
+      public void applyEffect(Action use) {
         final Person struck = (Person) use.target;
         float damage = Rand.index(4) + 1;
         struck.takeDamage(damage, 0);

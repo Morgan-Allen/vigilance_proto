@@ -29,6 +29,16 @@ public class Prop implements Session.Saveable {
   }
   
   
+  public Kind kind() {
+    return kind;
+  }
+  
+  
+  public Tile origin() {
+    return origin;
+  }
+  
+  
   
   /**  Rendering, debug and interface methods-
     */
@@ -36,3 +46,4 @@ public class Prop implements Session.Saveable {
     return kind.name;
   }
 }
+

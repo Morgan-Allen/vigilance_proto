@@ -13,7 +13,7 @@ public class Nation implements Session.Saveable {
   
   /**  Data fields, construction and save/load methods-
     */
-  Region region;
+  final public Region region;
   float trust = 0.25f;
   float crime = 0.25f;
   boolean member;
@@ -52,6 +52,14 @@ public class Nation implements Session.Saveable {
   }
   
   
+  /**  General query methods-
+    */
+  public float   trustLevel() { return trust  ; }
+  public float   crimeLevel() { return crime  ; }
+  public int     funding   () { return funding; }
+  public boolean member    () { return member ; }
+  
+  
   
   /**  Life cycle and update methods-
     */
@@ -68,6 +76,11 @@ public class Nation implements Session.Saveable {
       s.dangerLevel = 1.25f * (Rand.avgNums(2) + 1.5f) / 2;
     }
     return s;
+  }
+  
+  
+  public Scene currentMission() {
+    return mission;
   }
   
   

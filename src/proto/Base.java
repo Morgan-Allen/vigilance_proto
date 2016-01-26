@@ -10,7 +10,7 @@ public class Base implements Session.Saveable {
   
   /**  Data fields, constructors and save/load methods-
     */
-  final static int
+  final public static int
     MAX_FACILITIES = 12,
     SLOTS_WIDE     = 3 ;
   
@@ -64,6 +64,18 @@ public class Base implements Session.Saveable {
   
   
   
+  /**  General stat queries-
+    */
+  public int currentFunds() { return currentFunds; }
+  public int income() { return income; }
+  public int maintenance() { return maintenance; }
+  public int powerUse() { return powerUse; }
+  public int maxPower() { return maxPower; }
+  public int supportUse() { return supportUse; }
+  public int maxSupport() { return maxSupport; }
+  
+  
+  
   /**  Regular updates and life-cycle methods:
     */
   void updateBase(float numWeeks) {
@@ -94,17 +106,22 @@ public class Base implements Session.Saveable {
   
   /**  Roster modification-
     */
-  void addToTeam(Person hero) {
+  public void addToRoster(Person hero) {
     roster.add(hero);
   }
   
   
-  int engineerForce() {
+  public Series <Person> roster() {
+    return roster;
+  }
+  
+  
+  public int engineerForce() {
     return 3;
   }
   
   
-  int researchForce() {
+  public int researchForce() {
     int force = 3;
     for (Room r : rooms) {
       if (r.buildProgress < 1) continue;
@@ -119,7 +136,7 @@ public class Base implements Session.Saveable {
   }
   
   
-  float sensorChance() {
+  public float sensorChance() {
     float chance = 0;
     for (Room r : rooms) {
       if (r.buildProgress < 1) continue;
@@ -138,14 +155,14 @@ public class Base implements Session.Saveable {
   
   /**  Construction and salvage-
     */
-  boolean canConstruct(Blueprint print, int slot) {
+  public boolean canConstruct(Blueprint print, int slot) {
     if (rooms[slot].blueprint != Blueprint.NONE) return false;
     if (print.buildCost > currentFunds) return false;
     return true;
   }
   
   
-  float buildRate(Blueprint print) {
+  public float buildRate(Blueprint print) {
     float rate = 1f, numBuilding = 0;
     for (Room r : rooms) if (r.buildProgress < 1) numBuilding++;
     if (numBuilding == 0) return 1;
@@ -154,33 +171,52 @@ public class Base implements Session.Saveable {
   }
   
   
-  int buildETA(int slot) {
+  public int buildETA(int slot) {
     Room room = rooms[slot];
     return Nums.ceil((1 - room.buildProgress) / buildRate(room.blueprint));
   }
   
   
-  void addFacility(Blueprint print, int slot, float progress) {
+  public void addFacility(Blueprint print, int slot, float progress) {
     Room room = rooms[slot];
-    if (room == null) room = rooms[slot] = new Room(this, print);
+    if (room == null) room = rooms[slot] = new Room(this, slot);
     room.blueprint     = print;
-    room.slotIndex     = slot;
     room.buildProgress = progress;
   }
   
   
-  void beginConstruction(Blueprint print, int slot) {
+  public void beginConstruction(Blueprint print, int slot) {
     currentFunds -= print.buildCost;
     addFacility(print, slot, 0);
   }
   
   
-  void beginSalvage(int slot) {
+  public void beginSalvage(int slot) {
     currentFunds += rooms[slot].blueprint.buildCost / 2f;
     addFacility(Blueprint.NONE, slot, 1);
   }
   
+  
+  public Room[] rooms() {
+    return rooms;
+  }
+  
+  
+  
+  /**  Rendering and interface methods-
+    */
+  public int rosterIndex(Person p) {
+    return roster.indexOf(p);
+  }
+  
+  
+  public Person atRosterIndex(int i) {
+    return roster.atIndex(i);
+  }
 }
+
+
+
 
 
 

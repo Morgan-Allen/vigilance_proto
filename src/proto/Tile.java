@@ -5,26 +5,32 @@ package proto;
 
 
 public class Tile implements Session.Saveable {
-
-  Scene scene;
-  int x, y;
+  
+  
+  /**  Data fields, constructors and save/load methods-
+    */
+  final public Scene scene;
+  final public int x, y;
+  
   Prop prop;
   Person standing;
   
   Object flag;
   
   
-  Tile() {
-    
+  Tile(Scene s, int x, int y) {
+    this.scene = s;
+    this.x = x;
+    this.y = y;
   }
   
   
   public Tile(Session s) throws Exception {
     s.cacheInstance(this);
-    scene = (Scene) s.loadObject();
-    x = s.loadInt();
-    y = s.loadInt();
-    prop = (Prop) s.loadObject();
+    scene    = (Scene) s.loadObject();
+    x        = s.loadInt();
+    y        = s.loadInt();
+    prop     = (Prop) s.loadObject();
     standing = (Person) s.loadObject();
   }
   
@@ -39,6 +45,18 @@ public class Tile implements Session.Saveable {
   
   
   
+  /**  Public query methods-
+    */
+  public Prop prop() {
+    return prop;
+  }
+  
+  
+  public Person standing() {
+    return standing;
+  }
+  
+  
   
   
   
@@ -49,3 +67,7 @@ public class Tile implements Session.Saveable {
     return "Tile at "+x+"|"+y;
   }
 }
+
+
+
+

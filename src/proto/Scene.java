@@ -2,6 +2,7 @@
 
 package proto;
 import util.*;
+import view.*;
 import java.awt.Image;
 import java.awt.Graphics2D;
 import java.awt.Color;
@@ -14,14 +15,13 @@ public class Scene implements Session.Saveable, Assignment {
   /**  Data fields, constructors and save/load methods-
     */
   final static int
-    TILE_SIZE = 64;
-  final static int
     STATE_INIT  = -1,
     STATE_SETUP =  0,
     STATE_BEGUN =  1,
     STATE_WON   =  2,
     STATE_LOST  =  3;
   
+  SceneView view = new SceneView(this);
   
   String name;
   float dangerLevel;
@@ -40,12 +40,8 @@ public class Scene implements Session.Saveable, Assignment {
   List <Person> persons = new List();
   
   boolean playerTurn;
-  Person selected;
-  Ability activeAbility;
+  Person nextActing;
   Action currentAction;
-  
-  Tile zoomTile;
-  int zoomX, zoomY;
   
   
   Scene(World world, int size) {
@@ -56,6 +52,8 @@ public class Scene implements Session.Saveable, Assignment {
   
   public Scene(Session s) throws Exception {
     s.cacheInstance(this);
+    view.loadState(s);
+    
     name        = s.loadString();
     dangerLevel = s.loadFloat();
     expireTime  = s.loadInt();
@@ -78,26 +76,22 @@ public class Scene implements Session.Saveable, Assignment {
     s.loadObjects(persons);
     
     playerTurn    = s.loadBool();
-    selected      = (Person) s.loadObject();
-    activeAbility = (Ability) s.loadObject();
+    nextActing    = (Person) s.loadObject();
     currentAction = (Action) s.loadObject();
-    
-    zoomTile = (Tile) s.loadObject();
-    zoomX    = s.loadInt();
-    zoomY    = s.loadInt();
   }
   
   
   public void saveState(Session s) throws Exception {
+    view.saveState(s);
     
-    s.saveString(name);
-    s.saveFloat(dangerLevel);
-    s.saveInt(expireTime);
-    s.saveObject(world);
-    s.saveObject(site);
-    s.saveObjects(playerTeam);
-    s.saveObjects(othersTeam);
-    s.saveInt(state);
+    s.saveString (name       );
+    s.saveFloat  (dangerLevel);
+    s.saveInt    (expireTime );
+    s.saveObject (world      );
+    s.saveObject (site       );
+    s.saveObjects(playerTeam );
+    s.saveObjects(othersTeam );
+    s.saveInt    (state      );
     
     s.saveInt(size);
     s.saveInt(time);
@@ -111,26 +105,61 @@ public class Scene implements Session.Saveable, Assignment {
     s.saveObjects(persons);
     
     s.saveBool(playerTurn);
-    s.saveObject(selected);
-    s.saveObject(activeAbility);
+    s.saveObject(nextActing);
     s.saveObject(currentAction);
-    
-    s.saveObject(zoomTile);
-    s.saveInt(zoomX);
-    s.saveInt(zoomY);
   }
   
   
   
   /**  Supplemental query and setup methods-
     */
-  Tile tileAt(int x, int y) {
+  public Nation site() {
+    return site;
+  }
+  
+  
+  public World world() {
+    return world;
+  }
+  
+  
+  public boolean begun() {
+    return state >= STATE_BEGUN;
+  }
+  
+  
+  public boolean finished() {
+    return state == STATE_WON || state == STATE_LOST;
+  }
+  
+  
+  public boolean wasWon() {
+    return state == STATE_WON;
+  }
+  
+  
+  public boolean wasLost() {
+    return state == STATE_LOST;
+  }
+  
+  
+  public float dangerLevel() {
+    return dangerLevel;
+  }
+  
+
+  public int size() {
+    return size;
+  }
+  
+  
+  public Tile tileAt(int x, int y) {
     try { return tiles[x][y]; }
     catch (ArrayIndexOutOfBoundsException e) { return null; }
   }
   
   
-  Object topObjectAt(Tile at) {
+  public Object topObjectAt(Tile at) {
     if (at == null) return null;
     for (Person p : persons) if (p.location == at) return p;
     if (at.prop != null) return at.prop;
@@ -138,7 +167,7 @@ public class Scene implements Session.Saveable, Assignment {
   }
   
   
-  Tile tileUnder(Object object) {
+  public Tile tileUnder(Object object) {
     if (object instanceof Tile  ) return (Tile) object;
     if (object instanceof Person) return ((Person) object).location;
     if (object instanceof Prop  ) return ((Prop) object).origin;
@@ -146,23 +175,23 @@ public class Scene implements Session.Saveable, Assignment {
   }
   
   
-  float distance(Tile a, Tile b) {
+  public float distance(Tile a, Tile b) {
     final int xd = a.x - b.x, yd = a.y - b.y;
     return Nums.sqrt((xd * xd) + (yd * yd));
   }
   
   
-  float fogAt(Tile at) {
+  public float fogAt(Tile at) {
     return fog[at.x][at.y] / 100f;
   }
   
   
-  boolean blockedAt(Tile at) {
+  public boolean blockedAt(Tile at) {
     return at.prop != null && at.prop.kind.blockPath;
   }
   
   
-  float degreeOfSight(Tile orig, Tile dest, Person p) {
+  public float degreeOfSight(Tile orig, Tile dest, Person p) {
     
     int spanX = dest.x - orig.x, spanY = dest.y - orig.y;
     float ratioY = Nums.abs(spanY * 1f / spanX);
@@ -199,32 +228,17 @@ public class Scene implements Session.Saveable, Assignment {
   }
   
   
-  boolean begun() {
-    return state >= STATE_BEGUN;
-  }
-  
-  
-  boolean finished() {
-    return state == STATE_WON || state == STATE_LOST;
-  }
-  
-  
-  boolean wasWon() {
-    return state == STATE_WON;
-  }
-  
-  
-  boolean wasLost() {
-    return state == STATE_LOST;
-  }
-  
-  
-  boolean isExitPoint(Object point, Person exits) {
+  public boolean isExitPoint(Object point, Person exits) {
     Tile under = tileUnder(point);
     if (under == null || exits == null || ! exits.retreating()) return false;
     if (under.x == 0 || under.x == size - 1) return true;
     if (under.y == 0 || under.y == size - 1) return true;
     return false;
+  }
+  
+  
+  public Action currentAction() {
+    return currentAction;
   }
   
   
@@ -244,7 +258,12 @@ public class Scene implements Session.Saveable, Assignment {
   }
   
   
-  void addToTeam(Person p) {
+  public Series <Prop> props() {
+    return props;
+  }
+  
+  
+  public void addToTeam(Person p) {
     playerTeam.include(p);
     p.setAssignment(this);
   }
@@ -255,7 +274,7 @@ public class Scene implements Session.Saveable, Assignment {
   }
   
   
-  boolean addPerson(Person p, int x, int y) {
+  public boolean addPerson(Person p, int x, int y) {
     Tile location = tileAt(x, y);
     if (location == null) return false;
     p.setAssignment(this);
@@ -270,7 +289,7 @@ public class Scene implements Session.Saveable, Assignment {
   }
   
   
-  boolean removePerson(Person p) {
+  public boolean removePerson(Person p) {
     if (p.currentScene() != this) return false;
     p.setAssignment(null);
     p.location = null;
@@ -278,6 +297,21 @@ public class Scene implements Session.Saveable, Assignment {
     othersTeam.remove(p);
     persons.remove(p);
     return true;
+  }
+  
+  
+  public Series <Person> persons() {
+    return persons;
+  }
+  
+  
+  public Series <Person> playerTeam() {
+    return playerTeam;
+  }
+  
+  
+  public Series <Person> othersTeam() {
+    return othersTeam;
   }
   
   
@@ -291,10 +325,7 @@ public class Scene implements Session.Saveable, Assignment {
     fog   = new byte[size][size];
     
     for (Coord c : Visit.grid(0, 0, size, size, 1)) {
-      Tile t = tiles[c.x][c.y] = new Tile();
-      t.scene = this;
-      t.x = c.x;
-      t.y = c.y;
+      tiles[c.x][c.y] = new Tile(this, c.x, c.y);
     }
   }
   
@@ -304,25 +335,19 @@ public class Scene implements Session.Saveable, Assignment {
     
     int numT = playerTeam.size();
     int x = (size - numT) / 2, y = 0;
-    zoomTile = tileAt(x, y);
+    view.setViewpoint(tileAt(x, y));
     for (Person p : playerTeam) {
       addPerson(p, x, y);
       x += 1;
     }
-    selected = playerTeam.first();
+    nextActing = playerTeam.first();
     playerTurn = true;
     
     updateFog();
   }
   
   
-  void beginSelection(Person acting, Ability ability) {
-    this.selected = acting;
-    this.activeAbility = ability;
-  }
-  
-  
-  void queueNextAction(Action action) {
+  public void queueNextAction(Action action) {
     currentAction = action;
     Person acting = action.acting;
     acting.actionPoints -= action.used.costAP(action);
@@ -334,8 +359,9 @@ public class Scene implements Session.Saveable, Assignment {
   void onCompletion(Action action) {
     I.say("Action completed: "+action.used);
     I.say("  Player's turn? "+playerTurn);
-    this.activeAbility = null;
+    
     this.currentAction = null;
+    view.setSelection(nextActing, null);
     
     if (action != null) {
       Person acting = action.acting;
@@ -351,22 +377,22 @@ public class Scene implements Session.Saveable, Assignment {
   }
   
   
-  void moveToNextPersonsTurn() {
+  public void moveToNextPersonsTurn() {
     
     for (int maxTries = 2; maxTries-- > 0;) {
       Series <Person> team = playerTurn ? playerTeam : othersTeam;
-      selected = null;
+      nextActing = null;
       
       I.say("\n  Trying to find active person from ");
       if (playerTurn) I.add("player team"); else I.add("enemy team");
-      I.say("  Active: "+selected);
+      I.say("  Active: "+nextActing);
       
       for (Person p : team) {
         if (! p.canTakeAction()) continue;
         
         if (playerTurn) {
           I.say("  ACTIVE PC: "+p);
-          selected = p;
+          nextActing = p;
           break;
         }
         else {
@@ -375,7 +401,7 @@ public class Scene implements Session.Saveable, Assignment {
           if (taken != null) {
             I.say(p+" will take action: "+taken.used);
             queueNextAction(taken);
-            selected = p;
+            nextActing = p;
             break;
           }
           else {
@@ -386,7 +412,7 @@ public class Scene implements Session.Saveable, Assignment {
         }
       }
       
-      if (selected == null) {
+      if (nextActing == null) {
         I.say("  Will refresh AP and try other team...");
         for (Person p : team) {
           p.updateOnTurn();
@@ -395,8 +421,8 @@ public class Scene implements Session.Saveable, Assignment {
         playerTurn = ! playerTurn;
       }
       else {
-        I.say("  Will zoom to "+selected);
-        zoomTile = selected.location;
+        I.say("  Will zoom to "+nextActing);
+        view.setSelection(nextActing, null);
         return;
       }
     }
@@ -463,7 +489,7 @@ public class Scene implements Session.Saveable, Assignment {
   }
   
   
-  void endScene() {
+  public void endScene() {
     for (Person p : persons) removePerson(p);
     world.exitFromMission(this);
   }
@@ -491,7 +517,7 @@ public class Scene implements Session.Saveable, Assignment {
   }
   
   
-  float assessCollateral() {
+  public float assessCollateral() {
     float sum = 0;
     for (Person p : othersTeam) {
       float damage = p.injury / p.maxHealth();
@@ -503,7 +529,7 @@ public class Scene implements Session.Saveable, Assignment {
   }
   
   
-  float assessGetaways() {
+  public float assessGetaways() {
     float sum = 0, numC = 0;
     for (Person p : othersTeam) if (p.isCriminal()) {
       numC++;
@@ -546,260 +572,8 @@ public class Scene implements Session.Saveable, Assignment {
   
   /**  Graphical/display routines:
     */
-  void renderTo(Surface surface, Graphics2D g) {
-    
-    //
-    //  Update camera information first-
-    Person next = playerTeam.first();
-    if (next != null && next.location != null) {
-      if (zoomTile == null) zoomTile = next.location;
-    }
-    if (zoomTile != null) {
-      zoomX = zoomTile.x * TILE_SIZE;
-      zoomY = zoomTile.y * TILE_SIZE;
-    }
-    zoomX -= surface.getWidth () / 2;
-    zoomY -= surface.getHeight() / 2;
-    
-    //
-    //  Then, render any props, persons, or special FX-
-    for (Coord c : Visit.grid(0, 0, size, size, 1)) {
-      Tile t = tiles[c.x][c.y];
-      if (t.prop != null && t.prop.origin == t) {
-        renderAt(t.x, t.y, t.prop.kind, g);
-      }
-    }
-    for (Person p : persons) if (fogAt(p.location) > 0) {
-      renderAt(p.posX, p.posY, p.kind, g);
-    }
-    for (Person p : persons) if (fogAt(p.location) > 0) {
-      
-      Color teamColor = Color.GREEN;
-      if (p.isHero()) teamColor = Color.BLUE;
-      if (p.isCriminal()) teamColor = Color.RED;
-      
-      float maxHealth = p.maxHealth();
-      float tireLevel = 1f - (p.injury / maxHealth);
-      float healthLevel = 1f - ((p.injury + p.fatigue) / maxHealth);
-      renderAt(p.posX, p.posY + 0.9f, 1, 0.1f, null, Color.BLACK, g);
-      renderAt(p.posX, p.posY + 0.9f, tireLevel, 0.1f, null, Color.WHITE, g);
-      renderAt(p.posX, p.posY + 0.9f, healthLevel, 0.1f, null, teamColor, g);
-      renderString(p.posX, p.posY + 0.5f, p.name, Color.WHITE, g);
-    }
-    final Action a = currentAction;
-    if (a != null && a.progress >= 0) a.used.renderMissile(a, this, g);
-    
-    //
-    //  Then render fog on top of all objects-
-    final Color SCALE[] = new Color[10];
-    for (int n = 10; n-- > 0;) {
-      SCALE[n] = new Color(0, 0, 0, n / 20f);
-    }
-    for (Coord c : Visit.grid(0, 0, size, size, 1)) {
-      float fogAlpha = 1f - (fog[c.x][c.y] / 100f);
-      Color black = SCALE[Nums.clamp((int) (fogAlpha * 10), 10)];
-      renderAt(c.x, c.y, 1, 1, null, black, g);
-    }
-    
-    //
-    //  If complete, display a summary of the results!
-    if (finished()) {
-      return;
-    }
-    
-    //
-    //  Then determine what tile (and any objects above) are being selected-
-    int HT = TILE_SIZE / 2;
-    int hoverX = (surface.mouseX + zoomX + HT) / TILE_SIZE;
-    int hoverY = (surface.mouseY + zoomY + HT) / TILE_SIZE;
-    Tile hoverT = tileAt(hoverX, hoverY);
-    
-    if (hoverT != null) {
-      renderAt(hoverT.x, hoverT.y, 1, 1, world.selectCircle, null, g);
-      Object hovered = topObjectAt(hoverT);
-      
-      Action action = null;
-      if (activeAbility != null) action = activeAbility.configAction(
-        selected, hoverT, hovered, this, null
-      );
-      
-      if (activeAbility != null && action != null) {
-        int costAP = action.used.costAP(action);
-        renderString(hoverT.x, hoverT.y - 0.5f, "AP: "+costAP, Color.GREEN, g);
-      }
-      if (activeAbility != null && action == null) {
-        renderString(hoverT.x, hoverT.y - 0.5f, "X", Color.RED, g);
-      }
-      if (surface.mouseClicked && currentAction == null && action != null) {
-        queueNextAction(action);
-      }
-      else if (surface.mouseClicked) {
-        Person pickP = null;
-        if (hovered instanceof Person) pickP = (Person) hovered;
-        if (pickP != null) selected = pickP;
-        else zoomTile = hoverT;
-      }
-    }
-  }
-  
-  
-  String description() {
-    final StringBuffer s = new StringBuffer();
-    final Person  p = selected;
-    final Ability a = activeAbility;
-    
-    if (finished()) {
-      describeEndSummary(s);
-      return s.toString();
-    }
-    
-    if (p != null) {
-      s.append("\nSelection: "+p.name);
-      
-      int HP = (int) (p.maxHealth() - (p.injury + p.fatigue));
-      s.append("\n  Health: "+HP+"/"+p.maxHealth());
-      if (p.fatigue > 0) s.append(" (Stun "+(int) p.fatigue+")");
-      s.append("\n  AP: "+p.currentAP()+"/"+p.maxAP());
-      if (! p.alive) s.append("\n  Dead");
-      else if (! p.conscious) s.append("\n  Unconscious");
-      
-      boolean canCommand =
-        currentAction == null && p.isPlayerOwned() && p.canTakeAction()
-      ;
-      if (canCommand) {
-        s.append("\n\n  Abilities (Press 1-9):");
-        char key = '1';
-        for (Ability r : p.abilities) if (! r.passive()) {
-          s.append("\n    "+r.name);
-          
-          boolean canUse = r.minCostAP() <= p.currentAP();
-          if (canUse) s.append(" ("+key+") AP: "+r.minCostAP());
-          if (world.game.description.isPressed(key) && canUse) {
-            beginSelection(p, r);
-          }
-          key++;
-        }
-        if (a == null) {
-          s.append("\n  Pass Turn (X)");
-          if (world.game.description.isPressed('x')) {
-            p.actionPoints = 0;
-            moveToNextPersonsTurn();
-          }
-        }
-        //  TODO:  Allow zooming to and tabbing through party members.
-        else {
-          s.append("\n\n"+a.description);
-          s.append("\n  Select target");
-          s.append("\n  Cancel (X)");
-          if (world.game.description.isPressed('x')) {
-            beginSelection(p, null);
-          }
-        }
-      }
-    }
-    
-    //
-    //  General options-
-    s.append("\n");
-    s.append("\n  Save (S)");
-    if (world.game.description.isPressed('s')) try {
-      Session.saveSession(world.savePath, world);
-      I.say("Saving complete...");
-    }
-    catch (Exception e) { I.report(e); }
-    
-    return s.toString();
-  }
-  
-  
-  void describeEndSummary(StringBuffer s) {
-    boolean success = wasWon();
-    s.append("\nMission ");
-    if (success) s.append(" Successful.");
-    else s.append(" Failed.");
-    
-    s.append("\nTeam Status:");
-    for (Person p : playerTeam) {
-      s.append("\n  "+p.name);
-      if (p.currentScene() != this) {
-        s.append(" (escaped)");
-      }
-      else if (! p.alive()) {
-        s.append(" (dead)");
-      }
-      else if (! p.conscious()) {
-        s.append(success ? " (unconscious)" : " (captive)");
-      }
-      else s.append(" (okay)");
-    }
-    s.append("\nOther Forces:");
-    for (Person p : othersTeam) {
-      s.append("\n  "+p.name);
-      if (p.currentScene() != this) {
-        s.append(" (escaped)");
-      }
-      else if (! p.alive()) {
-        s.append(" (dead)");
-      }
-      else if (! p.conscious()) {
-        s.append(success ? " (captive)" : " (unconscious)");
-      }
-      else s.append(" (okay)");
-    }
-    
-    final String DESC_C[] = {
-      "None", "Minimal", "Medium", "Heavy", "Total"
-    };
-    final String DESC_G[] = {
-      "None", "Few", "Some", "Many", "All"
-    };
-    int colIndex = Nums.clamp((int) (assessCollateral() * 5), 5);
-    int getIndex = Nums.clamp((int) (assessGetaways  () * 5), 5);
-    s.append("\nCollateral: "+DESC_C[colIndex]);
-    s.append("\nGetaways: "  +DESC_G[getIndex]);
-    int trustPercent = (int) (site.trust * 100);
-    int crimePercent = (int) (site.crime * 100);
-    s.append("\nRegional Trust: "+trustPercent+"%");
-    s.append("\nRegional Crime: "+crimePercent+"%");
-    
-    s.append("\n\n  Press X to exit.");
-    if (world.game.description.isPressed('x')) {
-      endScene();
-    }
-  }
-  
-  
-  void renderString(float px, float py, String s, Color c, Graphics2D g) {
-    int x, y;
-    x = (int) ((px - 0.50f) * TILE_SIZE);
-    y = (int) ((py + 0.15f) * TILE_SIZE);
-    g.setColor(c);
-    g.drawString(s, x - zoomX, y - zoomY);
-  }
-  
-
-  void renderAt(float px, float py, Kind kind, Graphics2D g) {
-    renderAt(px, py, kind.wide, kind.high, kind.sprite, null, g);
-  }
-  
-  
-  void renderAt(
-    float px, float py, float w, float h,
-    Image sprite, Color fill, Graphics2D g
-  ) {
-    int x, y;
-    x = (int) ((px - 0.5f) * TILE_SIZE);
-    y = (int) ((py - 0.5f) * TILE_SIZE);
-    w *= TILE_SIZE;
-    h *= TILE_SIZE;
-    
-    if (sprite != null) {
-      g.drawImage(sprite, x - zoomX, y - zoomY, (int) w, (int) h, null);
-    }
-    if (fill != null) {
-      g.setColor(fill);
-      g.fillRect(x - zoomX, y - zoomY, (int) w, (int) h);
-    }
+  public SceneView view() {
+    return view;
   }
   
   

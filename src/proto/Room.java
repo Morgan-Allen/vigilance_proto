@@ -10,49 +10,62 @@ public class Room implements Session.Saveable, Assignment {
   
   /**  Data fields, construction and save/load methods-
     */
-  Blueprint blueprint;
-  Base base;
+  final public Base base;
+  final public int slotIndex;
   
-  int slotIndex;
+  Blueprint blueprint;
   float buildProgress;
   List <Person> visitors = new List();
   
   
-  Room(Base base, Blueprint blueprint) {
-    this.blueprint = blueprint;
+  Room(Base base, int slotIndex) {
     this.base = base;
+    this.slotIndex = slotIndex;
   }
   
   
   public Room(Session s) throws Exception {
     s.cacheInstance(this);
-    blueprint     = (Blueprint) s.loadObject();
     base          = (Base) s.loadObject();
     slotIndex     = s.loadInt();
+    blueprint     = (Blueprint) s.loadObject();
     buildProgress = s.loadFloat();
     s.loadObjects(visitors);
   }
   
   
   public void saveState(Session s) throws Exception {
-    s.saveObject(blueprint);
     s.saveObject(base);
     s.saveInt(slotIndex);
+    s.saveObject(blueprint);
     s.saveFloat(buildProgress);
     s.saveObjects(visitors);
   }
   
   
   
+  /**  Blueprints and (physical) construction-
+    */
+  public Blueprint blueprint() {
+    return blueprint;
+  }
+  
+  
+  public float buildProgress() {
+    return buildProgress;
+  }
+  
+  
+  
   /**  Toggling visitors-
     */
-  void addVisitor(Person p) {
+  public void addVisitor(Person p) {
     visitors.include(p);
     p.setAssignment(this);
   }
   
   
-  void removeVisitor(Person p) {
+  public void removeVisitor(Person p) {
     visitors.remove(p);
     p.setAssignment(null);
   }
@@ -62,6 +75,11 @@ public class Room implements Session.Saveable, Assignment {
     if (buildProgress < 1) return false;
     if (visitors.includes(p)) return true;
     return visitors.size() < blueprint.visitLimit;
+  }
+  
+  
+  public Series <Person> visitors() {
+    return visitors;
   }
   
   

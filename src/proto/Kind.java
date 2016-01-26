@@ -47,6 +47,13 @@ public class Kind extends Index.Entry implements Session.Saveable {
   }
   
   
+  public int wide() { return wide; }
+  public int high() { return high; }
+  public String name() { return name; }
+  public Image sprite() { return sprite; }
+  
+  
+  
   
   
   static Kind ofPerson(

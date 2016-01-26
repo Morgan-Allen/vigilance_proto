@@ -1,0 +1,14 @@
+
+
+
+Notes:
+
+*  A wider range of abilities for the current heroes.
+
+*  XP gain and skill-advancement over time.
+
+*  The basics of role-play elements.
+
+*  You need to factor out all those messy UI routines!
+
+*  Research & development.

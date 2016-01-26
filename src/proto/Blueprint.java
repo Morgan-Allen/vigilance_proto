@@ -26,10 +26,10 @@ public class Blueprint extends Index.Entry implements Session.Saveable {
     */
   final static Index <Blueprint> INDEX = new Index <Blueprint> ();
   
-  final static String IMG_DIR = "media assets/base view/";
+  final public static String IMG_DIR = "media assets/base view/";
   
-  String name, description;
-  Image sprite;
+  final public String name, description;
+  final public Image sprite;
   
   int buildCost   = 0;
   int buildTime   = 0;
@@ -43,7 +43,7 @@ public class Blueprint extends Index.Entry implements Session.Saveable {
   
   
   
-  final static Blueprint
+  final public static Blueprint
     GENERATOR = new Blueprint(
       "Generator", "blueprint_generator",
       "Provides power to the station, allowing you to support more facilities.",
@@ -187,6 +187,13 @@ public class Blueprint extends Index.Entry implements Session.Saveable {
   public void saveState(Session s) throws Exception {
     INDEX.saveEntry(this, s.output());
   }
+  
+  
+  public int buildCost  () { return buildCost  ; }
+  public int visitLimit () { return visitLimit ; }
+  public int maintenance() { return maintenance; }
+  public int lifeSupport() { return lifeSupport; }
+  public int powerCost  () { return powerCost  ; }
   
   
   

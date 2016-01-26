@@ -125,30 +125,113 @@ public class Person implements Session.Saveable {
   }
   
   
-
+  
+  /**  General state queries-
+    */
+  public Series <Ability> abilities() {
+    return abilities;
+  }
+  
+  
+  public int levelFor(Ability ability) {
+    return (int) abilityLevels.valueFor(ability);
+  }
+  
+  
+  public int maxHealth() {
+    return levelFor(HEALTH);
+  }
+  
+  
+  public float injury() {
+    return injury;
+  }
+  
+  
+  public float fatigue() {
+    return fatigue;
+  }
+  
+  
+  public int sightRange() {
+    return levelFor(SIGHT) / 2;
+  }
+  
+  
+  public int maxAP() {
+    return levelFor(SPEED) / 4;
+  }
+  
+  
+  public int currentAP() {
+    return actionPoints;
+  }
+  
+  
+  public boolean alive() {
+    return alive;
+  }
+  
+  
+  public boolean breathing() {
+    return true;
+  }
+  
+  
+  public boolean conscious() {
+    return conscious && alive;
+  }
+  
+  
+  public boolean canTakeAction() {
+    return conscious() && actionPoints > 0;
+  }
+  
+  
+  public Kind kind() {
+    return kind;
+  }
+  
+  
   
   /**  Assigning jobs & missions-
     */
-  boolean freeForAssignment() {
+  public boolean freeForAssignment() {
     if (! conscious()) return false;
     return assignment == null;
   }
   
   
-  void setAssignment(Assignment assigned) {
+  public Assignment assignment() {
+    return assignment;
+  }
+  
+  
+  public void setAssignment(Assignment assigned) {
     this.assignment = assigned;
   }
   
   
-  Scene currentScene() {
+  public Scene currentScene() {
     if (assignment instanceof Scene) return (Scene) assignment;
     return null;
   }
   
   
+  public Tile location() {
+    return location;
+  }
+  
+  
+  public Vec3D exactPosition() {
+    return new Vec3D(posX, posY, 0);
+  }
+  
+  
+  
   /**  State adjustments-
     */
-  void takeDamage(float injury, float fatigue) {
+  public void takeDamage(float injury, float fatigue) {
     float total = injury + fatigue;
     float scale = (total - levelFor(ARMOUR)) / total;
     if (total <= 0 || scale <= 0) return;
@@ -158,71 +241,28 @@ public class Person implements Session.Saveable {
   }
   
   
-  void liftInjury(float lift) {
+  public void liftInjury(float lift) {
     injury = Nums.max(0, injury - lift);
   }
   
   
-  void liftFatigue(float lift) {
+  public void liftFatigue(float lift) {
     fatigue = Nums.max(0, fatigue - lift);
   }
   
   
-  void liftStress(int lift) {
+  public void liftStress(int lift) {
     stress = Nums.max(0, stress - lift);
   }
   
   
-  void gainXP(int XP) {
+  public void gainXP(int XP) {
     totalXP += XP;
   }
   
   
-  
-  /**  State queries-
-    */
-  int levelFor(Ability ability) {
-    return (int) abilityLevels.valueFor(ability);
-  }
-  
-  
-  int sightRange() {
-    return levelFor(SIGHT) / 2;
-  }
-  
-  
-  int maxHealth() {
-    return levelFor(HEALTH);
-  }
-  
-  
-  int maxAP() {
-    return levelFor(SPEED) / 4;
-  }
-  
-  
-  int currentAP() {
-    return actionPoints;
-  }
-  
-  
-  boolean alive() {
-    return alive;
-  }
-  
-  
-  boolean breathing() {
-    return true;
-  }
-  
-  
-  boolean conscious() {
-    return conscious && alive;
-  }
-  
-  
-  boolean canTakeAction() {
-    return conscious() && actionPoints > 0;
+  public void setActionPoints(int AP) {
+    actionPoints = AP;
   }
   
   
@@ -262,51 +302,51 @@ public class Person implements Session.Saveable {
   
   /**  Rudimentary AI methods-
     */
-  boolean isHero() {
+  public boolean isHero() {
     return kind.type == Kind.TYPE_HERO;
   }
   
   
-  boolean isCriminal() {
+  public boolean isCriminal() {
     return kind.type == Kind.TYPE_MOOK || kind.type == Kind.TYPE_BOSS;
   }
   
   
-  boolean isCivilian() {
+  public boolean isCivilian() {
     return kind.type == Kind.TYPE_CIVILIAN;
   }
   
   
-  boolean isEnemy(Person other) {
+  public boolean isEnemy(Person other) {
     if (isHero    ()) return other.isCriminal();
     if (isCriminal()) return other.isHero    ();
     return false;
   }
   
   
-  boolean isAlly(Person other) {
+  public boolean isAlly(Person other) {
     if (isHero    ()) return other.isHero    ();
     if (isCriminal()) return other.isCriminal();
     return false;
   }
   
   
-  boolean isNeutral(Person other) {
+  public boolean isNeutral(Person other) {
     return ! (isEnemy(other) || isAlly(other));
   }
   
   
-  boolean isPlayerOwned() {
+  public boolean isPlayerOwned() {
     return isHero();
   }
   
   
-  boolean retreating() {
+  public boolean retreating() {
     return AIstate == STATE_RETREAT;
   }
   
   
-  boolean canSee(Tile point) {
+  public boolean canSee(Tile point) {
     Scene scene = currentScene();
     if (scene == null) return false;
     
@@ -319,7 +359,7 @@ public class Person implements Session.Saveable {
   }
   
   
-  Action selectActionAsAI() {
+  public Action selectActionAsAI() {
     Scene scene = currentScene();
     if (scene == null || ! conscious()) return null;
     Pick <Action> pick = new Pick(0);
@@ -373,6 +413,11 @@ public class Person implements Session.Saveable {
   
   /**  Interface, rendering and debug methods-
     */
+  public String name() {
+    return name;
+  }
+  
+  
   public String toString() {
     return name;
   }

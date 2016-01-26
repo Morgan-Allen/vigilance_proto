@@ -32,8 +32,8 @@ public abstract class Ability extends Index.Entry implements Session.Saveable {
     MEDIUM_POWER = 5,
     MAJOR_POWER  = 8;
   
-  final String name;
-  final String description;
+  final public String name;
+  final public String description;
   
   final int properties, costAP;
   final float harmLevel, powerLevel;
@@ -65,53 +65,54 @@ public abstract class Ability extends Index.Entry implements Session.Saveable {
   
   
   
-  
-  boolean hasProperty(int p) {
+  /**  Public query methods/properties-
+    */
+  public boolean hasProperty(int p) {
     return (properties & p) == p;
   }
   
   
-  boolean requiresSight() {
+  public boolean requiresSight() {
     return ! hasProperty(NO_NEED_SIGHT);
   }
   
   
-  boolean ranged() {
+  public boolean ranged() {
     return hasProperty(IS_RANGED);
   }
   
   
-  boolean passive() {
+  public boolean passive() {
     return hasProperty(IS_PASSIVE);
   }
   
   
-  int minCostAP() {
+  public int minCostAP() {
     return costAP;
   }
   
   
-  int motionCostAP(int pathLength) {
+  public int motionCostAP(int pathLength) {
     return (pathLength - 1) / 2;
   }
   
   
-  int costAP(Action use) {
+  public int costAP(Action use) {
     return minCostAP() + motionCostAP(use.path.length);
   }
   
   
-  boolean allowsTarget(Object target) {
+  public boolean allowsTarget(Object target) {
     return false;
   }
   
   
-  void applyEffect(Action use) {
+  public void applyEffect(Action use) {
     return;
   }
   
   
-  float rateUsage(Action use) {
+  public float rateUsage(Action use) {
     Person acts = use.acting;
     float rating = 1, relation = 0;
     
@@ -132,7 +133,7 @@ public abstract class Ability extends Index.Entry implements Session.Saveable {
   
   /**  Configuring actions-
     */
-  Action configAction(
+  public Action configAction(
     Person acting, Tile dest, Object target,
     Scene scene, Tile pathToTake[]
   ) {
@@ -153,10 +154,9 @@ public abstract class Ability extends Index.Entry implements Session.Saveable {
       else path = search.fullPath(Tile.class);
     }
     
-    Action newAction = new Action();
+    Action newAction = new Action(this);
     newAction.acting    = acting;
     newAction.path      = path;
-    newAction.used      = this;
     newAction.target    = target;
     newAction.timeStart = scene.time;
     newAction.progress  = -1;
@@ -166,7 +166,7 @@ public abstract class Ability extends Index.Entry implements Session.Saveable {
   }
   
   
-  Action bestMotionToward(Object point, Person acting, Scene scene) {
+  public Action bestMotionToward(Object point, Person acting, Scene scene) {
     Tile at = scene.tileUnder(point);
     if (at == null || ! acting.canSee(at)) return null;
     MoveSearch search = new MoveSearch(acting, acting.location, at);
@@ -187,6 +187,11 @@ public abstract class Ability extends Index.Entry implements Session.Saveable {
   
   /**  Rendering, interface and debug methods-
     */
+  public String name() {
+    return name;
+  }
+  
+  
   public String toString() {
     return name;
   }
@@ -202,7 +207,7 @@ public abstract class Ability extends Index.Entry implements Session.Saveable {
   }
   
   
-  void renderMissile(Action action, Scene s, Graphics2D g) {
+  public void renderMissile(Action action, Scene s, Graphics2D g) {
     Image sprite = missileSprite();
     if (sprite == null) return;
     
@@ -215,6 +220,13 @@ public abstract class Ability extends Index.Entry implements Session.Saveable {
     pX += target.x * progress;
     pY += target.y * progress;
     
-    s.renderAt(pX, pY, 0.5f, 0.5f, sprite, null, g);
+    s.view.renderAt(pX, pY, 0.5f, 0.5f, sprite, null, g);
   }
 }
+
+
+
+
+
+
+
