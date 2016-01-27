@@ -1,11 +1,10 @@
 
 
 package proto.game.scene;
+import proto.common.*;
+import proto.util.*;
 import java.awt.Graphics2D;
 import java.awt.Image;
-
-import proto.common.Session;
-import proto.util.*;
 
 
 
@@ -193,14 +192,32 @@ public abstract class Ability extends Index.Entry implements Session.Saveable {
       if (start) use.volley.beginVolley   ();
       if (end  ) use.volley.completeVolley();
       
-      if (self != null) for (Ability a : self.stats.listAbilities()) {
+      if (self != null && self.lastAction != null) {
+        Ability a = self.lastAction.used;
         if (a.triggerOnAttack() && a.allowsTarget(self, scene, self)) {
           if (start) a.applyOnAttackStart(volley);
           if (end  ) a.applyOnAttackEnd  (volley);
         }
       }
       
+      if (self != null) for (Ability a : self.stats.listAbilities()) {
+        if (! a.passive()) continue;
+        if (a.triggerOnAttack() && a.allowsTarget(self, scene, self)) {
+          if (start) a.applyOnAttackStart(volley);
+          if (end  ) a.applyOnAttackEnd  (volley);
+        }
+      }
+      
+      if (hits != null && hits.lastAction != null) {
+        Ability a = hits.lastAction.used;
+        if (a.triggerOnDefend() && a.allowsTarget(hits, scene, hits)) {
+          if (start) a.applyOnDefendStart(volley);
+          if (end  ) a.applyOnDefendEnd  (volley);
+        }
+      }
+      
       if (hits != null) for (Ability a : hits.stats.listAbilities()) {
+        if (! a.passive()) continue;
         if (a.triggerOnDefend() && a.allowsTarget(hits, scene, hits)) {
           if (start) a.applyOnDefendStart(volley);
           if (end  ) a.applyOnDefendEnd  (volley);

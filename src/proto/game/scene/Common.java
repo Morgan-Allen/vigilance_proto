@@ -63,6 +63,36 @@ public class Common {
       public Image missileSprite() { return missile; }
     },
     
+    EVASION = new Ability(
+      "Evasion", "ability_evasion",
+      "Reserve AP to increase chance to dodge enemy attacks until your next "+
+      " turn by 50%.",
+      IS_DELAYED | TRIGGER_ON_DEFEND, 1, NO_HARM, MINOR_POWER
+    ) {
+      
+      public boolean allowsTarget(Object target, Scene scene, Person acting) {
+        return acting instanceof Person;
+      }
+      
+      public void applyOnDefendStart(Volley volley) {
+        Tile open = nearestOpenTile(volley.hitsAsPerson());
+        if (open != null) volley.hitsDefence += 50;
+      }
+      
+      public void applyOnDefendEnd(Volley volley) {
+        Person self = volley.hitsAsPerson();
+        Tile open = nearestOpenTile(self);
+        if (open != null) self.setExactPosition(open.x, open.y, 0, open.scene);
+      }
+      
+      Tile nearestOpenTile(Person acting) {
+        for (Tile t : acting.location.tilesAdjacent()) if (t != null) {
+          if (! t.blocked()) return t;
+        }
+        return null;
+      }
+    },
+    
     DISARM = new Ability(
       "Disarm", "ability_disarm",
       "Attempt to disarm a melee target.  (Deals base of 1-3 stun damage, "+
@@ -241,7 +271,7 @@ public class Common {
       BRAIN , 20 ,
       SPEED , 20 ,
       SIGHT , 10 ,
-      MOVE, 1, STRIKE, 1,
+      MOVE, 1, STRIKE, 1, EVASION, 1,
       BATARANG, 1, ULTRASOUND, 1
     ),
     KESTREL  = Kind.ofPerson(
@@ -253,7 +283,7 @@ public class Common {
       BRAIN , 15 ,
       SPEED , 18 ,
       SIGHT , 12 ,
-      MOVE, 1, STRIKE, 1,
+      MOVE, 1, STRIKE, 1, EVASION, 1,
       BATARANG, 1
     ),
     CORONA   = Kind.ofPerson(

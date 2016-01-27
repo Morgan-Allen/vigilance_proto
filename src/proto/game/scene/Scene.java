@@ -1,20 +1,10 @@
 
 
 package proto.game.scene;
-import java.awt.Image;
-
-import proto.common.RunGame;
-import proto.common.Session;
-import proto.common.Session.Saveable;
-import proto.game.scene.Person.Side;
-import proto.game.world.Assignment;
-import proto.game.world.Nation;
-import proto.game.world.World;
+import proto.common.*;
+import proto.game.world.*;
 import proto.util.*;
 import proto.view.*;
-
-import java.awt.Graphics2D;
-import java.awt.Color;
 
 
 
@@ -383,6 +373,7 @@ public class Scene implements Session.Saveable, Assignment {
     Person acting = action.acting;
     nextActing = acting;
     acting.actionPoints -= action.used.costAP(action);
+    acting.lastAction = action;
     action.used.applyOnActionStart(action);
     action.used.checkForTriggers(action, true, false);
     I.say(acting+" using "+action.used+" on "+action.target);
@@ -449,7 +440,6 @@ public class Scene implements Session.Saveable, Assignment {
         I.say("  Will refresh AP and try other team...");
         for (Person p : team) {
           p.updateOnTurn();
-          p.actionPoints = p.maxAP();
         }
         playerTurn = ! playerTurn;
       }

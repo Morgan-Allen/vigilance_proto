@@ -188,6 +188,7 @@ public class Person implements Session.Saveable {
   
   
   public boolean canTakeAction() {
+    if (lastAction != null && lastAction.used.delayed()) return false;
     return conscious() && actionPoints > 0;
   }
   
@@ -320,7 +321,10 @@ public class Person implements Session.Saveable {
   /**  Regular updates and life-cycle-
     */
   public void updateOnTurn() {
+    actionPoints = maxAP();
+    lastAction   = null;
     
+    //  TODO:  Apply any conditions with stat effects, et cetera!
   }
   
   
