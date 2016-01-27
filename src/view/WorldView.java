@@ -365,7 +365,7 @@ public class WorldView {
       for (Ability a : p.abilities()) {
         int level = (int) p.levelFor(a);
         s.append("\n  "+a.name);
-        s.append(" (Level "+level+")");
+        s.append(" ("+level+")");
       }
       
       Assignment assigned = p.assignment();

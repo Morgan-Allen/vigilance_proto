@@ -5,8 +5,11 @@ Notes:
 
 *  A wider range of abilities for the current heroes.
 
-*  XP gain and skill-advancement over time.
+*  XP gain and skill-advancement over time.  (Either pick skills out of a hat
+   or have an explicit training mechanic.)
 
 *  The basics of role-play elements.
 
 *  Research & development.
+
+*  Hostages and captives.  Plus extra goon-types!

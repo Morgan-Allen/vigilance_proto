@@ -44,9 +44,14 @@ public class Person implements Session.Saveable {
     SLOT_ARMOUR = 1,
     SLOT_ITEMS  = 2,
     NUM_EQUIP_SLOTS = 4;
+  public static enum Side {
+    HEROES, VILLAINS
+  };
+  
   
   
   Kind kind;
+  Side side;
   String name;
   int AIstate = STATE_INIT;
   int totalXP = 0;
@@ -79,6 +84,9 @@ public class Person implements Session.Saveable {
       equipItem(kind.baseEquipment[n]);
     }
     alive = conscious = true;
+    
+    if (kind.type == Kind.TYPE_HERO) side = Side.HEROES;
+    else side = Side.VILLAINS;
   }
   
   
@@ -415,12 +423,8 @@ public class Person implements Session.Saveable {
     Scene scene = currentScene();
     if (scene == null) return false;
     
-    //  TODO:  This may require some subsequent refinement!
-    if (isPlayerOwned()) return scene.fogAt(point) > 0;
-    else {
-      if (scene.fogAt(location) <= 0) return false;
-      return scene.distance(location, point) < (sightRange() * 2);
-    }
+    //  TODO:  Include a bonus for recently seen/unmoved enemies!
+    return scene.fogAt(point, side) > 0;
   }
   
   

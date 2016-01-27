@@ -35,7 +35,8 @@ public class Scene implements Session.Saveable, Assignment {
   int size;
   int time;
   Tile tiles[][] = new Tile[0][0];
-  byte fog  [][] = new byte[0][0];
+  byte fogP [][] = new byte[0][0];
+  byte fogO [][] = new byte[0][0];
   List <Prop> props = new List();
   List <Person> persons = new List();
   
@@ -67,11 +68,13 @@ public class Scene implements Session.Saveable, Assignment {
     time   = s.loadInt();
     int tS = s.loadInt();
     tiles  = new Tile[tS][tS];
-    fog    = new byte[tS][tS];
+    fogP   = new byte[tS][tS];
+    fogO   = new byte[tS][tS];
     for (Coord c : Visit.grid(0, 0, tS, tS, 1)) {
       tiles[c.x][c.y] = (Tile) s.loadObject();
     }
-    s.loadByteArray(fog);
+    s.loadByteArray(fogP);
+    s.loadByteArray(fogO);
     s.loadObjects(props);
     s.loadObjects(persons);
     
@@ -100,7 +103,8 @@ public class Scene implements Session.Saveable, Assignment {
     for (Coord c : Visit.grid(0, 0, tS, tS, 1)) {
       s.saveObject(tiles[c.x][c.y]);
     }
-    s.saveByteArray(fog);
+    s.saveByteArray(fogP);
+    s.saveByteArray(fogO);
     s.saveObjects(props);
     s.saveObjects(persons);
     
@@ -181,8 +185,10 @@ public class Scene implements Session.Saveable, Assignment {
   }
   
   
-  public float fogAt(Tile at) {
-    return fog[at.x][at.y] / 100f;
+  public float fogAt(Tile at, Person.Side side) {
+    if (side == Person.Side.HEROES  ) return fogP[at.x][at.y] / 100f;
+    if (side == Person.Side.VILLAINS) return fogO[at.x][at.y] / 100f;
+    return 1;
   }
   
   
@@ -319,7 +325,8 @@ public class Scene implements Session.Saveable, Assignment {
     this.state = STATE_SETUP;
     
     tiles = new Tile[size][size];
-    fog   = new byte[size][size];
+    fogP  = new byte[size][size];
+    fogO  = new byte[size][size];
     
     for (Coord c : Visit.grid(0, 0, size, size, 1)) {
       tiles[c.x][c.y] = new Tile(this, c.x, c.y);
@@ -479,9 +486,14 @@ public class Scene implements Session.Saveable, Assignment {
     */
   void updateFog() {
     for (Coord c : Visit.grid(0, 0, size, size, 1)) {
-      fog[c.x][c.y] = 0;
+      fogP[c.x][c.y] = 0;
+      fogO[c.x][c.y] = 0;
     }
     for (Person p : playerTeam) {
+      final int radius = p.sightRange();
+      liftFogAround(p.location, radius, p, true);
+    }
+    for (Person p : othersTeam) {
       final int radius = p.sightRange();
       liftFogAround(p.location, radius, p, true);
     }
@@ -491,6 +503,11 @@ public class Scene implements Session.Saveable, Assignment {
   public void liftFogAround(
     Tile point, int radius, Person looks, boolean checkSight
   ) {
+    byte fog[][] = null;
+    if (looks.side == Person.Side.HEROES  ) fog = fogP;
+    if (looks.side == Person.Side.VILLAINS) fog = fogO;
+    if (fog == null) return;
+    
     for (Coord c : Visit.grid(
       point.x - radius, point.y - radius,
       radius * 2      , radius * 2      , 1

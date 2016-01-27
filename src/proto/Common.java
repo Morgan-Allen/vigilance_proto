@@ -92,7 +92,7 @@ public class Common {
     
     BATARANG = new Ability(
       "Batarang", "ability_batarang",
-      "Throw a Batarang for 1-5 damage and 40% chance to disarm. (Note that "+
+      "Throw a Batarang for 1-5 damage and 66% chance to disarm. (Note that "+
       "strong opponents may resist disarming.)",
       IS_RANGED, 1, MINOR_HARM, MINOR_POWER
     ) {
@@ -107,7 +107,7 @@ public class Common {
         struck.takeDamage(damage, 0);
         
         float resistance = struck.levelFor(MUSCLE) / 100f;
-        float disarmChance = 0.4f - resistance;
+        float disarmChance = 0.66f - resistance;
         if (Rand.num() < disarmChance && struck.hasEquipped(SLOT_WEAPON)) {
           I.say(struck+" dropped their weapon!");
           struck.emptyEquipSlot(Person.SLOT_WEAPON);

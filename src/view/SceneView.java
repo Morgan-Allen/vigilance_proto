@@ -69,6 +69,7 @@ public class SceneView {
   void renderTo(Surface surface, Graphics2D g) {
     int size = scene.size();
     Action done = scene.currentAction();
+    Batch <Person> visible = new Batch <Person> ();
     
     //
     //  Update camera information first-
@@ -85,12 +86,13 @@ public class SceneView {
       Tile t = prop.origin();
       renderAt(t.x, t.y, prop.kind(), g);
     }
-    for (Person p : scene.persons()) if (scene.fogAt(p.location()) > 0) {
+    for (Person p : scene.persons()) {
+      if (scene.fogAt(p.location(), Person.Side.HEROES) <= 0) continue;
       Vec3D pos = p.exactPosition();
       renderAt(pos.x, pos.y, p.kind(), g);
+      visible.add(p);
     }
-    for (Person p : scene.persons()) if (scene.fogAt(p.location()) > 0) {
-      
+    for (Person p : visible) {
       Color               teamColor = Color.GREEN;
       if (p.isHero    ()) teamColor = Color.BLUE;
       if (p.isCriminal()) teamColor = Color.RED;
@@ -120,7 +122,7 @@ public class SceneView {
     }
     for (Coord c : Visit.grid(0, 0, size, size, 1)) {
       Tile t = scene.tileAt(c.x, c.y);
-      float fogAlpha = 1f - scene.fogAt(t);
+      float fogAlpha = 1f - scene.fogAt(t, Person.Side.HEROES);
       Color black = SCALE[Nums.clamp((int) (fogAlpha * 10), 10)];
       renderAt(c.x, c.y, 1, 1, null, black, g);
     }
