@@ -8,7 +8,8 @@ Notes:
 *  XP gain and skill-advancement over time.  (Either pick skills out of a hat
    or have an explicit training mechanic.)
 
-*  The basics of role-play elements.
+*  The basics of role-play elements- gaining guilt, gaining luck, the effects
+   of killing, support and pledges.
 
 *  Research & development.
 
