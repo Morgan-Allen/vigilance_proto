@@ -6,6 +6,7 @@ import proto.*;
 import proto.common.Session;
 import proto.game.scene.Ability;
 import proto.game.scene.Action;
+import proto.game.scene.Common;
 import proto.game.scene.Equipped;
 import proto.game.scene.Kind;
 import proto.game.scene.Person;
@@ -84,6 +85,13 @@ public class SceneView {
     Action done = scene.currentAction();
     Batch <Person> visible = new Batch <Person> ();
     
+    final Color SCALE[] = new Color[10];
+    final Color ENEMY[] = new Color[10];
+    for (int n = 10; n-- > 0;) {
+      SCALE[n] = new Color(0, 0, 0, n / 10f);
+      ENEMY[n] = new Color(1, 0, 0, n / 50f);
+    }
+    
     //
     //  Update camera information first-
     if (zoomTile != null) {
@@ -99,6 +107,20 @@ public class SceneView {
       Tile t = prop.origin();
       renderAt(t.x, t.y, prop.kind(), g);
     }
+    
+    //
+    //  Render enemy-sight on top of objects but beneath persons-
+    for (Coord c : Visit.grid(0, 0, size, size, 1)) {
+      Tile t = scene.tileAt(c.x, c.y);
+      float seeAlpha = scene.fogAt(t, Person.Side.VILLAINS);
+      if (seeAlpha > 0) {
+        Color warns = ENEMY[Nums.clamp((int) (seeAlpha * 10), 10)];
+        renderAt(c.x, c.y, 1, 1, null, warns, g);
+      }
+    }
+    
+    //
+    //  Render the persons themselves-
     for (Person p : scene.persons()) {
       if (scene.fogAt(p.location(), Person.Side.HEROES) <= 0) continue;
       Vec3D pos = p.exactPosition();
@@ -128,11 +150,7 @@ public class SceneView {
     }
     
     //
-    //  Then render fog on top of all objects-
-    final Color SCALE[] = new Color[10];
-    for (int n = 10; n-- > 0;) {
-      SCALE[n] = new Color(0, 0, 0, n / 20f);
-    }
+    //  Then render our own fog on top of all objects-
     for (Coord c : Visit.grid(0, 0, size, size, 1)) {
       Tile t = scene.tileAt(c.x, c.y);
       float fogAlpha = 1f - scene.fogAt(t, Person.Side.HEROES);
@@ -147,7 +165,8 @@ public class SceneView {
     }
     
     //
-    //  Then determine what tile (and any objects above) are being selected-
+    //  Otherwise, determine what tile (and any objects above) are being
+    //  selected-
     int HT = TILE_SIZE / 2;
     int hoverX = (surface.mouseX + zoomX + HT) / TILE_SIZE;
     int hoverY = (surface.mouseY + zoomY + HT) / TILE_SIZE;
@@ -200,6 +219,7 @@ public class SceneView {
     
     if (p != null) {
       s.append("\nSelection: "+p.name());
+      s.append("\n  On team: "+p.isHero());
       
       int HP = (int) (p.maxHealth() - (p.injury() + p.fatigue()));
       int armour = p.stats.levelFor(Person.ARMOUR);
@@ -207,8 +227,12 @@ public class SceneView {
       if (p.fatigue() > 0) s.append(" (Stun "+(int) p.fatigue()+")");
       s.append("\n  AP: "+p.currentAP()+"/"+p.maxAP());
       if (armour > 0) s.append("\n  Armour: "+armour);
+      
       if (! p.alive()) s.append("\n  Dead");
       else if (! p.conscious()) s.append("\n  Unconscious");
+      else if (p.currentAction() != null) {
+        s.append("\n  Last action: "+p.currentAction().used);
+      }
       
       Series <Equipped> equipped = p.equipment();
       if (equipped.size() > 0) {
@@ -251,6 +275,7 @@ public class SceneView {
             s.append("\n  Confirm (C)");
             if (print.isPressed('c')) {
               scene.queueNextAction(selectAction);
+              scene.moveToNextPersonsTurn();
             }
           }
           else {

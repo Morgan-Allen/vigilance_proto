@@ -125,8 +125,8 @@ public class Volley implements Session.Saveable {
     
     this.self    = self;
     this.hits    = hits;
-    selfAccuracy = (self.stats.levelFor(SPEED) * 5) + 50;
-    hitsDefence  = (hits.stats.levelFor(SPEED) * 5) + 0 ;
+    selfAccuracy = (int) (self.stats.levelFor(SPEED) * 2.5f) + 50;
+    hitsDefence  = (int) (hits.stats.levelFor(SPEED) * 2.5f) + 0 ;
     
     //  TODO:  It might not be a weapon though- could be an ability or
     //  triggered item, etc.
@@ -139,8 +139,8 @@ public class Volley implements Session.Saveable {
     //  apply ranged penalties.
     if (weaponType.melee() && ! ranged) {
       int power = self.stats.levelFor(MUSCLE);
-      selfDamageBase  = Nums.floor(power / 8f);
-      selfDamageRange = Nums.ceil (power / 8f);
+      selfDamageBase  = Nums.floor(power / 5f);
+      selfDamageRange = Nums.ceil (power / 5f);
     }
     if (ranged) {
       int normRange = self.sightRange() - 2;
@@ -150,10 +150,8 @@ public class Volley implements Session.Saveable {
     
     selfDamageBase  += Nums.floor(weaponType.bonus / 2f);
     selfDamageRange += Nums.ceil (weaponType.bonus / 2f);
-    hitsArmour      += armourType.bonus     ;
-    
-    //  TODO:  Only do this if it's not your turn!
-    //hitsDefence     += hits.currentAP() * 10;
+    hitsArmour      += armourType.bonus;
+    if (hits.turnDone) hitsDefence += hits.currentAP() * 10;
     
     float damageMult = damagePercent / 100f;
     float armourMult = armourPercent / 100f;
@@ -178,6 +176,8 @@ public class Volley implements Session.Saveable {
   
   void resolveAccuracy() {
     accuracyMargin = selfAccuracy - hitsDefence;
+    I.say("  Resolving volley (hit chance "+accuracyMargin+"%)");
+    
     if (Rand.index(100) < accuracyMargin) {
       didConnect = true;
       I.say("  Volley connected!");

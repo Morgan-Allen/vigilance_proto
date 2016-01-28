@@ -28,7 +28,7 @@ public class Scene implements Session.Saveable, Assignment {
   World world;
   Nation site;
   List <Person> playerTeam = new List();
-  List <Person> othersTeam  = new List();
+  List <Person> othersTeam = new List();
   int state = STATE_INIT;
   
   int size;
@@ -358,6 +358,7 @@ public class Scene implements Session.Saveable, Assignment {
     view.setZoomPoint(tileAt(x, y));
     for (Person p : playerTeam) {
       addPerson(p, x, y);
+      p.onTurnStart();
       x += 1;
     }
     nextActing = playerTeam.first();
@@ -373,7 +374,7 @@ public class Scene implements Session.Saveable, Assignment {
     Person acting = action.acting;
     nextActing = acting;
     acting.actionPoints -= action.used.costAP(action);
-    acting.lastAction = action;
+    acting.currentAction = action;
     action.used.applyOnActionStart(action);
     action.used.checkForTriggers(action, true, false);
     I.say(acting+" using "+action.used+" on "+action.target);
@@ -402,34 +403,47 @@ public class Scene implements Session.Saveable, Assignment {
   
   
   public void moveToNextPersonsTurn() {
+    I.say("\n  Trying to find next active person...");
+    I.say("  Active: "+nextActing);
+    
+    //  TODO:  The whole architecture here probably needs a rewrite.
+    if (
+      (nextActing != null) &&
+      (! nextActing.turnDone) &&
+      (! nextActing.canTakeAction())
+    ) {
+      I.say("\n  Ending turn for "+nextActing);
+      nextActing.onTurnEnd();
+    }
+    nextActing = null;
     final int numTeams = 2;
+    
     for (int maxTries = numTeams + 1; maxTries-- > 0;) {
-      Series <Person> team = playerTurn ? playerTeam : othersTeam;
-      nextActing = null;
+      Series <Person> team     = playerTurn ? playerTeam : othersTeam;
+      Series <Person> nextTeam = playerTurn ? othersTeam : playerTeam;
       
       I.say("\n  Trying to find active person from ");
       if (playerTurn) I.add("player team"); else I.add("enemy team");
-      I.say("  Active: "+nextActing);
       
       for (Person p : team) {
         if (! p.canTakeAction()) continue;
         
         if (playerTurn) {
-          I.say("  ACTIVE PC: "+p);
+          I.say("  ACTIVE PC: "+p+", AP: "+p.actionPoints);
           nextActing = p;
           break;
         }
         else {
-          I.say("  FOUND NPC: "+p);
+          I.say("  FOUND NPC: "+p+", AP: "+p.actionPoints);
           Action taken = p.selectActionAsAI();
           if (taken != null) {
-            I.say(p+" will take action: "+taken.used);
+            I.say("    "+p+" will take action: "+taken.used);
             queueNextAction(taken);
             nextActing = p;
             break;
           }
           else {
-            I.say(p+" could not decide on action.");
+            I.say("    "+p+" could not decide on action.");
             p.actionPoints = 0;
             continue;
           }
@@ -438,8 +452,8 @@ public class Scene implements Session.Saveable, Assignment {
       
       if (nextActing == null) {
         I.say("  Will refresh AP and try other team...");
-        for (Person p : team) {
-          p.updateOnTurn();
+        for (Person p : nextTeam) {
+          p.onTurnStart();
         }
         playerTurn = ! playerTurn;
       }

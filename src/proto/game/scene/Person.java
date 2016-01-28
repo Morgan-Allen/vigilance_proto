@@ -68,7 +68,8 @@ public class Person implements Session.Saveable {
   Tile location;
   float posX, posY;
   int actionPoints;
-  Action lastAction;
+  Action currentAction;
+  boolean turnDone;
   
   
   
@@ -101,7 +102,7 @@ public class Person implements Session.Saveable {
     }
     
     injury    = s.loadFloat();
-    stun   = s.loadFloat();
+    stun      = s.loadFloat();
     alive     = s.loadBool();
     conscious = s.loadBool();
     
@@ -110,7 +111,8 @@ public class Person implements Session.Saveable {
     posX         = s.loadFloat();
     posY         = s.loadFloat();
     actionPoints = s.loadInt();
-    lastAction   = (Action) s.loadObject();
+    currentAction   = (Action) s.loadObject();
+    turnDone     = s.loadBool();
   }
   
   
@@ -119,25 +121,26 @@ public class Person implements Session.Saveable {
     s.saveEnum  (side);
     s.saveString(name);
     s.saveInt(AIstate);
-    s.saveInt(luck);
-    s.saveInt(stress);
+    s.saveInt(luck   );
+    s.saveInt(stress );
     
     stats.saveState(s);
     for (int i = 0 ; i < NUM_EQUIP_SLOTS; i++) {
       s.saveObject(equipSlots[i]);
     }
     
-    s.saveFloat(injury);
-    s.saveFloat(stun);
-    s.saveBool(alive);
-    s.saveBool(conscious);
+    s.saveFloat(injury   );
+    s.saveFloat(stun     );
+    s.saveBool (alive    );
+    s.saveBool (conscious);
     
-    s.saveObject(assignment);
-    s.saveObject(location);
-    s.saveFloat(posX);
-    s.saveFloat(posY);
-    s.saveInt(actionPoints);
-    s.saveObject(lastAction);
+    s.saveObject(assignment  );
+    s.saveObject(location    );
+    s.saveFloat (posX        );
+    s.saveFloat (posY        );
+    s.saveInt   (actionPoints);
+    s.saveObject(currentAction  );
+    s.saveBool  (turnDone    );
   }
   
   
@@ -189,9 +192,19 @@ public class Person implements Session.Saveable {
   }
   
   
+  public Action currentAction() {
+    return currentAction;
+  }
+  
+  
+  public boolean turnDone() {
+    return turnDone;
+  }
+  
+  
   public boolean canTakeAction() {
-    if (lastAction != null && lastAction.used.delayed()) return false;
-    return conscious() && actionPoints > 0;
+    if (currentAction != null && currentAction.used.delayed()) return false;
+    return conscious() && actionPoints > 0 && ! turnDone;
   }
   
   
@@ -292,11 +305,14 @@ public class Person implements Session.Saveable {
   /**  State adjustments-
     */
   public void receiveAttack(Volley attack) {
-    this.injury += attack.injureDamage;
-    this.stun   += attack.stunDamage  ;
     
-    //  TODO:  Only do this if it's not your turn!
-    if (! attack.didConnect) actionPoints -= 1;
+    if (attack.didConnect) {
+      this.injury += attack.injureDamage;
+      this.stun   += attack.stunDamage  ;
+    }
+    else if (turnDone) {
+      actionPoints -= 1;
+    }
     checkState();
   }
   
@@ -324,10 +340,19 @@ public class Person implements Session.Saveable {
   
   /**  Regular updates and life-cycle-
     */
-  public void updateOnTurn() {
-    actionPoints = maxAP();
-    lastAction   = null;
-    
+  public void onTurnStart() {
+    actionPoints  = maxAP();
+    currentAction = null;
+    turnDone      = false;
+  }
+  
+  
+  public void onTurnEnd() {
+    if (currentAction == null || ! currentAction.used.delayed()) {
+      currentAction = null;
+    }
+    turnDone = true;
+    //
     //  TODO:  Apply any conditions with stat effects, et cetera!
   }
   
@@ -361,12 +386,12 @@ public class Person implements Session.Saveable {
   /**  Rudimentary AI methods-
     */
   public boolean isHero() {
-    return kind.type == Kind.TYPE_HERO;
+    return side == Side.HEROES && ! isCivilian();
   }
   
   
   public boolean isCriminal() {
-    return kind.type == Kind.TYPE_MOOK || kind.type == Kind.TYPE_BOSS;
+    return side == Side.VILLAINS && ! isCivilian();
   }
   
   
@@ -416,11 +441,19 @@ public class Person implements Session.Saveable {
   public Action selectActionAsAI() {
     Scene scene = currentScene();
     if (scene == null || ! conscious()) return null;
-    Pick <Action> pick = new Pick(0);
+    boolean report = I.talkAbout == this;
+    if (report) I.say("\nGetting next AI action for "+this);
     
+    if (decideOnRetreat()) AIstate = STATE_RETREAT;
+    else AIstate = STATE_ACTIVE;
+    
+    Pick <Action> pick = new Pick(0);
     for (Person p : scene.persons) for (Ability a : stats.listAbilities()) {
       Action use = a.configAction(this, p.location, p, scene, null);
-      if (use != null) pick.compare(use, a.rateUsage(use) * Rand.avgNums(2));
+      if (use == null) continue;
+      float rating = a.rateUsage(use) * Rand.avgNums(2);
+      if (report) I.say("  Rating for "+a+" is "+rating);
+      pick.compare(use, rating);
     }
     
     if (pick.empty()) {
@@ -439,6 +472,11 @@ public class Person implements Session.Saveable {
   
   /**  Other supplementary action-creation methods-
     */
+  private boolean decideOnRetreat() {
+    return false;
+  }
+  
+  
   Action pickAdvanceAction(Series <Person> foes) {
     Scene scene = currentScene();
     for (Person p : foes) {

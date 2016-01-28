@@ -192,8 +192,8 @@ public abstract class Ability extends Index.Entry implements Session.Saveable {
       if (start) use.volley.beginVolley   ();
       if (end  ) use.volley.completeVolley();
       
-      if (self != null && self.lastAction != null) {
-        Ability a = self.lastAction.used;
+      if (self != null && self.currentAction != null) {
+        Ability a = self.currentAction.used;
         if (a.triggerOnAttack() && a.allowsTarget(self, scene, self)) {
           if (start) a.applyOnAttackStart(volley);
           if (end  ) a.applyOnAttackEnd  (volley);
@@ -208,8 +208,8 @@ public abstract class Ability extends Index.Entry implements Session.Saveable {
         }
       }
       
-      if (hits != null && hits.lastAction != null) {
-        Ability a = hits.lastAction.used;
+      if (hits != null && hits.currentAction != null) {
+        Ability a = hits.currentAction.used;
         if (a.triggerOnDefend() && a.allowsTarget(hits, scene, hits)) {
           if (start) a.applyOnDefendStart(volley);
           if (end  ) a.applyOnDefendEnd  (volley);
@@ -288,11 +288,15 @@ public abstract class Ability extends Index.Entry implements Session.Saveable {
       Person other = (Person) use.target;
       if (other.isAlly (acts)) relation =  1;
       if (other.isEnemy(acts)) relation = -1;
+      if (relation < 0 && ! other.conscious()) relation = 0;
     }
-    rating = harmLevel * relation * -1 * powerLevel;
     
+    rating = harmLevel * relation * -1 * powerLevel;
     Tile at = acts.currentScene().tileUnder(use.target);
     rating *= 10f / (10 + at.scene.distance(acts.location, at));
+    
+    //  TODO:  Include a rating for hit-chance, assuming that a Volley is
+    //  involved?  (Maybe base on brains?)
     
     return rating;
   }

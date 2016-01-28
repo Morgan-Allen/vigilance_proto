@@ -66,7 +66,7 @@ public class Common {
     EVASION = new Ability(
       "Evasion", "ability_evasion",
       "Reserve AP to increase chance to dodge enemy attacks until your next "+
-      " turn by 50%.",
+      " turn by 20%.",
       IS_DELAYED | TRIGGER_ON_DEFEND, 1, NO_HARM, MINOR_POWER
     ) {
       
@@ -76,7 +76,7 @@ public class Common {
       
       public void applyOnDefendStart(Volley volley) {
         Tile open = nearestOpenTile(volley.hitsAsPerson());
-        if (open != null) volley.hitsDefence += 50;
+        if (open != null) volley.hitsDefence += 20;
       }
       
       public void applyOnDefendEnd(Volley volley) {
@@ -195,14 +195,13 @@ public class Common {
     LASSO = new Ability(
       "Lasso", "ability_lasso",
       "Pulls a distant target to within closer range.  (Note- strong enemies "+
-      "may resist, and closest tile must be free.)",
+      "may resist, and an adjacent tile must be free.)",
       IS_RANGED, 2, NO_HARM, MINOR_POWER
     ) {
       
       public boolean allowsTarget(Object target, Scene scene, Person acting) {
         if (! (target instanceof Person)) return false;
         Tile close = closestTo((Person) target, acting);
-        if (close.blocked()) I.say("Tile is blocked");
         return ! close.blocked();
       }
       
@@ -239,7 +238,8 @@ public class Common {
       Tile closestTo(Person target, Person from) {
         Scene scene = from.currentScene();
         Pick <Tile> pick = new Pick();
-        for (Tile t : from.location.tilesAdjacent()) if (t != null) {
+        for (Tile t : from.location.tilesAdjacent()) {
+          if (t == null || t.blocked()) continue;
           pick.compare(t, 0 - scene.distance(t, target.location));
         }
         return pick.result();
@@ -311,7 +311,7 @@ public class Common {
       BRAIN , 16 ,
       SPEED , 25 ,
       SIGHT , 10 ,
-      MOVE, 1, STRIKE, 1, DISARM, 1,
+      MOVE, 1, STRIKE, 1, DISARM, 1, EVASION, 1,
       LASSO, 1
     );
   
