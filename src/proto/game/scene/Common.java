@@ -41,8 +41,8 @@ public class Common {
     
     STRIKE = new Ability(
       "Strike", "ability_strike",
-      "Strike a melee target.  (Deals base of 2-7 damage, scaling with "+
-      "strength and weapon bonus.  Half damage is stun.)",
+      "Strike a melee target.  (Base damage scales with strength and weapon "+
+      "bonus, 50% stun damage.)",
       NONE, 1, REAL_HARM, MINOR_POWER
     ) {
       
@@ -147,7 +147,7 @@ public class Common {
         Scene  scene  = use.acting.currentScene();
         Person struck = (Person) use.target;
         Volley volley = new Volley();
-        volley.setupVolley(use.acting, struck, false, scene);
+        volley.setupVolley(use.acting, struck, true, scene);
         volley.selfDamageBase  = 2;
         volley.selfDamageRange = 2;
         return volley;
@@ -194,25 +194,31 @@ public class Common {
     
     LASSO = new Ability(
       "Lasso", "ability_lasso",
-      "Pulls a distant enemy to within closer range and deals strike damage."+
-      " (Note- strong enemies may resist, and closest tile must be free.)",
+      "Pulls a distant target to within closer range.  (Note- strong enemies "+
+      "may resist, and closest tile must be free.)",
       IS_RANGED, 2, NO_HARM, MINOR_POWER
     ) {
       
       public boolean allowsTarget(Object target, Scene scene, Person acting) {
         if (! (target instanceof Person)) return false;
         Tile close = closestTo((Person) target, acting);
+        if (close.blocked()) I.say("Tile is blocked");
         return ! close.blocked();
       }
       
       
       public int maxRange() {
-        return 4;
+        return 9;
       }
       
       
       Volley createVolley(Action use) {
-        return STRIKE.createVolley(use);
+        Scene  scene  = use.acting.currentScene();
+        Person struck = (Person) use.target;
+        Volley volley = new Volley();
+        volley.setupVolley(use.acting, struck, true, scene);
+        volley.damagePercent = 0;
+        return volley;
       }
       
       
@@ -223,10 +229,9 @@ public class Common {
         float  resistance  = 0.5f + (struck.stats.levelFor(MUSCLE) / 100f);
                resistance -=         acting.stats.levelFor(MUSCLE) / 100f;
         
-        if (Rand.num() >= resistance) {
+        if (Rand.num() >= resistance && use.volley.didConnect) {
           Tile close = closestTo(struck, use.acting);
           struck.setExactPosition(close.x, close.y, 0, scene);
-          STRIKE.applyOnActionEnd(use);
         }
       }
       
@@ -251,13 +256,13 @@ public class Common {
       "Unarmed", "item_unarmed",
       "Bare fists and moxy.",
       SLOT_WEAPON, 0,
-      Equipped.IS_WEAPON | Equipped.IS_MELEE, 5
+      Equipped.IS_WEAPON | Equipped.IS_MELEE, 0
     ),
     UNARMOURED = new Equipped(
       "Unarmoured", "item_unarmoured",
       "Bare fists and moxy.",
       SLOT_ARMOUR, 0,
-      Equipped.IS_ARMOUR, 5
+      Equipped.IS_ARMOUR, 0
     );
   
   

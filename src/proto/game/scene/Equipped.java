@@ -22,10 +22,11 @@ public class Equipped extends Index.Entry implements Session.Saveable {
     IS_RANGED   = 1 << 4;
   
   final public String name, description;
-  final int slotID;
-  final int buildCost;
+  final public int slotID;
+  final public int buildCost;
+  final public int bonus;
+  
   final int properties;
-  final int bonus;
   final Ability abilities[];
   
   

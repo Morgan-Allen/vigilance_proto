@@ -89,6 +89,7 @@ public class Person implements Session.Saveable {
   public Person(Session s) throws Exception {
     s.cacheInstance(this);
     kind    = (Kind) s.loadObject();
+    side    = (Side) s.loadEnum(Side.values());
     name    = s.loadString();
     AIstate = s.loadInt();
     luck    = s.loadInt();
@@ -115,6 +116,7 @@ public class Person implements Session.Saveable {
   
   public void saveState(Session s) throws Exception {
     s.saveObject(kind);
+    s.saveEnum  (side);
     s.saveString(name);
     s.saveInt(AIstate);
     s.saveInt(luck);
@@ -292,6 +294,8 @@ public class Person implements Session.Saveable {
   public void receiveAttack(Volley attack) {
     this.injury += attack.injureDamage;
     this.stun   += attack.stunDamage  ;
+    
+    //  TODO:  Only do this if it's not your turn!
     if (! attack.didConnect) actionPoints -= 1;
     checkState();
   }

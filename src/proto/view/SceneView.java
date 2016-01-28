@@ -31,8 +31,9 @@ public class SceneView {
   
   Tile zoomTile;
   int zoomX, zoomY;
-  Person selected;
-  Ability activeAbility;
+  Person  selected;
+  Ability selectAbility;
+  Action  selectAction;
   
   Image hoverBox;
   
@@ -48,7 +49,7 @@ public class SceneView {
     zoomX         = s.loadInt();
     zoomY         = s.loadInt();
     selected      = (Person) s.loadObject();
-    activeAbility = (Ability) s.loadObject();
+    selectAbility = (Ability) s.loadObject();
   }
   
   
@@ -57,7 +58,7 @@ public class SceneView {
     s.saveInt   (zoomX);
     s.saveInt   (zoomY);
     s.saveObject(selected);
-    s.saveObject(activeAbility);
+    s.saveObject(selectAbility);
   }
   
   
@@ -69,12 +70,12 @@ public class SceneView {
   public void setSelection(Person acting, boolean keepActiveAbility) {
     final Person old = selected;
     this.selected = acting;
-    if (acting != old || ! keepActiveAbility) this.activeAbility = null;
+    if (acting != old || ! keepActiveAbility) this.selectAbility = null;
   }
   
   
   public void setActiveAbility(Ability ability) {
-    this.activeAbility = ability;
+    this.selectAbility = ability;
   }
   
 
@@ -155,20 +156,24 @@ public class SceneView {
     if (hoverT != null) {
       renderAt(hoverT.x, hoverT.y, 1, 1, hoverBox, null, g);
       Object hovered = scene.topObjectAt(hoverT);
+      selectAction = null;
       
-      Action action = null;
-      if (activeAbility != null) action = activeAbility.configAction(
-        selected, hoverT, hovered, scene, null
-      );
-      if (activeAbility != null && action != null) {
-        int costAP = action.used.costAP(action);
+      //  Note:  Delayed actions only target the self, so no selection is
+      //  needed here.
+      if (selectAbility != null && ! selectAbility.delayed()) {
+        selectAction = selectAbility.configAction(
+          selected, hoverT, hovered, scene, null
+        );
+      }
+      if (selectAbility != null && selectAction != null) {
+        int costAP = selectAction.used.costAP(selectAction);
         renderString(hoverT.x, hoverT.y - 0.5f, "AP: "+costAP, Color.GREEN, g);
       }
-      if (activeAbility != null && action == null) {
+      if (selectAbility != null && selectAction == null) {
         renderString(hoverT.x, hoverT.y - 0.5f, "X", Color.RED, g);
       }
-      if (surface.mouseClicked && done == null && action != null) {
-        scene.queueNextAction(action);
+      if (surface.mouseClicked && done == null && selectAction != null) {
+        scene.queueNextAction(selectAction);
       }
       else if (surface.mouseClicked) {
         Person pickP = null;
@@ -183,7 +188,7 @@ public class SceneView {
   String description() {
     final StringBuffer s = new StringBuffer();
     final Person   p      = selected;
-    final Ability  a      = activeAbility;
+    final Ability  a      = selectAbility;
     final World    world  = scene.world();
     final Action   action = scene.currentAction();
     final Printout print  = world.game().print();
@@ -197,16 +202,18 @@ public class SceneView {
       s.append("\nSelection: "+p.name());
       
       int HP = (int) (p.maxHealth() - (p.injury() + p.fatigue()));
+      int armour = p.stats.levelFor(Person.ARMOUR);
       s.append("\n  Health: "+HP+"/"+p.maxHealth());
       if (p.fatigue() > 0) s.append(" (Stun "+(int) p.fatigue()+")");
       s.append("\n  AP: "+p.currentAP()+"/"+p.maxAP());
+      if (armour > 0) s.append("\n  Armour: "+armour);
       if (! p.alive()) s.append("\n  Dead");
       else if (! p.conscious()) s.append("\n  Unconscious");
       
       Series <Equipped> equipped = p.equipment();
       if (equipped.size() > 0) {
         s.append("\n  Equipment:");
-        for (Equipped e : equipped) s.append(" "+e.name);
+        for (Equipped e : equipped) s.append(" "+e.name+" ("+e.bonus+")");
       }
       
       boolean canCommand =
@@ -235,9 +242,21 @@ public class SceneView {
           }
         }
         //  TODO:  Allow zooming to and tabbing through party members.
+        //  Note:  Delayed actions only target the self, so no selection is
+        //  needed, only confirmation.
         else {
-          s.append("\n\n"+a.description);
-          s.append("\n  Select target");
+          if (a.delayed()) {
+            selectAction = a.configAction(p, p.location(), p, scene, null);
+            s.append("\n\n"+a.describeAction(selectAction, scene));
+            s.append("\n  Confirm (C)");
+            if (print.isPressed('c')) {
+              scene.queueNextAction(selectAction);
+            }
+          }
+          else {
+            s.append("\n\n"+a.describeAction(selectAction, scene));
+            s.append("\n  Select target");
+          }
           s.append("\n  Cancel (X)");
           if (print.isPressed('x')) {
             setSelection(p, false);

@@ -155,7 +155,7 @@ public abstract class Ability extends Index.Entry implements Session.Saveable {
     if (pathToTake != null) {
       path = pathToTake;
     }
-    else if (ranged()) {
+    else if (ranged() || passive() || delayed()) {
       path = new Tile[] { acting.location };
     }
     else {
@@ -223,6 +223,8 @@ public abstract class Ability extends Index.Entry implements Session.Saveable {
           if (end  ) a.applyOnDefendEnd  (volley);
         }
       }
+      
+      if (end && hits != null) hits.receiveAttack(volley);
     }
   }
   
@@ -322,9 +324,10 @@ public abstract class Ability extends Index.Entry implements Session.Saveable {
   public String describeAction(Action action, Scene scene) {
     StringBuffer s = new StringBuffer();
     s.append(description);
-    Volley v = action.volley;
-    if (v != null) {
-      s.append("\n  "+v.selfDamageBase+"-"+v.selfDamageRange+" damage");
+    if (action != null && action.volley != null) {
+      Volley v = action.volley;
+      int maxDamage = v.selfDamageBase + v.selfDamageRange;
+      s.append("\n  "+v.selfDamageBase+"-"+maxDamage+" damage");
       int hitMargin = Nums.max(0, v.selfAccuracy - v.hitsDefence);
       s.append("\n  "+hitMargin+"% to hit (armour "+v.hitsArmour+")");
     }
