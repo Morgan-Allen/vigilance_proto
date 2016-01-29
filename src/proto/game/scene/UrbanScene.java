@@ -1,7 +1,7 @@
 
 
 package proto.game.scene;
-import static proto.game.scene.Common.*;
+import static proto.game.content.Common.*;
 import static proto.game.scene.Equipped.*;
 import static proto.game.scene.Person.*;
 

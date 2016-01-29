@@ -3,6 +3,7 @@
 package proto.game.scene;
 import proto.common.Session;
 import proto.common.Session.Saveable;
+import proto.game.content.Common;
 import proto.game.world.Assignment;
 import proto.util.*;
 
@@ -169,6 +170,11 @@ public class Person implements Session.Saveable {
   
   public int maxAP() {
     return stats.levelFor(SPEED) / 4;
+  }
+  
+  
+  public int baseArmour() {
+    return stats.levelFor(ARMOUR);
   }
   
   

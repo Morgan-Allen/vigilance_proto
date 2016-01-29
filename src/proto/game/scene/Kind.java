@@ -53,6 +53,9 @@ public class Kind extends Index.Entry implements Session.Saveable {
   
   public int wide() { return wide; }
   public int high() { return high; }
+  public boolean blockSight() { return blockSight; }
+  public boolean blockPath () { return blockPath ; }
+  
   public String name() { return name; }
   public Image sprite() { return sprite; }
   
@@ -60,7 +63,7 @@ public class Kind extends Index.Entry implements Session.Saveable {
   
   
   
-  static Kind ofPerson(
+  public static Kind ofPerson(
     String name, String ID, String spritePath,
     int type, Object... initStats
   ) {
@@ -101,7 +104,7 @@ public class Kind extends Index.Entry implements Session.Saveable {
   }
   
   
-  static Kind ofProp(
+  public static Kind ofProp(
     String name, String ID, String spritePath,
     int wide, int high, boolean blockPath, boolean blockSight
   ) {

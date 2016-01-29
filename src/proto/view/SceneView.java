@@ -4,9 +4,9 @@
 package proto.view;
 import proto.*;
 import proto.common.Session;
+import proto.game.content.Common;
 import proto.game.scene.Ability;
 import proto.game.scene.Action;
-import proto.game.scene.Common;
 import proto.game.scene.Equipped;
 import proto.game.scene.Kind;
 import proto.game.scene.Person;

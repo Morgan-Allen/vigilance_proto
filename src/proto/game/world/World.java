@@ -1,17 +1,9 @@
 
 
 package proto.game.world;
-import java.awt.*;
-import java.awt.image.*;
-import java.io.*;
-import javax.imageio.*;
-
-import proto.common.RunGame;
-import proto.common.Session;
-import proto.common.Session.Saveable;
-import proto.game.scene.Common;
-import proto.game.scene.Person;
-import proto.game.scene.Scene;
+import proto.common.*;
+import proto.game.scene.*;
+import proto.game.content.*;
 import proto.util.*;
 import proto.view.*;
 
@@ -97,10 +89,10 @@ public class World implements Session.Saveable {
   
   public void initDefaultBase() {
     this.base = new Base(this);
-    base.addToRoster(new Person(Common.NOCTURNE, "Batman"      ));
-    base.addToRoster(new Person(Common.KESTREL , "Robin"       ));
-    base.addToRoster(new Person(Common.CORONA  , "Superman"    ));
-    base.addToRoster(new Person(Common.GALATEA , "Wonder Woman"));
+    base.addToRoster(new Person(Vesper .VESPER , "Batman"      ));
+    base.addToRoster(new Person(Vesper .KESTREL, "Robin"       ));
+    base.addToRoster(new Person(Corona .CORONA , "Superman"    ));
+    base.addToRoster(new Person(Galatea.GALATEA, "Wonder Woman"));
     
     base.addFacility(Blueprint.INFIRMARY    , 0, 1f);
     base.addFacility(Blueprint.TRAINING_ROOM, 1, 1f);

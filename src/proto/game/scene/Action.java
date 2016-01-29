@@ -9,18 +9,19 @@ public class Action implements Session.Saveable {
   
   
   final public Ability used;
+  final public Person acting;
+  final public Object target;
   
-  Person acting;
-  Object target;
   Tile path[];
   Volley volley;
-  
   int timeStart;
   float progress;
   
   
-  Action(Ability used) {
+  Action(Ability used, Person acting, Object target) {
     this.used = used;
+    this.acting = acting;
+    this.target = target;
   }
   
   
@@ -48,10 +49,25 @@ public class Action implements Session.Saveable {
   
   
   
-  /**  Life-cycle and update methods-
+  /**  General query methods-
     */
   public float progress() {
     return progress;
+  }
+  
+  
+  public Scene scene() {
+    return acting.currentScene();
+  }
+  
+  
+  public Tile[] path() {
+    return path;
+  }
+  
+  
+  public Volley volley() {
+    return volley;
   }
   
   

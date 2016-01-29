@@ -375,8 +375,6 @@ public class Scene implements Session.Saveable, Assignment {
     nextActing = acting;
     acting.actionPoints -= action.used.costAP(action);
     acting.currentAction = action;
-    action.used.applyOnActionStart(action);
-    action.used.checkForTriggers(action, true, false);
     I.say(acting+" using "+action.used+" on "+action.target);
   }
   
@@ -398,6 +396,50 @@ public class Scene implements Session.Saveable, Assignment {
     }
     else {
       I.say(acting+" not finished turn yet...");
+    }
+  }
+  
+  
+  public void updateScene() {
+    
+    final Action a = currentAction;
+    if (a != null) {
+      final Person p = a.acting;
+      time++;
+      
+      int elapsed = time - a.timeStart;
+      float moveRate = 4;
+      float timeSteps = elapsed * moveRate / RunGame.FRAME_RATE;
+      
+      float alpha = timeSteps % 1;
+      Tile l = a.path[Nums.clamp((int)  timeSteps     , a.path.length)];
+      Tile n = a.path[Nums.clamp((int) (timeSteps + 1), a.path.length)];
+      
+      Tile oldLoc = p.location;
+      p.setExactPosition(
+        (alpha * n.x) + ((1 - alpha) * l.x),
+        (alpha * n.y) + ((1 - alpha) * l.y),
+        0, this
+      );
+      if (p.location != oldLoc) updateFog();
+      
+      if (timeSteps > a.path.length) {
+        if (a.progress == -1) {
+          a.used.applyOnActionStart(a);
+          a.used.checkForTriggers(a, true, false);
+        }
+        float extraTime = a.used.animDuration();
+        a.progress = (timeSteps - a.path.length) / (extraTime * moveRate);
+      }
+      if (a.progress >= 1) {
+        onCompletion(a);
+      }
+    }
+    
+    int nextState = checkCompletionStatus();
+    if (nextState != STATE_BEGUN && ! finished()) {
+      this.state = nextState;
+      applySiteEffects();
     }
   }
   
@@ -465,46 +507,6 @@ public class Scene implements Session.Saveable, Assignment {
       }
     }
     I.say("\nWARNING- COULD NOT FIND NEXT ACTIVE PERSON!");
-  }
-  
-  
-  public void updateScene() {
-    
-    final Action a = currentAction;
-    if (a != null) {
-      final Person p = a.acting;
-      time++;
-      
-      int elapsed = time - a.timeStart;
-      float moveRate = 4;
-      float timeSteps = elapsed * moveRate / RunGame.FRAME_RATE;
-      
-      float alpha = timeSteps % 1;
-      Tile l = a.path[Nums.clamp((int)  timeSteps     , a.path.length)];
-      Tile n = a.path[Nums.clamp((int) (timeSteps + 1), a.path.length)];
-      
-      Tile oldLoc = p.location;
-      p.setExactPosition(
-        (alpha * n.x) + ((1 - alpha) * l.x),
-        (alpha * n.y) + ((1 - alpha) * l.y),
-        0, this
-      );
-      if (p.location != oldLoc) updateFog();
-      
-      if (timeSteps > a.path.length) {
-        float extraTime = a.used.animDuration();
-        a.progress = (timeSteps - a.path.length) / (extraTime * moveRate);
-      }
-      if (a.progress >= 1) {
-        onCompletion(a);
-      }
-    }
-    
-    int nextState = checkCompletionStatus();
-    if (nextState != STATE_BEGUN && ! finished()) {
-      this.state = nextState;
-      applySiteEffects();
-    }
   }
   
   

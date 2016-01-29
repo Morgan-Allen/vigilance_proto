@@ -13,7 +13,7 @@ public class Equipped extends Index.Entry implements Session.Saveable {
     */
   final static Index <Equipped> INDEX = new Index <Equipped> ();
   
-  final static int
+  final public static int
     NONE        = 0     ,
     IS_CONSUMED = 1 << 0,
     IS_WEAPON   = 1 << 1,

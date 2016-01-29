@@ -15,7 +15,7 @@ public abstract class Ability extends Index.Entry implements Session.Saveable {
     */
   final static Index <Ability> INDEX = new Index <Ability> ();
   
-  final static int
+  final public static int
     NONE              = 0     ,
     IS_RANGED         = 1 << 0,
     IS_PASSIVE        = 1 << 1,
@@ -24,7 +24,7 @@ public abstract class Ability extends Index.Entry implements Session.Saveable {
     IS_EQUIPPED       = 1 << 4,
     TRIGGER_ON_ATTACK = 1 << 5,
     TRIGGER_ON_DEFEND = 1 << 6;
-  final static float
+  final public static float
     MAJOR_HELP = -2.0f,
     REAL_HELP  = -1.0f,
     MINOR_HELP = -0.5f,
@@ -32,7 +32,7 @@ public abstract class Ability extends Index.Entry implements Session.Saveable {
     MINOR_HARM =  0.5f,
     REAL_HARM  =  1.0f,
     MAJOR_HARM =  2.0f;
-  final static int
+  final public static int
     MINOR_POWER  = 2,
     MEDIUM_POWER = 5,
     MAJOR_POWER  = 8;
@@ -44,7 +44,7 @@ public abstract class Ability extends Index.Entry implements Session.Saveable {
   final float harmLevel, powerLevel;
   
   
-  Ability(
+  public Ability(
     String name, String uniqueID, String description,
     int properties, int costAP,
     float harmLevel, float powerLevel
@@ -165,9 +165,7 @@ public abstract class Ability extends Index.Entry implements Session.Saveable {
       else path = search.fullPath(Tile.class);
     }
     
-    Action newAction = new Action(this);
-    newAction.acting    = acting;
-    newAction.target    = target;
+    Action newAction = new Action(this, acting, target);
     newAction.path      = path;
     newAction.timeStart = scene.time;
     newAction.progress  = -1;
@@ -178,7 +176,28 @@ public abstract class Ability extends Index.Entry implements Session.Saveable {
   }
   
   
-  Volley createVolley(Action use) {
+  public Action takeFreeAction(
+    Person acting, Tile dest, Object target, Scene scene
+  ) {
+    Action newAction = new Action(this, acting, target);
+    newAction.path      = new Tile[] { acting.location };
+    newAction.timeStart = scene.time;
+    newAction.progress  = 0;
+    newAction.volley    = createVolley(newAction);
+    
+    applyOnActionStart(newAction);
+    checkForTriggers(newAction, true, false);
+    
+    newAction.progress = 1;
+    
+    checkForTriggers(newAction, false, true);
+    applyOnActionEnd(newAction);
+    
+    return newAction;
+  }
+  
+  
+  protected Volley createVolley(Action use) {
     return null;
   }
   
@@ -188,7 +207,7 @@ public abstract class Ability extends Index.Entry implements Session.Saveable {
     Volley volley = use.volley;
     
     if (volley != null) {
-      Person self = volley.selfAsPerson(), hits = volley.hitsAsPerson();
+      Person self = volley.origAsPerson(), hits = volley.targAsPerson();
       if (start) use.volley.beginVolley   ();
       if (end  ) use.volley.completeVolley();
       
@@ -356,7 +375,22 @@ public abstract class Ability extends Index.Entry implements Session.Saveable {
     
     s.view.renderAt(pX, pY, 0.5f, 0.5f, sprite, null, g);
   }
+  
+  
+  public void dodgePosition(Person self, Object from, float scale) {
+    Scene s = self.currentScene();
+    Tile atS = self.location(), atH = s.tileUnder(from);
+    Vec2D diff = new Vec2D(atS.x - atH.x, atS.y - atH.y);
+    diff.normalise().scale(Nums.clamp(scale, -0.49f, 0.49f));
+    self.setExactPosition(atS.x + diff.x, atS.y + diff.y, 0, s);
+  }
 }
+
+
+
+
+
+
 
 
 

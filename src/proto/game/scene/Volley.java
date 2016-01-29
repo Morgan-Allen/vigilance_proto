@@ -2,6 +2,7 @@
 
 package proto.game.scene;
 import proto.common.*;
+import proto.game.content.Common;
 import proto.util.*;
 import static proto.game.scene.Person.*;
 
@@ -12,32 +13,33 @@ public class Volley implements Session.Saveable {
   
   /**  Data fields, construction and save/load methods-
     */
-  Object self;
-  Object hits;
+  Object orig;
+  Object targ;
   Equipped weaponType;
   Equipped armourType;
+  boolean ranged;
   
-  int selfAccuracy;
-  int selfDamageBase;
-  int selfDamageRange;
+  public int selfAccuracy;
+  public int selfDamageBase;
+  public int selfDamageRange;
   
-  int damagePercent = 100;
-  int armourPercent = 100;
-  int critPercent   = 10;
-  int stunPercent   = 0;
+  public int damagePercent = 100;
+  public int armourPercent = 100;
+  public int critPercent   = 10;
+  public int stunPercent   = 0;
 
-  int hitsDefence;
-  int hitsArmour;
+  public int hitsDefence;
+  public int hitsArmour;
   
-  int accuracyMargin;
-  int damageRoll;
-  int damageMargin;
-  int injureDamage;
-  int stunDamage;
+  public int accuracyMargin;
+  public int damageRoll;
+  public int damageMargin;
+  public int injureDamage;
+  public int stunDamage;
   
-  boolean didConnect;
-  boolean didDamage;
-  boolean didCrit;
+  public boolean didConnect;
+  public boolean didDamage;
+  public boolean didCrit;
   
   
   public Volley() {
@@ -47,10 +49,11 @@ public class Volley implements Session.Saveable {
   
   public Volley(Session s) throws Exception {
     s.cacheInstance(this);
-    self = s.loadObject();
-    hits = s.loadObject();
+    orig = s.loadObject();
+    targ = s.loadObject();
     weaponType = (Equipped) s.loadObject();
     armourType = (Equipped) s.loadObject();
+    ranged     = s.loadBool();
     
     selfAccuracy    = s.loadInt();
     selfDamageBase  = s.loadInt();
@@ -77,10 +80,11 @@ public class Volley implements Session.Saveable {
   
   
   public void saveState(Session s) throws Exception {
-    s.saveObject((Session.Saveable) self);
-    s.saveObject((Session.Saveable) hits);
+    s.saveObject((Session.Saveable) orig);
+    s.saveObject((Session.Saveable) targ);
     s.saveObject(weaponType);
     s.saveObject(armourType);
+    s.saveBool  (ranged    );
 
     s.saveInt(selfAccuracy   );
     s.saveInt(selfDamageBase );
@@ -106,25 +110,31 @@ public class Volley implements Session.Saveable {
   }
   
   
-  Person selfAsPerson() {
-    if (self instanceof Person) return (Person) self;
+  public Person origAsPerson() {
+    if (orig instanceof Person) return (Person) orig;
     return null;
   }
   
   
-  Person hitsAsPerson() {
-    if (hits instanceof Person) return (Person) hits;
+  public Person targAsPerson() {
+    if (targ instanceof Person) return (Person) targ;
     return null;
   }
+  
+  
+  public boolean ranged() { return   ranged; }
+  public boolean melee () { return ! ranged; }
   
   
   
   /**  Life cycle and execution methods-
     */
-  void setupVolley(Person self, Person hits, boolean ranged, Scene scene) {
-    
-    this.self    = self;
-    this.hits    = hits;
+  public void setupVolley(
+    Person self, Person hits, boolean ranged, Scene scene
+  ) {
+    this.orig    = self;
+    this.targ    = hits;
+    this.ranged  = ranged;
     selfAccuracy = (int) (self.stats.levelFor(SPEED) * 2.5f) + 50;
     hitsDefence  = (int) (hits.stats.levelFor(SPEED) * 2.5f) + 0 ;
     
