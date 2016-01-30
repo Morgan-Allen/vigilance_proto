@@ -2,6 +2,8 @@
 
 package proto.game.scene;
 import proto.common.Session;
+import proto.game.person.Ability;
+import proto.game.person.Person;
 
 
 
@@ -18,10 +20,11 @@ public class Action implements Session.Saveable {
   float progress;
   
   
-  Action(Ability used, Person acting, Object target) {
+  public Action(Ability used, Person acting, Object target) {
     this.used = used;
     this.acting = acting;
     this.target = target;
+    this.progress = -1;
   }
   
   
@@ -51,8 +54,39 @@ public class Action implements Session.Saveable {
   
   /**  General query methods-
     */
+  public void attachPath(Tile path[], int timeStart) {
+    this.path      = path;
+    this.timeStart = timeStart;
+  }
+  
+  
+  public void attachVolley(Volley volley) {
+    this.volley = volley;
+  }
+  
+  
+  public void setProgress(float progress) {
+    this.progress = progress;
+  }
+  
+  
+  public int timeElapsed() {
+    return scene().time() - timeStart;
+  }
+  
+  
   public float progress() {
     return progress;
+  }
+  
+  
+  public boolean started() {
+    return progress >= 0;
+  }
+  
+  
+  public boolean complete() {
+    return progress >= 1;
   }
   
   

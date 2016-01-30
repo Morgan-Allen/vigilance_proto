@@ -1,8 +1,7 @@
 
 
-package proto.game.scene;
-import proto.common.Session;
-import proto.common.Session.Saveable;
+package proto.game.person;
+import proto.common.*;
 import proto.util.*;
 
 

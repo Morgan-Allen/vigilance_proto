@@ -1,11 +1,16 @@
 
 
 package proto.game.content;
+import proto.common.Kind;
+import proto.game.person.Ability;
+import proto.game.person.Person;
 import proto.game.scene.*;
 import proto.util.*;
-import static proto.game.scene.Ability.*;
-import static proto.game.scene.Person.*;
+
 import static proto.game.content.Common.*;
+import static proto.game.person.Ability.*;
+import static proto.game.person.Person.*;
+
 import java.awt.Image;
 
 

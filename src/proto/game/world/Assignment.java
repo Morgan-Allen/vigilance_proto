@@ -4,7 +4,7 @@ package proto.game.world;
 
 import proto.common.Session;
 import proto.common.Session.Saveable;
-import proto.game.scene.Person;
+import proto.game.person.Person;
 
 public interface Assignment extends Session.Saveable {
   

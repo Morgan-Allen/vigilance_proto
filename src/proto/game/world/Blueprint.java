@@ -3,10 +3,10 @@
 package proto.game.world;
 import java.awt.Image;
 
+import proto.common.Kind;
 import proto.common.Session;
 import proto.common.Session.Saveable;
-import proto.game.scene.Kind;
-import proto.game.scene.Person;
+import proto.game.person.Person;
 import proto.util.*;
 
 

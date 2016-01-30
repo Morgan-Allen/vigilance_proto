@@ -5,6 +5,7 @@ import static proto.util.TileConstants.*;
 
 import proto.common.Session;
 import proto.common.Session.Saveable;
+import proto.game.person.Person;
 
 
 
@@ -62,7 +63,7 @@ public class Tile implements Session.Saveable {
   
   
   public boolean blocked() {
-    if (prop != null && prop.kind.blockPath) return true;
+    if (prop != null && prop.kind.blockPath()) return true;
     if (standing != null) return true;
     
     //  TODO:  ALLOW UNCONSCIOUS PERSONS TO NOT BLOCK PATHING- BUT FOR THAT TO
@@ -82,12 +83,26 @@ public class Tile implements Session.Saveable {
   
   
   
+  /**  Modifying state-
+    */
+  public void setInside(Person p, boolean is) {
+    if (is) {
+      if (standing == null) standing = p;
+    }
+    else {
+      if (p == standing) standing = null;
+    }
+  }
+  
+  
+  
   /**  Rendering, debug and interface methods-
     */
   public String toString() {
     return "Tile at "+x+"|"+y;
   }
 }
+
 
 
 

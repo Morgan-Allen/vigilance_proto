@@ -3,13 +3,13 @@
 
 package proto.view;
 import proto.*;
+import proto.common.Kind;
 import proto.common.Session;
 import proto.game.content.Common;
-import proto.game.scene.Ability;
+import proto.game.person.Ability;
+import proto.game.person.Equipped;
+import proto.game.person.Person;
 import proto.game.scene.Action;
-import proto.game.scene.Equipped;
-import proto.game.scene.Kind;
-import proto.game.scene.Person;
 import proto.game.scene.Prop;
 import proto.game.scene.Scene;
 import proto.game.scene.Tile;
@@ -87,9 +87,11 @@ public class SceneView {
     
     final Color SCALE[] = new Color[10];
     final Color ENEMY[] = new Color[10];
+    final Color PALES[] = new Color[10];
     for (int n = 10; n-- > 0;) {
       SCALE[n] = new Color(0, 0, 0, n / 10f);
       ENEMY[n] = new Color(1, 0, 0, n / 50f);
+      PALES[n] = new Color(1, 1, 1, n / 10f);
     }
     
     //
@@ -132,12 +134,12 @@ public class SceneView {
       if (p.isHero    ()) teamColor = Color.BLUE;
       if (p.isCriminal()) teamColor = Color.RED;
       Vec3D pos         = p.exactPosition();
-      float maxHealth   = p.maxHealth();
-      float tireLevel   = 1f - (p.injury() / maxHealth);
-      float healthLevel = 1f - ((p.injury() + p.fatigue()) / maxHealth);
+      float healthLevel = p.healthLevel();
+      float stunLevel   = 1 - p.bleedRisk();
+      Color pale = PALES[(int) (stunLevel * 9.9f)];
       
       renderAt(pos.x, pos.y + 0.9f, 1, 0.1f, null, Color.BLACK, g);
-      renderAt(pos.x, pos.y + 0.9f, tireLevel, 0.1f, null, Color.WHITE, g);
+      renderAt(pos.x, pos.y + 0.9f, 1, 0.1f, null, pale, g);
       renderAt(pos.x, pos.y + 0.9f, healthLevel, 0.1f, null, teamColor, g);
       renderString(pos.x, pos.y + 0.5f, p.name(), Color.WHITE, g);
       
@@ -192,7 +194,8 @@ public class SceneView {
         renderString(hoverT.x, hoverT.y - 0.5f, "X", Color.RED, g);
       }
       if (surface.mouseClicked && done == null && selectAction != null) {
-        scene.queueNextAction(selectAction);
+        scene.setNextActing(selected);
+        selected.assignAction(selectAction);
       }
       else if (surface.mouseClicked) {
         Person pickP = null;
@@ -218,19 +221,16 @@ public class SceneView {
     }
     
     if (p != null) {
-      s.append("\nSelection: "+p.name());
-      s.append("\n  On team: "+p.isHero());
+      s.append("\nSelection: "+p.name()+" ("+p.side().name().toLowerCase()+")");
       
-      int HP = (int) (p.maxHealth() - (p.injury() + p.fatigue()));
+      int HP = (int) (p.maxHealth() - (p.injury() + p.stun()));
       int armour = p.stats.levelFor(Person.ARMOUR);
       s.append("\n  Health: "+HP+"/"+p.maxHealth());
-      if (p.fatigue() > 0) s.append(" (Stun "+(int) p.fatigue()+")");
-      s.append("\n  AP: "+p.currentAP()+"/"+p.maxAP());
+      if (p.stun() > 0) s.append(" (Stun "+(int) p.stun()+")");
       if (armour > 0) s.append("\n  Armour: "+armour);
-      
-      if (! p.alive()) s.append("\n  Dead");
-      else if (! p.conscious()) s.append("\n  Unconscious");
-      else if (p.currentAction() != null) {
+      s.append("\n  Status: "+p.confidenceDescription());
+      s.append("\n  AP: "+p.currentAP()+"/"+p.maxAP());
+      if (p.conscious() && p.currentAction() != null) {
         s.append("\n  Last action: "+p.currentAction().used);
       }
       
@@ -241,7 +241,7 @@ public class SceneView {
       }
       
       boolean canCommand =
-        action == null && p.isPlayerOwned() && p.canTakeAction()
+        action == null && p.canTakeAction() && p.isPlayerOwned()
       ;
       if (canCommand) {
         s.append("\n\n  Abilities (Press 1-9):");
@@ -261,7 +261,7 @@ public class SceneView {
         if (a == null) {
           s.append("\n  Pass Turn (X)");
           if (print.isPressed('x')) {
-            p.setActionPoints(0);
+            p.onTurnEnd();
             scene.moveToNextPersonsTurn();
           }
         }
@@ -272,9 +272,9 @@ public class SceneView {
           if (a.delayed()) {
             selectAction = a.configAction(p, p.location(), p, scene, null);
             s.append("\n\n"+a.describeAction(selectAction, scene));
-            s.append("\n  Confirm (C)");
-            if (print.isPressed('c')) {
-              scene.queueNextAction(selectAction);
+            s.append("\n  Confirm (Y)");
+            if (print.isPressed('y')) {
+              p.assignAction(selectAction);
               scene.moveToNextPersonsTurn();
             }
           }

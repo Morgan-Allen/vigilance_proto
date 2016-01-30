@@ -4,6 +4,7 @@ package proto.game.world;
 import proto.common.*;
 import proto.game.scene.*;
 import proto.game.content.*;
+import proto.game.person.Person;
 import proto.util.*;
 import proto.view.*;
 

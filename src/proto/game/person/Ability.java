@@ -1,7 +1,12 @@
 
 
-package proto.game.scene;
+package proto.game.person;
 import proto.common.*;
+import proto.game.scene.Action;
+import proto.game.scene.MoveSearch;
+import proto.game.scene.Scene;
+import proto.game.scene.Tile;
+import proto.game.scene.Volley;
 import proto.util.*;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -123,7 +128,7 @@ public abstract class Ability extends Index.Entry implements Session.Saveable {
   
   
   public int costAP(Action use) {
-    return minCostAP() + motionCostAP(use.path.length);
+    return minCostAP() + motionCostAP(use.path().length);
   }
   
   
@@ -166,10 +171,8 @@ public abstract class Ability extends Index.Entry implements Session.Saveable {
     }
     
     Action newAction = new Action(this, acting, target);
-    newAction.path      = path;
-    newAction.timeStart = scene.time;
-    newAction.progress  = -1;
-    newAction.volley    = createVolley(newAction);
+    newAction.attachPath(path, scene.time());
+    newAction.attachVolley(createVolley(newAction));
     
     if (costAP(newAction) > acting.currentAP()) return null;
     return newAction;
@@ -180,15 +183,13 @@ public abstract class Ability extends Index.Entry implements Session.Saveable {
     Person acting, Tile dest, Object target, Scene scene
   ) {
     Action newAction = new Action(this, acting, target);
-    newAction.path      = new Tile[] { acting.location };
-    newAction.timeStart = scene.time;
-    newAction.progress  = 0;
-    newAction.volley    = createVolley(newAction);
+    newAction.attachPath(new Tile[] { acting.location }, scene.time());
+    newAction.attachVolley(createVolley(newAction));
     
     applyOnActionStart(newAction);
     checkForTriggers(newAction, true, false);
     
-    newAction.progress = 1;
+    newAction.setProgress(1);
     
     checkForTriggers(newAction, false, true);
     applyOnActionEnd(newAction);
@@ -204,12 +205,12 @@ public abstract class Ability extends Index.Entry implements Session.Saveable {
   
   void checkForTriggers(Action use, boolean start, boolean end) {
     Scene  scene  = use.acting.currentScene();
-    Volley volley = use.volley;
+    Volley volley = use.volley();
     
     if (volley != null) {
       Person self = volley.origAsPerson(), hits = volley.targAsPerson();
-      if (start) use.volley.beginVolley   ();
-      if (end  ) use.volley.completeVolley();
+      if (start) volley.beginVolley   ();
+      if (end  ) volley.completeVolley();
       
       if (self != null && self.currentAction != null) {
         Ability a = self.currentAction.used;
@@ -283,7 +284,8 @@ public abstract class Ability extends Index.Entry implements Session.Saveable {
     */
   public Action bestMotionToward(Object point, Person acting, Scene scene) {
     Tile at = scene.tileUnder(point);
-    if (at == null || ! acting.canSee(at)) return null;
+    if (at == null) return null;
+    if (point instanceof Person && ! acting.canSee(at)) return null;
     MoveSearch search = new MoveSearch(acting, acting.location, at);
     search.doSearch();
     if (! search.success()) return null;
@@ -347,8 +349,8 @@ public abstract class Ability extends Index.Entry implements Session.Saveable {
   public String describeAction(Action action, Scene scene) {
     StringBuffer s = new StringBuffer();
     s.append(description);
-    if (action != null && action.volley != null) {
-      Volley v = action.volley;
+    if (action != null && action.volley() != null) {
+      Volley v = action.volley();
       int maxDamage = v.selfDamageBase + v.selfDamageRange;
       s.append("\n  "+v.selfDamageBase+"-"+maxDamage+" damage");
       int hitMargin = Nums.max(0, v.selfAccuracy - v.hitsDefence);
@@ -365,7 +367,7 @@ public abstract class Ability extends Index.Entry implements Session.Saveable {
     if (sprite == null) return;
     
     Person using = action.acting;
-    float progress = action.progress;
+    float progress = action.progress();
     Tile target = s.tileUnder(action.target);
     
     float pX = using.posX * (1 - progress);
@@ -373,7 +375,7 @@ public abstract class Ability extends Index.Entry implements Session.Saveable {
     pX += target.x * progress;
     pY += target.y * progress;
     
-    s.view.renderAt(pX, pY, 0.5f, 0.5f, sprite, null, g);
+    s.view().renderAt(pX, pY, 0.5f, 0.5f, sprite, null, g);
   }
   
   

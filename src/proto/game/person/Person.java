@@ -1,10 +1,10 @@
 
 
-package proto.game.scene;
-import proto.common.Session;
-import proto.common.Session.Saveable;
-import proto.game.content.Common;
-import proto.game.world.Assignment;
+package proto.game.person;
+import proto.common.*;
+import proto.game.content.*;
+import proto.game.scene.*;
+import proto.game.world.*;
 import proto.util.*;
 
 
@@ -57,15 +57,17 @@ public class Person implements Session.Saveable {
   Kind kind;
   Side side;
   String name;
-  int AIstate = STATE_INIT;
-  int luck = INIT_LUCK, stress = INIT_STRESS;
   
+  int luck = INIT_LUCK, stress = INIT_STRESS;
   final public PersonStats stats = new PersonStats(this);
   Equipped equipSlots[] = new Equipped[NUM_EQUIP_SLOTS];
   float injury, stun;
   boolean alive, conscious;
   
   Assignment assignment;
+  int AIstate = STATE_INIT;
+  float confidence = 1.0f;
+  
   Tile location;
   float posX, posY;
   int actionPoints;
@@ -78,12 +80,12 @@ public class Person implements Session.Saveable {
     this.kind = kind;
     this.name = name;
     stats.initFrom(kind);
-    for (int n = 0; n < kind.baseEquipment.length; n++) {
-      equipItem(kind.baseEquipment[n]);
+    for (int n = 0; n < kind.baseEquipped().length; n++) {
+      equipItem(kind.baseEquipped()[n]);
     }
     alive = conscious = true;
     
-    if (kind.type == Kind.TYPE_HERO) side = Side.HEROES;
+    if (kind.type() == Kind.TYPE_HERO) side = Side.HEROES;
     else side = Side.VILLAINS;
   }
   
@@ -93,7 +95,6 @@ public class Person implements Session.Saveable {
     kind    = (Kind) s.loadObject();
     side    = (Side) s.loadEnum(Side.values());
     name    = s.loadString();
-    AIstate = s.loadInt();
     luck    = s.loadInt();
     stress  = s.loadInt();
     
@@ -107,13 +108,16 @@ public class Person implements Session.Saveable {
     alive     = s.loadBool();
     conscious = s.loadBool();
     
-    assignment   = (Assignment) s.loadObject();
-    location     = (Tile) s.loadObject();
-    posX         = s.loadFloat();
-    posY         = s.loadFloat();
-    actionPoints = s.loadInt();
-    currentAction   = (Action) s.loadObject();
-    turnDone     = s.loadBool();
+    assignment = (Assignment) s.loadObject();
+    AIstate    = s.loadInt();
+    confidence = s.loadFloat();
+    
+    location      = (Tile) s.loadObject();
+    posX          = s.loadFloat();
+    posY          = s.loadFloat();
+    actionPoints  = s.loadInt();
+    currentAction = (Action) s.loadObject();
+    turnDone      = s.loadBool();
   }
   
   
@@ -121,7 +125,6 @@ public class Person implements Session.Saveable {
     s.saveObject(kind);
     s.saveEnum  (side);
     s.saveString(name);
-    s.saveInt(AIstate);
     s.saveInt(luck   );
     s.saveInt(stress );
     
@@ -135,13 +138,16 @@ public class Person implements Session.Saveable {
     s.saveBool (alive    );
     s.saveBool (conscious);
     
-    s.saveObject(assignment  );
-    s.saveObject(location    );
-    s.saveFloat (posX        );
-    s.saveFloat (posY        );
-    s.saveInt   (actionPoints);
-    s.saveObject(currentAction  );
-    s.saveBool  (turnDone    );
+    s.saveObject(assignment);
+    s.saveInt   (AIstate   );
+    s.saveFloat (confidence);
+    
+    s.saveObject(location     );
+    s.saveFloat (posX         );
+    s.saveFloat (posY         );
+    s.saveInt   (actionPoints );
+    s.saveObject(currentAction);
+    s.saveBool  (turnDone     );
   }
   
   
@@ -158,8 +164,20 @@ public class Person implements Session.Saveable {
   }
   
   
-  public float fatigue() {
+  public float stun() {
     return stun;
+  }
+  
+  
+  public float healthLevel() {
+    return Nums.clamp(1f - ((injury + stun) / maxHealth()), 0, 1);
+  }
+  
+  
+  public float bleedRisk() {
+    if (injury <= 0) return 0;
+    if (stun   <= 0) return 1;
+    return injury / (stun + injury);
   }
   
   
@@ -180,6 +198,11 @@ public class Person implements Session.Saveable {
   
   public int currentAP() {
     return actionPoints;
+  }
+  
+  
+  public float confidence() {
+    return confidence;
   }
   
   
@@ -218,6 +241,10 @@ public class Person implements Session.Saveable {
     return kind;
   }
   
+  
+  public Side side() {
+    return side;
+  }
   
   
   
@@ -297,12 +324,12 @@ public class Person implements Session.Saveable {
   
   public void setExactPosition(float x, float y, float z, Scene scene) {
     final Tile oldLoc = location;
-    posX = x;
-    posY = y;
+    posX     = x;
+    posY     = y;
     location = scene.tileAt((int) (x + 0.5f), (int) (y + 0.5f));
     if (oldLoc != location) {
-      if (oldLoc   != null) oldLoc  .standing = null;
-      if (location != null) location.standing = this;
+      if (oldLoc   != null) oldLoc  .setInside(this, false);
+      if (location != null) location.setInside(this, true );
     }
   }
   
@@ -350,6 +377,51 @@ public class Person implements Session.Saveable {
     actionPoints  = maxAP();
     currentAction = null;
     turnDone      = false;
+    assessConfidence();
+  }
+  
+  
+  public void assignAction(Action action) {
+    currentAction = action;
+    this.actionPoints -= action.used.costAP(action);
+  }
+  
+  
+  public void updateDuringTurn() {
+    Scene scene = currentScene();
+    Action a = currentAction;
+    if (scene == null || a == null) return;
+    
+    int elapsed = a.timeElapsed();
+    float moveRate = 4;
+    float timeSteps = elapsed * moveRate / RunGame.FRAME_RATE;
+    
+    float alpha = timeSteps % 1;
+    Tile path[] = a.path();
+    Tile l = path[Nums.clamp((int)  timeSteps     , path.length)];
+    Tile n = path[Nums.clamp((int) (timeSteps + 1), path.length)];
+    
+    Tile oldLoc = location();
+    setExactPosition(
+      (alpha * n.x) + ((1 - alpha) * l.x),
+      (alpha * n.y) + ((1 - alpha) * l.y),
+      0, scene
+    );
+    if (location() != oldLoc) scene.updateFog();
+    
+    if (timeSteps > path.length) {
+      if (! a.started()) {
+        a.used.applyOnActionStart(a);
+        a.used.checkForTriggers(a, true, false);
+      }
+      float extraTime = a.used.animDuration();
+      a.setProgress((timeSteps - path.length) / (extraTime * moveRate));
+    }
+    if (a.complete()) {
+      a.used.checkForTriggers(a, false, true);
+      a.used.applyOnActionEnd(a);
+      currentAction = null;
+    }
   }
   
   
@@ -402,7 +474,7 @@ public class Person implements Session.Saveable {
   
   
   public boolean isCivilian() {
-    return kind.type == Kind.TYPE_CIVILIAN;
+    return kind.type() == Kind.TYPE_CIVILIAN;
   }
   
   
@@ -450,20 +522,23 @@ public class Person implements Session.Saveable {
     boolean report = I.talkAbout == this;
     if (report) I.say("\nGetting next AI action for "+this);
     
-    if (decideOnRetreat()) AIstate = STATE_RETREAT;
-    else AIstate = STATE_ACTIVE;
-    
     Pick <Action> pick = new Pick(0);
-    for (Person p : scene.persons) for (Ability a : stats.listAbilities()) {
-      Action use = a.configAction(this, p.location, p, scene, null);
-      if (use == null) continue;
-      float rating = a.rateUsage(use) * Rand.avgNums(2);
-      if (report) I.say("  Rating for "+a+" is "+rating);
-      pick.compare(use, rating);
-    }
     
+    if (confidence < 1) {
+      AIstate = STATE_RETREAT;
+    }
+    else {
+      AIstate = STATE_ACTIVE;
+      for (Person p : scene.persons()) for (Ability a : stats.listAbilities()) {
+        Action use = a.configAction(this, p.location, p, scene, null);
+        if (use == null) continue;
+        float rating = a.rateUsage(use) * Rand.avgNums(2);
+        if (report) I.say("  Rating for "+a+" is "+rating);
+        pick.compare(use, rating);
+      }
+    }
     if (pick.empty()) {
-      Series <Person> foes = scene.playerTeam;
+      Series <Person> foes = scene.playerTeam();
       Action motion = retreating() ?
         pickRetreatAction(foes) :
         pickAdvanceAction(foes)
@@ -478,8 +553,40 @@ public class Person implements Session.Saveable {
   
   /**  Other supplementary action-creation methods-
     */
-  private boolean decideOnRetreat() {
-    return false;
+  private void assessConfidence() {
+    Scene scene = currentScene();
+    float teamHealth = 0, teamPower = 0;
+    
+    for (Person p : scene.persons()) {
+      if (! canSee(p.location())) continue;
+      if (p.isAlly(this)) {
+        teamPower  += p.powerLevel();
+        teamHealth += p.powerLevel() * p.healthLevel();
+      }
+    }
+    //  TODO:  Refine this?
+    float courage = 0.2f;
+    if (isHero    ()) courage = 1.5f;
+    if (isCriminal()) courage = 0.5f;
+    
+    if (teamPower <= 0) {
+      confidence = 0;
+    }
+    else {
+      confidence = teamHealth / teamPower;
+      confidence = (confidence + healthLevel()) / 2;
+      if (! retreating()) confidence += courage;
+      
+      I.say("Confidence for "+this+": "+confidence);
+    }
+  }
+  
+  
+  private float powerLevel() {
+    //  TODO:  Refine this!
+    if (isHero    ()) return 4;
+    if (isCriminal()) return 1;
+    return 0;
   }
   
   
@@ -489,13 +596,22 @@ public class Person implements Session.Saveable {
       Action motion = Common.MOVE.bestMotionToward(p, this, scene);
       if (motion != null) return motion;
     }
-    return null;
+    
+    int range = sightRange() / 2;
+    Tile pick = scene.tileAt(
+      location.x + (Rand.index(range + 1) * (Rand.yes() ? 1 : -1)),
+      location.y + (Rand.index(range + 1) * (Rand.yes() ? 1 : -1))
+    );
+    
+    I.say(this+" picked random tile to approach: "+pick+" (at "+location+")");
+    
+    return Common.MOVE.bestMotionToward(pick, this, scene);
   }
   
   
   Action pickRetreatAction(Series <Person> foes) {
     Scene scene = currentScene();
-    int hS = scene.size / 2, sD = scene.size - 1;
+    int hS = scene.size() / 2, sD = scene.size() - 1;
     Tile exits[] = {
       scene.tileAt(0 , hS),
       scene.tileAt(hS, 0 ),
@@ -519,7 +635,19 @@ public class Person implements Session.Saveable {
   public String toString() {
     return name;
   }
+  
+  
+  public String confidenceDescription() {
+    if (! alive()) return "Dead";
+    if (! conscious()) return "Unconscious";
+    if (retreating()) return "Retreating";
+    if (confidence < 1.33f) return "Shaken";
+    if (confidence < 1.66f) return "Steady";
+    return "Determined";
+  }
 }
+
+
 
 
 

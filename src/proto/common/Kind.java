@@ -1,12 +1,12 @@
 
 
-package proto.game.scene;
+package proto.common;
 import java.awt.*;
 import java.io.File;
 import javax.imageio.ImageIO;
 
-import proto.common.Session;
-import proto.common.Session.Saveable;
+import proto.game.person.Ability;
+import proto.game.person.Equipped;
 import proto.util.*;
 
 
@@ -31,9 +31,9 @@ public class Kind extends Index.Entry implements Session.Saveable {
   boolean blockSight;
   boolean blockPath;
   
-  Ability  baseAbilities    [] = new Ability [0];
-  Integer  baseAbilityLevels[] = new Integer [0];
-  Equipped baseEquipment    [] = new Equipped[0];
+  Ability  baseAbilities[] = new Ability [0];
+  Integer  baseLevels   [] = new Integer [0];
+  Equipped baseEquipped [] = new Equipped[0];
   
   
   Kind(String uniqueID) {
@@ -51,13 +51,18 @@ public class Kind extends Index.Entry implements Session.Saveable {
   }
   
   
+  public int type() { return type; }
   public int wide() { return wide; }
   public int high() { return high; }
   public boolean blockSight() { return blockSight; }
   public boolean blockPath () { return blockPath ; }
   
-  public String name() { return name; }
-  public Image sprite() { return sprite; }
+  public Ability [] baseAbilities() { return baseAbilities; }
+  public Integer [] baseLevels   () { return baseLevels   ; }
+  public Equipped[] baseEquipped() { return baseEquipped ; }
+  
+  public String name  () { return name  ; }
+  public Image  sprite() { return sprite; }
   
   
   
@@ -94,9 +99,9 @@ public class Kind extends Index.Entry implements Session.Saveable {
         readL = null;
       }
     }
-    k.baseAbilities     = allA.toArray(Ability .class);
-    k.baseAbilityLevels = allL.toArray(Integer .class);
-    k.baseEquipment     = allE.toArray(Equipped.class);
+    k.baseAbilities = allA.toArray(Ability .class);
+    k.baseLevels    = allL.toArray(Integer .class);
+    k.baseEquipped  = allE.toArray(Equipped.class);
     
     k.name = name;
     k.sprite = loadImage(spritePath);

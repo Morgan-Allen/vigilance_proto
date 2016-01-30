@@ -1,11 +1,16 @@
 
 
-package proto.game.scene;
+package proto.game.content;
 import static proto.game.content.Common.*;
-import static proto.game.scene.Equipped.*;
-import static proto.game.scene.Person.*;
+import static proto.game.person.Equipped.*;
+import static proto.game.person.Person.*;
 
+import proto.common.Kind;
 import proto.common.Session;
+import proto.game.person.Equipped;
+import proto.game.person.Person;
+import proto.game.scene.Scene;
+import proto.game.scene.Tile;
 import proto.game.world.World;
 import proto.util.*;
 
@@ -83,13 +88,13 @@ public class UrbanScene extends Scene {
     
     super.setupScene();
     
-    int cX = (size / 2) - 10, cY = 5;
+    int cX = (size() / 2) - 10, cY = 5;
     
     for (Coord c : Visit.grid(cX, cY, 20, 20, 1)) {
       addProp(KIND_FLOOR, c.x, c.y);
     }
     for (Coord c : Visit.grid(cX - 1, cY - 1, 22, 22, 1)) {
-      if (tileAt(c.x, c.y).prop != null) continue;
+      if (tileAt(c.x, c.y).prop() != null) continue;
       
       if (c.x == cX + 10 || c.y == cY + 10) {
         addProp(KIND_DOOR, c.x, c.y);
@@ -100,13 +105,14 @@ public class UrbanScene extends Scene {
     }
     addProp(KIND_POOL_TABLE, cX + 10, cY + 10);
     
-    int numGoons = (int) (10 * dangerLevel);
+    int numGoons = (int) (10 * dangerLevel());
     for (int n = numGoons; n-- > 0;) {
       Person p = new Person(KIND_GOON, "Goon");
       int x = cX + 5 + Rand.index(10), y = cY + 5 + Rand.index(10);
       Tile under = tileAt(x, y);
-      if (blockedAt(under) || under.standing != null) continue;
+      if (blockedAt(under) || under.standing() != null) continue;
       addPerson(p, x, y);
+      addToTeam(p);
     }
     
     //  TODO:  Some patrol routes for goons would be nice...?

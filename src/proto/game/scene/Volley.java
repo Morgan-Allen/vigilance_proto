@@ -1,10 +1,13 @@
 
 
 package proto.game.scene;
+import static proto.game.person.Person.*;
+
 import proto.common.*;
 import proto.game.content.Common;
+import proto.game.person.Equipped;
+import proto.game.person.Person;
 import proto.util.*;
-import static proto.game.scene.Person.*;
 
 
 
@@ -154,14 +157,14 @@ public class Volley implements Session.Saveable {
     }
     if (ranged) {
       int normRange = self.sightRange() - 2;
-      int distance = (int) scene.distance(self.location, hits.location);
+      int distance = (int) scene.distance(self.location(), hits.location());
       selfAccuracy -= 5 * (distance - normRange);
     }
     
     selfDamageBase  += Nums.floor(weaponType.bonus / 2f);
     selfDamageRange += Nums.ceil (weaponType.bonus / 2f);
     hitsArmour      += armourType.bonus;
-    if (hits.turnDone) hitsDefence += hits.currentAP() * 10;
+    if (hits.turnDone()) hitsDefence += hits.currentAP() * 10;
     
     float damageMult = damagePercent / 100f;
     float armourMult = armourPercent / 100f;
@@ -171,12 +174,12 @@ public class Volley implements Session.Saveable {
   }
   
   
-  void beginVolley() {
+  public void beginVolley() {
     return;
   }
   
   
-  void completeVolley() {
+  public void completeVolley() {
     resolveAccuracy();
     if (didConnect) resolveDamage();
     if (didDamage ) resolveCrit  ();

@@ -3,6 +3,16 @@
 
 Notes:
 
+*  I need to turn the pressure on during a given mission.  Either goons need to
+   be a credible threat, or escape needs to happen, or there should be hostages.
+   
+   I'm not sure the flat percentile-subtraction method is ideal.  There should
+   always be *some* chance of hitting or missing.  Or maybe dodge/block ONLY
+   happens if you explicitly script it?
+   
+   Goons should patrol, ideally...
+
+
 *  A wider range of abilities for the current heroes.
 
 *  XP gain and skill-advancement over time.  (Either pick skills out of a hat
@@ -12,5 +22,3 @@ Notes:
    of killing, support and pledges.
 
 *  Research & development.
-
-*  Hostages and captives.  Plus extra goon-types!

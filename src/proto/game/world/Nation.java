@@ -7,8 +7,8 @@ import javax.imageio.ImageIO;
 
 import proto.common.Session;
 import proto.common.Session.Saveable;
+import proto.game.content.UrbanScene;
 import proto.game.scene.Scene;
-import proto.game.scene.UrbanScene;
 import proto.util.*;
 
 

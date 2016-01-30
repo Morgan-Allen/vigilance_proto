@@ -3,7 +3,7 @@
 package proto.view;
 import java.awt.Image;
 
-import proto.game.scene.Kind;
+import proto.common.Kind;
 
 
 

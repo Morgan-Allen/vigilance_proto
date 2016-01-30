@@ -2,6 +2,8 @@
 
 package proto.game.scene;
 import proto.common.*;
+import proto.game.person.Person;
+import proto.game.person.Person.Side;
 import proto.game.world.*;
 import proto.util.*;
 import proto.view.*;
@@ -41,10 +43,10 @@ public class Scene implements Session.Saveable, Assignment {
   
   boolean playerTurn;
   Person nextActing;
-  Action currentAction;
+  //Action currentAction;
   
   
-  Scene(World world, int size) {
+  public Scene(World world, int size) {
     this.world = world;
     this.size = size;
   }
@@ -77,9 +79,8 @@ public class Scene implements Session.Saveable, Assignment {
     s.loadObjects(props);
     s.loadObjects(persons);
     
-    playerTurn    = s.loadBool();
-    nextActing    = (Person) s.loadObject();
-    currentAction = (Action) s.loadObject();
+    playerTurn = s.loadBool();
+    nextActing = (Person) s.loadObject();
   }
   
   
@@ -109,7 +110,6 @@ public class Scene implements Session.Saveable, Assignment {
     
     s.saveBool(playerTurn);
     s.saveObject(nextActing);
-    s.saveObject(currentAction);
   }
   
   
@@ -155,9 +155,14 @@ public class Scene implements Session.Saveable, Assignment {
     return dangerLevel;
   }
   
-
+  
   public int size() {
     return size;
+  }
+  
+  
+  public int time() {
+    return time;
   }
   
   
@@ -197,7 +202,7 @@ public class Scene implements Session.Saveable, Assignment {
   
   
   public boolean blockedAt(Tile at) {
-    return at.prop != null && at.prop.kind.blockPath;
+    return at.prop != null && at.prop.kind.blockPath();
   }
   
   
@@ -215,7 +220,7 @@ public class Scene implements Session.Saveable, Assignment {
       
       Tile t = tiles[x][y];
       if (t == dest) break;
-      if (t != orig && t.prop != null && t.prop.kind.blockSight) {
+      if (t != orig && t.prop != null && t.prop.kind.blockSight()) {
         sight *= 0;
       }
       if (sight == 0) break;
@@ -248,16 +253,17 @@ public class Scene implements Session.Saveable, Assignment {
   
   
   public Action currentAction() {
-    return currentAction;
+    if (nextActing == null) return null;
+    return nextActing.currentAction();
   }
   
   
   
   /**  Supplementary population methods for use during initial setup-
     */
-  boolean addProp(Kind type, int x, int y) {
+  public boolean addProp(Kind type, int x, int y) {
     Prop prop = new Prop(type);
-    for (Coord c : Visit.grid(x, y, type.wide, type.high, 1)) {
+    for (Coord c : Visit.grid(x, y, type.wide(), type.high(), 1)) {
       Tile under = tileAt(c.x, c.y);
       if (under == null) return false;
       else under.prop = prop;
@@ -274,7 +280,9 @@ public class Scene implements Session.Saveable, Assignment {
   
   
   public void addToTeam(Person p) {
-    playerTeam.include(p);
+    Side s = p.side();
+    if (s == Side.HEROES  ) playerTeam.include(p);
+    if (s == Side.VILLAINS) othersTeam.include(p);
     p.setAssignment(this);
   }
   
@@ -289,9 +297,7 @@ public class Scene implements Session.Saveable, Assignment {
     if (location == null) return false;
     p.setAssignment(this);
     p.setExactPosition(x, y, 0, this);
-    p.actionPoints = p.maxAP();
     persons.add(p);
-    if (! playerTeam.includes(p)) othersTeam.add(p);
     return true;
   }
   
@@ -299,9 +305,7 @@ public class Scene implements Session.Saveable, Assignment {
   public boolean removePerson(Person p) {
     if (p.currentScene() != this) return false;
     p.setAssignment(null);
-    p.location = null;
-    playerTeam.remove(p);
-    othersTeam.remove(p);
+    p.location().setInside(p, false);
     persons.remove(p);
     return true;
   }
@@ -369,70 +373,22 @@ public class Scene implements Session.Saveable, Assignment {
   }
   
   
-  public void queueNextAction(Action action) {
-    currentAction = action;
-    Person acting = action.acting;
-    nextActing = acting;
-    acting.actionPoints -= action.used.costAP(action);
-    acting.currentAction = action;
-    I.say(acting+" using "+action.used+" on "+action.target);
-  }
-  
-  
-  void onCompletion(Action action) {
-    I.say("Action completed: "+action.used);
-    I.say("  Player's turn? "+playerTurn);
-    
-    action.used.checkForTriggers(action, false, true);
-    action.used.applyOnActionEnd(action);
-    this.currentAction = null;
-    Person acting = action.acting;
-    view.setSelection(acting, false);
-    
-    //  TODO- have a 'wait for next action' phase instead, built into the
-    //  scene's update method?
-    if (! (acting.canTakeAction() && playerTurn)) {
-      moveToNextPersonsTurn();
-    }
-    else {
-      I.say(acting+" not finished turn yet...");
-    }
-  }
-  
-  
   public void updateScene() {
     
-    final Action a = currentAction;
-    if (a != null) {
-      final Person p = a.acting;
-      time++;
+    if (nextActing != null) {
+      Action last = nextActing.currentAction();
+      nextActing.updateDuringTurn();
+      Action taken = nextActing.currentAction();
       
-      int elapsed = time - a.timeStart;
-      float moveRate = 4;
-      float timeSteps = elapsed * moveRate / RunGame.FRAME_RATE;
-      
-      float alpha = timeSteps % 1;
-      Tile l = a.path[Nums.clamp((int)  timeSteps     , a.path.length)];
-      Tile n = a.path[Nums.clamp((int) (timeSteps + 1), a.path.length)];
-      
-      Tile oldLoc = p.location;
-      p.setExactPosition(
-        (alpha * n.x) + ((1 - alpha) * l.x),
-        (alpha * n.y) + ((1 - alpha) * l.y),
-        0, this
-      );
-      if (p.location != oldLoc) updateFog();
-      
-      if (timeSteps > a.path.length) {
-        if (a.progress == -1) {
-          a.used.applyOnActionStart(a);
-          a.used.checkForTriggers(a, true, false);
-        }
-        float extraTime = a.used.animDuration();
-        a.progress = (timeSteps - a.path.length) / (extraTime * moveRate);
+      if (taken != null) {
+        time += 1;
       }
-      if (a.progress >= 1) {
-        onCompletion(a);
+      else {
+        if (last != null) view.setSelection(nextActing, false);
+        
+        if (! (nextActing.canTakeAction() && playerTurn)) {
+          moveToNextPersonsTurn();
+        }
       }
     }
     
@@ -444,16 +400,17 @@ public class Scene implements Session.Saveable, Assignment {
   }
   
   
+  public void setNextActing(Person acting) {
+    nextActing = acting;
+  }
+  
+  
   public void moveToNextPersonsTurn() {
     I.say("\n  Trying to find next active person...");
     I.say("  Active: "+nextActing);
     
-    //  TODO:  The whole architecture here probably needs a rewrite.
-    if (
-      (nextActing != null) &&
-      (! nextActing.turnDone) &&
-      (! nextActing.canTakeAction())
-    ) {
+    Person n = nextActing;
+    if ((n != null) && (! n.turnDone()) && (! n.canTakeAction())) {
       I.say("\n  Ending turn for "+nextActing);
       nextActing.onTurnEnd();
     }
@@ -471,22 +428,22 @@ public class Scene implements Session.Saveable, Assignment {
         if (! p.canTakeAction()) continue;
         
         if (playerTurn) {
-          I.say("  ACTIVE PC: "+p+", AP: "+p.actionPoints);
+          I.say("  ACTIVE PC: "+p+", AP: "+p.currentAP());
           nextActing = p;
           break;
         }
         else {
-          I.say("  FOUND NPC: "+p+", AP: "+p.actionPoints);
+          I.say("  FOUND NPC: "+p+", AP: "+p.currentAP());
           Action taken = p.selectActionAsAI();
           if (taken != null) {
             I.say("    "+p+" will take action: "+taken.used);
-            queueNextAction(taken);
             nextActing = p;
+            p.assignAction(taken);
             break;
           }
           else {
             I.say("    "+p+" could not decide on action.");
-            p.actionPoints = 0;
+            p.setActionPoints(0);
             continue;
           }
         }
@@ -500,9 +457,13 @@ public class Scene implements Session.Saveable, Assignment {
         playerTurn = ! playerTurn;
       }
       else {
-        I.say("  Will zoom to "+nextActing);
-        view.setSelection(nextActing, false);
-        view.setZoomPoint(nextActing.location);
+        //
+        //  Zoom to the unit in question (if they're visible...)
+        if (fogAt(nextActing.location(), Person.Side.HEROES) > 0) {
+          I.say("  Will zoom to "+nextActing);
+          view.setSelection(nextActing, false);
+          view.setZoomPoint(nextActing.location());
+        }
         return;
       }
     }
@@ -519,7 +480,7 @@ public class Scene implements Session.Saveable, Assignment {
   
   /**  Fog and visibility updates-
     */
-  void updateFog() {
+  public void updateFog() {
     for (Coord c : Visit.grid(0, 0, size, size, 1)) {
       fogP[c.x][c.y] = 0;
       fogO[c.x][c.y] = 0;
@@ -539,8 +500,8 @@ public class Scene implements Session.Saveable, Assignment {
     Tile point, int radius, Person looks, boolean checkSight
   ) {
     byte fog[][] = null;
-    if (looks.side == Person.Side.HEROES  ) fog = fogP;
-    if (looks.side == Person.Side.VILLAINS) fog = fogO;
+    if (looks.side() == Person.Side.HEROES  ) fog = fogP;
+    if (looks.side() == Person.Side.VILLAINS) fog = fogO;
     if (fog == null) return;
     
     for (Coord c : Visit.grid(
@@ -565,10 +526,10 @@ public class Scene implements Session.Saveable, Assignment {
     
     boolean heroUp = false, criminalUp = false;
     for (Person p : playerTeam) if (p.isHero()) {
-      if (p.conscious()) heroUp = true;
+      if (p.conscious() && p.currentScene() == this) heroUp = true;
     }
     for (Person p : othersTeam) if (p.isCriminal()) {
-      if (p.conscious()) criminalUp = true;
+      if (p.conscious() && p.currentScene() == this) criminalUp = true;
     }
     if (! criminalUp) {
       return STATE_WON;
@@ -583,12 +544,12 @@ public class Scene implements Session.Saveable, Assignment {
   public float assessCollateral() {
     float sum = 0;
     for (Person p : othersTeam) {
-      float damage = p.injury / p.maxHealth();
-      if (! p.alive()) damage += 3;
+      float damage = p.injury() / p.maxHealth();
+      if (! p.alive     ()) damage += 3;
       if (! p.isCriminal()) damage *= 2;
       sum += damage;
     }
-    return sum * 0.25f / othersTeam.size();
+    return sum * 0.5f / othersTeam.size();
   }
   
   

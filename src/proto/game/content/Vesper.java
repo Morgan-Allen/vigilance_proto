@@ -1,11 +1,16 @@
 
 
 package proto.game.content;
+import proto.common.Kind;
+import proto.game.person.Ability;
+import proto.game.person.Person;
 import proto.game.scene.*;
 import proto.util.*;
-import static proto.game.scene.Ability.*;
-import static proto.game.scene.Person.*;
+
 import static proto.game.content.Common.*;
+import static proto.game.person.Ability.*;
+import static proto.game.person.Person.*;
+
 import java.awt.Image;
 
 
@@ -16,7 +21,7 @@ public class Vesper {
     
     BATARANG = new Ability(
       "Batarang", "ability_batarang",
-      "Throw a Batarang for 1-5 damage and 66% chance to disarm. (Note that "+
+      "Throw a Batarang for mild damage and 66% chance to disarm. (Note that "+
       "strong opponents may resist disarming.)",
       IS_RANGED, 1, MINOR_HARM, MINOR_POWER
     ) {
@@ -38,11 +43,15 @@ public class Vesper {
       
       
       public void applyOnActionEnd(Action use) {
-        Person struck       = use.volley().targAsPerson();
+        Volley volley       = use.volley();
+        Person struck       = volley.targAsPerson();
         float  resistance   = struck.stats.levelFor(MUSCLE) / 100f;
         float  disarmChance = 0.66f - resistance;
         
-        if (Rand.num() < disarmChance && struck.hasEquipped(SLOT_WEAPON)) {
+        if (! volley.didConnect) return;
+        if (! struck.hasEquipped(SLOT_WEAPON)) return;
+        
+        if (Rand.num() < disarmChance) {
           I.say(struck+" dropped their weapon!");
           struck.emptyEquipSlot(Person.SLOT_WEAPON);
         }

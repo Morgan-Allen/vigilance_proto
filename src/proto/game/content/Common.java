@@ -1,10 +1,16 @@
 
 
 package proto.game.content;
+import proto.common.Kind;
+import proto.game.person.Ability;
+import proto.game.person.Equipped;
+import proto.game.person.Person;
 import proto.game.scene.*;
 import proto.util.*;
-import static proto.game.scene.Ability.*;
-import static proto.game.scene.Person.*;
+
+import static proto.game.person.Ability.*;
+import static proto.game.person.Person.*;
+
 import java.awt.Image;
 
 
@@ -148,7 +154,7 @@ public class Common {
       public void applyOnDefendStart(Volley volley) {
         Person self = volley.targAsPerson();
         Person hits = volley.origAsPerson();
-        dodgePosition(self, hits, -0.33f);
+        dodgePosition(self, hits, 0.33f);
         volley.hitsArmour += 2;
         volley.hitsArmour += self.baseArmour() / 2f;
       }

@@ -7,9 +7,9 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import proto.*;
-import proto.game.scene.Ability;
-import proto.game.scene.Kind;
-import proto.game.scene.Person;
+import proto.common.Kind;
+import proto.game.person.Ability;
+import proto.game.person.Person;
 import proto.game.scene.Scene;
 import proto.game.world.Assignment;
 import proto.game.world.Base;
@@ -366,9 +366,9 @@ public class WorldView {
     
     else if (p != null && p == lastSelected) {
       s.append("\nCodename: "+p.name());
-      int HP = (int) (p.maxHealth() - (p.injury() + p.fatigue()));
+      int HP = (int) (p.maxHealth() - (p.injury() + p.stun()));
       s.append("\n  Health: "+HP+"/"+p.maxHealth());
-      if (p.fatigue() > 0) s.append(" (Stun "+(int) p.fatigue()+")");
+      if (p.stun() > 0) s.append(" (Stun "+(int) p.stun()+")");
       if (! p.alive()) s.append("\n  Dead");
       else if (! p.conscious()) s.append("\n  Unconscious");
       s.append("\nAbilities: ");

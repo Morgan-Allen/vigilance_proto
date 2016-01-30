@@ -1,7 +1,8 @@
 
 
-package proto.game.scene;
+package proto.game.person;
 import proto.*;
+import proto.common.Kind;
 import proto.common.Session;
 import proto.util.*;
 
@@ -27,9 +28,9 @@ public class PersonStats {
   
   
   void initFrom(Kind kind) {
-    for (int n = 0; n < kind.baseAbilities.length; n++) {
-      Ability a = kind.baseAbilities[n];
-      setLevel(a, kind.baseAbilityLevels[n], true);
+    for (int n = 0; n < kind.baseAbilities().length; n++) {
+      Ability a = kind.baseAbilities()[n];
+      setLevel(a, kind.baseLevels   ()[n], true);
     }
   }
   
@@ -64,6 +65,9 @@ public class PersonStats {
   }
   
   
+  
+  /**  General statistical queries-
+    */
   public Series <Ability> learnedAbilities() {
     return abilities;
   }
