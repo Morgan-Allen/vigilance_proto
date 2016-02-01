@@ -340,6 +340,7 @@ public class WorldView {
           Tally <Kind> kinds = new Tally();
           for (Person o : m.othersTeam()) kinds.add(1, o.kind());
           for (Kind k : kinds.keys()) {
+            s.append("\n    ");
             int num = (int) kinds.valueFor(k);
             if (num == 1) s.append(k.name());
             else s.append(num+"x "+k.name());
@@ -349,7 +350,7 @@ public class WorldView {
         
         s.append("\n  Team Selected (Press 1-9):");
         for (Person t : m.playerTeam()) {
-          s.append("\n  "+t.name());
+          s.append("\n    "+t.name());
         }
         Person picks = null;
         for (int i = 1; i <= 9; i++) {

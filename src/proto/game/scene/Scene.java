@@ -357,12 +357,12 @@ public class Scene implements Session.Saveable, Assignment {
   public void beginScene() {
     this.state = STATE_BEGUN;
     
+    I.say("\nBEGINNING SCENE...");
     int numT = playerTeam.size();
     int x = (size - numT) / 2, y = 0;
     view.setZoomPoint(tileAt(x, y));
     for (Person p : playerTeam) {
       addPerson(p, x, y);
-      p.onTurnStart();
       x += 1;
     }
     nextActing = playerTeam.first();
@@ -370,6 +370,7 @@ public class Scene implements Session.Saveable, Assignment {
     playerTurn = true;
     
     updateFog();
+    for (Person p : persons) p.onTurnStart();
   }
   
   

@@ -182,7 +182,7 @@ public class Person implements Session.Saveable {
   
   
   public int sightRange() {
-    return stats.levelFor(SIGHT) / 2;
+    return 3 + (stats.levelFor(SIGHT) / 4);
   }
   
   

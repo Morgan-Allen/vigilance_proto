@@ -1,18 +1,12 @@
 
 
 package proto.game.content;
-import static proto.game.content.Common.*;
-import static proto.game.person.Equipped.*;
-import static proto.game.person.Person.*;
-
-import proto.common.Kind;
-import proto.common.Session;
-import proto.game.person.Equipped;
-import proto.game.person.Person;
-import proto.game.scene.Scene;
-import proto.game.scene.Tile;
-import proto.game.world.World;
+import proto.common.*;
+import proto.game.person.*;
+import proto.game.scene.*;
+import proto.game.world.*;
 import proto.util.*;
+import static proto.util.TileConstants.*;
 
 
 
@@ -43,26 +37,6 @@ public class UrbanScene extends Scene {
     );
   
   
-  final static Equipped
-    BASEBALL_BAT = new Equipped(
-      "Baseball bat", "item_baseball_bat",
-      "A simple, sturdy wooden bat.  +5 damage bonus.",
-      Person.SLOT_WEAPON, 0,
-      IS_WEAPON | IS_MELEE, 5
-    );
-  
-  final static Kind
-    KIND_GOON = Kind.ofPerson(
-      "Goon", "prop_goon_urban", IMG_DIR+"sprite_big_goon.png",
-      Kind.TYPE_MOOK,
-      HEALTH, 20 ,
-      ARMOUR, 0  ,
-      MUSCLE, 16 ,
-      BRAIN , 6  ,
-      SPEED , 10 ,
-      SIGHT , 6  ,
-      MOVE, 1, STRIKE, 1, BASEBALL_BAT
-    );
   
   
   public UrbanScene(World world, int size) {
@@ -80,14 +54,70 @@ public class UrbanScene extends Scene {
   }
   
   
+
+  public void assignMissionParameters(
+    String name, Nation site, float dangerLevel, int expireTime,
+    Series <Person> forces
+  ) {
+    super.assignMissionParameters(name, site, dangerLevel, expireTime, forces);
+    if (forces == null) generateForces();
+  }
+  
+  
+  private void generateForces() {
+    
+    final Kind BOSSES[] = {
+      Villains.KIND_SLADE,
+      Villains.KIND_MR_FREEZE
+    };
+    final Kind GOONS[] = {
+      Villains.KIND_BRUISER,
+      Villains.KIND_MOBSTER,
+      Villains.KIND_CRIME_CULTIST
+    };
+    final float GOON_CHANCES[] = { 3, 2, 1 };
+    final float GOON_POWERS [] = { 1, 2, 3 };
+    
+    float forceLimit = dangerLevel() * 10;
+    float bossChance = dangerLevel() / 2;
+    float hostages   = 1 + Rand.index(4);
+    float forceSum   = 0;
+    
+    while (hostages-- > 0) {
+      Person hostage = new Person(Villains.KIND_HOSTAGE, "Hostage");
+      addToTeam(hostage);
+    }
+    while (forceSum < forceLimit) {
+      Kind ofGoon = (Kind) Rand.pickFrom(GOONS, GOON_CHANCES);
+      Person goon = new Person(ofGoon, ofGoon.name());
+      forceSum += GOON_POWERS[Visit.indexOf(ofGoon, GOONS)];
+      addToTeam(goon);
+    }
+    if (Rand.num() < bossChance) {
+      Kind ofBoss = (Kind) Rand.pickFrom(BOSSES);
+      Person boss = new Person(ofBoss, ofBoss.name());
+      addToTeam(boss);
+    }
+  }
+  
+  
+  private Tile findEntryPoint(Person p, int nearX, int nearY) {
+    int x = nearX + 5 + Rand.index(10), y = nearY + 5 + Rand.index(10);
+    Tile under = tileAt(x, y);
+    int dir = T_INDEX[Rand.index(T_INDEX.length)];
+    
+    while (under != null) {
+      if (! blockedAt(under)) return under;
+      x += T_X[dir];
+      y += T_Y[dir];
+      under = tileAt(x, y);
+    }
+    return null;
+  }
   
   
   public void setupScene() {
-    
-    //  TODO:  You need a separate pass for generating enemy forces!
-    
     super.setupScene();
-    
     int cX = (size() / 2) - 10, cY = 5;
     
     for (Coord c : Visit.grid(cX, cY, 20, 20, 1)) {
@@ -105,14 +135,9 @@ public class UrbanScene extends Scene {
     }
     addProp(KIND_POOL_TABLE, cX + 10, cY + 10);
     
-    int numGoons = (int) (10 * dangerLevel());
-    for (int n = numGoons; n-- > 0;) {
-      Person p = new Person(KIND_GOON, "Goon");
-      int x = cX + 5 + Rand.index(10), y = cY + 5 + Rand.index(10);
-      Tile under = tileAt(x, y);
-      if (blockedAt(under) || under.standing() != null) continue;
-      addPerson(p, x, y);
-      addToTeam(p);
+    for (Person p : othersTeam()) {
+      Tile entry = findEntryPoint(p, cX, cY);
+      if (entry != null) addPerson(p, entry.x, entry.y);
     }
     
     //  TODO:  Some patrol routes for goons would be nice...?
