@@ -1,13 +1,11 @@
 
 
 package proto.game.scene;
-import static proto.game.person.Person.*;
-
 import proto.common.*;
-import proto.game.content.Common;
-import proto.game.person.Equipped;
-import proto.game.person.Person;
+import proto.game.person.*;
 import proto.util.*;
+import proto.game.content.Common;
+import static proto.game.person.Person.*;
 
 
 
@@ -163,7 +161,7 @@ public class Volley implements Session.Saveable {
     
     selfDamageBase  += Nums.floor(weaponType.bonus / 2f);
     selfDamageRange += Nums.ceil (weaponType.bonus / 2f);
-    hitsArmour      += armourType.bonus;
+    hitsArmour       = armourType.bonus + hits.baseArmour();
     if (hits.turnDone()) hitsDefence += hits.currentAP() * 10;
     
     float damageMult = damagePercent / 100f;
@@ -221,6 +219,7 @@ public class Volley implements Session.Saveable {
       else if (accuracyMargin <= 60) {
         damageMargin *= 1.0f;
       }
+      I.say("  Full damage roll: "+damageRoll);
       I.say("  Volley did damage: "+damageMargin);
     }
     else {

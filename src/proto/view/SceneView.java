@@ -2,19 +2,10 @@
 
 
 package proto.view;
-import proto.*;
-import proto.common.Kind;
-import proto.common.Session;
-import proto.game.content.Common;
-import proto.game.person.Ability;
-import proto.game.person.Equipped;
-import proto.game.person.Person;
-import proto.game.scene.Action;
-import proto.game.scene.Prop;
-import proto.game.scene.Scene;
-import proto.game.scene.Tile;
-import proto.game.world.Nation;
-import proto.game.world.World;
+import proto.common.*;
+import proto.game.person.*;
+import proto.game.scene.*;
+import proto.game.world.*;
 import proto.util.*;
 
 import java.awt.*;
@@ -394,6 +385,25 @@ public class SceneView {
       g.fillRect(x - zoomX, y - zoomY, (int) w, (int) h);
     }
   }
+  
+  
+  public Coord screenCoord(Tile point) {
+    return screenCoord(point.x, point.y);
+  }
+  
+  
+  public Coord screenCoord(float px, float py) {
+    int x, y;
+    x = (int) ((px - 0.0f) * TILE_SIZE) - zoomX;
+    y = (int) ((py - 0.0f) * TILE_SIZE) - zoomY;
+    return new Coord(x, y);
+  }
 }
+
+
+
+
+
+
 
 

@@ -2,16 +2,15 @@
 
 package proto.game.content;
 import proto.common.Kind;
-import proto.game.person.Ability;
-import proto.game.person.Equipped;
-import proto.game.person.Person;
+import proto.game.person.*;
 import proto.game.scene.*;
 import proto.util.*;
-
 import static proto.game.person.Ability.*;
 import static proto.game.person.Person.*;
 
 import java.awt.Image;
+import java.awt.Graphics2D;
+import java.awt.Color;
 
 
 
@@ -72,6 +71,32 @@ public class Common {
       
       final Image missile = Kind.loadImage(IMG_DIR+"sprite_punch.png");
       public Image missileSprite() { return missile; }
+    },
+    
+    SHOOT = new Ability(
+      "Shoot", "ability_shoot",
+      "Fire a shot using ranged weaponry.  Accuracy falls off with distance.",
+      IS_RANGED, 1, REAL_HARM, MINOR_POWER
+    ) {
+      
+      public boolean allowsTarget(Object target, Scene scene, Person acting) {
+        return target instanceof Person;
+      }
+      
+      protected Volley createVolley(Action use) {
+        Scene  scene  = use.scene();
+        Person struck = (Person) use.target;
+        Volley volley = new Volley();
+        volley.setupVolley(use.acting, struck, true, scene);
+        return volley;
+      }
+      
+      public void renderMissile(Action action, Scene s, Graphics2D g) {
+        Person acting = action.acting;
+        Equipped weapon = acting.equippedInSlot(SLOT_WEAPON);
+        if (weapon == null || ! weapon.ranged()) return;
+        weapon.renderUsage(action, s, g);
+      }
     },
     
     DISARM = new Ability(
@@ -182,12 +207,14 @@ public class Common {
     UNARMED = new Equipped(
       "Unarmed", "item_unarmed",
       "Bare fists and moxy.",
+      null,
       SLOT_WEAPON, 0,
       Equipped.IS_WEAPON | Equipped.IS_MELEE, 0
     ),
     UNARMOURED = new Equipped(
       "Unarmoured", "item_unarmoured",
-      "Bare fists and moxy.",
+      "Nothin' but the clothes on your back.",
+      null,
       SLOT_ARMOUR, 0,
       Equipped.IS_ARMOUR, 0
     );

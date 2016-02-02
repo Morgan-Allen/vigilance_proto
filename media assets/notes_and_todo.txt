@@ -3,22 +3,32 @@
 
 Notes:
 
-*  I need to turn the pressure on during a given mission.  Either goons need to
-   be a credible threat, or escape needs to happen, or there should be hostages.
+*  Goons should patrol, ideally.  And hostages need to show correct behaviour.
+
+*  The same villain should not appear in two places at once!
+
+*  Scenes need to have a bit more in the way of cover.
+
+*  Reform the dodge/parry system so that it's not directly connected to AP.
    
-   I'm not sure the flat percentile-subtraction method is ideal.  There should
-   always be *some* chance of hitting or missing.  Or maybe dodge/block ONLY
-   happens if you explicitly script it?
-   
-   Goons should patrol, ideally...
+*  There needs to be more of a sense of 'getting' something out of a mission:
+     Evidence and contraband.
+     Rewards for information or property returned (PR bonus if refused.)
+     Captive supervillains for containment, intel or rehab.
+     
+     *  Clues to track down supervillains and their plots (after a heist.)
+     *  The chance to liberate scientists, engineers or a hero.
+     *  Foiling an invasion, with the chance to recover relics or materials.
+
+*  Plots and clue-research.  3-4 adaptable templates for the moment.  Okay.
+
+*  Research & development.  6-8 key technologies for the moment.
 
 
-*  A wider range of abilities for the current heroes.
+*  A wider range of abilities for the current heroes.  3-4 each, say.
 
 *  XP gain and skill-advancement over time.  (Either pick skills out of a hat
    or have an explicit training mechanic.)
 
 *  The basics of role-play elements- gaining guilt, gaining luck, the effects
    of killing, support and pledges.
-
-*  Research & development.

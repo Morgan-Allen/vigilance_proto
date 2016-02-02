@@ -2,14 +2,13 @@
 
 package proto.game.person;
 import proto.common.*;
-import proto.game.scene.Action;
-import proto.game.scene.MoveSearch;
-import proto.game.scene.Scene;
-import proto.game.scene.Tile;
-import proto.game.scene.Volley;
+import proto.game.scene.*;
 import proto.util.*;
+
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Color;
+import java.awt.BasicStroke;
 
 
 
@@ -154,7 +153,8 @@ public abstract class Ability extends Index.Entry implements Session.Saveable {
     
     final float range = scene.distance(acting.location, dest);
     final int maxRange = maxRange();
-    if (maxRange > 0 && range > maxRange) return null;
+    if (maxRange > 0 && range > maxRange ) return null;
+    if (range > (acting.sightRange() + 2)) return null;
     
     Tile path[] = null;
     if (pathToTake != null) {
@@ -363,12 +363,17 @@ public abstract class Ability extends Index.Entry implements Session.Saveable {
   //  TODO:  Move this out to the 'view' package?
   
   public void renderMissile(Action action, Scene s, Graphics2D g) {
-    Image sprite = missileSprite();
+    renderMissile(action, s, missileSprite(), g);
+  }
+  
+  
+  protected void renderMissile(
+    Action action, Scene s, Image sprite, Graphics2D g
+  ) {
     if (sprite == null) return;
-    
     Person using = action.acting;
-    float progress = action.progress();
     Tile target = s.tileUnder(action.target);
+    float progress = action.progress();
     
     float pX = using.posX * (1 - progress);
     float pY = using.posY * (1 - progress);
@@ -379,7 +384,28 @@ public abstract class Ability extends Index.Entry implements Session.Saveable {
   }
   
   
-  public void dodgePosition(Person self, Object from, float scale) {
+  protected void renderBeam(
+    Action action, Scene s,
+    Color beamTone, Color coreTone, int beamWide, Graphics2D g
+  ) {
+    if (beamTone == null || coreTone == null) return;
+    Person using = action.acting;
+    Tile target = s.tileUnder(action.target);
+    
+    Coord orig = s.view().screenCoord(using.location());
+    Coord dest = s.view().screenCoord(target);
+    
+    g.setColor(beamTone);
+    g.setStroke(new BasicStroke(beamWide * 4));
+    g.drawLine(orig.x, orig.y, dest.x, dest.y);
+    
+    g.setColor(coreTone);
+    g.setStroke(new BasicStroke(beamWide * 2));
+    g.drawLine(orig.x, orig.y, dest.x, dest.y);
+  }
+  
+  
+  protected void dodgePosition(Person self, Object from, float scale) {
     Scene s = self.currentScene();
     Tile atS = self.location(), atH = s.tileUnder(from);
     Vec2D diff = new Vec2D(atS.x - atH.x, atS.y - atH.y);

@@ -304,8 +304,13 @@ public class Scene implements Session.Saveable, Assignment {
   
   public boolean removePerson(Person p) {
     if (p.currentScene() != this) return false;
+    Tile under = p.location();
+    if (under != null) under.setInside(p, false);
+    else {
+      playerTeam.remove(p);
+      othersTeam.remove(p);
+    }
     p.setAssignment(null);
-    p.location().setInside(p, false);
     persons.remove(p);
     return true;
   }

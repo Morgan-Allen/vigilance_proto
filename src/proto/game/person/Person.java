@@ -49,7 +49,7 @@ public class Person implements Session.Saveable {
     SLOT_ITEMS  = 2,
     NUM_EQUIP_SLOTS = 4;
   public static enum Side {
-    HEROES, VILLAINS
+    HEROES, CIVILIANS, VILLAINS
   };
   
   
@@ -85,7 +85,8 @@ public class Person implements Session.Saveable {
     }
     alive = conscious = true;
     
-    if (kind.type() == Kind.TYPE_HERO) side = Side.HEROES;
+    if      (kind.type() == Kind.TYPE_HERO    ) side = Side.HEROES   ;
+    else if (kind.type() == Kind.TYPE_CIVILIAN) side = Side.CIVILIANS;
     else side = Side.VILLAINS;
   }
   
@@ -556,6 +557,8 @@ public class Person implements Session.Saveable {
   private void assessConfidence() {
     Scene scene = currentScene();
     float teamHealth = 0, teamPower = 0;
+    
+    I.say("Assessing confidence for "+this);
     
     for (Person p : scene.persons()) {
       if (! canSee(p.location())) continue;

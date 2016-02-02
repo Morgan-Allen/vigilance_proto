@@ -7,6 +7,8 @@ import static proto.game.content.Common.*;
 import static proto.game.person.Equipped.*;
 import static proto.game.person.Person.*;
 
+import java.awt.Color;
+
 
 
 public class Villains {
@@ -20,26 +22,30 @@ public class Villains {
     BASEBALL_BAT = new Equipped(
       "Baseball bat", "item_baseball_bat",
       "A simple, sturdy wooden bat.  +5 damage bonus.",
+      null,
       Person.SLOT_WEAPON, 0,
       IS_WEAPON | IS_MELEE, 5
     ),
     TOMMY_GUN = new Equipped(
       "Tommy gun", "item_tommy_gun",
       "A rapid-firing automatic firearm.  +10 damage bonus.",
+      Kind.loadImage(IMG_DIR+"sprite_gun_fire.png"),
       Person.SLOT_WEAPON, 0,
       IS_WEAPON | IS_RANGED, 10
     ),
     BOLT_RIFLE = new Equipped(
       "Bolt Rifle", "item_bolt_rifle",
       "Powerful, reverse-engineered alien weaponry.  +15 damage bonus.",
+      Color.ORANGE,
       Person.SLOT_WEAPON, 0,
-      IS_WEAPON | IS_RANGED, 15
+      IS_WEAPON | IS_RANGED | IS_BEAM, 15
     ),
     HI_LASER = new Equipped(
       "Hi Laser", "item_hi_laser",
       "A high-intensity focused microwave cannon.  +20 damage bonus.",
+      Color.RED,
       Person.SLOT_WEAPON, 0,
-      IS_WEAPON | IS_RANGED, 20
+      IS_WEAPON | IS_RANGED | IS_BEAM, 20
     );
   
   
@@ -77,7 +83,7 @@ public class Villains {
       BRAIN , 10 ,
       SPEED , 12 ,
       SIGHT , 8  ,
-      MOVE, 1, STRIKE, 1, TOMMY_GUN
+      MOVE, 1, SHOOT, 1, TOMMY_GUN
     ),
     KIND_CRIME_CULTIST = Kind.ofPerson(
       "Crime Cultist", "kind_crime_cultist", IMG_DIR+"sprite_crime_cultist.png",
@@ -88,7 +94,7 @@ public class Villains {
       BRAIN , 16 ,
       SPEED , 14 ,
       SIGHT , 12 ,
-      MOVE, 1, STRIKE, 1, BOLT_RIFLE
+      MOVE, 1, SHOOT, 1, BOLT_RIFLE
     ),
     KIND_LEXDROID = Kind.ofPerson(
       "Lexdroid", "kind_lexdroid", IMG_DIR+"sprite_lexdroid.png",
@@ -99,7 +105,7 @@ public class Villains {
       BRAIN , 4  ,
       SPEED , 16 ,
       SIGHT , 10 ,
-      MOVE, 1, STRIKE, 1, HI_LASER
+      MOVE, 1, SHOOT, 1, HI_LASER
     );
   
   
@@ -113,7 +119,7 @@ public class Villains {
       BRAIN , 18 ,
       SPEED , 20 ,
       SIGHT , 18 ,
-      MOVE, 1, STRIKE, 1
+      MOVE, 1, STRIKE, 1, SHOOT, 1
     ),
     
     KIND_MR_FREEZE = Kind.ofPerson(
@@ -125,11 +131,11 @@ public class Villains {
       BRAIN , 20 ,
       SPEED , 10 ,
       SIGHT , 12 ,
-      MOVE, 1, STRIKE, 1
+      MOVE, 1, SHOOT, 1
     ),
     
     KIND_METALLO = Kind.ofPerson(
-      "Metalloy", "kind_metallo", IMG_DIR+"sprite_metallo.png",
+      "Metallo", "kind_metallo", IMG_DIR+"sprite_metallo.png",
       Kind.TYPE_BOSS,
       HEALTH, 120,
       ARMOUR, 8  ,
@@ -137,7 +143,7 @@ public class Villains {
       BRAIN , 14 ,
       SPEED , 16 ,
       SIGHT , 10 ,
-      MOVE, 1, STRIKE, 1
+      MOVE, 1, SHOOT, 1
     );
 }
 
