@@ -1,13 +1,12 @@
 
 
 package proto.common;
-import java.awt.*;
-import java.io.File;
-import javax.imageio.ImageIO;
-
 import proto.game.person.Ability;
 import proto.game.person.Equipped;
 import proto.util.*;
+import java.awt.*;
+import java.io.File;
+import javax.imageio.ImageIO;
 
 
 

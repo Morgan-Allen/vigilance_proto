@@ -1,29 +1,35 @@
 
 
 package proto.view;
-import java.awt.Image;
-
-import proto.common.Kind;
+import proto.util.*;
+import java.awt.*;
+import java.awt.image.*;
 
 
 
 public class RegionView {
   
   
+  String name;
   int colourKey;
-  Image outline;
+  Box2D bounds = null;
+  BufferedImage outline;
   int outlineX, outlineY, centerX, centerY;
-
   
   
-  public void loadOutline(String imgFile, int colourKey, int offX, int offY) {
-    outline = Kind.loadImage(WorldView.IMG_DIR+imgFile);
-    this.colourKey = colourKey;
-    outlineX = offX;
-    outlineY = offY;
-    if (outline != null) {
-      centerX = offX + (outline.getWidth (null) / 2);
-      centerY = offY + (outline.getHeight(null) / 2);
-    }
+  public void attachColourKey(int key, String name) {
+    this.name      = name;
+    this.colourKey = key ;
   }
 }
+
+
+
+
+
+
+
+
+
+
+

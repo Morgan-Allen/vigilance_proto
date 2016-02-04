@@ -37,29 +37,29 @@ public class Region extends Index.Entry implements Session.Saveable {
   
   static {
     NA.cities = new String[] { "Toronto", "Metropolis", "Gotham" };
-    NA.view.loadOutline("NA_outline.png", -38656, 136, 82);
+    NA.view.attachColourKey(-38656, "NA");
     NA.defaultFunding = 200 ;
     NA.defaultTrust   = 0.5f;
     NA.defaultMember  = true;
     
     SA.cities = new String[] { "Brazilia", "Buenos Aires", "Atlantis"};
-    SA.view.loadOutline("SA_outline.png", -11740822, 463, 337);
+    SA.view.attachColourKey(-11740822, "SA");
     SA.defaultFunding = 150;
     
     AF.cities = new String[] { "Capetown", "Cairo", "Timbuktu" };
-    AF.view.loadOutline("AF_outline.png", -989079, 665, 243);
+    AF.view.attachColourKey(-989079, "AF");
     AF.defaultFunding = 120;
     
     EU.cities = new String[] { "London", "Paris", "Themyscira" };
-    EU.view.loadOutline("EU_outline.png", -3956789, 663, 96);
+    EU.view.attachColourKey(-3956789, "EU");
     EU.defaultFunding = 180;
     
     SB.cities = new String[] { "Moscow", "Leningrad", "Berlin" };
-    SB.view.loadOutline("RU_outline.png", -3162470, 843, 54);
+    SB.view.attachColourKey(-3162470, "SB");
     SB.defaultFunding = 150;
     
     OC.cities = new String[] { "Perth", "Singapore", "Tokyo" };
-    OC.view.loadOutline("OC_outline.png", -9335063, 926, 160);
+    OC.view.attachColourKey(-9335063, "OC");
     OC.defaultFunding = 150;
   }
   

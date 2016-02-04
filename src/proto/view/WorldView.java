@@ -6,17 +6,10 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
-import proto.*;
-import proto.common.Kind;
-import proto.game.person.Ability;
-import proto.game.person.Person;
-import proto.game.scene.Scene;
-import proto.game.world.Assignment;
-import proto.game.world.Base;
-import proto.game.world.Blueprint;
-import proto.game.world.Nation;
-import proto.game.world.Room;
-import proto.game.world.World;
+import proto.common.*;
+import proto.game.person.*;
+import proto.game.scene.*;
+import proto.game.world.*;
 import proto.util.*;
 
 
@@ -34,7 +27,8 @@ public class WorldView {
   Room   selectedRoom;
   Object lastSelected;
   
-  Image mapImage, alertMarker, selectCircle, constructMark;
+  RegionsMapView mapView = new RegionsMapView();
+  Image alertMarker, selectCircle, constructMark;
   
   
   public WorldView(World world) {
@@ -44,34 +38,34 @@ public class WorldView {
   
   
   void loadMedia() {
-    mapImage     = Kind.loadImage(IMG_DIR+"world_map_image.png");
-    alertMarker  = Kind.loadImage(IMG_DIR+"alert_symbol.png"   );
-    selectCircle = Kind.loadImage(IMG_DIR+"select_circle.png"  );
+    mapView.loadMapImages(IMG_DIR+"world_map_image.png");
+    alertMarker   = Kind.loadImage(IMG_DIR+"alert_symbol.png");
+    selectCircle  = Kind.loadImage(IMG_DIR+"select_circle.png");
     constructMark = Kind.loadImage(Blueprint.IMG_DIR+"under_construction.png");
   }
   
 
   void renderTo(Surface surface, Graphics2D g) {
     Nation nations[] = world.nations();
-    
-    
+    mapView.attachOutlinesFor(nations);
+    Image mapImage = mapView.keyImage;
     //
     //  Draw the background image first!
     g.drawImage(mapImage, 0, 0, surface.getWidth(), surface.getHeight(), null);
     Nation nationHovered = null;
     Person personHovered = null;
-    
     //
     //  Then draw the nations of the world on the satellite map.
     int viewWide = surface.getWidth(), viewHigh = surface.getHeight();
     float mapWRatio = 1, mapHRatio = 1;
-    mapWRatio *= mapImage.getWidth (null) * 1f / viewWide;
-    mapHRatio *= mapImage.getHeight(null) * 1f / viewHigh;
+    mapWRatio *= (mapImage.getWidth (null) * 1f) / viewWide;
+    mapHRatio *= (mapImage.getHeight(null) * 1f) / viewHigh;
     
     int mX = surface.mouseX, mY = surface.mouseY;
     mX *= mapWRatio;
     mY *= mapHRatio;
     int pixVal = ((BufferedImage) mapImage).getRGB(mX, mY);
+    
     for (Nation n : nations) if (n.region.view.colourKey == pixVal) {
       nationHovered = n;
     }
@@ -132,6 +126,9 @@ public class WorldView {
       
       if (surface.mouseIn(x, y, size, size)) {
         personHovered = p;
+        g.drawImage(selectCircle, x, y, size, size, null);
+      }
+      if (selectedPerson == p) {
         g.drawImage(selectCircle, x, y, size, size, null);
       }
       
@@ -214,10 +211,11 @@ public class WorldView {
     Nation n, Surface surface, Graphics2D g, float mapWRatio, float mapHRatio
   ) {
     if (n == null || n.region.view.outline == null) return;
+    
     RegionView r = n.region.view;
     int
-      x = (int) (r.outlineX / mapWRatio),
-      y = (int) (r.outlineY / mapHRatio),
+      x = (int) ((r.outlineX / mapWRatio) + 0.5f),
+      y = (int) ((r.outlineY / mapHRatio) + 0.5f),
       w = (int) (r.outline.getWidth (null) / mapWRatio),
       h = (int) (r.outline.getHeight(null) / mapHRatio);
     g.drawImage(r.outline, x, y, w, h, null);
