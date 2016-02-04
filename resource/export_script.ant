@@ -8,15 +8,14 @@
   <target name="build">
     
     <delete dir="${output}"/>
-    
+    <mkdir  dir="${output}"/>
+    <mkdir  dir="${output}/saves"/>
     <copy todir="${output}/media assets">
       <fileset dir="media assets">
         <exclude name="*.psd"/>
         <exclude name="*.txt"/>
       </fileset>
     </copy>
-    
-    <mkdir dir="${output}/saves"/>
     
     <jar destfile="${output}/vigilance.jar" basedir="bin">
       <manifest>

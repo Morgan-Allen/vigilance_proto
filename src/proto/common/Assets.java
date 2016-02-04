@@ -19,7 +19,7 @@ public class Assets {
   
   final static boolean EXCLUDE_BASE_DIR = false;
   //  TODO:  TEMPORARY HACK BELOW, REMOVE!
-  final static String DEFAULT_JAR_NAME = "Vigilance_JAR.jar";
+  final static String DEFAULT_JAR_NAME = "vigilance.jar";
   final public static char REP_SEP = '/';
   private static boolean
     callsVerbose = false,
