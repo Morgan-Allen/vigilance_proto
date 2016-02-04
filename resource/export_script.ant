@@ -1,0 +1,31 @@
+
+
+<project name="Vigilance Build" basedir=".." default="build">
+  
+  <property name="output" value="../Vigilance_Prototype_Folder" />
+  <property name="outZip" value="../Vigilance_Prototype.zip"    />
+  
+  <target name="build">
+    
+    <delete dir="${output}"/>
+    
+    <copy todir="${output}/media assets">
+      <fileset dir="media assets">
+        <exclude name="*.psd"/>
+        <exclude name="*.txt"/>
+      </fileset>
+    </copy>
+    
+    <mkdir dir="${output}/saves"/>
+    
+    <jar destfile="${output}/vigilance.jar" basedir="bin">
+      <manifest>
+        <attribute name="Main-Class" value="proto.common.RunGame"/>
+      </manifest>
+    </jar>
+    
+    <zip destfile="${outZip}">
+      <zipfileset dir="${output}" filemode="755"/>
+    </zip>
+  </target>
+</project>
