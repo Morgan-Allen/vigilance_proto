@@ -1,5 +1,27 @@
 
 
+SCENES & ACTIONS:
+  Motion options.  {Sneak, Move, Dash}
+  Damage options.  {Disarm, Hit, Kill}
+  Defend options.  {Evade, Guard, Sentry}
+
+  Stealth increases effective sight-range from enemies by a random increment
+  each turn (average 1 tile for every 10 points.)
+
+HERO STATS:
+  Heroes have 4 base stats, which is all that's shown by default.  Brain, Will,
+  Reflex, and Muscle.
+  Health & Stress.  Luck & Experience.
+  Plus Armour, Regen & default Min/Max Damage.
+  Everything else (and there's quite a bit of it) is derived.  (You can get
+  info via tooltips or maybe an optional 'detail' view.)
+
+NATION STATS:
+  Freedom.  Equality.  Education.  Environment.
+  Wealth.  Crime.
+  Trust.  Tech & Infrastructure.  Enforcement.
+
+
 
 Notes:
 
@@ -32,3 +54,5 @@ Notes:
 
 *  The basics of role-play elements- gaining guilt, gaining luck, the effects
    of killing, support and pledges.
+
+

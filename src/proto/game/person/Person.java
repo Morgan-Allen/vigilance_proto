@@ -26,6 +26,12 @@ public class Person implements Session.Saveable {
     BRAIN  = new Stat("Brain" , "brain_stat" , ""),
     SPEED  = new Stat("Speed" , "speed_stat" , ""),
     SIGHT  = new Stat("Sight" , "sight_stat" , "");
+    //  Energy.
+    //  Charm.
+    //  Defence.
+    //  Will.
+    //  Stealth.
+  
   final public static int
     STATE_INIT    = -1,
     STATE_AS_PC   =  0,

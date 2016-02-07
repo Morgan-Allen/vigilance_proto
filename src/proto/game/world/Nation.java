@@ -1,12 +1,7 @@
 
 
 package proto.game.world;
-import java.awt.Image;
-import java.io.File;
-import javax.imageio.ImageIO;
-
-import proto.common.Session;
-import proto.common.Session.Saveable;
+import proto.common.*;
 import proto.game.content.UrbanScene;
 import proto.game.scene.Scene;
 import proto.util.*;
@@ -19,28 +14,51 @@ public class Nation implements Session.Saveable {
   /**  Data fields, construction and save/load methods-
     */
   final public Region region;
-  float trust = 0.25f;
-  float crime = 0.25f;
-  boolean member;
-  int funding;
   
-  Scene mission;
+  List <Object> infrastructure = new List();
+  float
+    crime      ,
+    wealth     ,
+    environment,
+    education  ,
+    equality   ,
+    freedom    ;
+  
+  float   trust  ;
+  boolean member ;
+  int     funding;
+  Scene   mission;
   
   
   Nation(Region region) {
-    this.region  = region;
-    this.funding = region.defaultFunding;
+    this.region = region;
+    
+    this.crime       = region.defaultCrime;
+    this.wealth      = region.defaultWealth;
+    this.environment = region.defaultEnvironment;
+    this.education   = region.defaultEducation;
+    this.equality    = region.defaultEquality;
+    this.freedom     = region.defaultFreedom;
+
     this.trust   = region.defaultTrust;
-    this.crime   = region.defaultCrime;
+    this.funding = region.defaultFunding;
     this.member  = region.defaultMember;
   }
   
   
   public Nation(Session s) throws Exception {
     s.cacheInstance(this);
-    region  = (Region) s.loadObject();
+    region = (Region) s.loadObject();
+    
+    s.loadObjects(infrastructure);
+    crime       = s.loadFloat();
+    wealth      = s.loadFloat();
+    environment = s.loadFloat();
+    education   = s.loadFloat();
+    equality    = s.loadFloat();
+    freedom     = s.loadFloat();
+    
     trust   = s.loadFloat();
-    crime   = s.loadFloat();
     member  = s.loadBool();
     funding = s.loadInt();
     mission = (Scene) s.loadObject();
@@ -49,10 +67,18 @@ public class Nation implements Session.Saveable {
   
   public void saveState(Session s) throws Exception {
     s.saveObject(region);
-    s.saveFloat(trust);
-    s.saveFloat(crime);
-    s.saveBool(member);
-    s.saveInt(funding);
+    
+    s.saveObjects(infrastructure);
+    s.saveFloat(crime      );
+    s.saveFloat(wealth     );
+    s.saveFloat(environment);
+    s.saveFloat(education  );
+    s.saveFloat(equality   );
+    s.saveFloat(freedom    );
+
+    s.saveFloat (trust  );
+    s.saveBool  (member );
+    s.saveInt   (funding);
     s.saveObject(mission);
   }
   
