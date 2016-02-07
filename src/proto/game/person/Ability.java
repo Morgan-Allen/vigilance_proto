@@ -1,7 +1,6 @@
 
 
 package proto.game.person;
-import proto.common.*;
 import proto.game.scene.*;
 import proto.util.*;
 
@@ -12,12 +11,11 @@ import java.awt.BasicStroke;
 
 
 
-public abstract class Ability extends Index.Entry implements Session.Saveable {
-
+public abstract class Ability extends Trait {
+  
   
   /**  Data fields, construction and save/load methods-
     */
-  final static Index <Ability> INDEX = new Index <Ability> ();
   
   final public static int
     NONE              = 0     ,
@@ -41,35 +39,20 @@ public abstract class Ability extends Index.Entry implements Session.Saveable {
     MEDIUM_POWER = 5,
     MAJOR_POWER  = 8;
   
-  final public String name;
-  final public String description;
-  
   final int properties, costAP;
   final float harmLevel, powerLevel;
   
   
   public Ability(
-    String name, String uniqueID, String description,
+    String name, String ID, String description,
     int properties, int costAP,
     float harmLevel, float powerLevel
   ) {
-    super(INDEX, uniqueID);
-    this.name        = name;
-    this.description = description;
+    super(name, ID, description);
     this.properties  = properties;
     this.costAP      = costAP;
     this.harmLevel   = harmLevel;
     this.powerLevel  = powerLevel;
-  }
-  
-  
-  public static Ability loadConstant(Session s) throws Exception {
-    return INDEX.loadEntry(s.input());
-  }
-  
-  
-  public void saveState(Session s) throws Exception {
-    INDEX.saveEntry(this, s.output());
   }
   
   

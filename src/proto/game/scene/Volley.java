@@ -136,8 +136,12 @@ public class Volley implements Session.Saveable {
     this.orig    = self;
     this.targ    = hits;
     this.ranged  = ranged;
-    selfAccuracy = (int) (self.stats.levelFor(SPEED) * 2.5f) + 50;
-    hitsDefence  = (int) (hits.stats.levelFor(SPEED) * 2.5f) + 0 ;
+    
+    //  TODO:  USE THE FULL RANGE OF STATS FOR THIS!  AND SET THOSE UP
+    //         BEFOREHAND, BASED OFF PRIMARY ATTRIBUTES!
+    
+    selfAccuracy = (int) (self.stats.levelFor(SPEED_ACT) * 2.5f) + 50;
+    hitsDefence  = (int) (hits.stats.levelFor(SPEED_ACT) * 2.5f) + 0 ;
     
     //  TODO:  It might not be a weapon though- could be an ability or
     //  triggered item, etc.

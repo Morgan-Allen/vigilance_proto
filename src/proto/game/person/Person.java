@@ -14,23 +14,37 @@ public class Person implements Session.Saveable {
   
   /**  Data fields and construction-
     */
-  static class Stat extends Ability {
+  static class Stat extends Trait {
     public Stat(String name, String ID, String description) {
-      super(name, ID, description, IS_PASSIVE, 0, NO_HARM, MINOR_POWER);
+      super(name, ID, description);
     }
   }
+  
   final public static Stat
-    HEALTH = new Stat("Health", "health_stat", ""),
-    ARMOUR = new Stat("Armour", "armour_stat", ""),
-    MUSCLE = new Stat("Muscle", "muscle_stat", ""),
-    BRAIN  = new Stat("Brain" , "brain_stat" , ""),
-    SPEED  = new Stat("Speed" , "speed_stat" , ""),
-    SIGHT  = new Stat("Sight" , "sight_stat" , "");
-    //  Energy.
-    //  Charm.
-    //  Defence.
-    //  Will.
-    //  Stealth.
+    WILL       = new Stat("Will"      , "stat_will"      , ""),
+    BRAIN      = new Stat("Brain"     , "stat_brain"     , ""),
+    MUSCLE     = new Stat("Muscle"    , "stat_muscle"    , ""),
+    REFLEX     = new Stat("Reflex"    , "stat_reflex"    , ""),
+    
+    HIT_POINTS = new Stat("Hit Points", "stat_hit_points", ""),
+    ENERGY     = new Stat("Energy"    , "stat_energy"    , ""),
+    ARMOUR     = new Stat("Armour"    , "stat_armour"    , ""),
+    REGEN      = new Stat("Regen"     , "stat_regen"     , ""),
+    MIN_DAMAGE = new Stat("Min Damage", "stat_min_damage", ""),
+    RNG_DAMAGE = new Stat("Rng Damage", "stat_rng_damage", ""),
+    
+    SIGHT      = new Stat("Sight"     , "stat_sight"     , ""),
+    SPEED_ACT  = new Stat("Speed Act" , "stat_speed_act" , ""),
+    SPEED_MOV  = new Stat("Speed Mov" , "stat_speed_mov" , ""),
+    PRECISION  = new Stat("Precision" , "stat_precision" , ""),
+    STUNNING   = new Stat("Stunning"  , "stat_stunning"  , ""),
+    DODGE      = new Stat("Dodge"     , "stat_dodge"     , ""),
+    PARRY      = new Stat("Parry"     , "stat_parry"     , ""),
+    STEALTH    = new Stat("Stealth"   , "stat_stealth"   , ""),
+    
+    QUESTION   = new Stat("Question"  , "stat_question"  , ""),
+    SUASION    = new Stat("Suasion"   , "stat_suasion"   , "");
+  
   
   final public static int
     STATE_INIT    = -1,
@@ -162,7 +176,7 @@ public class Person implements Session.Saveable {
   /**  General state queries-
     */
   public int maxHealth() {
-    return stats.levelFor(HEALTH);
+    return stats.levelFor(HIT_POINTS);
   }
   
   
@@ -194,7 +208,7 @@ public class Person implements Session.Saveable {
   
   
   public int maxAP() {
-    return stats.levelFor(SPEED) / 4;
+    return stats.levelFor(SPEED_ACT) / 4;
   }
   
   

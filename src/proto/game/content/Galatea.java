@@ -83,11 +83,11 @@ public class Galatea {
     GALATEA  = Kind.ofPerson(
       "Galatea", "hero_kind_galatea", IMG_DIR+"sprite_wonder_woman.png",
       Kind.TYPE_HERO,
-      HEALTH, 180,
+      HIT_POINTS, 180,
       ARMOUR, 2  ,
       MUSCLE, 45 ,
       BRAIN , 16 ,
-      SPEED , 25 ,
+      SPEED_ACT , 25 ,
       SIGHT , 10 ,
       MOVE, 1, STRIKE, 1, DISARM, 1, EVASION, 1, GUARD, 1,
       LASSO, 1

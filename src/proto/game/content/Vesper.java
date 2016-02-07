@@ -1,9 +1,8 @@
 
 
 package proto.game.content;
-import proto.common.Kind;
-import proto.game.person.Ability;
-import proto.game.person.Person;
+import proto.common.*;
+import proto.game.person.*;
 import proto.game.scene.*;
 import proto.util.*;
 
@@ -90,11 +89,11 @@ public class Vesper {
     VESPER = Kind.ofPerson(
       "Nocturne", "hero_kind_vesper", IMG_DIR+"sprite_batman.png",
       Kind.TYPE_HERO,
-      HEALTH, 30 ,
+      HIT_POINTS, 30 ,
       ARMOUR, 2  ,
       MUSCLE, 20 ,
       BRAIN , 20 ,
-      SPEED , 20 ,
+      SPEED_ACT , 20 ,
       SIGHT , 10 ,
       MOVE, 1, STRIKE, 1, EVASION, 1, GUARD, 1,
       BATARANG, 1, ULTRASOUND, 1
@@ -102,11 +101,11 @@ public class Vesper {
     KESTREL  = Kind.ofPerson(
       "Kestrel", "hero_kind_kestrel", IMG_DIR+"sprite_robin.png",
       Kind.TYPE_HERO, 
-      HEALTH, 20 ,
+      HIT_POINTS, 20 ,
       ARMOUR, 0  ,
       MUSCLE, 16 ,
       BRAIN , 15 ,
-      SPEED , 18 ,
+      SPEED_ACT , 18 ,
       SIGHT , 12 ,
       MOVE, 1, STRIKE, 1, EVASION, 1, GUARD, 1,
       BATARANG, 1

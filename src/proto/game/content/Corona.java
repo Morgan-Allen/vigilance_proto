@@ -22,11 +22,11 @@ public class Corona {
     CORONA   = Kind.ofPerson(
       "Corona", "hero_kind_corona", IMG_DIR+"sprite_superman.png",
       Kind.TYPE_HERO,
-      HEALTH, 250,
+      HIT_POINTS, 250,
       ARMOUR, 8  ,
       MUSCLE, 100,
       BRAIN , 16 ,
-      SPEED , 16 ,
+      SPEED_ACT , 16 ,
       SIGHT , 16 ,
       MOVE, 1, STRIKE, 1, DISARM, 1, GUARD, 1
     );

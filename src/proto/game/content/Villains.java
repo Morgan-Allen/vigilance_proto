@@ -6,7 +6,6 @@ import proto.game.person.*;
 import static proto.game.content.Common.*;
 import static proto.game.person.Equipped.*;
 import static proto.game.person.Person.*;
-
 import java.awt.Color;
 
 
@@ -53,11 +52,11 @@ public class Villains {
     KIND_HOSTAGE = Kind.ofPerson(
       "Hostage", "kind_hostage", IMG_DIR+"sprite_hostage.png",
       Kind.TYPE_CIVILIAN,
-      HEALTH, 8  ,
+      HIT_POINTS, 8  ,
       ARMOUR, 0  ,
       MUSCLE, 4  ,
       BRAIN , 6  ,
-      SPEED , 6  ,
+      SPEED_ACT , 6  ,
       SIGHT , 6  ,
       MOVE, 1
     );
@@ -66,44 +65,44 @@ public class Villains {
     KIND_BRUISER = Kind.ofPerson(
       "Bruiser", "kind_bruiser", IMG_DIR+"sprite_bruiser.png",
       Kind.TYPE_MOOK,
-      HEALTH, 20 ,
+      HIT_POINTS, 20 ,
       ARMOUR, 1  ,
       MUSCLE, 16 ,
       BRAIN , 6  ,
-      SPEED , 10 ,
+      SPEED_ACT , 10 ,
       SIGHT , 6  ,
       MOVE, 1, STRIKE, 1, BASEBALL_BAT
     ),
     KIND_MOBSTER = Kind.ofPerson(
       "Mobster", "kind_mobster", IMG_DIR+"sprite_mobster.png",
       Kind.TYPE_MOOK,
-      HEALTH, 14 ,
+      HIT_POINTS, 14 ,
       ARMOUR, 0  ,
       MUSCLE, 12 ,
       BRAIN , 10 ,
-      SPEED , 12 ,
+      SPEED_ACT , 12 ,
       SIGHT , 8  ,
       MOVE, 1, SHOOT, 1, TOMMY_GUN
     ),
     KIND_CRIME_CULTIST = Kind.ofPerson(
       "Crime Cultist", "kind_crime_cultist", IMG_DIR+"sprite_crime_cultist.png",
       Kind.TYPE_MOOK,
-      HEALTH, 16 ,
+      HIT_POINTS, 16 ,
       ARMOUR, 2  ,
       MUSCLE, 14 ,
       BRAIN , 16 ,
-      SPEED , 14 ,
+      SPEED_ACT , 14 ,
       SIGHT , 12 ,
       MOVE, 1, SHOOT, 1, BOLT_RIFLE
     ),
     KIND_LEXDROID = Kind.ofPerson(
       "Lexdroid", "kind_lexdroid", IMG_DIR+"sprite_lexdroid.png",
       Kind.TYPE_MOOK,
-      HEALTH, 30 ,
+      HIT_POINTS, 30 ,
       ARMOUR, 6  ,
       MUSCLE, 2  ,
       BRAIN , 4  ,
-      SPEED , 16 ,
+      SPEED_ACT , 16 ,
       SIGHT , 10 ,
       MOVE, 1, SHOOT, 1, HI_LASER
     );
@@ -113,11 +112,11 @@ public class Villains {
     KIND_SLADE = Kind.ofPerson(
       "Slade", "kind_slade", IMG_DIR+"sprite_slade.png",
       Kind.TYPE_BOSS,
-      HEALTH, 30 ,
+      HIT_POINTS, 30 ,
       ARMOUR, 3  ,
       MUSCLE, 20 ,
       BRAIN , 18 ,
-      SPEED , 20 ,
+      SPEED_ACT , 20 ,
       SIGHT , 18 ,
       MOVE, 1, STRIKE, 1, SHOOT, 1
     ),
@@ -125,11 +124,11 @@ public class Villains {
     KIND_MR_FREEZE = Kind.ofPerson(
       "Mr. Freeze", "kind_mr_freeze", IMG_DIR+"sprite_mr_freeze.png",
       Kind.TYPE_BOSS,
-      HEALTH, 50 ,
+      HIT_POINTS, 50 ,
       ARMOUR, 5  ,
       MUSCLE, 20 ,
       BRAIN , 20 ,
-      SPEED , 10 ,
+      SPEED_ACT , 10 ,
       SIGHT , 12 ,
       MOVE, 1, SHOOT, 1
     ),
@@ -137,11 +136,11 @@ public class Villains {
     KIND_METALLO = Kind.ofPerson(
       "Metallo", "kind_metallo", IMG_DIR+"sprite_metallo.png",
       Kind.TYPE_BOSS,
-      HEALTH, 120,
+      HIT_POINTS, 120,
       ARMOUR, 8  ,
       MUSCLE, 20 ,
       BRAIN , 14 ,
-      SPEED , 16 ,
+      SPEED_ACT , 16 ,
       SIGHT , 10 ,
       MOVE, 1, SHOOT, 1
     );

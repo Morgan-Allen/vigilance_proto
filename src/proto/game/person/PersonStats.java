@@ -19,7 +19,7 @@ public class PersonStats {
     float level, practice, bonus;
     boolean learned;
   }
-  Table <Ability, Level> levels = new Table();
+  Table <Trait, Level> levels = new Table();
   
   
   PersonStats(Person p) {
@@ -39,7 +39,7 @@ public class PersonStats {
     totalXP = s.loadInt();
     s.loadObjects(abilities);
     for (int n = s.loadInt(); n-- > 0;) {
-      Ability key = (Ability) s.loadObject();
+      Trait key = (Trait) s.loadObject();
       Level l = new Level();
       l.level    = s.loadFloat();
       l.practice = s.loadFloat();
@@ -54,7 +54,7 @@ public class PersonStats {
     s.saveInt(totalXP);
     s.saveObjects(abilities);
     s.saveInt(levels.size());
-    for (Ability a : levels.keySet()) {
+    for (Trait a : levels.keySet()) {
       Level l = levels.get(a);
       s.saveObject(a);
       s.saveFloat(l.level   );
@@ -73,8 +73,8 @@ public class PersonStats {
   }
   
   
-  public int levelFor(Ability ability) {
-    Level l = levels.get(ability);
+  public int levelFor(Trait trait) {
+    Level l = levels.get(trait);
     if (l == null) return 0;
     return (int) l.level;
   }
@@ -91,7 +91,7 @@ public class PersonStats {
     }
     return all;
   }
-
+  
   
   
   /**  Assigning experience and abilities-
