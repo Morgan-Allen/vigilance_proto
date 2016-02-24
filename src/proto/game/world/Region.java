@@ -57,7 +57,9 @@ public class Region extends Index.Entry implements Session.Saveable {
     
     SA.cities = new String[] { "Brazilia", "Buenos Aires", "Atlantis"};
     SA.view.attachColourKey(-11740822, "SA");
-    SA.defaultFunding = 150;
+    SA.defaultFunding = 150  ;
+    SA.defaultTrust   = 0.25f;
+    SA.defaultMember  = false;
     
     SA.defaultCrime       = 0.3f;
     SA.defaultWealth      = 0.5f;
@@ -68,7 +70,9 @@ public class Region extends Index.Entry implements Session.Saveable {
     
     AF.cities = new String[] { "Capetown", "Cairo", "Timbuktu" };
     AF.view.attachColourKey(-989079, "AF");
-    AF.defaultFunding = 120;
+    AF.defaultFunding = 120  ;
+    AF.defaultTrust   = 0.25f;
+    AF.defaultMember  = false;
     
     AF.defaultCrime       = 0.5f;
     AF.defaultWealth      = 0.4f;
@@ -79,7 +83,9 @@ public class Region extends Index.Entry implements Session.Saveable {
     
     EU.cities = new String[] { "London", "Paris", "Themyscira" };
     EU.view.attachColourKey(-3956789, "EU");
-    EU.defaultFunding = 180;
+    EU.defaultFunding = 180  ;
+    EU.defaultTrust   = 0.25f;
+    EU.defaultMember  = false;
     
     EU.defaultCrime       = 0.2f;
     EU.defaultWealth      = 0.7f;
@@ -90,7 +96,9 @@ public class Region extends Index.Entry implements Session.Saveable {
     
     SB.cities = new String[] { "Moscow", "Leningrad", "Berlin" };
     SB.view.attachColourKey(-3162470, "SB");
-    SB.defaultFunding = 150;
+    SB.defaultFunding = 150  ;
+    SB.defaultTrust   = 0.25f;
+    SB.defaultMember  = false;
     
     SB.defaultCrime       = 0.1f;
     SB.defaultWealth      = 0.5f;
@@ -101,7 +109,9 @@ public class Region extends Index.Entry implements Session.Saveable {
     
     OC.cities = new String[] { "Perth", "Singapore", "Tokyo" };
     OC.view.attachColourKey(-9335063, "OC");
-    OC.defaultFunding = 150;
+    OC.defaultFunding = 150  ;
+    OC.defaultTrust   = 0.25f;
+    OC.defaultMember  = false;
     
     OC.defaultCrime       = 0.4f;
     OC.defaultWealth      = 0.6f;

@@ -164,7 +164,7 @@ public class Person implements Session.Saveable {
   
   
   public float sightRange() {
-    return 3 + (stats.levelFor(SIGHT) / 4f);
+    return 2 + (stats.levelFor(SIGHT) / 4f);
   }
   
   
@@ -542,7 +542,7 @@ public class Person implements Session.Saveable {
   
   
   public boolean isPlayerOwned() {
-    return isHero();
+    return side == Side.HEROES;
   }
   
   
@@ -552,7 +552,8 @@ public class Person implements Session.Saveable {
   
   
   public boolean captive() {
-    return isCivilian() && side == Side.VILLAINS;
+    //  TODO:  Add some nuance here!
+    return isCivilian();// && side == Side.VILLAINS;
   }
   
   
@@ -567,22 +568,23 @@ public class Person implements Session.Saveable {
     Scene scene = currentScene();
     if (scene == null) return false;
     
-    Tile under = scene.tileUnder(point);
-    if (! hasSight(under)) return false;
+    Tile  under      = scene.tileUnder(point);
+    float visibility = scene.fogAt(under, side);
+    if (visibility <= 0) return false;
     
     if (point instanceof Person) {
-      Person  other    = (Person) point;
-      Action  action   = other.currentAction();
-      float   distance = scene.distance(under, location);
-      float   sighting = sightRange();
-      float   stealth  = other.hidingRange();
-      boolean focused  = lastTarget == other;
-      
+      Person other = (Person) point;
       if (other.isAlly(this)) return true;
       
-      sighting *= wariness + (focused ? 1 : 0.5f);
+      float   sighting = Nums.max(1, sightRange());
+      float   stealth  = other.hidingRange();
+      Action  action   = other.currentAction();
+      boolean focused  = lastTarget == other;
+      
+      sighting *= wariness + (focused ? 0.5f : 0);
       stealth  *= action == null ? 0.5f : action.moveRoll();
-      if ((distance + stealth) > sighting) return false;
+      stealth  /= sighting;
+      if (stealth > visibility) return false;
     }
     
     return true;
@@ -733,6 +735,7 @@ public class Person implements Session.Saveable {
   public String confidenceDescription() {
     if (! alive     ()) return "Dead"       ;
     if (! conscious ()) return "Unconscious";
+    if (  captive   ()) return "Captive"    ;
     if (  retreating()) return "Retreating" ;
     
     String moraleDesc = "Determined", alertDesc = "Alert";

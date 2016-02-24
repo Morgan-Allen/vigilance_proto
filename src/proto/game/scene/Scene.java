@@ -202,6 +202,7 @@ public class Scene implements Session.Saveable, Assignment {
   
   
   public boolean blockedAt(Tile at) {
+    if (at.standing != null) return true;
     return at.prop != null && at.prop.kind.blockPath();
   }
   
@@ -280,9 +281,8 @@ public class Scene implements Session.Saveable, Assignment {
   
   
   public void addToTeam(Person p) {
-    Side s = p.side();
-    if (s == Side.HEROES  ) playerTeam.include(p);
-    if (s == Side.VILLAINS) othersTeam.include(p);
+    if (p.isPlayerOwned()) playerTeam.include(p);
+    else                   othersTeam.include(p);
     p.setAssignment(this);
   }
   

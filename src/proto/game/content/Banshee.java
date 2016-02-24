@@ -25,7 +25,7 @@ public class Banshee {
     NINJUTSU = new Ability(
       "Ninjutsu", "ability_ninjutsu",
       "Improves stealth, evasion and accuracy.  Can be used to perform "+
-      "silent takedown of unwary foes with 50% bonus damage.",
+      "silent takedown of unwary foes.",
       IS_ACTIVE | IS_PASSIVE | TRIGGER_ON_ATTACK | TRIGGER_ON_DEFEND,
       1, MINOR_HARM, MINOR_POWER
     ) {
@@ -49,8 +49,6 @@ public class Banshee {
         float  resistance = struck.stats.levelFor(MUSCLE) / 100f;
         
         if (! volley.didConnect) return;
-        //if (struck.canNotice(use.acting)) return;
-        
         float downChance = 1.0f;
         downChance += use.acting.stats.levelFor(this) / 10f;
         downChance -= resistance;
@@ -139,7 +137,7 @@ public class Banshee {
     ULTRASOUND = new Ability(
       "Ultrasound", "ability_ultrasound",
       "Reveal hidden areas of the map nearby.",
-      IS_RANGED | NO_NEED_SIGHT, 2, NO_HARM, MINOR_POWER
+      IS_RANGED | NO_NEED_SIGHT, 1, NO_HARM, MINOR_POWER
     ) {
       
       public boolean allowsTarget(Object target, Scene scene, Person acting) {
@@ -180,7 +178,7 @@ public class Banshee {
       BRAIN , 15 ,
       WILL  , 17 ,
       MOVE, 1, STRIKE, 1, EVASION, 1, GUARD, 1,
-      NINJUTSU, 1, BATARANG, 1
+      NINJUTSU, 1, BATARANG, 1, ULTRASOUND, 1
     );
 }
 

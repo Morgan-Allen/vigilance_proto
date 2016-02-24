@@ -48,7 +48,7 @@ public class Galatea {
       "Lasso", "ability_lasso",
       "Pulls a distant target to within closer range.  (Note- strong enemies "+
       "may resist, and an adjacent tile must be free.)",
-      IS_RANGED, 2, NO_HARM, MINOR_POWER
+      IS_RANGED, 1, NO_HARM, MINOR_POWER
     ) {
       
       public boolean allowsTarget(Object target, Scene scene, Person acting) {
@@ -63,11 +63,9 @@ public class Galatea {
       }
       
       
-      protected Volley createVolley(Action use) {
-        Scene  scene  = use.acting.currentScene();
-        Person struck = (Person) use.target;
+      protected Volley createVolley(Action use, Object target, Scene scene) {
         Volley volley = new Volley();
-        volley.setupVolley(use.acting, struck, true, scene);
+        volley.setupVolley(use.acting, (Person) target, true, scene);
         volley.damagePercent = 0;
         return volley;
       }
@@ -77,9 +75,10 @@ public class Galatea {
         Scene  scene       = use.acting.currentScene();
         Person acting      = use.acting;
         Person struck      = use.volley().targAsPerson();
-        float  resistance  = 0.5f + (struck.stats.levelFor(MUSCLE) / 100f);
-               resistance -=         acting.stats.levelFor(MUSCLE) / 100f;
+        float  resistance  = 0.5f + (struck.stats.levelFor(MUSCLE) / 50f);
+               resistance -=         acting.stats.levelFor(MUSCLE) / 50f;
         
+        I.say("Lasso resistance: "+resistance);
         if (Rand.num() >= resistance && use.volley().didConnect) {
           Tile close = closestTo(struck, use.acting);
           struck.setExactPosition(close.x, close.y, 0, scene);

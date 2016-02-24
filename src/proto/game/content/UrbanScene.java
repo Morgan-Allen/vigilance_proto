@@ -98,6 +98,9 @@ public class UrbanScene extends Scene {
       Person boss = new Person(ofBoss, ofBoss.name());
       addToTeam(boss);
     }
+    
+    I.say("Scene generated, team is: ");
+    for (Person p : this.othersTeam()) I.say("  "+p);
   }
   
   
@@ -137,6 +140,8 @@ public class UrbanScene extends Scene {
     
     for (Person p : othersTeam()) {
       Tile entry = findEntryPoint(p, cX, cY);
+      
+      I.say("Finding entry for "+p+", at: "+entry);
       if (entry != null) addPerson(p, entry.x, entry.y);
     }
     
