@@ -90,8 +90,8 @@ public class World implements Session.Saveable {
   
   public void initDefaultBase() {
     this.base = new Base(this);
-    base.addToRoster(new Person(Vesper .VESPER , "Batman"      ));
-    base.addToRoster(new Person(Vesper .KESTREL, "Robin"       ));
+    base.addToRoster(new Person(Banshee.BANSHEE, "Batman"      ));
+    base.addToRoster(new Person(Banshee.KESTREL, "Robin"       ));
     base.addToRoster(new Person(Corona .CORONA , "Superman"    ));
     base.addToRoster(new Person(Galatea.GALATEA, "Wonder Woman"));
     

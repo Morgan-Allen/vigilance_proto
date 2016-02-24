@@ -305,7 +305,9 @@ public class Scene implements Session.Saveable, Assignment {
   public boolean removePerson(Person p) {
     if (p.currentScene() != this) return false;
     Tile under = p.location();
-    if (under != null) under.setInside(p, false);
+    if (under != null) {
+      under.setInside(p, false);
+    }
     else {
       playerTeam.remove(p);
       othersTeam.remove(p);
@@ -397,6 +399,7 @@ public class Scene implements Session.Saveable, Assignment {
         }
       }
     }
+    else moveToNextPersonsTurn();
     
     int nextState = checkCompletionStatus();
     if (nextState != STATE_BEGUN && ! finished()) {
@@ -457,7 +460,7 @@ public class Scene implements Session.Saveable, Assignment {
       
       if (nextActing == null) {
         I.say("  Will refresh AP and try other team...");
-        for (Person p : nextTeam) {
+        for (Person p : nextTeam) if (p.currentScene() == this) {
           p.onTurnStart();
         }
         playerTurn = ! playerTurn;
@@ -491,28 +494,28 @@ public class Scene implements Session.Saveable, Assignment {
       fogP[c.x][c.y] = 0;
       fogO[c.x][c.y] = 0;
     }
-    for (Person p : playerTeam) {
-      final int radius = p.sightRange();
+    for (Person p : playerTeam) if (p.conscious()) {
+      final float radius = p.sightRange();
       liftFogAround(p.location(), radius, p, true);
     }
-    for (Person p : othersTeam) {
-      final int radius = p.sightRange();
+    for (Person p : othersTeam) if (p.conscious())  {
+      final float radius = p.sightRange();
       liftFogAround(p.location(), radius, p, true);
     }
   }
   
   
   public void liftFogAround(
-    Tile point, int radius, Person looks, boolean checkSight
+    Tile point, float radius, Person looks, boolean checkSight
   ) {
     byte fog[][] = null;
     if (looks.side() == Person.Side.HEROES  ) fog = fogP;
     if (looks.side() == Person.Side.VILLAINS) fog = fogO;
     if (fog == null) return;
     
+    final int lim = Nums.ceil(radius);
     for (Coord c : Visit.grid(
-      point.x - radius, point.y - radius,
-      radius * 2      , radius * 2      , 1
+      point.x - lim, point.y - lim, lim * 2, lim * 2, 1
     )) {
       Tile t = tileAt(c.x, c.y);
       if (t == null) continue;
@@ -553,7 +556,7 @@ public class Scene implements Session.Saveable, Assignment {
       float damage = p.injury() / p.maxHealth();
       if (! p.alive     ()) damage += 3;
       if (! p.isCriminal()) damage *= 2;
-      sum += damage;
+      sum += Nums.max(0, damage - 0.5f) * 2;
     }
     return sum * 0.5f / othersTeam.size();
   }

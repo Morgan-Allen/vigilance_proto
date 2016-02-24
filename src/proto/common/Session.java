@@ -389,8 +389,10 @@ public final class Session {
   }
   
   
-  public void saveObject(Saveable s) throws Exception {
-    if (s == null) { out.writeInt(-1); return; }
+  public void saveObject(Object o) throws Exception {
+    if (! (o instanceof Saveable)) { out.writeInt(-1); return; }
+    final Saveable s = (Saveable) o;
+    
     final Integer saveID = saveIDs.get(s);
     if (saveID == null) {
       

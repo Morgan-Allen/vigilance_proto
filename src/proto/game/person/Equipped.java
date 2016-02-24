@@ -17,12 +17,18 @@ public class Equipped extends Index.Entry implements Session.Saveable {
   
   final public static int
     NONE        = 0     ,
+    
     IS_CONSUMED = 1 << 0,
     IS_WEAPON   = 1 << 1,
     IS_MELEE    = 1 << 2,
     IS_ARMOUR   = 1 << 3,
     IS_RANGED   = 1 << 4,
-    IS_BEAM     = 1 << 5;
+    
+    IS_KINETIC  = 1 << 5,
+    IS_BEAM     = 1 << 6,
+    IS_PLASMA   = 1 << 7,
+    IS_NUCLEAR  = 1 << 8,
+    IS_AREA_FX  = 1 << 9;
   
   final public String name, description;
   final Object media;
@@ -31,7 +37,7 @@ public class Equipped extends Index.Entry implements Session.Saveable {
   final public int buildCost;
   final public int bonus;
   
-  final int properties;
+  final public int properties;
   final Ability abilities[];
   
   

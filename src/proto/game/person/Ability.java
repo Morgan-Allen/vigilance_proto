@@ -19,13 +19,16 @@ public abstract class Ability extends Trait {
   
   final public static int
     NONE              = 0     ,
-    IS_RANGED         = 1 << 0,
-    IS_PASSIVE        = 1 << 1,
-    IS_DELAYED        = 1 << 2,
-    NO_NEED_SIGHT     = 1 << 3,
-    IS_EQUIPPED       = 1 << 4,
-    TRIGGER_ON_ATTACK = 1 << 5,
-    TRIGGER_ON_DEFEND = 1 << 6;
+    IS_MELEE          = 1 << 0,
+    IS_RANGED         = 1 << 1,
+    IS_ACTIVE         = 1 << 2,
+    IS_PASSIVE        = 1 << 3,
+    IS_DELAYED        = 1 << 4,
+    NO_NEED_SIGHT     = 1 << 5,
+    IS_BASIC          = 1 << 6,
+    IS_EQUIPPED       = 1 << 7,
+    TRIGGER_ON_ATTACK = 1 << 8,
+    TRIGGER_ON_DEFEND = 1 << 9;
   final public static float
     MAJOR_HELP = -2.0f,
     REAL_HELP  = -1.0f,
@@ -38,6 +41,9 @@ public abstract class Ability extends Trait {
     MINOR_POWER  = 2,
     MEDIUM_POWER = 5,
     MAJOR_POWER  = 8;
+  final public static Trait
+    NO_TRAITS[] = new Trait[0],
+    ALL_STATS[] = PersonStats.ALL_STATS;
   
   final int properties, costAP;
   final float harmLevel, powerLevel;
@@ -81,6 +87,16 @@ public abstract class Ability extends Trait {
   
   public boolean passive() {
     return hasProperty(IS_PASSIVE);
+  }
+  
+  
+  public boolean active() {
+    return hasProperty(IS_ACTIVE) || ! passive();
+  }
+  
+  
+  public boolean basic() {
+    return hasProperty(IS_BASIC);
   }
   
   
@@ -132,7 +148,7 @@ public abstract class Ability extends Trait {
     Scene scene, Tile pathToTake[]
   ) {
     if (acting == null || ! allowsTarget(target, scene, acting)) return null;
-    if (requiresSight() && ! acting.canSee(dest)) return null;
+    if (requiresSight() && ! acting.hasSight(dest)) return null;
     
     final float range = scene.distance(acting.location, dest);
     final int maxRange = maxRange();
@@ -143,7 +159,7 @@ public abstract class Ability extends Trait {
     if (pathToTake != null) {
       path = pathToTake;
     }
-    else if (ranged() || passive() || delayed()) {
+    else if (ranged() || delayed()) {
       path = new Tile[] { acting.location };
     }
     else {
@@ -155,7 +171,7 @@ public abstract class Ability extends Trait {
     
     Action newAction = new Action(this, acting, target);
     newAction.attachPath(path, scene.time());
-    newAction.attachVolley(createVolley(newAction));
+    newAction.attachVolley(createVolley(newAction, target, scene));
     
     if (costAP(newAction) > acting.currentAP()) return null;
     return newAction;
@@ -167,7 +183,7 @@ public abstract class Ability extends Trait {
   ) {
     Action newAction = new Action(this, acting, target);
     newAction.attachPath(new Tile[] { acting.location }, scene.time());
-    newAction.attachVolley(createVolley(newAction));
+    newAction.attachVolley(createVolley(newAction, target, scene));
     
     applyOnActionStart(newAction);
     checkForTriggers(newAction, true, false);
@@ -181,12 +197,12 @@ public abstract class Ability extends Trait {
   }
   
   
-  protected Volley createVolley(Action use) {
+  protected Volley createVolley(Action use, Object target, Scene scene) {
     return null;
   }
   
   
-  void checkForTriggers(Action use, boolean start, boolean end) {
+  protected void checkForTriggers(Action use, boolean start, boolean end) {
     Scene  scene  = use.acting.currentScene();
     Volley volley = use.volley();
     
@@ -232,6 +248,25 @@ public abstract class Ability extends Trait {
   }
   
   
+  protected void applyPassiveStatsBonus(Person person) {
+    for (Trait trait : passiveTraitsModified()) {
+      final float mod = passiveModifierFor(person, trait);
+      if (mod != 0) person.stats.incBonus(trait, mod);
+    }
+    return;
+  }
+  
+  
+  public Trait[] passiveTraitsModified() {
+    return NO_TRAITS;
+  }
+  
+  
+  public float passiveModifierFor(Person person, Trait trait) {
+    return 0;
+  }
+  
+  
   public void applyOnActionStart(Action use) {
     return;
   }
@@ -268,7 +303,7 @@ public abstract class Ability extends Trait {
   public Action bestMotionToward(Object point, Person acting, Scene scene) {
     Tile at = scene.tileUnder(point);
     if (at == null) return null;
-    if (point instanceof Person && ! acting.canSee(at)) return null;
+    if (point instanceof Person && ! acting.canNotice(point)) return null;
     MoveSearch search = new MoveSearch(acting, acting.location, at);
     search.doSearch();
     if (! search.success()) return null;
@@ -334,10 +369,11 @@ public abstract class Ability extends Trait {
     s.append(description);
     if (action != null && action.volley() != null) {
       Volley v = action.volley();
-      int maxDamage = v.selfDamageBase + v.selfDamageRange;
-      s.append("\n  "+v.selfDamageBase+"-"+maxDamage+" damage");
-      int hitMargin = Nums.max(0, v.selfAccuracy - v.hitsDefence);
-      s.append("\n  "+hitMargin+"% to hit (armour "+v.hitsArmour+")");
+      int minDamage = Nums.floor(v.minDamage());
+      int maxDamage = Nums.ceil (v.maxDamage());
+      s.append("\n  "+minDamage+"-"+maxDamage+" damage");
+      int hitPercent = Nums.clamp(v.accuracyPercent, 101);
+      s.append("\n  "+hitPercent+"% to hit (armour "+v.hitsArmour+")");
     }
     return s.toString();
   }

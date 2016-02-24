@@ -1,9 +1,8 @@
 
 
 package proto.game.world;
-import proto.common.Session;
-import proto.common.Session.Saveable;
-import proto.game.person.Person;
+import proto.common.*;
+import proto.game.person.*;
 import proto.util.*;
 
 
@@ -130,7 +129,7 @@ public class Base implements Session.Saveable {
       if (r.buildProgress < 1) continue;
       float skillBonus = 0;
       for (Person p : r.visitors) {
-        skillBonus += p.stats.levelFor(Person.BRAIN) * 2;
+        skillBonus += p.stats.levelFor(PersonStats.BRAIN) * 2;
       }
       skillBonus /= 10;
       force += r.blueprint.studyBonus * (1 + skillBonus);
@@ -145,8 +144,8 @@ public class Base implements Session.Saveable {
       if (r.buildProgress < 1) continue;
       float skillBonus = 0;
       for (Person p : r.visitors) {
-        skillBonus += p.stats.levelFor(Person.BRAIN);
-        skillBonus += p.stats.levelFor(Person.SIGHT);
+        skillBonus += p.stats.levelFor(PersonStats.BRAIN);
+        skillBonus += p.stats.levelFor(PersonStats.SIGHT);
       }
       skillBonus /= 100;
       chance += r.blueprint.sensorBonus * (1 + skillBonus);

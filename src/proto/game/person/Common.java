@@ -1,12 +1,13 @@
 
 
-package proto.game.content;
+package proto.game.person;
 import proto.common.Kind;
 import proto.game.person.*;
 import proto.game.scene.*;
 import proto.util.*;
 import static proto.game.person.Ability.*;
 import static proto.game.person.Person.*;
+import static proto.game.person.PersonStats.*;
 
 import java.awt.Image;
 import java.awt.Graphics2D;
@@ -16,8 +17,7 @@ import java.awt.Color;
 
 public class Common {
   
-
-
+  
   final static String IMG_DIR = "media assets/hero sprites/";
   
   final public static Ability
@@ -25,7 +25,7 @@ public class Common {
     MOVE = new Ability(
       "Move", "ability_move",
       "Move to the chosen point.",
-      NONE, 1, NO_HARM, MINOR_POWER
+      IS_BASIC, 1, NO_HARM, MINOR_POWER
     ) {
       
       public boolean allowsTarget(Object target, Scene scene, Person acting) {
@@ -53,18 +53,17 @@ public class Common {
       "Strike", "ability_strike",
       "Strike a melee target.  (Base damage scales with strength and weapon "+
       "bonus, 50% stun damage.)",
-      NONE, 1, REAL_HARM, MINOR_POWER
+      IS_BASIC, 1, REAL_HARM, MINOR_POWER
     ) {
       
       public boolean allowsTarget(Object target, Scene scene, Person acting) {
+        if (! acting.currentWeapon().melee()) return false;
         return target instanceof Person;
       }
       
-      protected Volley createVolley(Action use) {
-        Scene  scene  = use.scene();
-        Person struck = (Person) use.target;
+      protected Volley createVolley(Action use, Object target, Scene scene) {
         Volley volley = new Volley();
-        volley.setupVolley(use.acting, struck, false, scene);
+        volley.setupVolley(use.acting, (Person) target, false, scene);
         volley.stunPercent = 50;
         return volley;
       }
@@ -76,18 +75,18 @@ public class Common {
     SHOOT = new Ability(
       "Shoot", "ability_shoot",
       "Fire a shot using ranged weaponry.  Accuracy falls off with distance.",
-      IS_RANGED, 1, REAL_HARM, MINOR_POWER
+      IS_BASIC | IS_RANGED, 1, REAL_HARM, MINOR_POWER
     ) {
       
       public boolean allowsTarget(Object target, Scene scene, Person acting) {
+        if (! acting.currentWeapon().ranged()) return false;
         return target instanceof Person;
       }
       
-      protected Volley createVolley(Action use) {
-        Scene  scene  = use.scene();
-        Person struck = (Person) use.target;
+      protected Volley createVolley(Action use, Object target, Scene scene) {
         Volley volley = new Volley();
-        volley.setupVolley(use.acting, struck, true, scene);
+        volley.setupVolley(use.acting, (Person) target, true, scene);
+        volley.stunPercent = 0;
         return volley;
       }
       
@@ -103,24 +102,21 @@ public class Common {
       "Disarm", "ability_disarm",
       "Attempt to disarm a melee target.  (Deals base of 1-3 stun damage, "+
       "scaling with strength.  Disarm chance is based on enemy health.)",
-      NONE, 2, MINOR_HARM, MINOR_POWER
+      IS_BASIC, 2, MINOR_HARM, MINOR_POWER
     ) {
       
       public boolean allowsTarget(Object target, Scene scene, Person acting) {
+        if (! acting.currentWeapon().melee()) return false;
         return target instanceof Person;
       }
       
-      
-      protected Volley createVolley(Action use) {
-        Scene  scene  = use.acting.currentScene();
-        Person struck = (Person) use.target;
+      protected Volley createVolley(Action use, Object target, Scene scene) {
         Volley volley = new Volley();
-        volley.setupVolley(use.acting, struck, false, scene);
-        volley.stunPercent = 100;
-        volley.damagePercent = 50;
+        volley.setupVolley(use.acting, (Person) target, false, scene);
+        volley.stunPercent   = 100;
+        volley.damagePercent = 50 ;
         return volley;
       }
-      
       
       public void applyOnActionEnd(Action use) {
         Person struck       = use.volley().targAsPerson();
@@ -143,7 +139,7 @@ public class Common {
       "Evasion", "ability_evasion",
       "Reserve AP to increase chance to dodge enemy attacks by at least 20%. "+
       "Ends turn.",
-      IS_DELAYED | TRIGGER_ON_DEFEND, 1, NO_HARM, MINOR_POWER
+      IS_BASIC | IS_DELAYED | TRIGGER_ON_DEFEND, 1, NO_HARM, MINOR_POWER
     ) {
       
       public boolean allowsTarget(Object target, Scene scene, Person acting) {
@@ -154,13 +150,15 @@ public class Common {
         Person self = volley.targAsPerson();
         Person hits = volley.origAsPerson();
         dodgePosition(self, hits, 0.33f);
-        volley.hitsDefence += 20;
+        volley.hitsDefence += self.stats.levelFor(DODGE) * 5;
+        volley.hitsDefence += 25 + (self.currentAP() * 5);
       }
       
       public void applyOnDefendEnd(Volley volley) {
         Person self = volley.targAsPerson();
         Tile at = self.location();
         self.setExactPosition(at.x, at.y, 0, at.scene);
+        self.modifyAP(-1);
       }
     },
     
@@ -168,7 +166,7 @@ public class Common {
       "Guard", "ability_guard",
       "Reserve AP to reduce incoming damage and grant chance to counter-"+
       "attack in melee.  Ends turn.",
-      IS_DELAYED | TRIGGER_ON_DEFEND, 1, NO_HARM, MINOR_POWER
+      IS_BASIC | IS_DELAYED | TRIGGER_ON_DEFEND, 1, NO_HARM, MINOR_POWER
     ) {
       
       public boolean allowsTarget(Object target, Scene scene, Person acting) {
@@ -180,8 +178,9 @@ public class Common {
         Person self = volley.targAsPerson();
         Person hits = volley.origAsPerson();
         dodgePosition(self, hits, 0.33f);
-        volley.hitsArmour += 2;
-        volley.hitsArmour += self.baseArmour() / 2f;
+        volley.hitsArmour  += 2 + (self.baseArmour() / 2f);
+        volley.hitsDefence += self.stats.levelFor(PARRY) * 5;
+        volley.hitsDefence += 5 + (self.currentAP() * 5);
       }
       
       
@@ -209,7 +208,7 @@ public class Common {
       "Bare fists and moxy.",
       null,
       SLOT_WEAPON, 0,
-      Equipped.IS_WEAPON | Equipped.IS_MELEE, 0
+      Equipped.IS_WEAPON | Equipped.IS_MELEE | Equipped.IS_KINETIC, 0
     ),
     UNARMOURED = new Equipped(
       "Unarmoured", "item_unarmoured",

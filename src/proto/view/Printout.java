@@ -2,6 +2,7 @@
 
 package proto.view;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import javax.swing.JTextPane;
@@ -20,6 +21,7 @@ public class Printout extends JTextPane implements KeyListener {
   public Printout(RunGame game) {
     this.game = game;
     this.setPreferredSize(new Dimension(250, 600));
+    this.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 10));
     addKeyListener(this);
   }
   

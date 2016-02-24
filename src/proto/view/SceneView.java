@@ -215,7 +215,7 @@ public class SceneView {
       s.append("\nSelection: "+p.name()+" ("+p.side().name().toLowerCase()+")");
       
       int HP = (int) (p.maxHealth() - (p.injury() + p.stun()));
-      int armour = p.stats.levelFor(Person.ARMOUR);
+      int armour = p.stats.levelFor(PersonStats.ARMOUR);
       s.append("\n  Health: "+HP+"/"+p.maxHealth());
       if (p.stun() > 0) s.append(" (Stun "+(int) p.stun()+")");
       if (armour > 0) s.append("\n  Armour: "+armour);
@@ -238,7 +238,7 @@ public class SceneView {
         s.append("\n\n  Abilities (Press 1-9):");
         char key = '1';
         for (Ability r : p.stats.listAbilities())  {
-          if (r.passive()) continue;
+          if (! r.active()) continue;
           s.append("\n    "+r.name());
           
           boolean canUse = r.minCostAP() <= p.currentAP();
@@ -294,10 +294,10 @@ public class SceneView {
   
   void describeEndSummary(StringBuffer s) {
     boolean success = scene.wasWon();
-    World world = scene.world();
-    Nation site = scene.site();
-    Printout print = world.game().print();
+    World   world   = scene.world();
+    Nation  site    = scene.site();
     
+    Printout print = world.game().print();
     s.append("\nMission ");
     if (success) s.append(" Successful.");
     else s.append(" Failed.");
@@ -337,8 +337,8 @@ public class SceneView {
     final String DESC_G[] = {
       "None", "Few", "Some", "Many", "All"
     };
-    int colIndex = Nums.clamp((int) (scene.assessCollateral() * 5), 5);
-    int getIndex = Nums.clamp((int) (scene.assessGetaways  () * 5), 5);
+    int colIndex = Nums.clamp(Nums.ceil(scene.assessCollateral() * 5), 5);
+    int getIndex = Nums.clamp(Nums.ceil(scene.assessGetaways  () * 5), 5);
     s.append("\nCollateral: "+DESC_C[colIndex]);
     s.append("\nGetaways: "  +DESC_G[getIndex]);
     int trustPercent = (int) (site.trustLevel() * 100);

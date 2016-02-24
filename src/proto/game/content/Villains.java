@@ -3,9 +3,12 @@
 package proto.game.content;
 import proto.common.*;
 import proto.game.person.*;
-import static proto.game.content.Common.*;
+
+import static proto.game.person.Common.*;
 import static proto.game.person.Equipped.*;
 import static proto.game.person.Person.*;
+import static proto.game.person.PersonStats.*;
+
 import java.awt.Color;
 
 
@@ -23,14 +26,14 @@ public class Villains {
       "A simple, sturdy wooden bat.  +5 damage bonus.",
       null,
       Person.SLOT_WEAPON, 0,
-      IS_WEAPON | IS_MELEE, 5
+      IS_WEAPON | IS_MELEE | IS_KINETIC, 5
     ),
     TOMMY_GUN = new Equipped(
       "Tommy gun", "item_tommy_gun",
       "A rapid-firing automatic firearm.  +10 damage bonus.",
       Kind.loadImage(IMG_DIR+"sprite_gun_fire.png"),
       Person.SLOT_WEAPON, 0,
-      IS_WEAPON | IS_RANGED, 10
+      IS_WEAPON | IS_RANGED | IS_KINETIC, 10
     ),
     BOLT_RIFLE = new Equipped(
       "Bolt Rifle", "item_bolt_rifle",
@@ -52,12 +55,10 @@ public class Villains {
     KIND_HOSTAGE = Kind.ofPerson(
       "Hostage", "kind_hostage", IMG_DIR+"sprite_hostage.png",
       Kind.TYPE_CIVILIAN,
-      HIT_POINTS, 8  ,
-      ARMOUR, 0  ,
       MUSCLE, 4  ,
+      REFLEX, 8  ,
       BRAIN , 6  ,
-      SPEED_ACT , 6  ,
-      SIGHT , 6  ,
+      WILL  , 2  ,
       MOVE, 1
     );
   
@@ -69,7 +70,8 @@ public class Villains {
       ARMOUR, 1  ,
       MUSCLE, 16 ,
       BRAIN , 6  ,
-      SPEED_ACT , 10 ,
+      REFLEX, 8  ,
+      WILL  , 2  ,
       SIGHT , 6  ,
       MOVE, 1, STRIKE, 1, BASEBALL_BAT
     ),
@@ -80,9 +82,10 @@ public class Villains {
       ARMOUR, 0  ,
       MUSCLE, 12 ,
       BRAIN , 10 ,
-      SPEED_ACT , 12 ,
+      REFLEX, 12 ,
+      WILL  , 2  ,
       SIGHT , 8  ,
-      MOVE, 1, SHOOT, 1, TOMMY_GUN
+      MOVE, 1, STRIKE, 1, SHOOT, 1, TOMMY_GUN
     ),
     KIND_CRIME_CULTIST = Kind.ofPerson(
       "Crime Cultist", "kind_crime_cultist", IMG_DIR+"sprite_crime_cultist.png",
@@ -91,9 +94,10 @@ public class Villains {
       ARMOUR, 2  ,
       MUSCLE, 14 ,
       BRAIN , 16 ,
-      SPEED_ACT , 14 ,
+      REFLEX, 14 ,
+      WILL  , 2  ,
       SIGHT , 12 ,
-      MOVE, 1, SHOOT, 1, BOLT_RIFLE
+      MOVE, 1, STRIKE, 1, SHOOT, 1, BOLT_RIFLE
     ),
     KIND_LEXDROID = Kind.ofPerson(
       "Lexdroid", "kind_lexdroid", IMG_DIR+"sprite_lexdroid.png",
@@ -101,8 +105,9 @@ public class Villains {
       HIT_POINTS, 30 ,
       ARMOUR, 6  ,
       MUSCLE, 2  ,
+      REFLEX, 16 ,
       BRAIN , 4  ,
-      SPEED_ACT , 16 ,
+      WILL  , 0  ,
       SIGHT , 10 ,
       MOVE, 1, SHOOT, 1, HI_LASER
     );
@@ -115,8 +120,9 @@ public class Villains {
       HIT_POINTS, 30 ,
       ARMOUR, 3  ,
       MUSCLE, 20 ,
+      REFLEX, 20 ,
       BRAIN , 18 ,
-      SPEED_ACT , 20 ,
+      WILL  , 18 ,
       SIGHT , 18 ,
       MOVE, 1, STRIKE, 1, SHOOT, 1
     ),
@@ -126,11 +132,12 @@ public class Villains {
       Kind.TYPE_BOSS,
       HIT_POINTS, 50 ,
       ARMOUR, 5  ,
-      MUSCLE, 20 ,
+      MUSCLE, 24 ,
       BRAIN , 20 ,
-      SPEED_ACT , 10 ,
+      REFLEX, 10 ,
+      WILL  , 18 ,
       SIGHT , 12 ,
-      MOVE, 1, SHOOT, 1
+      MOVE, 1, STRIKE, 1, SHOOT, 1
     ),
     
     KIND_METALLO = Kind.ofPerson(
@@ -140,7 +147,8 @@ public class Villains {
       ARMOUR, 8  ,
       MUSCLE, 20 ,
       BRAIN , 14 ,
-      SPEED_ACT , 16 ,
+      REFLEX, 16 ,
+      WILL  , 18 ,
       SIGHT , 10 ,
       MOVE, 1, SHOOT, 1
     );

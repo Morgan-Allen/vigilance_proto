@@ -4,8 +4,8 @@ package proto.game.scene;
 import proto.common.*;
 import proto.game.person.*;
 import proto.util.*;
-import proto.game.content.Common;
-import static proto.game.person.Person.*;
+
+import static proto.game.person.PersonStats.*;
 
 
 
@@ -18,6 +18,7 @@ public class Volley implements Session.Saveable {
   Object targ;
   Equipped weaponType;
   Equipped armourType;
+  int damageType;
   boolean ranged;
   
   public int selfAccuracy;
@@ -32,7 +33,7 @@ public class Volley implements Session.Saveable {
   public int hitsDefence;
   public int hitsArmour;
   
-  public int accuracyMargin;
+  public int accuracyPercent;
   public int damageRoll;
   public int damageMargin;
   public int injureDamage;
@@ -55,6 +56,7 @@ public class Volley implements Session.Saveable {
     weaponType = (Equipped) s.loadObject();
     armourType = (Equipped) s.loadObject();
     ranged     = s.loadBool();
+    damageType = s.loadInt();
     
     selfAccuracy    = s.loadInt();
     selfDamageBase  = s.loadInt();
@@ -68,7 +70,7 @@ public class Volley implements Session.Saveable {
     hitsDefence     = s.loadInt();
     hitsArmour      = s.loadInt();
     
-    accuracyMargin  = s.loadInt();
+    accuracyPercent = s.loadInt();
     damageRoll      = s.loadInt();
     damageMargin    = s.loadInt();
     injureDamage    = s.loadInt();
@@ -86,6 +88,7 @@ public class Volley implements Session.Saveable {
     s.saveObject(weaponType);
     s.saveObject(armourType);
     s.saveBool  (ranged    );
+    s.saveInt   (damageType);
 
     s.saveInt(selfAccuracy   );
     s.saveInt(selfDamageBase );
@@ -99,7 +102,7 @@ public class Volley implements Session.Saveable {
     s.saveInt(hitsDefence    );
     s.saveInt(hitsArmour     );
     
-    s.saveInt(accuracyMargin );
+    s.saveInt(accuracyPercent);
     s.saveInt(damageRoll     );
     s.saveInt(damageMargin   );
     s.saveInt(injureDamage   );
@@ -127,52 +130,64 @@ public class Volley implements Session.Saveable {
   public boolean melee () { return ! ranged; }
   
   
+  public boolean hasDamageType(int properties) {
+    return (damageType & properties) == properties;
+  }
+  
+  
+  public float minDamage() {
+    return selfDamageBase * damagePercent / 100f;
+  }
+  
+  
+  public float maxDamage() {
+    return (selfDamageRange + selfDamageBase) * damagePercent / 100f;
+  }
+  
+  
   
   /**  Life cycle and execution methods-
     */
   public void setupVolley(
     Person self, Person hits, boolean ranged, Scene scene
   ) {
-    this.orig    = self;
-    this.targ    = hits;
-    this.ranged  = ranged;
+    this.orig   = self  ;
+    this.targ   = hits  ;
+    this.ranged = ranged;
     
-    //  TODO:  USE THE FULL RANGE OF STATS FOR THIS!  AND SET THOSE UP
-    //         BEFOREHAND, BASED OFF PRIMARY ATTRIBUTES!
+    Equipped weapon = self.currentWeapon();
+    damageType = weapon.properties;
     
-    selfAccuracy = (int) (self.stats.levelFor(SPEED_ACT) * 2.5f) + 50;
-    hitsDefence  = (int) (hits.stats.levelFor(SPEED_ACT) * 2.5f) + 0 ;
+    selfAccuracy    = self.stats.levelFor(PRECISION) + 50;
+    selfDamageBase  = self.stats.levelFor(MIN_DAMAGE);
+    selfDamageRange = self.stats.levelFor(RNG_DAMAGE);
+    critPercent     = 10 + (self.stats.levelFor(PRECISION) / 2);
+    hitsDefence     = 0;
+    hitsArmour      = hits.stats.levelFor(ARMOUR);
     
-    //  TODO:  It might not be a weapon though- could be an ability or
-    //  triggered item, etc.
-    weaponType = self.equippedInSlot(SLOT_WEAPON);
-    armourType = hits.equippedInSlot(SLOT_ARMOUR);
-    if (weaponType == null) weaponType = Common.UNARMED   ;
-    if (armourType == null) armourType = Common.UNARMOURED;
-    
-    //  If it's a melee weapon, apply strength bonus.  If it's a ranged weapon,
-    //  apply ranged penalties.
-    if (weaponType.melee() && ! ranged) {
-      int power = self.stats.levelFor(MUSCLE);
-      selfDamageBase  = Nums.floor(power / 5f);
-      selfDamageRange = Nums.ceil (power / 5f);
+    if (weapon.melee() && ! ranged) {
+      float brawnBonus = self.strengthDamage();
+      selfDamageBase  += Nums.floor(brawnBonus);
+      selfDamageRange += Nums.ceil (brawnBonus);
     }
     if (ranged) {
-      int normRange = self.sightRange() - 2;
-      int distance = (int) scene.distance(self.location(), hits.location());
+      float normRange = self.sightRange() - 2;
+      float distance  = scene.distance(self.location(), hits.location());
       selfAccuracy -= 5 * (distance - normRange);
     }
     
-    selfDamageBase  += Nums.floor(weaponType.bonus / 2f);
-    selfDamageRange += Nums.ceil (weaponType.bonus / 2f);
-    hitsArmour       = armourType.bonus + hits.baseArmour();
-    if (hits.turnDone()) hitsDefence += hits.currentAP() * 10;
-    
-    float damageMult = damagePercent / 100f;
-    float armourMult = armourPercent / 100f;
-    selfDamageBase  *= damageMult;
-    selfDamageRange *= damageMult;
-    hitsArmour      *= armourMult;
+    if (selfAccuracy > hitsDefence) {
+      float hitChance = 0;
+      hitChance = ((selfAccuracy - hitsDefence) / selfAccuracy);
+      hitChance += 0.5f * (1 - hitChance);
+      accuracyPercent = (int) (hitChance * 100);
+    }
+    else {
+      float defChance = 0;
+      defChance = ((hitsDefence - selfAccuracy) / hitsDefence);
+      defChance += 0.5f * (1 - defChance);
+      accuracyPercent = 100 - (int) (defChance * 100);
+    }
   }
   
   
@@ -182,18 +197,18 @@ public class Volley implements Session.Saveable {
   
   
   public void completeVolley() {
-    resolveAccuracy();
-    if (didConnect) resolveDamage();
-    if (didDamage ) resolveCrit  ();
+    I.say("Resolving volley between "+orig+" and "+targ);
+    if (true      ) resolveConnection();
+    if (didConnect) resolveDamage    ();
+    if (didDamage ) resolveCrit      ();
   }
   
   
   
-  void resolveAccuracy() {
-    accuracyMargin = selfAccuracy - hitsDefence;
-    I.say("  Resolving volley (hit chance "+accuracyMargin+"%)");
+  void resolveConnection() {
+    I.say("  Resolving connection (hit chance "+accuracyPercent+"%)");
     
-    if (Rand.index(100) < accuracyMargin) {
+    if (Rand.index(100) < accuracyPercent) {
       didConnect = true;
       I.say("  Volley connected!");
     }
@@ -206,24 +221,31 @@ public class Volley implements Session.Saveable {
   
   void resolveDamage() {
     damageRoll = selfDamageBase + Rand.index(selfDamageRange + 1);
-    damageMargin = damageRoll - hitsArmour;
+    damageRoll *= damagePercent / 100f;
+    int armourSoak = (int) (hitsArmour * (armourPercent / 100f));
+    damageMargin = damageRoll - armourSoak;
     
     if (damageMargin > 0) {
       didDamage = true;
       
-      if (accuracyMargin > 100) {
+      if (accuracyPercent > 60) {
+        I.say("  Dead centre!");
         damageMargin *= 1.2f;
       }
-      else if (accuracyMargin <= 10) {
+      else if (accuracyPercent <= 10) {
+        I.say("  Glancing blow!");
         damageMargin *= 0.2f;
       }
-      else if (accuracyMargin <= 30) {
-        damageMargin *= 0.5f;
+      else if (accuracyPercent <= 30) {
+        I.say("  Flesh wound!");
+        damageMargin *= 0.8f;
       }
-      else if (accuracyMargin <= 60) {
+      else if (accuracyPercent <= 60) {
+        I.say("  Palpable hit!");
         damageMargin *= 1.0f;
       }
-      I.say("  Full damage roll: "+damageRoll);
+      I.say("  Full damage roll:  "+damageRoll);
+      I.say("  Armour absorbed:   "+armourSoak);
       I.say("  Volley did damage: "+damageMargin);
     }
     else {
@@ -234,7 +256,8 @@ public class Volley implements Session.Saveable {
   
   
   void resolveCrit() {
-    if (Rand.index(100) < (critPercent * accuracyMargin) / 100f) {
+    I.say("  Resolving critical (crit chance "+critPercent+")");
+    if (Rand.index(100) < (critPercent * accuracyPercent) / 100f) {
       didCrit = true;
       damageMargin *= 1 + (critPercent / 10);
       I.say("  Volley did critical damage: "+damageMargin);

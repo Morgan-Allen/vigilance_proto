@@ -1,8 +1,7 @@
 
 
 package proto.common;
-import proto.game.person.Ability;
-import proto.game.person.Equipped;
+import proto.game.person.*;
 import proto.util.*;
 import java.awt.*;
 import java.io.File;
@@ -30,9 +29,9 @@ public class Kind extends Index.Entry implements Session.Saveable {
   boolean blockSight;
   boolean blockPath;
   
-  Ability  baseAbilities[] = new Ability [0];
-  Integer  baseLevels   [] = new Integer [0];
-  Equipped baseEquipped [] = new Equipped[0];
+  Table <Trait, Integer> traitLevels = new Table();
+  Trait    baseTraits  [] = new Trait   [0];
+  Equipped baseEquipped[] = new Equipped[0];
   
   
   Kind(String uniqueID) {
@@ -50,22 +49,6 @@ public class Kind extends Index.Entry implements Session.Saveable {
   }
   
   
-  public int type() { return type; }
-  public int wide() { return wide; }
-  public int high() { return high; }
-  public boolean blockSight() { return blockSight; }
-  public boolean blockPath () { return blockPath ; }
-  
-  public Ability [] baseAbilities() { return baseAbilities; }
-  public Integer [] baseLevels   () { return baseLevels   ; }
-  public Equipped[] baseEquipped() { return baseEquipped ; }
-  
-  public String name  () { return name  ; }
-  public Image  sprite() { return sprite; }
-  
-  
-  
-  
   
   public static Kind ofPerson(
     String name, String ID, String spritePath,
@@ -76,14 +59,14 @@ public class Kind extends Index.Entry implements Session.Saveable {
     k.wide = k.high = 1;
     k.blockPath = k.blockSight = false;
     
-    Batch <Ability > allA = new Batch();
-    Batch <Integer > allL = new Batch();
+    Batch <Trait   > allT = new Batch();
     Batch <Equipped> allE = new Batch();
-    Ability readA = null;
+    Trait   readT = null;
     Integer readL = null;
+    
     for (Object o : initStats) {
-      if (o instanceof Ability) {
-        readA = (Ability) o;
+      if (o instanceof Trait) {
+        readT = (Trait) o;
       }
       if (o instanceof Integer) {
         readL = (Integer) o;
@@ -91,16 +74,15 @@ public class Kind extends Index.Entry implements Session.Saveable {
       if (o instanceof Equipped) {
         allE.add((Equipped) o);
       }
-      if (readA != null && readL != null) {
-        allA.add(readA);
-        allL.add(readL);
-        readA = null;
+      if (readT != null && readL != null) {
+        allT.add(readT);
+        k.traitLevels.put(readT, readL);
+        readT = null;
         readL = null;
       }
     }
-    k.baseAbilities = allA.toArray(Ability .class);
-    k.baseLevels    = allL.toArray(Integer .class);
-    k.baseEquipped  = allE.toArray(Equipped.class);
+    k.baseTraits   = allT.toArray(Trait   .class);
+    k.baseEquipped = allE.toArray(Equipped.class);
     
     k.name = name;
     k.sprite = loadImage(spritePath);
@@ -123,6 +105,29 @@ public class Kind extends Index.Entry implements Session.Saveable {
     k.sprite = loadImage(spritePath);
     return k;
   }
+  
+  
+  public int baseLevel(Trait t) {
+    final Integer l = traitLevels.get(t);
+    return l == null ? 0 : l;
+  }
+  
+  
+  public Trait[] baseTraits() {
+    return baseTraits;
+  }
+  
+  
+  public int type() { return type; }
+  public int wide() { return wide; }
+  public int high() { return high; }
+  public boolean blockSight() { return blockSight; }
+  public boolean blockPath () { return blockPath ; }
+  
+  public Equipped[] baseEquipped() { return baseEquipped ; }
+  
+  public String name  () { return name  ; }
+  public Image  sprite() { return sprite; }
   
   
   public static Image loadImage(String spritePath) {

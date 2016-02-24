@@ -6,6 +6,7 @@ import proto.game.content.*;
 import proto.game.scene.*;
 import proto.game.world.*;
 import proto.util.*;
+import static proto.game.person.PersonStats.*;
 
 
 
@@ -14,38 +15,6 @@ public class Person implements Session.Saveable {
   
   /**  Data fields and construction-
     */
-  static class Stat extends Trait {
-    public Stat(String name, String ID, String description) {
-      super(name, ID, description);
-    }
-  }
-  
-  final public static Stat
-    WILL       = new Stat("Will"      , "stat_will"      , ""),
-    BRAIN      = new Stat("Brain"     , "stat_brain"     , ""),
-    MUSCLE     = new Stat("Muscle"    , "stat_muscle"    , ""),
-    REFLEX     = new Stat("Reflex"    , "stat_reflex"    , ""),
-    
-    HIT_POINTS = new Stat("Hit Points", "stat_hit_points", ""),
-    ENERGY     = new Stat("Energy"    , "stat_energy"    , ""),
-    ARMOUR     = new Stat("Armour"    , "stat_armour"    , ""),
-    REGEN      = new Stat("Regen"     , "stat_regen"     , ""),
-    MIN_DAMAGE = new Stat("Min Damage", "stat_min_damage", ""),
-    RNG_DAMAGE = new Stat("Rng Damage", "stat_rng_damage", ""),
-    
-    SIGHT      = new Stat("Sight"     , "stat_sight"     , ""),
-    SPEED_ACT  = new Stat("Speed Act" , "stat_speed_act" , ""),
-    SPEED_MOV  = new Stat("Speed Mov" , "stat_speed_mov" , ""),
-    PRECISION  = new Stat("Precision" , "stat_precision" , ""),
-    STUNNING   = new Stat("Stunning"  , "stat_stunning"  , ""),
-    DODGE      = new Stat("Dodge"     , "stat_dodge"     , ""),
-    PARRY      = new Stat("Parry"     , "stat_parry"     , ""),
-    STEALTH    = new Stat("Stealth"   , "stat_stealth"   , ""),
-    
-    QUESTION   = new Stat("Question"  , "stat_question"  , ""),
-    SUASION    = new Stat("Suasion"   , "stat_suasion"   , "");
-  
-  
   final public static int
     STATE_INIT    = -1,
     STATE_AS_PC   =  0,
@@ -85,29 +54,34 @@ public class Person implements Session.Saveable {
   boolean alive, conscious;
   
   Assignment assignment;
-  int AIstate = STATE_INIT;
+  
+  int   AIstate    = STATE_INIT;
   float confidence = 1.0f;
+  float wariness   = 0.0f;
   
   Tile location;
   float posX, posY;
   int actionPoints;
   Action currentAction;
   boolean turnDone;
+  Object lastTarget;
   
   
   
   public Person(Kind kind, String name) {
     this.kind = kind;
     this.name = name;
-    stats.initFrom(kind);
+    
     for (int n = 0; n < kind.baseEquipped().length; n++) {
       equipItem(kind.baseEquipped()[n]);
     }
-    alive = conscious = true;
     
     if      (kind.type() == Kind.TYPE_HERO    ) side = Side.HEROES   ;
     else if (kind.type() == Kind.TYPE_CIVILIAN) side = Side.CIVILIANS;
     else side = Side.VILLAINS;
+    
+    alive = conscious = true;
+    stats.initStats();
   }
   
   
@@ -132,6 +106,7 @@ public class Person implements Session.Saveable {
     assignment = (Assignment) s.loadObject();
     AIstate    = s.loadInt();
     confidence = s.loadFloat();
+    wariness   = s.loadFloat();
     
     location      = (Tile) s.loadObject();
     posX          = s.loadFloat();
@@ -139,6 +114,7 @@ public class Person implements Session.Saveable {
     actionPoints  = s.loadInt();
     currentAction = (Action) s.loadObject();
     turnDone      = s.loadBool();
+    lastTarget    = s.loadObject();
   }
   
   
@@ -162,6 +138,7 @@ public class Person implements Session.Saveable {
     s.saveObject(assignment);
     s.saveInt   (AIstate   );
     s.saveFloat (confidence);
+    s.saveFloat (wariness  );
     
     s.saveObject(location     );
     s.saveFloat (posX         );
@@ -169,6 +146,7 @@ public class Person implements Session.Saveable {
     s.saveInt   (actionPoints );
     s.saveObject(currentAction);
     s.saveBool  (turnDone     );
+    s.saveObject(lastTarget   );
   }
   
   
@@ -177,6 +155,21 @@ public class Person implements Session.Saveable {
     */
   public int maxHealth() {
     return stats.levelFor(HIT_POINTS);
+  }
+  
+  
+  public float strengthDamage() {
+    return stats.levelFor(MUSCLE) / 5f;
+  }
+  
+  
+  public float sightRange() {
+    return 3 + (stats.levelFor(SIGHT) / 4f);
+  }
+  
+  
+  public float hidingRange() {
+    return 0 + (stats.levelFor(STEALTH) / 8f);
   }
   
   
@@ -202,13 +195,8 @@ public class Person implements Session.Saveable {
   }
   
   
-  public int sightRange() {
-    return 3 + (stats.levelFor(SIGHT) / 4);
-  }
-  
-  
-  public int maxAP() {
-    return stats.levelFor(SPEED_ACT) / 4;
+  public float maxAP() {
+    return 1 + Nums.ceil(stats.levelFor(SPEED_ACT) / 4f);
   }
   
   
@@ -253,6 +241,7 @@ public class Person implements Session.Saveable {
   
   
   public boolean canTakeAction() {
+    if (currentScene() == null) return false;
     if (currentAction != null && currentAction.used.delayed()) return false;
     return conscious() && actionPoints > 0 && ! turnDone;
   }
@@ -298,6 +287,18 @@ public class Person implements Session.Saveable {
   
   public boolean hasEquipped(int slotID) {
     return equipSlots[slotID] != null;
+  }
+  
+  
+  public Equipped currentWeapon() {
+    Equipped weapon = equippedInSlot(SLOT_WEAPON);
+    return weapon == null ? Common.UNARMED : weapon;
+  }
+  
+  
+  public Equipped currentArmour() {
+    Equipped armour = equippedInSlot(SLOT_ARMOUR);
+    return armour == null ? Common.UNARMOURED : armour;
   }
   
   
@@ -371,6 +372,18 @@ public class Person implements Session.Saveable {
   }
   
   
+  public void receiveStun(float stun) {
+    this.stun += stun;
+    checkState();
+  }
+  
+  
+  public void receiveInjury(float injury) {
+    this.injury += injury;
+    checkState();
+  }
+  
+  
   public void liftInjury(float lift) {
     injury = Nums.max(0, injury - lift);
   }
@@ -386,6 +399,11 @@ public class Person implements Session.Saveable {
   }
   
   
+  public void modifyAP(int modifier) {
+    actionPoints += modifier;
+  }
+  
+  
   public void setActionPoints(int AP) {
     actionPoints = AP;
   }
@@ -395,15 +413,18 @@ public class Person implements Session.Saveable {
   /**  Regular updates and life-cycle-
     */
   public void onTurnStart() {
-    actionPoints  = maxAP();
+    actionPoints  = (int) maxAP();
     currentAction = null;
     turnDone      = false;
+    stats.updateStats();
     assessConfidence();
   }
   
   
   public void assignAction(Action action) {
     currentAction = action;
+    if (action.path().length > 0) action.setMoveRoll(Rand.avgNums(2));
+    if (action.target != this   ) lastTarget = action.target;
     this.actionPoints -= action.used.costAP(action);
   }
   
@@ -460,6 +481,8 @@ public class Person implements Session.Saveable {
     if (! alive) return;
     if (conscious()) stun = 0;
     
+    stats.updateStats();
+    
     int maxHealth = maxHealth();
     float regen = maxHealth * numWeeks / FULL_HEAL_WEEKS;
     injury = Nums.max(0, injury - regen);
@@ -477,7 +500,7 @@ public class Person implements Session.Saveable {
   void checkState() {
     int maxHealth = maxHealth();
     if (injury + stun > maxHealth) this.conscious = false;
-    if (injury > maxHealth * 1.5f   ) this.alive     = false;
+    if (injury > maxHealth * 1.5f) this.alive     = false;
   }
   
   
@@ -528,34 +551,67 @@ public class Person implements Session.Saveable {
   }
   
   
-  public boolean canSee(Tile point) {
+  public boolean captive() {
+    return isCivilian() && side == Side.VILLAINS;
+  }
+  
+  
+  public boolean hasSight(Tile point) {
+    Scene scene = currentScene();
+    if (scene == null) return false;
+    return scene.fogAt(point, side) > 0;
+  }
+  
+  
+  public boolean canNotice(Object point) {
     Scene scene = currentScene();
     if (scene == null) return false;
     
-    //  TODO:  Include a bonus for recently seen/unmoved enemies!
-    return scene.fogAt(point, side) > 0;
+    Tile under = scene.tileUnder(point);
+    if (! hasSight(under)) return false;
+    
+    if (point instanceof Person) {
+      Person  other    = (Person) point;
+      Action  action   = other.currentAction();
+      float   distance = scene.distance(under, location);
+      float   sighting = sightRange();
+      float   stealth  = other.hidingRange();
+      boolean focused  = lastTarget == other;
+      
+      if (other.isAlly(this)) return true;
+      
+      sighting *= wariness + (focused ? 1 : 0.5f);
+      stealth  *= action == null ? 0.5f : action.moveRoll();
+      if ((distance + stealth) > sighting) return false;
+    }
+    
+    return true;
   }
   
   
   public Action selectActionAsAI() {
     Scene scene = currentScene();
-    if (scene == null || ! conscious()) return null;
+    if (scene == null || captive() || ! conscious()) return null;
     boolean report = I.talkAbout == this;
     if (report) I.say("\nGetting next AI action for "+this);
     
     Pick <Action> pick = new Pick(0);
+    Series <Ability> abilities = stats.listAbilities();
     
     if (confidence < 1) {
       AIstate = STATE_RETREAT;
     }
     else {
       AIstate = STATE_ACTIVE;
-      for (Person p : scene.persons()) for (Ability a : stats.listAbilities()) {
-        Action use = a.configAction(this, p.location, p, scene, null);
-        if (use == null) continue;
-        float rating = a.rateUsage(use) * Rand.avgNums(2);
-        if (report) I.say("  Rating for "+a+" is "+rating);
-        pick.compare(use, rating);
+      for (Person p : scene.persons()) {
+        if (! canNotice(p)) continue;
+        for (Ability a : abilities) {
+          Action use = a.configAction(this, p.location, p, scene, null);
+          if (use == null) continue;
+          float rating = a.rateUsage(use) * Rand.avgNums(2);
+          if (report) I.say("  Rating for "+a+" is "+rating);
+          pick.compare(use, rating);
+        }
       }
     }
     if (pick.empty()) {
@@ -576,19 +632,33 @@ public class Person implements Session.Saveable {
     */
   private void assessConfidence() {
     Scene scene = currentScene();
-    float teamHealth = 0, teamPower = 0;
+    float teamHealth = 0, teamPower = 0, enemySight = 0;
     
     I.say("Assessing confidence for "+this);
     
     for (Person p : scene.persons()) {
-      if (! canSee(p.location())) continue;
       if (p.isAlly(this)) {
         teamPower  += p.powerLevel();
         teamHealth += p.powerLevel() * p.healthLevel();
       }
+      else if (p.isEnemy(this) && hasSight(p.location())) {
+        enemySight++;
+        if (canNotice(p)) enemySight++;
+      }
     }
-    //  TODO:  Refine this?
-    float courage = 0.2f;
+    
+    //  TODO:  Refine these, and use constants to define the math.
+    
+    float minAlert = (stats.levelFor(REFLEX) + stats.levelFor(WILL)) / 100f;
+    if (enemySight > 0) {
+      wariness += enemySight / 4f;
+    }
+    else {
+      wariness -= 0.25f;
+    }
+    wariness = Nums.clamp(wariness, minAlert, 1);
+
+    float             courage = 0.2f;
     if (isHero    ()) courage = 1.5f;
     if (isCriminal()) courage = 0.5f;
     
@@ -620,7 +690,7 @@ public class Person implements Session.Saveable {
       if (motion != null) return motion;
     }
     
-    int range = sightRange() / 2;
+    int range = Nums.ceil(sightRange() / 2);
     Tile pick = scene.tileAt(
       location.x + (Rand.index(range + 1) * (Rand.yes() ? 1 : -1)),
       location.y + (Rand.index(range + 1) * (Rand.yes() ? 1 : -1))
@@ -661,12 +731,16 @@ public class Person implements Session.Saveable {
   
   
   public String confidenceDescription() {
-    if (! alive()) return "Dead";
-    if (! conscious()) return "Unconscious";
-    if (retreating()) return "Retreating";
-    if (confidence < 1.33f) return "Shaken";
-    if (confidence < 1.66f) return "Steady";
-    return "Determined";
+    if (! alive     ()) return "Dead"       ;
+    if (! conscious ()) return "Unconscious";
+    if (  retreating()) return "Retreating" ;
+    
+    String moraleDesc = "Determined", alertDesc = "Alert";
+    if (confidence < 1.66f) moraleDesc = "Steady"  ;
+    if (confidence < 1.33f) moraleDesc = "Shaken"  ;
+    if (wariness   < 0.66f) alertDesc  = "Watchful";
+    if (wariness   < 0.33f) alertDesc  = "Unwary"  ;
+    return moraleDesc+", "+alertDesc;
   }
 }
 

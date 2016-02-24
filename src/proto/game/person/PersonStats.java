@@ -11,6 +11,52 @@ import proto.util.*;
 public class PersonStats {
   
   
+  static class Stat extends Trait {
+    public Stat(String name, String ID, String description) {
+      super(name, ID, description);
+    }
+  }
+  
+  final public static Stat
+    MUSCLE     = new Stat("Muscle"    , "stat_muscle"    , ""),
+    REFLEX     = new Stat("Reflex"    , "stat_reflex"    , ""),
+    WILL       = new Stat("Will"      , "stat_will"      , ""),
+    BRAIN      = new Stat("Brain"     , "stat_brain"     , ""),
+    BASE_ATTRIBUTES[] = {
+      MUSCLE, REFLEX, WILL, BRAIN
+    },
+    HIT_POINTS = new Stat("Hit Points", "stat_hit_points", ""),
+    ENERGY     = new Stat("Energy"    , "stat_energy"    , ""),
+    ARMOUR     = new Stat("Armour"    , "stat_armour"    , ""),
+    REGEN      = new Stat("Regen"     , "stat_regen"     , ""),
+    MIN_DAMAGE = new Stat("Min Damage", "stat_min_damage", ""),
+    RNG_DAMAGE = new Stat("Rng Damage", "stat_rng_damage", ""),
+    HEAVY_STATS[] = {
+      HIT_POINTS, ENERGY, ARMOUR, REGEN, MIN_DAMAGE, RNG_DAMAGE
+    },
+    SIGHT      = new Stat("Sight"     , "stat_sight"     , ""),
+    SPEED_ACT  = new Stat("Speed Act" , "stat_speed_act" , ""),
+    SPEED_MOV  = new Stat("Speed Mov" , "stat_speed_mov" , ""),
+    PRECISION  = new Stat("Precision" , "stat_precision" , ""),
+    RESTRAINT  = new Stat("Restraint" , "stat_restraint" , ""),
+    DODGE      = new Stat("Dodge"     , "stat_dodge"     , ""),
+    PARRY      = new Stat("Parry"     , "stat_parry"     , ""),
+    STEALTH    = new Stat("Stealth"   , "stat_stealth"   , ""),
+    LIGHT_STATS[] = {
+      SIGHT, SPEED_ACT, SPEED_MOV, PRECISION, RESTRAINT, DODGE, PARRY, STEALTH
+    },
+    QUESTION   = new Stat("Question"  , "stat_question"  , ""),
+    SUASION    = new Stat("Suasion"   , "stat_suasion"   , ""),
+    SOCIAL_STATS[] = {
+      QUESTION, SUASION
+    },
+    
+    ALL_STATS[] = (Stat[]) Visit.compose(Stat.class,
+      BASE_ATTRIBUTES, HEAVY_STATS, LIGHT_STATS, SOCIAL_STATS
+    );
+  
+  
+  
   final Person person;
   
   int totalXP = 0;
@@ -24,14 +70,6 @@ public class PersonStats {
   
   PersonStats(Person p) {
     person = p;
-  }
-  
-  
-  void initFrom(Kind kind) {
-    for (int n = 0; n < kind.baseAbilities().length; n++) {
-      Ability a = kind.baseAbilities()[n];
-      setLevel(a, kind.baseLevels   ()[n], true);
-    }
   }
   
   
@@ -76,7 +114,14 @@ public class PersonStats {
   public int levelFor(Trait trait) {
     Level l = levels.get(trait);
     if (l == null) return 0;
-    return (int) l.level;
+    return (int) (l.level + l.bonus);
+  }
+  
+  
+  public int bonusFor(Trait trait) {
+    Level l = levels.get(trait);
+    if (l == null) return 0;
+    return (int) l.bonus;
   }
   
   
@@ -94,20 +139,105 @@ public class PersonStats {
   
   
   
+  /**  Regular updates-
+    */
+  void initStats() {
+    for (Trait s : person.kind.baseTraits()) {
+      float base = person.kind().baseLevel(s);
+      setLevel(s, base, true);
+    }
+    updateStats();
+  }
+  
+  
+  void updateStats() {
+    float    muscle = levelFor(MUSCLE);
+    float    reflex = levelFor(REFLEX);
+    float    brain  = levelFor(BRAIN );
+    float    will   = levelFor(WILL  );
+    Equipped armour = person.currentArmour();
+    Equipped weapon = person.currentWeapon();
+    
+    float maxHP      = 10 + muscle;
+    float maxEnergy  = (muscle + will) / 2f;
+    float baseArmour = armour.bonus;
+    float baseRegen  = muscle / 100f;
+    float baseDamage = weapon.bonus / 2f;
+    float rollDamage = weapon.bonus / 2f;
+    
+    setStatBase(HIT_POINTS, maxHP     , false);
+    setStatBase(ENERGY    , maxEnergy , false);
+    setStatBase(ARMOUR    , baseArmour, false);
+    setStatBase(REGEN     , baseRegen , false);
+    setStatBase(MIN_DAMAGE, baseDamage, false);
+    setStatBase(RNG_DAMAGE, rollDamage, false);
+    
+    float lightLevel = (reflex + 10) / 2;
+    setStatBase(SIGHT    , lightLevel, true);
+    setStatBase(SPEED_MOV, lightLevel, true);
+    setStatBase(SPEED_ACT, lightLevel, true);
+    setStatBase(PRECISION, lightLevel, true);
+    setStatBase(RESTRAINT, lightLevel, true);
+    setStatBase(DODGE    , lightLevel, true);
+    setStatBase(PARRY    , lightLevel, true);
+    setStatBase(STEALTH  , lightLevel, true);
+    
+    float levelQuestion = (will + brain      ) / 2;
+    float levelSuasion  = (10 + will + reflex) / 2;
+    setStatBase(QUESTION, levelQuestion, true);
+    setStatBase(SUASION , levelSuasion , true);
+    
+    Series <Ability> abilities = listAbilities();
+    for (Ability a : abilities) if (a.passive()) {
+      a.applyPassiveStatsBonus(person);
+    }
+  }
+  
+  
+  protected void setStatBase(Stat stat, float level, boolean mental) {
+    Level l = levels.get(stat);
+    if (l == null) levels.put(stat, l = new Level());
+    
+    final int minVal = person.kind().baseLevel(stat);
+    if (level < minVal) level = minVal;
+    
+    l.learned = mental;
+    l.level   = level ;
+    l.bonus   = 0     ;
+  }
+  
+  
+  protected void incBonus(Trait trait, float bonusMod) {
+    Level l = levels.get(trait);
+    if (l == null) levels.put(trait, l = new Level());
+    l.bonus += bonusMod;
+  }
+  
+  
+  protected void applyStatEffects() {
+    final float regen = levelFor(REGEN);
+    if      (person.stun  () > 0) person.liftStun  (regen * 2);
+    else if (person.injury() > 0) person.liftInjury(regen * 1);
+  }
+  
+  
+  
   /**  Assigning experience and abilities-
     */
-  public void setLevel(Ability a, int level, boolean learned) {
+  public void setLevel(Trait a, float level, boolean learned) {
+    final boolean keep = learned && a instanceof Ability;
+    
     if (level > 0) {
       Level l = levels.get(a);
       if (l == null) levels.put(a, l = new Level());
-      l.level = level;
+      l.level    = level;
       l.practice = 0;
-      l.learned = learned;
-      if (learned) abilities.include(a);
+      l.learned  = learned;
+      if (keep) abilities.include((Ability) a);
     }
     else {
       levels.remove(a);
-      abilities.remove(a);
+      if (keep) abilities.remove((Ability) a);
     }
   }
   

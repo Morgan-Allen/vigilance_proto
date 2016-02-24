@@ -13,7 +13,8 @@ public class Action implements Session.Saveable {
   final public Ability used;
   final public Person acting;
   final public Object target;
-  
+
+  float moveRoll;
   Tile path[];
   Volley volley;
   int timeStart;
@@ -35,19 +36,21 @@ public class Action implements Session.Saveable {
     path      = (Tile[] ) s.loadObjectArray(Tile.class);
     volley    = (Volley ) s.loadObject();
     target    = s.loadObject();
+    moveRoll  = s.loadFloat ();
     timeStart = s.loadInt   ();
     progress  = s.loadFloat ();
   }
   
   
   public void saveState(Session s) throws Exception {
-    s.saveObject(used);
+    s.saveObject(used  );
     s.saveObject(acting);
     s.saveObjectArray(path);
-    s.saveObject(volley);
-    s.saveObject((Session.Saveable) target);
-    s.saveInt(timeStart);
-    s.saveFloat(progress);
+    s.saveObject(volley   );
+    s.saveObject(target   );
+    s.saveFloat (moveRoll );
+    s.saveInt   (timeStart);
+    s.saveFloat (progress );
   }
   
   
@@ -57,6 +60,7 @@ public class Action implements Session.Saveable {
   public void attachPath(Tile path[], int timeStart) {
     this.path      = path;
     this.timeStart = timeStart;
+    this.moveRoll  = 1.0f;
   }
   
   
@@ -67,6 +71,16 @@ public class Action implements Session.Saveable {
   
   public void setProgress(float progress) {
     this.progress = progress;
+  }
+  
+  
+  public void setMoveRoll(float moveRoll) {
+    this.moveRoll = moveRoll;
+  }
+  
+  
+  public float moveRoll() {
+    return moveRoll;
   }
   
   

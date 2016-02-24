@@ -365,16 +365,30 @@ public class WorldView {
     
     else if (p != null && p == lastSelected) {
       s.append("\nCodename: "+p.name());
-      int HP = (int) (p.maxHealth() - (p.injury() + p.stun()));
+      int HP = (int) Nums.max(0, p.maxHealth() - (p.injury() + p.stun()));
       s.append("\n  Health: "+HP+"/"+p.maxHealth());
-      if (p.stun() > 0) s.append(" (Stun "+(int) p.stun()+")");
-      if (! p.alive()) s.append("\n  Dead");
-      else if (! p.conscious()) s.append("\n  Unconscious");
+      if (! p.alive()) s.append(" (Dead)");
+      else if (! p.conscious()) s.append(" (Unconscious)");
+      else if (p.stun() > 0) s.append(" (Stun "+(int) p.stun()+")");
+      
+      int minD = p.stats.levelFor(PersonStats.MIN_DAMAGE);
+      int rngD = p.stats.levelFor(PersonStats.RNG_DAMAGE);
+      int armr = p.stats.levelFor(PersonStats.ARMOUR    );
+      s.append("\n  Damage: "+minD+"-"+(minD + rngD));
+      s.append(  "  Armour: "+armr);
+      
+      s.append("\nStatistics: ");
+      for (Trait stat : PersonStats.BASE_ATTRIBUTES) {
+        int level = p.stats.levelFor(stat);
+        int bonus = p.stats.bonusFor(stat);
+        s.append("\n  "+stat.name+": "+level);
+        if (bonus > 0) s.append(" (+"+bonus+")");
+      }
+      
       s.append("\nAbilities: ");
-      for (Ability a : p.stats.listAbilities()) {
+      for (Ability a : p.stats.listAbilities()) if (! a.basic()) {
         int level = (int) p.stats.levelFor(a);
-        s.append("\n  "+a.name);
-        s.append(" ("+level+")");
+        s.append("\n  "+a.name+": "+level);
       }
       
       Assignment assigned = p.assignment();

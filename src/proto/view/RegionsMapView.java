@@ -34,7 +34,6 @@ public class RegionsMapView {
     int pixVals[] = keyImage.getRGB(0, 0, imgWide, imgHigh, null, 0, imgWide);
     int fills = new Color(1, 1, 1, 0.5f).getRGB();
     
-    I.say("Attaching outlines...");
     for (Coord c : Visit.grid(0, 0, imgWide, imgHigh, 1)) {
       int pixVal = pixVals[(c.y * imgWide) + c.x];
       for (RegionView r : attached) if (r.colourKey == pixVal) {
@@ -45,7 +44,6 @@ public class RegionsMapView {
     }
     
     for (RegionView r : attached) if (r.bounds != null && r.outline == null) {
-      I.say("  Bounds for "+r.name+" are: "+r.bounds);
       int w = (int) (r.bounds.xdim() + 1), h = (int) (r.bounds.ydim() + 1);
       r.outline  = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
       r.outlineX = (int) r.bounds.xpos();
