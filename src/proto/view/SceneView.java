@@ -299,8 +299,8 @@ public class SceneView {
     
     Printout print = world.game().print();
     s.append("\nMission ");
-    if (success) s.append(" Successful.");
-    else s.append(" Failed.");
+    if (success) s.append(" Successful: "+scene);
+    else s.append(" Failed: "+scene);
     
     s.append("\nTeam Status:");
     for (Person p : scene.playerTeam()) {

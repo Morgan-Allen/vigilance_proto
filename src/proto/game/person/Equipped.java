@@ -3,6 +3,7 @@
 package proto.game.person;
 import proto.common.*;
 import proto.game.scene.*;
+import proto.game.world.*;
 import proto.util.*;
 import java.awt.*;
 
@@ -16,19 +17,22 @@ public class Equipped extends Index.Entry implements Session.Saveable {
   final static Index <Equipped> INDEX = new Index <Equipped> ();
   
   final public static int
-    NONE        = 0     ,
+    NONE        = 0      ,
+    IS_COMMON   = 1 << 0 ,
+    IS_CUSTOM   = 1 << 1 ,
     
-    IS_CONSUMED = 1 << 0,
-    IS_WEAPON   = 1 << 1,
-    IS_MELEE    = 1 << 2,
-    IS_ARMOUR   = 1 << 3,
-    IS_RANGED   = 1 << 4,
+    IS_CONSUMED = 1 << 2 ,
+    IS_WEAPON   = 1 << 3 ,
+    IS_MELEE    = 1 << 4 ,
+    IS_ARMOUR   = 1 << 5 ,
+    IS_RANGED   = 1 << 6 ,
     
-    IS_KINETIC  = 1 << 5,
-    IS_BEAM     = 1 << 6,
-    IS_PLASMA   = 1 << 7,
-    IS_NUCLEAR  = 1 << 8,
-    IS_AREA_FX  = 1 << 9;
+    IS_KINETIC  = 1 << 7 ,
+    IS_BEAM     = 1 << 8 ,
+    IS_PLASMA   = 1 << 9 ,
+    IS_NUCLEAR  = 1 << 10,
+    IS_AREA_FX  = 1 << 11
+  ;
   
   final public String name, description;
   final Object media;
@@ -39,6 +43,9 @@ public class Equipped extends Index.Entry implements Session.Saveable {
   
   final public int properties;
   final Ability abilities[];
+  
+  private Kind inventor;
+  private Tech required[];
   
   
   public Equipped(
@@ -61,6 +68,13 @@ public class Equipped extends Index.Entry implements Session.Saveable {
   }
   
   
+  public Equipped setRequirements(Kind inventor, Tech... required) {
+    this.inventor = inventor;
+    this.required = required;
+    return this;
+  }
+  
+  
   public static Equipped loadConstant(Session s) throws Exception {
     return INDEX.loadEntry(s.input());
   }
@@ -76,6 +90,16 @@ public class Equipped extends Index.Entry implements Session.Saveable {
     */
   boolean hasProperty(int p) {
     return (properties & p) == p;
+  }
+  
+  
+  public boolean isCommon() {
+    return hasProperty(IS_COMMON);
+  }
+  
+  
+  public boolean isCustom() {
+    return hasProperty(IS_CUSTOM);
   }
   
   
@@ -106,6 +130,16 @@ public class Equipped extends Index.Entry implements Session.Saveable {
   
   public boolean isBeam() {
     return hasProperty(IS_BEAM);
+  }
+  
+  
+  public boolean availableFor(Person user, Base base) {
+    if (isCommon()) return true;
+    if (inventor != null && user.kind() != inventor) return false;
+    if (required != null) for (Tech req : required) {
+      if (! base.hasTech(req)) return false;
+    }
+    return true;
   }
   
   

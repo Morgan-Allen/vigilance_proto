@@ -18,7 +18,10 @@ public class Base implements Session.Saveable {
   
   World world;
   List <Person> roster = new List();
+  
   Room rooms[] = new Room[MAX_FACILITIES];
+  List <Equipped> equipment = new List();
+  List <Tech    > knownTech = new List();
   
   int currentFunds, income, maintenance;
   int powerUse, maxPower, supportUse, maxSupport;
@@ -39,6 +42,8 @@ public class Base implements Session.Saveable {
     for (int n = 0 ; n < MAX_FACILITIES; n++) {
       rooms[n] = (Room) s.loadObject();
     }
+    s.loadObjects(equipment);
+    s.loadObjects(knownTech);
     currentFunds = s.loadInt();
     income       = s.loadInt();
     maintenance  = s.loadInt();
@@ -55,6 +60,8 @@ public class Base implements Session.Saveable {
     for (int n = 0 ; n < MAX_FACILITIES; n++) {
       s.saveObject(rooms[n]);
     }
+    s.saveObjects(equipment);
+    s.saveObjects(knownTech);
     s.saveInt(currentFunds);
     s.saveInt(income      );
     s.saveInt(maintenance );
@@ -152,6 +159,43 @@ public class Base implements Session.Saveable {
     }
     return Nums.clamp(chance / 100, 0, 1);
   }
+  
+  
+  
+  /**  Inventory and storage-
+    */
+  public Series <Equipped> itemsAvailableFor(Person person) {
+    Batch <Equipped> available = new Batch();
+    for (Equipped common : equipment) {
+      if (! common.availableFor(person, this)) continue;
+      available.add(common);
+    }
+    for (Equipped special : person.kind().customItems()) {
+      if (! special.availableFor(person, this)) continue;
+      available.add(special);
+    }
+    return available;
+  }
+  
+  
+  public boolean addEquipment(Equipped item) {
+    if (item == null || equipment.includes(item)) return false;
+    equipment.add(item);
+    return true;
+  }
+  
+  
+  public boolean hasTech(Tech tech) {
+    return knownTech.includes(tech);
+  }
+  
+  
+  public boolean addTech(Tech tech) {
+    if (tech == null || knownTech.includes(tech)) return false;
+    knownTech.add(tech);
+    return true;
+  }
+  
   
   
   

@@ -33,10 +33,11 @@ public class Person implements Session.Saveable {
     WEEK_TRAINING_XP  = 250 ,
     MIN_LEVEL_XP      = 1000;
   final public static int
-    SLOT_WEAPON = 0,
-    SLOT_ARMOUR = 1,
-    SLOT_ITEMS  = 2,
-    NUM_EQUIP_SLOTS = 4;
+    SLOT_WEAPON     = 0,
+    SLOT_ARMOUR     = 1,
+    SLOT_ITEMS      = 2,
+    NUM_EQUIP_SLOTS = 3,
+    ALL_SLOTS[] = { 0, 1, 2 };
   public static enum Side {
     HEROES, CIVILIANS, VILLAINS
   };
@@ -268,6 +269,21 @@ public class Person implements Session.Saveable {
   }
   
   
+  public boolean removeItem(Equipped item) {
+    int slotID = equipSlotFor(item);
+    if (slotID == -1) return false;
+    emptyEquipSlot(slotID);
+    return true;
+  }
+  
+  
+  public int equipSlotFor(Equipped item) {
+    int slotID = 0;
+    for (Equipped i : equipSlots) if (i == item) return slotID; else slotID++;
+    return -1;
+  }
+  
+  
   public void emptyEquipSlot(int slotID) {
     equipSlots[slotID] = null;
   }
@@ -287,6 +303,20 @@ public class Person implements Session.Saveable {
   
   public boolean hasEquipped(int slotID) {
     return equipSlots[slotID] != null;
+  }
+  
+  
+  public boolean hasEquipped(Equipped item) {
+    for (Equipped i : equipSlots) if (i == item) return true;
+    return false;
+  }
+  
+  
+  public boolean canEquip(Equipped item) {
+    for (int slotID : ALL_SLOTS) {
+      if (item.slotID == slotID && equipSlots[slotID] == null) return true;
+    }
+    return false;
   }
   
   

@@ -4,7 +4,7 @@ package proto.game.world;
 import proto.common.*;
 import proto.game.scene.*;
 import proto.game.content.*;
-import proto.game.person.Person;
+import proto.game.person.*;
 import proto.util.*;
 import proto.view.*;
 
@@ -99,6 +99,11 @@ public class World implements Session.Saveable {
     base.addFacility(Blueprint.TRAINING_ROOM, 1, 1f);
     base.addFacility(Blueprint.GENERATOR    , 2, 1f);
     base.addFacility(Blueprint.ARBORETUM    , 3, 1f);
+    
+    base.addEquipment(BasicGear.MED_POUCH);
+    base.addEquipment(BasicGear.BODY_VEST);
+    base.addEquipment(BasicGear.FLASHBANG);
+    base.addEquipment(BasicGear.INTERCOM );
     
     base.updateBase(0);
     base.currentFunds = 500;

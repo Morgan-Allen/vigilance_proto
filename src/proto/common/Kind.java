@@ -32,6 +32,7 @@ public class Kind extends Index.Entry implements Session.Saveable {
   Table <Trait, Integer> traitLevels = new Table();
   Trait    baseTraits  [] = new Trait   [0];
   Equipped baseEquipped[] = new Equipped[0];
+  Equipped customItems [] = new Equipped[0];
   
   
   Kind(String uniqueID) {
@@ -61,6 +62,7 @@ public class Kind extends Index.Entry implements Session.Saveable {
     
     Batch <Trait   > allT = new Batch();
     Batch <Equipped> allE = new Batch();
+    Batch <Equipped> allC = new Batch();
     Trait   readT = null;
     Integer readL = null;
     
@@ -72,7 +74,9 @@ public class Kind extends Index.Entry implements Session.Saveable {
         readL = (Integer) o;
       }
       if (o instanceof Equipped) {
-        allE.add((Equipped) o);
+        Equipped e = (Equipped) o;
+        allE.add(e);
+        if (e.isCustom()) allC.add(e);
       }
       if (readT != null && readL != null) {
         allT.add(readT);
@@ -83,6 +87,7 @@ public class Kind extends Index.Entry implements Session.Saveable {
     }
     k.baseTraits   = allT.toArray(Trait   .class);
     k.baseEquipped = allE.toArray(Equipped.class);
+    k.customItems  = allC.toArray(Equipped.class);
     
     k.name = name;
     k.sprite = loadImage(spritePath);
@@ -124,7 +129,8 @@ public class Kind extends Index.Entry implements Session.Saveable {
   public boolean blockSight() { return blockSight; }
   public boolean blockPath () { return blockPath ; }
   
-  public Equipped[] baseEquipped() { return baseEquipped ; }
+  public Equipped[] baseEquipped() { return baseEquipped; }
+  public Equipped[] customItems () { return customItems ; }
   
   public String name  () { return name  ; }
   public Image  sprite() { return sprite; }

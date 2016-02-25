@@ -19,6 +19,10 @@ public class WorldView {
   
   
   final static String IMG_DIR = "media assets/world map/";
+  final static int
+    PANE_ABILITIES  = 0,
+    PANE_OUTFIT = 1,
+    PANE_PSYCH  = 2;
   
   final World world;
   
@@ -26,9 +30,11 @@ public class WorldView {
   Person selectedPerson;
   Room   selectedRoom;
   Object lastSelected;
+  int personPaneMode = PANE_ABILITIES;
   
   RegionsMapView mapView = new RegionsMapView();
   Image alertMarker, selectCircle, constructMark;
+  
   
   
   public WorldView(World world) {
@@ -364,36 +370,16 @@ public class WorldView {
     }
     
     else if (p != null && p == lastSelected) {
-      s.append("\nCodename: "+p.name());
-      int HP = (int) Nums.max(0, p.maxHealth() - (p.injury() + p.stun()));
-      s.append("\n  Health: "+HP+"/"+p.maxHealth());
-      if (! p.alive()) s.append(" (Dead)");
-      else if (! p.conscious()) s.append(" (Unconscious)");
-      else if (p.stun() > 0) s.append(" (Stun "+(int) p.stun()+")");
-      
-      int minD = p.stats.levelFor(PersonStats.MIN_DAMAGE);
-      int rngD = p.stats.levelFor(PersonStats.RNG_DAMAGE);
-      int armr = p.stats.levelFor(PersonStats.ARMOUR    );
-      s.append("\n  Damage: "+minD+"-"+(minD + rngD));
-      s.append(  "  Armour: "+armr);
-      
-      s.append("\nStatistics: ");
-      for (Trait stat : PersonStats.BASE_ATTRIBUTES) {
-        int level = p.stats.levelFor(stat);
-        int bonus = p.stats.bonusFor(stat);
-        s.append("\n  "+stat.name+": "+level);
-        if (bonus > 0) s.append(" (+"+bonus+")");
+      if (personPaneMode == PANE_ABILITIES) {
+        describePersonAbilities(p, s);
       }
-      
-      s.append("\nAbilities: ");
-      for (Ability a : p.stats.listAbilities()) if (! a.basic()) {
-        int level = (int) p.stats.levelFor(a);
-        s.append("\n  "+a.name+": "+level);
+      if (personPaneMode == PANE_OUTFIT) {
+        describePersonOutfit(p, s);
       }
-      
-      Assignment assigned = p.assignment();
-      String assignName = assigned == null ? "None" : assigned.name();
-      s.append("\n\nAssignment: "+assignName);
+      if (personPaneMode == PANE_PSYCH) {
+        describePersonPsych(p, s);
+      }
+      appendPersonPaneOptions(p, s);
     }
     
     s.append("\n");
@@ -417,7 +403,97 @@ public class WorldView {
     
     return s.toString();
   }
+  
+  
+  void describePersonAbilities(Person p, StringBuffer s) {
+    
+    s.append("\nCodename: "+p.name());
+    int HP = (int) Nums.max(0, p.maxHealth() - (p.injury() + p.stun()));
+    s.append("\n  Health: "+HP+"/"+p.maxHealth());
+    if (! p.alive()) s.append(" (Dead)");
+    else if (! p.conscious()) s.append(" (Unconscious)");
+    else if (p.stun() > 0) s.append(" (Stun "+(int) p.stun()+")");
+    
+    int minD = p.stats.levelFor(PersonStats.MIN_DAMAGE);
+    int rngD = p.stats.levelFor(PersonStats.RNG_DAMAGE);
+    int armr = p.stats.levelFor(PersonStats.ARMOUR    );
+    s.append("\n  Damage: "+minD+"-"+(minD + rngD));
+    s.append(  "  Armour: "+armr);
+    
+    s.append("\nStatistics: ");
+    for (Trait stat : PersonStats.BASE_ATTRIBUTES) {
+      int level = p.stats.levelFor(stat);
+      int bonus = p.stats.bonusFor(stat);
+      s.append("\n  "+stat.name+": "+level);
+      if (bonus > 0) s.append(" (+"+bonus+")");
+    }
+    
+    s.append("\nAbilities: ");
+    for (Ability a : p.stats.listAbilities()) if (! a.basic()) {
+      int level = (int) p.stats.levelFor(a);
+      s.append("\n  Level "+level+" "+a.name);
+    }
+    
+    Assignment assigned = p.assignment();
+    String assignName = assigned == null ? "None" : assigned.name();
+    s.append("\n\nAssignment: "+assignName);
+  }
+  
+  
+  void describePersonOutfit(Person p, StringBuffer s) {
+    Printout print = world.game().print();
+    
+    s.append("\nCodename: "+p.name());
+    
+    s.append("\nItems equipped:");
+    for (Equipped item : p.equipment()) {
+      s.append("\n  "+item);
+    }
+    
+    s.append("\nItems available:");
+    int index = 0;
+    for (Equipped item : world.base().itemsAvailableFor(p)) {
+      boolean equipped = p.hasEquipped(item);
+      boolean canEquip = p.canEquip   (item);
+      s.append("\n  "+item.name+" ("+index+")");
+      if      (equipped  ) s.append(" (Equipped)");
+      else if (! canEquip) s.append(" (No Slot)" );
+      
+      if (print.isPressed((char) ('0' + index))) {
+        if      (equipped) p.removeItem(item);
+        else if (canEquip) p.equipItem (item);
+      }
+    }
+  }
+  
+  
+  void describePersonPsych(Person p, StringBuffer s) {
+    //  TODO:  FILL THIS IN!
+  }
+  
+  
+  void appendPersonPaneOptions(Person p, StringBuffer s) {
+    s.append("\n\nPress A for Abilities, O for Outfit, P for Psych");
+    
+    Printout print = world.game().print();
+    if (print.isPressed('a')) {
+      personPaneMode = PANE_ABILITIES;
+    }
+    if (print.isPressed('o')) {
+      personPaneMode = PANE_OUTFIT;
+    }
+    if (print.isPressed('p')) {
+      personPaneMode = PANE_PSYCH;
+    }
+  }
+  
 }
+
+
+
+
+
+
 
 
 
