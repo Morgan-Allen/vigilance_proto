@@ -1,17 +1,14 @@
 
 
 package proto.common;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-
 import proto.game.scene.Scene;
 import proto.game.world.World;
 import proto.util.*;
 import proto.view.*;
 
-import java.io.*;
-import javax.imageio.*;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
 
 
 
@@ -83,8 +80,8 @@ public class RunGame extends JFrame implements ActionListener {
   
   private void initUI() {
     this.setLayout(new BorderLayout());
-    add(this.surface     = new Surface (this), BorderLayout.CENTER);
-    add(this.print = new Printout(this), BorderLayout.EAST  );
+    add(this.surface = new Surface (this), BorderLayout.CENTER);
+    add(this.print   = new Printout(this), BorderLayout.EAST  );
     
     pack();
     setTitle("Run Game");
