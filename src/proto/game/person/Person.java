@@ -2,8 +2,6 @@
 
 package proto.game.person;
 import proto.common.*;
-import proto.game.content.*;
-import proto.game.scene.*;
 import proto.game.world.*;
 import proto.util.*;
 import static proto.game.person.PersonStats.*;
@@ -60,10 +58,8 @@ public class Person implements Session.Saveable {
   float confidence = 1.0f;
   float wariness   = 0.0f;
   
-  Tile location;
   float posX, posY;
   int actionPoints;
-  Action currentAction;
   boolean turnDone;
   Object lastTarget;
   
@@ -109,11 +105,9 @@ public class Person implements Session.Saveable {
     confidence = s.loadFloat();
     wariness   = s.loadFloat();
     
-    location      = (Tile) s.loadObject();
     posX          = s.loadFloat();
     posY          = s.loadFloat();
     actionPoints  = s.loadInt();
-    currentAction = (Action) s.loadObject();
     turnDone      = s.loadBool();
     lastTarget    = s.loadObject();
   }
@@ -141,11 +135,9 @@ public class Person implements Session.Saveable {
     s.saveFloat (confidence);
     s.saveFloat (wariness  );
     
-    s.saveObject(location     );
     s.saveFloat (posX         );
     s.saveFloat (posY         );
     s.saveInt   (actionPoints );
-    s.saveObject(currentAction);
     s.saveBool  (turnDone     );
     s.saveObject(lastTarget   );
   }
@@ -156,21 +148,6 @@ public class Person implements Session.Saveable {
     */
   public int maxHealth() {
     return stats.levelFor(HIT_POINTS);
-  }
-  
-  
-  public float strengthDamage() {
-    return stats.levelFor(MUSCLE) / 5f;
-  }
-  
-  
-  public float sightRange() {
-    return 2 + (stats.levelFor(SIGHT) / 4f);
-  }
-  
-  
-  public float hidingRange() {
-    return 0 + (stats.levelFor(STEALTH) / 8f);
   }
   
   
@@ -196,16 +173,6 @@ public class Person implements Session.Saveable {
   }
   
   
-  public float maxAP() {
-    return 1 + Nums.ceil(stats.levelFor(SPEED_ACT) / 4f);
-  }
-  
-  
-  public int baseArmour() {
-    return stats.levelFor(ARMOUR);
-  }
-  
-  
   public int currentAP() {
     return actionPoints;
   }
@@ -228,23 +195,6 @@ public class Person implements Session.Saveable {
   
   public boolean conscious() {
     return conscious && alive;
-  }
-  
-  
-  public Action currentAction() {
-    return currentAction;
-  }
-  
-  
-  public boolean turnDone() {
-    return turnDone;
-  }
-  
-  
-  public boolean canTakeAction() {
-    if (currentScene() == null) return false;
-    if (currentAction != null && currentAction.used.delayed()) return false;
-    return conscious() && actionPoints > 0 && ! turnDone;
   }
   
   
@@ -358,50 +308,9 @@ public class Person implements Session.Saveable {
   }
   
   
-  public Scene currentScene() {
-    if (assignment instanceof Scene) return (Scene) assignment;
-    return null;
-  }
-  
-  
-  public Tile location() {
-    return location;
-  }
-  
-  
-  public Vec3D exactPosition() {
-    return new Vec3D(posX, posY, 0);
-  }
-  
-  
-  public void setExactPosition(float x, float y, float z, Scene scene) {
-    final Tile oldLoc = location;
-    posX     = x;
-    posY     = y;
-    location = scene.tileAt((int) (x + 0.5f), (int) (y + 0.5f));
-    if (oldLoc != location) {
-      if (oldLoc   != null) oldLoc  .setInside(this, false);
-      if (location != null) location.setInside(this, true );
-    }
-  }
-  
-  
   
   /**  State adjustments-
     */
-  public void receiveAttack(Volley attack) {
-    
-    if (attack.didConnect) {
-      this.injury += attack.injureDamage;
-      this.stun   += attack.stunDamage  ;
-    }
-    else if (turnDone) {
-      actionPoints -= 1;
-    }
-    checkState();
-  }
-  
-  
   public void receiveStun(float stun) {
     this.stun += stun;
     checkState();
@@ -442,69 +351,6 @@ public class Person implements Session.Saveable {
   
   /**  Regular updates and life-cycle-
     */
-  public void onTurnStart() {
-    actionPoints  = (int) maxAP();
-    currentAction = null;
-    turnDone      = false;
-    stats.updateStats();
-    assessConfidence();
-  }
-  
-  
-  public void assignAction(Action action) {
-    currentAction = action;
-    if (action.path().length > 0) action.setMoveRoll(Rand.avgNums(2));
-    if (action.target != this   ) lastTarget = action.target;
-    this.actionPoints -= action.used.costAP(action);
-  }
-  
-  
-  public void updateDuringTurn() {
-    Scene scene = currentScene();
-    Action a = currentAction;
-    if (scene == null || a == null) return;
-    
-    int elapsed = a.timeElapsed();
-    float moveRate = 4;
-    float timeSteps = elapsed * moveRate / RunGame.FRAME_RATE;
-    
-    float alpha = timeSteps % 1;
-    Tile path[] = a.path();
-    Tile l = path[Nums.clamp((int)  timeSteps     , path.length)];
-    Tile n = path[Nums.clamp((int) (timeSteps + 1), path.length)];
-    
-    Tile oldLoc = location();
-    setExactPosition(
-      (alpha * n.x) + ((1 - alpha) * l.x),
-      (alpha * n.y) + ((1 - alpha) * l.y),
-      0, scene
-    );
-    if (location() != oldLoc) scene.updateFog();
-    
-    if (timeSteps > path.length) {
-      if (! a.started()) {
-        a.used.applyOnActionStart(a);
-        a.used.checkForTriggers(a, true, false);
-      }
-      float extraTime = a.used.animDuration();
-      a.setProgress((timeSteps - path.length) / (extraTime * moveRate));
-    }
-    if (a.complete()) {
-      a.used.checkForTriggers(a, false, true);
-      a.used.applyOnActionEnd(a);
-      currentAction = null;
-    }
-  }
-  
-  
-  public void onTurnEnd() {
-    if (currentAction == null || ! currentAction.used.delayed()) {
-      currentAction = null;
-    }
-    turnDone = true;
-    //
-    //  TODO:  Apply any conditions with stat effects, et cetera!
-  }
   
   
   public void updateOnBase(float numWeeks) {
@@ -582,171 +428,9 @@ public class Person implements Session.Saveable {
   
   
   public boolean captive() {
-    //  TODO:  Add some nuance here!
-    return isCivilian();// && side == Side.VILLAINS;
+    return false;
   }
   
-  
-  public boolean hasSight(Tile point) {
-    Scene scene = currentScene();
-    if (scene == null) return false;
-    return scene.fogAt(point, side) > 0;
-  }
-  
-  
-  public boolean canNotice(Object point) {
-    Scene scene = currentScene();
-    if (scene == null) return false;
-    
-    Tile  under      = scene.tileUnder(point);
-    float visibility = scene.fogAt(under, side);
-    if (visibility <= 0) return false;
-    
-    if (point instanceof Person) {
-      Person other = (Person) point;
-      if (other.isAlly(this)) return true;
-      
-      float   sighting = Nums.max(1, sightRange());
-      float   stealth  = other.hidingRange();
-      Action  action   = other.currentAction();
-      boolean focused  = lastTarget == other;
-      
-      sighting *= wariness + (focused ? 0.5f : 0);
-      stealth  *= action == null ? 0.5f : action.moveRoll();
-      stealth  /= sighting;
-      if (stealth > visibility) return false;
-    }
-    
-    return true;
-  }
-  
-  
-  public Action selectActionAsAI() {
-    Scene scene = currentScene();
-    if (scene == null || captive() || ! conscious()) return null;
-    boolean report = I.talkAbout == this;
-    if (report) I.say("\nGetting next AI action for "+this);
-    
-    Pick <Action> pick = new Pick(0);
-    Series <Ability> abilities = stats.listAbilities();
-    
-    if (confidence < 1) {
-      AIstate = STATE_RETREAT;
-    }
-    else {
-      AIstate = STATE_ACTIVE;
-      for (Person p : scene.persons()) {
-        if (! canNotice(p)) continue;
-        for (Ability a : abilities) {
-          Action use = a.configAction(this, p.location, p, scene, null);
-          if (use == null) continue;
-          float rating = a.rateUsage(use) * Rand.avgNums(2);
-          if (report) I.say("  Rating for "+a+" is "+rating);
-          pick.compare(use, rating);
-        }
-      }
-    }
-    if (pick.empty()) {
-      Series <Person> foes = scene.playerTeam();
-      Action motion = retreating() ?
-        pickRetreatAction(foes) :
-        pickAdvanceAction(foes)
-      ;
-      pick.compare(motion, 1);
-    }
-    
-    return pick.result();
-  }
-  
-  
-  
-  /**  Other supplementary action-creation methods-
-    */
-  private void assessConfidence() {
-    Scene scene = currentScene();
-    float teamHealth = 0, teamPower = 0, enemySight = 0;
-    
-    I.say("Assessing confidence for "+this);
-    
-    for (Person p : scene.persons()) {
-      if (p.isAlly(this)) {
-        teamPower  += p.powerLevel();
-        teamHealth += p.powerLevel() * p.healthLevel();
-      }
-      else if (p.isEnemy(this) && hasSight(p.location())) {
-        enemySight++;
-        if (canNotice(p)) enemySight++;
-      }
-    }
-    
-    //  TODO:  Refine these, and use constants to define the math.
-    
-    float minAlert = (stats.levelFor(REFLEX) + stats.levelFor(WILL)) / 100f;
-    if (enemySight > 0) {
-      wariness += enemySight / 4f;
-    }
-    else {
-      wariness -= 0.25f;
-    }
-    wariness = Nums.clamp(wariness, minAlert, 1);
-
-    float             courage = 0.2f;
-    if (isHero    ()) courage = 1.5f;
-    if (isCriminal()) courage = 0.5f;
-    
-    if (teamPower <= 0) {
-      confidence = 0;
-    }
-    else {
-      confidence = teamHealth / teamPower;
-      confidence = (confidence + healthLevel()) / 2;
-      if (! retreating()) confidence += courage;
-      
-      I.say("Confidence for "+this+": "+confidence);
-    }
-  }
-  
-  
-  private float powerLevel() {
-    //  TODO:  Refine this!
-    if (isHero    ()) return 4;
-    if (isCriminal()) return 1;
-    return 0;
-  }
-  
-  
-  Action pickAdvanceAction(Series <Person> foes) {
-    Scene scene = currentScene();
-    for (Person p : foes) {
-      Action motion = Common.MOVE.bestMotionToward(p, this, scene);
-      if (motion != null) return motion;
-    }
-    
-    int range = Nums.ceil(sightRange() / 2);
-    Tile pick = scene.tileAt(
-      location.x + (Rand.index(range + 1) * (Rand.yes() ? 1 : -1)),
-      location.y + (Rand.index(range + 1) * (Rand.yes() ? 1 : -1))
-    );
-    
-    I.say(this+" picked random tile to approach: "+pick+" (at "+location+")");
-    
-    return Common.MOVE.bestMotionToward(pick, this, scene);
-  }
-  
-  
-  Action pickRetreatAction(Series <Person> foes) {
-    Scene scene = currentScene();
-    int hS = scene.size() / 2, sD = scene.size() - 1;
-    Tile exits[] = {
-      scene.tileAt(0 , hS),
-      scene.tileAt(hS, 0 ),
-      scene.tileAt(sD, hS),
-      scene.tileAt(hS, sD)
-    };
-    final Pick <Tile> pick = new Pick();
-    for (Tile t : exits) pick.compare(t, 0 - scene.distance(t, location));
-    return Common.MOVE.bestMotionToward(pick.result(), this, scene);
-  }
   
   
   

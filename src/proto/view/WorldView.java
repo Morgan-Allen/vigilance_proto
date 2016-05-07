@@ -2,15 +2,15 @@
 
 
 package proto.view;
+import proto.common.*;
+import proto.game.person.*;
+import proto.game.world.*;
+import proto.util.*;
+
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.image.BufferedImage;
-import proto.common.*;
-import proto.game.person.*;
-import proto.game.scene.*;
-import proto.game.world.*;
-import proto.util.*;
+//import java.awt.image.BufferedImage;
 
 
 
@@ -18,72 +18,57 @@ import proto.util.*;
 public class WorldView {
   
   
-  final static String IMG_DIR = "media assets/world map/";
+  final static String IMG_DIR = "media assets/city map/";
   final static int
-    PANE_ABILITIES  = 0,
-    PANE_OUTFIT = 1,
-    PANE_PSYCH  = 2;
+    PANE_ABILITIES = 0,
+    PANE_OUTFIT    = 1,
+    PANE_PSYCH     = 2;
   
   final World world;
   
+  /*
   Nation selectedNation;
   Person selectedPerson;
   Room   selectedRoom;
+  //*/
+  
   Object lastSelected;
   int personPaneMode = PANE_ABILITIES;
   
-  RegionsMapView mapView = new RegionsMapView();
+  RegionsMapView mapView;
   Image alertMarker, selectCircle, constructMark;
   
   
   
   public WorldView(World world) {
     this.world = world;
+    mapView = new RegionsMapView(this, new Box2D(0, 0, 400, 600));
     loadMedia();
   }
   
   
   void loadMedia() {
-    mapView.loadMapImages(IMG_DIR+"world_map_image.png");
+    mapView.loadMapImages(
+      IMG_DIR+"city_map.png",
+      IMG_DIR+"city_districts_key.png"
+    );
     alertMarker   = Kind.loadImage(IMG_DIR+"alert_symbol.png");
     selectCircle  = Kind.loadImage(IMG_DIR+"select_circle.png");
     constructMark = Kind.loadImage(Blueprint.IMG_DIR+"under_construction.png");
   }
   
-
+  
+  void setSelection(Object selected) {
+    this.lastSelected = selected;
+  }
+  
+  
+  
+  /**  Rendering methods-
+    */
   void renderTo(Surface surface, Graphics2D g) {
-    Nation nations[] = world.nations();
-    mapView.attachOutlinesFor(nations);
-    Image mapImage = mapView.keyImage;
-    //
-    //  Draw the background image first!
-    g.drawImage(mapImage, 0, 0, surface.getWidth(), surface.getHeight(), null);
-    Nation nationHovered = null;
-    Person personHovered = null;
-    //
-    //  Then draw the nations of the world on the satellite map.
-    int viewWide = surface.getWidth(), viewHigh = surface.getHeight();
-    float mapWRatio = 1, mapHRatio = 1;
-    mapWRatio *= (mapImage.getWidth (null) * 1f) / viewWide;
-    mapHRatio *= (mapImage.getHeight(null) * 1f) / viewHigh;
     
-    int mX = surface.mouseX, mY = surface.mouseY;
-    mX *= mapWRatio;
-    mY *= mapHRatio;
-    int pixVal = ((BufferedImage) mapImage).getRGB(mX, mY);
-    
-    for (Nation n : nations) if (n.region.view.colourKey == pixVal) {
-      nationHovered = n;
-    }
-    
-    if (nationHovered != null && surface.mouseClicked) {
-      this.selectedNation = nationHovered;
-      this.lastSelected   = nationHovered;
-    }
-    
-    renderOutline(selectedNation, surface, g, mapWRatio, mapHRatio);
-    renderOutline(nationHovered , surface, g, mapWRatio, mapHRatio);
-    
+    /*
     for (Nation n : nations) if (n.currentMission() != null) {
       Scene crisis = n.currentMission();
       int x = (int) (n.region.view.centerX / mapWRatio);
@@ -91,6 +76,9 @@ public class WorldView {
       g.drawImage(alertMarker, x - 25, y - 25, 50, 50, null);
       renderAssigned(crisis.playerTeam(), x - 25, y + 15, surface, g);
     }
+    //*/
+    
+    mapView.renderTo(surface, g);
     
     //
     //  Then draw the various base-facilities:
@@ -98,13 +86,14 @@ public class WorldView {
     
     //
     //  Then draw the monitor-status active at the moment-
-    int x = (viewWide / 2) - 65, y = 330;
-    Batch <Scene> missions = world.missions();
+    int x = (surface.getWidth() / 2) - 65, y = 330;
+    //Batch <Scene> missions = world.missions();
     
     if (world.monitorActive()) {
       g.setColor(Color.ORANGE);
       g.drawString("Monitoring...", x, y);
     }
+    /*
     else if (! missions.empty()) {
       g.setColor(Color.RED);
       for (Scene m : missions) {
@@ -112,6 +101,7 @@ public class WorldView {
         y -= 20;
       }
     }
+    //*/
     else {
       g.setColor(Color.BLUE);
       g.drawString("Monitoring paused...", x, y);
@@ -119,6 +109,7 @@ public class WorldView {
     
     //
     //  And finally, draw the roster for the current base!
+    /*
     Base base = world.base();
     int offX = 360, offY = 360;
     int maxAcross = 300, across = 0, down = 0, size = 64;
@@ -150,10 +141,12 @@ public class WorldView {
       this.selectedPerson = personHovered;
       this.lastSelected   = personHovered;
     }
+    //*/
   }
   
   
   void renderBase(Surface surface, Graphics2D g) {
+    /*
     Base base = world.base();
     
     int offX = 23, offY = 399, slotX = 0, slotY = 0, index = 0;
@@ -195,10 +188,13 @@ public class WorldView {
     report += " Week: "+world.currentTime();
     report += " Funds: "+base.currentFunds()+"";
     report += " Income: "+base.income()+"";
+    /*
     int senseChance = (int) (base.sensorChance() * 100);
     report += " Sensors: "+senseChance+"%";
     report += " Engineering: "+base.engineerForce();
     report += " Research: "+base.researchForce();
+    //*/
+    /*
     g.setColor(Color.BLUE);
     g.drawString(report, offX, offY);
     
@@ -210,21 +206,7 @@ public class WorldView {
     report += " Maintenance: "+base.maintenance()+"";
     g.setColor(Color.BLUE);
     g.drawString(report, offX, offY);
-  }
-  
-  
-  void renderOutline(
-    Nation n, Surface surface, Graphics2D g, float mapWRatio, float mapHRatio
-  ) {
-    if (n == null || n.region.view.outline == null) return;
-    
-    RegionView r = n.region.view;
-    int
-      x = (int) ((r.outlineX / mapWRatio) + 0.5f),
-      y = (int) ((r.outlineY / mapHRatio) + 0.5f),
-      w = (int) (r.outline.getWidth (null) / mapWRatio),
-      h = (int) (r.outline.getHeight(null) / mapHRatio);
-    g.drawImage(r.outline, x, y, w, h, null);
+    //*/
   }
   
   
@@ -245,9 +227,9 @@ public class WorldView {
     Printout print = world.game().print();
     
     final Base base = world.base();
-    final Nation n = this.selectedNation;
-    final Person p = this.selectedPerson;
-    final Room   r = this.selectedRoom;
+    final Nation n = null;// this.selectedNation;
+    final Person p = null;// this.selectedPerson;
+    final Room   r = null;// this.selectedRoom;
     
     if (r != null && r == lastSelected) {
       if (r.blueprint() == Blueprint.NONE) {
@@ -321,52 +303,15 @@ public class WorldView {
     if (n != null && n == lastSelected) {
       int trustPercent = (int) (n.trustLevel() * 100);
       int crimePercent = (int) (n.crimeLevel() * 100);
-      Scene crisis = n.currentMission();
-      String crisisName = crisis == null ? "None" : crisis.name();
+      //Scene crisis = n.currentMission();
+      //String crisisName = crisis == null ? "None" : crisis.name();
       
       s.append("\nRegion:  "+n.region.name);
       s.append("\nFunding: "+n.funding()+"K");
       s.append("\nTrust:   "+trustPercent+"%");
       s.append("\nCrime:   "+crimePercent+"%");
       s.append("\nLeague Member: "+n.member());
-      s.append("\n\nCurrent crisis: "+crisisName);
-      
-      if (n.currentMission() != null) {
-        final Scene m = n.currentMission();
-        final String THREAT_DESC[] = {
-          "None", "Mild", "Moderate", "Severe", "Impossible"
-        };
-        int descL = Nums.clamp((int) (m.dangerLevel() * 5 / 2f), 5);
-        s.append("\n  Threat level: "+THREAT_DESC[descL]);
-        
-        s.append("\n  Enemy forces:");
-        if (m.othersTeam().size() > 0) {
-          Tally <Kind> kinds = new Tally();
-          for (Person o : m.othersTeam()) kinds.add(1, o.kind());
-          for (Kind k : kinds.keys()) {
-            s.append("\n    ");
-            int num = (int) kinds.valueFor(k);
-            if (num == 1) s.append(k.name());
-            else s.append(num+"x "+k.name());
-          }
-        }
-        else s.append("\n  No Intel");
-        
-        s.append("\n  Team Selected (Press 1-9):");
-        for (Person t : m.playerTeam()) {
-          s.append("\n    "+t.name());
-        }
-        Person picks = null;
-        for (int i = 1; i <= 9; i++) {
-          if (print.isPressed((char) ('0' + i))) {
-            picks = base.atRosterIndex(i -1);
-          }
-        }
-        if (picks != null) {
-          if (picks.freeForAssignment()) m.addToTeam(picks);
-          else if (picks.assignment() == m) m.removePerson(picks);
-        }
-      }
+      //s.append("\n\nCurrent crisis: "+crisisName);
     }
     
     else if (p != null && p == lastSelected) {
@@ -383,7 +328,7 @@ public class WorldView {
     }
     
     s.append("\n");
-    if (! world.assignedToMissions().empty()) {
+    if (false) {//! world.assignedToMissions().empty()) {
       s.append("\n  Press M to begin missions.");
       if (print.isPressed('m')) {
         world.beginNextMission();
@@ -414,6 +359,7 @@ public class WorldView {
     else if (! p.conscious()) s.append(" (Unconscious)");
     else if (p.stun() > 0) s.append(" (Stun "+(int) p.stun()+")");
     
+    /*
     int minD = p.stats.levelFor(PersonStats.MIN_DAMAGE);
     int rngD = p.stats.levelFor(PersonStats.RNG_DAMAGE);
     int armr = p.stats.levelFor(PersonStats.ARMOUR    );
@@ -427,6 +373,7 @@ public class WorldView {
       s.append("\n  "+stat.name+": "+level);
       if (bonus > 0) s.append(" (+"+bonus+")");
     }
+    //*/
     
     s.append("\nAbilities: ");
     for (Ability a : p.stats.listAbilities()) if (! a.basic()) {

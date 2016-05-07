@@ -18,42 +18,17 @@ public class PersonStats {
   }
   
   final public static Stat
-    MUSCLE     = new Stat("Muscle"    , "stat_muscle"    , ""),
-    REFLEX     = new Stat("Reflex"    , "stat_reflex"    , ""),
-    WILL       = new Stat("Will"      , "stat_will"      , ""),
-    BRAIN      = new Stat("Brain"     , "stat_brain"     , ""),
-    BASE_ATTRIBUTES[] = {
-      MUSCLE, REFLEX, WILL, BRAIN
-    },
-    HIT_POINTS = new Stat("Hit Points", "stat_hit_points", ""),
-    ENERGY     = new Stat("Energy"    , "stat_energy"    , ""),
-    ARMOUR     = new Stat("Armour"    , "stat_armour"    , ""),
-    REGEN      = new Stat("Regen"     , "stat_regen"     , ""),
-    MIN_DAMAGE = new Stat("Min Damage", "stat_min_damage", ""),
-    RNG_DAMAGE = new Stat("Rng Damage", "stat_rng_damage", ""),
-    HEAVY_STATS[] = {
-      HIT_POINTS, ENERGY, ARMOUR, REGEN, MIN_DAMAGE, RNG_DAMAGE
-    },
-    SIGHT      = new Stat("Sight"     , "stat_sight"     , ""),
-    SPEED_ACT  = new Stat("Speed Act" , "stat_speed_act" , ""),
-    SPEED_MOV  = new Stat("Speed Mov" , "stat_speed_mov" , ""),
-    PRECISION  = new Stat("Precision" , "stat_precision" , ""),
-    RESTRAINT  = new Stat("Restraint" , "stat_restraint" , ""),
-    DODGE      = new Stat("Dodge"     , "stat_dodge"     , ""),
-    PARRY      = new Stat("Parry"     , "stat_parry"     , ""),
-    STEALTH    = new Stat("Stealth"   , "stat_stealth"   , ""),
-    LIGHT_STATS[] = {
-      SIGHT, SPEED_ACT, SPEED_MOV, PRECISION, RESTRAINT, DODGE, PARRY, STEALTH
-    },
+    PERCEPTION = new Stat("Perception", "stat_perception", ""),
+    EVASION    = new Stat("Evasion"   , "stat_evasion"   , ""),
     QUESTION   = new Stat("Question"  , "stat_question"  , ""),
-    SUASION    = new Stat("Suasion"   , "stat_suasion"   , ""),
-    SOCIAL_STATS[] = {
-      QUESTION, SUASION
-    },
+    COMBAT     = new Stat("Combat"    , "stat_combat"    , ""),
+    HIT_POINTS = new Stat("Hit Points", "stat_hit_points", ""),
+    WILLPOWER  = new Stat("Willpower" , "stat_willpower" , ""),
     
-    ALL_STATS[] = (Stat[]) Visit.compose(Stat.class,
-      BASE_ATTRIBUTES, HEAVY_STATS, LIGHT_STATS, SOCIAL_STATS
-    );
+    ALL_STATS[] = {
+      PERCEPTION, EVASION, QUESTION, COMBAT, HIT_POINTS, WILLPOWER
+    }
+  ;
   
   
   
@@ -151,6 +126,9 @@ public class PersonStats {
   
   
   void updateStats() {
+    
+    
+    /*
     float    muscle = levelFor(MUSCLE);
     float    reflex = levelFor(REFLEX);
     float    brain  = levelFor(BRAIN );
@@ -186,6 +164,7 @@ public class PersonStats {
     float levelSuasion  = (10 + will + reflex) / 2;
     setStatBase(QUESTION, levelQuestion, true);
     setStatBase(SUASION , levelSuasion , true);
+    //*/
     
     Series <Ability> abilities = listAbilities();
     for (Ability a : abilities) if (a.passive()) {
@@ -215,9 +194,11 @@ public class PersonStats {
   
   
   protected void applyStatEffects() {
+    /*
     final float regen = levelFor(REGEN);
     if      (person.stun  () > 0) person.liftStun  (regen * 2);
     else if (person.injury() > 0) person.liftInjury(regen * 1);
+    //*/
   }
   
   

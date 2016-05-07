@@ -2,8 +2,8 @@
 
 package proto.view;
 import proto.*;
-import proto.game.scene.*;
 import proto.game.world.*;
+import proto.util.I;
 import proto.common.RunGame;
 
 import java.awt.*;
@@ -12,12 +12,15 @@ import javax.swing.JPanel;
 
 
 
-public class Surface extends JPanel implements MouseListener, MouseMotionListener {
+public class Surface extends JPanel implements
+  MouseListener, MouseMotionListener
+{
   
   
   RunGame game;
   boolean mouseDown, mouseClick, mouseClicked;
   int mouseX, mouseY;
+  long numPaints = 0;
   
   
   
@@ -38,14 +41,19 @@ public class Surface extends JPanel implements MouseListener, MouseMotionListene
   public void paintComponent(Graphics g) {
     super.paintComponent(g);
     Graphics2D g2d = (Graphics2D) g;
-    Scene scene = game.scene();
     World world = game.world();
     
+    I.used60Frames = (numPaints++ % 60) == 0;
+    
+    if (false) {
+    }
+    /*
     if (scene != null) {
       SceneView view = scene.view();
       view.renderTo(this, g2d);
       game.print().setText(view.description());
     }
+    //*/
     else if (world != null) {
       WorldView view = world.view();
       view.renderTo(this, g2d);

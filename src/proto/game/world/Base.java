@@ -125,42 +125,6 @@ public class Base implements Session.Saveable {
   }
   
   
-  public int engineerForce() {
-    return 3;
-  }
-  
-  
-  public int researchForce() {
-    int force = 3;
-    for (Room r : rooms) {
-      if (r.buildProgress < 1) continue;
-      float skillBonus = 0;
-      for (Person p : r.visitors) {
-        skillBonus += p.stats.levelFor(PersonStats.BRAIN) * 2;
-      }
-      skillBonus /= 10;
-      force += r.blueprint.studyBonus * (1 + skillBonus);
-    }
-    return force;
-  }
-  
-  
-  public float sensorChance() {
-    float chance = 0;
-    for (Room r : rooms) {
-      if (r.buildProgress < 1) continue;
-      float skillBonus = 0;
-      for (Person p : r.visitors) {
-        skillBonus += p.stats.levelFor(PersonStats.BRAIN);
-        skillBonus += p.stats.levelFor(PersonStats.SIGHT);
-      }
-      skillBonus /= 100;
-      chance += r.blueprint.sensorBonus * (1 + skillBonus);
-    }
-    return Nums.clamp(chance / 100, 0, 1);
-  }
-  
-  
   
   /**  Inventory and storage-
     */
@@ -212,7 +176,7 @@ public class Base implements Session.Saveable {
     float rate = 1f, numBuilding = 0;
     for (Room r : rooms) if (r.buildProgress < 1) numBuilding++;
     if (numBuilding == 0) return 1;
-    rate *= engineerForce();
+    //rate *= engineerForce();
     return rate / (numBuilding * print.buildTime);
   }
   

@@ -1,8 +1,7 @@
 
 
 package proto.common;
-import proto.game.scene.Scene;
-import proto.game.world.World;
+import proto.game.world.*;
 import proto.util.*;
 import proto.view.*;
 
@@ -115,9 +114,11 @@ public class RunGame extends JFrame implements ActionListener {
   }
   
   
+  /*
   public Scene scene() {
     return world == null ? null : world.enteredScene();
   }
+  //*/
   
   
   public Printout print() {

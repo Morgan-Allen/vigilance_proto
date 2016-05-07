@@ -2,7 +2,6 @@
 
 package proto.game.person;
 import proto.common.*;
-import proto.game.scene.*;
 import proto.game.world.*;
 import proto.util.*;
 import java.awt.*;
@@ -141,35 +140,6 @@ public class Equipped extends Index.Entry implements Session.Saveable {
     }
     return true;
   }
-  
-  
-  
-  /**  Rendering, debug and interface methods-
-    */
-  public Image missileSprite() {
-    if (media instanceof Image) return (Image) media;
-    return null;
-  }
-  
-  
-  public Color beamColor() {
-    if (media instanceof Color) return (Color) media;
-    return null;
-  }
-  
-  
-  public void renderUsage(Action a, Scene s, Graphics2D g) {
-    if (isWeapon()) {
-      Ability used = a.used;
-      if (isBeam()) {
-        used.renderBeam(a, s, beamColor(), Color.WHITE, 1, g);
-      }
-      else {
-        used.renderMissile(a, s, missileSprite(), g);
-      }
-    }
-  }
-  
   
   
 }

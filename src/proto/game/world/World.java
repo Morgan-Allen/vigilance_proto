@@ -2,7 +2,6 @@
 
 package proto.game.world;
 import proto.common.*;
-import proto.game.scene.*;
 import proto.game.content.*;
 import proto.game.person.*;
 import proto.util.*;
@@ -24,7 +23,6 @@ public class World implements Session.Saveable {
   
   int currentTime = 1;
   boolean amWatching = false;
-  Scene enteredScene = null;
   
   
   
@@ -46,7 +44,6 @@ public class World implements Session.Saveable {
     base         = (Base) s.loadObject();
     currentTime  = s.loadInt();
     amWatching   = s.loadBool();
-    enteredScene = (Scene) s.loadObject();
   }
   
   
@@ -55,7 +52,6 @@ public class World implements Session.Saveable {
     s.saveObject(base);
     s.saveInt(currentTime);
     s.saveBool(amWatching);
-    s.saveObject(enteredScene);
   }
   
   
@@ -90,10 +86,13 @@ public class World implements Session.Saveable {
   
   public void initDefaultBase() {
     this.base = new Base(this);
+    
+    /*
     base.addToRoster(new Person(Banshee.BANSHEE, "Batman"      ));
     base.addToRoster(new Person(Banshee.SWIFT  , "Robin"       ));
     base.addToRoster(new Person(Corona .CORONA , "Superman"    ));
     base.addToRoster(new Person(Galatea.GALATEA, "Wonder Woman"));
+    //*/
     
     base.addFacility(Blueprint.INFIRMARY    , 0, 1f);
     base.addFacility(Blueprint.TRAINING_ROOM, 1, 1f);
@@ -128,25 +127,6 @@ public class World implements Session.Saveable {
   }
   
   
-  public Scene enteredScene() {
-    return enteredScene;
-  }
-  
-  
-  public Batch <Scene> missions() {
-    Batch <Scene> all = new Batch();
-    for (Nation n : nations) if (n.mission != null) all.add(n.mission);
-    return all;
-  }
-  
-  
-  public Batch <Person> assignedToMissions() {
-    Batch <Person> all = new Batch();
-    for (Scene m : missions()) for (Person p : m.playerTeam()) all.add(p);
-    return all;
-  }
-  
-  
   public int currentTime() {
     return this.currentTime;
   }
@@ -156,6 +136,7 @@ public class World implements Session.Saveable {
   /**  Regular updates and activity cycle:
     */
   public void updateWorld() {
+    /*
     if (enteredScene != null) {
       enteredScene.updateScene();
     }
@@ -176,6 +157,7 @@ public class World implements Session.Saveable {
       base.updateBase(1);
       currentTime += 1;
     }
+    //*/
   }
   
   
@@ -190,6 +172,7 @@ public class World implements Session.Saveable {
   
   
   public void beginNextMission() {
+    /*
     Scene toEnter = missions().first();
     if (toEnter != null) {
       toEnter.setupScene();
@@ -200,12 +183,7 @@ public class World implements Session.Saveable {
       currentTime += 1;
     }
     this.enteredScene = toEnter;
-  }
-  
-  
-  public void exitFromMission(Scene mission) {
-    for (Nation n : nations) if (n.mission == mission) n.mission = null;
-    beginNextMission();
+    //*/
   }
   
   
