@@ -26,12 +26,6 @@ public class WorldView {
   
   final World world;
   
-  /*
-  Nation selectedNation;
-  Person selectedPerson;
-  Room   selectedRoom;
-  //*/
-  
   Object lastSelected;
   int personPaneMode = PANE_ABILITIES;
   
@@ -42,7 +36,7 @@ public class WorldView {
   
   public WorldView(World world) {
     this.world = world;
-    mapView = new RegionsMapView(this, new Box2D(0, 0, 400, 600));
+    mapView = new RegionsMapView(this, new Box2D(320, 20, 360, 560));
     loadMedia();
   }
   
@@ -68,15 +62,10 @@ public class WorldView {
     */
   void renderTo(Surface surface, Graphics2D g) {
     
-    /*
-    for (Nation n : nations) if (n.currentMission() != null) {
-      Scene crisis = n.currentMission();
-      int x = (int) (n.region.view.centerX / mapWRatio);
-      int y = (int) (n.region.view.centerY / mapHRatio);
-      g.drawImage(alertMarker, x - 25, y - 25, 50, 50, null);
-      renderAssigned(crisis.playerTeam(), x - 25, y + 15, surface, g);
-    }
-    //*/
+    
+    final int wide = surface.getWidth(), high = surface.getHeight();
+    g.setColor(Color.BLACK);
+    g.fillRect(0, 0, wide, high);
     
     mapView.renderTo(surface, g);
     
@@ -86,7 +75,7 @@ public class WorldView {
     
     //
     //  Then draw the monitor-status active at the moment-
-    int x = (surface.getWidth() / 2) - 65, y = 330;
+    int x = (wide / 2) + 25, y = high - 10;
     //Batch <Scene> missions = world.missions();
     
     if (world.monitorActive()) {
@@ -227,7 +216,7 @@ public class WorldView {
     Printout print = world.game().print();
     
     final Base base = world.base();
-    final Nation n = null;// this.selectedNation;
+    final Nation n = mapView.selectedNation;
     final Person p = null;// this.selectedPerson;
     final Room   r = null;// this.selectedRoom;
     
@@ -288,8 +277,10 @@ public class WorldView {
             s.append("\n  "+u.name());
           }
           if (picks != null) {
-            if (picks.freeForAssignment()) r.addVisitor(picks);
-            else if (picks.assignment() == r) r.removeVisitor(picks);
+            if (picks.freeForAssignment() && r.allowsAssignment(picks)) {
+              r.setAssigned(picks, true);
+            }
+            else if (picks.assignment() == r) r.setAssigned(picks, false);
           }
         }
         
@@ -311,7 +302,6 @@ public class WorldView {
       s.append("\nTrust:   "+trustPercent+"%");
       s.append("\nCrime:   "+crimePercent+"%");
       s.append("\nLeague Member: "+n.member());
-      //s.append("\n\nCurrent crisis: "+crisisName);
     }
     
     else if (p != null && p == lastSelected) {

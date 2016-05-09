@@ -62,15 +62,9 @@ public class Room implements Session.Saveable, Assignment {
   
   /**  Toggling visitors-
     */
-  public void addVisitor(Person p) {
-    visitors.include(p);
-    p.setAssignment(this);
-  }
-  
-  
-  public void removeVisitor(Person p) {
-    visitors.remove(p);
-    p.setAssignment(null);
+  public void setAssigned(Person p, boolean is) {
+    visitors.toggleMember(p, is);
+    p.setAssignment(is ? this : null);
   }
   
   

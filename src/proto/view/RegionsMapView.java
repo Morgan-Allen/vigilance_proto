@@ -12,6 +12,9 @@ import java.awt.image.*;
 
 public class RegionsMapView {
   
+  
+  /**  Data fields, construction, setup and attachment-
+    */
   final WorldView parent;
   final Box2D viewBounds;
   
@@ -74,6 +77,8 @@ public class RegionsMapView {
   
   
   
+  /**  Actual rendering methods-
+    */
   void renderTo(Surface surface, Graphics2D g) {
     Nation nations[] = parent.world.nations();
     attachOutlinesFor(nations);
@@ -103,7 +108,7 @@ public class RegionsMapView {
       pixVal = ((BufferedImage) keyImage).getRGB(mX, mY);
     }
     
-    //if (I.used60Frames) I.say("Pixel value is: "+pixVal);
+    ///if (I.used60Frames) I.say("Pixel value is: "+pixVal);
     
     for (Nation n : nations) if (n.region.view.colourKey == pixVal) {
       nationHovered = n;
@@ -114,6 +119,16 @@ public class RegionsMapView {
     
     renderOutline(selectedNation, surface, g, mapWRatio, mapHRatio);
     renderOutline(nationHovered , surface, g, mapWRatio, mapHRatio);
+
+    /*
+    for (Nation n : nations) if (n.currentMission() != null) {
+      Scene crisis = n.currentMission();
+      int x = (int) (n.region.view.centerX / mapWRatio);
+      int y = (int) (n.region.view.centerY / mapHRatio);
+      g.drawImage(alertMarker, x - 25, y - 25, 50, 50, null);
+      renderAssigned(crisis.playerTeam(), x - 25, y + 15, surface, g);
+    }
+    //*/
   }
   
   
