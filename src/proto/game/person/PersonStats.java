@@ -1,9 +1,7 @@
 
 
 package proto.game.person;
-import proto.*;
-import proto.common.Kind;
-import proto.common.Session;
+import proto.common.*;
 import proto.util.*;
 
 

@@ -19,6 +19,7 @@ public class World implements Session.Saveable {
   
   Nation nations[];
   Base base;
+  Events events = new Events(this);
   
   int currentTime = 1;
   boolean amWatching = false;
@@ -39,16 +40,19 @@ public class World implements Session.Saveable {
   public World(Session s) throws Exception {
     s.cacheInstance(this);
     
-    nations      = (Nation[]) s.loadObjectArray(Nation.class);
-    base         = (Base) s.loadObject();
-    currentTime  = s.loadInt();
-    amWatching   = s.loadBool();
+    nations = (Nation[]) s.loadObjectArray(Nation.class);
+    base    = (Base) s.loadObject();
+    events.loadState(s);
+    
+    currentTime = s.loadInt();
+    amWatching  = s.loadBool();
   }
   
   
   public void saveState(Session s) throws Exception {
     s.saveObjectArray(nations);
     s.saveObject(base);
+    events.saveState(s);
     s.saveInt(currentTime);
     s.saveBool(amWatching);
   }
@@ -86,24 +90,10 @@ public class World implements Session.Saveable {
   public void initDefaultBase() {
     this.base = new Base(this);
     
-    /*
-    base.addToRoster(new Person(Banshee.BANSHEE, "Batman"      ));
-    base.addToRoster(new Person(Banshee.SWIFT  , "Robin"       ));
-    base.addToRoster(new Person(Corona .CORONA , "Superman"    ));
-    base.addToRoster(new Person(Galatea.GALATEA, "Wonder Woman"));
-    //*/
-    
     base.addFacility(Blueprint.INFIRMARY    , 0, 1f);
     base.addFacility(Blueprint.TRAINING_ROOM, 1, 1f);
     base.addFacility(Blueprint.GENERATOR    , 2, 1f);
     base.addFacility(Blueprint.ARBORETUM    , 3, 1f);
-    
-    /*
-    base.addEquipment(BasicGear.MED_POUCH);
-    base.addEquipment(BasicGear.BODY_VEST);
-    base.addEquipment(BasicGear.FLASHBANG);
-    base.addEquipment(BasicGear.INTERCOM );
-    //*/
     
     base.updateBase(0);
     base.currentFunds = 500;

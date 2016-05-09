@@ -11,7 +11,7 @@ public class Clue implements Session.Saveable {
   final String name;
   
   
-  Clue(String name) {
+  public Clue(String name) {
     this.name = name;
   }
   

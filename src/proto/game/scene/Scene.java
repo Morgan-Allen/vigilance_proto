@@ -11,7 +11,7 @@ public class Scene implements Session.Saveable {
   final String name;
   
   
-  Scene(String name) {
+  public Scene(String name) {
     this.name = name;
   }
   

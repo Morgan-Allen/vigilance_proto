@@ -5,23 +5,27 @@ import proto.common.Session;
 
 
 
+
+
 public class Lead extends Task {
   
   
   /**  Data fields, construction and save/load methods-
     */
-  final Investigation parent;
-  final Object origin, reveals;
+  final public Investigation parent;
+  final public int ID;
+  final public Object origin, reveals;
   boolean followed;
   
   
-  Lead(
+  public Lead(
     String name, String info,
-    Investigation parent, Object origin, Object reveals,
+    Investigation parent, int ID, Object origin, Object reveals,
     Object... args
   ) {
     super(name, info, args);
     this.parent  = parent ;
+    this.ID      = ID     ;
     this.origin  = origin ;
     this.reveals = reveals;
   }
@@ -30,6 +34,7 @@ public class Lead extends Task {
   public Lead(Session s) throws Exception {
     super(s);
     parent   = (Investigation) s.loadObject();
+    ID       = s.loadInt   ();
     origin   = s.loadObject();
     reveals  = s.loadObject();
     followed = s.loadBool  ();
@@ -39,6 +44,7 @@ public class Lead extends Task {
   public void saveState(Session s) throws Exception {
     super.saveState(s);
     s.saveObject(parent  );
+    s.saveInt   (ID      );
     s.saveObject(origin  );
     s.saveObject(reveals );
     s.saveBool  (followed);
@@ -57,6 +63,11 @@ public class Lead extends Task {
   protected void onFailure() {
     if (! parent.checkFollowed(this, false)) return;
     followed = false;
+  }
+  
+  
+  public boolean followed() {
+    return followed;
   }
   
 }

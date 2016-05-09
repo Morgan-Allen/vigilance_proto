@@ -230,6 +230,11 @@ public final class Session {
   }
   
   
+  public void saveObjects(Saveable... objects) throws Exception {
+    for (Saveable o : objects) saveObject(o);
+  }
+  
+  
   public Series loadObjects(Series objects) throws Exception {
     final int count = loadInt();
     if (count == -1) return null;
