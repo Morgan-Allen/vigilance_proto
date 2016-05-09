@@ -29,19 +29,17 @@ public class WorldView {
   Object lastSelected;
   int personPaneMode = PANE_ABILITIES;
   
-  RegionsMapView mapView;
+  MapView mapView;
+  RosterView rosterView;
   Image alertMarker, selectCircle, constructMark;
   
   
   
   public WorldView(World world) {
     this.world = world;
-    mapView = new RegionsMapView(this, new Box2D(320, 20, 360, 560));
-    loadMedia();
-  }
-  
-  
-  void loadMedia() {
+    mapView    = new MapView   (this, new Box2D(320, 20, 360, 560));
+    rosterView = new RosterView(this, new Box2D(20 , 20, 320, 560));
+    
     mapView.loadMapImages(
       IMG_DIR+"city_map.png",
       IMG_DIR+"city_districts_key.png"
@@ -98,39 +96,7 @@ public class WorldView {
     
     //
     //  And finally, draw the roster for the current base!
-    /*
-    Base base = world.base();
-    int offX = 360, offY = 360;
-    int maxAcross = 300, across = 0, down = 0, size = 64;
-    
-    for (Person p : base.roster()) {
-      x = offX + across;
-      y = offY + down;
-      g.drawImage(p.kind().sprite(), x, y, size, size, null);
-      g.setColor(Color.BLUE);
-      g.drawString("("+(base.rosterIndex(p) + 1)+")", x, y + 15);
-      
-      if (surface.mouseIn(x, y, size, size)) {
-        personHovered = p;
-        g.drawImage(selectCircle, x, y, size, size, null);
-      }
-      if (selectedPerson == p) {
-        g.drawImage(selectCircle, x, y, size, size, null);
-      }
-      
-      //  TODO:  Render differently for different assignments!
-      
-      if (p.assignment() != null) {
-        g.drawImage(alertMarker, x + size - 20, y + size - 20, 20, 20, null);
-      }
-      across += size;
-      if (across >= maxAcross) { across = 0; down += size; }
-    }
-    if (personHovered != null && surface.mouseClicked) {
-      this.selectedPerson = personHovered;
-      this.lastSelected   = personHovered;
-    }
-    //*/
+    rosterView.renderTo(surface, g);
   }
   
   
@@ -217,7 +183,7 @@ public class WorldView {
     
     final Base base = world.base();
     final Nation n = mapView.selectedNation;
-    final Person p = null;// this.selectedPerson;
+    final Person p = rosterView.selectedPerson;
     final Room   r = null;// this.selectedRoom;
     
     if (r != null && r == lastSelected) {
@@ -345,6 +311,9 @@ public class WorldView {
     s.append("\nCodename: "+p.name());
     int HP = (int) Nums.max(0, p.maxHealth() - (p.injury() + p.stun()));
     s.append("\n  Health: "+HP+"/"+p.maxHealth());
+    int SP = (int) Nums.clamp(p.stress(), 0, p.maxStress());
+    s.append("\n  Stress: "+SP+"/"+p.maxStress());
+    
     if (! p.alive()) s.append(" (Dead)");
     else if (! p.conscious()) s.append(" (Unconscious)");
     else if (p.stun() > 0) s.append(" (Stun "+(int) p.stun()+")");
@@ -355,21 +324,23 @@ public class WorldView {
     int armr = p.stats.levelFor(PersonStats.ARMOUR    );
     s.append("\n  Damage: "+minD+"-"+(minD + rngD));
     s.append(  "  Armour: "+armr);
-    
+    //*/
+
     s.append("\nStatistics: ");
-    for (Trait stat : PersonStats.BASE_ATTRIBUTES) {
+    for (Trait stat : PersonStats.BASE_STATS) {
       int level = p.stats.levelFor(stat);
       int bonus = p.stats.bonusFor(stat);
       s.append("\n  "+stat.name+": "+level);
       if (bonus > 0) s.append(" (+"+bonus+")");
     }
-    //*/
     
+    /*
     s.append("\nAbilities: ");
     for (Ability a : p.stats.listAbilities()) if (! a.basic()) {
       int level = (int) p.stats.levelFor(a);
       s.append("\n  Level "+level+" "+a.name);
     }
+    //*/
     
     Assignment assigned = p.assignment();
     String assignName = assigned == null ? "None" : assigned.name();

@@ -10,7 +10,7 @@ import java.awt.image.*;
 
 
 
-public class RegionsMapView {
+public class MapView {
   
   
   /**  Data fields, construction, setup and attachment-
@@ -25,7 +25,7 @@ public class RegionsMapView {
   Nation selectedNation;
   
   
-  RegionsMapView(WorldView parent, Box2D viewBounds) {
+  MapView(WorldView parent, Box2D viewBounds) {
     this.parent     = parent    ;
     this.viewBounds = viewBounds;
   }

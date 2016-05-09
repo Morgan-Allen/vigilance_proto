@@ -82,6 +82,11 @@ public class Person implements Session.Saveable {
   }
   
   
+  public Person(Kind kind) {
+    this(kind, kind.name());
+  }
+  
+  
   public Person(Session s) throws Exception {
     s.cacheInstance(this);
     kind    = (Kind) s.loadObject();
@@ -151,6 +156,11 @@ public class Person implements Session.Saveable {
   }
   
   
+  public int maxStress() {
+    return stats.levelFor(WILLPOWER);
+  }
+  
+  
   public float injury() {
     return injury;
   }
@@ -158,6 +168,11 @@ public class Person implements Session.Saveable {
   
   public float stun() {
     return stun;
+  }
+  
+  
+  public float stress() {
+    return stress;
   }
   
   

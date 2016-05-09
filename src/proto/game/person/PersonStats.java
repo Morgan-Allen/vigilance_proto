@@ -20,12 +20,17 @@ public class PersonStats {
     EVASION    = new Stat("Evasion"   , "stat_evasion"   , ""),
     QUESTION   = new Stat("Question"  , "stat_question"  , ""),
     COMBAT     = new Stat("Combat"    , "stat_combat"    , ""),
+    
     HIT_POINTS = new Stat("Hit Points", "stat_hit_points", ""),
     WILLPOWER  = new Stat("Willpower" , "stat_willpower" , ""),
     
-    ALL_STATS[] = {
-      PERCEPTION, EVASION, QUESTION, COMBAT, HIT_POINTS, WILLPOWER
-    }
+    BASE_STATS[] = {
+      PERCEPTION, EVASION, QUESTION, COMBAT
+    },
+    PHYS_STATS[] = {
+      HIT_POINTS, WILLPOWER
+    },
+    ALL_STATS[] = (Stat[]) Visit.compose(Stat.class, BASE_STATS, PHYS_STATS)
   ;
   
   

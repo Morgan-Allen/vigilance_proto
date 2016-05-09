@@ -2,6 +2,7 @@
 
 package proto.game.world;
 import proto.common.*;
+import proto.content.agents.Heroes;
 import proto.game.person.*;
 import proto.util.*;
 import proto.view.*;
@@ -89,6 +90,10 @@ public class World implements Session.Saveable {
   
   public void initDefaultBase() {
     this.base = new Base(this);
+    
+    base.addToRoster(new Person(Heroes.BATMAN));
+    base.addToRoster(new Person(Heroes.ALFRED));
+    base.addToRoster(new Person(Heroes.SWARM ));
     
     base.addFacility(Blueprint.INFIRMARY    , 0, 1f);
     base.addFacility(Blueprint.TRAINING_ROOM, 1, 1f);
