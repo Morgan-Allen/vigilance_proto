@@ -3,6 +3,7 @@
 package proto.view;
 import proto.util.*;
 import proto.game.world.*;
+import proto.common.Kind;
 import proto.game.person.*;
 
 import java.awt.*;
@@ -18,12 +19,26 @@ public class RosterView {
   final WorldView parent;
   final Box2D viewBounds;
   
+  final Color statColors[] = new Color[4];
+  final Image statIcons [] = new Image[4];
+  
   Person selectedPerson;
   
   
   RosterView(WorldView parent, Box2D viewBounds) {
     this.parent     = parent    ;
     this.viewBounds = viewBounds;
+    
+    statColors[0] = new Color(0.0f, 0.0f, 1.0f);
+    statColors[1] = new Color(0.0f, 1.0f, 0.0f);
+    statColors[2] = new Color(1.0f, 1.0f, 0.5f);
+    statColors[3] = new Color(1.0f, 0.5f, 1.0f);
+    
+    final String imgPath = "media assets/stat icons/";
+    statIcons[0] = Kind.loadImage(imgPath+"icon_intellect.png");
+    statIcons[1] = Kind.loadImage(imgPath+"icon_evasion.png"  );
+    statIcons[2] = Kind.loadImage(imgPath+"icon_social.png"   );
+    statIcons[3] = Kind.loadImage(imgPath+"icon_combat.png"   );
   }
   
   
@@ -62,6 +77,34 @@ public class RosterView {
       }
       //*/
       
+      int MH = p.maxHealth(), MS = p.maxStress();
+      int inj = (int) p.injury(), fat = (int) p.stun();
+      int str = (int) p.stress();
+      
+      /*
+      renderStatBar(
+        x + size + 05, y, 5, size + 35,
+        Color.RED, Color.BLACK, (MH - inj) * 1f / MH, g
+      );
+      renderStatBar(
+        x + size + 10, y, 5, size + 35,
+        Color.LIGHT_GRAY, Color.GRAY, str * 1f / MS, g
+      );
+      //*/
+      
+      int index = 0;
+      for (Trait t : PersonStats.BASE_STATS) {
+        float fill = p.stats.levelFor(t) / 10f;
+        renderStatBar(
+          x + (index * 19), y + size + 5, 16, 20,
+          statColors[index], null, fill, g
+        );
+        g.drawImage(
+          statIcons[index], x + (index * 19), y + size + 17, 16, 16, null
+        );
+        index++;
+      }
+      
       across += size + pad;
       if (across >= maxAcross) { across = 0; down += size + pad; }
     }
@@ -70,4 +113,27 @@ public class RosterView {
     }
   }
   
+  
+  void renderStatBar(
+    int x, int y, int w, int h, Color c, Color b, float fill, Graphics g
+  ) {
+    if (b != null) {
+      g.setColor(b);
+      g.fillRect(x, y, w, h);
+    }
+    
+    int barH = (int) (h * fill);
+    g.setColor(c);
+    g.fillRect(x, y + h - barH, w, barH);
+  }
 }
+
+
+
+
+
+
+
+
+
+

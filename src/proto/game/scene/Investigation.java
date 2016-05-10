@@ -2,6 +2,7 @@
 
 package proto.game.scene;
 import proto.common.*;
+import proto.game.world.*;
 import proto.util.*;
 
 
@@ -59,6 +60,16 @@ public class Investigation implements Session.Saveable {
   }
   
   
+  public float timeBegins() {
+    return timeBegins;
+  }
+  
+  
+  public float timeEnds() {
+    return timeEnds;
+  }
+  
+  
   protected void assignLeads(Lead... leads) {
     for (Lead l : leads) this.leads.add(l);
   }
@@ -86,6 +97,11 @@ public class Investigation implements Session.Saveable {
   }
   
   
+  public Series <Object> involved() {
+    return involved;
+  }
+  
+  
   public Series <Lead> leadsFrom(Object origin) {
     final Batch <Lead> from = new Batch();
     for (Lead l : leads) if (l.origin == origin) from.add(l);
@@ -93,10 +109,19 @@ public class Investigation implements Session.Saveable {
   }
   
   
-  public Series <Object> involved() {
-    return involved;
+  public Series <Lead> leadsFrom(Region region) {
+    final Batch <Lead> from = new Batch();
+    for (Lead l : leads) if (l.origin instanceof Scene) {
+      if (((Scene) l.origin).region == region) from.add(l);
+    }
+    return from;
   }
 }
+
+
+
+
+
 
 
 

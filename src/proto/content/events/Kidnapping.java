@@ -2,9 +2,13 @@
 
 package proto.content.events;
 import proto.common.*;
+import proto.game.world.*;
 import proto.game.person.*;
 import proto.game.scene.*;
 import static proto.game.person.PersonStats.*;
+
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 
 
 
@@ -17,6 +21,13 @@ public class Kidnapping extends Investigation {
     LEAD_RESCUE  = 2,
     LEAD_RAID    = 3;
   
+  final static Image
+    //  TODO:  You will need more of these...
+    IMG_LEAD = Kind.loadImage(
+      "media assets/scene backgrounds/crime_generic_1.png"
+    );
+  
+  Region region;
   Person boss;
   Person missing;
   Scene home;
@@ -41,12 +52,13 @@ public class Kidnapping extends Investigation {
   
   
   
-  public Kidnapping(Person boss, Person missing) {
+  public Kidnapping(Person boss, Person missing, Region region) {
     super("Kidnapping of "+missing.name());
     
-    this.home   = new Scene("home"  );
-    this.taken  = new Scene("taken" );
-    this.fibres = new Clue ("fibres");
+    this.region = region;
+    this.home   = new Scene("home"  , region);
+    this.taken  = new Scene("taken" , region);
+    this.fibres = new Clue("fibres");
     
     this.assignLeads(new Lead(
       "Home of "+missing,
@@ -97,7 +109,27 @@ public class Kidnapping extends Investigation {
     
     return super.checkFollowed(lead, success);
   }
+  
+  
+  
+  /**  And, last but not least, a generator/type for the event-
+    */
+  final public static EventType TYPE = new EventType(
+    "Kidnapping", "event_kidnapping"
+  ) {
+    public Investigation createRandomEvent(World world) {
+      return null;
+    }
+    
+    public float eventChance(Investigation event) {
+      return 0;
+    }
+  };
 }
+
+
+
+
 
 
 

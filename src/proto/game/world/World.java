@@ -3,6 +3,7 @@
 package proto.game.world;
 import proto.common.*;
 import proto.content.agents.Heroes;
+import proto.content.events.Kidnapping;
 import proto.game.person.*;
 import proto.util.*;
 import proto.view.*;
@@ -85,6 +86,8 @@ public class World implements Session.Saveable {
     for (int n = 0; n < numN; n++) {
       nations[n] = new Nation(Region.ALL_REGIONS[n]);
     }
+    
+    events.addType(Kidnapping.TYPE);
   }
   
   
@@ -132,6 +135,11 @@ public class World implements Session.Saveable {
   /**  Regular updates and activity cycle:
     */
   public void updateWorld() {
+    
+    if (amWatching) {
+      events.updateEvents();
+      if (events.active.size() > 0) amWatching = false;
+    }
     /*
     if (enteredScene != null) {
       enteredScene.updateScene();

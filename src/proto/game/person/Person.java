@@ -45,9 +45,11 @@ public class Person implements Session.Saveable {
   Kind kind;
   Side side;
   String name;
+
+  final public PersonStats     stats     = new PersonStats    (this);
+  final public PersonRelations relations = new PersonRelations(this);
   
   int luck = INIT_LUCK, stress = INIT_STRESS;
-  final public PersonStats stats = new PersonStats(this);
   Equipped equipSlots[] = new Equipped[NUM_EQUIP_SLOTS];
   float injury, stun;
   boolean alive, conscious;
@@ -92,10 +94,11 @@ public class Person implements Session.Saveable {
     kind    = (Kind) s.loadObject();
     side    = (Side) s.loadEnum(Side.values());
     name    = s.loadString();
-    luck    = s.loadInt();
-    stress  = s.loadInt();
-    
-    stats.loadState(s);
+
+    stats    .loadState(s);
+    relations.loadState(s);
+    luck   = s.loadInt();
+    stress = s.loadInt();
     for (int i = 0 ; i < NUM_EQUIP_SLOTS; i++) {
       equipSlots[i] = (Equipped) s.loadObject();
     }
@@ -122,10 +125,11 @@ public class Person implements Session.Saveable {
     s.saveObject(kind);
     s.saveEnum  (side);
     s.saveString(name);
-    s.saveInt(luck   );
-    s.saveInt(stress );
     
-    stats.saveState(s);
+    stats    .saveState(s);
+    relations.saveState(s);
+    s.saveInt(luck  );
+    s.saveInt(stress);
     for (int i = 0 ; i < NUM_EQUIP_SLOTS; i++) {
       s.saveObject(equipSlots[i]);
     }
