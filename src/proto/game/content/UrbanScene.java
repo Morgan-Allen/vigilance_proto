@@ -110,7 +110,7 @@ public class UrbanScene extends Scene {
     int dir = T_INDEX[Rand.index(T_INDEX.length)];
     
     while (under != null) {
-      if (! blockedAt(under)) return under;
+      if (! under.blocked()) return under;
       x += T_X[dir];
       y += T_Y[dir];
       under = tileAt(x, y);

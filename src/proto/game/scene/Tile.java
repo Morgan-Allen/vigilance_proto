@@ -1,11 +1,10 @@
 
 
 package proto.game.scene;
+import proto.common.*;
+import proto.game.person.*;
+import proto.util.*;
 import static proto.util.TileConstants.*;
-
-import proto.common.Session;
-import proto.common.Session.Saveable;
-import proto.game.person.Person;
 
 
 
@@ -17,8 +16,9 @@ public class Tile implements Session.Saveable {
   final public Scene scene;
   final public int x, y;
   
-  Prop prop;
-  Person standing;
+  private Prop prop;
+  private Stack <Person> inside = new Stack();
+  private int blockState = -1;
   
   Object flag;
   
@@ -36,7 +36,7 @@ public class Tile implements Session.Saveable {
     x        = s.loadInt();
     y        = s.loadInt();
     prop     = (Prop) s.loadObject();
-    standing = (Person) s.loadObject();
+    s.loadObjects(inside);
   }
   
   
@@ -45,7 +45,7 @@ public class Tile implements Session.Saveable {
     s.saveInt(x);
     s.saveInt(y);
     s.saveObject(prop);
-    s.saveObject(standing);
+    s.saveObjects(inside);
   }
   
   
@@ -57,19 +57,18 @@ public class Tile implements Session.Saveable {
   }
   
   
-  public Person standing() {
-    return standing;
+  public Series <Person> inside() {
+    return inside;
   }
   
   
   public boolean blocked() {
-    if (prop != null && prop.kind.blockPath()) return true;
-    if (standing != null) return true;
-    
-    //  TODO:  ALLOW UNCONSCIOUS PERSONS TO NOT BLOCK PATHING- BUT FOR THAT TO
-    //  WORK YOU'LL NEED TO ALLOW MULTIPLE OBJECTS IN THE SAME TILE.?
-    
-    return false;
+    if (blockState == -1 || true) {
+      blockState = 0;
+      if (prop != null && prop.kind.blockPath()) blockState = 1;
+      for (Person p : inside) if (p.conscious()) blockState = 1;
+    }
+    return blockState == 1;
   }
   
   
@@ -86,12 +85,15 @@ public class Tile implements Session.Saveable {
   /**  Modifying state-
     */
   public void setInside(Person p, boolean is) {
-    if (is) {
-      if (standing == null) standing = p;
-    }
-    else {
-      if (p == standing) standing = null;
-    }
+    if (is) inside.include(p);
+    else inside.remove(p);
+    blockState = -1;
+  }
+  
+  
+  public void setProp(Prop prop) {
+    this.prop = prop;
+    blockState = -1;
   }
   
   

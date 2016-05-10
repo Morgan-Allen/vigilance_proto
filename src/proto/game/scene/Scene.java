@@ -174,8 +174,8 @@ public class Scene implements Session.Saveable, Assignment {
   
   public Object topObjectAt(Tile at) {
     if (at == null) return null;
-    for (Person p : persons) if (p.location() == at) return p;
-    if (at.prop != null) return at.prop;
+    for (Person p : persons) if (p.location() == at && p.conscious()) return p;
+    if (at.prop() != null) return at.prop();
     return at;
   }
   
@@ -201,12 +201,6 @@ public class Scene implements Session.Saveable, Assignment {
   }
   
   
-  public boolean blockedAt(Tile at) {
-    if (at.standing != null) return true;
-    return at.prop != null && at.prop.kind.blockPath();
-  }
-  
-  
   public float degreeOfSight(Tile orig, Tile dest, Person p) {
     
     int spanX = dest.x - orig.x, spanY = dest.y - orig.y;
@@ -221,7 +215,7 @@ public class Scene implements Session.Saveable, Assignment {
       
       Tile t = tiles[x][y];
       if (t == dest) break;
-      if (t != orig && t.prop != null && t.prop.kind.blockSight()) {
+      if (t != orig && t.prop() != null && t.prop().kind.blockSight()) {
         sight *= 0;
       }
       if (sight == 0) break;
@@ -267,7 +261,7 @@ public class Scene implements Session.Saveable, Assignment {
     for (Coord c : Visit.grid(x, y, type.wide(), type.high(), 1)) {
       Tile under = tileAt(c.x, c.y);
       if (under == null) return false;
-      else under.prop = prop;
+      else under.setProp(prop);
     }
     prop.origin = tileAt(x, y);
     props.add(prop);
