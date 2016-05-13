@@ -5,6 +5,7 @@ package proto.view;
 import proto.common.*;
 import proto.game.person.*;
 import proto.game.world.*;
+import proto.game.scene.*;
 import proto.util.*;
 
 import java.awt.Color;
@@ -74,21 +75,18 @@ public class WorldView {
     //
     //  Then draw the monitor-status active at the moment-
     int x = (wide / 2) + 25, y = high - 10;
-    //Batch <Scene> missions = world.missions();
-    
+    Series <Investigation> events = world.events().active();
     if (world.monitorActive()) {
       g.setColor(Color.ORANGE);
       g.drawString("Monitoring...", x, y);
     }
-    /*
-    else if (! missions.empty()) {
+    else if (! events.empty()) {
       g.setColor(Color.RED);
-      for (Scene m : missions) {
-        g.drawString("Crisis: "+m.name(), x, y);
+      for (Investigation event : events) {
+        g.drawString("Crime: "+event.name(), x, y);
         y -= 20;
       }
     }
-    //*/
     else {
       g.setColor(Color.BLUE);
       g.drawString("Monitoring paused...", x, y);
@@ -268,6 +266,12 @@ public class WorldView {
       s.append("\nTrust:   "+trustPercent+"%");
       s.append("\nCrime:   "+crimePercent+"%");
       s.append("\nLeague Member: "+n.member());
+      
+      for (Investigation event : world.events().active()) {
+        for (Lead l : event.leadsFrom(n.region)) {
+          s.append("\n  Lead: "+l);
+        }
+      }
     }
     
     else if (p != null && p == lastSelected) {
@@ -284,6 +288,8 @@ public class WorldView {
     }
     
     s.append("\n");
+    s.append("\n  Time: "+world.currentTime());
+    
     if (false) {//! world.assignedToMissions().empty()) {
       s.append("\n  Press M to begin missions.");
       if (print.isPressed('m')) {

@@ -121,6 +121,11 @@ public class World implements Session.Saveable {
   }
   
   
+  public Events events() {
+    return events;
+  }
+  
+  
   public boolean monitorActive() {
     return amWatching;
   }
@@ -139,6 +144,7 @@ public class World implements Session.Saveable {
     if (amWatching) {
       events.updateEvents();
       if (events.active.size() > 0) amWatching = false;
+      currentTime += 1;
     }
     /*
     if (enteredScene != null) {

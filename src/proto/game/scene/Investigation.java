@@ -116,6 +116,19 @@ public class Investigation implements Session.Saveable {
     }
     return from;
   }
+  
+  
+  
+  /**  Rendering, debug and interface methods-
+    */
+  public String name() {
+    return name;
+  }
+  
+  
+  public String toString() {
+    return name;
+  }
 }
 
 

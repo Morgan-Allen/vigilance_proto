@@ -5,7 +5,9 @@ import proto.common.*;
 import proto.game.world.*;
 import proto.game.person.*;
 import proto.game.scene.*;
+import proto.util.*;
 import static proto.game.person.PersonStats.*;
+import proto.content.agents.*;
 
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -83,7 +85,7 @@ public class Kidnapping extends Investigation {
     this.assignLeads(new Lead(
       "Raid on "+taken,
       "You've found where "+missing+" is being kept.  You could try a direct "+
-      "raid to subdue- or at least distract- her captors.",
+      "raid to subdue- or at least distract- their captors.",
       this, LEAD_RAID, taken, missing,
       COMBAT, 6
     ));
@@ -118,7 +120,15 @@ public class Kidnapping extends Investigation {
     "Kidnapping", "event_kidnapping"
   ) {
     public Investigation createRandomEvent(World world) {
-      return null;
+      
+      Person boss    = new Person(Crooks.MOBSTER );
+      Person missing = new Person(Crooks.CIVILIAN);
+      Nation nation = (Nation) Rand.pickFrom(world.nations());
+      
+      Investigation s = new Kidnapping(boss, missing, nation.region);
+      float time = world.currentTime() + Rand.index(5);
+      s.assignDates(time + 2, time + 7);
+      return s;
     }
     
     public float eventChance(Investigation event) {

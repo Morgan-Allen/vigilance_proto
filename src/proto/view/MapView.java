@@ -3,6 +3,7 @@
 package proto.view;
 import proto.common.*;
 import proto.game.world.*;
+import proto.game.scene.*;
 import proto.util.*;
 
 import java.awt.*;
@@ -119,16 +120,15 @@ public class MapView {
     
     renderOutline(selectedNation, surface, g, mapWRatio, mapHRatio);
     renderOutline(nationHovered , surface, g, mapWRatio, mapHRatio);
-
-    /*
-    for (Nation n : nations) if (n.currentMission() != null) {
-      Scene crisis = n.currentMission();
-      int x = (int) (n.region.view.centerX / mapWRatio);
-      int y = (int) (n.region.view.centerY / mapHRatio);
-      g.drawImage(alertMarker, x - 25, y - 25, 50, 50, null);
-      renderAssigned(crisis.playerTeam(), x - 25, y + 15, surface, g);
+    
+    for (Investigation event : parent.world.events().active()) {
+      for (Nation n : nations) if (event.leadsFrom(n.region).size() > 0) {
+        int x = (int) ((n.region.view.centerX / mapWRatio) + b.xpos());
+        int y = (int) ((n.region.view.centerY / mapHRatio) + b.ypos());
+        g.drawImage(parent.alertMarker, x - 25, y - 25, 50, 50, null);
+        //renderAssigned(crisis.playerTeam(), x - 25, y + 15, surface, g);
+      }
     }
-    //*/
   }
   
   
