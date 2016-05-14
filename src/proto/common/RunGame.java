@@ -46,7 +46,6 @@ public class RunGame extends JFrame implements ActionListener {
   /**  Setup and construction-
     */
   Surface surface;
-  Printout print;
   World world;
   
   
@@ -80,7 +79,6 @@ public class RunGame extends JFrame implements ActionListener {
   private void initUI() {
     this.setLayout(new BorderLayout());
     add(this.surface = new Surface (this), BorderLayout.CENTER);
-    add(this.print   = new Printout(this), BorderLayout.EAST  );
     
     pack();
     setTitle("Run Game");
@@ -92,7 +90,6 @@ public class RunGame extends JFrame implements ActionListener {
   public void actionPerformed(ActionEvent e) {
     if (world   != null) world.updateWorld();
     if (surface != null) surface.repaint();
-    if (print   != null) print.repaint();
   }
   
   
@@ -119,11 +116,6 @@ public class RunGame extends JFrame implements ActionListener {
     return world == null ? null : world.enteredScene();
   }
   //*/
-  
-  
-  public Printout print() {
-    return print;
-  }
   
   
   public Surface surface() {

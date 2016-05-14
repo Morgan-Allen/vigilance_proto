@@ -21,7 +21,7 @@ public class MapView {
   
   BufferedImage mapImage;
   BufferedImage keyImage;
-  RegionView attached[];
+  RegionAssets attached[];
   
   Nation selectedNation;
   
@@ -41,7 +41,7 @@ public class MapView {
   void attachOutlinesFor(Nation... nations) {
     if (this.attached != null) return;
     
-    attached = new RegionView[nations.length];
+    attached = new RegionAssets[nations.length];
     for (int i = attached.length; i-- > 0;) {
       attached[i] = nations[i].region.view;
     }
@@ -52,14 +52,14 @@ public class MapView {
     
     for (Coord c : Visit.grid(0, 0, imgWide, imgHigh, 1)) {
       int pixVal = pixVals[(c.y * imgWide) + c.x];
-      for (RegionView r : attached) if (r.colourKey == pixVal) {
+      for (RegionAssets r : attached) if (r.colourKey == pixVal) {
         if (r.bounds == null) { r.bounds = new Box2D(c.x, c.y, 0, 0); }
         else r.bounds.include(c.x, c.y, 0);
         break;
       }
     }
     
-    for (RegionView r : attached) if (r.bounds != null && r.outline == null) {
+    for (RegionAssets r : attached) if (r.bounds != null && r.outline == null) {
       int w = (int) (r.bounds.xdim() + 1), h = (int) (r.bounds.ydim() + 1);
       r.outline  = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
       r.outlineX = (int) r.bounds.xpos();
@@ -69,7 +69,7 @@ public class MapView {
     }
     for (Coord c : Visit.grid(0, 0, imgWide, imgHigh, 1)) {
       int pixVal = pixVals[(c.y * imgWide) + c.x];
-      for (RegionView r : attached) {
+      for (RegionAssets r : attached) {
         if (r.colourKey != pixVal || r.outline == null) continue;
         r.outline.setRGB(c.x - r.outlineX, c.y - r.outlineY, fills);
       }
@@ -129,6 +129,28 @@ public class MapView {
         //renderAssigned(crisis.playerTeam(), x - 25, y + 15, surface, g);
       }
     }
+    //
+    //  Then draw the monitor-status active at the moment-
+    int x = (viewWide / 2) -50, y = viewHigh - 10;
+    x += b.xpos();
+    y += b.ypos();
+    
+    Series <Investigation> events = parent.world.events().active();
+    if (parent.world.monitorActive()) {
+      g.setColor(Color.ORANGE);
+      g.drawString("Monitoring...", x, y);
+    }
+    else if (! events.empty()) {
+      g.setColor(Color.RED);
+      for (Investigation event : events) {
+        g.drawString("Crime: "+event.name(), x, y);
+        y -= 20;
+      }
+    }
+    else {
+      g.setColor(Color.BLUE);
+      g.drawString("Monitoring paused...", x, y);
+    }
   }
   
   
@@ -136,7 +158,7 @@ public class MapView {
     Nation n, Surface surface, Graphics2D g, float mapWRatio, float mapHRatio
   ) {
     if (n == null || n.region.view.outline == null) return;
-    RegionView r = n.region.view;
+    RegionAssets r = n.region.view;
     final Box2D b = this.viewBounds;
     int
       x = (int) (b.xpos() + (r.outlineX / mapWRatio) + 0.5f),

@@ -4,6 +4,7 @@ package proto.game.scene;
 import proto.common.*;
 import proto.game.world.*;
 import proto.util.*;
+import java.awt.Image;
 
 
 
@@ -12,12 +13,19 @@ public class Investigation implements Session.Saveable {
   
   /**  Data fields, construction and save/load methods-
     */
+  final static Image
+    //  TODO:  You will need more of these...
+    IMG_LEAD = Kind.loadImage(
+      "media assets/scene backgrounds/crime_generic_1.png"
+    );
+  
+  
   final String name;
   
   float timeBegins, timeEnds;
   List <Lead> leads = new List();
   
-  List <Object> involved = new List();
+  List <Object> known = new List();
   boolean closed, solved;
   
   
@@ -33,7 +41,7 @@ public class Investigation implements Session.Saveable {
     timeBegins = s.loadFloat();
     timeEnds   = s.loadFloat();
     s.loadObjects(leads   );
-    s.loadObjects(involved);
+    s.loadObjects(known);
     closed = s.loadBool();
     solved = s.loadBool();
   }
@@ -45,7 +53,7 @@ public class Investigation implements Session.Saveable {
     s.saveFloat(timeBegins);
     s.saveFloat(timeEnds  );
     s.saveObjects(leads   );
-    s.saveObjects(involved);
+    s.saveObjects(known);
     s.saveBool(closed);
     s.saveBool(solved);
   }
@@ -75,8 +83,13 @@ public class Investigation implements Session.Saveable {
   }
   
   
+  protected void setKnown(Object... known) {
+    Visit.appendTo(this.known, known);
+  }
+  
+  
   protected boolean checkFollowed(Lead lead, boolean success) {
-    if (success) involved.include(lead.reveals);
+    if (success) known.include(lead.reveals);
     return true;
   }
   
@@ -91,14 +104,14 @@ public class Investigation implements Session.Saveable {
   /**  Lead-compilation for general assessment and UI purposes-
     */
   public Series <Lead> knownLeads() {
-    final Batch <Lead> known = new Batch();
-    for (Lead l : leads) if (involved.includes(l.origin)) known.add(l);
-    return known;
+    final Batch <Lead> matches = new Batch();
+    for (Lead l : leads) if (known.includes(l.origin)) matches.add(l);
+    return matches;
   }
   
   
-  public Series <Object> involved() {
-    return involved;
+  public Series <Object> knownObjects() {
+    return known;
   }
   
   
@@ -123,6 +136,11 @@ public class Investigation implements Session.Saveable {
     */
   public String name() {
     return name;
+  }
+  
+  
+  public Image imageFor(Lead lead) {
+    return IMG_LEAD;
   }
   
   

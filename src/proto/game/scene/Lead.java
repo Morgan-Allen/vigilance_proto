@@ -70,6 +70,11 @@ public class Lead extends Task {
     return followed;
   }
   
+  
+  public boolean canFollow() {
+    return parent.known.includes(origin);
+  }
+  
 }
 
 

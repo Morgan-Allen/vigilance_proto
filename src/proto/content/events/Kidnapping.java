@@ -23,12 +23,6 @@ public class Kidnapping extends Investigation {
     LEAD_RESCUE  = 2,
     LEAD_RAID    = 3;
   
-  final static Image
-    //  TODO:  You will need more of these...
-    IMG_LEAD = Kind.loadImage(
-      "media assets/scene backgrounds/crime_generic_1.png"
-    );
-  
   Region region;
   Person boss;
   Person missing;
@@ -61,6 +55,8 @@ public class Kidnapping extends Investigation {
     this.home   = new Scene("home"  , region);
     this.taken  = new Scene("taken" , region);
     this.fibres = new Clue("fibres");
+    
+    this.setKnown(home);
     
     this.assignLeads(new Lead(
       "Home of "+missing,

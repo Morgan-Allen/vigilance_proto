@@ -3,23 +3,25 @@
 package proto.view;
 import proto.*;
 import proto.game.world.*;
-import proto.util.I;
-import proto.common.RunGame;
+import proto.util.*;
+import proto.common.*;
 
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.JPanel;
+import static java.awt.RenderingHints.*;
 
 
 
 public class Surface extends JPanel implements
-  MouseListener, MouseMotionListener
+  MouseListener, MouseMotionListener, KeyListener
 {
   
   
   RunGame game;
   boolean mouseDown, mouseClick, mouseClicked;
   int mouseX, mouseY;
+  Batch <Character> pressed = new Batch();
   long numPaints = 0;
   
   
@@ -27,7 +29,7 @@ public class Surface extends JPanel implements
   public Surface(RunGame runGame) {
     this.game = runGame;
     
-    this.setPreferredSize(new Dimension(850, 600));
+    this.setPreferredSize(new Dimension(1200, 600));
     addMouseListener(this);
     addMouseMotionListener(this);
   }
@@ -38,11 +40,23 @@ public class Surface extends JPanel implements
   }
   
   
+  public boolean isPressed(char k) {
+    for (Character c : pressed) if (c == k) return true;
+    return false;
+  }
+  
+  
   public void paintComponent(Graphics g) {
     super.paintComponent(g);
     Graphics2D g2d = (Graphics2D) g;
     World world = game.world();
     
+    final Table <Key, ?> hints = Table.make(
+      KEY_TEXT_ANTIALIASING  , VALUE_TEXT_ANTIALIAS_ON,
+      KEY_ALPHA_INTERPOLATION, VALUE_ALPHA_INTERPOLATION_QUALITY,
+      KEY_INTERPOLATION      , VALUE_INTERPOLATION_BILINEAR
+    );
+    g2d.setRenderingHints(hints);
     I.used60Frames = (numPaints++ % 60) == 0;
     
     if (false) {
@@ -57,12 +71,12 @@ public class Surface extends JPanel implements
     else if (world != null) {
       WorldView view = world.view();
       view.renderTo(this, g2d);
-      game.print().setText(view.description());
+      //game.print().setText(view.description());
     }
     
     this.mouseClicked = this.mouseClick;
     this.mouseClick = false;
-    this.game.print().clearInputs();
+    pressed.clear();
   }
 
 
@@ -99,6 +113,21 @@ public class Surface extends JPanel implements
   
   
   public void mouseExited(MouseEvent e) {
+    return;
+  }
+  
+  
+  public void keyTyped(KeyEvent e) {
+    pressed.add(e.getKeyChar());
+  }
+  
+  
+  public void keyPressed(KeyEvent e) {
+    return;
+  }
+  
+  
+  public void keyReleased(KeyEvent e) {
     return;
   }
 }
