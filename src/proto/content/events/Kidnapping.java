@@ -59,7 +59,7 @@ public class Kidnapping extends Investigation {
     this.setKnown(home);
     
     this.assignLeads(new Lead(
-      "Home of "+missing,
+      "Missing Person: "+missing,
       "Inspect the victim's last known location for clues.",
       this, LEAD_INSPECT, home, fibres,
       PERCEPTION, 4

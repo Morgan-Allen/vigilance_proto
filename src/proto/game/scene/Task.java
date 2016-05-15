@@ -91,6 +91,11 @@ public abstract class Task implements Assignment {
   }
   
   
+  public Series <Person> assigned() {
+    return assigned;
+  }
+  
+  
   
   /**  Task performance and completion-
     */

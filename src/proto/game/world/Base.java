@@ -105,7 +105,7 @@ public class Base implements Session.Saveable {
     }
     for (Room r : rooms) {
       r.blueprint.updateForBase(this, r);
-      for (Person p : r.visitors) r.blueprint.affectVisitor(p, this);
+      for (Person p : r.assigned) r.blueprint.affectVisitor(p, this);
     }
     
     this.currentFunds += (income - maintenance) * numWeeks;

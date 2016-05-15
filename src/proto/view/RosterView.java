@@ -16,6 +16,12 @@ public class RosterView {
   
   /**  Data fields, construction, setup and attachment-
     */
+  final static Image
+    NOT_ASSIGNED = Kind.loadImage(
+      "media assets/scene backgrounds/no_assignment.png"
+    );
+  
+  
   final WorldView parent;
   final Box2D viewBounds;
   
@@ -51,7 +57,7 @@ public class RosterView {
       offX      = (int) viewBounds.xpos(),
       offY      = (int) viewBounds.ypos(),
       maxAcross = (int) viewBounds.xdim(),
-      across = 0, down = 15, size = 75, pad = 25, x, y
+      across = 0, down = 15, size = 75, sizeA = 25, pad = 25, x, y
     ;
     
     for (Person p : base.roster()) {
@@ -70,13 +76,11 @@ public class RosterView {
         g.drawImage(selectCircle, x, y, size, size, null);
       }
       
-      //  TODO:  Render differently for different assignments!
-      /*
-      if (p.assignment() != null) {
-        g.drawImage(alertMarker, x + size - 20, y + size - 20, 20, 20, null);
-      }
-      //*/
+      final Assignment a = p.assignment();
+      final Image forA = a == null ? NOT_ASSIGNED : a.icon();
+      g.drawImage(forA, x, y + size - sizeA, sizeA, sizeA, null);
       
+      /*
       int MH = p.maxHealth(), MS = p.maxStress();
       int inj = (int) p.injury(), fat = (int) p.stun();
       int str = (int) p.stress();
@@ -108,8 +112,16 @@ public class RosterView {
       across += size + pad;
       if (across >= maxAcross) { across = 0; down += size + pad; }
     }
+    
     if (personHovered != null && surface.mouseClicked) {
-      parent.setSelection(selectedPerson = personHovered);
+      final Assignment a = parent.currentAssignment();
+      final Person p = personHovered;
+      final Assignment o = p.assignment();
+      if (a != null) {
+        if (o != null) o.setAssigned(p, false);
+        if (o != a   ) a.setAssigned(p, true );
+      }
+      else parent.setSelection(selectedPerson = personHovered);
     }
   }
   

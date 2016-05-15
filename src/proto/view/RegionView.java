@@ -1,8 +1,8 @@
 
 
 package proto.view;
-import proto.game.scene.Investigation;
-import proto.game.scene.Lead;
+import proto.game.scene.*;
+import proto.game.person.*;
 import proto.game.world.*;
 import proto.util.*;
 
@@ -17,6 +17,8 @@ public class RegionView {
   
   final WorldView parent;
   final Box2D viewBounds;
+  
+  Lead selectedLead;
   
   
   RegionView(WorldView parent, Box2D viewBounds) {
@@ -55,15 +57,27 @@ public class RegionView {
     
     
     g.setColor(Color.LIGHT_GRAY);
-    int leadID = 0, down = vy + portH + 50;
+    int leadID = 0, personID, down = vy + portH + 50, across;
+    
     for (Investigation event : parent.world.events().active()) {
       for (Lead l : event.leadsFrom(nation.region)) if (l.canFollow()) {
         Image leadImg = event.imageFor(l);
         g.drawImage(leadImg, vx + 20, down, 80, 80, null);
         g.drawString(l.name(), vx + 20, down + 90);
         
-        if (surface.mouseIn(vx + 20, down, 80, 80)) {
+        boolean hovered = surface.mouseIn(vx + 20, down, 80, 80);
+        if (hovered || selectedLead == l) {
           g.drawImage(parent.selectCircle, vx + 20, down, 80, 80, null);
+        }
+        if (surface.mouseClicked && hovered) {
+          parent.setSelection(selectedLead = l);
+        }
+        
+        personID = 0;
+        across = vx + 105;
+        for (Person p : l.assigned()) {
+          g.drawImage(p.kind().sprite(), across, down, 20, 20, null);
+          across += 25;
         }
         
         leadID++;

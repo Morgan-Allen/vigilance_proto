@@ -57,6 +57,16 @@ public class WorldView {
   
   void setSelection(Object selected) {
     this.lastSelected = selected;
+    I.say("Selection is: "+selected);
+    if (lastSelected instanceof Assignment) {
+      I.say("  Is assignment!");
+    }
+  }
+  
+  
+  Assignment currentAssignment() {
+    if (! (lastSelected instanceof Assignment)) return null;
+    return (Assignment) lastSelected;
   }
   
   

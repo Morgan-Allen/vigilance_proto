@@ -1,9 +1,9 @@
 
 
 package proto.game.scene;
+import java.awt.Image;
+
 import proto.common.Session;
-
-
 
 
 
@@ -73,6 +73,14 @@ public class Lead extends Task {
   
   public boolean canFollow() {
     return parent.known.includes(origin);
+  }
+  
+  
+  
+  /**  Rendering, debug and interface methods-
+    */
+  public Image icon() {
+    return parent.imageFor(this);
   }
   
 }

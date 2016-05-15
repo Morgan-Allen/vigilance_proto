@@ -86,20 +86,20 @@ public class MapView {
     //
     //  Draw the background image first-
     final Box2D b = this.viewBounds;
-    g.drawImage(
-      mapImage,
-      (int) b.xpos(), (int) b.ypos(),
-      (int) b.xdim(), (int) b.ydim(),
-      null
-    );
+    final int
+      vx = (int) b.xpos(),
+      vy = (int) b.ypos(),
+      vw = (int) b.xdim(),
+      vh = (int) b.ydim()
+    ;
+    g.drawImage(mapImage, vx, vy, vw, vh, null);
     Nation nationHovered = null;
     //
     //  Then draw the nations of the world on the satellite map.
-    int viewWide = (int) b.xdim(), viewHigh = (int) b.ydim();
     int imgWide = mapImage.getWidth(), imgHigh = mapImage.getHeight();
     float mapWRatio = 1, mapHRatio = 1;
-    mapWRatio *= (imgWide * 1f) / viewWide;
-    mapHRatio *= (imgHigh * 1f) / viewHigh;
+    mapWRatio *= (imgWide * 1f) / vw;
+    mapHRatio *= (imgHigh * 1f) / vh;
     
     int mX = surface.mouseX, mY = surface.mouseY;
     mX = (int) ((mX - b.xpos()) * mapWRatio);
@@ -131,25 +131,23 @@ public class MapView {
     }
     //
     //  Then draw the monitor-status active at the moment-
-    int x = (viewWide / 2) -50, y = viewHigh - 10;
-    x += b.xpos();
-    y += b.ypos();
+    String alertS = "Monitoring...";
+    Color alertC = Color.ORANGE;
+    boolean active = parent.world.monitorActive();
     
-    Series <Investigation> events = parent.world.events().active();
-    if (parent.world.monitorActive()) {
-      g.setColor(Color.ORANGE);
-      g.drawString("Monitoring...", x, y);
+    if (active) {
+      alertS = "Monitoring paused.";
+      alertC = Color.BLUE;
     }
-    else if (! events.empty()) {
-      g.setColor(Color.RED);
-      for (Investigation event : events) {
-        g.drawString("Crime: "+event.name(), x, y);
-        y -= 20;
-      }
-    }
-    else {
-      g.setColor(Color.BLUE);
-      g.drawString("Monitoring paused...", x, y);
+    
+    int x = (vw / 2), y = vh;
+    x += vx - (g.getFontMetrics().stringWidth(alertS) / 2);
+    y += vy + 15;
+    g.setColor(alertC);
+    g.drawString(alertS, x, y);
+    
+    if (surface.mouseIn(vx, vy + vh, vw, 20) && surface.mouseClicked) {
+      if (! active) parent.world.beginMonitoring();
     }
   }
   

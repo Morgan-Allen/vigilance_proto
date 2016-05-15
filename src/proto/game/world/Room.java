@@ -1,10 +1,11 @@
 
 
 package proto.game.world;
-import proto.common.Session;
-import proto.common.Session.Saveable;
-import proto.game.person.Person;
+import proto.common.*;
+import proto.game.person.*;
 import proto.util.*;
+
+import java.awt.Image;
 
 
 
@@ -18,7 +19,7 @@ public class Room implements Session.Saveable, Assignment {
   
   Blueprint blueprint;
   float buildProgress;
-  List <Person> visitors = new List();
+  List <Person> assigned = new List();
   
   
   Room(Base base, int slotIndex) {
@@ -33,7 +34,7 @@ public class Room implements Session.Saveable, Assignment {
     slotIndex     = s.loadInt();
     blueprint     = (Blueprint) s.loadObject();
     buildProgress = s.loadFloat();
-    s.loadObjects(visitors);
+    s.loadObjects(assigned);
   }
   
   
@@ -42,7 +43,7 @@ public class Room implements Session.Saveable, Assignment {
     s.saveInt(slotIndex);
     s.saveObject(blueprint);
     s.saveFloat(buildProgress);
-    s.saveObjects(visitors);
+    s.saveObjects(assigned);
   }
   
   
@@ -63,20 +64,20 @@ public class Room implements Session.Saveable, Assignment {
   /**  Toggling visitors-
     */
   public void setAssigned(Person p, boolean is) {
-    visitors.toggleMember(p, is);
+    assigned.toggleMember(p, is);
     p.setAssignment(is ? this : null);
   }
   
   
   public boolean allowsAssignment(Person p) {
     if (buildProgress < 1) return false;
-    if (visitors.includes(p)) return true;
-    return visitors.size() < blueprint.visitLimit;
+    if (assigned.includes(p)) return true;
+    return assigned.size() < blueprint.visitLimit;
   }
   
   
-  public Series <Person> visitors() {
-    return visitors;
+  public Series <Person> assigned() {
+    return assigned;
   }
   
   
@@ -90,6 +91,11 @@ public class Room implements Session.Saveable, Assignment {
   
   public String name() {
     return blueprint.name+" (Room "+slotIndex+")";
+  }
+  
+  
+  public Image icon() {
+    return blueprint.sprite;
   }
 }
 
