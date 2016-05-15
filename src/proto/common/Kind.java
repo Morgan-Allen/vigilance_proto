@@ -24,6 +24,7 @@ public class Kind extends Index.Entry implements Session.Saveable {
   String name;
   Image sprite;
   
+  //  TODO:  Move these out into a dedicated person/prop-kind class.
   int type;
   int wide, high;
   boolean blockSight;

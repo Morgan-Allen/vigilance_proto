@@ -117,9 +117,9 @@ public class Kidnapping extends Investigation {
   ) {
     public Investigation createRandomEvent(World world) {
       
-      Person boss    = new Person(Crooks.MOBSTER );
-      Person missing = new Person(Crooks.CIVILIAN);
-      Nation nation = (Nation) Rand.pickFrom(world.nations());
+      Person boss    = new Person(Crooks.MOBSTER , Crooks.randomCommonName());
+      Person missing = new Person(Crooks.CIVILIAN, Crooks.randomCommonName());
+      Nation nation  = (Nation) Rand.pickFrom(world.nations());
       
       Investigation s = new Kidnapping(boss, missing, nation.region);
       float time = world.currentTime() + Rand.index(5);

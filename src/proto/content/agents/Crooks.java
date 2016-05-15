@@ -2,6 +2,8 @@
 
 package proto.content.agents;
 import proto.common.*;
+import proto.util.Rand;
+
 import static proto.game.person.PersonStats.*;
 
 
@@ -36,6 +38,21 @@ public class Crooks {
       WILLPOWER , 4
     )
   ;
+  
+  final public static String
+    COMMON_FIRST_NAMES[] = {
+      "Jerry", "Stan", "Louis", "Abed", "Nico", "Zoe"
+    },
+    COMMON_LAST_NAMES[] = {
+      "Stanfeld", "Turner", "Lewis", "Walker", "Bryant", "Cole"
+    };
+  
+  public static String randomCommonName() {
+    return
+      Rand.pickFrom(COMMON_FIRST_NAMES)+" "+Rand.pickFrom(COMMON_LAST_NAMES);
+  }
+  
+  
 }
 
 
