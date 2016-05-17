@@ -122,7 +122,7 @@ public class MapView {
     renderOutline(nationHovered , surface, g, mapWRatio, mapHRatio);
     
     for (Investigation event : parent.world.events().active()) {
-      for (Nation n : nations) if (event.leadsFrom(n.region).size() > 0) {
+      for (Nation n : nations) if (event.openLeadsFrom(n.region).size() > 0) {
         int x = (int) ((n.region.view.centerX / mapWRatio) + b.xpos());
         int y = (int) ((n.region.view.centerY / mapHRatio) + b.ypos());
         g.drawImage(parent.alertMarker, x - 25, y - 25, 50, 50, null);
@@ -131,13 +131,13 @@ public class MapView {
     }
     //
     //  Then draw the monitor-status active at the moment-
-    String alertS = "Monitoring...";
-    Color alertC = Color.ORANGE;
+    String alertS = "Resume Monitoring";
+    Color alertC = Color.BLUE;
     boolean active = parent.world.monitorActive();
     
     if (active) {
-      alertS = "Monitoring paused.";
-      alertC = Color.BLUE;
+      alertS = "Monitoring...";
+      alertC = Color.ORANGE;
     }
     
     int x = (vw / 2), y = vh;

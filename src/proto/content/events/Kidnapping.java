@@ -49,7 +49,11 @@ public class Kidnapping extends Investigation {
   
   
   public Kidnapping(Person boss, Person missing, Region region) {
-    super("Kidnapping of "+missing.name());
+    super(
+      "Kidnapping of "+missing.name(),
+      missing.name()+" disappeared from their home in "+region+" recently. "+
+      "Find them before it's too late."
+    );
     
     this.region = region;
     this.home   = new Scene("home"  , region);

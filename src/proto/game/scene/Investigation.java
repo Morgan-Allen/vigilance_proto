@@ -20,7 +20,7 @@ public class Investigation implements Session.Saveable {
     );
   
   
-  final String name;
+  final String name, info;
   
   float timeBegins, timeEnds;
   List <Lead> leads = new List();
@@ -29,14 +29,16 @@ public class Investigation implements Session.Saveable {
   boolean closed, solved;
   
   
-  protected Investigation(String name) {
+  protected Investigation(String name, String info) {
     this.name = name;
+    this.info = info;
   }
   
   
   public Investigation(Session s) throws Exception {
     s.cacheInstance(this);
     name = s.loadString();
+    info = s.loadString();
     
     timeBegins = s.loadFloat();
     timeEnds   = s.loadFloat();
@@ -49,6 +51,7 @@ public class Investigation implements Session.Saveable {
   
   public void saveState(Session s) throws Exception {
     s.saveString(name);
+    s.saveString(info);
     
     s.saveFloat(timeBegins);
     s.saveFloat(timeEnds  );
@@ -115,16 +118,16 @@ public class Investigation implements Session.Saveable {
   }
   
   
-  public Series <Lead> leadsFrom(Object origin) {
+  public Series <Lead> openLeadsFrom(Object origin) {
     final Batch <Lead> from = new Batch();
-    for (Lead l : leads) if (l.origin == origin) from.add(l);
+    for (Lead l : leads) if (l.origin == origin && l.open()) from.add(l);
     return from;
   }
   
   
-  public Series <Lead> leadsFrom(Region region) {
+  public Series <Lead> openLeadsFrom(Region region) {
     final Batch <Lead> from = new Batch();
-    for (Lead l : leads) if (l.origin instanceof Scene) {
+    for (Lead l : leads) if (l.origin instanceof Scene) if (l.open()) {
       if (((Scene) l.origin).region == region) from.add(l);
     }
     return from;
@@ -136,6 +139,11 @@ public class Investigation implements Session.Saveable {
     */
   public String name() {
     return name;
+  }
+  
+  
+  public String info() {
+    return info;
   }
   
   

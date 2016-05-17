@@ -140,6 +140,13 @@ public class Region extends Index.Entry implements Session.Saveable {
     INDEX.saveEntry(this, s.output());
   }
   
+  
+  
+  /**  Rendering, debug and interface methods-
+    */
+  public String toString() {
+    return name;
+  }
 }
 
 

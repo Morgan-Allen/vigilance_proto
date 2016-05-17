@@ -60,29 +60,62 @@ public class RegionView {
     int leadID = 0, personID, down = vy + portH + 50, across;
     
     for (Investigation event : parent.world.events().active()) {
-      for (Lead l : event.leadsFrom(nation.region)) if (l.canFollow()) {
+      
+      final Series <Lead> leads = event.openLeadsFrom(nation.region);
+      if (leads.empty()) continue;
+      //
+      //  First, draw the name and info for the investigation as a whole:
+      int initDown = down, LIS = 60;  // Lead image size...
+      
+      g.drawString(event.name(), vx + 20, down + 15);
+      down += 20;
+      ViewUtils.drawWrappedString(
+        event.info(), g, vx + 20, down + 15, vw - 40, 60
+      );
+      down += 60;
+      //
+      //  Then, draw info for any individual leads:
+      for (Lead l : leads) {
+        //
+        //  Draw the icon and description for this particular lead-
         Image leadImg = event.imageFor(l);
-        g.drawImage(leadImg, vx + 20, down, 80, 80, null);
-        g.drawString(l.name(), vx + 20, down + 90);
+        g.drawImage(leadImg, vx + 20, down, LIS, LIS, null);
         
-        boolean hovered = surface.mouseIn(vx + 20, down, 80, 80);
-        if (hovered || selectedLead == l) {
-          g.drawImage(parent.selectCircle, vx + 20, down, 80, 80, null);
+        ViewUtils.drawWrappedString(
+          l.info(), g, vx + 20 + 60 +5, down + 15, vw - 85, 45
+        );
+        g.drawString(l.testInfo(), vx + 20 + 60 +5, down + 45 + 15);
+        //
+        //  Draw the highlight/selection rectangle, and toggle selection if
+        //  clicked-
+        final boolean hovered = surface.mouseIn(
+          vx + 20 -5, down - 5, vw + 10 - 40, 60 + 10
+        );
+        if (selectedLead == l || hovered) {
+          if (l != selectedLead) g.setColor(Color.GRAY);
+          g.drawRect(vx + 20 -5, down - 5, vw + 10 - 40, 60 + 10);
         }
         if (surface.mouseClicked && hovered) {
-          parent.setSelection(selectedLead = l);
+          boolean selected = parent.lastSelected == l;
+          selectedLead = selected ? null : l;
+          parent.setSelection(selectedLead);
         }
-        
+        //
+        //  Finally, draw any persons assigned to this lead...
         personID = 0;
-        across = vx + 105;
+        across = vx + 250;
         for (Person p : l.assigned()) {
-          g.drawImage(p.kind().sprite(), across, down, 20, 20, null);
+          g.drawImage(p.kind().sprite(), across, down + 45, 20, 20, null);
           across += 25;
         }
-        
+        //
+        //  ...and move down for the next lead.
         leadID++;
-        down += 80 + 10;
+        down += 60 + 10;
       }
+      
+      g.setColor(Color.GRAY);
+      g.drawRect(vx + 10, initDown, vw - 20, down - initDown);
     }
   }
   

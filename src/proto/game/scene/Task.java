@@ -142,6 +142,21 @@ public abstract class Task implements Assignment {
   }
   
   
+  public String info() {
+    return info;
+  }
+  
+  
+  public String testInfo() {
+    StringBuffer s = new StringBuffer("Requires: ");
+    for (int n = 0; n < tested.length;) {
+      s.append(tested[n].name+" "+testDCs[n]);
+      if (++n < tested.length) s.append(", ");
+    }
+    return s.toString();
+  }
+  
+  
   public String toString() {
     return name;
   }

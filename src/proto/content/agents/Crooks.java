@@ -19,7 +19,7 @@ public class Crooks {
       Kind.TYPE_MOOK,
       PERCEPTION, 4 ,
       EVASION   , 4 ,
-      QUESTION  , 4 ,
+      SOCIAL  , 4 ,
       COMBAT    , 4 ,
       HIT_POINTS, 10,
       WILLPOWER , 8
@@ -32,7 +32,7 @@ public class Crooks {
       Kind.TYPE_CIVILIAN,
       PERCEPTION, 2 ,
       EVASION   , 2 ,
-      QUESTION  , 2 ,
+      SOCIAL  , 2 ,
       COMBAT    , 2 ,
       HIT_POINTS, 6 ,
       WILLPOWER , 4

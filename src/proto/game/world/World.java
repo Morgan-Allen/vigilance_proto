@@ -94,9 +94,12 @@ public class World implements Session.Saveable {
   public void initDefaultBase() {
     this.base = new Base(this);
     
-    base.addToRoster(new Person(Heroes.BATMAN));
-    base.addToRoster(new Person(Heroes.ALFRED));
-    base.addToRoster(new Person(Heroes.SWARM ));
+    base.addToRoster(new Person(Heroes.HERO_BATMAN   ));
+    base.addToRoster(new Person(Heroes.HERO_ALFRED   ));
+    base.addToRoster(new Person(Heroes.HERO_SWARM    ));
+    base.addToRoster(new Person(Heroes.HERO_BATGIRL  ));
+    base.addToRoster(new Person(Heroes.HERO_NIGHTWING));
+    base.addToRoster(new Person(Heroes.HERO_QUESTION ));
     
     base.addFacility(Blueprint.INFIRMARY    , 0, 1f);
     base.addFacility(Blueprint.TRAINING_ROOM, 1, 1f);

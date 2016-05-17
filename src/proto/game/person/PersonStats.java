@@ -18,14 +18,14 @@ public class PersonStats {
   final public static Stat
     PERCEPTION = new Stat("Perception", "stat_perception", ""),
     EVASION    = new Stat("Evasion"   , "stat_evasion"   , ""),
-    QUESTION   = new Stat("Question"  , "stat_question"  , ""),
+    SOCIAL     = new Stat("Question"  , "stat_question"  , ""),
     COMBAT     = new Stat("Combat"    , "stat_combat"    , ""),
     
     HIT_POINTS = new Stat("Hit Points", "stat_hit_points", ""),
     WILLPOWER  = new Stat("Willpower" , "stat_willpower" , ""),
     
     BASE_STATS[] = {
-      PERCEPTION, EVASION, QUESTION, COMBAT
+      PERCEPTION, EVASION, SOCIAL, COMBAT
     },
     PHYS_STATS[] = {
       HIT_POINTS, WILLPOWER

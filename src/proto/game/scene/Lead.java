@@ -71,8 +71,8 @@ public class Lead extends Task {
   }
   
   
-  public boolean canFollow() {
-    return parent.known.includes(origin);
+  public boolean open() {
+    return parent.known.includes(origin) && ! followed;
   }
   
   
