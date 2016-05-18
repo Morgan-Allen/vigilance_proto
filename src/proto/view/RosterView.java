@@ -18,7 +18,7 @@ public class RosterView {
     */
   final static Image
     NOT_ASSIGNED  = Kind.loadImage(
-      "media assets/scene backgrounds/no_assignment.png"
+      "media assets/action view/assignment_blank.png"
     ),
     ASSIGN_OKAY   = Kind.loadImage(
       "media assets/action view/select_okay.png"

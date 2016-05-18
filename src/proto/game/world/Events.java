@@ -67,13 +67,13 @@ public class Events {
     }
     
     for (Investigation event : coming) {
-      if (event.timeBegins() <= world.currentTime()) {
+      if (event.timeBegins() <= world.timeInDays()) {
         coming.remove(event);
         active.add(event);
       }
     }
     for (Investigation event : active) {
-      if (event.timeEnds() <= world.currentTime()) {
+      if (event.timeEnds() <= world.timeInDays()) {
         active.remove(event);
       }
     }

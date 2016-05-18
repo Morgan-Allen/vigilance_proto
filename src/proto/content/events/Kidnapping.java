@@ -126,7 +126,7 @@ public class Kidnapping extends Investigation {
       Nation nation  = (Nation) Rand.pickFrom(world.nations());
       
       Investigation s = new Kidnapping(boss, missing, nation.region);
-      float time = world.currentTime() + Rand.index(5);
+      float time = world.timeInDays() + Rand.index(5);
       s.assignDates(time + 2, time + 7);
       return s;
     }

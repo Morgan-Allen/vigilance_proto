@@ -89,9 +89,9 @@ public class WorldView {
     baseView  .renderTo(surface, g);
     rosterView.renderTo(surface, g);
     
-    float time = world.currentTime();
     g.setColor(Color.WHITE);
-    g.drawString("Time: "+time+" weeks", 320, 15);
+    String timeString = ViewUtils.getTimeString(world);
+    g.drawString("Time: "+timeString, 320, 15);
   }
 }
 

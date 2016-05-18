@@ -14,6 +14,18 @@ public class World implements Session.Saveable {
   
   /**  Data fields, construction and save/load methods-
     */
+  final static int
+    SECONDS_PER_MINUTE = 60,
+    MINUTES_PER_HOUR   = 60,
+    HOURS_PER_DAY      = 24,
+    HOURS_PER_SHIFT    = 8,
+    SHIFTS_PER_DAY     = 3,
+    DAYS_PER_WEEK      = 7,
+    WEEKS_PER_YEAR     = 52,
+    
+    GAME_HOURS_PER_REAL_SECOND = 8
+  ;
+  
   RunGame game;
   String savePath;
   
@@ -23,7 +35,9 @@ public class World implements Session.Saveable {
   Base base;
   Events events = new Events(this);
   
-  int currentTime = 1;
+  
+  int timeDays = 0;
+  float timeHours = 0;
   boolean amWatching = false;
   
   
@@ -46,8 +60,9 @@ public class World implements Session.Saveable {
     base    = (Base) s.loadObject();
     events.loadState(s);
     
-    currentTime = s.loadInt();
-    amWatching  = s.loadBool();
+    timeDays  = s.loadInt  ();
+    timeHours = s.loadFloat();
+    amWatching = s.loadBool();
   }
   
   
@@ -55,7 +70,8 @@ public class World implements Session.Saveable {
     s.saveObjectArray(nations);
     s.saveObject(base);
     events.saveState(s);
-    s.saveInt(currentTime);
+    s.saveInt  (timeDays );
+    s.saveFloat(timeHours);
     s.saveBool(amWatching);
   }
   
@@ -134,8 +150,18 @@ public class World implements Session.Saveable {
   }
   
   
-  public int currentTime() {
-    return this.currentTime;
+  public int timeInDays() {
+    return timeDays;
+  }
+  
+  
+  public int timeHours() {
+    return (int) timeHours;
+  }
+  
+  
+  public int timeMinutes() {
+    return (int) ((timeHours % 1) * MINUTES_PER_HOUR);
   }
   
   
@@ -147,7 +173,13 @@ public class World implements Session.Saveable {
     if (amWatching) {
       events.updateEvents();
       if (events.active.size() > 0) amWatching = false;
-      currentTime += 1;
+      
+      float realGap = 1f / RunGame.FRAME_RATE;
+      timeHours += realGap * GAME_HOURS_PER_REAL_SECOND;
+      while (timeHours > HOURS_PER_DAY) {
+        timeDays++;
+        timeHours -= HOURS_PER_DAY;
+      }
     }
     /*
     if (enteredScene != null) {
