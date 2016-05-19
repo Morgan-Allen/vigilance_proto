@@ -8,7 +8,7 @@ import java.awt.Image;
 
 
 
-public class Investigation implements Session.Saveable {
+public class Event implements Session.Saveable {
   
   
   /**  Data fields, construction and save/load methods-
@@ -29,20 +29,20 @@ public class Investigation implements Session.Saveable {
   boolean closed, solved;
   
   
-  protected Investigation(String name, String info) {
+  protected Event(String name, String info) {
     this.name = name;
     this.info = info;
   }
   
   
-  public Investigation(Session s) throws Exception {
+  public Event(Session s) throws Exception {
     s.cacheInstance(this);
     name = s.loadString();
     info = s.loadString();
     
     timeBegins = s.loadFloat();
     timeEnds   = s.loadFloat();
-    s.loadObjects(leads   );
+    s.loadObjects(leads);
     s.loadObjects(known);
     closed = s.loadBool();
     solved = s.loadBool();
@@ -55,7 +55,7 @@ public class Investigation implements Session.Saveable {
     
     s.saveFloat(timeBegins);
     s.saveFloat(timeEnds  );
-    s.saveObjects(leads   );
+    s.saveObjects(leads);
     s.saveObjects(known);
     s.saveBool(closed);
     s.saveBool(solved);
@@ -100,6 +100,11 @@ public class Investigation implements Session.Saveable {
   protected void setComplete(boolean solved) {
     this.closed = true;
     this.solved = solved;
+  }
+  
+  
+  public void updateEvent(World world) {
+    for (Lead lead : leads) lead.updateAssignment(world);
   }
   
   

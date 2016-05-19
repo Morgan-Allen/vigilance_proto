@@ -73,7 +73,7 @@ public class ViewUtils {
   static String getTimeString(World world) {
     
     long timeMS = 0;
-    timeMS += world.timeInDays();
+    timeMS += world.timeDays();
     timeMS *= 24;
     timeMS += world.timeHours();
     timeMS *= 60;

@@ -2,7 +2,6 @@
 
 package proto.game.scene;
 import java.awt.Image;
-
 import proto.common.Session;
 
 
@@ -12,18 +11,18 @@ public class Lead extends Task {
   
   /**  Data fields, construction and save/load methods-
     */
-  final public Investigation parent;
+  final public Event parent;
   final public int ID;
   final public Object origin, reveals;
-  boolean followed;
   
   
   public Lead(
     String name, String info,
-    Investigation parent, int ID, Object origin, Object reveals,
+    Event parent, int ID, Object origin, Object reveals,
+    int timeHours,
     Object... args
   ) {
-    super(name, info, args);
+    super(name, info, timeHours, args);
     this.parent  = parent ;
     this.ID      = ID     ;
     this.origin  = origin ;
@@ -33,11 +32,10 @@ public class Lead extends Task {
   
   public Lead(Session s) throws Exception {
     super(s);
-    parent   = (Investigation) s.loadObject();
+    parent   = (Event) s.loadObject();
     ID       = s.loadInt   ();
     origin   = s.loadObject();
     reveals  = s.loadObject();
-    followed = s.loadBool  ();
   }
   
   
@@ -47,7 +45,6 @@ public class Lead extends Task {
     s.saveInt   (ID      );
     s.saveObject(origin  );
     s.saveObject(reveals );
-    s.saveBool  (followed);
   }
   
   
@@ -56,23 +53,16 @@ public class Lead extends Task {
     */
   protected void onSuccess() {
     if (! parent.checkFollowed(this, true)) return;
-    followed = true;
   }
   
   
   protected void onFailure() {
     if (! parent.checkFollowed(this, false)) return;
-    followed = false;
-  }
-  
-  
-  public boolean followed() {
-    return followed;
   }
   
   
   public boolean open() {
-    return parent.known.includes(origin) && ! followed;
+    return parent.known.includes(origin) && ! complete();
   }
   
   

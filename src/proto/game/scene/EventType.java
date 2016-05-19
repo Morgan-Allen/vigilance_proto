@@ -32,8 +32,8 @@ public abstract class EventType extends Index.Entry implements
   }
   
   
-  public abstract Investigation createRandomEvent(World world);
-  public abstract float eventChance(Investigation event);
+  public abstract Event createRandomEvent(World world);
+  public abstract float eventChance(Event event);
 }
 
 

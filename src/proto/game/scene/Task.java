@@ -11,11 +11,15 @@ import proto.util.*;
 public abstract class Task implements Assignment {
   
   
-  final static int
+  final public static int
     RESOLVE_AVG = 0,
     RESOLVE_SEQ = 1,
-    RESOLVE_ALL = 2;
-  
+    RESOLVE_ALL = 2,
+    
+    TIME_SHORT  = 1,
+    TIME_MEDIUM = World.HOURS_PER_SHIFT,
+    TIME_LONG   = World.HOURS_PER_DAY * World.DAYS_PER_WEEK
+  ;
   
   final String name;
   final String info;
@@ -23,13 +27,19 @@ public abstract class Task implements Assignment {
   Trait   tested [];
   int     testDCs[];
   boolean results[];
+  
   List <Person> assigned = new List();
+  int timeTaken, initTime;
+  boolean complete, success;
   
   
   
-  public Task(String name, String info, Object... args) {
+  public Task(String name, String info, int timeHours, Object... args) {
     this.name = name;
     this.info = info;
+    
+    this.timeTaken = timeHours * World.MINUTES_PER_HOUR;
+    this.initTime  = -1;
     
     final int numT = args.length / 2;
     tested  = new Trait  [numT];
@@ -59,6 +69,10 @@ public abstract class Task implements Assignment {
     }
     
     s.loadObjects(assigned);
+    timeTaken = s.loadInt ();
+    initTime  = s.loadInt ();
+    complete  = s.loadBool();
+    success   = s.loadBool();
   }
   
   
@@ -74,6 +88,10 @@ public abstract class Task implements Assignment {
     }
     
     s.saveObjects(assigned);
+    s.saveInt (timeTaken);
+    s.saveInt (initTime );
+    s.saveBool(complete );
+    s.saveBool(success  );
   }
   
   
@@ -96,13 +114,42 @@ public abstract class Task implements Assignment {
   }
   
   
+  public boolean complete() {
+    return complete;
+  }
+  
+  
+  public boolean success() {
+    return success;
+  }
+  
+  
+  public boolean failed() {
+    return complete && ! success;
+  }
+  
+  
   
   /**  Task performance and completion-
     */
+  protected void updateAssignment(World world) {
+    if (assigned.empty() || complete) return;
+    
+    final int time = world.totalMinutes();
+    if (initTime == -1) initTime = time;
+    if ((time - initTime) > timeTaken) attemptTask();
+  }
+  
+  
   public boolean attemptTask() {
-    final boolean success = performTest();
-    if (success) onSuccess();
-    else onFailure();
+    success = performTest();
+    if (success) {
+      onSuccess();
+    }
+    else {
+      onFailure();
+    }
+    complete = true;
     return success;
   }
   

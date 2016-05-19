@@ -15,8 +15,8 @@ public class Events {
     */
   final World world;
   List <EventType> eventTypes = new List();
-  List <Investigation> coming = new List();
-  List <Investigation> active = new List();
+  List <Event> coming = new List();
+  List <Event> active = new List();
   
   
   Events(World world) {
@@ -46,8 +46,8 @@ public class Events {
   
   /**  General public access/query methods-
     */
-  public Series <Investigation> active() { return active; }
-  public Series <Investigation> coming() { return coming; }
+  public Series <Event> active() { return active; }
+  public Series <Event> coming() { return coming; }
   
   
   
@@ -57,34 +57,33 @@ public class Events {
     int MAX_EVENTS = 2;
     
     if (coming.size() < MAX_EVENTS) {
-      Pick <Investigation> pickEvent = new Pick();
+      Pick <Event> pickEvent = new Pick();
       for (EventType type : eventTypes) {
-        Investigation e = type.createRandomEvent(world);
+        Event e = type.createRandomEvent(world);
         pickEvent.compare(e, type.eventChance(e) * Rand.num());
       }
-      Investigation event = pickEvent.result();
+      Event event = pickEvent.result();
       if (event != null) coming.add(event);
     }
     
-    for (Investigation event : coming) {
-      if (event.timeBegins() <= world.timeInDays()) {
+    for (Event event : coming) {
+      if (event.timeBegins() <= world.timeDays()) {
         coming.remove(event);
         active.add(event);
+        world.pauseMonitoring();
       }
     }
-    for (Investigation event : active) {
-      if (event.timeEnds() <= world.timeInDays()) {
+    
+    for (Event event : active) {
+      if (event.timeEnds() <= world.timeDays()) {
         active.remove(event);
       }
+      else event.updateEvent(world);
     }
   }
   
   
 }
-
-
-
-
 
 
 

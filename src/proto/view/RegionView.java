@@ -59,7 +59,7 @@ public class RegionView {
     g.setColor(Color.LIGHT_GRAY);
     int leadID = 0, personID, down = vy + portH + 50, across;
     
-    for (Investigation event : parent.world.events().active()) {
+    for (Event event : parent.world.events().active()) {
       
       final Series <Lead> leads = event.openLeadsFrom(nation.region);
       if (leads.empty()) continue;

@@ -6,8 +6,9 @@ import proto.game.world.*;
 import proto.game.scene.*;
 import proto.util.*;
 
-import java.awt.*;
-import java.awt.image.*;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 
 
 
@@ -121,7 +122,7 @@ public class MapView {
     renderOutline(selectedNation, surface, g, mapWRatio, mapHRatio);
     renderOutline(nationHovered , surface, g, mapWRatio, mapHRatio);
     
-    for (Investigation event : parent.world.events().active()) {
+    for (Event event : parent.world.events().active()) {
       for (Nation n : nations) if (event.openLeadsFrom(n.region).size() > 0) {
         int x = (int) ((n.region.view.centerX / mapWRatio) + b.xpos());
         int y = (int) ((n.region.view.centerY / mapHRatio) + b.ypos());
@@ -147,7 +148,8 @@ public class MapView {
     g.drawString(alertS, x, y);
     
     if (surface.mouseIn(vx, vy + vh, vw, 20) && surface.mouseClicked) {
-      if (! active) parent.world.beginMonitoring();
+      if (active) parent.world.pauseMonitoring();
+      else        parent.world.beginMonitoring();
     }
   }
   

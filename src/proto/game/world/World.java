@@ -14,7 +14,7 @@ public class World implements Session.Saveable {
   
   /**  Data fields, construction and save/load methods-
     */
-  final static int
+  final public static int
     SECONDS_PER_MINUTE = 60,
     MINUTES_PER_HOUR   = 60,
     HOURS_PER_DAY      = 24,
@@ -150,7 +150,7 @@ public class World implements Session.Saveable {
   }
   
   
-  public int timeInDays() {
+  public int timeDays() {
     return timeDays;
   }
   
@@ -165,21 +165,25 @@ public class World implements Session.Saveable {
   }
   
   
+  public int totalMinutes() {
+    return (timeDays * 24 * 60) + (int) (timeHours * 60);
+  }
+  
+  
 
   /**  Regular updates and activity cycle:
     */
   public void updateWorld() {
     
     if (amWatching) {
-      events.updateEvents();
-      if (events.active.size() > 0) amWatching = false;
-      
-      float realGap = 1f / RunGame.FRAME_RATE;
+      final float realGap = 1f / RunGame.FRAME_RATE;
       timeHours += realGap * GAME_HOURS_PER_REAL_SECOND;
       while (timeHours > HOURS_PER_DAY) {
         timeDays++;
         timeHours -= HOURS_PER_DAY;
       }
+      
+      events.updateEvents();
     }
     /*
     if (enteredScene != null) {
@@ -211,7 +215,7 @@ public class World implements Session.Saveable {
   }
   
   
-  public void stopMonitoring() {
+  public void pauseMonitoring() {
     this.amWatching = false;
   }
   
