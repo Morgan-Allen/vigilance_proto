@@ -40,6 +40,7 @@ public class WorldView {
   
   public WorldView(World world) {
     this.world = world;
+    
     rosterView = new RosterView(this, new Box2D(20 , 20, 320, 560));
     mapView    = new MapView   (this, new Box2D(320, 20, 360, 560));
     regionView = new RegionView(this, new Box2D(680, 20, 520, 560));
@@ -82,7 +83,6 @@ public class WorldView {
   
   public void dismissMessage(MessageView message) {
     messageQueue.remove(message);
-    if (messageQueue.empty()) world.beginMonitoring();
   }
   
   
@@ -109,6 +109,20 @@ public class WorldView {
     String timeString = ViewUtils.getTimeString(world);
     g.drawString("Time: "+timeString, 320, 15);
     
+    boolean hoverS = surface.mouseIn(320 + 360 - 160, 0, 80, 15, this);
+    g.setColor(hoverS ? Color.YELLOW : Color.BLUE);
+    g.drawString("Save (S)"  , 320 + 360 - 160, 15);
+    
+    boolean hoverR = surface.mouseIn(320 + 360 - 80, 0, 80, 15, this);
+    g.setColor(hoverR ? Color.YELLOW : Color.BLUE);
+    g.drawString("Reload (R)", 320 + 360 - 80, 15);
+    
+    if (hoverS && surface.mouseClicked(this)) {
+      world.performSave();
+    }
+    if (hoverR && surface.mouseClicked(this)) {
+      world.reloadFromSave();
+    }
     
     if (message != null) {
       message.attachTo(this, 400, 250);
@@ -117,6 +131,9 @@ public class WorldView {
   }
   
 }
+
+
+
 
 
 

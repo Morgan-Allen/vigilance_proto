@@ -31,4 +31,8 @@ public class Trait extends Index.Entry implements Session.Saveable  {
     INDEX.saveEntry(this, s.output());
   }
   
+  
+  public String toString() {
+    return name;
+  }
 }

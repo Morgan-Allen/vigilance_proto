@@ -63,7 +63,7 @@ public class Kidnapping extends Event {
     this.setKnown(home);
     
     this.assignLeads(new Lead(
-      "Missing Person: "+missing,
+      "Inspect the scene",
       "Inspect the victim's last known location for clues.",
       this, LEAD_INSPECT, home, fibres, Task.TIME_SHORT,
       PERCEPTION, 4

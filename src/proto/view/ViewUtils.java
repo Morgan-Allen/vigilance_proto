@@ -21,7 +21,7 @@ public class ViewUtils {
   static void drawWrappedString(
     String s, Graphics2D g, int x, int y, int w, int h
   ) {
-    StringTokenizer t = new StringTokenizer(s, " \n");
+    StringTokenizer t = new StringTokenizer(s, " \n", true);
     final List <String> tokens = new List();
     while (t.hasMoreTokens()) tokens.add(t.nextToken());
     
@@ -32,7 +32,12 @@ public class ViewUtils {
       String line = "", lineMore = line;
       
       while (! tokens.empty()) {
-        lineMore = line + tokens.first() + " ";
+        final String token = tokens.first();
+        
+        if (token.equals(" " )) { tokens.removeFirst(); continue; }
+        if (token.equals("\n")) { tokens.removeFirst(); break   ; }
+        
+        lineMore = line + token + " ";
         int lineWide = metrics.stringWidth(lineMore);
         if (lineWide > w) break;
         line = lineMore;

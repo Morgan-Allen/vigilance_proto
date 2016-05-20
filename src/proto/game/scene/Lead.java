@@ -1,8 +1,13 @@
 
 
 package proto.game.scene;
+import proto.common.*;
+import proto.game.person.*;
+import proto.game.world.*;
+import proto.util.Visit;
+import proto.view.*;
+
 import java.awt.Image;
-import proto.common.Session;
 
 
 
@@ -69,10 +74,47 @@ public class Lead extends Task {
   
   /**  Rendering, debug and interface methods-
     */
+  protected void presentMessage(final World world) {
+    
+    StringBuffer s = new StringBuffer();
+    
+    for (Person p : assigned) {
+      s.append(p.name());
+      if (p != assigned.last()) s.append(" and ");
+    }
+    s.append(" tested their ");
+    for (Trait t : tested) {
+      s.append(t);
+      if (t != Visit.last(tested)) s.append(" and ");
+    }
+    s.append(".");
+    if (success()) s.append("  They were successful.");
+    else           s.append("  They had no luck."    );
+    
+    if (success) for (Lead l : parent.openLeadsFrom(reveals)) {
+      s.append("\nNew lead: ");
+      s.append(l.info);
+    }
+    //  TODO:  If no fresh leads are uncovered, say as much.
+    
+    world.view().queueMessage(new MessageView(
+      icon(), "Task complete: "+name,
+      s.toString(),
+      "Dismiss"
+    ) {
+      protected void whenClicked(String option, int optionID) {
+        world.view().dismissMessage(this);
+      }
+    });
+  }
+  
+  
   public Image icon() {
     return parent.imageFor(this);
   }
-  
 }
+
+
+
 
 

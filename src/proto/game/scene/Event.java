@@ -131,9 +131,17 @@ public class Event implements Session.Saveable {
   
   
   public Series <Lead> openLeadsFrom(Region region) {
+    boolean linksToRegion = false;
     final Batch <Lead> from = new Batch();
-    for (Lead l : leads) if (l.origin instanceof Scene) if (l.open()) {
-      if (((Scene) l.origin).region == region) from.add(l);
+    
+    for (Lead l : leads) if (l.origin instanceof Scene) {
+      final Scene s = (Scene) l.origin;
+      if (s.region == region && known.includes(s)) linksToRegion = true;
+    }
+    if (! linksToRegion) return from;
+    
+    for (Lead l : leads) if (l.open()) {
+      from.add(l);
     }
     return from;
   }

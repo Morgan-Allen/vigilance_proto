@@ -186,6 +186,9 @@ public abstract class Task implements Assignment {
   
   /**  Rendering, debug and interface methods-
     */
+  protected abstract void presentMessage(World world);
+  
+  
   public String name() {
     return name;
   }
@@ -203,19 +206,6 @@ public abstract class Task implements Assignment {
       if (++n < tested.length) s.append(", ");
     }
     return s.toString();
-  }
-  
-  
-  protected void presentMessage(final World world) {
-    world.view().queueMessage(new MessageView(
-      icon(), "Task complete: "+name,
-      "",
-      "Dismiss"
-    ) {
-      protected void whenClicked(String option, int optionID) {
-        world.view().dismissMessage(this);
-      }
-    });
   }
   
   
