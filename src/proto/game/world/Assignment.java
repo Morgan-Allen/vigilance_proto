@@ -17,4 +17,5 @@ public interface Assignment extends Session.Saveable {
   boolean allowsAssignment(Person p);
   void setAssigned(Person p, boolean is);
   Series <Person> assigned();
+  boolean complete();
 }

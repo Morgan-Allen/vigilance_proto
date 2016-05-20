@@ -21,7 +21,9 @@ public class Event implements Session.Saveable {
   
   
   final String name, info;
+  Batch <String> actionLog = new Batch();
   
+  final World world;
   float timeBegins, timeEnds;
   List <Lead> leads = new List();
   
@@ -29,17 +31,20 @@ public class Event implements Session.Saveable {
   boolean closed, solved;
   
   
-  protected Event(String name, String info) {
-    this.name = name;
-    this.info = info;
+  protected Event(String name, String info, World world) {
+    this.name  = name ;
+    this.info  = info ;
+    this.world = world;
   }
   
   
   public Event(Session s) throws Exception {
     s.cacheInstance(this);
+    
     name = s.loadString();
     info = s.loadString();
     
+    world      = (World) s.loadObject();
     timeBegins = s.loadFloat();
     timeEnds   = s.loadFloat();
     s.loadObjects(leads);
@@ -50,9 +55,12 @@ public class Event implements Session.Saveable {
   
   
   public void saveState(Session s) throws Exception {
+    
     s.saveString(name);
     s.saveString(info);
+    //  NOTE:  The action log is wiped after use, so we don't save it.
     
+    s.saveObject(world);
     s.saveFloat(timeBegins);
     s.saveFloat(timeEnds  );
     s.saveObjects(leads);
@@ -68,6 +76,11 @@ public class Event implements Session.Saveable {
   public void assignDates(float begins, float ends) {
     this.timeBegins = begins;
     this.timeEnds   = ends  ;
+  }
+  
+  
+  public World world() {
+    return world;
   }
   
   
@@ -91,6 +104,12 @@ public class Event implements Session.Saveable {
   }
   
   
+  protected Lead leadWithID(int ID) {
+    for (Lead l : leads) if (l.ID == ID) return l;
+    return null;
+  }
+  
+  
   protected boolean checkFollowed(Lead lead, boolean success) {
     if (success) known.include(lead.reveals);
     return true;
@@ -103,8 +122,13 @@ public class Event implements Session.Saveable {
   }
   
   
-  public void updateEvent(World world) {
-    for (Lead lead : leads) lead.updateAssignment(world);
+  public void updateEvent() {
+    for (Lead lead : leads) lead.updateAssignment();
+  }
+  
+  
+  public boolean complete() {
+    return closed;
   }
   
   
@@ -150,6 +174,21 @@ public class Event implements Session.Saveable {
   
   /**  Rendering, debug and interface methods-
     */
+  protected void logAction(String action) {
+    actionLog.add(action);
+  }
+  
+  
+  protected void wipeActionLog() {
+    actionLog.clear();
+  }
+  
+  
+  public Series <String> actionLog() {
+    return actionLog;
+  }
+  
+  
   public String name() {
     return name;
   }

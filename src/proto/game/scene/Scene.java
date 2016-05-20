@@ -32,4 +32,8 @@ public class Scene implements Session.Saveable {
     s.saveObject(region);
   }
   
+  
+  public String toString() {
+    return name;
+  }
 }

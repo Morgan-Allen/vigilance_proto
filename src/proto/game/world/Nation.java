@@ -86,6 +86,16 @@ public class Nation implements Session.Saveable {
   public boolean member    () { return member ; }
   
   
+  public void incCrime(int percent) {
+    crime = Nums.clamp(crime + (percent / 100f), 0, 1);
+  }
+  
+  
+  public void incTrust(int percent) {
+    trust = Nums.clamp(trust + (percent / 100f), 0, 1);
+  }
+  
+  
   
   /**  Rendering and debug methods-
     */

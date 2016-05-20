@@ -4,9 +4,8 @@ package proto.game.scene;
 import proto.common.*;
 import proto.game.person.*;
 import proto.game.world.*;
-import proto.util.Visit;
+import proto.util.*;
 import proto.view.*;
-
 import java.awt.Image;
 
 
@@ -24,10 +23,9 @@ public class Lead extends Task {
   public Lead(
     String name, String info,
     Event parent, int ID, Object origin, Object reveals,
-    int timeHours,
-    Object... args
+    int timeHours, Object... args
   ) {
-    super(name, info, timeHours, args);
+    super(name, info, timeHours, parent.world, args);
     this.parent  = parent ;
     this.ID      = ID     ;
     this.origin  = origin ;
@@ -96,6 +94,12 @@ public class Lead extends Task {
       s.append(l.info);
     }
     //  TODO:  If no fresh leads are uncovered, say as much.
+    
+    for (String action : parent.actionLog()) {
+      s.append("\n");
+      s.append(action);
+    }
+    parent.wipeActionLog();
     
     world.view().queueMessage(new MessageView(
       icon(), "Task complete: "+name,

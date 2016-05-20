@@ -33,6 +33,7 @@ public class Kidnapping extends Event {
   
   public Kidnapping(Session s) throws Exception {
     super(s);
+    region  = (Region) s.loadObject();
     boss    = (Person) s.loadObject();
     missing = (Person) s.loadObject();
     home    = (Scene ) s.loadObject();
@@ -43,22 +44,25 @@ public class Kidnapping extends Event {
   
   public void saveState(Session s) throws Exception {
     super.saveState(s);
-    s.saveObjects(boss, missing, home, taken, fibres);
+    s.saveObjects(region, boss, missing, home, taken, fibres);
   }
   
   
   
-  public Kidnapping(Person boss, Person missing, Region region) {
+  public Kidnapping(Person boss, Person missing, Region region, World world) {
     super(
       "Kidnapping of "+missing.name(),
       missing.name()+" disappeared from their home in "+region+" recently. "+
-      "Find them before it's too late."
+      "Find them before it's too late.",
+      world
     );
     
-    this.region = region;
-    this.home   = new Scene("home"  , region);
-    this.taken  = new Scene("taken" , region);
-    this.fibres = new Clue("fibres");
+    this.region  = region;
+    this.boss    = boss;
+    this.missing = missing;
+    this.home    = new Scene("home"  , region);
+    this.taken   = new Scene("taken" , region);
+    this.fibres  = new Clue("fibres");
     
     this.setKnown(home);
     
@@ -93,19 +97,46 @@ public class Kidnapping extends Event {
   
   
   protected boolean checkFollowed(Lead lead, boolean success) {
+    final Nation nation = world().nationFor(region);
     
     if (lead.ID == LEAD_RESCUE) {
       if (success) {
         setComplete(true);
+        logAction(missing+" escapes unharmed from their captors.");
+        nation.incTrust(5);
+        logAction("Trust +5: "+region);
+      }
+      else {
+        Lead raid = leadWithID(LEAD_RAID);
+        raid.setModifier(COMBAT, -2);
+        raid.attemptTask();
       }
     }
     
     if (lead.ID == LEAD_RAID) {
       if (success) {
         setComplete(true);
+        logAction("The captors keeping "+missing+" hostage were subdued.");
+        nation.incCrime(-5);
+        logAction("Crime -5: "+region);
       }
       else {
         setComplete(false);
+        if (Rand.yes()) {
+          for (Person p : lead.assigned()) {
+            p.receiveInjury(2);
+            logAction(p.name()+" was injured.");
+          }
+        }
+        else {
+          missing.receiveInjury(missing.maxHealth() * (Rand.num() + 0.5f));
+          if (missing.alive()) logAction(missing.name()+" was injured.");
+          else                 logAction(missing.name()+" was killed!" );
+          nation.incTrust(-10);
+          logAction("Trust -10: "+region);
+        }
+        nation.incCrime(10);
+        logAction("Crime +10: "+region);
       }
     }
     
@@ -125,7 +156,7 @@ public class Kidnapping extends Event {
       Person missing = new Person(Crooks.CIVILIAN, Crooks.randomCommonName());
       Nation nation  = (Nation) Rand.pickFrom(world.nations());
       
-      Event s = new Kidnapping(boss, missing, nation.region);
+      Event s = new Kidnapping(boss, missing, nation.region, world);
       float time = world.timeDays() + Rand.index(5);
       s.assignDates(time + 2, time + 7);
       return s;

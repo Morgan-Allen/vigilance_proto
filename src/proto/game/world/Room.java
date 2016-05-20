@@ -81,6 +81,11 @@ public class Room implements Session.Saveable, Assignment {
   }
   
   
+  public boolean complete() {
+    return false;
+  }
+  
+  
   
   /**  Rendering, debug and interface methods-
     */

@@ -27,4 +27,7 @@ public class Clue implements Session.Saveable {
   }
   
   
+  public String toString() {
+    return name;
+  }
 }

@@ -94,7 +94,7 @@ public class Person implements Session.Saveable {
     kind    = (Kind) s.loadObject();
     side    = (Side) s.loadEnum(Side.values());
     name    = s.loadString();
-
+    
     stats    .loadState(s);
     relations.loadState(s);
     luck   = s.loadInt();
@@ -370,9 +370,11 @@ public class Person implements Session.Saveable {
   
   /**  Regular updates and life-cycle-
     */
-  
-  
   public void updateOnBase(float numWeeks) {
+    if (assignment != null && assignment.complete()) {
+      assignment = null;
+    }
+    
     if (! alive) return;
     if (conscious()) stun = 0;
     

@@ -75,10 +75,10 @@ public class Events {
     }
     
     for (Event event : active) {
-      if (event.timeEnds() <= world.timeDays()) {
+      if (event.timeEnds() <= world.timeDays() || event.complete()) {
         active.remove(event);
       }
-      else event.updateEvent(world);
+      else event.updateEvent();
     }
   }
   

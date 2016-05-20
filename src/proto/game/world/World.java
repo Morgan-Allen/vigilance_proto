@@ -135,6 +135,12 @@ public class World implements Session.Saveable {
   }
   
   
+  public Nation nationFor(Region r) {
+    for (Nation n : nations) if (n.region == r) return n;
+    return null;
+  }
+  
+  
   public Base base() {
     return base;
   }

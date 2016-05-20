@@ -25,8 +25,10 @@ public abstract class Task implements Assignment {
   final String name;
   final String info;
   
+  World   world;
   Trait   tested [];
   int     testDCs[];
+  int     testMod[];
   boolean results[];
   
   List <Person> assigned = new List();
@@ -35,16 +37,20 @@ public abstract class Task implements Assignment {
   
   
   
-  public Task(String name, String info, int timeHours, Object... args) {
+  protected Task(
+    String name, String info, int timeHours, World world, Object... args
+  ) {
     this.name = name;
     this.info = info;
     
     this.timeTaken = timeHours * World.MINUTES_PER_HOUR;
     this.initTime  = -1;
+    this.world     = world;
     
     final int numT = args.length / 2;
     tested  = new Trait  [numT];
     testDCs = new int    [numT];
+    testMod = new int    [numT];
     results = new boolean[numT];
     
     for (int n = 0; n < numT; n++) {
@@ -62,14 +68,17 @@ public abstract class Task implements Assignment {
     final int numT = s.loadInt();
     tested  = new Trait  [numT];
     testDCs = new int    [numT];
+    testMod = new int    [numT];
     results = new boolean[numT];
     for (int n = 0; n < numT; n++) {
       tested [n] = (Trait) s.loadObject();
       testDCs[n] = s.loadInt ();
+      testMod[n] = s.loadInt ();
       results[n] = s.loadBool();
     }
     
     s.loadObjects(assigned);
+    world     = (World) s.loadObject();
     timeTaken = s.loadInt ();
     initTime  = s.loadInt ();
     complete  = s.loadBool();
@@ -85,10 +94,12 @@ public abstract class Task implements Assignment {
     for (int n = 0; n < tested.length; n++) {
       s.saveObject(tested [n]);
       s.saveInt   (testDCs[n]);
+      s.saveInt   (testMod[n]);
       s.saveBool  (results[n]);
     }
     
     s.saveObjects(assigned);
+    s.saveObject(world);
     s.saveInt (timeTaken);
     s.saveInt (initTime );
     s.saveBool(complete );
@@ -102,6 +113,14 @@ public abstract class Task implements Assignment {
   public void setAssigned(Person p, boolean is) {
     assigned.toggleMember(p, is);
     p.setAssignment(is ? this : null);
+  }
+  
+  
+  public boolean setModifier(Trait skill, int mod) {
+    int index = Visit.indexOf(skill, tested);
+    if (index == -1) return false;
+    testMod[index] = mod;
+    return true;
   }
   
   
@@ -133,17 +152,17 @@ public abstract class Task implements Assignment {
   
   /**  Task performance and completion-
     */
-  protected void updateAssignment(World world) {
+  protected void updateAssignment() {
     if (assigned.empty() || complete) return;
     
     final int time = world.totalMinutes();
     if (initTime == -1) initTime = time;
-    if ((time - initTime) > timeTaken) attemptTask(world);
+    if ((time - initTime) > timeTaken) attemptTask();
   }
   
   
-  public boolean attemptTask(World world) {
-    success = performTest(world);
+  public boolean attemptTask() {
+    success = performTest();
     if (success) {
       onSuccess();
     }
@@ -152,20 +171,22 @@ public abstract class Task implements Assignment {
     }
     complete = true;
     presentMessage(world);
+    for (Person p : assigned) setAssigned(p, false);
     return success;
   }
   
   
-  protected boolean performTest(World world) {
+  protected boolean performTest() {
     boolean okay = true;
     
     for (int n = tested.length; n-- > 0;) {
       Trait stat = tested [n];
-      int   DC   = testDCs[n];
+      int   mod  = testMod[n];
+      int   DC   = testDCs[n] + Nums.max(0, -mod);
       
       float maxLevel = 0, sumLevels = 0;
       for (Person p : assigned) {
-        float level = p.stats.levelFor(stat);
+        float level = p.stats.levelFor(stat) + Nums.max(0, mod);
         maxLevel  = Nums.max(level, maxLevel);
         sumLevels += level;
       }
