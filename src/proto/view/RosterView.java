@@ -84,15 +84,13 @@ public class RosterView {
       g.setColor(Color.LIGHT_GRAY);
       g.drawString(p.name()+" ("+(base.rosterIndex(p) + 1)+")", x, y - 5);
       
-      if (surface.mouseIn(x, y, size, size)) {
+      if (surface.mouseIn(x, y, size, size, this)) {
         personHovered = p;
         g.drawImage(selectCircle, x, y, size, size, null);
       }
       if (selectedPerson == p) {
         g.drawImage(selectCircle, x, y, size, size, null);
       }
-      
-      //*
       
       
       final Assignment a = p.assignment();
@@ -103,7 +101,6 @@ public class RosterView {
       }
       g.drawImage(forA, x, y + size - sizeA, sizeA, sizeA, null);
       
-      //*/
       /*
       int MH = p.maxHealth(), MS = p.maxStress();
       int inj = (int) p.injury(), fat = (int) p.stun();
@@ -134,7 +131,7 @@ public class RosterView {
       }
     }
     
-    if (personHovered != null && surface.mouseClicked) {
+    if (personHovered != null && surface.mouseClicked(this)) {
       final Person p = personHovered;
       final Assignment o = p.assignment();
       if (assignTo != null) {

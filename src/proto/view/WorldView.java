@@ -11,7 +11,6 @@ import proto.util.*;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
-//import java.awt.image.BufferedImage;
 
 
 
@@ -34,6 +33,8 @@ public class WorldView {
   RosterView rosterView;
   BaseView   baseView  ;
   Image alertMarker, selectCircle, constructMark;
+  
+  List <MessageView> messageQueue = new List();
   
   
   
@@ -73,6 +74,18 @@ public class WorldView {
   }
   
   
+  public void queueMessage(MessageView message) {
+    messageQueue.add(message);
+    world.pauseMonitoring();
+  }
+  
+  
+  public void dismissMessage(MessageView message) {
+    messageQueue.remove(message);
+    if (messageQueue.empty()) world.beginMonitoring();
+  }
+  
+  
   
   /**  Rendering methods-
     */
@@ -81,6 +94,9 @@ public class WorldView {
     final int wide = surface.getWidth(), high = surface.getHeight();
     g.setColor(Color.BLACK);
     g.fillRect(0, 0, wide, high);
+
+    MessageView message = messageQueue.first();
+    surface.setMouseFocus(message);
     
     //
     //  TODO:  Only render some of these at a time!
@@ -92,12 +108,15 @@ public class WorldView {
     g.setColor(Color.WHITE);
     String timeString = ViewUtils.getTimeString(world);
     g.drawString("Time: "+timeString, 320, 15);
+    
+    
+    if (message != null) {
+      message.attachTo(this, 400, 250);
+      message.renderTo(surface, g);
+    }
   }
+  
 }
-
-
-
-
 
 
 

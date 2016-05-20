@@ -102,11 +102,12 @@ public class MapView {
     mapWRatio *= (imgWide * 1f) / vw;
     mapHRatio *= (imgHigh * 1f) / vh;
     
-    int mX = surface.mouseX, mY = surface.mouseY;
+    boolean mouseInMap = surface.mouseIn(vx, vy, vw, vh, this);
+    int mX = surface.mouseX(), mY = surface.mouseY();
     mX = (int) ((mX - b.xpos()) * mapWRatio);
     mY = (int) ((mY - b.ypos()) * mapHRatio);
     int pixVal = 0;
-    if (mX >= 0 && mX < imgWide && mY >= 0 && mY < imgHigh) {
+    if (mouseInMap && mX >= 0 && mX < imgWide && mY >= 0 && mY < imgHigh) {
       pixVal = ((BufferedImage) keyImage).getRGB(mX, mY);
     }
     
@@ -115,7 +116,7 @@ public class MapView {
     for (Nation n : nations) if (n.region.view.colourKey == pixVal) {
       nationHovered = n;
     }
-    if (nationHovered != null && surface.mouseClicked) {
+    if (nationHovered != null && surface.mouseClicked(this)) {
       parent.setSelection(selectedNation = nationHovered);
     }
     
@@ -132,6 +133,7 @@ public class MapView {
     }
     //
     //  Then draw the monitor-status active at the moment-
+    boolean hovered = surface.mouseIn(vx, vy + vh, vw, 20, this);
     String alertS = "Resume Monitoring";
     Color alertC = Color.BLUE;
     boolean active = parent.world.monitorActive();
@@ -140,6 +142,7 @@ public class MapView {
       alertS = "Monitoring...";
       alertC = Color.ORANGE;
     }
+    if (hovered) alertC = Color.YELLOW;
     
     int x = (vw / 2), y = vh;
     x += vx - (g.getFontMetrics().stringWidth(alertS) / 2);
@@ -147,7 +150,10 @@ public class MapView {
     g.setColor(alertC);
     g.drawString(alertS, x, y);
     
-    if (surface.mouseIn(vx, vy + vh, vw, 20) && surface.mouseClicked) {
+    //
+    //  TODO:  This belongs in the world view, maybe?  Shouldn't be outside the
+    //  map bounds anyway.
+    if (hovered && surface.mouseClicked(this)) {
       if (active) parent.world.pauseMonitoring();
       else        parent.world.beginMonitoring();
     }

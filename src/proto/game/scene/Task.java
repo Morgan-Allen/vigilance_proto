@@ -5,6 +5,7 @@ import proto.game.world.*;
 import proto.common.*;
 import proto.game.person.*;
 import proto.util.*;
+import proto.view.*;
 
 
 
@@ -137,12 +138,12 @@ public abstract class Task implements Assignment {
     
     final int time = world.totalMinutes();
     if (initTime == -1) initTime = time;
-    if ((time - initTime) > timeTaken) attemptTask();
+    if ((time - initTime) > timeTaken) attemptTask(world);
   }
   
   
-  public boolean attemptTask() {
-    success = performTest();
+  public boolean attemptTask(World world) {
+    success = performTest(world);
     if (success) {
       onSuccess();
     }
@@ -150,11 +151,12 @@ public abstract class Task implements Assignment {
       onFailure();
     }
     complete = true;
+    presentMessage(world);
     return success;
   }
   
   
-  protected boolean performTest() {
+  protected boolean performTest(World world) {
     boolean okay = true;
     
     for (int n = tested.length; n-- > 0;) {
@@ -201,6 +203,19 @@ public abstract class Task implements Assignment {
       if (++n < tested.length) s.append(", ");
     }
     return s.toString();
+  }
+  
+  
+  protected void presentMessage(final World world) {
+    world.view().queueMessage(new MessageView(
+      icon(), "Task complete: "+name,
+      "",
+      "Dismiss"
+    ) {
+      protected void whenClicked(String option, int optionID) {
+        world.view().dismissMessage(this);
+      }
+    });
   }
   
   

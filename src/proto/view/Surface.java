@@ -17,12 +17,14 @@ public class Surface extends JPanel implements
   MouseListener, MouseMotionListener, KeyListener
 {
   
+  final RunGame game;
   
-  RunGame game;
-  boolean mouseDown, mouseClick, mouseClicked;
-  int mouseX, mouseY;
-  Batch <Character> pressed = new Batch();
-  long numPaints = 0;
+  private boolean mouseDown, mouseClick, mouseClicked;
+  private int mouseX, mouseY;
+  private Object mouseFocus;
+  
+  private Batch <Character> pressed = new Batch();
+  private long numPaints = 0;
   
   
   
@@ -35,8 +37,28 @@ public class Surface extends JPanel implements
   }
   
   
-  public boolean mouseIn(int x, int y, int w, int h) {
+  
+  /**  Utility methods for input queries-
+    */
+  public int mouseX() { return mouseX; }
+  public int mouseY() { return mouseY; }
+  public boolean mouseDown() { return mouseDown; }
+  
+  
+  public void setMouseFocus(Object focus) {
+    this.mouseFocus = focus;
+  }
+  
+  
+  public boolean mouseIn(int x, int y, int w, int h, Object within) {
+    if (mouseFocus != null && mouseFocus != within) return false;
     return mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h;
+  }
+  
+  
+  public boolean mouseClicked(Object within) {
+    if (mouseFocus != null && mouseFocus != within) return false;
+    return mouseClicked;
   }
   
   
@@ -46,6 +68,9 @@ public class Surface extends JPanel implements
   }
   
   
+  
+  /**  Root rendering method/s-
+    */
   public void paintComponent(Graphics g) {
     super.paintComponent(g);
     Graphics2D g2d = (Graphics2D) g;
@@ -78,8 +103,11 @@ public class Surface extends JPanel implements
     this.mouseClick = false;
     pressed.clear();
   }
-
-
+  
+  
+  
+  /**  Basic event listeners-
+    */
   public void mouseDragged(MouseEvent e) {
     this.mouseX = e.getX();
     this.mouseY = e.getY();

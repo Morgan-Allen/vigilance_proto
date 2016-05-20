@@ -41,8 +41,8 @@ public class ViewUtils {
       
       downMore += metrics.getHeight();
       if (downMore > h) break;
-      g.drawString(line, x, y + down);
       down = downMore;
+      g.drawString(line, x, y + down);
     }
   }
   

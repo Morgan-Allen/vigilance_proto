@@ -89,13 +89,13 @@ public class RegionView {
         //  Draw the highlight/selection rectangle, and toggle selection if
         //  clicked-
         final boolean hovered = surface.mouseIn(
-          vx + 20 -5, down - 5, vw + 10 - 40, 60 + 10
+          vx + 20 -5, down - 5, vw + 10 - 40, 60 + 10, this
         );
         if (selectedLead == l || hovered) {
           if (l != selectedLead) g.setColor(Color.GRAY);
           g.drawRect(vx + 20 -5, down - 5, vw + 10 - 40, 60 + 10);
         }
-        if (surface.mouseClicked && hovered) {
+        if (surface.mouseClicked(this) && hovered) {
           boolean selected = parent.lastSelected == l;
           selectedLead = selected ? null : l;
           parent.setSelection(selectedLead);
