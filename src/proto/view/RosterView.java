@@ -60,23 +60,25 @@ public class RosterView {
     Assignment assignTo = parent.currentAssignment();
     
     Image selectCircle = parent.selectCircle;
-    int
-      offX      = (int) viewBounds.xpos(),
-      offY      = (int) viewBounds.ypos(),
-      maxAcross = (int) viewBounds.xdim(),
-      across = 0, down = 15, size = 75, sizeA = 25, pad = 25, x, y
+    final Box2D b = viewBounds;
+    final int
+      vx = (int) b.xpos(),
+      vy = (int) b.ypos(),
+      vw = (int) b.xdim(),
+      vh = (int) b.ydim()
     ;
+    int across = 0, down = 15, size = 75, sizeA = 25, pad = 25, x, y;
     
     for (Person p : base.roster()) {
       
       int nextAcross = across + size + pad;
-      if (nextAcross >= maxAcross) {
+      if (nextAcross >= vw) {
         across = 0;
         down += size + pad + 50;
       }
       
-      x = offX + across;
-      y = offY + down;
+      x = vx + across;
+      y = vy + down;
       across += size + pad;
       
       g.drawImage(p.kind().sprite(), x, y, size, size, null);
@@ -138,7 +140,11 @@ public class RosterView {
         if (o != null    ) o       .setAssigned(p, false);
         if (o != assignTo) assignTo.setAssigned(p, true );
       }
-      else parent.setSelection(selectedPerson = personHovered);
+      else {
+        selectedPerson = personHovered;
+        if (parent.lastSelected == p) selectedPerson = null;
+        parent.setSelection(selectedPerson);
+      }
     }
   }
   

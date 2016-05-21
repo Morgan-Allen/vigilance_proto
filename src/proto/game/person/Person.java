@@ -41,13 +41,13 @@ public class Person implements Session.Saveable {
   };
   
   
-  
   Kind kind;
   Side side;
   String name;
-
+  
   final public PersonStats     stats     = new PersonStats    (this);
   final public PersonRelations relations = new PersonRelations(this);
+  final public PersonHistory   history   = new PersonHistory  (this);
   
   int luck = INIT_LUCK, stress = INIT_STRESS;
   Equipped equipSlots[] = new Equipped[NUM_EQUIP_SLOTS];
@@ -71,6 +71,8 @@ public class Person implements Session.Saveable {
     this.kind = kind;
     this.name = name;
     
+    history.setSummary(kind.defaultInfo());
+    
     for (int n = 0; n < kind.baseEquipped().length; n++) {
       equipItem(kind.baseEquipped()[n]);
     }
@@ -91,12 +93,15 @@ public class Person implements Session.Saveable {
   
   public Person(Session s) throws Exception {
     s.cacheInstance(this);
-    kind    = (Kind) s.loadObject();
-    side    = (Side) s.loadEnum(Side.values());
-    name    = s.loadString();
+    
+    kind = (Kind) s.loadObject();
+    side = (Side) s.loadEnum(Side.values());
+    name = s.loadString();
     
     stats    .loadState(s);
     relations.loadState(s);
+    history  .loadState(s);
+    
     luck   = s.loadInt();
     stress = s.loadInt();
     for (int i = 0 ; i < NUM_EQUIP_SLOTS; i++) {
@@ -128,6 +133,8 @@ public class Person implements Session.Saveable {
     
     stats    .saveState(s);
     relations.saveState(s);
+    history  .saveState(s);
+    
     s.saveInt(luck  );
     s.saveInt(stress);
     for (int i = 0 ; i < NUM_EQUIP_SLOTS; i++) {

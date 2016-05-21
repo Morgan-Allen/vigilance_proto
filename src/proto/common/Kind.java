@@ -22,6 +22,7 @@ public class Kind extends Index.Entry implements Session.Saveable {
     TYPE_BOSS     = 4;
   
   String name;
+  String defaultInfo;
   Image sprite;
   
   //  TODO:  Move these out into a dedicated person/prop-kind class.
@@ -53,7 +54,7 @@ public class Kind extends Index.Entry implements Session.Saveable {
   
   
   public static Kind ofPerson(
-    String name, String ID, String spritePath,
+    String name, String ID, String spritePath, String defaultInfo,
     int type, Object... initStats
   ) {
     Kind k = new Kind(ID);
@@ -91,6 +92,7 @@ public class Kind extends Index.Entry implements Session.Saveable {
     k.customItems  = allC.toArray(Equipped.class);
     
     k.name = name;
+    k.defaultInfo = defaultInfo;
     k.sprite = loadImage(spritePath);
     return k;
   }
@@ -135,6 +137,8 @@ public class Kind extends Index.Entry implements Session.Saveable {
   
   public String name  () { return name  ; }
   public Image  sprite() { return sprite; }
+  
+  public String defaultInfo() { return defaultInfo; }
   
   
   public static Image loadImage(String spritePath) {

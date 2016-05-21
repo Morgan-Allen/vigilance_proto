@@ -30,8 +30,10 @@ public class WorldView {
   
   MapView    mapView   ;
   RegionView regionView;
-  RosterView rosterView;
   BaseView   baseView  ;
+  PersonView personView;
+  
+  RosterView rosterView;
   Image alertMarker, selectCircle, constructMark;
   
   List <MessageView> messageQueue = new List();
@@ -42,10 +44,12 @@ public class WorldView {
     this.world = world;
     
     rosterView = new RosterView(this, new Box2D(20 , 20, 320, 560));
+    
+    personView = new PersonView(this, new Box2D(320, 20, 880, 560));
     mapView    = new MapView   (this, new Box2D(320, 20, 360, 560));
     regionView = new RegionView(this, new Box2D(680, 20, 520, 560));
     baseView   = new BaseView  (this, new Box2D(320, 20, 360, 560));
-
+    
     final String
       MAPS_DIR = "media assets/city map/",
       ACTS_DIR = "media assets/action view/"
@@ -98,12 +102,16 @@ public class WorldView {
     MessageView message = messageQueue.first();
     surface.setMouseFocus(message);
     
-    //
-    //  TODO:  Only render some of these at a time!
-    mapView   .renderTo(surface, g);
-    regionView.renderTo(surface, g);
-    baseView  .renderTo(surface, g);
     rosterView.renderTo(surface, g);
+    //  TODO:  The toggling-criteria here could use some review...
+    if (lastSelected instanceof Person) {
+      personView.renderTo(surface, g);
+    }
+    else {
+      mapView   .renderTo(surface, g);
+      regionView.renderTo(surface, g);
+      baseView  .renderTo(surface, g);
+    }
     
     g.setColor(Color.WHITE);
     String timeString = ViewUtils.getTimeString(world);

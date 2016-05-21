@@ -17,7 +17,6 @@ import java.util.StringTokenizer;
 public class ViewUtils {
   
   
-  
   static void drawWrappedString(
     String s, Graphics2D g, int x, int y, int w, int h
   ) {
@@ -39,13 +38,15 @@ public class ViewUtils {
         
         lineMore = line + token + " ";
         int lineWide = metrics.stringWidth(lineMore);
-        if (lineWide > w) break;
+        if (lineWide >= w) break;
+        
         line = lineMore;
         tokens.removeFirst();
       }
       
       downMore += metrics.getHeight();
       if (downMore > h) break;
+      
       down = downMore;
       g.drawString(line, x, y + down);
     }
@@ -62,7 +63,6 @@ public class ViewUtils {
       x += 20;
     }
   }
-  
   
   
   final static DateFormat

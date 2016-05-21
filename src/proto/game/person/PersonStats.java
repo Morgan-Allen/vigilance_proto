@@ -18,7 +18,7 @@ public class PersonStats {
   final public static Stat
     PERCEPTION = new Stat("Perception", "stat_perception", ""),
     EVASION    = new Stat("Evasion"   , "stat_evasion"   , ""),
-    SOCIAL     = new Stat("Question"  , "stat_question"  , ""),
+    SOCIAL     = new Stat("Social"    , "stat_social"    , ""),
     COMBAT     = new Stat("Combat"    , "stat_combat"    , ""),
     
     HIT_POINTS = new Stat("Hit Points", "stat_hit_points", ""),
