@@ -9,10 +9,6 @@ import proto.util.*;
 import static proto.game.person.PersonStats.*;
 import proto.content.agents.*;
 
-import java.awt.Image;
-import java.awt.image.BufferedImage;
-
-
 
 
 public class Kidnapping extends Event {
@@ -70,28 +66,28 @@ public class Kidnapping extends Event {
       "Inspect the scene",
       "Inspect the victim's last known location for clues.",
       this, LEAD_INSPECT, home, fibres, Task.TIME_SHORT,
-      PERCEPTION, 4
+      INTELLECT, 4
     ));
     this.assignLeads(new Lead(
       "Fibres",
       "It looks like the kidnapper snagged some fibres when they broke the "+
       "window.",
       this, LEAD_FIBRES, fibres, taken, Task.TIME_MEDIUM,
-      PERCEPTION, 6
+      INTELLECT, 6
     ));
     this.assignLeads(new Lead(
       "Escape with "+missing,
       "You've found where "+missing+" is being kept.  You could try to free "+
       "the victim and escape without alerting their captors.",
       this, LEAD_RESCUE, taken, missing, Task.TIME_SHORT,
-      EVASION, 7
+      REFLEX, 7
     ));
     this.assignLeads(new Lead(
       "Raid on "+taken,
       "You've found where "+missing+" is being kept.  You could try a direct "+
       "raid to subdue- or at least distract- their captors.",
       this, LEAD_RAID, taken, missing, Task.TIME_SHORT,
-      COMBAT, 6
+      STRENGTH, 6
     ));
   }
   
@@ -108,7 +104,7 @@ public class Kidnapping extends Event {
       }
       else {
         Lead raid = leadWithID(LEAD_RAID);
-        raid.setModifier(COMBAT, -2);
+        raid.setModifier(STRENGTH, -2);
         raid.attemptTask();
       }
     }

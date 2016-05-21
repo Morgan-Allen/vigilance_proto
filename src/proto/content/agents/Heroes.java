@@ -4,6 +4,7 @@ package proto.content.agents;
 import proto.common.*;
 import proto.game.world.*;
 import proto.game.person.*;
+
 import static proto.game.person.PersonStats.*;
 
 
@@ -20,12 +21,31 @@ public class Heroes {
       "philanthropists, Bruce Wayne swore to repay their deaths at the hands "+
       "of a criminal by warring upon Gotham's underworld.",
       Kind.TYPE_HERO,
-      PERCEPTION, 7 ,
-      EVASION   , 7 ,
+      INTELLECT , 7 ,
+      REFLEX    , 7 ,
       SOCIAL    , 7 ,
-      COMBAT    , 7 ,
+      STRENGTH  , 7 ,
       HIT_POINTS, 21,
-      WILLPOWER , 21
+      WILLPOWER , 21,
+      
+      ENGINEERING  , 6,
+      INFORMATICS  , 6,
+      PHARMACY     , 6,
+      ANATOMY      , 6,
+      LAW_N_FINANCE, 5,
+      THE_OCCULT   , 1,
+      LANGUAGES    , 6,
+      QUESTION     , 7,
+      DISGUISE     , 7,
+      SUASION      , 5,
+      STEALTH      , 7,
+      SURVEILLANCE , 7,
+      VEHICLES     , 7,
+      MARKSMAN     , 7,
+      INTIMIDATE   , 8,
+      GYMNASTICS   , 7,
+      CLOSE_COMBAT , 7,
+      STAMINA      , 7
     )
   ;
   
@@ -35,12 +55,31 @@ public class Heroes {
       "Bruce's caretaker, mentor, occasional confidante, and old family "+
       "friend.",
       Kind.TYPE_HERO,
-      PERCEPTION, 6 ,
-      EVASION   , 3 ,
+      INTELLECT , 6 ,
+      REFLEX    , 3 ,
       SOCIAL    , 6 ,
-      COMBAT    , 5 ,
+      STRENGTH  , 5 ,
       HIT_POINTS, 16,
-      WILLPOWER , 20
+      WILLPOWER , 20,
+      
+      ENGINEERING  , 2,
+      INFORMATICS  , 0,
+      PHARMACY     , 3,
+      ANATOMY      , 5,
+      LAW_N_FINANCE, 6,
+      THE_OCCULT   , 0,
+      LANGUAGES    , 4,
+      QUESTION     , 3,
+      DISGUISE     , 4,
+      SUASION      , 6,
+      STEALTH      , 2,
+      SURVEILLANCE , 4,
+      VEHICLES     , 6,
+      MARKSMAN     , 6,
+      INTIMIDATE   , 2,
+      GYMNASTICS   , 0,
+      CLOSE_COMBAT , 5,
+      STAMINA      , 5
     )
   ;
   
@@ -49,10 +88,10 @@ public class Heroes {
       "Swarm", "hero_kind_swarm", IMG_DIR+"icon_swarm.png",
       "THE BATS!  THEY GET EVERYWHERE!",
       Kind.TYPE_HERO,
-      PERCEPTION, 10,
-      EVASION   , 8 ,
+      INTELLECT , 2 ,
+      REFLEX    , 8 ,
       SOCIAL    , 0 ,
-      COMBAT    , 2 ,
+      STRENGTH  , 2 ,
       HIT_POINTS, 8 ,
       WILLPOWER , 8
     )
@@ -64,12 +103,31 @@ public class Heroes {
       "A former ward of Bruce Wayne, united in his dedication to fighting "+
       "crime but separated by differences over methods and motivation.",
       Kind.TYPE_HERO,
-      PERCEPTION, 5 ,
-      EVASION   , 6 ,
+      INTELLECT , 5 ,
+      REFLEX    , 6 ,
       SOCIAL    , 7 ,
-      COMBAT    , 6 ,
+      STRENGTH  , 6 ,
       HIT_POINTS, 20,
-      WILLPOWER , 18
+      WILLPOWER , 18,
+      
+      ENGINEERING  , 3,
+      INFORMATICS  , 2,
+      PHARMACY     , 3,
+      ANATOMY      , 2,
+      LAW_N_FINANCE, 0,
+      THE_OCCULT   , 0,
+      LANGUAGES    , 2,
+      QUESTION     , 5,
+      DISGUISE     , 6,
+      SUASION      , 7,
+      STEALTH      , 7,
+      SURVEILLANCE , 7,
+      VEHICLES     , 7,
+      MARKSMAN     , 7,
+      INTIMIDATE   , 5,
+      GYMNASTICS   , 7,
+      CLOSE_COMBAT , 7,
+      STAMINA      , 7
     )
   ;
   
@@ -80,12 +138,31 @@ public class Heroes {
       "assassin, Ms. Cain possesses uncanny reflexes and steely resolve but "+
       "is functionally mute and easily manipulated.",
       Kind.TYPE_HERO,
-      PERCEPTION, 6 ,
-      EVASION   , 8 ,
+      INTELLECT , 6 ,
+      REFLEX    , 8 ,
       SOCIAL    , 2 ,
-      COMBAT    , 7 ,
+      STRENGTH  , 7 ,
       HIT_POINTS, 16,
-      WILLPOWER , 16
+      WILLPOWER , 16,
+      
+      ENGINEERING  , 0,
+      INFORMATICS  , 0,
+      PHARMACY     , 0,
+      ANATOMY      , 0,
+      LAW_N_FINANCE, 0,
+      THE_OCCULT   , 0,
+      LANGUAGES    , 0,
+      QUESTION     , 0,
+      DISGUISE     , 4,
+      SUASION      , 0,
+      STEALTH      , 7,
+      SURVEILLANCE , 6,
+      VEHICLES     , 6,
+      MARKSMAN     , 7,
+      INTIMIDATE   , 0,
+      GYMNASTICS   , 7,
+      CLOSE_COMBAT , 8,
+      STAMINA      , 5
     )
   ;
   
@@ -95,12 +172,31 @@ public class Heroes {
       "Paranoid conspiracist or the smartest guy left in the room?  That is "+
       "the Question.",
       Kind.TYPE_HERO,
-      PERCEPTION, 8 ,
-      EVASION   , 5 ,
+      INTELLECT , 8 ,
+      REFLEX    , 5 ,
       SOCIAL    , 6 ,
-      COMBAT    , 5 ,
+      STRENGTH  , 5 ,
       HIT_POINTS, 16,
-      WILLPOWER , 14
+      WILLPOWER , 14,
+      
+      ENGINEERING  , 4,
+      INFORMATICS  , 8,
+      PHARMACY     , 4,
+      ANATOMY      , 6,
+      LAW_N_FINANCE, 8,
+      THE_OCCULT   , 4,
+      LANGUAGES    , 8,
+      QUESTION     , 8,
+      DISGUISE     , 8,
+      SUASION      , 5,
+      STEALTH      , 7,
+      SURVEILLANCE , 7,
+      VEHICLES     , 3,
+      MARKSMAN     , 5,
+      INTIMIDATE   , 4,
+      GYMNASTICS   , 4,
+      CLOSE_COMBAT , 5,
+      STAMINA      , 4
     )
   ;
   

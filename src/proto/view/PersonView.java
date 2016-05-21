@@ -13,12 +13,33 @@ import java.awt.Graphics2D;
 
 public class PersonView {
   
-  
   final static Object[] STAT_DISPLAY_COORDS = {
-    PERCEPTION, 0, 0,
-    EVASION   , 0, 1,
+    INTELLECT, 0, 0,
+    REFLEX   , 0, 1,
     SOCIAL    , 0, 2,
-    COMBAT    , 0, 3,
+    STRENGTH    , 0, 3,
+
+    ENGINEERING  , 0, 5 ,
+    INFORMATICS  , 0, 6 ,
+    PHARMACY     , 0, 7 ,
+    ANATOMY      , 0, 8 ,
+    LAW_N_FINANCE, 0, 9 ,
+    THE_OCCULT   , 0, 10,
+    
+    LANGUAGES    , 1, 0 ,
+    QUESTION     , 1, 1 ,
+    DISGUISE     , 1, 2 ,
+    SUASION      , 1, 3 ,
+    
+    STEALTH      , 1, 5 ,
+    SURVEILLANCE , 1, 6 ,
+    VEHICLES     , 1, 7 ,
+    MARKSMAN     , 1, 8 ,
+    
+    INTIMIDATE   , 1, 10,
+    GYMNASTICS   , 1, 11,
+    CLOSE_COMBAT , 1, 12,
+    STAMINA      , 1, 13,
   };
   
   final WorldView parent;
@@ -57,13 +78,13 @@ public class PersonView {
       int index = Visit.indexOf(t, STAT_DISPLAY_COORDS);
       if (index == -1) continue;
       
-      float level = person.stats.levelFor(t);
+      int level = person.stats.levelFor(t);
       int x = (Integer) STAT_DISPLAY_COORDS[index + 1];
       int y = (Integer) STAT_DISPLAY_COORDS[index + 2];
-      x *= 100;
+      x *= 150;
       y *=  20;
-      g.drawString(t.name    , vx + x + 20     , vy + y + 120 + 25);
-      g.drawString(": "+level, vx + x + 20 + 75, vy + y + 120 + 25);
+      g.drawString(t.name    , vx + x + 20      , vy + y + 120 + 25);
+      g.drawString(""+level, vx + x + 20 + 100, vy + y + 120 + 25);
     }
     
   }

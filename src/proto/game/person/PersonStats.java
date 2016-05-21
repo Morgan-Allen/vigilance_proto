@@ -10,29 +10,58 @@ public class PersonStats {
   
   
   static class Stat extends Trait {
-    public Stat(String name, String ID, String description) {
+    
+    final Stat roots[];
+    
+    public Stat(String name, String ID, String description, Stat... roots) {
       super(name, ID, description);
+      this.roots = roots;
     }
   }
   
   final public static Stat
-    PERCEPTION = new Stat("Perception", "stat_perception", ""),
-    EVASION    = new Stat("Evasion"   , "stat_evasion"   , ""),
-    SOCIAL     = new Stat("Social"    , "stat_social"    , ""),
-    COMBAT     = new Stat("Combat"    , "stat_combat"    , ""),
+    INTELLECT  = new Stat("Intellect" , "stat_intellect", ""),
+    REFLEX     = new Stat("Reflex"    , "stat_reflex"   , ""),
+    SOCIAL     = new Stat("Social"    , "stat_social"   , ""),
+    STRENGTH   = new Stat("Strength"  , "stat_strength" , ""),
+    BASE_STATS[] = { INTELLECT, REFLEX, SOCIAL, STRENGTH },
     
     HIT_POINTS = new Stat("Hit Points", "stat_hit_points", ""),
     WILLPOWER  = new Stat("Willpower" , "stat_willpower" , ""),
+    PHYS_STATS[] = { HIT_POINTS, WILLPOWER },
     
-    BASE_STATS[] = {
-      PERCEPTION, EVASION, SOCIAL, COMBAT
+    ENGINEERING   = new Stat("Engineering"  , "skill_eng", "", INTELLECT),
+    INFORMATICS   = new Stat("Informatics"  , "skill_inf", "", INTELLECT),
+    PHARMACY      = new Stat("Pharmacy"     , "skill_pha", "", INTELLECT),
+    ANATOMY       = new Stat("Anatomy"      , "skill_ant", "", INTELLECT),
+    LAW_N_FINANCE = new Stat("Law & Finance", "skill_law", "", INTELLECT),
+    THE_OCCULT    = new Stat("The Occult"   , "skill_occ", "", INTELLECT),
+    
+    LANGUAGES     = new Stat("Languages", "skill_lng", "", INTELLECT, SOCIAL),
+    QUESTION      = new Stat("Question" , "skill_que", "", INTELLECT, SOCIAL),
+    DISGUISE      = new Stat("Disguise" , "skill_dis", "", SOCIAL),
+    SUASION       = new Stat("Suasion"  , "skill_sua", "", SOCIAL),
+    
+    STEALTH       = new Stat("Stealth"     , "skill_ste", "", REFLEX),
+    SURVEILLANCE  = new Stat("Surveillance", "skill_sur", "", REFLEX),
+    VEHICLES      = new Stat("Vehicles"    , "skill_veh", "", REFLEX),
+    MARKSMAN      = new Stat("Marksman"    , "skill_mrk", "", REFLEX),
+    
+    INTIMIDATE    = new Stat("Intimidate"  , "skill_int", "", STRENGTH, SOCIAL),
+    GYMNASTICS    = new Stat("Gymnastics"  , "skill_gym", "", STRENGTH, REFLEX),
+    CLOSE_COMBAT  = new Stat("Close Combat", "skill_ccm", "", STRENGTH, REFLEX),
+    STAMINA       = new Stat("Stamina"     , "skill_sta", "", STRENGTH),
+    
+    ALL_SKILLS[] = {
+      ENGINEERING, INFORMATICS, PHARMACY, ANATOMY, LAW_N_FINANCE, THE_OCCULT,
+      LANGUAGES , QUESTION    , DISGUISE    , SUASION ,
+      STEALTH   , SURVEILLANCE, VEHICLES    , MARKSMAN,
+      INTIMIDATE, GYMNASTICS  , CLOSE_COMBAT, STAMINA
     },
-    PHYS_STATS[] = {
-      HIT_POINTS, WILLPOWER
-    },
-    ALL_STATS[] = (Stat[]) Visit.compose(Stat.class, BASE_STATS, PHYS_STATS)
+    ALL_STATS[] = (Stat[]) Visit.compose(
+      Stat.class, BASE_STATS, PHYS_STATS, ALL_SKILLS
+    )
   ;
-  
   
   
   final Person person;

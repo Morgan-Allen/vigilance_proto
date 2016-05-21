@@ -18,10 +18,10 @@ public class Crooks {
       "Mobster", "person_kind_mobster", IMG_DIR+"icon_mobster.png",
       "",
       Kind.TYPE_MOOK,
-      PERCEPTION, 4 ,
-      EVASION   , 4 ,
+      INTELLECT , 4 ,
+      REFLEX    , 4 ,
       SOCIAL    , 4 ,
-      COMBAT    , 4 ,
+      STRENGTH  , 4 ,
       HIT_POINTS, 10,
       WILLPOWER , 8
     )
@@ -32,10 +32,10 @@ public class Crooks {
       "Civilian", "person_kind_civilian", IMG_DIR+"icon_civilian_2.png",
       "",
       Kind.TYPE_CIVILIAN,
-      PERCEPTION, 2 ,
-      EVASION   , 2 ,
+      INTELLECT , 2 ,
+      REFLEX    , 2 ,
       SOCIAL    , 2 ,
-      COMBAT    , 2 ,
+      STRENGTH  , 2 ,
       HIT_POINTS, 6 ,
       WILLPOWER , 4
     )
