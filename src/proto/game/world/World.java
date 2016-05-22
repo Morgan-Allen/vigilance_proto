@@ -4,6 +4,8 @@ package proto.game.world;
 import proto.common.*;
 import proto.content.agents.Heroes;
 import proto.content.events.Kidnapping;
+import proto.content.rooms.Gymnasium;
+import proto.content.rooms.Library;
 import proto.game.person.*;
 import proto.util.*;
 import proto.view.*;
@@ -117,10 +119,8 @@ public class World implements Session.Saveable {
     base.addToRoster(new Person(Heroes.HERO_NIGHTWING));
     base.addToRoster(new Person(Heroes.HERO_QUESTION ));
     
-    base.addFacility(Blueprint.INFIRMARY    , 0, 1f);
-    base.addFacility(Blueprint.TRAINING_ROOM, 1, 1f);
-    base.addFacility(Blueprint.GENERATOR    , 2, 1f);
-    base.addFacility(Blueprint.ARBORETUM    , 3, 1f);
+    base.addFacility(Gymnasium.BLUEPRINT, 0, 1f);
+    base.addFacility(Library  .BLUEPRINT, 1, 1f);
     
     base.updateBase(0);
     base.currentFunds = 500;
@@ -183,34 +183,20 @@ public class World implements Session.Saveable {
     
     if (amWatching) {
       final float realGap = 1f / RunGame.FRAME_RATE;
-      timeHours += realGap * GAME_HOURS_PER_REAL_SECOND;
+      final float timeGap = realGap * GAME_HOURS_PER_REAL_SECOND;
+      timeHours += timeGap;
+      
       while (timeHours > HOURS_PER_DAY) {
         timeDays++;
         timeHours -= HOURS_PER_DAY;
       }
       
       events.updateEvents();
+      base.updateBase(timeGap / (HOURS_PER_DAY * DAYS_PER_WEEK));
     }
     /*
     if (enteredScene != null) {
       enteredScene.updateScene();
-    }
-    else if (amWatching) {
-      for (Nation n : nations) {
-        
-        if (Rand.num() < n.crime && n.mission == null) {
-          final Scene s = n.generateCrisis(this);
-          n.mission = s;
-          amWatching = false;
-        }
-        
-        if (n.mission != null && n.mission.expireTime() <= currentTime) {
-          n.mission.resolveAsIgnored();
-          n.mission = null;
-        }
-      }
-      base.updateBase(1);
-      currentTime += 1;
     }
     //*/
   }

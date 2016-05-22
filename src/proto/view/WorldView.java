@@ -28,13 +28,15 @@ public class WorldView {
   Object lastSelected;
   int personPaneMode = PANE_ABILITIES;
   
-  MapView    mapView   ;
-  RegionView regionView;
   BaseView   baseView  ;
-  PersonView personView;
+  MapView    mapView   ;
+  RoomView   roomView  ;
+  RegionView regionView;
   
   RosterView rosterView;
-  Image alertMarker, selectCircle, constructMark;
+  PersonView personView;
+  
+  Image alertMarker, selectCircle, selectSquare;
   
   List <MessageView> messageQueue = new List();
   
@@ -43,16 +45,37 @@ public class WorldView {
   public WorldView(World world) {
     this.world = world;
     
-    rosterView = new RosterView(this, new Box2D(20 , 20, 320, 560));
+    int fullHigh = 750, fullWide = 1200;
+    int paneDown = 20, paneHigh = fullHigh - (20 + 20);
     
-    personView = new PersonView(this, new Box2D(320, 20, 880, 560));
-    mapView    = new MapView   (this, new Box2D(320, 20, 360, 560));
-    regionView = new RegionView(this, new Box2D(680, 20, 520, 560));
-    baseView   = new BaseView  (this, new Box2D(320, 20, 360, 560));
+    rosterView = new RosterView(this, new Box2D(20 , 20, 320, fullHigh - 40));
+    personView = new PersonView(this, new Box2D(
+      320, paneDown,
+      880, paneHigh
+    ));
+    
+    baseView = new BaseView(this, new Box2D(
+      320, paneDown,
+      400, paneHigh
+    ));
+    mapView = new MapView(this, new Box2D(
+      320 + 80, paneDown +  80,
+      320     , paneHigh - 240
+    ));
+    roomView = new RoomView(this, new Box2D(
+      720, paneDown,
+      480, paneHigh
+    ));
+    regionView = new RegionView(this, new Box2D(
+      720, paneDown,
+      480, paneHigh
+    ));
+    
     
     final String
       MAPS_DIR = "media assets/city map/",
-      ACTS_DIR = "media assets/action view/"
+      ACTS_DIR = "media assets/action view/",
+      MNUI_DIR = "media assets/main UI/"
     ;
     mapView.loadMapImages(
       MAPS_DIR+"city_map.png",
@@ -60,7 +83,7 @@ public class WorldView {
     );
     alertMarker   = Kind.loadImage(MAPS_DIR+"alert_symbol.png" );
     selectCircle  = Kind.loadImage(ACTS_DIR+"select_circle.png");
-    constructMark = Kind.loadImage(Blueprint.IMG_DIR+"under_construction.png");
+    selectSquare  = Kind.loadImage(MNUI_DIR+"select_square.png");
   }
   
   
@@ -108,9 +131,10 @@ public class WorldView {
       personView.renderTo(surface, g);
     }
     else {
-      mapView   .renderTo(surface, g);
-      regionView.renderTo(surface, g);
       baseView  .renderTo(surface, g);
+      mapView   .renderTo(surface, g);
+      roomView  .renderTo(surface, g);
+      regionView.renderTo(surface, g);
     }
     
     g.setColor(Color.WHITE);

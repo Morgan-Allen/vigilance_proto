@@ -30,9 +30,10 @@ public class RegionView {
   /**  Actual rendering methods-
     */
   void renderTo(Surface surface, Graphics2D g) {
-    
-    Nation nation = parent.mapView.selectedNation;
-    if (nation == null) return;
+
+    Object area = parent.baseView.selectedArea;
+    if (! (area instanceof Nation)) return;
+    Nation nation = (Nation) area;
     
     final int
       vx = (int) viewBounds.xpos(),

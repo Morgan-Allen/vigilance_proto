@@ -74,6 +74,7 @@ public class Lead extends Task {
     */
   protected void presentMessage(final World world) {
     
+    //  TODO:  Move this out to the View directory!
     StringBuffer s = new StringBuffer();
     
     for (Person p : assigned) {

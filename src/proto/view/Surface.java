@@ -31,7 +31,7 @@ public class Surface extends JPanel implements
   public Surface(RunGame runGame) {
     this.game = runGame;
     
-    this.setPreferredSize(new Dimension(1200, 600));
+    this.setPreferredSize(new Dimension(1200, 750));
     addMouseListener(this);
     addMouseMotionListener(this);
   }
@@ -52,7 +52,7 @@ public class Surface extends JPanel implements
   
   public boolean mouseIn(int x, int y, int w, int h, Object within) {
     if (mouseFocus != null && mouseFocus != within) return false;
-    return mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h;
+    return mouseX > x && mouseX <= x + w && mouseY > y && mouseY <= y + h;
   }
   
   

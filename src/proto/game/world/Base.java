@@ -29,9 +29,6 @@ public class Base implements Session.Saveable {
   
   Base(World world) {
     this.world = world;
-    for (int n = 0 ; n < MAX_FACILITIES; n++) {
-      addFacility(Blueprint.NONE, n, 1);
-    }
   }
   
   
@@ -83,6 +80,8 @@ public class Base implements Session.Saveable {
   public int supportUse() { return supportUse; }
   public int maxSupport() { return maxSupport; }
   
+  public World world() { return world; }
+  
   
   
   /**  Regular updates and life-cycle methods:
@@ -103,9 +102,8 @@ public class Base implements Session.Saveable {
       if (p.breathing()) supportUse += 1;
       p.updateOnBase(numWeeks);
     }
-    for (Room r : rooms) {
-      r.blueprint.updateForBase(this, r);
-      for (Person p : r.assigned) r.blueprint.affectVisitor(p, this);
+    for (Room r : rooms) if (r != null) {
+      r.updateRoom();
     }
     
     this.currentFunds += (income - maintenance) * numWeeks;
@@ -166,7 +164,7 @@ public class Base implements Session.Saveable {
   /**  Construction and salvage-
     */
   public boolean canConstruct(Blueprint print, int slot) {
-    if (rooms[slot].blueprint != Blueprint.NONE) return false;
+    if (rooms[slot] != null) return false;
     if (print.buildCost > currentFunds) return false;
     return true;
   }
@@ -176,7 +174,6 @@ public class Base implements Session.Saveable {
     float rate = 1f, numBuilding = 0;
     for (Room r : rooms) if (r.buildProgress < 1) numBuilding++;
     if (numBuilding == 0) return 1;
-    //rate *= engineerForce();
     return rate / (numBuilding * print.buildTime);
   }
   
@@ -188,8 +185,9 @@ public class Base implements Session.Saveable {
   
   
   public void addFacility(Blueprint print, int slot, float progress) {
+    if (print == null) { rooms[slot] = null; return; }
     Room room = rooms[slot];
-    if (room == null) room = rooms[slot] = new Room(this, slot);
+    if (room == null) room = rooms[slot] = print.createRoom(this, slot);
     room.blueprint     = print;
     room.buildProgress = progress;
   }
@@ -203,7 +201,7 @@ public class Base implements Session.Saveable {
   
   public void beginSalvage(int slot) {
     currentFunds += rooms[slot].blueprint.buildCost / 2f;
-    addFacility(Blueprint.NONE, slot, 1);
+    addFacility(null, slot, 1);
   }
   
   

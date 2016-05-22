@@ -152,7 +152,7 @@ public abstract class Task implements Assignment {
   
   /**  Task performance and completion-
     */
-  protected void updateAssignment() {
+  public void updateAssignment() {
     if (assigned.empty() || complete) return;
     
     final int time = world.totalMinutes();
@@ -170,9 +170,14 @@ public abstract class Task implements Assignment {
       onFailure();
     }
     complete = true;
+    onCompletion();
+    return success;
+  }
+  
+  
+  protected void onCompletion() {
     presentMessage(world);
     for (Person p : assigned) setAssigned(p, false);
-    return success;
   }
   
   
@@ -197,6 +202,12 @@ public abstract class Task implements Assignment {
     }
     
     return okay;
+  }
+  
+  
+  protected void resetTask() {
+    complete = success = false;
+    initTime = -1;
   }
   
   

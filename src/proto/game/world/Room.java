@@ -3,13 +3,14 @@
 package proto.game.world;
 import proto.common.*;
 import proto.game.person.*;
+import proto.game.scene.*;
 import proto.util.*;
 
 import java.awt.Image;
 
 
 
-public class Room implements Session.Saveable, Assignment {
+public abstract class Room implements Session.Saveable {
   
   
   /**  Data fields, construction and save/load methods-
@@ -19,11 +20,12 @@ public class Room implements Session.Saveable, Assignment {
   
   Blueprint blueprint;
   float buildProgress;
-  List <Person> assigned = new List();
   
   
-  Room(Base base, int slotIndex) {
-    this.base = base;
+  
+  protected Room(Base base, Blueprint print, int slotIndex) {
+    this.base      = base;
+    this.blueprint = print;
     this.slotIndex = slotIndex;
   }
   
@@ -34,7 +36,6 @@ public class Room implements Session.Saveable, Assignment {
     slotIndex     = s.loadInt();
     blueprint     = (Blueprint) s.loadObject();
     buildProgress = s.loadFloat();
-    s.loadObjects(assigned);
   }
   
   
@@ -43,59 +44,41 @@ public class Room implements Session.Saveable, Assignment {
     s.saveInt(slotIndex);
     s.saveObject(blueprint);
     s.saveFloat(buildProgress);
-    s.saveObjects(assigned);
-  }
-  
-  
-  
-  /**  Blueprints and (physical) construction-
-    */
-  public Blueprint blueprint() {
-    return blueprint;
-  }
-  
-  
-  public float buildProgress() {
-    return buildProgress;
   }
   
   
   
   /**  Toggling visitors-
     */
-  public void setAssigned(Person p, boolean is) {
-    assigned.toggleMember(p, is);
-    p.setAssignment(is ? this : null);
+  public Series <Person> visitors() {
+    final Batch <Person> visitors = new Batch();
+    for (Task t : possibleTasks()) for (Person p : t.assigned()) {
+      visitors.include(p);
+    }
+    return visitors;
   }
   
   
-  public boolean allowsAssignment(Person p) {
-    if (buildProgress < 1) return false;
-    if (assigned.includes(p)) return true;
-    return assigned.size() < blueprint.visitLimit;
+  public void updateRoom() {
+    for (Task t : possibleTasks()) {
+      t.updateAssignment();
+    }
   }
   
   
-  public Series <Person> assigned() {
-    return assigned;
-  }
-  
-  
-  public boolean complete() {
-    return false;
-  }
+  public abstract Task[] possibleTasks();
   
   
   
   /**  Rendering, debug and interface methods-
     */
   public String toString() {
-    return blueprint.name+" (Room "+slotIndex+")";
+    return blueprint.name;
   }
   
   
   public String name() {
-    return blueprint.name+" (Room "+slotIndex+")";
+    return blueprint.name;
   }
   
   

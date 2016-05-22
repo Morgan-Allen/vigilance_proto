@@ -16,9 +16,9 @@ public class PersonView {
   final static Object[] STAT_DISPLAY_COORDS = {
     INTELLECT, 0, 0,
     REFLEX   , 0, 1,
-    SOCIAL    , 0, 2,
-    STRENGTH    , 0, 3,
-
+    SOCIAL   , 0, 2,
+    STRENGTH , 0, 3,
+    
     ENGINEERING  , 0, 5 ,
     INFORMATICS  , 0, 6 ,
     PHARMACY     , 0, 7 ,
@@ -72,9 +72,10 @@ public class PersonView {
     ViewUtils.drawWrappedString(
       person.history.summary(), g, vx + 125, vy + 20, vw - (120 + 10), 100
     );
-    //g.drawRect(vx + 125, vy + 20, vw - (120 + 10), 100);
     
-    for (Trait t : ALL_STATS) {
+    Stat hovered = null;
+    
+    for (Stat t : ALL_STATS) {
       int index = Visit.indexOf(t, STAT_DISPLAY_COORDS);
       if (index == -1) continue;
       
@@ -83,10 +84,38 @@ public class PersonView {
       int y = (Integer) STAT_DISPLAY_COORDS[index + 2];
       x *= 150;
       y *=  20;
-      g.drawString(t.name    , vx + x + 20      , vy + y + 120 + 25);
+      Color forT = Color.WHITE;
+      
+      if (surface.mouseIn(vx + x + 20, vy + y + 120 + 10, 150, 20, this)) {
+        hovered = t;
+        forT = Color.YELLOW;
+      }
+      
+      g.setColor(forT);
+      g.drawString(t.name  , vx + x + 20      , vy + y + 120 + 25);
       g.drawString(""+level, vx + x + 20 + 100, vy + y + 120 + 25);
     }
     
+    if (hovered != null) {
+      g.setColor(Color.LIGHT_GRAY);
+      
+      String desc = "";
+      if (hovered.roots.length == 0) {
+        
+      }
+      else {
+        desc += "\n  Bonus from: ";
+        for (Stat r : hovered.roots) {
+          desc += r;
+          if (r != Visit.last(hovered.roots)) desc += " plus ";
+        }
+      }
+      desc = hovered.description + desc;
+      
+      ViewUtils.drawWrappedString(
+        desc, g, vx + 20, vy + 120 + (15 * 20), 300, 100
+      );
+    }
   }
   
   

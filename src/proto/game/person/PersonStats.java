@@ -9,9 +9,9 @@ import proto.util.*;
 public class PersonStats {
   
   
-  static class Stat extends Trait {
+  public static class Stat extends Trait {
     
-    final Stat roots[];
+    final public Stat roots[];
     
     public Stat(String name, String ID, String description, Stat... roots) {
       super(name, ID, description);
@@ -20,37 +20,137 @@ public class PersonStats {
   }
   
   final public static Stat
-    INTELLECT  = new Stat("Intellect" , "stat_intellect", ""),
-    REFLEX     = new Stat("Reflex"    , "stat_reflex"   , ""),
-    SOCIAL     = new Stat("Social"    , "stat_social"   , ""),
-    STRENGTH   = new Stat("Strength"  , "stat_strength" , ""),
+    INTELLECT  = new Stat(
+      "Intellect", "stat_intellect",
+      "Abstract logic, knowledge and planning ability."
+    ),
+    REFLEX     = new Stat(
+      "Reflex", "stat_reflex",
+      "Agility, sensory acuity and motor coordination."
+    ),
+    SOCIAL     = new Stat(
+      "Social", "stat_social",
+      "Charm, presence, and emotional awareness."
+    ),
+    STRENGTH   = new Stat(
+      "Strength", "stat_strength",
+      "Brute force, stature and muscle development."
+    ),
     BASE_STATS[] = { INTELLECT, REFLEX, SOCIAL, STRENGTH },
     
     HIT_POINTS = new Stat("Hit Points", "stat_hit_points", ""),
     WILLPOWER  = new Stat("Willpower" , "stat_willpower" , ""),
     PHYS_STATS[] = { HIT_POINTS, WILLPOWER },
     
-    ENGINEERING   = new Stat("Engineering"  , "skill_eng", "", INTELLECT),
-    INFORMATICS   = new Stat("Informatics"  , "skill_inf", "", INTELLECT),
-    PHARMACY      = new Stat("Pharmacy"     , "skill_pha", "", INTELLECT),
-    ANATOMY       = new Stat("Anatomy"      , "skill_ant", "", INTELLECT),
-    LAW_N_FINANCE = new Stat("Law & Finance", "skill_law", "", INTELLECT),
-    THE_OCCULT    = new Stat("The Occult"   , "skill_occ", "", INTELLECT),
+    ENGINEERING   = new Stat(
+      "Engineering", "skill_eng",
+      "Engineering skill allows an agent to construct and repair gadgets, "+
+      "vehicles, and base facilities.",
+      INTELLECT
+    ),
+    INFORMATICS   = new Stat(
+      "Informatics", "skill_inf",
+      "Informatics covers software engineering, data mining and encryption- "+
+      "necessary for certain forms of research and advanced gadgetry.",
+      INTELLECT
+    ),
+    PHARMACY      = new Stat(
+      "Pharmacy", "skill_pha",
+      "A knowledge of pharmacy allows a character to concoct vaccines and "+
+      "medicines- or chemical weapons for their own use.",
+      INTELLECT
+    ),
+    ANATOMY       = new Stat(
+      "Anatomy", "skill_ant",
+      "A knowledge of anatomy is essential to treatment of serious injury- "+
+      "and can let you inflict crushing blows.",
+      INTELLECT
+    ),
+    LAW_N_FINANCE = new Stat(
+      "Law & Finance", "skill_law",
+      "A knowledge of loopholes, regulations and wheels to grease helps to "+
+      "navigate the corporate world and judicial process.",
+      INTELLECT
+    ),
+    THE_OCCULT    = new Stat(
+      "The Occult", "skill_occ",
+      "There are some things man was not meant to know.",
+      INTELLECT
+    ),
     
-    LANGUAGES     = new Stat("Languages", "skill_lng", "", INTELLECT, SOCIAL),
-    QUESTION      = new Stat("Question" , "skill_que", "", INTELLECT, SOCIAL),
-    DISGUISE      = new Stat("Disguise" , "skill_dis", "", SOCIAL),
-    SUASION       = new Stat("Suasion"  , "skill_sua", "", SOCIAL),
+    LANGUAGES     = new Stat(
+      "Languages", "skill_lng",
+      "A knowledge of spoken and written languages, both ancient and modern. "+
+      "Often useful for research, travel, questioning or impersonation.",
+      INTELLECT, SOCIAL
+    ),
+    QUESTION      = new Stat(
+      "Question", "skill_que",
+      "Used to obtain information from friendly or neutral persons, and spot "+
+      "inconsistencies or gaps in the account.",
+      INTELLECT, SOCIAL
+    ),
+    DISGUISE      = new Stat(
+      "Disguise" , "skill_dis",
+      "How to blend in or stand out through the use of wigs, props, costume "+
+      "and cosmetics.  Used working undercover or leading a double life.",
+      SOCIAL
+    ),
+    SUASION       = new Stat(
+      "Suasion"  , "skill_sua",
+      "Allows an agent to beg favours, bargain or advocate convincingly, "+
+      "without resorting to force.",
+      SOCIAL
+    ),
     
-    STEALTH       = new Stat("Stealth"     , "skill_ste", "", REFLEX),
-    SURVEILLANCE  = new Stat("Surveillance", "skill_sur", "", REFLEX),
-    VEHICLES      = new Stat("Vehicles"    , "skill_veh", "", REFLEX),
-    MARKSMAN      = new Stat("Marksman"    , "skill_mrk", "", REFLEX),
+    STEALTH       = new Stat(
+      "Stealth", "skill_ste",
+      "Allows an agent to slip past guards and surveillance systems unnoticed,"+
+      "particularly after dark or with some cover.",
+      REFLEX
+    ),
+    SURVEILLANCE  = new Stat(
+      "Surveillance", "skill_sur",
+      "Lets agents keep an eye out for suspicious activity, trail a suspect "+
+      "or see through a ruse.",
+      REFLEX
+    ),
+    VEHICLES      = new Stat(
+      "Vehicles", "skill_veh",
+      "Allows piloting of bikes, automobiles, or even jets & planes.",
+      REFLEX
+    ),
+    MARKSMAN      = new Stat(
+      "Marksman", "skill_mrk",
+      "Permits the accurate and forceful use of projectile weapons- bows, "+
+      "throwing stars, darts and guns.",
+      REFLEX
+    ),
     
-    INTIMIDATE    = new Stat("Intimidate"  , "skill_int", "", STRENGTH, SOCIAL),
-    GYMNASTICS    = new Stat("Gymnastics"  , "skill_gym", "", STRENGTH, REFLEX),
-    CLOSE_COMBAT  = new Stat("Close Combat", "skill_ccm", "", STRENGTH, REFLEX),
-    STAMINA       = new Stat("Stamina"     , "skill_sta", "", STRENGTH),
+    INTIMIDATE    = new Stat(
+      "Intimidate", "skill_int",
+      "A combination of physical brutality and menacing implications might "+
+      "coax cooperation from stubborn suspects.",
+      STRENGTH, SOCIAL
+    ),
+    GYMNASTICS    = new Stat(
+      "Gymnastics", "skill_gym",
+      "They might not dodge bullets, but a good gymnast can vault obstacles "+
+      "to reach cover, escape injury, or reach inaccessible places.",
+      STRENGTH, REFLEX
+    ),
+    CLOSE_COMBAT  = new Stat(
+      "Close Combat", "skill_ccm",
+      "An agent with close combat skills can deliver knockout blows, and "+
+      "stands a better chance of disarming or cuffing a perp.",
+      STRENGTH, REFLEX
+    ),
+    STAMINA       = new Stat(
+      "Stamina", "skill_sta",
+      "Sheer physical endurance may be the only way to weather certain "+
+      "trials, work through pain, or survive an injury.",
+      STRENGTH
+    ),
     
     ALL_SKILLS[] = {
       ENGINEERING, INFORMATICS, PHARMACY, ANATOMY, LAW_N_FINANCE, THE_OCCULT,
@@ -66,7 +166,6 @@ public class PersonStats {
   
   final Person person;
   
-  int totalXP = 0;
   List <Ability> abilities = new List();
   class Level {
     float level, practice, bonus;
@@ -81,7 +180,6 @@ public class PersonStats {
   
   
   void loadState(Session s) throws Exception {
-    totalXP = s.loadInt();
     s.loadObjects(abilities);
     for (int n = s.loadInt(); n-- > 0;) {
       Trait key = (Trait) s.loadObject();
@@ -96,7 +194,6 @@ public class PersonStats {
   
   
   void saveState(Session s) throws Exception {
-    s.saveInt(totalXP);
     s.saveObjects(abilities);
     s.saveInt(levels.size());
     for (Trait a : levels.keySet()) {
@@ -122,6 +219,13 @@ public class PersonStats {
     Level l = levels.get(trait);
     if (l == null) return 0;
     return (int) (l.level + l.bonus);
+  }
+  
+  
+  public int xpFor(Trait trait) {
+    Level l = levels.get(trait);
+    if (l == null) return 0;
+    return (int) l.practice;
   }
   
   
@@ -205,10 +309,15 @@ public class PersonStats {
   }
   
   
+  protected Level getLevel(Trait trait) {
+    Level l = levels.get(trait);
+    if (l == null) levels.put(trait, l = new Level());
+    return l;
+  }
+  
+  
   protected void setStatBase(Stat stat, float level, boolean mental) {
-    Level l = levels.get(stat);
-    if (l == null) levels.put(stat, l = new Level());
-    
+    final Level l = getLevel(stat);
     final int minVal = person.kind().baseLevel(stat);
     if (level < minVal) level = minVal;
     
@@ -219,8 +328,7 @@ public class PersonStats {
   
   
   protected void incBonus(Trait trait, float bonusMod) {
-    Level l = levels.get(trait);
-    if (l == null) levels.put(trait, l = new Level());
+    final Level l = getLevel(trait);
     l.bonus += bonusMod;
   }
   
@@ -241,8 +349,7 @@ public class PersonStats {
     final boolean keep = learned && a instanceof Ability;
     
     if (level > 0) {
-      Level l = levels.get(a);
-      if (l == null) levels.put(a, l = new Level());
+      final Level l = getLevel(a);
       l.level    = level;
       l.practice = 0;
       l.learned  = learned;
@@ -255,8 +362,13 @@ public class PersonStats {
   }
   
   
-  public void gainXP(int XP) {
-    totalXP += XP;
+  public void gainXP(Stat stat, int XP) {
+    final Level l = getLevel(stat);
+    l.practice += XP;
+    while (l.practice >= l.level + 1) {
+      l.practice -= l.level + 1;
+      l.level++;
+    }
   }
   
   

@@ -24,8 +24,6 @@ public class MapView {
   BufferedImage keyImage;
   RegionAssets attached[];
   
-  Nation selectedNation;
-  
   
   MapView(WorldView parent, Box2D viewBounds) {
     this.parent     = parent    ;
@@ -112,16 +110,17 @@ public class MapView {
     }
     
     ///if (I.used60Frames) I.say("Pixel value is: "+pixVal);
-    
+    Object selectedArea = parent.baseView.selectedArea;
     for (Nation n : nations) if (n.region.view.colourKey == pixVal) {
       nationHovered = n;
     }
     if (nationHovered != null && surface.mouseClicked(this)) {
-      parent.setSelection(selectedNation = nationHovered);
+      parent.setSelection(selectedArea = nationHovered);
+      parent.baseView.selectedArea = selectedArea;
     }
     
-    renderOutline(selectedNation, surface, g, mapWRatio, mapHRatio);
-    renderOutline(nationHovered , surface, g, mapWRatio, mapHRatio);
+    renderOutline(selectedArea , surface, g, mapWRatio, mapHRatio);
+    renderOutline(nationHovered, surface, g, mapWRatio, mapHRatio);
     
     for (Event event : parent.world.events().active()) {
       for (Nation n : nations) if (event.openLeadsFrom(n.region).size() > 0) {
@@ -161,8 +160,10 @@ public class MapView {
   
   
   void renderOutline(
-    Nation n, Surface surface, Graphics2D g, float mapWRatio, float mapHRatio
+    Object a, Surface surface, Graphics2D g, float mapWRatio, float mapHRatio
   ) {
+    if (! (a instanceof Nation)) return;
+    final Nation n = (Nation) a;
     if (n == null || n.region.view.outline == null) return;
     RegionAssets r = n.region.view;
     final Box2D b = this.viewBounds;
