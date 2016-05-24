@@ -199,9 +199,14 @@ public abstract class Task implements Assignment {
         sumLevels += level;
       }
       
-      float check = maxLevel + ((sumLevels - maxLevel) / 2);
-      check += Rand.index(5);
-      okay &= results[n] = check >= DC;
+      float checkLevel = maxLevel + ((sumLevels - maxLevel) / 2);
+      float winChance = Nums.clamp(checkLevel - (DC + 5) / 10f, 0, 1);
+      
+      okay &= results[n] = (Rand.num() < winChance);
+      
+      if (stat instanceof Skill) for (Person p : assigned) {
+        p.stats.gainXP((Skill) stat, (1 - winChance) * 2);
+      }
     }
     
     return okay;

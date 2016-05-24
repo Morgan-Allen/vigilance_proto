@@ -3,7 +3,6 @@
 package proto.content.rooms;
 import proto.common.*;
 import proto.game.person.*;
-import proto.game.person.PersonStats.Stat;
 import proto.game.scene.*;
 import proto.game.world.*;
 import static proto.game.person.PersonStats.*;
@@ -12,7 +11,7 @@ import static proto.game.person.PersonStats.*;
 
 public class Library extends Room {
   
-  final static Stat LIB_SKILLS[] = {
+  final static Skill LIB_SKILLS[] = {
     ENGINEERING,
     INFORMATICS,
     PHARMACY,

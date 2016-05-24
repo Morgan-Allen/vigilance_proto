@@ -94,6 +94,12 @@ public class World implements Session.Saveable {
   }
   
   
+  public void performSaveAndQuit() {
+    performSave();
+    System.exit(0);
+  }
+  
+  
   public void reloadFromSave() {
     if (game == null || savePath == null) return;
     game.attemptReload(savePath);
@@ -120,6 +126,8 @@ public class World implements Session.Saveable {
     base.addToRoster(new Person(Heroes.HERO_BATGIRL  ));
     base.addToRoster(new Person(Heroes.HERO_NIGHTWING));
     base.addToRoster(new Person(Heroes.HERO_QUESTION ));
+    
+    //  TODO:  Include default relationships too?
     
     base.addFacility(Gymnasium .BLUEPRINT, 0, 1f);
     base.addFacility(Library   .BLUEPRINT, 1, 1f);

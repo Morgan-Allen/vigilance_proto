@@ -18,10 +18,10 @@ import java.awt.Image;
 public class Training extends Task {
   
   Room room;
-  Stat trained;
+  Skill trained;
 
 
-  public Training(Stat trained, Room room) {
+  public Training(Skill trained, Room room) {
     super(
       "Training "+trained.name,
       "Training "+trained.name,
@@ -36,7 +36,7 @@ public class Training extends Task {
   public Training(Session s) throws Exception {
     super(s);
     room    = (Room) s.loadObject();
-    trained = (Stat) s.loadObject();
+    trained = (Skill) s.loadObject();
   }
   
   
@@ -53,15 +53,21 @@ public class Training extends Task {
     //  TODO:  You need a more generalised method of recording ongoing events
     //  and presenting those to the user in a bulletin.
     
+    //  TODO:  Rates of XP and relations-gain need to be balanced.
+    
     for (Person p : assigned()) {
+      
       int oldL = p.stats.levelFor(trained);
       p.stats.gainXP(trained, 1);
       int newL = p.stats.levelFor(trained);
+      
+      for (Person o : assigned()) if (o != p) {
+        p.bonds.incBond(o, 1f / 100);
+      }
+      
       if (oldL != newL) {
         s.append("\n"+p+" went to level "+newL);
       }
-      
-      I.say("Gained 1 XP: "+p+" in "+trained);
     }
     
     if (s.length() > 0) {
