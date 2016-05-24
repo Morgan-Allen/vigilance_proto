@@ -4,11 +4,7 @@ package proto.game.scene;
 import proto.common.*;
 import proto.game.person.*;
 import proto.game.world.*;
-import proto.util.*;
-import proto.view.TaskView;
-import proto.view.WorldView;
-
-import static proto.game.person.PersonStats.*;
+import proto.view.*;
 
 import java.awt.Image;
 
@@ -106,6 +102,29 @@ public class Crafting extends Task {
   
 
   protected void presentMessage(final World world) {
+    StringBuffer s = new StringBuffer();
+    
+    for (Person p : assigned) {
+      s.append(p.name());
+      if (p != assigned.last()) s.append(" and ");
+    }
+    s.append(" attempted to make "+made+".");
+    if (success()) {
+      s.append(" They were successful.");
+    }
+    else {
+      s.append(" The encountered difficulties.");
+    }
+    
+    world.view().queueMessage(new MessageView(
+      icon(), "Task complete: "+name,
+      s.toString(),
+      "Dismiss"
+    ) {
+      protected void whenClicked(String option, int optionID) {
+        world.view().dismissMessage(this);
+      }
+    });
   }
 }
 

@@ -28,7 +28,6 @@ public class BaseView {
   void renderTo(Surface surface, Graphics2D g) {
     
     final Base base = parent.world.base();
-
     final Box2D b = this.viewBounds;
     final int
       vx = (int) b.xpos(),

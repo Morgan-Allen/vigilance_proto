@@ -82,12 +82,14 @@ public class TaskView {
       vx + 20 -5, vy - 5, vw + 10 - 40, 60 + 10, this
     );
     final boolean selected = parent.baseView.selectedTask() == task;
-    g.setColor(Color.WHITE);
     
-    if (hovered || selected) {
-      if (! selected) g.setColor(Color.GRAY);
-      g.drawRect(vx + 20 -5, vy - 5, vw + 10 - 40, vh + 10);
-    }
+    Color boxColor = Color.GRAY;
+    if (selected) boxColor = Color.GREEN;
+    else if (hovered) boxColor = Color.YELLOW;
+    
+    g.setColor(boxColor);
+    g.drawRect(vx + 20 -5, vy - 5, vw + 10 - 41, vh + 9);
+    
     if (surface.mouseClicked(this) && hovered) {
       parent.baseView.setSelectedTask(selected ? null : task);
     }

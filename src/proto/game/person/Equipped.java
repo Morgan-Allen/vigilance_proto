@@ -144,6 +144,17 @@ public class Equipped extends Index.Entry implements Session.Saveable {
   }
   
   
+  
+  /**  Rendering, debug and interface methods-
+    */
+  public String toString() {
+    return name;
+  }
+  
+  
+  public String name() {
+    return name;
+  }
 }
 
 
