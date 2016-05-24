@@ -40,9 +40,11 @@ public abstract class StringButton {
     ;
     
     boolean hovered = surface.mouseIn(viewBounds, parent);
-    if (toggled || hovered) g.setColor(Color.YELLOW);
+    if (toggled) g.setColor(Color.GREEN);
+    else if (hovered) g.setColor(Color.YELLOW);
     else g.setColor(Color.BLUE);
-    g.drawString(label, vx, vy + 15);
+    g.drawString(label, vx + 5, vy + 15);
+    g.drawRect(vx, vy, vw, vh);
     
     if (hovered && surface.mouseClicked(parent)) whenClicked();
   }

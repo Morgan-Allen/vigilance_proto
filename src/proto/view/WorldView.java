@@ -144,19 +144,26 @@ public class WorldView {
     String timeString = ViewUtils.getTimeString(world);
     g.drawString("Time: "+timeString, 800, 15);
     
-    boolean hoverS = surface.mouseIn(800 + 360 - 160, 0, 80, 15, this);
+    boolean hoverS = surface.mouseIn(800 + 360 - 150, 0, 50, 15, this);
     g.setColor(hoverS ? Color.YELLOW : Color.BLUE);
-    g.drawString("Save"  , 800 + 360 - 160, 15);
+    g.drawString("Save"  , 800 + 360 - 150, 15);
     
-    boolean hoverR = surface.mouseIn(800 + 360 - 80, 0, 80, 15, this);
+    boolean hoverR = surface.mouseIn(800 + 360 - 100, 0, 70, 15, this);
     g.setColor(hoverR ? Color.YELLOW : Color.BLUE);
-    g.drawString("Reload", 800 + 360 - 80 , 15);
+    g.drawString("Reload", 800 + 360 - 100 , 15);
+    
+    boolean hoverQ = surface.mouseIn(800 + 360 - 30, 0, 50, 15, this);
+    g.setColor(hoverQ ? Color.YELLOW : Color.BLUE);
+    g.drawString("Quit", 800 + 360 - 30 , 15);
     
     if (hoverS && surface.mouseClicked(this)) {
       world.performSave();
     }
     if (hoverR && surface.mouseClicked(this)) {
       world.reloadFromSave();
+    }
+    if (hoverQ && surface.mouseClicked(this)) {
+      world.performSaveAndQuit();
     }
     
     if (message != null) {
