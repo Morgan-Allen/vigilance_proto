@@ -38,6 +38,7 @@ public class Equipped extends Index.Entry implements Session.Saveable {
   
   final public int slotID;
   final public int buildCost;
+  final public Object craftArgs[];
   final public int bonus;
   
   final public int properties;
@@ -50,7 +51,7 @@ public class Equipped extends Index.Entry implements Session.Saveable {
   public Equipped(
     String name, String ID, String description,
     Object media,
-    int slotID, int buildCost,
+    int slotID, int buildCost, Object craftArgs[],
     int properties, int bonus,
     Ability... abilities
   ) {
@@ -61,6 +62,7 @@ public class Equipped extends Index.Entry implements Session.Saveable {
     
     this.slotID     = slotID;
     this.buildCost  = buildCost;
+    this.craftArgs  = craftArgs;
     this.properties = properties;
     this.bonus      = bonus;
     this.abilities  = abilities;

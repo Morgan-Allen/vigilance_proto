@@ -4,6 +4,7 @@ package proto.view;
 import proto.common.*;
 import proto.game.world.*;
 import proto.game.scene.*;
+import proto.game.person.*;
 import proto.util.*;
 
 import java.awt.Color;
@@ -110,25 +111,26 @@ public class MapView {
     }
     
     ///if (I.used60Frames) I.say("Pixel value is: "+pixVal);
-    Object selectedArea = parent.baseView.selectedArea;
+    Nation selectedArea = parent.baseView.selectedNation();
     for (Nation n : nations) if (n.region.view.colourKey == pixVal) {
       nationHovered = n;
     }
     if (nationHovered != null && surface.mouseClicked(this)) {
-      parent.setSelection(selectedArea = nationHovered);
-      parent.baseView.selectedArea = selectedArea;
+      parent.baseView.setSelection(nationHovered);
     }
     
     renderOutline(selectedArea , surface, g, mapWRatio, mapHRatio);
     renderOutline(nationHovered, surface, g, mapWRatio, mapHRatio);
     
-    for (Event event : parent.world.events().active()) {
-      for (Nation n : nations) if (event.openLeadsFrom(n.region).size() > 0) {
-        int x = (int) ((n.region.view.centerX / mapWRatio) + b.xpos());
-        int y = (int) ((n.region.view.centerY / mapHRatio) + b.ypos());
-        g.drawImage(parent.alertMarker, x - 25, y - 25, 50, 50, null);
-        //renderAssigned(crisis.playerTeam(), x - 25, y + 15, surface, g);
+    for (Nation n : nations) {
+      int x = (int) ((n.region.view.centerX / mapWRatio) + b.xpos());
+      int y = (int) ((n.region.view.centerY / mapHRatio) + b.ypos());
+      for (Event event : parent.world.events().active()) {
+        if (event.openLeadsFrom(n.region).size() > 0) {
+          g.drawImage(parent.alertMarker, x - 25, y - 25, 50, 50, null);
+        }
       }
+      ViewUtils.renderAssigned(visitors(n), x + 25, y + 25, surface, g);
     }
     //
     //  Then draw the monitor-status active at the moment-
@@ -150,8 +152,7 @@ public class MapView {
     g.drawString(alertS, x, y);
     
     //
-    //  TODO:  This belongs in the world view, maybe?  Shouldn't be outside the
-    //  map bounds anyway.
+    //  TODO:  This shouldn't be outside the map bounds.
     if (hovered && surface.mouseClicked(this)) {
       if (active) parent.world.pauseMonitoring();
       else        parent.world.beginMonitoring();
@@ -159,11 +160,20 @@ public class MapView {
   }
   
   
-  void renderOutline(
-    Object a, Surface surface, Graphics2D g, float mapWRatio, float mapHRatio
+  private Series <Person> visitors(Nation located) {
+    final Batch <Person> visitors = new Batch();
+    for (Person p : parent.world.base().roster()) if (p.assignment() != null) {
+      if (p.assignment().targetLocation() == located.region) {
+        visitors.include(p);
+      }
+    }
+    return visitors;
+  }
+  
+  
+  private void renderOutline(
+    Nation n, Surface surface, Graphics2D g, float mapWRatio, float mapHRatio
   ) {
-    if (! (a instanceof Nation)) return;
-    final Nation n = (Nation) a;
     if (n == null || n.region.view.outline == null) return;
     RegionAssets r = n.region.view;
     final Box2D b = this.viewBounds;

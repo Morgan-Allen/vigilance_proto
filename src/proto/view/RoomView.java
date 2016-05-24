@@ -26,14 +26,12 @@ public class RoomView {
     this.viewBounds = viewBounds;
   }
   
-
+  
+  
   /**  Actual rendering methods-
     */
   void renderTo(Surface surface, Graphics2D g) {
     
-    Object area = parent.baseView.selectedArea;
-    if (! (area instanceof Room)) return;
-    Room room = (Room) area;
     
     final int
       vx = (int) viewBounds.xpos(),
@@ -41,8 +39,24 @@ public class RoomView {
       vw = (int) viewBounds.xdim(),
       vh = (int) viewBounds.ydim()
     ;
-    //Image portrait = nation.region.view.portrait;
     
+    //  TODO:  This should properly be independent of either RoomView or
+    //  RegionView.  Either merge the two or move this warning outside!
+    BaseView BV = parent.baseView;
+    if (BV.selectedRoom() == null && BV.selectedNation() == null) {
+      g.setColor(Color.LIGHT_GRAY);
+      ViewUtils.drawWrappedString(
+        "Select an agent from your roster to view their gear, skills and "+
+        "relationships.\n\nSelect a room or location from the map to assign "+
+        "activities.",
+        g, vx + 25, vy + 0, vw - 30, 150
+      );
+    }
+    
+    Room room = parent.baseView.selectedRoom();
+    if (room == null) return;
+    
+    //Image portrait = nation.region.view.portrait;
     /*
     //  TODO:  Use a proper interior view instead.
     Image portrait = room.icon();
@@ -52,48 +66,29 @@ public class RoomView {
 
     g.setColor(Color.WHITE);
     g.drawString(room.name(), vx + 20, vy + 20);
+    //
+    //  TODO:  Render information on the room type!
     
+    String info = room.blueprint.description;
+    ViewUtils.drawWrappedString(info,
+      g, vx + 25, vy + 20, vw - 30, 80
+    );
     
-    //  TODO:  Create a TaskView class for this, and share with RegionView!
-    
-    int down = vy + 50, across;
+    int down = vy + 100;
     
     for (Task task : room.possibleTasks()) {
-      //
-      //  Draw the icon and description for this particular lead-
-      Image leadImg = task.icon();
-      //g.drawImage(leadImg, vx + 20, down, LIS, LIS, null);
-      
-      g.setColor(Color.WHITE);
-      ViewUtils.drawWrappedString(
-        task.info(), g, vx + 20 + 60 +5, down, vw - 85, 45
-      );
-      g.drawString(task.testInfo(), vx + 20 + 60 + 5, down + 45 + 15);
-      //
-      //  Draw the highlight/selection rectangle, and toggle selection if
-      //  clicked-
-      final boolean hovered = surface.mouseIn(
-        vx + 20 -5, down - 5, vw + 10 - 40, 60 + 10, this
-      );
-      if (selectedTask == task || hovered) {
-        if (task != selectedTask) g.setColor(Color.GRAY);
-        g.drawRect(vx + 20 -5, down - 5, vw + 10 - 40, 60 + 10);
-      }
-      if (surface.mouseClicked(this) && hovered) {
-        boolean selected = parent.lastSelected == task;
-        selectedTask = selected ? null : task;
-        parent.setSelection(selectedTask);
-      }
-      //
-      //  Finally, draw any persons assigned to this lead...
-      across = vx + 250;
-      for (Person p : task.assigned()) {
-        g.drawImage(p.kind().sprite(), across, down + 45, 20, 20, null);
-        across += 25;
-      }
-      //
-      //  ...and move down for the next lead.
+      TaskView view = task.createView(parent);
+      view.viewBounds.set(vx, vy + down, vw, 60);
+      view.renderTo(surface, g);
       down += 60 + 10;
+    }
+    
+    if (parent.rosterView.selected() == null) {
+      g.setColor(Color.LIGHT_GRAY);
+      ViewUtils.drawWrappedString(
+        "Select an agent from your roster to perform assignments.",
+        g, vx + 25, down + 20, vw - 30, 150
+      );
     }
   }
   

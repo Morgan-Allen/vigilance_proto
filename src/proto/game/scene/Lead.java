@@ -69,6 +69,11 @@ public class Lead extends Task {
   }
   
   
+  public Object targetLocation() {
+    return parent.firstLocation();
+  }
+  
+  
   
   /**  Rendering, debug and interface methods-
     */
@@ -116,6 +121,11 @@ public class Lead extends Task {
   
   public Image icon() {
     return parent.imageFor(this);
+  }
+  
+  
+  public String description() {
+    return name()+" ("+parent.name()+")";
   }
 }
 

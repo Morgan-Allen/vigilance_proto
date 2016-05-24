@@ -16,14 +16,14 @@ public class Common {
       "Unarmed", "item_unarmed",
       "Bare fists and moxy.",
       null,
-      SLOT_WEAPON, 0,
+      SLOT_WEAPON, 0, new Object[0],
       Equipped.IS_WEAPON | Equipped.IS_MELEE | Equipped.IS_KINETIC, 0
     ),
     UNARMOURED = new Equipped(
       "Unarmoured", "item_unarmoured",
       "Nothin' but the clothes on your back.",
       null,
-      SLOT_ARMOUR, 0,
+      SLOT_ARMOUR, 0, new Object[0],
       Equipped.IS_ARMOUR, 0
     );
   

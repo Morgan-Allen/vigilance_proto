@@ -141,9 +141,21 @@ public class Base implements Session.Saveable {
   
   
   public boolean addEquipment(Equipped item) {
-    if (item == null || equipment.includes(item)) return false;
+    if (item == null) return false;
     equipment.add(item);
     return true;
+  }
+  
+  
+  public void removeFromStore(Equipped item) {
+    equipment.remove(item);
+  }
+  
+  
+  public int numStored(Equipped item) {
+    int count = 0;
+    for (Equipped i : equipment) if (i == item) count++;
+    return count;
   }
   
   
@@ -155,6 +167,12 @@ public class Base implements Session.Saveable {
   public boolean addTech(Tech tech) {
     if (tech == null || knownTech.includes(tech)) return false;
     knownTech.add(tech);
+    return true;
+  }
+  
+  
+  public boolean incFunding(int funds) {
+    this.currentFunds += funds;
     return true;
   }
   
@@ -188,7 +206,6 @@ public class Base implements Session.Saveable {
     if (print == null) { rooms[slot] = null; return; }
     Room room = rooms[slot];
     if (room == null) room = rooms[slot] = print.createRoom(this, slot);
-    room.blueprint     = print;
     room.buildProgress = progress;
   }
   

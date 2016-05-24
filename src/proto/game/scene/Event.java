@@ -171,6 +171,15 @@ public class Event implements Session.Saveable {
   }
   
   
+  Region firstLocation() {
+    for (Lead l : leads) if (l.origin instanceof Scene) {
+      final Scene s = (Scene) l.origin;
+      return s.region;
+    }
+    return null;
+  }
+  
+  
   
   /**  Rendering, debug and interface methods-
     */

@@ -6,6 +6,8 @@ import proto.game.person.*;
 import proto.game.world.*;
 import proto.util.I;
 import proto.view.MessageView;
+import proto.view.TaskView;
+import proto.view.WorldView;
 
 import static proto.game.person.PersonStats.*;
 
@@ -22,7 +24,7 @@ public class Training extends Task {
   public Training(Stat trained, Room room) {
     super(
       "Training "+trained.name,
-      "Train "+trained.name,
+      "Training "+trained.name,
       TIME_MEDIUM, room.base.world(),
       trained, 0
     );
@@ -96,6 +98,11 @@ public class Training extends Task {
   }
   
   
+  public Object targetLocation() {
+    return room;
+  }
+  
+  
   
   /**  Rendering, debug and interface methods-
     */
@@ -104,9 +111,24 @@ public class Training extends Task {
   }
   
   
+  public String description() {
+    return name()+" in "+room.name();
+  }
+  
+
+  public TaskView createView(WorldView parent) {
+    TaskView view = super.createView(parent);
+    view.showIcon = false;
+    view.isCraft  = false;
+    return view;
+  }
+  
+  
   protected void presentMessage(final World world) {
   }
 }
+
+
 
 
 

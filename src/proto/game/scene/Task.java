@@ -19,7 +19,7 @@ public abstract class Task implements Assignment {
     
     TIME_SHORT  = 1,
     TIME_MEDIUM = World.HOURS_PER_SHIFT,
-    TIME_LONG   = World.HOURS_PER_DAY * World.DAYS_PER_WEEK
+    TIME_LONG   = World.HOURS_PER_SHIFT * World.DAYS_PER_WEEK
   ;
   
   final String name;
@@ -149,6 +149,9 @@ public abstract class Task implements Assignment {
   }
   
   
+  public abstract Object targetLocation();
+  
+  
   
   /**  Task performance and completion-
     */
@@ -226,7 +229,7 @@ public abstract class Task implements Assignment {
   }
   
   
-  public String info() {
+  public String longInfo() {
     return info;
   }
   
@@ -238,6 +241,11 @@ public abstract class Task implements Assignment {
       if (++n < tested.length) s.append(", ");
     }
     return s.toString();
+  }
+  
+  
+  public TaskView createView(WorldView parent) {
+    return new TaskView(this, parent);
   }
   
   

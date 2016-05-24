@@ -2,6 +2,7 @@
 
 package proto.view;
 import proto.game.world.*;
+import proto.game.person.*;
 import proto.util.*;
 
 import java.awt.Graphics2D;
@@ -14,8 +15,8 @@ public class BaseView {
   final WorldView parent;
   final Box2D viewBounds;
   
-  Object selectedArea;
-  //Room selectedRoom;
+  private Object selectedArea;
+  private Assignment selectedTask;
   
   
   BaseView(WorldView parent, Box2D viewBounds) {
@@ -47,10 +48,11 @@ public class BaseView {
       
       if (hover && surface.mouseClicked(this)) {
         selectedArea = room;
-        if (room == parent.lastSelected) selectedArea = null;
-        parent.setSelection(selectedArea);
       }
       
+      ViewUtils.renderAssigned(
+        room.visitors(), vx + 60 + 10, vy + down + 20 + 60, surface, g
+      );
       down += 60 + 10;
     }
     
@@ -61,30 +63,6 @@ public class BaseView {
     int offX = 23, offY = 399, slotX = 0, slotY = 0, index = 0;
     int x, y, w, h;
     Room roomHovered = null;
-    
-    for (Room r : base.rooms()) {
-      slotX = index % Base.SLOTS_WIDE;
-      slotY = index / Base.SLOTS_WIDE;
-      index++;
-      x = offX + (slotX * 82);
-      y = offY + (slotY * 40);
-      w = 72;
-      h = 35;
-      
-      Image sprite = r.buildProgress() < 1 ?
-        constructMark : r.blueprint().sprite
-      ;
-      if (r != null && r.blueprint() != Blueprint.NONE) g.drawImage(
-        sprite, x, y, w, h, null
-      );
-      if (surface.mouseIn(x, y, w, h)) {
-        roomHovered = r;
-      }
-      if (r == roomHovered || r == selectedRoom) {
-        g.drawImage(selectCircle, x - 10, y - 5, w + 20, h + 10, null);
-      }
-      renderAssigned(r.visitors(), x + 5, y + 5, surface, g);
-    }
     
     if (roomHovered != null && surface.mouseClicked) {
       this.selectedRoom = roomHovered;
@@ -118,6 +96,41 @@ public class BaseView {
     //*/
   }
   
+  
+  void setSelection(Object selected) {
+    this.selectedArea = selected;
+  }
+  
+  
+  Room selectedRoom() {
+    if (selectedArea instanceof Room) return (Room) selectedArea;
+    return null;
+  }
+  
+  
+  Nation selectedNation() {
+    if (selectedArea instanceof Nation) return (Nation) selectedArea;
+    return null;
+  }
+  
+  
+  void setSelectedTask(Assignment task) {
+    final Person active = parent.rosterView.selected();
+    if (active == null) return;
+    final Assignment oldTask = active.assignment();
+    
+    if (active != null && oldTask != null) {
+      oldTask.setAssigned(active, false);
+    }
+    if (active != null && task != null && task != oldTask) {
+      task.setAssigned(active, true);
+    }
+  }
+  
+  
+  Assignment selectedTask() {
+    return selectedTask;
+  }
 }
 
 

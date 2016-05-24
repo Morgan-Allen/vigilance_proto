@@ -36,6 +36,8 @@ public class Person implements Session.Saveable {
     SLOT_ITEMS      = 2,
     NUM_EQUIP_SLOTS = 3,
     ALL_SLOTS[] = { 0, 1, 2 };
+  final public static String
+    SLOT_NAMES[] = { "Weapon", "Armour", "Items" };
   public static enum Side {
     HEROES, CIVILIANS, VILLAINS
   };
@@ -45,9 +47,9 @@ public class Person implements Session.Saveable {
   Side side;
   String name;
   
-  final public PersonStats     stats     = new PersonStats    (this);
-  final public PersonRelations relations = new PersonRelations(this);
-  final public PersonHistory   history   = new PersonHistory  (this);
+  final public PersonStats   stats   = new PersonStats  (this);
+  final public PersonBonds   bonds   = new PersonBonds  (this);
+  final public PersonHistory history = new PersonHistory(this);
   
   int luck = INIT_LUCK, stress = INIT_STRESS;
   Equipped equipSlots[] = new Equipped[NUM_EQUIP_SLOTS];
@@ -99,7 +101,7 @@ public class Person implements Session.Saveable {
     name = s.loadString();
     
     stats    .loadState(s);
-    relations.loadState(s);
+    bonds.loadState(s);
     history  .loadState(s);
     
     luck   = s.loadInt();
@@ -132,7 +134,7 @@ public class Person implements Session.Saveable {
     s.saveString(name);
     
     stats    .saveState(s);
-    relations.saveState(s);
+    bonds.saveState(s);
     history  .saveState(s);
     
     s.saveInt(luck  );

@@ -17,16 +17,9 @@ import java.awt.Image;
 
 public class WorldView {
   
-  
-  final static int
-    PANE_ABILITIES = 0,
-    PANE_OUTFIT    = 1,
-    PANE_PSYCH     = 2;
-  
   final World world;
   
-  Object lastSelected;
-  int personPaneMode = PANE_ABILITIES;
+  //Object lastSelected;
   
   BaseView   baseView  ;
   MapView    mapView   ;
@@ -48,26 +41,35 @@ public class WorldView {
     int fullHigh = 750, fullWide = 1200;
     int paneDown = 20, paneHigh = fullHigh - (20 + 20);
     
-    rosterView = new RosterView(this, new Box2D(20 , 20, 320, fullHigh - 40));
+    rosterView = new RosterView(this, new Box2D(
+      0 + 10, 20,
+      320   , fullHigh - 40
+    ));
+    personView = new PersonView(this, new Box2D(
+      0 + 10, 20,
+      320   , fullHigh - 40
+    ));
+    /*
     personView = new PersonView(this, new Box2D(
       320, paneDown,
       880, paneHigh
     ));
+    //*/
     
     baseView = new BaseView(this, new Box2D(
-      320, paneDown,
+      790, paneDown,
       400, paneHigh
     ));
     mapView = new MapView(this, new Box2D(
-      320 + 80, paneDown +  80,
+      790 + 80, paneDown +  80,
       320     , paneHigh - 240
     ));
     roomView = new RoomView(this, new Box2D(
-      720, paneDown,
+      320, paneDown,
       480, paneHigh
     ));
     regionView = new RegionView(this, new Box2D(
-      720, paneDown,
+      320, paneDown,
       480, paneHigh
     ));
     
@@ -87,6 +89,7 @@ public class WorldView {
   }
   
   
+  /*
   void setSelection(Object selected) {
     this.lastSelected = selected;
     I.say("Selection is: "+selected);
@@ -100,6 +103,7 @@ public class WorldView {
     if (! (lastSelected instanceof Assignment)) return null;
     return (Assignment) lastSelected;
   }
+  //*/
   
   
   public void queueMessage(MessageView message) {
@@ -125,29 +129,28 @@ public class WorldView {
     MessageView message = messageQueue.first();
     surface.setMouseFocus(message);
     
-    rosterView.renderTo(surface, g);
-    //  TODO:  The toggling-criteria here could use some review...
-    if (lastSelected instanceof Person) {
+    if (rosterView.selected() != null) {
       personView.renderTo(surface, g);
     }
     else {
-      baseView  .renderTo(surface, g);
-      mapView   .renderTo(surface, g);
-      roomView  .renderTo(surface, g);
-      regionView.renderTo(surface, g);
+      rosterView.renderTo(surface, g);
     }
+    mapView   .renderTo(surface, g);
+    baseView  .renderTo(surface, g);
+    regionView.renderTo(surface, g);
+    roomView  .renderTo(surface, g);
     
     g.setColor(Color.WHITE);
     String timeString = ViewUtils.getTimeString(world);
-    g.drawString("Time: "+timeString, 320, 15);
+    g.drawString("Time: "+timeString, 800, 15);
     
-    boolean hoverS = surface.mouseIn(320 + 360 - 160, 0, 80, 15, this);
+    boolean hoverS = surface.mouseIn(800 + 360 - 160, 0, 80, 15, this);
     g.setColor(hoverS ? Color.YELLOW : Color.BLUE);
-    g.drawString("Save (S)"  , 320 + 360 - 160, 15);
+    g.drawString("Save"  , 800 + 360 - 160, 15);
     
-    boolean hoverR = surface.mouseIn(320 + 360 - 80, 0, 80, 15, this);
+    boolean hoverR = surface.mouseIn(800 + 360 - 80, 0, 80, 15, this);
     g.setColor(hoverR ? Color.YELLOW : Color.BLUE);
-    g.drawString("Reload (R)", 320 + 360 - 80, 15);
+    g.drawString("Reload", 800 + 360 - 80 , 15);
     
     if (hoverS && surface.mouseClicked(this)) {
       world.performSave();

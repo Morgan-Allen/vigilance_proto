@@ -56,6 +56,13 @@ public class Surface extends JPanel implements
   }
   
   
+  public boolean mouseIn(Box2D b, Object within) {
+    return mouseIn(
+      (int) b.xpos(), (int) b.ypos(), (int) b.xdim(), (int) b.ydim(), within
+    );
+  }
+  
+  
   public boolean mouseClicked(Object within) {
     if (mouseFocus != null && mouseFocus != within) return false;
     return mouseClicked;

@@ -34,7 +34,7 @@ public class RosterView {
   final Color statColors[] = new Color[4];
   final Image statIcons [] = new Image[4];
   
-  Person selectedPerson;
+  private Person selectedPerson;
   
   
   RosterView(WorldView parent, Box2D viewBounds) {
@@ -57,7 +57,7 @@ public class RosterView {
   void renderTo(Surface surface, Graphics2D g) {
     Base base = parent.world.base();
     Person personHovered = null;
-    Assignment assignTo = parent.currentAssignment();
+    Assignment assignTo = parent.baseView.selectedTask();
     
     Image selectCircle = parent.selectCircle;
     final Box2D b = viewBounds;
@@ -86,14 +86,16 @@ public class RosterView {
       g.setColor(Color.LIGHT_GRAY);
       g.drawString(p.name()+" ("+(base.rosterIndex(p) + 1)+")", x, y - 5);
       
+      //g.setColor(Color.YELLOW);
       if (surface.mouseIn(x, y, size, size, this)) {
         personHovered = p;
+        //g.drawOval(x, y, size, size);
         g.drawImage(selectCircle, x, y, size, size, null);
       }
       if (selectedPerson == p) {
+        //g.drawOval(x, y, size, size);
         g.drawImage(selectCircle, x, y, size, size, null);
       }
-      
       
       final Assignment a = p.assignment();
       Image forA = a == null ? null : a.icon();
@@ -107,8 +109,6 @@ public class RosterView {
       int MH = p.maxHealth(), MS = p.maxStress();
       int inj = (int) p.injury(), fat = (int) p.stun();
       int str = (int) p.stress();
-      
-      /*
       renderStatBar(
         x + size + 05, y, 5, size + 35,
         Color.RED, Color.BLACK, (MH - inj) * 1f / MH, g
@@ -122,9 +122,9 @@ public class RosterView {
       int index = 0;
       for (Trait t : PersonStats.BASE_STATS) {
         float fill = p.stats.levelFor(t) / 10f;
-        renderStatBar(
+        ViewUtils.renderStatBar(
           x + (index * 19), y + size + 5, 16, 20,
-          statColors[index], null, fill, g
+          statColors[index], null, fill, true, g
         );
         g.drawImage(
           statIcons[index], x + (index * 19), y + size + 17, 16, 16, null
@@ -134,6 +134,7 @@ public class RosterView {
     }
     
     if (personHovered != null && surface.mouseClicked(this)) {
+      /*
       final Person p = personHovered;
       final Assignment o = p.assignment();
       if (assignTo != null) {
@@ -141,72 +142,26 @@ public class RosterView {
         if (o != assignTo) assignTo.setAssigned(p, true );
       }
       else {
-        selectedPerson = personHovered;
-        if (parent.lastSelected == p) selectedPerson = null;
-        parent.setSelection(selectedPerson);
+        setSelection(personHovered);
       }
+      //*/
+      setSelection(personHovered);
     }
   }
   
   
-  void renderStatBar(
-    int x, int y, int w, int h, Color c, Color b, float fill, Graphics g
-  ) {
-    if (b != null) {
-      g.setColor(b);
-      g.fillRect(x, y, w, h);
-    }
-    
-    int barH = (int) (h * fill);
-    g.setColor(c);
-    g.fillRect(x, y + h - barH, w, barH);
+  void setSelection(Person selected) {
+    selectedPerson = selected;
+  }
+  
+  
+  Person selected() {
+    return selectedPerson;
   }
 }
 
 
-
-
 /*
-    else if (p != null && p == lastSelected) {
-      if (personPaneMode == PANE_ABILITIES) {
-        describePersonAbilities(p, s);
-      }
-      if (personPaneMode == PANE_OUTFIT) {
-        describePersonOutfit(p, s);
-      }
-      if (personPaneMode == PANE_PSYCH) {
-        describePersonPsych(p, s);
-      }
-      appendPersonPaneOptions(p, s);
-    }
-  
-  
-  void describePersonAbilities(Person p, StringBuffer s) {
-    
-    s.append("\nCodename: "+p.name());
-    int HP = (int) Nums.max(0, p.maxHealth() - (p.injury() + p.stun()));
-    s.append("\n  Health: "+HP+"/"+p.maxHealth());
-    int SP = (int) Nums.clamp(p.stress(), 0, p.maxStress());
-    s.append("\n  Stress: "+SP+"/"+p.maxStress());
-    
-    if (! p.alive()) s.append(" (Dead)");
-    else if (! p.conscious()) s.append(" (Unconscious)");
-    else if (p.stun() > 0) s.append(" (Stun "+(int) p.stun()+")");
-    
-    s.append("\nStatistics: ");
-    for (Trait stat : PersonStats.BASE_STATS) {
-      int level = p.stats.levelFor(stat);
-      int bonus = p.stats.bonusFor(stat);
-      s.append("\n  "+stat.name+": "+level);
-      if (bonus > 0) s.append(" (+"+bonus+")");
-    }
-    
-    Assignment assigned = p.assignment();
-    String assignName = assigned == null ? "None" : assigned.name();
-    s.append("\n\nAssignment: "+assignName);
-  }
-  
-  
   void describePersonOutfit(Person p, StringBuffer s) {
     final Surface input = world.game().surface();
     
@@ -229,27 +184,6 @@ public class RosterView {
         if      (equipped) p.removeItem(item);
         else if (canEquip) p.equipItem (item);
       }
-    }
-  }
-  
-  
-  void describePersonPsych(Person p, StringBuffer s) {
-    //  TODO:  FILL THIS IN!
-  }
-  
-  
-  void appendPersonPaneOptions(Person p, StringBuffer s) {
-    s.append("\n\nPress A for Abilities, O for Outfit, P for Psych");
-    final Surface input = world.game().surface();
-    
-    if (input.isPressed('a')) {
-      personPaneMode = PANE_ABILITIES;
-    }
-    if (input.isPressed('o')) {
-      personPaneMode = PANE_OUTFIT;
-    }
-    if (input.isPressed('p')) {
-      personPaneMode = PANE_PSYCH;
     }
   }
 

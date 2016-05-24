@@ -5,7 +5,9 @@ import proto.common.*;
 import proto.content.agents.Heroes;
 import proto.content.events.Kidnapping;
 import proto.content.rooms.Gymnasium;
+import proto.content.rooms.Laboratory;
 import proto.content.rooms.Library;
+import proto.content.rooms.Workshop;
 import proto.game.person.*;
 import proto.util.*;
 import proto.view.*;
@@ -119,8 +121,10 @@ public class World implements Session.Saveable {
     base.addToRoster(new Person(Heroes.HERO_NIGHTWING));
     base.addToRoster(new Person(Heroes.HERO_QUESTION ));
     
-    base.addFacility(Gymnasium.BLUEPRINT, 0, 1f);
-    base.addFacility(Library  .BLUEPRINT, 1, 1f);
+    base.addFacility(Gymnasium .BLUEPRINT, 0, 1f);
+    base.addFacility(Library   .BLUEPRINT, 1, 1f);
+    base.addFacility(Workshop  .BLUEPRINT, 2, 1f);
+    base.addFacility(Laboratory.BLUEPRINT, 3, 1f);
     
     base.updateBase(0);
     base.currentFunds = 500;

@@ -17,8 +17,8 @@ public abstract class Room implements Session.Saveable {
     */
   final public Base base;
   final public int slotIndex;
+  final public Blueprint blueprint;
   
-  Blueprint blueprint;
   float buildProgress;
   
   

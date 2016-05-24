@@ -6,7 +6,9 @@ import proto.game.person.*;
 import proto.util.*;
 
 import java.awt.Graphics2D;
+import java.awt.Color;
 import java.awt.FontMetrics;
+import java.awt.Graphics;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -53,18 +55,56 @@ public class ViewUtils {
   }
   
   
-  void renderAssigned(
+  
+  /**  Rendering persons and stats-
+    */
+  static void renderAssigned(
     Series <Person> assigned, int atX, int atY,
     Surface surface, Graphics2D g
   ) {
-    int x = atX, y = atY;
+    int x = atX, y = atY - 20;
+    g.setColor(Color.YELLOW);
+    final WorldView parent = surface.game.world().view();
+    
     for (Person p : assigned) {
+      x -= 20;
+      boolean hovered = surface.mouseIn(x, y, 20, 20, surface);
       g.drawImage(p.kind().sprite(), x, y, 20, 20, null);
-      x += 20;
+      
+      if (hovered) {
+        g.drawOval(x, y, 20, 20);
+        if (surface.mouseClicked(surface)) {
+          parent.rosterView.setSelection(p);
+        }
+      }
     }
   }
   
   
+  static void renderStatBar(
+    int x, int y, int w, int h,
+    Color tint, Color back, float fill, boolean vertical, Graphics g
+  ) {
+    if (back != null) {
+      g.setColor(back);
+      g.fillRect(x, y, w, h);
+    }
+    g.setColor(tint);
+    
+    if (vertical) {
+      int barH = (int) (h * fill);
+      g.fillRect(x, y + h - barH, w, barH);
+    }
+    else {
+      int barW = (int) (w * fill);
+      g.fillRect(x, y, barW, h);
+    }
+  }
+  
+  
+  
+  /**  Time and date utilities-
+    */
   final static DateFormat
     DISPLAY_FORMAT = new SimpleDateFormat("HH:mm EEE, MMM d, yyyy");
   
