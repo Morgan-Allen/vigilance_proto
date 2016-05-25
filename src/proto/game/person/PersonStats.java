@@ -336,7 +336,7 @@ public class PersonStats {
       l.level++;
     }
     for (Skill root : stat.roots) {
-      gainXP(root, XP / 3f * (stat.roots.length));
+      gainXP(root, XP / (3f * stat.roots.length));
     }
   }
   

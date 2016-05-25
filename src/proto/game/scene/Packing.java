@@ -85,7 +85,6 @@ public class Packing extends Task {
   public TaskView createView(WorldView parent) {
     TaskView view = super.createView(parent);
     view.showIcon = false;
-    view.isCraft  = false;
     return view;
   }
   

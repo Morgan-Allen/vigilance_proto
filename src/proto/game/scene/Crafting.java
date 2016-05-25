@@ -96,7 +96,6 @@ public class Crafting extends Task {
   public TaskView createView(WorldView parent) {
     TaskView view = super.createView(parent);
     view.showIcon = false;
-    view.isCraft  = true ;
     return view;
   }
   

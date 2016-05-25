@@ -121,11 +121,10 @@ public class Training extends Task {
     return name()+" in "+room.name();
   }
   
-
+  
   public TaskView createView(WorldView parent) {
     TaskView view = super.createView(parent);
     view.showIcon = false;
-    view.isCraft  = false;
     return view;
   }
   

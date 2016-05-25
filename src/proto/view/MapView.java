@@ -125,6 +125,20 @@ public class MapView {
     for (Nation n : nations) {
       int x = (int) ((n.region.view.centerX / mapWRatio) + b.xpos());
       int y = (int) ((n.region.view.centerY / mapHRatio) + b.ypos());
+      
+      g.setColor(Color.LIGHT_GRAY);
+      g.drawString(n.region.name, x - 25, y + 25 + 15);
+      
+      float crimeLevel = n.crimeLevel(), trustLevel = n.trustLevel();
+      ViewUtils.renderStatBar(
+        x - 25, y + 25 + 15 + 5, 25, 5,
+        Color.RED, Color.BLACK, crimeLevel, false, g
+      );
+      ViewUtils.renderStatBar(
+        x - 0, y + 25 + 15 + 5, 25, 5,
+        Color.BLUE, Color.BLACK, trustLevel, false, g
+      );
+      
       for (Event event : parent.world.events().active()) {
         if (event.openLeadsFrom(n.region).size() > 0) {
           g.drawImage(parent.alertMarker, x - 25, y - 25, 50, 50, null);

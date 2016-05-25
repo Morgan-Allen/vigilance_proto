@@ -9,6 +9,7 @@ import static proto.game.person.PersonStats.*;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Image;
 
 
 
@@ -57,6 +58,7 @@ public class PersonView {
   final Box2D viewBounds;
   
   int tabMode = TAB_SKILLS;
+  ClickMenu pickMenu = null;
   
   
   PersonView(WorldView parent, Box2D viewBounds) {
@@ -133,6 +135,9 @@ public class PersonView {
     }
     if (tabMode == TAB_BONDS) {
       renderBonds(surface, g, person);
+    }
+    if (pickMenu != null) {
+      pickMenu.renderTo(surface, g);
     }
   }
   
@@ -242,17 +247,49 @@ public class PersonView {
       vh = (int) b.ydim()
     ;
     
-    g.setColor(Color.WHITE);
     int down = 120 + 60 + 10;
     
     for (int slotID : Person.ALL_SLOTS) {
       Equipped inSlot = person.equippedInSlot(slotID);
+      Image  icon = inSlot == null ? null   : inSlot.icon();
       String desc = inSlot == null ? "None" : inSlot.name;
       String slotName = Person.SLOT_NAMES[slotID];
-      g.drawString(slotName+": "+desc, vx + 5, vy + down + 15);
+      
+      boolean hovered = surface.mouseIn(vx + 5, vy + down, vw - 10, 40, this);
+      if (hovered) g.setColor(Color.YELLOW);
+      else g.setColor(Color.WHITE);
+      
+      g.drawImage(icon, vx + 5, vy + down, 40, 40, null);
+      g.drawString(slotName+": "+desc, vx + 5 + 40 + 5, vy + down + 15);
+      
+      if (hovered && surface.mouseClicked(this)) {
+        createItemMenu(person, slotID, vx + 5 + 40, vy + down + 20);
+      }
+      
       down += 40 + 10;
     }
+  }
+  
+  
+  void createItemMenu(final Person person, final int slotID, int x, int y) {
+    if (pickMenu != null) return;
     
+    final Batch <Equipped> types = new Batch();
+    for (Equipped type : parent.world.base().itemsAvailableFor(person)) {
+      types.add(type);
+    }
+    
+    pickMenu = new ClickMenu <Equipped> (
+      types, x, y
+    ) {
+      protected Image imageFor(Equipped option) {
+        return option.icon();
+      }
+      protected void whenPicked(String option, int optionID) {
+        person.equipItem(types.atIndex(optionID));
+        pickMenu = null;
+      }
+    };
   }
   
 
@@ -280,6 +317,7 @@ public class PersonView {
       
       g.drawImage(other.kind().sprite(), vx + 5, down + 5, 40, 40, null);
       boolean hoverP = surface.mouseIn(vx + 5, down + 5, 40, 40, this);
+      
       if (hoverP) {
         g.drawImage(parent.selectCircle, vx + 5, down + 5, 40, 40, null);
         if (surface.mouseClicked(this)) {

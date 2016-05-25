@@ -20,7 +20,6 @@ public class TaskView {
   final WorldView parent;
   final Box2D viewBounds;
   
-  public boolean isCraft = false;
   public boolean showIcon = true;
   
   
@@ -46,6 +45,7 @@ public class TaskView {
       vw = (int) viewBounds.xdim(),
       vh = (int) viewBounds.ydim()
     ;
+    final Person activeP = parent.rosterView.selected();
     //
     //  Draw the icon and description for this particular lead-
     g.setColor(Color.WHITE);
@@ -54,31 +54,13 @@ public class TaskView {
       g.drawImage(leadImg, vx + 20, vy, 60, 60, null);
     }
     ViewUtils.drawWrappedString(
-      task.longInfo(), g, vx + 20 + 60 + 5, vy, vw - 85, vh - 15
+      task.longInfo(), g, vx + 20 + 60 + 5, vy, vw - 95, vh - 15
     );
     g.drawString(task.testInfo(), vx + 20 + 60 +5, vy + vh);
     //
-    //  In the case of a crafting task, this doubles for purposes of item-
-    //  assignment:
-    //  TODO:  Make sure the equipment is available/legal first!
-    final Person activeP = parent.rosterView.selected();
-    boolean hoverE = false;
-    if (isCraft && activeP != null) {
-      Equipped item = ((Crafting) task).made();
-      
-      hoverE = surface.mouseIn(vx + 20, vy, 60, vh, this);
-      g.setColor(hoverE ? Color.YELLOW : Color.BLUE);
-      g.drawString("Equip", vx + 20, vy + 15);
-      
-      if (hoverE && surface.mouseClicked(this)) {
-        if (activeP.hasEquipped(item)) activeP.removeItem(item);
-        else activeP.equipItem(item);
-      }
-    }
-    //
     //  Draw the highlight/selection rectangle, and toggle selection if
     //  clicked-
-    final boolean hovered = activeP != null && (! hoverE) && surface.mouseIn(
+    final boolean hovered = activeP != null && surface.mouseIn(
       vx + 20 -5, vy - 5, vw + 10 - 40, 60 + 10, this
     );
     final boolean selected = parent.baseView.selectedTask() == task;
