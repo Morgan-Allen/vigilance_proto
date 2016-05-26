@@ -56,11 +56,11 @@ public abstract class MessageView extends UINode {
     for (int i = 0; i < options.length; i++) {
       g.drawString(options[i], vx + 5, vy + down + 5 + 15);
       
-      final boolean hovered = surface.mouseIn(
+      final boolean hovered = surface.tryHover(
         vx + 5, vy + down + 5, vw - 10, 15, this
       );
       if (hovered) g.drawRect(vx + 3, vy + down + 3, vw - 6, 19);
-      if (hovered && surface.mouseClicked(this)) whenClicked(options[i], i);
+      if (hovered && surface.mouseClicked()) whenClicked(options[i], i);
     }
   }
   

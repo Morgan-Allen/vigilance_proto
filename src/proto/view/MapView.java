@@ -90,7 +90,7 @@ public class MapView extends UINode {
     mapWRatio *= (imgWide * 1f) / vw;
     mapHRatio *= (imgHigh * 1f) / vh;
     
-    boolean mouseInMap = surface.mouseIn(vx, vy, vw, vh, this);
+    boolean mouseInMap = surface.tryHover(vx, vy, vw, vh, this);
     int mX = surface.mouseX(), mY = surface.mouseY();
     mX = (int) ((mX - vx) * mapWRatio);
     mY = (int) ((mY - vy) * mapHRatio);
@@ -104,7 +104,7 @@ public class MapView extends UINode {
     for (Nation n : nations) if (n.region.view.colourKey == pixVal) {
       nationHovered = n;
     }
-    if (nationHovered != null && surface.mouseClicked(this)) {
+    if (nationHovered != null && surface.mouseClicked()) {
       mainView.baseView.setSelection(nationHovered);
     }
     

@@ -125,34 +125,31 @@ public class WorldView extends UINode {
     g.setColor(Color.BLACK);
     g.fillRect(0, 0, wide, high);
     
-    MessageView message = messageQueue.first();
-    surface.setMouseFocus(message);
-
     g.setColor(Color.WHITE);
     int across = 320;
     
     String timeString = ViewUtils.getTimeString(world);
     g.drawString("Time: "+timeString, across, 15);
     
-    boolean hoverS = surface.mouseIn(across + 360 - 150, 0, 50, 15, this);
+    boolean hoverS = surface.tryHover(across + 360 - 150, 0, 50, 15, "Save");
     g.setColor(hoverS ? Color.YELLOW : Color.BLUE);
     g.drawString("Save"  , across + 360 - 150, 15);
     
-    boolean hoverR = surface.mouseIn(across + 360 - 100, 0, 70, 15, this);
+    boolean hoverR = surface.tryHover(across + 360 - 100, 0, 70, 15, "Reload");
     g.setColor(hoverR ? Color.YELLOW : Color.BLUE);
     g.drawString("Reload", across + 360 - 100 , 15);
     
-    boolean hoverQ = surface.mouseIn(across + 360 - 30, 0, 50, 15, this);
+    boolean hoverQ = surface.tryHover(across + 360 - 30, 0, 50, 15, "Quit");
     g.setColor(hoverQ ? Color.YELLOW : Color.BLUE);
     g.drawString("Quit", across + 360 - 30 , 15);
     
-    if (hoverS && surface.mouseClicked(this)) {
+    if (hoverS && surface.mouseClicked()) {
       world.performSave();
     }
-    if (hoverR && surface.mouseClicked(this)) {
+    if (hoverR && surface.mouseClicked()) {
       world.reloadFromSave();
     }
-    if (hoverQ && surface.mouseClicked(this)) {
+    if (hoverQ && surface.mouseClicked()) {
       world.performSaveAndQuit();
     }
   }

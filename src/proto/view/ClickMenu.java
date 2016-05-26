@@ -62,23 +62,24 @@ public abstract class ClickMenu <T> extends UINode {
     for (i = 0; i < options.size(); i++) {
       String label = labels[i];
       Image  image = images[i];
+      T option = options.atIndex(i);
       boolean hovered = false;
       g.setColor(Color.WHITE);
       
       if (image == null) {
-        hovered = surface.mouseIn(x, y, maxWide, 20, this);
+        hovered = surface.tryHover(x, y, maxWide, 20, option);
         if (hovered) g.setColor(Color.YELLOW);
         g.drawString(label, x, y);
         y += 20;
       }
       else {
-        hovered = surface.mouseIn(x, y, maxWide, 40, this);
+        hovered = surface.tryHover(x, y, maxWide, 40, option);
         if (hovered) g.setColor(Color.YELLOW);
         g.drawImage(image, x, y, 40, 40, null);
         g.drawString(label, x + 40 + 5, y + 15);
         y += 40;
       }
-      if (hovered && surface.mouseClicked(this)) {
+      if (hovered && surface.mouseClicked()) {
         whenPicked(label, i);
       }
     }

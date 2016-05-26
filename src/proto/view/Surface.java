@@ -21,7 +21,7 @@ public class Surface extends JPanel implements
   
   private boolean mouseDown, mouseClick, mouseClicked;
   private int mouseX, mouseY;
-  private Object mouseFocus;
+  private Object mouseFocus = null, lastFocus = null;
   
   private Batch <Character> pressed = new Batch();
   private long numPaints = 0;
@@ -43,22 +43,30 @@ public class Surface extends JPanel implements
   public int mouseX() { return mouseX; }
   public int mouseY() { return mouseY; }
   public boolean mouseDown() { return mouseDown; }
+  public boolean mouseClicked() { return mouseClicked; }
   
   
-  public void setMouseFocus(Object focus) {
-    this.mouseFocus = focus;
+  public void recordHover(int x, int y, int w, int h, Object hovered) {
+    if (mouseX > x && mouseX <= x + w && mouseY > y && mouseY <= y + h) {
+      mouseFocus = hovered;
+    }
   }
   
   
-  public boolean mouseIn(int x, int y, int w, int h, Object within) {
-    if (mouseFocus != null && mouseFocus != within) return false;
-    return mouseX > x && mouseX <= x + w && mouseY > y && mouseY <= y + h;
+  public boolean wasHovered(Object focus) {
+    if (lastFocus == null || focus == null) return false;
+    return lastFocus.equals(focus);
   }
   
   
-  public boolean mouseClicked(Object within) {
-    if (mouseFocus != null && mouseFocus != within) return false;
-    return mouseClicked;
+  public boolean tryHover(UINode node) {
+    return tryHover(node.vx, node.vy, node.vw, node.vh, node);
+  }
+  
+  
+  public boolean tryHover(int x, int y, int w, int h, Object hovered) {
+    recordHover(x, y, w, h, hovered);
+    return wasHovered(hovered);
   }
   
   
@@ -86,6 +94,8 @@ public class Surface extends JPanel implements
     
     if (world != null) {
       WorldView view = world.view();
+      this.lastFocus  = mouseFocus;
+      this.mouseFocus = null;
       view.updateAndRender(this, g2d);
     }
     

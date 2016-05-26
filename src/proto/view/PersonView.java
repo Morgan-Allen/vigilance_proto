@@ -178,7 +178,7 @@ public class PersonView extends UINode {
       y *=  20;
       Color forT = Color.LIGHT_GRAY;
       
-      if (surface.mouseIn(vx + x + 20, vy + y + down, 150, 20, this)) {
+      if (surface.tryHover(vx + x + 20, vy + y + down, 150, 20, t)) {
         hovered = t;
         forT = Color.YELLOW;
       }
@@ -237,14 +237,16 @@ public class PersonView extends UINode {
       String desc = inSlot == null ? "None" : inSlot.name;
       String slotName = Person.SLOT_NAMES[slotID];
       
-      boolean hovered = surface.mouseIn(vx + 5, vy + down, vw - 10, 40, this);
+      final boolean hovered = surface.tryHover(
+        vx + 5, vy + down, vw - 10, 40, slotID
+      );
       if (hovered) g.setColor(Color.YELLOW);
       else g.setColor(Color.WHITE);
       
       g.drawImage(icon, vx + 5, vy + down, 40, 40, null);
       g.drawString(slotName+": "+desc, vx + 5 + 40 + 5, vy + down + 15);
       
-      if (hovered && surface.mouseClicked(this)) {
+      if (hovered && surface.mouseClicked()) {
         createItemMenu(person, slotID, vx + 5 + 40, vy + down + 20);
       }
       
@@ -294,11 +296,11 @@ public class PersonView extends UINode {
       float value = person.bonds.valueFor(other);
       
       g.drawImage(other.kind().sprite(), vx + 5, down + 5, 40, 40, null);
-      boolean hoverP = surface.mouseIn(vx + 5, down + 5, 40, 40, this);
+      boolean hoverP = surface.tryHover(vx + 5, down + 5, 40, 40, other);
       
       if (hoverP) {
         g.drawImage(mainView.selectCircle, vx + 5, down + 5, 40, 40, null);
-        if (surface.mouseClicked(this)) {
+        if (surface.mouseClicked()) {
           mainView.rosterView.setSelection(other);
         }
       }

@@ -1,9 +1,9 @@
 
 
 package proto.view;
-import java.awt.Graphics2D;
-
 import proto.util.*;
+
+import java.awt.Graphics2D;
 
 
 

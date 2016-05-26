@@ -68,12 +68,12 @@ public class ViewUtils {
     
     for (Person p : assigned) {
       x -= 20;
-      boolean hovered = surface.mouseIn(x, y, 20, 20, surface);
+      boolean hovered = surface.tryHover(x, y, 20, 20, p);
       g.drawImage(p.kind().sprite(), x, y, 20, 20, null);
       
       if (hovered) {
         g.drawOval(x, y, 20, 20);
-        if (surface.mouseClicked(surface)) {
+        if (surface.mouseClicked()) {
           parent.rosterView.setSelection(p);
         }
       }

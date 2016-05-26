@@ -76,7 +76,7 @@ public class RosterView extends UINode {
       g.drawString(p.name(), x, y - 5);
       
       //g.setColor(Color.YELLOW);
-      if (surface.mouseIn(x, y, size, size, this)) {
+      if (surface.tryHover(x, y, size, size, p)) {
         personHovered = p;
         //g.drawOval(x, y, size, size);
         g.drawImage(selectCircle, x, y, size, size, null);
@@ -122,7 +122,7 @@ public class RosterView extends UINode {
       }
     }
     
-    if (personHovered != null && surface.mouseClicked(this)) {
+    if (personHovered != null && surface.mouseClicked()) {
       /*
       final Person p = personHovered;
       final Assignment o = p.assignment();

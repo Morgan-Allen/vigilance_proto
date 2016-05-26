@@ -50,13 +50,13 @@ public class AreasView extends UINode {
     
     for (Room room : base.rooms()) if (room != null) {
       g.drawImage(room.icon(), vx + 10, vy + down, 60, 60, null);
-      boolean hover = surface.mouseIn(vx + 10, vy + down, 60, 60, this);
+      boolean hover = surface.tryHover(vx + 10, vy + down, 60, 60, room);
       
       if (hover || selectedArea == room) {
         g.drawImage(mainView.selectSquare, vx + 10, vy + down, 60, 60, null);
       }
       
-      if (hover && surface.mouseClicked(this)) {
+      if (hover && surface.mouseClicked()) {
         selectedArea = room;
       }
       

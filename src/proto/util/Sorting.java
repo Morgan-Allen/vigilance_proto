@@ -429,6 +429,12 @@ public abstract class Sorting <K> implements Series <K> {
     return toArray(Object.class);
   }
   
+  
+  public K atIndex(int index) {
+    for (K k : this) if (index-- == 0) return k;
+    return null;
+  }
+  
 
   final public Iterator <K> iterator() {
     final int height = heightFor(root);

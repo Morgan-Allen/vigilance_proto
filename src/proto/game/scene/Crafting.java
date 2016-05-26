@@ -76,7 +76,7 @@ public class Crafting extends Task {
   /**  Rendering, debug and interface methods-
     */
   public Image icon() {
-    return room.icon();
+    return made.icon();
   }
   
   
