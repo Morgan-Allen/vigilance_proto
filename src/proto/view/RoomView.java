@@ -30,7 +30,7 @@ public class RoomView extends UINode {
     
     //  TODO:  This should properly be independent of either RoomView or
     //  RegionView.  Either merge the two or move this warning outside!
-    AreasView BV = mainView.baseView;
+    AreasView BV = mainView.areaView;
     if (BV.selectedRoom() == null && BV.selectedNation() == null) {
       g.setColor(Color.LIGHT_GRAY);
       ViewUtils.drawWrappedString(
@@ -41,7 +41,7 @@ public class RoomView extends UINode {
       );
     }
     
-    Room room = mainView.baseView.selectedRoom();
+    Room room = mainView.areaView.selectedRoom();
     if (room == null) return;
     
     //Image portrait = nation.region.view.portrait;

@@ -17,7 +17,7 @@ public class WorldView extends UINode {
   
   final World world;
   
-  AreasView  baseView  ;
+  AreasView  areaView  ;
   RoomView   roomView  ;
   RegionView regionView;
   
@@ -50,7 +50,7 @@ public class WorldView extends UINode {
     ));
     addChildren(rosterView, personView);
     
-    baseView = new AreasView(this, new Box2D(
+    areaView = new AreasView(this, new Box2D(
       320, paneDown,
       400, paneHigh
     ));
@@ -62,14 +62,14 @@ public class WorldView extends UINode {
       720, paneDown,
       480, paneHigh
     ));
-    addChildren(baseView, roomView, regionView);
+    addChildren(areaView, roomView, regionView);
     
     final String
       MAPS_DIR = "media assets/city map/",
       ACTS_DIR = "media assets/action view/",
       MNUI_DIR = "media assets/main UI/"
     ;
-    baseView.mapView.loadMapImages(
+    areaView.mapView.loadMapImages(
       MAPS_DIR+"city_map.png",
       MAPS_DIR+"city_districts_key.png"
     );

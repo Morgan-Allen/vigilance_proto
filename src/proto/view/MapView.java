@@ -100,12 +100,12 @@ public class MapView extends UINode {
     }
     
     ///if (I.used60Frames) I.say("Pixel value is: "+pixVal);
-    Nation selectedArea = mainView.baseView.selectedNation();
+    Nation selectedArea = mainView.areaView.selectedNation();
     for (Nation n : nations) if (n.region.view.colourKey == pixVal) {
       nationHovered = n;
     }
     if (nationHovered != null && surface.mouseClicked()) {
-      mainView.baseView.setSelection(nationHovered);
+      mainView.areaView.setSelection(nationHovered);
     }
     
     renderOutline(selectedArea , surface, g, mapWRatio, mapHRatio);

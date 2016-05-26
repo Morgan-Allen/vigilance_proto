@@ -47,6 +47,7 @@ public class Surface extends JPanel implements
   
   
   public void recordHover(int x, int y, int w, int h, Object hovered) {
+    if (hovered == null) return;
     if (mouseX > x && mouseX <= x + w && mouseY > y && mouseY <= y + h) {
       mouseFocus = hovered;
     }
@@ -97,6 +98,7 @@ public class Surface extends JPanel implements
       this.lastFocus  = mouseFocus;
       this.mouseFocus = null;
       view.updateAndRender(this, g2d);
+      ///if (I.used60Frames) I.say("  Last focus was: "+lastFocus);
     }
     
     this.mouseClicked = this.mouseClick;

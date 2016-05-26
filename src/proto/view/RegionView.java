@@ -27,7 +27,7 @@ public class RegionView extends UINode {
     */
   void renderTo(Surface surface, Graphics2D g) {
     
-    Nation nation = mainView.baseView.selectedNation();
+    Nation nation = mainView.areaView.selectedNation();
     if (nation == null) return;
     
     Image portrait = nation.region.view.portrait;

@@ -39,24 +39,24 @@ public class TaskView extends UINode {
     ViewUtils.drawWrappedString(
       task.longInfo(), g, vx + 20 + 60 + 5, vy, vw - 95, vh - 15
     );
-    g.drawString(task.testInfo(), vx + 20 + 60 +5, vy + vh);
+    g.drawString(task.testInfo(), vx + 20 + 60 + 5, vy + vh);
     //
     //  Draw the highlight/selection rectangle, and toggle selection if
     //  clicked-
     final boolean hovered = activeP != null && surface.tryHover(
-      vx + 20 -5, vy - 5, vw + 10 - 40, 60 + 10, this
+      vx + 20 - 5, vy - 5, vw + 10 - 40, 60 + 10, task
     );
-    final boolean selected = mainView.baseView.selectedTask() == task;
+    final boolean selected = mainView.areaView.selectedTask() == task;
     
-    Color boxColor = Color.GRAY;
-    if (selected) boxColor = Color.GREEN;
-    else if (hovered) boxColor = Color.YELLOW;
+    Color              boxColor = Color.GRAY;
+    if      (selected) boxColor = Color.GREEN;
+    else if (hovered ) boxColor = Color.YELLOW;
     
     g.setColor(boxColor);
     g.drawRect(vx + 20 -5, vy - 5, vw + 10 - 41, vh + 9);
     
     if (surface.mouseClicked() && hovered) {
-      mainView.baseView.setSelectedTask(selected ? null : task);
+      mainView.areaView.setSelectedTask(selected ? null : task);
     }
     //
     //  Finally, draw any persons assigned to this task...

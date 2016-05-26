@@ -107,7 +107,6 @@ public class ViewUtils {
     */
   final static DateFormat
     DISPLAY_FORMAT = new SimpleDateFormat("HH:mm EEE, MMM d, yyyy");
-  
   static Date
     DEFAULT_INIT_DATE = new Date();
   static {

@@ -53,7 +53,7 @@ public class RosterView extends UINode {
   void renderTo(Surface surface, Graphics2D g) {
     Base base = mainView.world.base();
     Person personHovered = null;
-    Assignment assignTo = mainView.baseView.selectedTask();
+    Assignment assignTo = mainView.areaView.selectedTask();
     
     Image selectCircle = mainView.selectCircle;
     int across = 0, down = 15, size = 75, sizeA = 25, pad = 25, x, y;
