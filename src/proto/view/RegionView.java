@@ -12,18 +12,14 @@ import java.awt.Graphics2D;
 
 
 
-public class RegionView {
+public class RegionView extends UINode {
   
-  
-  final WorldView parent;
-  final Box2D viewBounds;
   
   Lead selectedLead;
   
   
-  RegionView(WorldView parent, Box2D viewBounds) {
-    this.parent     = parent    ;
-    this.viewBounds = viewBounds;
+  RegionView(UINode parent, Box2D viewBounds) {
+    super(parent, viewBounds);
   }
   
 
@@ -31,15 +27,9 @@ public class RegionView {
     */
   void renderTo(Surface surface, Graphics2D g) {
     
-    Nation nation = parent.baseView.selectedNation();
+    Nation nation = mainView.baseView.selectedNation();
     if (nation == null) return;
     
-    final int
-      vx = (int) viewBounds.xpos(),
-      vy = (int) viewBounds.ypos(),
-      vw = (int) viewBounds.xdim(),
-      vh = (int) viewBounds.ydim()
-    ;
     Image portrait = nation.region.view.portrait;
     
     g.setColor(Color.WHITE);
@@ -58,10 +48,10 @@ public class RegionView {
     
     g.setColor(Color.LIGHT_GRAY);
     int down = vy + portH + 50;
-    boolean canAssign = parent.rosterView.selected() != null;
+    boolean canAssign = mainView.rosterView.selected() != null;
     boolean noEvents = true;
     
-    for (Event event : parent.world.events().active()) {
+    for (Event event : mainView.world.events().active()) {
       final Series <Lead> leads = event.openLeadsFrom(nation.region);
       if (leads.empty()) continue;
       noEvents = false;
@@ -76,14 +66,16 @@ public class RegionView {
       down += 60;
       //
       //  Then, draw info for any individual leads:
+      //  TODO:  Should be using attachment/detachment here?
       for (Lead l : leads) {
         TaskView view = l.createView(parent);
-        view.viewBounds.set(vx, vy + down, vw, 60);
-        view.renderTo(surface, g);
+        view.relBounds.set(vx, vy + down, vw, 60);
+        view.updateAndRender(surface, g);
         down += 60 + 10;
       }
+      down += 20;
       g.setColor(Color.GRAY);
-      g.drawRect(vx + 10, initDown, vw - 20, down + 20 - initDown);
+      g.drawRect(vx + 10, initDown, vw - 20, down - initDown);
     }
     
     if (noEvents) {

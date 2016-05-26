@@ -1,11 +1,9 @@
 
 
-
 package proto.view;
+
 import proto.common.*;
-import proto.game.person.*;
 import proto.game.world.*;
-import proto.game.scene.*;
 import proto.util.*;
 
 import java.awt.Color;
@@ -15,14 +13,11 @@ import java.awt.Image;
 
 
 
-public class WorldView {
+public class WorldView extends UINode {
   
   final World world;
   
-  //Object lastSelected;
-  
-  BaseView   baseView  ;
-  MapView    mapView   ;
+  AreasView  baseView  ;
   RoomView   roomView  ;
   RegionView regionView;
   
@@ -31,14 +26,18 @@ public class WorldView {
   
   Image alertMarker, selectCircle, selectSquare;
   
+  MessageView messageShown = null;
   List <MessageView> messageQueue = new List();
   
   
   
   public WorldView(World world) {
+    super();
     this.world = world;
     
     int fullHigh = 750, fullWide = 1200;
+    this.relBounds.set(0, 0, fullWide, fullHigh);
+    
     int paneDown = 20, paneHigh = fullHigh - (20 + 20);
     
     rosterView = new RosterView(this, new Box2D(
@@ -49,37 +48,28 @@ public class WorldView {
       0 + 10, 20,
       320   , fullHigh - 40
     ));
-    /*
-    personView = new PersonView(this, new Box2D(
-      320, paneDown,
-      880, paneHigh
-    ));
-    //*/
+    addChildren(rosterView, personView);
     
-    baseView = new BaseView(this, new Box2D(
-      790, paneDown,
+    baseView = new AreasView(this, new Box2D(
+      320, paneDown,
       400, paneHigh
     ));
-    mapView = new MapView(this, new Box2D(
-      790 + 80, paneDown +  80,
-      320     , paneHigh - 240
-    ));
     roomView = new RoomView(this, new Box2D(
-      320, paneDown,
+      720, paneDown,
       480, paneHigh
     ));
     regionView = new RegionView(this, new Box2D(
-      320, paneDown,
+      720, paneDown,
       480, paneHigh
     ));
-    
+    addChildren(baseView, roomView, regionView);
     
     final String
       MAPS_DIR = "media assets/city map/",
       ACTS_DIR = "media assets/action view/",
       MNUI_DIR = "media assets/main UI/"
     ;
-    mapView.loadMapImages(
+    baseView.mapView.loadMapImages(
       MAPS_DIR+"city_map.png",
       MAPS_DIR+"city_districts_key.png"
     );
@@ -87,23 +77,6 @@ public class WorldView {
     selectCircle  = Kind.loadImage(ACTS_DIR+"select_circle.png");
     selectSquare  = Kind.loadImage(MNUI_DIR+"select_square.png");
   }
-  
-  
-  /*
-  void setSelection(Object selected) {
-    this.lastSelected = selected;
-    I.say("Selection is: "+selected);
-    if (lastSelected instanceof Assignment) {
-      I.say("  Is assignment!");
-    }
-  }
-  
-  
-  Assignment currentAssignment() {
-    if (! (lastSelected instanceof Assignment)) return null;
-    return (Assignment) lastSelected;
-  }
-  //*/
   
   
   public void queueMessage(MessageView message) {
@@ -120,41 +93,58 @@ public class WorldView {
   
   /**  Rendering methods-
     */
+  protected void updateAndRender(Surface surface, Graphics2D g) {
+    if (rosterView.selected() != null) {
+      personView.visible = true ;
+      rosterView.visible = false;
+    }
+    else {
+      personView.visible = false;
+      rosterView.visible = true ;
+    }
+    
+    final MessageView topMessage = messageQueue.first();
+    if (topMessage != messageShown) {
+      if (topMessage != null) {
+        topMessage.attachAt(vw / 2, vh / 2);
+        setChild(topMessage, true);
+      }
+      if (messageShown != null) {
+        setChild(messageShown, false);
+      }
+      messageShown = topMessage;
+    }
+    
+    super.updateAndRender(surface, g);
+  }
+  
+  
   void renderTo(Surface surface, Graphics2D g) {
     
     final int wide = surface.getWidth(), high = surface.getHeight();
     g.setColor(Color.BLACK);
     g.fillRect(0, 0, wide, high);
-
+    
     MessageView message = messageQueue.first();
     surface.setMouseFocus(message);
-    
-    if (rosterView.selected() != null) {
-      personView.renderTo(surface, g);
-    }
-    else {
-      rosterView.renderTo(surface, g);
-    }
-    mapView   .renderTo(surface, g);
-    baseView  .renderTo(surface, g);
-    regionView.renderTo(surface, g);
-    roomView  .renderTo(surface, g);
-    
+
     g.setColor(Color.WHITE);
+    int across = 320;
+    
     String timeString = ViewUtils.getTimeString(world);
-    g.drawString("Time: "+timeString, 800, 15);
+    g.drawString("Time: "+timeString, across, 15);
     
-    boolean hoverS = surface.mouseIn(800 + 360 - 150, 0, 50, 15, this);
+    boolean hoverS = surface.mouseIn(across + 360 - 150, 0, 50, 15, this);
     g.setColor(hoverS ? Color.YELLOW : Color.BLUE);
-    g.drawString("Save"  , 800 + 360 - 150, 15);
+    g.drawString("Save"  , across + 360 - 150, 15);
     
-    boolean hoverR = surface.mouseIn(800 + 360 - 100, 0, 70, 15, this);
+    boolean hoverR = surface.mouseIn(across + 360 - 100, 0, 70, 15, this);
     g.setColor(hoverR ? Color.YELLOW : Color.BLUE);
-    g.drawString("Reload", 800 + 360 - 100 , 15);
+    g.drawString("Reload", across + 360 - 100 , 15);
     
-    boolean hoverQ = surface.mouseIn(800 + 360 - 30, 0, 50, 15, this);
+    boolean hoverQ = surface.mouseIn(across + 360 - 30, 0, 50, 15, this);
     g.setColor(hoverQ ? Color.YELLOW : Color.BLUE);
-    g.drawString("Quit", 800 + 360 - 30 , 15);
+    g.drawString("Quit", across + 360 - 30 , 15);
     
     if (hoverS && surface.mouseClicked(this)) {
       world.performSave();
@@ -164,11 +154,6 @@ public class WorldView {
     }
     if (hoverQ && surface.mouseClicked(this)) {
       world.performSaveAndQuit();
-    }
-    
-    if (message != null) {
-      message.attachTo(this, 400, 250);
-      message.renderTo(surface, g);
     }
   }
   

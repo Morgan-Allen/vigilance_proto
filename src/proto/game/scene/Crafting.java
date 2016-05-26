@@ -112,10 +112,11 @@ public class Crafting extends Task {
       s.append(" They were successful.");
     }
     else {
-      s.append(" The encountered difficulties.");
+      s.append(" They encountered difficulties.");
     }
     
     world.view().queueMessage(new MessageView(
+      world.view(),
       icon(), "Task complete: "+name,
       s.toString(),
       "Dismiss"

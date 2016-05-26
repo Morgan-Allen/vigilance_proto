@@ -108,6 +108,7 @@ public class Lead extends Task {
     parent.wipeActionLog();
     
     world.view().queueMessage(new MessageView(
+      world.view(),
       icon(), "Task complete: "+name,
       s.toString(),
       "Dismiss"

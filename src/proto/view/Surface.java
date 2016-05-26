@@ -56,13 +56,6 @@ public class Surface extends JPanel implements
   }
   
   
-  public boolean mouseIn(Box2D b, Object within) {
-    return mouseIn(
-      (int) b.xpos(), (int) b.ypos(), (int) b.xdim(), (int) b.ydim(), within
-    );
-  }
-  
-  
   public boolean mouseClicked(Object within) {
     if (mouseFocus != null && mouseFocus != within) return false;
     return mouseClicked;
@@ -91,19 +84,9 @@ public class Surface extends JPanel implements
     g2d.setRenderingHints(hints);
     I.used60Frames = (numPaints++ % 60) == 0;
     
-    if (false) {
-    }
-    /*
-    if (scene != null) {
-      SceneView view = scene.view();
-      view.renderTo(this, g2d);
-      game.print().setText(view.description());
-    }
-    //*/
-    else if (world != null) {
+    if (world != null) {
       WorldView view = world.view();
-      view.renderTo(this, g2d);
-      //game.print().setText(view.description());
+      view.updateAndRender(this, g2d);
     }
     
     this.mouseClicked = this.mouseClick;

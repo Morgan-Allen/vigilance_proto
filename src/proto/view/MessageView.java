@@ -9,13 +9,10 @@ import java.awt.Graphics2D;
 
 
 
-public abstract class MessageView {
+public abstract class MessageView extends UINode {
   
   
-  WorldView parent;
-  Box2D viewBounds;
   Color background;
-  
   Image mainImage;
   String title;
   String mainText;
@@ -23,9 +20,10 @@ public abstract class MessageView {
   
   
   protected MessageView(
+    UINode parent,
     Image mainImage, String title, String mainText, String... options
   ) {
-    viewBounds = new Box2D();
+    super(parent);
     background = new Color(0, 0, 0, 0.75f);
     this.mainImage = mainImage;
     this.title     = title    ;
@@ -34,21 +32,12 @@ public abstract class MessageView {
   }
   
   
-  void attachTo(WorldView parent, int wide, int high) {
-    this.parent = parent;
-    this.viewBounds.set(600 - (wide / 2), 300 - (high / 2), wide, high);
+  void attachAt(int wide, int high) {
+    this.relBounds.set(600 - (wide / 2), 300 - (high / 2), wide, high);
   }
   
   
   void renderTo(Surface surface, Graphics2D g) {
-    
-    final Box2D b = this.viewBounds;
-    final int
-      vx = (int) b.xpos(),
-      vy = (int) b.ypos(),
-      vw = (int) b.xdim(),
-      vh = (int) b.ydim()
-    ;
     
     g.setColor(background);
     g.fillRect(vx, vy, vw, vh);

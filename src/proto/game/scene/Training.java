@@ -82,6 +82,7 @@ public class Training extends Task {
       s.append(record);
       
       world.view().queueMessage(new MessageView(
+        world.view(),
         icon(), "Task complete: "+name,
         s.toString(),
         "Dismiss"

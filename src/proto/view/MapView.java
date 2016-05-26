@@ -13,22 +13,18 @@ import java.awt.image.BufferedImage;
 
 
 
-public class MapView {
+public class MapView extends UINode {
   
   
   /**  Data fields, construction, setup and attachment-
     */
-  final WorldView parent;
-  final Box2D viewBounds;
-  
   BufferedImage mapImage;
   BufferedImage keyImage;
   RegionAssets attached[];
   
   
-  MapView(WorldView parent, Box2D viewBounds) {
-    this.parent     = parent    ;
-    this.viewBounds = viewBounds;
+  MapView(UINode parent, Box2D viewBounds) {
+    super(parent, viewBounds);
   }
   
   
@@ -81,17 +77,10 @@ public class MapView {
   /**  Actual rendering methods-
     */
   void renderTo(Surface surface, Graphics2D g) {
-    Nation nations[] = parent.world.nations();
+    Nation nations[] = mainView.world.nations();
     attachOutlinesFor(nations);
     //
     //  Draw the background image first-
-    final Box2D b = this.viewBounds;
-    final int
-      vx = (int) b.xpos(),
-      vy = (int) b.ypos(),
-      vw = (int) b.xdim(),
-      vh = (int) b.ydim()
-    ;
     g.drawImage(mapImage, vx, vy, vw, vh, null);
     Nation nationHovered = null;
     //
@@ -103,28 +92,28 @@ public class MapView {
     
     boolean mouseInMap = surface.mouseIn(vx, vy, vw, vh, this);
     int mX = surface.mouseX(), mY = surface.mouseY();
-    mX = (int) ((mX - b.xpos()) * mapWRatio);
-    mY = (int) ((mY - b.ypos()) * mapHRatio);
+    mX = (int) ((mX - vx) * mapWRatio);
+    mY = (int) ((mY - vy) * mapHRatio);
     int pixVal = 0;
     if (mouseInMap && mX >= 0 && mX < imgWide && mY >= 0 && mY < imgHigh) {
       pixVal = ((BufferedImage) keyImage).getRGB(mX, mY);
     }
     
     ///if (I.used60Frames) I.say("Pixel value is: "+pixVal);
-    Nation selectedArea = parent.baseView.selectedNation();
+    Nation selectedArea = mainView.baseView.selectedNation();
     for (Nation n : nations) if (n.region.view.colourKey == pixVal) {
       nationHovered = n;
     }
     if (nationHovered != null && surface.mouseClicked(this)) {
-      parent.baseView.setSelection(nationHovered);
+      mainView.baseView.setSelection(nationHovered);
     }
     
     renderOutline(selectedArea , surface, g, mapWRatio, mapHRatio);
     renderOutline(nationHovered, surface, g, mapWRatio, mapHRatio);
     
     for (Nation n : nations) {
-      int x = (int) ((n.region.view.centerX / mapWRatio) + b.xpos());
-      int y = (int) ((n.region.view.centerY / mapHRatio) + b.ypos());
+      int x = (int) ((n.region.view.centerX / mapWRatio) + vx);
+      int y = (int) ((n.region.view.centerY / mapHRatio) + vy);
       
       g.setColor(Color.LIGHT_GRAY);
       g.drawString(n.region.name, x - 25, y + 25 + 15);
@@ -139,44 +128,19 @@ public class MapView {
         Color.BLUE, Color.BLACK, trustLevel, false, g
       );
       
-      for (Event event : parent.world.events().active()) {
+      for (Event event : mainView.world.events().active()) {
         if (event.openLeadsFrom(n.region).size() > 0) {
-          g.drawImage(parent.alertMarker, x - 25, y - 25, 50, 50, null);
+          g.drawImage(mainView.alertMarker, x - 25, y - 25, 50, 50, null);
         }
       }
       ViewUtils.renderAssigned(visitors(n), x + 25, y + 25, surface, g);
-    }
-    //
-    //  Then draw the monitor-status active at the moment-
-    boolean hovered = surface.mouseIn(vx, vy + vh, vw, 20, this);
-    String alertS = "Resume Monitoring";
-    Color alertC = Color.BLUE;
-    boolean active = parent.world.monitorActive();
-    
-    if (active) {
-      alertS = "Monitoring...";
-      alertC = Color.ORANGE;
-    }
-    if (hovered) alertC = Color.YELLOW;
-    
-    int x = (vw / 2), y = vh;
-    x += vx - (g.getFontMetrics().stringWidth(alertS) / 2);
-    y += vy + 15;
-    g.setColor(alertC);
-    g.drawString(alertS, x, y);
-    
-    //
-    //  TODO:  This shouldn't be outside the map bounds.
-    if (hovered && surface.mouseClicked(this)) {
-      if (active) parent.world.pauseMonitoring();
-      else        parent.world.beginMonitoring();
     }
   }
   
   
   private Series <Person> visitors(Nation located) {
     final Batch <Person> visitors = new Batch();
-    for (Person p : parent.world.base().roster()) if (p.assignment() != null) {
+    for (Person p : mainView.world.base().roster()) if (p.assignment() != null) {
       if (p.assignment().targetLocation() == located.region) {
         visitors.include(p);
       }
@@ -190,10 +154,9 @@ public class MapView {
   ) {
     if (n == null || n.region.view.outline == null) return;
     RegionAssets r = n.region.view;
-    final Box2D b = this.viewBounds;
     int
-      x = (int) (b.xpos() + (r.outlineX / mapWRatio) + 0.5f),
-      y = (int) (b.ypos() + (r.outlineY / mapHRatio) + 0.5f),
+      x = (int) (vx + (r.outlineX / mapWRatio) + 0.5f),
+      y = (int) (vy + (r.outlineY / mapHRatio) + 0.5f),
       w = (int) (r.outline.getWidth (null) / mapWRatio),
       h = (int) (r.outline.getHeight(null) / mapHRatio);
     g.drawImage(r.outline, x, y, w, h, null);

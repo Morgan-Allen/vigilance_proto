@@ -10,7 +10,7 @@ import java.awt.FontMetrics;
 
 
 
-public abstract class ClickMenu <T> {
+public abstract class ClickMenu <T> extends UINode {
   
   
   int atX, atY;
@@ -19,12 +19,14 @@ public abstract class ClickMenu <T> {
   
   
   
-  ClickMenu(Series <T> options, int atX, int atY) {
+  ClickMenu(Series <T> options, int atX, int atY, UINode parent) {
+    super(parent);
     this.options = options;
     this.atX = atX;
     this.atY = atY;
     background = new Color(0, 0, 0, 0.75f);
   }
+  
   
   
   void renderTo(Surface surface, Graphics2D g) {
@@ -51,6 +53,7 @@ public abstract class ClickMenu <T> {
     g.drawRect(atX, atY, maxWide, totalHigh);
     
     int x = atX, y = atY;
+    this.relBounds.set(x, y, maxWide, totalHigh);
     
     //  TODO:  It might help to have a consistent set of UI classes for 'stuff
     //  that comes in a vertical list and has icons'.  Then factor that out of
@@ -60,6 +63,7 @@ public abstract class ClickMenu <T> {
       String label = labels[i];
       Image  image = images[i];
       boolean hovered = false;
+      g.setColor(Color.WHITE);
       
       if (image == null) {
         hovered = surface.mouseIn(x, y, maxWide, 20, this);

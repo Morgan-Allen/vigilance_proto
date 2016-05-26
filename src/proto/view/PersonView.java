@@ -13,7 +13,7 @@ import java.awt.Image;
 
 
 
-public class PersonView {
+public class PersonView extends UINode {
   
   final static Object[] STAT_DISPLAY_COORDS = {
     INTELLECT, 0, 0,
@@ -54,31 +54,57 @@ public class PersonView {
   ;
   
   
-  final WorldView parent;
-  final Box2D viewBounds;
-  
   int tabMode = TAB_SKILLS;
+  StringButton navButtons[], tabButtons[];
   ClickMenu pickMenu = null;
   
   
-  PersonView(WorldView parent, Box2D viewBounds) {
-    this.parent     = parent;
-    this.viewBounds = viewBounds;
+  PersonView(UINode parent, Box2D viewBounds) {
+    super(parent, viewBounds);
+    
+    navButtons = new StringButton[3];
+    tabButtons = new StringButton[3];
+    
+    final String navNames[] = { "Roster", "Last", "Next" };
+    
+    for (int i = 0; i < 3; i++) {
+      final int actionID = i;
+      navButtons[i] = new StringButton(
+        navNames[i], vx + 120 + 5 + (60 * i), vy + 0, 60, 20, this
+      ) {
+        void whenClicked() {
+          Person person = mainView.rosterView.selected();
+          performNavigation(actionID, person);
+        }
+      };
+    }
+    addChildren(navButtons);
+    
+    final String tabNames[] = { "Skills", "Gear", "Bonds" };
+    for (int i = 0; i < 3; i++) {
+      final int modeID = i + 1;
+      tabButtons[i] = new StringButton(
+        tabNames[i], vx + 0 + 5 + (60 * i), vy + 120 + 40, 60, 20, this
+      ) {
+        void whenClicked() {
+          setTab(modeID, this);
+        }
+      };
+    }
+    addChildren(tabButtons);
+  }
+  
+  
+  void setTab(int modeID, StringButton clicked) {
+    tabMode = modeID;
+    for (StringButton b : tabButtons) b.toggled = b == clicked;
   }
   
   
 
   void renderTo(Surface surface, Graphics2D g) {
     
-    final Person person = parent.rosterView.selected();
-    
-    final Box2D b = this.viewBounds;
-    final int
-      vx = (int) b.xpos(),
-      vy = (int) b.ypos(),
-      vw = (int) b.xdim(),
-      vh = (int) b.ydim()
-    ;
+    final Person person = mainView.rosterView.selected();
     
     g.setColor(Color.WHITE);
     g.drawImage(person.kind().sprite(), vx, vy, 120, 120, null);
@@ -89,19 +115,6 @@ public class PersonView {
       person.history.summary(), g, vx + 125, vy + 40, vw - (120 + 10), 80
     );
     
-    final String navNames[] = { "Roster", "Last", "Next" };
-    for (int i = 0; i < 3; i++) {
-      final int actionID = i;
-      StringButton navButton = new StringButton(
-        navNames[i], vx + 120 + 5 + (60 * i), vy + 0, 60, 20, this
-      ) {
-        void whenClicked() {
-          performNavigation(actionID, person);
-        }
-      };
-      navButton.renderTo(surface, g);
-    }
-
     g.setColor(Color.WHITE);
     final Assignment task = person.assignment();
     String assignDesc = "None";
@@ -111,20 +124,6 @@ public class PersonView {
       "Assignment: "+assignDesc, g,
       vx + 5, vy + 120, vw - 10, 40
     );
-    
-    final String tabNames[] = { "Skills", "Gear", "Bonds" };
-    for (int i = 0; i < 3; i++) {
-      final int modeID = i + 1;
-      StringButton tabButton = new StringButton(
-        tabNames[i], vx + 0 + 5 + (60 * i), vy + 120 + 40, 60, 20, this
-      ) {
-        void whenClicked() {
-          tabMode = modeID;
-        }
-      };
-      tabButton.toggled = tabMode == modeID;
-      tabButton.renderTo(surface, g);
-    }
 
     g.setColor(Color.LIGHT_GRAY);
     if (tabMode == TAB_SKILLS) {
@@ -136,41 +135,32 @@ public class PersonView {
     if (tabMode == TAB_BONDS) {
       renderBonds(surface, g, person);
     }
-    if (pickMenu != null) {
-      pickMenu.renderTo(surface, g);
-    }
   }
   
   
   void performNavigation(int actionID, Person person) {
     if (actionID == ACTION_BACK) {
-      parent.rosterView.setSelection(null);
+      mainView.rosterView.setSelection(null);
       return;
     }
     
-    final Base base = parent.world.base();
+    final Base base = mainView.world.base();
     final Series <Person> roster = base.roster();
     int personID = base.rosterIndex(person);
     
     if (actionID == ACTION_NEXT) {
       personID = (personID + 1) % roster.size();
-      parent.rosterView.setSelection(base.atRosterIndex(personID));
+      mainView.rosterView.setSelection(base.atRosterIndex(personID));
     }
     if (actionID == ACTION_LAST) {
       personID = (personID + roster.size() - 1) % roster.size();
-      parent.rosterView.setSelection(base.atRosterIndex(personID));
+      mainView.rosterView.setSelection(base.atRosterIndex(personID));
     }
   }
   
   
   void renderSkills(Surface surface, Graphics2D g, Person person) {
-    final Box2D b = this.viewBounds;
-    final int
-      vx = (int) b.xpos(),
-      vy = (int) b.ypos(),
-      vw = (int) b.xdim(),
-      vh = (int) b.ydim()
-    ;
+    
     Skill hovered = null;
     
     g.setColor(Color.WHITE);
@@ -239,14 +229,6 @@ public class PersonView {
   
 
   void renderGear(Surface surface, Graphics2D g, Person person) {
-    final Box2D b = this.viewBounds;
-    final int
-      vx = (int) b.xpos(),
-      vy = (int) b.ypos(),
-      vw = (int) b.xdim(),
-      vh = (int) b.ydim()
-    ;
-    
     int down = 120 + 60 + 10;
     
     for (int slotID : Person.ALL_SLOTS) {
@@ -275,32 +257,28 @@ public class PersonView {
     if (pickMenu != null) return;
     
     final Batch <Equipped> types = new Batch();
-    for (Equipped type : parent.world.base().itemsAvailableFor(person)) {
+    for (Equipped type : mainView.world.base().itemsAvailableFor(person)) {
       types.add(type);
     }
     
     pickMenu = new ClickMenu <Equipped> (
-      types, x, y
+      types, x, y, this
     ) {
       protected Image imageFor(Equipped option) {
         return option.icon();
       }
+      
       protected void whenPicked(String option, int optionID) {
         person.equipItem(types.atIndex(optionID));
+        parent.setChild(this, false);
         pickMenu = null;
       }
     };
+    setChild(pickMenu, true);
   }
   
 
   void renderBonds(Surface surface, Graphics2D g, Person person) {
-    final Box2D b = this.viewBounds;
-    final int
-      vx = (int) b.xpos(),
-      vy = (int) b.ypos(),
-      vw = (int) b.xdim(),
-      vh = (int) b.ydim()
-    ;
     
     g.setColor(Color.WHITE);
     int down = 120 + 60 + 20;
@@ -319,9 +297,9 @@ public class PersonView {
       boolean hoverP = surface.mouseIn(vx + 5, down + 5, 40, 40, this);
       
       if (hoverP) {
-        g.drawImage(parent.selectCircle, vx + 5, down + 5, 40, 40, null);
+        g.drawImage(mainView.selectCircle, vx + 5, down + 5, 40, 40, null);
         if (surface.mouseClicked(this)) {
-          parent.rosterView.setSelection(other);
+          mainView.rosterView.setSelection(other);
         }
       }
       

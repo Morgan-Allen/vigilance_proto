@@ -11,7 +11,7 @@ import java.awt.image.*;
 
 
 
-public class RosterView {
+public class RosterView extends UINode {
   
   
   /**  Data fields, construction, setup and attachment-
@@ -28,18 +28,14 @@ public class RosterView {
     );
   
   
-  final WorldView parent;
-  final Box2D viewBounds;
-  
   final Color statColors[] = new Color[4];
   final Image statIcons [] = new Image[4];
   
   private Person selectedPerson;
   
   
-  RosterView(WorldView parent, Box2D viewBounds) {
-    this.parent     = parent    ;
-    this.viewBounds = viewBounds;
+  RosterView(UINode parent, Box2D viewBounds) {
+    super(parent, viewBounds);
     
     statColors[0] = new Color(0.0f, 0.0f, 1.0f);
     statColors[1] = new Color(0.0f, 1.0f, 0.0f);
@@ -55,18 +51,11 @@ public class RosterView {
   
   
   void renderTo(Surface surface, Graphics2D g) {
-    Base base = parent.world.base();
+    Base base = mainView.world.base();
     Person personHovered = null;
-    Assignment assignTo = parent.baseView.selectedTask();
+    Assignment assignTo = mainView.baseView.selectedTask();
     
-    Image selectCircle = parent.selectCircle;
-    final Box2D b = viewBounds;
-    final int
-      vx = (int) b.xpos(),
-      vy = (int) b.ypos(),
-      vw = (int) b.xdim(),
-      vh = (int) b.ydim()
-    ;
+    Image selectCircle = mainView.selectCircle;
     int across = 0, down = 15, size = 75, sizeA = 25, pad = 25, x, y;
     
     for (Person p : base.roster()) {
@@ -84,7 +73,7 @@ public class RosterView {
       g.drawImage(p.kind().sprite(), x, y, size, size, null);
       
       g.setColor(Color.LIGHT_GRAY);
-      g.drawString(p.name()+" ("+(base.rosterIndex(p) + 1)+")", x, y - 5);
+      g.drawString(p.name(), x, y - 5);
       
       //g.setColor(Color.YELLOW);
       if (surface.mouseIn(x, y, size, size, this)) {
@@ -105,19 +94,19 @@ public class RosterView {
       }
       g.drawImage(forA, x, y + size - sizeA, sizeA, sizeA, null);
       
-      /*
       int MH = p.maxHealth(), MS = p.maxStress();
       int inj = (int) p.injury(), fat = (int) p.stun();
       int str = (int) p.stress();
-      renderStatBar(
-        x + size + 05, y, 5, size + 35,
-        Color.RED, Color.BLACK, (MH - inj) * 1f / MH, g
+      float injLevel = (MH - inj) * 1f / MH, strLevel = str * 1f / MS;
+      
+      ViewUtils.renderStatBar(
+        x, y + size + 20 + 10 + 5, size, 5,
+        Color.BLUE, Color.DARK_GRAY, injLevel, false, g
       );
-      renderStatBar(
-        x + size + 10, y, 5, size + 35,
-        Color.LIGHT_GRAY, Color.GRAY, str * 1f / MS, g
+      ViewUtils.renderStatBar(
+        x, y + size + 20 + 10 + 10, size, 5,
+        Color.GRAY, Color.DARK_GRAY, strLevel, false, g
       );
-      //*/
       
       int index = 0;
       for (Trait t : PersonStats.BASE_STATS) {

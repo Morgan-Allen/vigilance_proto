@@ -12,18 +12,14 @@ import java.awt.Graphics2D;
 
 
 
-public class RoomView {
+public class RoomView extends UINode {
   
-  
-  final WorldView parent;
-  final Box2D viewBounds;
   
   Task selectedTask = null;
   
   
-  RoomView(WorldView parent, Box2D viewBounds) {
-    this.parent     = parent    ;
-    this.viewBounds = viewBounds;
+  RoomView(UINode parent, Box2D viewBounds) {
+    super(parent, viewBounds);
   }
   
   
@@ -32,17 +28,9 @@ public class RoomView {
     */
   void renderTo(Surface surface, Graphics2D g) {
     
-    
-    final int
-      vx = (int) viewBounds.xpos(),
-      vy = (int) viewBounds.ypos(),
-      vw = (int) viewBounds.xdim(),
-      vh = (int) viewBounds.ydim()
-    ;
-    
     //  TODO:  This should properly be independent of either RoomView or
     //  RegionView.  Either merge the two or move this warning outside!
-    BaseView BV = parent.baseView;
+    AreasView BV = mainView.baseView;
     if (BV.selectedRoom() == null && BV.selectedNation() == null) {
       g.setColor(Color.LIGHT_GRAY);
       ViewUtils.drawWrappedString(
@@ -53,7 +41,7 @@ public class RoomView {
       );
     }
     
-    Room room = parent.baseView.selectedRoom();
+    Room room = mainView.baseView.selectedRoom();
     if (room == null) return;
     
     //Image portrait = nation.region.view.portrait;
@@ -76,14 +64,15 @@ public class RoomView {
     
     int down = vy + 100;
     
+    //  TODO:  Should be using attachment/detachment here?
     for (Task task : room.possibleTasks()) {
       TaskView view = task.createView(parent);
-      view.viewBounds.set(vx, vy + down, vw, 60);
-      view.renderTo(surface, g);
+      view.relBounds.set(vx, vy + down, vw, 60);
+      view.updateAndRender(surface, g);
       down += 60 + 10;
     }
     
-    if (parent.rosterView.selected() == null) {
+    if (mainView.rosterView.selected() == null) {
       g.setColor(Color.LIGHT_GRAY);
       ViewUtils.drawWrappedString(
         "Select an agent from your roster to perform assignments.",

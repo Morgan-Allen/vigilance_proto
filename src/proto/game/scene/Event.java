@@ -21,6 +21,9 @@ public class Event implements Session.Saveable {
   
   
   final String name, info;
+  
+  //  TODO: Move the log into the events class, and record anything &
+  //  everything of interest.
   Batch <String> actionLog = new Batch();
   
   final World world;

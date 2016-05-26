@@ -184,26 +184,31 @@ public abstract class Task implements Assignment {
   }
   
   
+  public float testChance(int testIndex) {
+    Trait stat = tested [testIndex];
+    int   mod  = testMod[testIndex];
+    int   DC   = testDCs[testIndex] + Nums.max(0, -mod);
+    
+    float maxLevel = 0, sumLevels = 0;
+    for (Person p : assigned) {
+      float level = p.stats.levelFor(stat) + Nums.max(0, mod);
+      maxLevel  = Nums.max(level, maxLevel);
+      sumLevels += level;
+    }
+    
+    float checkLevel = maxLevel + ((sumLevels - maxLevel) / 2);
+    float winChance = Nums.clamp((checkLevel - (DC - 5)) / 10f, 0, 1);
+    return winChance;
+  }
+  
+  
   protected boolean performTest() {
     boolean okay = true;
     
     for (int n = tested.length; n-- > 0;) {
       Trait stat = tested [n];
-      int   mod  = testMod[n];
-      int   DC   = testDCs[n] + Nums.max(0, -mod);
-      
-      float maxLevel = 0, sumLevels = 0;
-      for (Person p : assigned) {
-        float level = p.stats.levelFor(stat) + Nums.max(0, mod);
-        maxLevel  = Nums.max(level, maxLevel);
-        sumLevels += level;
-      }
-      
-      float checkLevel = maxLevel + ((sumLevels - maxLevel) / 2);
-      float winChance = Nums.clamp(checkLevel - (DC + 5) / 10f, 0, 1);
-      
+      float winChance = testChance(n);
       okay &= results[n] = (Rand.num() < winChance);
-      
       if (stat instanceof Skill) for (Person p : assigned) {
         p.stats.gainXP((Skill) stat, (1 - winChance) * 2);
       }
@@ -243,13 +248,17 @@ public abstract class Task implements Assignment {
     StringBuffer s = new StringBuffer("Requires: ");
     for (int n = 0; n < tested.length;) {
       s.append(tested[n].name+" "+testDCs[n]);
+      
+      float chance = testChance(n);
+      s.append(" ("+((int) (chance * 100))+"%)");
+      
       if (++n < tested.length) s.append(", ");
     }
     return s.toString();
   }
   
   
-  public TaskView createView(WorldView parent) {
+  public TaskView createView(UINode parent) {
     return new TaskView(this, parent);
   }
   
