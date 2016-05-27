@@ -18,6 +18,10 @@ public class Events {
   List <Event> coming = new List();
   List <Event> active = new List();
   
+  Assignment currentAction = null;
+  static class LogEntry { String info; Assignment action; int priority; }
+  List <LogEntry> actionLog = new List();
+  
   
   Events(World world) {
     this.world = world;
@@ -78,11 +82,51 @@ public class Events {
       if (event.timeEnds() <= world.timeDays() || event.complete()) {
         active.remove(event);
       }
-      else event.updateEvent();
+      else {
+        event.updateEvent();
+      }
     }
   }
   
   
+  /**  Logging background events-
+    */
+  public void logAssignment(Assignment action) {
+    this.currentAction = action;
+  }
+  
+  
+  public void log(String info, int priority) {
+    if (currentAction == null) return;
+    final LogEntry entry = new LogEntry();
+    entry.action   = currentAction;
+    entry.info     = info;
+    entry.priority = priority;
+    actionLog.add(entry);
+  }
+  
+  
+  public void log(String info) {
+    log(info, Event.EVENT_NORMAL);
+  }
+  
+  
+  public Series <String> extractLogInfo(Assignment action, int minPriority) {
+    final Batch <String> extracts = new Batch();
+    
+    for (LogEntry entry : actionLog) {
+      if (entry.action == action) {
+        actionLog.remove(entry);
+        if (entry.priority >= minPriority) extracts.add(entry.info);
+      }
+    }
+    return extracts;
+  }
+  
+  
+  public Series <String> extractLogInfo(Assignment action) {
+    return extractLogInfo(action, Event.EVENT_NORMAL);
+  }
 }
 
 

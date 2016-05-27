@@ -110,7 +110,7 @@ public class World implements Session.Saveable {
     int numN = Region.ALL_REGIONS.length;
     this.nations = new Nation[numN];
     for (int n = 0; n < numN; n++) {
-      nations[n] = new Nation(Region.ALL_REGIONS[n]);
+      nations[n] = new Nation(Region.ALL_REGIONS[n], this);
     }
     
     events.addType(Kidnapping.TYPE);
@@ -120,14 +120,14 @@ public class World implements Session.Saveable {
   public void initDefaultBase() {
     this.base = new Base(this);
     
-    base.addToRoster(new Person(Heroes.HERO_BATMAN   ));
-    base.addToRoster(new Person(Heroes.HERO_ALFRED   ));
-    base.addToRoster(new Person(Heroes.HERO_SWARM    ));
-    base.addToRoster(new Person(Heroes.HERO_BATGIRL  ));
-    base.addToRoster(new Person(Heroes.HERO_NIGHTWING));
-    base.addToRoster(new Person(Heroes.HERO_QUESTION ));
+    base.addToRoster(new Person(Heroes.HERO_BATMAN   , this));
+    base.addToRoster(new Person(Heroes.HERO_ALFRED   , this));
+    base.addToRoster(new Person(Heroes.HERO_SWARM    , this));
+    base.addToRoster(new Person(Heroes.HERO_BATGIRL  , this));
+    base.addToRoster(new Person(Heroes.HERO_NIGHTWING, this));
+    base.addToRoster(new Person(Heroes.HERO_QUESTION , this));
     
-    //  TODO:  Include default relationships too?
+    //  TODO:  Include default relationships too.
     
     base.addFacility(Gymnasium .BLUEPRINT, 0, 1f);
     base.addFacility(Library   .BLUEPRINT, 1, 1f);
@@ -192,7 +192,12 @@ public class World implements Session.Saveable {
   /**  Regular updates and activity cycle:
     */
   public void updateWorld() {
-    
+
+    /*
+    if (enteredScene != null) {
+      enteredScene.updateScene();
+    }
+    //*/
     if (amWatching) {
       final float realGap = 1f / RunGame.FRAME_RATE;
       final float timeGap = realGap * GAME_HOURS_PER_REAL_SECOND;
@@ -206,11 +211,6 @@ public class World implements Session.Saveable {
       events.updateEvents();
       base.updateBase(timeGap / (HOURS_PER_DAY * DAYS_PER_WEEK));
     }
-    /*
-    if (enteredScene != null) {
-      enteredScene.updateScene();
-    }
-    //*/
   }
   
   

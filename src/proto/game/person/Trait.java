@@ -4,6 +4,8 @@ package proto.game.person;
 import proto.common.*;
 import proto.util.*;
 
+import java.awt.Image;
+
 
 
 public class Trait extends Index.Entry implements Session.Saveable  {
@@ -13,12 +15,14 @@ public class Trait extends Index.Entry implements Session.Saveable  {
   
   final public String name;
   final public String description;
+  final public Image icon;
   
-
+  
   protected Trait(String name, String ID, String description) {
     super(INDEX, ID);
-    this.name = name;
+    this.name        = name;
     this.description = description;
+    this.icon        = null;//Kind.loadImage(imgPath);
   }
   
   
@@ -35,4 +39,14 @@ public class Trait extends Index.Entry implements Session.Saveable  {
   public String toString() {
     return name;
   }
+  
+  
+  public Image icon() {
+    return icon;
+  }
 }
+
+
+
+
+

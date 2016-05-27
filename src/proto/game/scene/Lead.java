@@ -95,17 +95,18 @@ public class Lead extends Task {
     if (success()) s.append("  They were successful.");
     else           s.append("  They had no luck."    );
     
+    boolean noLeads = true;
     if (success) for (Lead l : parent.openLeadsFrom(reveals)) {
       s.append("\nNew lead: ");
       s.append(l.info);
+      noLeads = false;
     }
-    //  TODO:  If no fresh leads are uncovered, say as much.
+    if (noLeads) s.append("\nNo new leads were uncovered.");
     
-    for (String action : parent.actionLog()) {
+    for (String action : world.events().extractLogInfo(this)) {
       s.append("\n");
       s.append(action);
     }
-    parent.wipeActionLog();
     
     world.view().queueMessage(new MessageView(
       world.view(),

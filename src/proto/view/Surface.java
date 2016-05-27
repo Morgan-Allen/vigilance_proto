@@ -46,11 +46,13 @@ public class Surface extends JPanel implements
   public boolean mouseClicked() { return mouseClicked; }
   
   
-  public void recordHover(int x, int y, int w, int h, Object hovered) {
-    if (hovered == null) return;
+  public boolean recordHover(int x, int y, int w, int h, Object hovered) {
+    if (hovered == null) return false;
     if (mouseX > x && mouseX <= x + w && mouseY > y && mouseY <= y + h) {
       mouseFocus = hovered;
+      return true;
     }
+    return false;
   }
   
   
@@ -66,7 +68,7 @@ public class Surface extends JPanel implements
   
   
   public boolean tryHover(int x, int y, int w, int h, Object hovered) {
-    recordHover(x, y, w, h, hovered);
+    if (! recordHover(x, y, w, h, hovered)) return false;
     return wasHovered(hovered);
   }
   

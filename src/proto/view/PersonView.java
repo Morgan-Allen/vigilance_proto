@@ -238,7 +238,7 @@ public class PersonView extends UINode {
       String slotName = Person.SLOT_NAMES[slotID];
       
       final boolean hovered = surface.tryHover(
-        vx + 5, vy + down, vw - 10, 40, slotID
+        vx + 5, vy + down, vw - 10, 40, "Slot_"+slotID
       );
       if (hovered) g.setColor(Color.YELLOW);
       else g.setColor(Color.WHITE);

@@ -331,9 +331,11 @@ public class PersonStats {
   public void gainXP(Skill stat, float XP) {
     final Level l = getLevel(stat);
     l.practice += XP;
+    
     while (l.practice >= l.level + 1) {
       l.practice -= l.level + 1;
       l.level++;
+      person.world.events().log(person+" reached level "+l.level+" in "+stat);
     }
     for (Skill root : stat.roots) {
       gainXP(root, XP / (3f * stat.roots.length));

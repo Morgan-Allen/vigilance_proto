@@ -13,18 +13,22 @@ public class Event implements Session.Saveable {
   
   /**  Data fields, construction and save/load methods-
     */
+  final public static int
+    EVENT_MINOR  = 0,
+    EVENT_NORMAL = 1,
+    EVENT_MAJOR  = 2
+  ;
   final static Image
-    //  TODO:  You will need more of these...
-    IMG_LEAD = Kind.loadImage(
-      "media assets/scene backgrounds/crime_generic_1.png"
+    LEAD_IMAGES[] = Kind.loadImages(
+      "media assets/scene backgrounds/",
+      "crime_generic_1.png",
+      "crime_generic_2.png",
+      "crime_generic_3.png",
+      "crime_generic_4.png"
     );
   
   
   final String name, info;
-  
-  //  TODO: Move the log into the events class, and record anything &
-  //  everything of interest.
-  Batch <String> actionLog = new Batch();
   
   final World world;
   float timeBegins, timeEnds;
@@ -126,7 +130,9 @@ public class Event implements Session.Saveable {
   
   
   public void updateEvent() {
-    for (Lead lead : leads) lead.updateAssignment();
+    for (Lead lead : leads) {
+      lead.updateAssignment();
+    }
   }
   
   
@@ -186,21 +192,6 @@ public class Event implements Session.Saveable {
   
   /**  Rendering, debug and interface methods-
     */
-  protected void logAction(String action) {
-    actionLog.add(action);
-  }
-  
-  
-  protected void wipeActionLog() {
-    actionLog.clear();
-  }
-  
-  
-  public Series <String> actionLog() {
-    return actionLog;
-  }
-  
-  
   public String name() {
     return name;
   }
@@ -212,7 +203,7 @@ public class Event implements Session.Saveable {
   
   
   public Image imageFor(Lead lead) {
-    return IMG_LEAD;
+    return LEAD_IMAGES[lead.ID % LEAD_IMAGES.length];
   }
   
   

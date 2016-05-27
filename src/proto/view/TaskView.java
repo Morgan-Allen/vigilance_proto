@@ -28,7 +28,6 @@ public class TaskView extends UINode {
   
   
   void renderTo(Surface surface, Graphics2D g) {
-    final Person activeP = mainView.rosterView.selected();
     //
     //  Draw the icon and description for this particular task-
     g.setColor(Color.WHITE);
@@ -43,7 +42,7 @@ public class TaskView extends UINode {
     //
     //  Draw the highlight/selection rectangle, and toggle selection if
     //  clicked-
-    final boolean hovered = activeP != null && surface.tryHover(
+    final boolean hovered = surface.tryHover(
       vx + 20 - 5, vy - 5, vw + 10 - 40, 60 + 10, task
     );
     final boolean selected = mainView.areaView.selectedTask() == task;

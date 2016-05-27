@@ -8,6 +8,7 @@ import proto.game.scene.*;
 import proto.util.*;
 import static proto.game.person.PersonStats.*;
 import proto.content.agents.*;
+import static proto.content.agents.Crooks.*;
 
 
 
@@ -94,13 +95,13 @@ public class Kidnapping extends Event {
   
   protected boolean checkFollowed(Lead lead, boolean success) {
     final Nation nation = world().nationFor(region);
+    final Events events = world().events();
     
     if (lead.ID == LEAD_RESCUE) {
       if (success) {
         setComplete(true);
-        logAction(missing+" escapes unharmed from their captors.");
+        events.log(missing+" escapes unharmed from their captors.");
         nation.incTrust(5);
-        logAction("Trust +5: "+region);
       }
       else {
         Lead raid = leadWithID(LEAD_RAID);
@@ -112,27 +113,21 @@ public class Kidnapping extends Event {
     if (lead.ID == LEAD_RAID) {
       if (success) {
         setComplete(true);
-        logAction("The captors keeping "+missing+" hostage were subdued.");
+        events.log("The captors keeping "+missing+" hostage were subdued.");
         nation.incCrime(-5);
-        logAction("Crime -5: "+region);
       }
       else {
         setComplete(false);
         if (Rand.yes()) {
           for (Person p : lead.assigned()) {
             p.receiveInjury(2);
-            logAction(p.name()+" was injured.");
           }
         }
         else {
           missing.receiveInjury(missing.maxHealth() * (Rand.num() + 0.5f));
-          if (missing.alive()) logAction(missing.name()+" was injured.");
-          else                 logAction(missing.name()+" was killed!" );
           nation.incTrust(-10);
-          logAction("Trust -10: "+region);
         }
         nation.incCrime(10);
-        logAction("Crime +10: "+region);
       }
     }
     
@@ -148,8 +143,8 @@ public class Kidnapping extends Event {
   ) {
     public Event createRandomEvent(World world) {
       
-      Person boss    = new Person(Crooks.MOBSTER , Crooks.randomCommonName());
-      Person missing = new Person(Crooks.CIVILIAN, Crooks.randomCommonName());
+      Person boss    = new Person(MOBSTER , world, randomCommonName());
+      Person missing = new Person(CIVILIAN, world, randomCommonName());
       Nation nation  = (Nation) Rand.pickFrom(world.nations());
       
       Event s = new Kidnapping(boss, missing, nation.region, world);

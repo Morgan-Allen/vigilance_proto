@@ -141,10 +141,20 @@ public class Kind extends Index.Entry implements Session.Saveable {
   public String defaultInfo() { return defaultInfo; }
   
   
-  public static Image loadImage(String spritePath) {
-    try { return ImageIO.read(new File(spritePath)); }
-    catch (Exception e) { I.say("Could not load: "+spritePath); return null; }
+  public static Image loadImage(String imgPath) {
+    try { return ImageIO.read(new File(imgPath)); }
+    catch (Exception e) { I.say("Could not load: "+imgPath); return null; }
   }
+  
+  
+  public static Image[] loadImages(String basePath, String... imgNames) {
+    final Image images[] = new Image[imgNames.length];
+    for (int n = 0; n < imgNames.length; n++) {
+      images[n] = loadImage(basePath+imgNames[n]);
+    }
+    return images;
+  }
+  
 }
 
 

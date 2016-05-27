@@ -52,13 +52,16 @@ public class RosterView extends UINode {
   
   void renderTo(Surface surface, Graphics2D g) {
     Base base = mainView.world.base();
-    Person personHovered = null;
     Assignment assignTo = mainView.areaView.selectedTask();
     
     Image selectCircle = mainView.selectCircle;
     int across = 0, down = 15, size = 75, sizeA = 25, pad = 25, x, y;
     
+    Person personHovered = null;
+    Person assignHovered = null;
+    
     for (Person p : base.roster()) {
+      final int personID = base.rosterIndex(p);
       
       int nextAcross = across + size + pad;
       if (nextAcross >= vw) {
@@ -75,27 +78,33 @@ public class RosterView extends UINode {
       g.setColor(Color.LIGHT_GRAY);
       g.drawString(p.name(), x, y - 5);
       
-      //g.setColor(Color.YELLOW);
       if (surface.tryHover(x, y, size, size, p)) {
         personHovered = p;
-        //g.drawOval(x, y, size, size);
         g.drawImage(selectCircle, x, y, size, size, null);
       }
       if (selectedPerson == p) {
-        //g.drawOval(x, y, size, size);
         g.drawImage(selectCircle, x, y, size, size, null);
       }
       
       final Assignment a = p.assignment();
       Image forA = a == null ? null : a.icon();
+      
+      final boolean hoverA = surface.tryHover(
+        x, y + size - sizeA, sizeA, sizeA, "Roster_"+personID
+      );
+      g.drawImage(forA, x, y + size - sizeA, sizeA, sizeA, null);
       if (assignTo != null) {
         if (a == assignTo) forA = ASSIGN_OKAY;
         else forA = ASSIGN_FORBID;
+        g.drawImage(forA, x, y + size - sizeA, sizeA, sizeA, null);
       }
-      g.drawImage(forA, x, y + size - sizeA, sizeA, sizeA, null);
+      if (hoverA) {
+        g.drawImage(selectCircle, x, y + size - sizeA, sizeA, sizeA, null);
+        assignHovered = p;
+      }
       
       int MH = p.maxHealth(), MS = p.maxStress();
-      int inj = (int) p.injury(), fat = (int) p.stun();
+      int inj = (int) p.injury();//, fat = (int) p.stun();
       int str = (int) p.stress();
       float injLevel = (MH - inj) * 1f / MH, strLevel = str * 1f / MS;
       
@@ -122,18 +131,13 @@ public class RosterView extends UINode {
       }
     }
     
-    if (personHovered != null && surface.mouseClicked()) {
-      /*
-      final Person p = personHovered;
+    if (assignHovered != null && surface.mouseClicked() && assignTo != null) {
+      final Person p = assignHovered;
       final Assignment o = p.assignment();
-      if (assignTo != null) {
-        if (o != null    ) o       .setAssigned(p, false);
-        if (o != assignTo) assignTo.setAssigned(p, true );
-      }
-      else {
-        setSelection(personHovered);
-      }
-      //*/
+      if (o != null    ) o       .setAssigned(p, false);
+      if (o != assignTo) assignTo.setAssigned(p, true );
+    }
+    if (personHovered != null && surface.mouseClicked()) {
       setSelection(personHovered);
     }
   }
@@ -148,38 +152,6 @@ public class RosterView extends UINode {
     return selectedPerson;
   }
 }
-
-
-/*
-  void describePersonOutfit(Person p, StringBuffer s) {
-    final Surface input = world.game().surface();
-    
-    s.append("\nCodename: "+p.name());
-    s.append("\nItems equipped:");
-    for (Equipped item : p.equipment()) {
-      s.append("\n  "+item);
-    }
-    
-    s.append("\nItems available:");
-    int index = 0;
-    for (Equipped item : world.base().itemsAvailableFor(p)) {
-      boolean equipped = p.hasEquipped(item);
-      boolean canEquip = p.canEquip   (item);
-      s.append("\n  "+item.name+" ("+index+")");
-      if      (equipped  ) s.append(" (Equipped)");
-      else if (! canEquip) s.append(" (No Slot)" );
-      
-      if (input.isPressed((char) ('0' + index))) {
-        if      (equipped) p.removeItem(item);
-        else if (canEquip) p.equipItem (item);
-      }
-    }
-  }
-
-//*/
-
-
-
 
 
 

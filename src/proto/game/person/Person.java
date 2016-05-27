@@ -44,7 +44,9 @@ public class Person implements Session.Saveable {
   
   
   Kind kind;
+  World world;
   Side side;
+  
   String name;
   
   final public PersonStats   stats   = new PersonStats  (this);
@@ -69,9 +71,10 @@ public class Person implements Session.Saveable {
   
   
   
-  public Person(Kind kind, String name) {
-    this.kind = kind;
-    this.name = name;
+  public Person(Kind kind, World world, String name) {
+    this.kind  = kind;
+    this.world = world;
+    this.name  = name;
     
     history.setSummary(kind.defaultInfo());
     
@@ -88,17 +91,18 @@ public class Person implements Session.Saveable {
   }
   
   
-  public Person(Kind kind) {
-    this(kind, kind.name());
+  public Person(Kind kind, World world) {
+    this(kind, world, kind.name());
   }
   
   
   public Person(Session s) throws Exception {
     s.cacheInstance(this);
     
-    kind = (Kind) s.loadObject();
-    side = (Side) s.loadEnum(Side.values());
-    name = s.loadString();
+    kind  = (Kind ) s.loadObject();
+    world = (World) s.loadObject();
+    side  = (Side ) s.loadEnum(Side.values());
+    name  = s.loadString();
     
     stats    .loadState(s);
     bonds.loadState(s);
@@ -120,18 +124,19 @@ public class Person implements Session.Saveable {
     confidence = s.loadFloat();
     wariness   = s.loadFloat();
     
-    posX          = s.loadFloat();
-    posY          = s.loadFloat();
-    actionPoints  = s.loadInt();
-    turnDone      = s.loadBool();
-    lastTarget    = s.loadObject();
+    posX         = s.loadFloat();
+    posY         = s.loadFloat();
+    actionPoints = s.loadInt();
+    turnDone     = s.loadBool();
+    lastTarget   = s.loadObject();
   }
   
   
   public void saveState(Session s) throws Exception {
-    s.saveObject(kind);
-    s.saveEnum  (side);
-    s.saveString(name);
+    s.saveObject(kind );
+    s.saveObject(world);
+    s.saveEnum  (side );
+    s.saveString(name );
     
     stats    .saveState(s);
     bonds.saveState(s);
@@ -153,11 +158,11 @@ public class Person implements Session.Saveable {
     s.saveFloat (confidence);
     s.saveFloat (wariness  );
     
-    s.saveFloat (posX         );
-    s.saveFloat (posY         );
-    s.saveInt   (actionPoints );
-    s.saveBool  (turnDone     );
-    s.saveObject(lastTarget   );
+    s.saveFloat (posX        );
+    s.saveFloat (posY        );
+    s.saveInt   (actionPoints);
+    s.saveBool  (turnDone    );
+    s.saveObject(lastTarget  );
   }
   
   
@@ -342,12 +347,14 @@ public class Person implements Session.Saveable {
   public void receiveStun(float stun) {
     this.stun += stun;
     checkState();
+    world.events().log(name()+" suffered "+stun+" stun.");
   }
   
   
   public void receiveInjury(float injury) {
     this.injury += injury;
     checkState();
+    world.events().log(name()+" suffered "+injury+" injury.");
   }
   
   
@@ -405,8 +412,14 @@ public class Person implements Session.Saveable {
   
   void checkState() {
     int maxHealth = maxHealth();
-    if (injury + stun > maxHealth) this.conscious = false;
-    if (injury > maxHealth * 1.5f) this.alive     = false;
+    if (conscious && injury + stun > maxHealth) {
+      this.conscious = false;
+      world.events().log(name()+" fell unconscious!");
+    }
+    if (alive && injury > maxHealth * 1.5f) {
+      this.alive = false;
+      world.events().log(name()+" was killed!");
+    }
   }
   
   

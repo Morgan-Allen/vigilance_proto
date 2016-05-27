@@ -158,6 +158,8 @@ public abstract class Task implements Assignment {
   public void updateAssignment() {
     if (assigned.empty() || complete) return;
     
+    world.events().logAssignment(this);
+    
     final int time = world.totalMinutes();
     if (initTime == -1) initTime = time;
     if ((time - initTime) > timeTaken) attemptTask();

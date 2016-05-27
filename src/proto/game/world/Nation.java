@@ -2,6 +2,7 @@
 
 package proto.game.world;
 import proto.common.*;
+import proto.game.scene.Event;
 import proto.util.*;
 
 
@@ -11,6 +12,7 @@ public class Nation implements Session.Saveable {
   
   /**  Data fields, construction and save/load methods-
     */
+  final World world;
   final public Region region;
   
   List <Object> infrastructure = new List();
@@ -27,7 +29,8 @@ public class Nation implements Session.Saveable {
   int     funding;
   
   
-  Nation(Region region) {
+  Nation(Region region, World world) {
+    this.world  = world ;
     this.region = region;
     
     this.crime       = region.defaultCrime;
@@ -45,6 +48,7 @@ public class Nation implements Session.Saveable {
   
   public Nation(Session s) throws Exception {
     s.cacheInstance(this);
+    world  = (World ) s.loadObject();
     region = (Region) s.loadObject();
     
     s.loadObjects(infrastructure);
@@ -62,6 +66,7 @@ public class Nation implements Session.Saveable {
   
   
   public void saveState(Session s) throws Exception {
+    s.saveObject(world );
     s.saveObject(region);
     
     s.saveObjects(infrastructure);
@@ -87,12 +92,28 @@ public class Nation implements Session.Saveable {
   
   
   public void incCrime(int percent) {
+    final float oldVal = crime;
     crime = Nums.clamp(crime + (percent / 100f), 0, 1);
+    
+    if (oldVal != crime) {
+      String desc = "Crime";
+      if (percent >= 0) desc += "+"+percent;
+      else              desc += "-"+(0 - percent);
+      world.events.log(desc+": "+region, Event.EVENT_MAJOR);
+    }
   }
   
   
   public void incTrust(int percent) {
+    final float oldVal = trust;
     trust = Nums.clamp(trust + (percent / 100f), 0, 1);
+    
+    if (oldVal != trust) {
+      String desc = "Trust";
+      if (percent >= 0) desc += "+"+percent;
+      else              desc += "-"+(0 - percent);
+      world.events.log(desc+": "+region, Event.EVENT_MAJOR);
+    }
   }
   
   

@@ -28,7 +28,7 @@ public class AreasView extends UINode {
       viewBounds.xdim() - 80, viewBounds.ydim() - 240
     ));
     monitorButton = new StringButton(
-      "Resume Monitoring", new Box2D(0, 40, viewBounds.xdim(), 20), this
+      "Resume Monitoring", new Box2D(0, 35, viewBounds.xdim(), 20), this
     ) {
       void whenClicked() {
         final boolean active = mainView.world.monitorActive();
@@ -66,6 +66,8 @@ public class AreasView extends UINode {
       down += 60 + 10;
     }
     
+    //  TODO:  Include a funding report!
+    
     /*
     offX =  5;
     offY = 15;
@@ -81,7 +83,9 @@ public class AreasView extends UINode {
   
   
   void setSelection(Object selected) {
+    final Object old = selectedArea;
     this.selectedArea = selected;
+    if (old != selected) selectedTask = null;
   }
   
   
@@ -98,6 +102,8 @@ public class AreasView extends UINode {
   
   
   void setSelectedTask(Assignment task) {
+    this.selectedTask = task;
+    /*
     final Person active = mainView.rosterView.selected();
     if (active == null) return;
     final Assignment oldTask = active.assignment();
@@ -108,6 +114,7 @@ public class AreasView extends UINode {
     if (active != null && task != null && task != oldTask) {
       task.setAssigned(active, true);
     }
+    //*/
   }
   
   
