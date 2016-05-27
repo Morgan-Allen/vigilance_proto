@@ -29,7 +29,7 @@ public class RosterView extends UINode {
   
   
   final Color statColors[] = new Color[4];
-  final Image statIcons [] = new Image[4];
+  //final Image statIcons [] = new Image[4];
   
   private Person selectedPerson;
   
@@ -41,12 +41,6 @@ public class RosterView extends UINode {
     statColors[1] = new Color(0.0f, 1.0f, 0.0f);
     statColors[2] = new Color(1.0f, 1.0f, 0.5f);
     statColors[3] = new Color(1.0f, 0.5f, 1.0f);
-    
-    final String imgPath = "media assets/stat icons/";
-    statIcons[0] = Kind.loadImage(imgPath+"icon_intellect.png");
-    statIcons[1] = Kind.loadImage(imgPath+"icon_evasion.png"  );
-    statIcons[2] = Kind.loadImage(imgPath+"icon_social.png"   );
-    statIcons[3] = Kind.loadImage(imgPath+"icon_combat.png"   );
   }
   
   
@@ -125,7 +119,7 @@ public class RosterView extends UINode {
           statColors[index], null, fill, true, g
         );
         g.drawImage(
-          statIcons[index], x + (index * 19), y + size + 17, 16, 16, null
+          t.icon(), x + (index * 19), y + size + 17, 16, 16, null
         );
         index++;
       }

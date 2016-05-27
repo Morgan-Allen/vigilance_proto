@@ -49,11 +49,11 @@ public abstract class Ability extends Trait {
   
   
   public Ability(
-    String name, String ID, String description,
+    String name, String ID, String imgPath, String description,
     int properties, int costAP,
     float harmLevel, float powerLevel
   ) {
-    super(name, ID, description);
+    super(name, ID, imgPath, description);
     this.properties  = properties;
     this.costAP      = costAP;
     this.harmLevel   = harmLevel;

@@ -9,8 +9,11 @@ public class Skill extends Trait {
   final public Skill roots[];
   
   
-  public Skill(String name, String ID, String description, Skill... roots) {
-    super(name, ID, description);
+  public Skill(
+    String name, String ID, String imgPath, String description,
+    Skill... roots
+  ) {
+    super(name, ID, imgPath, description);
     this.roots = roots;
   }
 }

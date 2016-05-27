@@ -18,11 +18,11 @@ public class Trait extends Index.Entry implements Session.Saveable  {
   final public Image icon;
   
   
-  protected Trait(String name, String ID, String description) {
+  protected Trait(String name, String ID, String imgPath, String description) {
     super(INDEX, ID);
     this.name        = name;
     this.description = description;
-    this.icon        = null;//Kind.loadImage(imgPath);
+    this.icon        = Kind.loadImage(imgPath);
   }
   
   

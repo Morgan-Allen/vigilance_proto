@@ -76,7 +76,7 @@ public class Training extends Task {
   /**  Rendering, debug and interface methods-
     */
   public Image icon() {
-    return room.icon();
+    return trained.icon();
   }
   
   
