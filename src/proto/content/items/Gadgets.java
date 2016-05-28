@@ -13,7 +13,7 @@ public class Gadgets {
   
   final public static Equipped
     BATARANGS = new Equipped(
-      "Batarangs", "item_batarangs",
+      "Batarang Set", "item_batarangs",
       "Lightweight, throwable projectiles, useful to disarm or startle foes.",
       "media assets/item icons/icon_batarangs.png",
       SLOT_WEAPON, 10, new Object[] {

@@ -35,31 +35,31 @@ public class PersonStats {
     PHYS_STATS[] = { HIT_POINTS, WILLPOWER },
     
     ENGINEERING   = new Skill(
-      "Engineering", "skill_eng", ICON_PATH+"icon_intellect.png",
+      "Engineering", "skill_eng", ICON_PATH+"icon_engineering.png",
       "Engineering skill allows an agent to construct and repair gadgets, "+
       "vehicles, and base facilities.",
       INTELLECT
     ),
     INFORMATICS   = new Skill(
-      "Informatics", "skill_inf", ICON_PATH+"icon_intellect.png",
+      "Informatics", "skill_inf", ICON_PATH+"icon_informatics.png",
       "Informatics covers software engineering, data mining and encryption- "+
       "necessary for certain forms of research and advanced gadgetry.",
       INTELLECT
     ),
     PHARMACY      = new Skill(
-      "Pharmacy", "skill_pha", ICON_PATH+"icon_intellect.png",
+      "Pharmacy", "skill_pha", ICON_PATH+"icon_pharmacy.png",
       "A knowledge of pharmacy allows a character to concoct vaccines and "+
       "medicines- or chemical weapons for their own use.",
       INTELLECT
     ),
     ANATOMY       = new Skill(
-      "Anatomy", "skill_ant", ICON_PATH+"icon_intellect.png",
+      "Anatomy", "skill_ant", ICON_PATH+"icon_anatomy.png",
       "A knowledge of anatomy is essential to treatment of serious injury- "+
       "and can let you inflict crushing blows.",
       INTELLECT
     ),
     LAW_N_FINANCE = new Skill(
-      "Law & Finance", "skill_law", ICON_PATH+"icon_intellect.png",
+      "Law & Finance", "skill_law", ICON_PATH+"icon_law_and_finance.png",
       "A knowledge of loopholes, regulations and wheels to grease helps to "+
       "navigate the corporate world and judicial process.",
       INTELLECT
@@ -71,7 +71,7 @@ public class PersonStats {
     ),
     
     LANGUAGES     = new Skill(
-      "Languages", "skill_lng", ICON_PATH+"icon_social.png",
+      "Languages", "skill_lng", ICON_PATH+"icon_languages.png",
       "A knowledge of spoken and written languages, both ancient and modern. "+
       "Often useful for research, travel, questioning or impersonation.",
       INTELLECT, SOCIAL
@@ -113,7 +113,7 @@ public class PersonStats {
       REFLEX
     ),
     MARKSMAN      = new Skill(
-      "Marksman", "skill_mrk", ICON_PATH+"icon_reflex.png",
+      "Marksman", "skill_mrk", ICON_PATH+"icon_marksman.png",
       "Permits the accurate and forceful use of projectile weapons- bows, "+
       "throwing stars, darts and guns.",
       REFLEX
@@ -126,19 +126,19 @@ public class PersonStats {
       STRENGTH, SOCIAL
     ),
     GYMNASTICS    = new Skill(
-      "Gymnastics", "skill_gym", ICON_PATH+"icon_strength.png",
+      "Gymnastics", "skill_gym", ICON_PATH+"icon_gymnastics.png",
       "They might not dodge bullets, but a good gymnast can vault obstacles "+
       "to reach cover, escape injury, or reach inaccessible places.",
       STRENGTH, REFLEX
     ),
     CLOSE_COMBAT  = new Skill(
-      "Close Combat", "skill_ccm", ICON_PATH+"icon_strength.png",
+      "Close Combat", "skill_ccm", ICON_PATH+"icon_close_combat.png",
       "An agent with close combat skills can deliver knockout blows, and "+
       "stands a better chance of disarming or cuffing a perp.",
       STRENGTH, REFLEX
     ),
     STAMINA       = new Skill(
-      "Stamina", "skill_sta", ICON_PATH+"icon_strength.png",
+      "Stamina", "skill_sta", ICON_PATH+"icon_stamina.png",
       "Sheer physical endurance may be the only way to weather certain "+
       "trials, work through pain, or survive an injury.",
       STRENGTH

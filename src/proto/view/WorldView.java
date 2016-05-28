@@ -39,25 +39,25 @@ public class WorldView extends UINode {
     int paneDown = 20 + rosterHigh, paneHigh = fullHigh - (10 + paneDown);
     
     personView = new PersonView(this, new Box2D(
-      0  , paneDown,
-      400, paneHigh
+      0  , 0,
+      320, fullHigh
     ));
     rosterView = new RosterView(this, new Box2D(
-      10, 10,
-      fullWide, 120
+      320, 0,
+      fullWide - 320, 120
     ));
     addChildren(personView, rosterView);
     
     areaView = new AreasView(this, new Box2D(
-      0  , paneDown,
+      320, paneDown,
       400, paneHigh
     ));
     roomView = new RoomView(this, new Box2D(
-      400, paneDown,
+      720, paneDown,
       480, paneHigh
     ));
     regionView = new RegionView(this, new Box2D(
-      400, paneDown,
+      720, paneDown,
       480, paneHigh
     ));
     addChildren(areaView, roomView, regionView);
@@ -93,6 +93,7 @@ public class WorldView extends UINode {
     */
   protected void updateAndRender(Surface surface, Graphics2D g) {
     
+    /*
     if (rosterView.selected() != null) {
       personView.visible = true;
       areaView.visible   = false;
@@ -101,6 +102,7 @@ public class WorldView extends UINode {
       personView.visible = false;
       areaView.visible   = true;
     }
+    //*/
     
     final MessageView topMessage = messageQueue.first();
     if (topMessage != messageShown) {

@@ -90,7 +90,13 @@ public class PersonView extends UINode {
   
   
   void renderTo(Surface surface, Graphics2D g) {
-    final Person person = mainView.rosterView.selected();
+    
+    Person person = mainView.rosterView.selected();
+    if (person == null) {
+      person = mainView.world.base().atRosterIndex(0);
+      mainView.rosterView.setSelection(person);
+      if (person == null) return;
+    }
     
     g.setColor(Color.WHITE);
     g.drawImage(person.kind().sprite(), vx, vy, 120, 120, null);
