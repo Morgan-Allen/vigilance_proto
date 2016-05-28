@@ -118,8 +118,6 @@ public abstract class Ability extends Trait {
   
   /**  Configuring actions-
     */
-  
-  
   protected void applyPassiveStatsBonus(Person person) {
     for (Trait trait : passiveTraitsModified()) {
       final float mod = passiveModifierFor(person, trait);

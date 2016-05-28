@@ -17,11 +17,12 @@ public class Base implements Session.Saveable {
     SLOTS_WIDE     = 3 ;
   
   World world;
+  
   List <Person> roster = new List();
+  final public BaseStocks stocks = new BaseStocks(this);
   
   Room rooms[] = new Room[MAX_FACILITIES];
-  List <Equipped> equipment = new List();
-  List <Tech    > knownTech = new List();
+  List <Tech> knownTech = new List();
   
   int currentFunds, income, maintenance;
   int powerUse, maxPower, supportUse, maxSupport;
@@ -39,8 +40,9 @@ public class Base implements Session.Saveable {
     for (int n = 0 ; n < MAX_FACILITIES; n++) {
       rooms[n] = (Room) s.loadObject();
     }
-    s.loadObjects(equipment);
     s.loadObjects(knownTech);
+    stocks.loadState(s);
+    
     currentFunds = s.loadInt();
     income       = s.loadInt();
     maintenance  = s.loadInt();
@@ -57,8 +59,9 @@ public class Base implements Session.Saveable {
     for (int n = 0 ; n < MAX_FACILITIES; n++) {
       s.saveObject(rooms[n]);
     }
-    s.saveObjects(equipment);
     s.saveObjects(knownTech);
+    stocks.saveState(s);
+    
     s.saveInt(currentFunds);
     s.saveInt(income      );
     s.saveInt(maintenance );
@@ -129,41 +132,8 @@ public class Base implements Session.Saveable {
   
   
   
-  /**  Inventory and storage-
+  /**  Tech levels and funding-
     */
-  public Series <Equipped> itemsAvailableFor(Person person) {
-    Batch <Equipped> available = new Batch();
-    for (Equipped common : equipment) {
-      if (! common.availableFor(person, this)) continue;
-      available.add(common);
-    }
-    for (Equipped special : person.kind().customItems()) {
-      if (! special.availableFor(person, this)) continue;
-      available.add(special);
-    }
-    return available;
-  }
-  
-  
-  public boolean addEquipment(Equipped item) {
-    if (item == null) return false;
-    equipment.add(item);
-    return true;
-  }
-  
-  
-  public void removeFromStore(Equipped item) {
-    equipment.remove(item);
-  }
-  
-  
-  public int numStored(Equipped item) {
-    int count = 0;
-    for (Equipped i : equipment) if (i == item) count++;
-    return count;
-  }
-  
-  
   public boolean hasTech(Tech tech) {
     return knownTech.includes(tech);
   }

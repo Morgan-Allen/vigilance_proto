@@ -269,6 +269,9 @@ public class PersonStats {
     for (Ability a : abilities) if (a.passive()) {
       a.applyPassiveStatsBonus(person);
     }
+    for (Equipped i : person.equipment()) {
+      i.applyPassiveStatsBonus(person);
+    }
   }
   
   

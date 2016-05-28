@@ -61,7 +61,7 @@ public class Crafting extends Task {
   
   protected void onSuccess() {
     room.base.incFunding(0 - made.buildCost);
-    room.base.addEquipment(made);
+    room.base.stocks.incStock(made, 1);
   }
   
   
@@ -102,7 +102,7 @@ public class Crafting extends Task {
   
   public String longInfo() {
     String info = super.longInfo();
-    int total = room.base.numStored(made);
+    int total = room.base.stocks.numStored(made);
     info += "  (In stock: "+total+")";
     return info;
   }

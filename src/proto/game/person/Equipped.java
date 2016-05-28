@@ -147,10 +147,37 @@ public class Equipped extends Index.Entry implements Session.Saveable {
   
   
   
+  /**  Stat modifications-
+    */
+  protected void applyPassiveStatsBonus(Person person) {
+    for (Trait trait : PersonStats.ALL_STATS) {
+      final float mod = passiveModifierFor(person, trait);
+      if (mod != 0) person.stats.incBonus(trait, mod);
+    }
+    return;
+  }
+  
+  
+  public float passiveModifierFor(Person person, Trait trait) {
+    return 0;
+  }
+  
+  
+  
   /**  Rendering, debug and interface methods-
     */
   public String toString() {
     return name;
+  }
+  
+  
+  public String describeStats(Person person) {
+    final StringBuffer s = new StringBuffer();
+    for (Trait t : PersonStats.ALL_STATS) {
+      final float mod = passiveModifierFor(person, t);
+      if (mod != 0) s.append(t+"+"+mod+" ");
+    }
+    return s.toString();
   }
   
   

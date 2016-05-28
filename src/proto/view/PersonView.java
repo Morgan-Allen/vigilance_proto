@@ -254,9 +254,12 @@ public class PersonView extends UINode {
     if (pickMenu != null) return;
     
     final Batch <Equipped> types = new Batch();
-    for (Equipped type : mainView.world.base().itemsAvailableFor(person)) {
+    final BaseStocks stocks = mainView.world.base().stocks;
+    
+    for (Equipped type : stocks.availableItems(person, slotID)) {
       types.add(type);
     }
+    if (types.empty()) return;
     
     pickMenu = new ClickMenu <Equipped> (
       types, x, y, this
@@ -265,8 +268,12 @@ public class PersonView extends UINode {
         return option.icon();
       }
       
-      protected void whenPicked(String option, int optionID) {
-        person.equipItem(types.atIndex(optionID));
+      protected String labelFor(Equipped option) {
+        return option.name+" ("+option.describeStats(person)+")";
+      }
+      
+      protected void whenPicked(Equipped option, int optionID) {
+        person.equipItem(option, mainView.world.base());
         parent.setChild(this, false);
         pickMenu = null;
       }

@@ -4,6 +4,7 @@ package proto.game.world;
 import proto.common.*;
 import proto.content.agents.Heroes;
 import proto.content.events.Kidnapping;
+import proto.content.items.Gadgets;
 import proto.content.rooms.Gymnasium;
 import proto.content.rooms.Laboratory;
 import proto.content.rooms.Library;
@@ -127,12 +128,17 @@ public class World implements Session.Saveable {
     base.addToRoster(new Person(Heroes.HERO_NIGHTWING, this));
     base.addToRoster(new Person(Heroes.HERO_QUESTION , this));
     
-    //  TODO:  Include default relationships too.
+    for (Person p : base.roster()) for (Person o : base.roster()) {
+      if (p != o) p.bonds.incBond(o, 0.2f);
+    }
     
     base.addFacility(Gymnasium .BLUEPRINT, 0, 1f);
     base.addFacility(Library   .BLUEPRINT, 1, 1f);
     base.addFacility(Workshop  .BLUEPRINT, 2, 1f);
     base.addFacility(Laboratory.BLUEPRINT, 3, 1f);
+    
+    base.stocks.incStock(Gadgets.BATARANGS  , 5);
+    base.stocks.incStock(Gadgets.BODY_ARMOUR, 2);
     
     base.updateBase(0);
     base.currentFunds = 500;

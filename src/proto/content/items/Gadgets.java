@@ -7,9 +7,8 @@ import static proto.game.person.Equipped.*;
 import static proto.game.person.Person.*;
 
 
+
 public class Gadgets {
-  
-  
   
   final public static Equipped
     BATARANGS = new Equipped(
@@ -21,7 +20,10 @@ public class Gadgets {
       },
       IS_WEAPON | IS_RANGED | IS_KINETIC | IS_CONSUMED, 0
     ) {
-      
+      public float passiveModifierFor(Person person, Trait trait) {
+        if (trait == MARKSMAN) return 2;
+        return 0;
+      }
     }
   ;
   final public static Equipped
@@ -35,7 +37,10 @@ public class Gadgets {
       },
       IS_WEAPON | IS_RANGED | IS_KINETIC, 0
     ) {
-      
+      public float passiveModifierFor(Person person, Trait trait) {
+        if (trait == GYMNASTICS) return 3;
+        return 0;
+      }
     }
   ;
   final public static Equipped
@@ -48,7 +53,11 @@ public class Gadgets {
       },
       IS_ARMOUR, 0
     ) {
-      
+      public float passiveModifierFor(Person person, Trait trait) {
+        if (trait == STAMINA   ) return  3;
+        if (trait == GYMNASTICS) return -1;
+        return 0;
+      }
     }
   ;
   final public static Equipped
@@ -61,26 +70,13 @@ public class Gadgets {
       },
       IS_ARMOUR, 0
     ) {
-      
+      public float passiveModifierFor(Person person, Trait trait) {
+        if (trait == STAMINA) return 2;
+        return 0;
+      }
     }
   ;
   
-  
-  //  Body Armour.
-  //  Kevlar Vest.
-  //  Glide Cape.
-  
-  //  Sonic Visor.
-  //  Telescope.
-  //  Terminal.
-  
-  //  Batarangs.
-  //  Bolas.
-  //  Grapple Gun.
-  
-  //  Tranq Gun.
-  //  Medkit.
-  //  Smoke Bombs.
   
 }
 

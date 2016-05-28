@@ -79,8 +79,8 @@ public abstract class ClickMenu <T> extends UINode {
         g.drawString(label, x + 40 + 5, y + 15);
         y += 40;
       }
-      if (hovered && surface.mouseClicked()) {
-        whenPicked(label, i);
+      if (surface.mouseClicked() && hovered) {
+        whenPicked(option, i);
       }
     }
   }
@@ -88,7 +88,7 @@ public abstract class ClickMenu <T> extends UINode {
   
   protected Image imageFor(T option) { return null; }
   protected String labelFor(T option) { return option.toString(); }
-  protected abstract void whenPicked(String option, int optionID);
+  protected abstract void whenPicked(T option, int optionID);
   
 }
 

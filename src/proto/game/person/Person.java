@@ -79,7 +79,7 @@ public class Person implements Session.Saveable {
     history.setSummary(kind.defaultInfo());
     
     for (int n = 0; n < kind.baseEquipped().length; n++) {
-      equipItem(kind.baseEquipped()[n]);
+      equipItem(kind.baseEquipped()[n], null);
     }
     
     if      (kind.type() == Kind.TYPE_HERO    ) side = Side.HEROES   ;
@@ -244,31 +244,14 @@ public class Person implements Session.Saveable {
   
   /**  Assigning equipment loadout-
     */
-  public void equipItem(Equipped item) {
+  public void equipItem(Equipped item, Base from) {
     Equipped oldItem = equipSlots[item.slotID];
     equipSlots[item.slotID] = item;
     stats.toggleItemAbilities(oldItem, false);
     stats.toggleItemAbilities(item   , true );
-  }
-  
-  
-  public boolean removeItem(Equipped item) {
-    int slotID = equipSlotFor(item);
-    if (slotID == -1) return false;
-    emptyEquipSlot(slotID);
-    return true;
-  }
-  
-  
-  public int equipSlotFor(Equipped item) {
-    int slotID = 0;
-    for (Equipped i : equipSlots) if (i == item) return slotID; else slotID++;
-    return -1;
-  }
-  
-  
-  public void emptyEquipSlot(int slotID) {
-    equipSlots[slotID] = null;
+    
+    if (oldItem != null && from != null) from.stocks.incStock(oldItem,  1);
+    if (item    != null && from != null) from.stocks.incStock(item   , -1);
   }
   
   
