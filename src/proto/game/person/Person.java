@@ -319,6 +319,14 @@ public class Person implements Session.Saveable {
   }
   
   
+  public boolean canAssignTo(Assignment a) {
+    for (Ability t : stats.abilities) {
+      if (! t.allowsAssignment(this, a)) return false;
+    }
+    return true;
+  }
+  
+  
   public void setAssignment(Assignment assigned) {
     this.assignment = assigned;
   }

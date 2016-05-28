@@ -1,6 +1,7 @@
 
 
 package proto.game.person;
+import proto.game.world.*;
 import proto.util.*;
 
 import java.awt.Graphics2D;
@@ -37,6 +38,7 @@ public abstract class Ability extends Trait {
     REAL_HARM  =  1.0f,
     MAJOR_HARM =  2.0f;
   final public static int
+    NO_POWER     = 0,
     MINOR_POWER  = 2,
     MEDIUM_POWER = 5,
     MAJOR_POWER  = 8;
@@ -134,6 +136,11 @@ public abstract class Ability extends Trait {
   
   public float passiveModifierFor(Person person, Trait trait) {
     return 0;
+  }
+  
+  
+  public boolean allowsAssignment(Person p, Assignment a) {
+    return true;
   }
   
   

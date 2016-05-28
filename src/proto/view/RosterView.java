@@ -55,6 +55,7 @@ public class RosterView extends UINode {
     
     for (Person p : base.roster()) {
       final int personID = base.rosterIndex(p);
+      final boolean canAssign = assignTo != null && p.canAssignTo(assignTo);
       
       int nextAcross = across + size + pad;
       if (nextAcross >= vw) {
@@ -88,10 +89,10 @@ public class RosterView extends UINode {
       g.drawImage(forA, x, y + size - sizeA, sizeA, sizeA, null);
       if (assignTo != null) {
         if (a == assignTo) forA = ASSIGN_OKAY;
-        else if (a != null) forA = ASSIGN_FORBID;
+        else if (! canAssign) forA = ASSIGN_FORBID;
         g.drawImage(forA, x, y + size - sizeA, sizeA, sizeA, null);
       }
-      if (hoverA) {
+      if (hoverA && canAssign) {
         g.drawImage(selectCircle, x, y + size - sizeA, sizeA, sizeA, null);
         assignHovered = p;
       }
@@ -109,21 +110,6 @@ public class RosterView extends UINode {
         x, y + size + 10, size, 5,
         Color.GRAY, Color.DARK_GRAY, strLevel, false, g
       );
-      
-      /*
-      int index = 0;
-      for (Trait t : PersonStats.BASE_STATS) {
-        float fill = p.stats.levelFor(t) / 10f;
-        ViewUtils.renderStatBar(
-          x + (index * 19), y + size + 5, 16, 20,
-          statColors[index], null, fill, true, g
-        );
-        g.drawImage(
-          t.icon(), x + (index * 19), y + size + 17, 16, 16, null
-        );
-        index++;
-      }
-      //*/
     }
     
     if (assignHovered != null && surface.mouseClicked() && assignTo != null) {

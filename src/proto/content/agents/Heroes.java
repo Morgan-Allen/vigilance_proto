@@ -4,12 +4,53 @@ package proto.content.agents;
 import proto.common.*;
 import proto.game.world.*;
 import proto.game.person.*;
+import proto.game.scene.*;
 
 import static proto.game.person.PersonStats.*;
 
 
 
 public class Heroes {
+  
+  
+  
+  final static Ability TRAIT_ANIMAL = new Ability(
+    "Animal", "trait_animal", null,
+    "This agent is an animal.  They cannot be assigned to train or craft "+
+    "items, and may only otherwise accompany agents on physical assignments.",
+    Ability.IS_PASSIVE, 0, Ability.NO_HARM, Ability.NO_POWER
+  ) {
+    public boolean allowsAssignment(Person p, Assignment a) {
+      if (a instanceof Training) return false;
+      if (a instanceof Crafting) return false;
+      
+      if (a instanceof Lead) {
+        final Lead l = (Lead) a;
+        if (l.mental()) return false;
+        
+        boolean company = false;
+        for (Person o : a.assigned()) if (p != o) company = true;
+        if (! company) return false;
+        
+        return true;
+      }
+      return false;
+    }
+  };
+  
+  
+  final static Ability TRAIT_CIVILIAN = new Ability(
+    "Civilian", "trait_civilian", null,
+    "This agent is a civilian.  They can assist in training, crafting and "+
+    "research, but will not become directly involved in investigations.",
+    Ability.IS_PASSIVE, 0, Ability.NO_HARM, Ability.NO_POWER
+  ) {
+    public boolean allowsAssignment(Person p, Assignment a) {
+      if (a instanceof Training) return true;
+      if (a instanceof Crafting) return true;
+      return false;
+    }
+  };
   
   
   final static String IMG_DIR = "media assets/character icons/";
@@ -79,7 +120,9 @@ public class Heroes {
       INTIMIDATE   , 2,
       GYMNASTICS   , 0,
       CLOSE_COMBAT , 5,
-      STAMINA      , 5
+      STAMINA      , 5,
+      
+      TRAIT_CIVILIAN, 1
     )
   ;
   
@@ -93,7 +136,9 @@ public class Heroes {
       SOCIAL    , 0 ,
       STRENGTH  , 2 ,
       HIT_POINTS, 8 ,
-      WILLPOWER , 8
+      WILLPOWER , 8 ,
+      
+      TRAIT_ANIMAL, 1
     )
   ;
   

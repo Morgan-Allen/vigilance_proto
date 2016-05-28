@@ -6,6 +6,7 @@ import proto.common.*;
 import proto.game.person.*;
 import proto.util.*;
 import proto.view.*;
+import static proto.game.person.PersonStats.*;
 
 
 
@@ -132,6 +133,22 @@ public abstract class Task implements Assignment {
   
   public boolean allowsAssignment(Person p) {
     return true;
+  }
+  
+  
+  public boolean physical() {
+    for (Trait t : tested) for (Skill s : t.roots()) {
+      if (s == REFLEX || s == STRENGTH) return true;
+    }
+    return false;
+  }
+  
+  
+  public boolean mental() {
+    for (Trait t : tested) for (Skill s : t.roots()) {
+      if (s == INTELLECT || s == SOCIAL) return true;
+    }
+    return false;
   }
   
   

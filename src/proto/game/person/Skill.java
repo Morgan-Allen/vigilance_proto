@@ -16,4 +16,9 @@ public class Skill extends Trait {
     super(name, ID, imgPath, description);
     this.roots = roots;
   }
+  
+  
+  public Skill[] roots() {
+    return roots;
+  }
 }

@@ -12,6 +12,7 @@ public class Trait extends Index.Entry implements Session.Saveable  {
   
   
   final static Index <Trait> INDEX = new Index <Trait> ();
+  final static Skill NO_ROOTS[] = new Skill[0];
   
   final public String name;
   final public String description;
@@ -36,6 +37,17 @@ public class Trait extends Index.Entry implements Session.Saveable  {
   }
   
   
+  
+  /**  Typing and properties-
+    */
+  public Skill[] roots() {
+    return NO_ROOTS;
+  }
+  
+  
+  
+  /**  Rendering, debug and interface methods-
+    */
   public String toString() {
     return name;
   }
