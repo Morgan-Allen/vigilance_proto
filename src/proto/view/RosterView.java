@@ -36,7 +36,6 @@ public class RosterView extends UINode {
   
   RosterView(UINode parent, Box2D viewBounds) {
     super(parent, viewBounds);
-    
     statColors[0] = new Color(0.0f, 0.0f, 1.0f);
     statColors[1] = new Color(0.0f, 1.0f, 0.0f);
     statColors[2] = new Color(1.0f, 1.0f, 0.5f);
@@ -89,7 +88,7 @@ public class RosterView extends UINode {
       g.drawImage(forA, x, y + size - sizeA, sizeA, sizeA, null);
       if (assignTo != null) {
         if (a == assignTo) forA = ASSIGN_OKAY;
-        else forA = ASSIGN_FORBID;
+        else if (a != null) forA = ASSIGN_FORBID;
         g.drawImage(forA, x, y + size - sizeA, sizeA, sizeA, null);
       }
       if (hoverA) {
@@ -103,14 +102,15 @@ public class RosterView extends UINode {
       float injLevel = (MH - inj) * 1f / MH, strLevel = str * 1f / MS;
       
       ViewUtils.renderStatBar(
-        x, y + size + 20 + 10 + 5, size, 5,
+        x, y + size + 5, size, 5,
         Color.BLUE, Color.DARK_GRAY, injLevel, false, g
       );
       ViewUtils.renderStatBar(
-        x, y + size + 20 + 10 + 10, size, 5,
+        x, y + size + 10, size, 5,
         Color.GRAY, Color.DARK_GRAY, strLevel, false, g
       );
       
+      /*
       int index = 0;
       for (Trait t : PersonStats.BASE_STATS) {
         float fill = p.stats.levelFor(t) / 10f;
@@ -123,6 +123,7 @@ public class RosterView extends UINode {
         );
         index++;
       }
+      //*/
     }
     
     if (assignHovered != null && surface.mouseClicked() && assignTo != null) {
@@ -132,8 +133,12 @@ public class RosterView extends UINode {
       if (o != assignTo) assignTo.setAssigned(p, true );
     }
     if (personHovered != null && surface.mouseClicked()) {
+      if (selectedPerson == personHovered) personHovered = null;
       setSelection(personHovered);
     }
+    
+    g.setColor(Color.DARK_GRAY);
+    g.drawRect(vx, vy, vw, vh);
   }
   
   

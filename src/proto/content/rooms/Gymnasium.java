@@ -24,7 +24,7 @@ public class Gymnasium extends Room {
     
     tasks = new Task[GYM_SKILLS.length];
     for (int i = 0; i < GYM_SKILLS.length; i++) {
-      tasks[i] = new Training(GYM_SKILLS[i], this);
+      tasks[i] = new Training(GYM_SKILLS[i], INTIMIDATE, this);
     }
   }
   

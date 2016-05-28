@@ -88,6 +88,13 @@ public class Crafting extends Task {
   }
   
   
+  public String testInfo() {
+    String info = super.testInfo();
+    info += " Cost: "+made.buildCost;
+    return info;
+  }
+  
+  
   public String description() {
     return name()+" in "+room.name();
   }

@@ -19,7 +19,13 @@ public abstract class Task implements Assignment {
     
     TIME_SHORT  = 1,
     TIME_MEDIUM = World.HOURS_PER_SHIFT,
-    TIME_LONG   = World.HOURS_PER_SHIFT * World.DAYS_PER_WEEK
+    TIME_LONG   = World.HOURS_PER_SHIFT * World.DAYS_PER_WEEK,
+    
+    TRIVIAL_DC = 1,
+    LOW_DC     = 3,
+    MEDIUM_DC  = 5,
+    HIGH_DC    = 7,
+    EPIC_DC    = 9
   ;
   
   final String name;
@@ -217,6 +223,20 @@ public abstract class Task implements Assignment {
     }
     
     return okay;
+  }
+  
+  
+  protected boolean performTest(Trait stat, Person p, int DC) {
+    //  TODO:  Unify with the above method/s.
+    
+    int checkLevel = p.stats.levelFor(stat);
+    float winChance = Nums.clamp((checkLevel - (DC - 5)) / 10f, 0, 1);
+    
+    if (stat instanceof Skill) {
+      p.stats.gainXP((Skill) stat, (1 - winChance) * 2);
+    }
+    
+    return Rand.num() < winChance;
   }
   
   

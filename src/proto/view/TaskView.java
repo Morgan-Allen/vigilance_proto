@@ -31,24 +31,25 @@ public class TaskView extends UINode {
     //
     //  Draw the icon and description for this particular task-
     g.setColor(Color.WHITE);
+    final int iconSize = vh;
     if (showIcon) {
       Image leadImg = task.icon();
-      g.drawImage(leadImg, vx + 20, vy, 60, 60, null);
+      g.drawImage(leadImg, vx + 20, vy, iconSize, iconSize, null);
     }
     ViewUtils.drawWrappedString(
-      task.longInfo(), g, vx + 20 + 60 + 5, vy, vw - 95, vh - 15
+      task.longInfo(), g, vx + 20 + iconSize + 5, vy, vw - 95, vh - 15
     );
-    g.drawString(task.testInfo(), vx + 20 + 60 + 5, vy + vh);
+    g.drawString(task.testInfo(), vx + 20 + iconSize + 5, vy + vh);
     //
     //  Draw the highlight/selection rectangle, and toggle selection if
     //  clicked-
     final boolean hovered = surface.tryHover(
-      vx + 20 - 5, vy - 5, vw + 10 - 40, 60 + 10, task
+      vx + 20 - 5, vy + 0, vw + 10 - 40, vh - 0, task
     );
     final boolean selected = mainView.areaView.selectedTask() == task;
     
-    Color              boxColor = Color.GRAY;
-    if      (selected) boxColor = Color.GREEN;
+    Color              boxColor = Color.DARK_GRAY;
+    if      (selected) boxColor = Color.YELLOW;
     else if (hovered ) boxColor = Color.YELLOW;
     
     g.setColor(boxColor);

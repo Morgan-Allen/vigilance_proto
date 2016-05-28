@@ -1,5 +1,4 @@
 
-
 package proto.view;
 
 import proto.common.*;
@@ -35,31 +34,30 @@ public class WorldView extends UINode {
     super();
     this.world = world;
     
-    int fullHigh = 750, fullWide = 1200;
+    int fullHigh = 750, fullWide = 1200, rosterHigh = 125;
     this.relBounds.set(0, 0, fullWide, fullHigh);
+    int paneDown = 20 + rosterHigh, paneHigh = fullHigh - (10 + paneDown);
     
-    int paneDown = 20, paneHigh = fullHigh - (20 + 20);
-    
-    rosterView = new RosterView(this, new Box2D(
-      0 + 10, 20,
-      320   , fullHigh - 40
-    ));
     personView = new PersonView(this, new Box2D(
-      0 + 10, 20,
-      320   , fullHigh - 40
+      0  , paneDown,
+      400, paneHigh
     ));
-    addChildren(rosterView, personView);
+    rosterView = new RosterView(this, new Box2D(
+      10, 10,
+      fullWide, 120
+    ));
+    addChildren(personView, rosterView);
     
     areaView = new AreasView(this, new Box2D(
-      320, paneDown,
+      0  , paneDown,
       400, paneHigh
     ));
     roomView = new RoomView(this, new Box2D(
-      720, paneDown,
+      400, paneDown,
       480, paneHigh
     ));
     regionView = new RegionView(this, new Box2D(
-      720, paneDown,
+      400, paneDown,
       480, paneHigh
     ));
     addChildren(areaView, roomView, regionView);
@@ -94,13 +92,14 @@ public class WorldView extends UINode {
   /**  Rendering methods-
     */
   protected void updateAndRender(Surface surface, Graphics2D g) {
+    
     if (rosterView.selected() != null) {
-      personView.visible = true ;
-      rosterView.visible = false;
+      personView.visible = true;
+      areaView.visible   = false;
     }
     else {
       personView.visible = false;
-      rosterView.visible = true ;
+      areaView.visible   = true;
     }
     
     final MessageView topMessage = messageQueue.first();
@@ -120,38 +119,8 @@ public class WorldView extends UINode {
   
   
   void renderTo(Surface surface, Graphics2D g) {
-    
-    final int wide = surface.getWidth(), high = surface.getHeight();
     g.setColor(Color.BLACK);
-    g.fillRect(0, 0, wide, high);
-    
-    g.setColor(Color.WHITE);
-    int across = 320;
-    
-    String timeString = ViewUtils.getTimeString(world);
-    g.drawString("Time: "+timeString, across, 15);
-    
-    boolean hoverS = surface.tryHover(across + 360 - 150, 0, 50, 15, "Save");
-    g.setColor(hoverS ? Color.YELLOW : Color.BLUE);
-    g.drawString("Save"  , across + 360 - 150, 15);
-    
-    boolean hoverR = surface.tryHover(across + 360 - 100, 0, 70, 15, "Reload");
-    g.setColor(hoverR ? Color.YELLOW : Color.BLUE);
-    g.drawString("Reload", across + 360 - 100 , 15);
-    
-    boolean hoverQ = surface.tryHover(across + 360 - 30, 0, 50, 15, "Quit");
-    g.setColor(hoverQ ? Color.YELLOW : Color.BLUE);
-    g.drawString("Quit", across + 360 - 30 , 15);
-    
-    if (hoverS && surface.mouseClicked()) {
-      world.performSave();
-    }
-    if (hoverR && surface.mouseClicked()) {
-      world.reloadFromSave();
-    }
-    if (hoverQ && surface.mouseClicked()) {
-      world.performSaveAndQuit();
-    }
+    g.fillRect(vx, vy, vw, vh);
   }
   
 }

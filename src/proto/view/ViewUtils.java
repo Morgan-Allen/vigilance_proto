@@ -62,12 +62,16 @@ public class ViewUtils {
     Series <Person> assigned, int atX, int atY,
     Surface surface, Graphics2D g
   ) {
-    int x = atX, y = atY - 20;
+    int x = atX - 20, y = atY - 20;
     g.setColor(Color.YELLOW);
     final WorldView parent = surface.game.world().view();
     
+    int moveX = 20;
+    if (assigned.size() > 3) {
+      moveX = 40 / (assigned.size() - 1);
+    }
+    
     for (Person p : assigned) {
-      x -= 20;
       boolean hovered = surface.tryHover(x, y, 20, 20, p);
       g.drawImage(p.kind().sprite(), x, y, 20, 20, null);
       
@@ -77,6 +81,7 @@ public class ViewUtils {
           parent.rosterView.setSelection(p);
         }
       }
+      x -= moveX;
     }
   }
   

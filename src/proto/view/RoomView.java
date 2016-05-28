@@ -62,20 +62,21 @@ public class RoomView extends UINode {
       g, vx + 25, vy + 20, vw - 30, 80
     );
     
-    int down = vy + 100;
+    int down = vy + 50;
     
     //  TODO:  Should be using attachment/detachment here?
     for (Task task : room.possibleTasks()) {
       TaskView view = task.createView(parent);
-      view.relBounds.set(vx, vy + down, vw, 60);
+      view.relBounds.set(vx, 0 + down, vw, 50);
       view.updateAndRender(surface, g);
-      down += 60 + 10;
+      down += view.relBounds.ydim() + 10;
     }
     
-    if (mainView.rosterView.selected() == null) {
+    if (true) {
       g.setColor(Color.LIGHT_GRAY);
       ViewUtils.drawWrappedString(
-        "Select an agent from your roster to perform assignments.",
+        "Select a task, then click in the bottom-left of roster portraits to "+
+        "assign agents to the task.",
         g, vx + 25, down + 20, vw - 30, 150
       );
     }

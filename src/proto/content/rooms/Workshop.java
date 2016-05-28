@@ -55,7 +55,7 @@ public class Workshop extends Room {
     */
   final public static Blueprint BLUEPRINT = new Blueprint(
     "Workshop", "blueprint_workshop",
-    "Allows agents to equip, repair or manufacture gadgets and armour.",
+    "Allows agents to repair or manufacture gadgets and armour.",
     "media assets/main UI/room_workshop.png"
   ) {
     protected Room createRoom(Base base, int slotID) {

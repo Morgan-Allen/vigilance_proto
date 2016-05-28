@@ -13,26 +13,31 @@ import java.awt.Image;
 
 public class Training extends Task {
   
+  
+  
   Room room;
   Skill trained;
-
-
-  public Training(Skill trained, Room room) {
+  Skill talking;
+  
+  
+  public Training(Skill trained, Skill talking, Room room) {
     super(
-      "Training "+trained.name,
-      "Training "+trained.name,
+      "Train "+trained.name,
+      "Train "+trained.name,
       TIME_MEDIUM, room.base.world(),
       trained, 0
     );
     this.room    = room   ;
     this.trained = trained;
+    this.talking = talking;
   }
   
   
   public Training(Session s) throws Exception {
     super(s);
-    room    = (Room) s.loadObject();
+    room    = (Room ) s.loadObject();
     trained = (Skill) s.loadObject();
+    talking = (Skill) s.loadObject();
   }
   
   
@@ -40,17 +45,43 @@ public class Training extends Task {
     super.saveState(s);
     s.saveObject(room   );
     s.saveObject(trained);
+    s.saveObject(talking);
   }
   
   
   protected void onCompletion() {
+    //
     //  TODO:  Rates of XP and relations-gain need to be balanced.
+    //  TODO:  Allow for the possibility of more efficient solo training
+    //         under particular circumstances?
+    
+    final Skill chatWith = Rand.yes() ? talking : PersonStats.SUASION;
+    float maxLevel = 0, numPeers = assigned.size() - 1;
+    
+    for (Person p : assigned) {
+      maxLevel = Nums.max(maxLevel, p.stats.levelFor(trained));
+    }
     
     for (Person p : assigned()) {
-      p.stats.gainXP(trained, 1);
-      
+      float trainBonus = 0;
+      //
+      //  If you're training in a group, then you gain a bonus for whoever has
+      //  the highest skill-rating, and for successfully performing a needed
+      //  conversation skill.
+      if (numPeers > 0) {
+        float ownLevel = p.stats.levelFor(trained);
+        if (performTest(chatWith, p, MEDIUM_DC)) trainBonus += 0.5f;
+        trainBonus += (maxLevel + MEDIUM_DC) * 0.5f / (ownLevel + MEDIUM_DC);
+      }
+      //
+      //  Otherwise you gain XP at a fixed rate-
+      float gainedXP = 1;
+      gainedXP *= (1 + trainBonus) / 10f;
+      p.stats.gainXP(trained, gainedXP);
+      //
+      //  Then you boost any related relationships.
       for (Person o : assigned()) if (o != p) {
-        p.bonds.incBond(o, 1f / 100);
+        p.bonds.incBond(o, (1f + trainBonus) / 100);
       }
     }
     
@@ -76,12 +107,18 @@ public class Training extends Task {
   /**  Rendering, debug and interface methods-
     */
   public Image icon() {
+    //  TODO:  Get a better variety of these.
     return trained.icon();
   }
   
   
   public String description() {
     return name()+" in "+room.name();
+  }
+  
+  
+  public String testInfo() {
+    return "";
   }
   
   

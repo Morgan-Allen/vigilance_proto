@@ -35,20 +35,18 @@ public class RegionView extends UINode {
     g.setColor(Color.WHITE);
     g.drawString(nation.region.name, vx + 20, vy + 20);
     
-    int portW = vw - 40, portH = (int) (portW / 2.5f);
-    g.drawImage(portrait, vx + 20, vy + 40, portW, portH, null);
+    int portW = vw - 120, portH = (int) (portW / 2.5f);
+    //g.drawImage(portrait, vx + 120, vy + 20, portW, portH, null);
     
     int trustPercent = (int) (nation.trustLevel() * 100);
     int crimePercent = (int) (nation.crimeLevel() * 100);
     
-    g.drawString("Trust: "+trustPercent+"%", vx + 30, vy + 50);
-    g.drawString("Crime: "+crimePercent+"%", vx + 30, vy + 65);
+    g.drawString("Trust: "+trustPercent+"%" , vx + 30, vy + 50);
+    g.drawString("Crime: "+crimePercent+"%" , vx + 30, vy + 65);
     g.drawString("Wealth: "+nation.funding(), vx + 30, vy + 80);
     
-    
     g.setColor(Color.LIGHT_GRAY);
-    int down = vy + portH + 50;
-    boolean canAssign = mainView.rosterView.selected() != null;
+    int down = vy + 100;
     boolean noEvents = true;
     
     for (Event event : mainView.world.events().active()) {
@@ -69,12 +67,11 @@ public class RegionView extends UINode {
       //  TODO:  Should be using attachment/detachment here?
       for (Lead l : leads) {
         TaskView view = l.createView(parent);
-        view.relBounds.set(vx, vy + down, vw, 60);
+        view.relBounds.set(vx, down, vw, 60);
         view.updateAndRender(surface, g);
-        down += 60 + 10;
+        down += view.relBounds.ydim() + 10;
       }
-      down += 20;
-      g.setColor(Color.GRAY);
+      g.setColor(Color.DARK_GRAY);
       g.drawRect(vx + 10, initDown, vw - 20, down - initDown);
     }
     
@@ -85,13 +82,17 @@ public class RegionView extends UINode {
         g, vx + 25, down + 20, vw - 30, 150
       );
     }
-    else if (! canAssign) {
+    else if (true) {
       g.setColor(Color.LIGHT_GRAY);
       ViewUtils.drawWrappedString(
-        "Select an agent from your roster to perform assignments.",
+        "Select a task, then click in the bottom-left of roster portraits to "+
+        "assign agents to the task.",
         g, vx + 25, down + 20, vw - 30, 150
       );
     }
+    
+    g.setColor(Color.DARK_GRAY);
+    g.drawRect(vx, vy, vw, vh);
   }
   
 }

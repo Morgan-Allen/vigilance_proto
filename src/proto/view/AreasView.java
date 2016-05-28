@@ -14,7 +14,7 @@ public class AreasView extends UINode {
   
   
   final MapView mapView;
-  final StringButton monitorButton;
+  final StringButton monitorButton, saveButton, loadButton, quitButton;
   
   private Object selectedArea;
   private Assignment selectedTask;
@@ -24,11 +24,17 @@ public class AreasView extends UINode {
     super(parent, viewBounds);
     
     mapView = new MapView(this, new Box2D(
-      80, 60,
-      viewBounds.xdim() - 80, viewBounds.ydim() - 240
+      80, 10,
+      viewBounds.xdim() - 80, viewBounds.ydim() - 80
     ));
+    
+    int
+      across = (int) viewBounds.xdim() - 150,
+      down   = (int) viewBounds.ydim() - 20 ;
+    
     monitorButton = new StringButton(
-      "Resume Monitoring", new Box2D(0, 35, viewBounds.xdim(), 20), this
+      "Resume Monitoring",
+      new Box2D(10, down - 45, viewBounds.xdim() - 10, 20), this
     ) {
       void whenClicked() {
         final boolean active = mainView.world.monitorActive();
@@ -36,8 +42,30 @@ public class AreasView extends UINode {
         else        mainView.world.beginMonitoring();
       }
     };
-    
     addChildren(mapView, monitorButton);
+    
+    saveButton = new StringButton(
+      "Save", new Box2D(across + 0, down, 50, 20), this
+    ) {
+      void whenClicked() {
+        mainView.world.performSave();
+      }
+    };
+    loadButton = new StringButton(
+      "Reload", new Box2D(across + 50, down, 50, 20), this
+    ) {
+      void whenClicked() {
+        mainView.world.reloadFromSave();
+      }
+    };
+    quitButton = new StringButton(
+      "Quit", new Box2D(across + 100, down, 50, 20), this
+    ) {
+      void whenClicked() {
+        mainView.world.performSaveAndQuit();
+      }
+    };
+    addChildren(saveButton, loadButton, quitButton);
   }
   
   
@@ -46,7 +74,7 @@ public class AreasView extends UINode {
     final World world = mainView.world;
     final Base  base  = world.base();
     
-    int down = 60;
+    int down = 10;
     
     for (Room room : base.rooms()) if (room != null) {
       g.drawImage(room.icon(), vx + 10, vy + down, 60, 60, null);
@@ -66,19 +94,19 @@ public class AreasView extends UINode {
       down += 60 + 10;
     }
     
-    //  TODO:  Include a funding report!
+    //  TODO:  This might belong in a separate UI node?
+    g.setColor(Color.WHITE);
+    String timeString = "Time: "+ViewUtils.getTimeString(world);
+    g.drawString(timeString, vx + 10, vy + vh - 5);
     
-    /*
-    offX =  5;
-    offY = 15;
-    String report = "";
-    report += " Week: "+world.currentTime();
-    report += " Funds: "+base.currentFunds()+"";
-    report += " Income: "+base.income()+"";
+    String cashString = "";
+    cashString +=  "Funds: " +base.currentFunds()+"";
+    cashString += " Income: "+base.income      ()+"";
+    cashString += " Outlay: "+base.maintenance ()+"";
+    g.drawString(cashString, vx + 10, vy + vh - 25);
     
-    g.setColor(Color.BLUE);
-    g.drawString(report, offX, offY);
-    //*/
+    g.setColor(Color.DARK_GRAY);
+    g.drawRect(vx, vy, vw, vh);
   }
   
   
@@ -103,18 +131,6 @@ public class AreasView extends UINode {
   
   void setSelectedTask(Assignment task) {
     this.selectedTask = task;
-    /*
-    final Person active = mainView.rosterView.selected();
-    if (active == null) return;
-    final Assignment oldTask = active.assignment();
-    
-    if (active != null && oldTask != null) {
-      oldTask.setAssigned(active, false);
-    }
-    if (active != null && task != null && task != oldTask) {
-      task.setAssigned(active, true);
-    }
-    //*/
   }
   
   

@@ -95,9 +95,14 @@ public class Base implements Session.Saveable {
     this.maxSupport  = 0;
     this.supportUse  = 0;
     
+    //  TODO:  Introduce investment projects for this!
+    this.income = 10;
+    /*
     for (Nation n : world.nations) if (n.member) {
       this.income += n.funding;
     }
+    //*/
+    
     for (Person p : roster) {
       if (p.breathing()) supportUse += 1;
       p.updateOnBase(numWeeks);

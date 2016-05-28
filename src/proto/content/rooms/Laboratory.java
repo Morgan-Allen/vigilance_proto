@@ -40,7 +40,7 @@ public class Laboratory extends Room {
     */
   final public static Blueprint BLUEPRINT = new Blueprint(
     "Laboratory", "blueprint_laboratory",
-    "Allows agents to equip and synthesise medicine, serums and chemicals.",
+    "Allows agents to synthesise medicine, serums and chemicals.",
     "media assets/main UI/room_laboratory.png"
   ) {
     protected Room createRoom(Base base, int slotID) {

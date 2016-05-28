@@ -55,31 +55,14 @@ public class PersonView extends UINode {
   
   
   int tabMode = TAB_SKILLS;
-  StringButton navButtons[], tabButtons[];
+  StringButton tabButtons[];
   ClickMenu pickMenu = null;
   
   
   PersonView(UINode parent, Box2D viewBounds) {
     super(parent, viewBounds);
     
-    navButtons = new StringButton[3];
     tabButtons = new StringButton[3];
-    
-    final String navNames[] = { "Roster", "Last", "Next" };
-    
-    for (int i = 0; i < 3; i++) {
-      final int actionID = i;
-      navButtons[i] = new StringButton(
-        navNames[i], vx + 120 + 5 + (60 * i), vy + 0, 60, 20, this
-      ) {
-        void whenClicked() {
-          Person person = mainView.rosterView.selected();
-          performNavigation(actionID, person);
-        }
-      };
-    }
-    addChildren(navButtons);
-    
     final String tabNames[] = { "Skills", "Gear", "Bonds" };
     for (int i = 0; i < 3; i++) {
       final int modeID = i + 1;
@@ -101,18 +84,21 @@ public class PersonView extends UINode {
   }
   
   
-
+  protected void updateAndRender(Surface surface, Graphics2D g) {
+    super.updateAndRender(surface, g);
+  }
+  
+  
   void renderTo(Surface surface, Graphics2D g) {
-    
     final Person person = mainView.rosterView.selected();
     
     g.setColor(Color.WHITE);
     g.drawImage(person.kind().sprite(), vx, vy, 120, 120, null);
     
-    g.drawString("Codename: "+person.name(), vx + 125, vy + 40);
+    g.drawString("Codename: "+person.name(), vx + 125, vy + 20);
     g.setColor(Color.LIGHT_GRAY);
     ViewUtils.drawWrappedString(
-      person.history.summary(), g, vx + 125, vy + 40, vw - (120 + 10), 80
+      person.history.summary(), g, vx + 125, vy + 20, vw - (120 + 10), 100
     );
     
     g.setColor(Color.WHITE);
@@ -135,6 +121,9 @@ public class PersonView extends UINode {
     if (tabMode == TAB_BONDS) {
       renderBonds(surface, g, person);
     }
+    
+    g.setColor(Color.DARK_GRAY);
+    g.drawRect(vx, vy, vw, vh);
   }
   
   
@@ -174,28 +163,28 @@ public class PersonView extends UINode {
       float XP    = person.stats.xpLevelFor(t);
       int x = (Integer) STAT_DISPLAY_COORDS[index + 1];
       int y = (Integer) STAT_DISPLAY_COORDS[index + 2];
-      x *= 150;
-      y *=  20;
+      x = (x * 150) + 10;
+      y *= 20;
       Color forT = Color.LIGHT_GRAY;
       
-      if (surface.tryHover(vx + x + 20, vy + y + down, 150, 20, t)) {
+      if (surface.tryHover(vx + x, vy + y + down, 150, 20, t)) {
         hovered = t;
         forT = Color.YELLOW;
       }
       
       ViewUtils.renderStatBar(
-        vx + x + 20 + 100, vy + y + down, 50, 15,
+        vx + x + 100, vy + y + down, 50, 15,
         Color.DARK_GRAY, null, level / 10f, false, g
       );
       ViewUtils.renderStatBar(
-        vx + x + 20 + 100, vy + y + down + 15, 50, 5,
+        vx + x + 100, vy + y + down + 15, 50, 5,
         Color.GRAY, null, XP, false, g
       );
       
       g.setColor(forT);
-      g.drawString(t.name  , vx + x + 20      , vy + y + down + 15);
+      g.drawString(t.name  , vx + x      , vy + y + down + 15);
       g.setColor(Color.WHITE);
-      g.drawString(""+level, vx + x + 20 + 100, vy + y + down + 15);
+      g.drawString(""+level, vx + x + 100, vy + y + down + 15);
     }
     
     if (hovered != null) {
@@ -283,7 +272,7 @@ public class PersonView extends UINode {
   void renderBonds(Surface surface, Graphics2D g, Person person) {
     
     g.setColor(Color.WHITE);
-    int down = 120 + 60 + 20;
+    int down = vy + 120 + 60 + 20;
     
     final String friendDescs[] = {
       "Civil", "Friendly", "Close", "Soulmate"

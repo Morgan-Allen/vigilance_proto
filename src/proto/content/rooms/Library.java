@@ -29,7 +29,7 @@ public class Library extends Room {
     
     tasks = new Task[LIB_SKILLS.length];
     for (int i = 0; i < LIB_SKILLS.length; i++) {
-      tasks[i] = new Training(LIB_SKILLS[i], this);
+      tasks[i] = new Training(LIB_SKILLS[i], QUESTION, this);
     }
   }
   
