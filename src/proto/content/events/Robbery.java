@@ -15,9 +15,10 @@ public class Robbery extends Event {
   
   final static int
     LEAD_OWNER  = 0,
-    LEAD_MOLE   = 1,
-    LEAD_BOSS   = 2,
-    LEAD_STASH  = 3
+    LEAD_CAMERA = 1,
+    LEAD_MOLE   = 2,
+    LEAD_BOSS   = 3,
+    LEAD_STASH  = 4
   ;
   
   Scene business;
@@ -61,8 +62,6 @@ public class Robbery extends Event {
     
     this.setKnown(business, owner);
     
-    //  TODO:  Add an 'inspect footage' option here!
-    
     this.assignLeads(new Lead(
       "Talk to the manager",
       owner+", the manager of "+busName+" has appealed for help from "+
@@ -70,11 +69,19 @@ public class Robbery extends Event {
       this, LEAD_OWNER, owner, new Object[] { mole, boss }, Task.TIME_SHORT,
       QUESTION, 3
     ));
+
+    this.assignLeads(new Lead(
+      "Inspect security footage",
+      "The perpetrators were caught on camera.  You could hack the security "+
+      "archives and inspect the footage.",
+      this, LEAD_CAMERA, business, mole, Task.TIME_SHORT,
+      INFORMATICS, 4
+    ));
     
     this.assignLeads(new Lead(
       "Interrogate the inside man",
-      owner+" has fingered "+mole+" as responsible for helping the perps "+
-      "bypass security.  Try bracing him to see if he cracks.",
+      "You have reason to believe "+mole+" was responsible for helping the "+
+      "perps bypass security.  Try bracing him to see if he cracks.",
       this, LEAD_MOLE, mole, stash, Task.TIME_SHORT,
       INTIMIDATE, 5
     ));
@@ -101,6 +108,43 @@ public class Robbery extends Event {
     final Nation nation = world().nationFor(region());
     final Events events = world().events();
     
+    if (lead.ID == LEAD_CAMERA) {
+      if (success) {
+        events.log(
+          "There's a blurry shot of two individuals exiting the building, but "+
+          "prior to that it looks like the footage is looped.  According to "+
+          "employee records, only "+mole+" had maintenance access."
+        );
+      }
+      else {
+        events.log(
+          "There's a blurry shot of two individuals exiting the building, but "+
+          "the rest of the footage is inaccessible."
+        );
+      }
+    }
+    
+    if (lead.ID == LEAD_OWNER) {
+      if (success) {
+        events.log(
+          owner+" seems reluctant to talk, but believes that "+mole+" may "+
+          "have informed "+boss+" when the vault was being emptied.  The "+
+          "latter had been pressuring them to invest in the rackets."
+        );
+      }
+      else {
+        events.log(
+          owner+" is clearly frightened.  Someone got to them before you "+
+          "could coax them to talk."
+        );
+      }
+    }
+    
+    if (lead.ID == LEAD_MOLE) {
+      if (! success) {
+        nation.incTrust(-1);
+      }
+    }
     
     if (lead.ID == LEAD_STASH) {
       setComplete(true);
@@ -142,7 +186,7 @@ public class Robbery extends Event {
     }
     
     public float eventChance(Event event) {
-      return 0;
+      return 1;
     }
   };
 }

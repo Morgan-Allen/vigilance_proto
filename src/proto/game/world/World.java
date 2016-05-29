@@ -113,6 +113,7 @@ public class World implements Session.Saveable {
     }
     events.addType(Kidnapping.TYPE);
     events.addType(Robbery   .TYPE);
+    events.addType(Murder    .TYPE);
   }
   
   

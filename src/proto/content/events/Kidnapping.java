@@ -151,7 +151,7 @@ public class Kidnapping extends Event {
     }
     
     public float eventChance(Event event) {
-      return 0;
+      return 1;
     }
   };
 }
