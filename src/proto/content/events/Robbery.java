@@ -81,7 +81,7 @@ public class Robbery extends Event {
     this.assignLeads(new Lead(
       "Interrogate the inside man",
       "You have reason to believe "+mole+" was responsible for helping the "+
-      "perps bypass security.  Try bracing him to see if he cracks.",
+      "perps bypass security.  Interrogate them.",
       this, LEAD_MOLE, mole, stash, Task.TIME_SHORT,
       INTIMIDATE, 5
     ));
@@ -89,8 +89,8 @@ public class Robbery extends Event {
     this.assignLeads(new Lead(
       "Surveil the mobster",
       owner+" claims "+boss+" organised the heist in reprisal for his refusal "+
-      "to invest in mob businesses.  Follow him and see where it leads.",
-      this, LEAD_BOSS, boss, stash, Task.TIME_LONG,
+      "to invest in mob businesses.  Follow him.",
+      this, LEAD_BOSS, boss, stash, Task.TIME_MEDIUM,
       SURVEILLANCE, 6, STEALTH, 5
     ));
     
@@ -98,7 +98,7 @@ public class Robbery extends Event {
       "Raid the stash",
       "You've found the location of the stash where the goods are being "+
       "held- take out the goons and hang them out to dry.",
-      this, LEAD_STASH, stash, this, Task.TIME_LONG,
+      this, LEAD_STASH, stash, this, Task.TIME_SHORT,
       CLOSE_COMBAT, 5, MARKSMAN, 5
     ));
   }
@@ -129,7 +129,7 @@ public class Robbery extends Event {
         events.log(
           owner+" seems reluctant to talk, but believes that "+mole+" may "+
           "have informed "+boss+" when the vault was being emptied.  The "+
-          "latter had been pressuring them to invest in the rackets."
+          "latter had been pressuring them to invest in mob businesses."
         );
       }
       else {

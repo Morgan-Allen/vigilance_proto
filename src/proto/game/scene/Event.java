@@ -127,7 +127,8 @@ public class Event implements Session.Saveable {
   
   
   protected boolean checkFollowed(Lead lead, boolean success) {
-    if (success) known.include(lead.reveals);
+    if (success) for (Object r : lead.goes) known.include(r);
+    if (complete()) world.events().closeEvent(this);
     return true;
   }
   
@@ -153,9 +154,11 @@ public class Event implements Session.Saveable {
   
   /**  Lead-compilation for general assessment and UI purposes-
     */
-  public Series <Lead> knownLeads() {
+  public Series <Lead> knownOpenLeads() {
     final Batch <Lead> matches = new Batch();
-    for (Lead l : leads) if (known.includes(l.origin)) matches.add(l);
+    for (Lead l : leads) {
+      if (l.open()) matches.add(l);
+    }
     return matches;
   }
   
@@ -165,9 +168,13 @@ public class Event implements Session.Saveable {
   }
   
   
-  public Series <Lead> openLeadsFrom(Object origin) {
+  public Series <Lead> openLeadsFrom(Lead lead) {
     final Batch <Lead> from = new Batch();
-    for (Lead l : leads) if (l.origin == origin && l.open()) from.add(l);
+    for (Lead l : leads) {
+      boolean match = false;
+      for (Object o : lead.goes) if (o == l.origin) match = true;
+      if (match) from.add(l);
+    }
     return from;
   }
   

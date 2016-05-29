@@ -53,7 +53,7 @@ public class RegionView extends UINode {
       //
       //  Firstly, check to see if there's an event occurring in this region:
       if (event.region() != nation.region) continue;
-      final Series <Lead> leads = event.knownLeads();
+      final Series <Lead> leads = event.knownOpenLeads();
       if (leads.empty()) continue;
       noEvents = false;
       int initDown = down;
@@ -70,7 +70,7 @@ public class RegionView extends UINode {
       //  TODO:  Should I be using attachment/detachment here?
       for (Lead l : leads) {
         TaskView view = l.createView(parent);
-        view.relBounds.set(vx, down, vw, 60);
+        view.relBounds.set(vx, down, vw, 65);
         view.updateAndRender(surface, g);
         down += view.relBounds.ydim() + 10;
       }

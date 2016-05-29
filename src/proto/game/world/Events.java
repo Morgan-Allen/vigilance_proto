@@ -80,13 +80,20 @@ public class Events {
     
     for (Event event : active) {
       if (event.timeEnds() <= world.timeDays() || event.complete()) {
-        active.remove(event);
+        closeEvent(event);
       }
       else {
         event.updateEvent();
       }
     }
   }
+  
+  
+  public void closeEvent(Event event) {
+    coming.remove(event);
+    active.remove(event);
+  }
+  
   
   
   /**  Logging background events-

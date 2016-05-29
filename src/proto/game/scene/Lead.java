@@ -17,7 +17,7 @@ public class Lead extends Task {
     */
   final public Event parent;
   final public int ID;
-  final public Object origin, reveals[];
+  final public Object origin, goes[];
   
   
   public Lead(
@@ -30,8 +30,8 @@ public class Lead extends Task {
     this.ID      = ID     ;
     this.origin  = origin ;
     
-    if (reveals instanceof Object[]) this.reveals = (Object[]) reveals;
-    else this.reveals = new Object[] { reveals };
+    if (reveals instanceof Object[]) this.goes = (Object[]) reveals;
+    else this.goes = new Object[] { reveals };
   }
   
   
@@ -40,7 +40,7 @@ public class Lead extends Task {
     parent  = (Event) s.loadObject();
     ID      = s.loadInt   ();
     origin  = s.loadObject();
-    reveals = s.loadObjectArray(Object.class);
+    goes    = s.loadObjectArray(Object.class);
   }
   
   
@@ -49,7 +49,7 @@ public class Lead extends Task {
     s.saveObject(parent);
     s.saveInt   (ID    );
     s.saveObject(origin);
-    s.saveObjectArray(reveals);
+    s.saveObjectArray(goes);
   }
   
   
@@ -67,7 +67,9 @@ public class Lead extends Task {
   
   
   public boolean open() {
-    return parent.known.includes(origin) && ! complete();
+    boolean known = parent.known.includes(origin);
+    boolean done = complete();
+    return known && ! done;
   }
   
   
@@ -98,15 +100,15 @@ public class Lead extends Task {
     else           s.append("  They had no luck."    );
     
     boolean noLeads = true;
-    if (success) for (Lead l : parent.openLeadsFrom(reveals)) {
-      s.append("\nNew lead: ");
+    if (success) for (Lead l : parent.openLeadsFrom(this)) {
+      s.append("\n\nNew lead: ");
       s.append(l.info);
       noLeads = false;
     }
     if (noLeads) s.append("\nNo new leads were uncovered.");
     
     for (String action : world.events().extractLogInfo(this)) {
-      s.append("\n");
+      s.append("\n\n");
       s.append(action);
     }
     

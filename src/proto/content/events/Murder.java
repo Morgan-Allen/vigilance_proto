@@ -59,7 +59,7 @@ public class Murder extends Event {
     this.victim  = victim;
     this.rival   = Crooks.randomCivilian(world);
     this.partner = Crooks.randomCivilian(world);
-    this.hides   = new Scene("", region);
+    this.hides   = new Scene("Hidden Area", region);
     this.weapon  = new Clue("Murder Weapon");
     this.setKnown(morgue, victim, partner, rival);
     
@@ -72,7 +72,7 @@ public class Murder extends Event {
     this.assignLeads(new Lead(
       "Talk to their partner",
       "Talk to "+partner+", their partner, to get some idea of what "+victim+
-      "was involved in.",
+      " was involved in.",
       this, LEAD_PARTNER, partner, weapon, Task.TIME_SHORT,
       QUESTION, 2, SUASION, 3
     ));
@@ -147,6 +147,7 @@ public class Murder extends Event {
       }
       if (partnerSolved) {
         events.log(partner+" is telling a different story.  Who is lying?");
+        weaponSolved = true;
       }
     }
     
@@ -163,12 +164,14 @@ public class Murder extends Event {
           "scene properly.  You find a bloody paperweight stashed under the "+
           "floorboards that matches the victim's pattern of contusions."
         );
+        nation.incTrust(2);
       }
       else {
         events.log(
           "This looks like a dead end.  Lacking conclusive evidence, you'll "+
           "have to let this drop..."
         );
+        nation.incCrime(5);
       }
     }
     
