@@ -19,7 +19,7 @@ public abstract class ClickMenu <T> extends UINode {
   
   
   
-  ClickMenu(Series <T> options, int atX, int atY, UINode parent) {
+  ClickMenu(Series <T> options, int atX, int atY, MainView parent) {
     super(parent);
     this.options = options;
     this.atX = atX;
@@ -59,6 +59,10 @@ public abstract class ClickMenu <T> extends UINode {
     //  that comes in a vertical list and has icons'.  Then factor that out of
     //  here and the rooms-view, et cetera.
     
+    final boolean hoverMenu = surface.tryHover(
+      0, 0, surface.getWidth(), surface.getHeight(), this
+    );
+    
     for (i = 0; i < options.size(); i++) {
       String label = labels[i];
       Image  image = images[i];
@@ -81,7 +85,12 @@ public abstract class ClickMenu <T> extends UINode {
       }
       if (surface.mouseClicked() && hovered) {
         whenPicked(option, i);
+        mainView.hideClickMenu(this);
       }
+    }
+    
+    if (hoverMenu && surface.mouseClicked()) {
+      mainView.hideClickMenu(this);
     }
   }
   

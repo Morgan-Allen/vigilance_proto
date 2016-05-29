@@ -56,7 +56,6 @@ public class PersonView extends UINode {
   
   int tabMode = TAB_SKILLS;
   StringButton tabButtons[];
-  ClickMenu pickMenu = null;
   
   
   PersonView(UINode parent, Box2D viewBounds) {
@@ -251,8 +250,6 @@ public class PersonView extends UINode {
   
   
   void createItemMenu(final Person person, final int slotID, int x, int y) {
-    if (pickMenu != null) return;
-    
     final Batch <Equipped> types = new Batch();
     final BaseStocks stocks = mainView.world.base().stocks;
     
@@ -261,8 +258,8 @@ public class PersonView extends UINode {
     }
     if (types.empty()) return;
     
-    pickMenu = new ClickMenu <Equipped> (
-      types, x, y, this
+    mainView.showClickMenu(new ClickMenu <Equipped> (
+      types, x, y, mainView
     ) {
       protected Image imageFor(Equipped option) {
         return option.icon();
@@ -274,11 +271,8 @@ public class PersonView extends UINode {
       
       protected void whenPicked(Equipped option, int optionID) {
         person.equipItem(option, mainView.world.base());
-        parent.setChild(this, false);
-        pickMenu = null;
       }
-    };
-    setChild(pickMenu, true);
+    });
   }
   
 

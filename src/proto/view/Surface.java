@@ -96,7 +96,7 @@ public class Surface extends JPanel implements
     I.used60Frames = (numPaints++ % 60) == 0;
     
     if (world != null) {
-      WorldView view = world.view();
+      MainView view = world.view();
       this.lastFocus  = mouseFocus;
       this.mouseFocus = null;
       view.updateAndRender(this, g2d);

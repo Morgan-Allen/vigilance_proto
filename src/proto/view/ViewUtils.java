@@ -64,7 +64,7 @@ public class ViewUtils {
   ) {
     int x = atX - 20, y = atY - 20;
     g.setColor(Color.YELLOW);
-    final WorldView parent = surface.game.world().view();
+    final MainView parent = surface.game.world().view();
     
     int moveX = 20;
     if (assigned.size() > 3) {

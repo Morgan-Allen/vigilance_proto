@@ -10,7 +10,7 @@ import java.awt.Graphics2D;
 public abstract class UINode {
   
   
-  final WorldView mainView;
+  final MainView mainView;
   final UINode parent;
   final Box2D relBounds = new Box2D();
   final List <UINode> kids = new List();
@@ -23,7 +23,7 @@ public abstract class UINode {
   
   UINode() {
     this.parent = null;
-    this.mainView = (WorldView) this;
+    this.mainView = (MainView) this;
   }
   
   
@@ -40,7 +40,9 @@ public abstract class UINode {
   
   
   protected void setChild(UINode kid, boolean is) {
-    if (kid.parent != this) return;
+    if (kid.parent != this) {
+      I.complain("Must have matching parent: "+kid+", "+kid.parent+" vs "+this);
+    }
     kids.toggleMember(kid, is);
   }
   

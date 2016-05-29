@@ -31,7 +31,7 @@ public class World implements Session.Saveable {
   RunGame game;
   String savePath;
   
-  WorldView view = new WorldView(this);
+  MainView view = new MainView(this);
   
   Nation nations[];
   Base base;
@@ -248,7 +248,7 @@ public class World implements Session.Saveable {
   
   /**  Graphical/display routines:
     */
-  public WorldView view() {
+  public MainView view() {
     return view;
   }
 }

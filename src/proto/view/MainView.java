@@ -12,7 +12,7 @@ import java.awt.Image;
 
 
 
-public class WorldView extends UINode {
+public class MainView extends UINode {
   
   final World world;
   
@@ -27,10 +27,11 @@ public class WorldView extends UINode {
   
   MessageView messageShown = null;
   List <MessageView> messageQueue = new List();
+  ClickMenu clickMenu = null;
   
   
   
-  public WorldView(World world) {
+  public MainView(World world) {
     super();
     this.world = world;
     
@@ -77,6 +78,9 @@ public class WorldView extends UINode {
   }
   
   
+  
+  /**  Various custom popup-presentation methods:
+    */
   public void queueMessage(MessageView message) {
     messageQueue.add(message);
     world.pauseMonitoring();
@@ -85,6 +89,18 @@ public class WorldView extends UINode {
   
   public void dismissMessage(MessageView message) {
     messageQueue.remove(message);
+  }
+  
+  
+  public void showClickMenu(ClickMenu menu) {
+    this.clickMenu = menu;
+    setChild(menu, true);
+  }
+  
+  
+  public void hideClickMenu(ClickMenu menu) {
+    setChild(menu, false);
+    this.clickMenu = null;
   }
   
   

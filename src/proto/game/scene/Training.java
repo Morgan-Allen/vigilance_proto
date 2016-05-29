@@ -122,7 +122,7 @@ public class Training extends Task {
   }
   
   
-  public TaskView createView(WorldView parent) {
+  public TaskView createView(MainView parent) {
     TaskView view = super.createView(parent);
     view.showIcon = false;
     return view;
