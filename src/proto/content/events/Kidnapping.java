@@ -20,7 +20,6 @@ public class Kidnapping extends Event {
     LEAD_RESCUE  = 2,
     LEAD_RAID    = 3;
   
-  Region region;
   Person boss;
   Person missing;
   Scene home;
@@ -30,7 +29,6 @@ public class Kidnapping extends Event {
   
   public Kidnapping(Session s) throws Exception {
     super(s);
-    region  = (Region) s.loadObject();
     boss    = (Person) s.loadObject();
     missing = (Person) s.loadObject();
     home    = (Scene ) s.loadObject();
@@ -41,7 +39,7 @@ public class Kidnapping extends Event {
   
   public void saveState(Session s) throws Exception {
     super.saveState(s);
-    s.saveObjects(region, boss, missing, home, taken, fibres);
+    s.saveObjects(boss, missing, home, taken, fibres);
   }
   
   
@@ -51,10 +49,9 @@ public class Kidnapping extends Event {
       "Kidnapping of "+missing.name(),
       missing.name()+" disappeared from their home in "+region+" recently. "+
       "Find them before it's too late.",
-      world
+      world, region
     );
     
-    this.region  = region;
     this.boss    = boss;
     this.missing = missing;
     this.home    = new Scene("home"  , region);
@@ -67,34 +64,34 @@ public class Kidnapping extends Event {
       "Inspect the scene",
       "Inspect the victim's last known location for clues.",
       this, LEAD_INSPECT, home, fibres, Task.TIME_SHORT,
-      INTELLECT, 4
+      SURVEILLANCE, 4
     ));
     this.assignLeads(new Lead(
       "Fibres",
       "It looks like the kidnapper snagged some fibres when they broke the "+
-      "window.",
+      "window.  Microscopic or chemical analysis might yield some information.",
       this, LEAD_FIBRES, fibres, taken, Task.TIME_MEDIUM,
-      INTELLECT, 6
+      PHARMACY, 6
     ));
     this.assignLeads(new Lead(
       "Escape with "+missing,
       "You've found where "+missing+" is being kept.  You could try to free "+
       "the victim and escape without alerting their captors.",
       this, LEAD_RESCUE, taken, missing, Task.TIME_SHORT,
-      REFLEX, 7
+      STEALTH, 7, GYMNASTICS, 4
     ));
     this.assignLeads(new Lead(
       "Raid on "+taken,
       "You've found where "+missing+" is being kept.  You could try a direct "+
       "raid to subdue- or at least distract- their captors.",
       this, LEAD_RAID, taken, missing, Task.TIME_SHORT,
-      STRENGTH, 6
+      CLOSE_COMBAT, 6, MARKSMAN, 3
     ));
   }
   
   
   protected boolean checkFollowed(Lead lead, boolean success) {
-    final Nation nation = world().nationFor(region);
+    final Nation nation = world().nationFor(region());
     final Events events = world().events();
     
     if (lead.ID == LEAD_RESCUE) {
@@ -143,8 +140,8 @@ public class Kidnapping extends Event {
   ) {
     public Event createRandomEvent(World world) {
       
-      Person boss    = new Person(MOBSTER , world, randomCommonName());
-      Person missing = new Person(CIVILIAN, world, randomCommonName());
+      Person boss    = Crooks.randomMobster (world);
+      Person missing = Crooks.randomCivilian(world);
       Nation nation  = (Nation) Rand.pickFrom(world.nations());
       
       Event s = new Kidnapping(boss, missing, nation.region, world);

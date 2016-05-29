@@ -2,8 +2,9 @@
 
 package proto.content.agents;
 import proto.common.*;
-import proto.util.Rand;
-
+import proto.game.world.*;
+import proto.game.person.*;
+import proto.util.*;
 import static proto.game.person.PersonStats.*;
 
 
@@ -52,6 +53,16 @@ public class Crooks {
   public static String randomCommonName() {
     return
       Rand.pickFrom(COMMON_FIRST_NAMES)+" "+Rand.pickFrom(COMMON_LAST_NAMES);
+  }
+  
+  
+  public static Person randomCivilian(World world) {
+    return new Person(CIVILIAN, world, randomCommonName());
+  }
+  
+  
+  public static Person randomMobster(World world) {
+    return new Person(MOBSTER, world, randomCommonName());
   }
   
   

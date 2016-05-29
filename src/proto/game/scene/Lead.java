@@ -17,7 +17,7 @@ public class Lead extends Task {
     */
   final public Event parent;
   final public int ID;
-  final public Object origin, reveals;
+  final public Object origin, reveals[];
   
   
   public Lead(
@@ -29,25 +29,27 @@ public class Lead extends Task {
     this.parent  = parent ;
     this.ID      = ID     ;
     this.origin  = origin ;
-    this.reveals = reveals;
+    
+    if (reveals instanceof Object[]) this.reveals = (Object[]) reveals;
+    else this.reveals = new Object[] { reveals };
   }
   
   
   public Lead(Session s) throws Exception {
     super(s);
-    parent   = (Event) s.loadObject();
-    ID       = s.loadInt   ();
-    origin   = s.loadObject();
-    reveals  = s.loadObject();
+    parent  = (Event) s.loadObject();
+    ID      = s.loadInt   ();
+    origin  = s.loadObject();
+    reveals = s.loadObjectArray(Object.class);
   }
   
   
   public void saveState(Session s) throws Exception {
     super.saveState(s);
-    s.saveObject(parent  );
-    s.saveInt   (ID      );
-    s.saveObject(origin  );
-    s.saveObject(reveals );
+    s.saveObject(parent);
+    s.saveInt   (ID    );
+    s.saveObject(origin);
+    s.saveObjectArray(reveals);
   }
   
   
@@ -70,7 +72,7 @@ public class Lead extends Task {
   
   
   public Object targetLocation() {
-    return parent.firstLocation();
+    return parent.region();
   }
   
   

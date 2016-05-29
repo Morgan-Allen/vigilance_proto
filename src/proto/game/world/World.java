@@ -2,16 +2,13 @@
 
 package proto.game.world;
 import proto.common.*;
-import proto.content.agents.Heroes;
-import proto.content.events.Kidnapping;
-import proto.content.items.Gadgets;
-import proto.content.rooms.Gymnasium;
-import proto.content.rooms.Laboratory;
-import proto.content.rooms.Library;
-import proto.content.rooms.Workshop;
 import proto.game.person.*;
 import proto.util.*;
 import proto.view.*;
+import proto.content.agents.*;
+import proto.content.events.*;
+import proto.content.items.*;
+import proto.content.rooms.*;
 
 
 
@@ -110,11 +107,12 @@ public class World implements Session.Saveable {
   public void initDefaultNations() {
     int numN = Region.ALL_REGIONS.length;
     this.nations = new Nation[numN];
+    
     for (int n = 0; n < numN; n++) {
       nations[n] = new Nation(Region.ALL_REGIONS[n], this);
     }
-    
     events.addType(Kidnapping.TYPE);
+    events.addType(Robbery   .TYPE);
   }
   
   

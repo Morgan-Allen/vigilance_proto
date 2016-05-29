@@ -129,7 +129,7 @@ public class MapView extends UINode {
       );
       
       for (Event event : mainView.world.events().active()) {
-        if (event.openLeadsFrom(n.region).size() > 0) {
+        if (event.region() == n.region) {
           g.drawImage(mainView.alertMarker, x - 25, y - 25, 50, 50, null);
         }
       }

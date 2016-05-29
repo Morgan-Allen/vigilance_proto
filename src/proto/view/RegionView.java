@@ -50,12 +50,15 @@ public class RegionView extends UINode {
     boolean noEvents = true;
     
     for (Event event : mainView.world.events().active()) {
-      final Series <Lead> leads = event.openLeadsFrom(nation.region);
+      //
+      //  Firstly, check to see if there's an event occurring in this region:
+      if (event.region() != nation.region) continue;
+      final Series <Lead> leads = event.knownLeads();
       if (leads.empty()) continue;
       noEvents = false;
       int initDown = down;
       //
-      //  First, draw the name and info for the investigation as a whole:
+      //  If so, draw the name and info for the investigation as a whole:
       g.drawString(event.name(), vx + 20, down + 15);
       down += 20;
       ViewUtils.drawWrappedString(
@@ -64,7 +67,7 @@ public class RegionView extends UINode {
       down += 60;
       //
       //  Then, draw info for any individual leads:
-      //  TODO:  Should be using attachment/detachment here?
+      //  TODO:  Should I be using attachment/detachment here?
       for (Lead l : leads) {
         TaskView view = l.createView(parent);
         view.relBounds.set(vx, down, vw, 60);

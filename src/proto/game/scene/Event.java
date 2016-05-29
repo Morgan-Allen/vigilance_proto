@@ -31,6 +31,8 @@ public class Event implements Session.Saveable {
   final String name, info;
   
   final World world;
+  final Region region;
+  
   float timeBegins, timeEnds;
   List <Lead> leads = new List();
   
@@ -38,10 +40,11 @@ public class Event implements Session.Saveable {
   boolean closed, solved;
   
   
-  protected Event(String name, String info, World world) {
-    this.name  = name ;
-    this.info  = info ;
-    this.world = world;
+  protected Event(String name, String info, World world, Region region) {
+    this.name   = name  ;
+    this.info   = info  ;
+    this.world  = world ;
+    this.region = region;
   }
   
   
@@ -51,7 +54,8 @@ public class Event implements Session.Saveable {
     name = s.loadString();
     info = s.loadString();
     
-    world      = (World) s.loadObject();
+    world      = (World ) s.loadObject();
+    region     = (Region) s.loadObject();
     timeBegins = s.loadFloat();
     timeEnds   = s.loadFloat();
     s.loadObjects(leads);
@@ -65,9 +69,9 @@ public class Event implements Session.Saveable {
     
     s.saveString(name);
     s.saveString(info);
-    //  NOTE:  The action log is wiped after use, so we don't save it.
     
-    s.saveObject(world);
+    s.saveObject(world );
+    s.saveObject(region);
     s.saveFloat(timeBegins);
     s.saveFloat(timeEnds  );
     s.saveObjects(leads);
@@ -88,6 +92,11 @@ public class Event implements Session.Saveable {
   
   public World world() {
     return world;
+  }
+  
+  
+  public Region region() {
+    return region;
   }
   
   
@@ -160,32 +169,6 @@ public class Event implements Session.Saveable {
     final Batch <Lead> from = new Batch();
     for (Lead l : leads) if (l.origin == origin && l.open()) from.add(l);
     return from;
-  }
-  
-  
-  public Series <Lead> openLeadsFrom(Region region) {
-    boolean linksToRegion = false;
-    final Batch <Lead> from = new Batch();
-    
-    for (Lead l : leads) if (l.origin instanceof Scene) {
-      final Scene s = (Scene) l.origin;
-      if (s.region == region && known.includes(s)) linksToRegion = true;
-    }
-    if (! linksToRegion) return from;
-    
-    for (Lead l : leads) if (l.open()) {
-      from.add(l);
-    }
-    return from;
-  }
-  
-  
-  Region firstLocation() {
-    for (Lead l : leads) if (l.origin instanceof Scene) {
-      final Scene s = (Scene) l.origin;
-      return s.region;
-    }
-    return null;
   }
   
   
