@@ -105,7 +105,7 @@ public class Robbery extends Event {
   
   
   protected boolean checkFollowed(Lead lead, boolean success) {
-    final Nation nation = world().nationFor(region());
+    final District nation = world().nationFor(region());
     final Events events = world().events();
     
     if (lead.ID == LEAD_CAMERA) {
@@ -142,7 +142,7 @@ public class Robbery extends Event {
     
     if (lead.ID == LEAD_MOLE) {
       if (! success) {
-        nation.incTrust(-1);
+        nation.incLevel(District.TRUST, -1);
       }
     }
     
@@ -151,7 +151,8 @@ public class Robbery extends Event {
       
       if (success) {
         events.log("The stolen valuables have been recovered.");
-        nation.incTrust(2);
+        nation.incLevel(District.TRUST     , 2);
+        nation.incLevel(District.DETERRENCE, 5);
       }
       else {
         for (Person p : lead.assigned()) {
@@ -161,7 +162,7 @@ public class Robbery extends Event {
           "Your bust was a failure.  The perps will have scattered and taken "+
           "the cash with them- you'll never find it now."
         );
-        nation.incCrime(5);
+        nation.incLevel(District.DETERRENCE, -10);
       }
     }
     
@@ -177,7 +178,7 @@ public class Robbery extends Event {
   ) {
     public Event createRandomEvent(World world) {
       Person boss    = Crooks.randomMobster(world);
-      Nation nation  = (Nation) Rand.pickFrom(world.nations());
+      District nation  = (District) Rand.pickFrom(world.nations());
       
       Event s = new Robbery(boss, "The Central Bank", nation.region, world);
       float time = world.timeDays() + Rand.index(5);

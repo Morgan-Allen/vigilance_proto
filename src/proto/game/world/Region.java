@@ -7,6 +7,10 @@ import proto.view.*;
 
 
 
+//  TODO:  Rename this to the 'Geography' class to avoid confusion, and include
+//  all the initialisation data in the content package.
+
+
 public class Region extends Index.Entry implements Session.Saveable {
   
   
@@ -16,18 +20,9 @@ public class Region extends Index.Entry implements Session.Saveable {
   
   final public String name;
   final public RegionAssets view = new RegionAssets();
-  String cities[] = {};
   
-  float 
-    defaultCrime       = 0.25f,
-    defaultWealth      = 0.50f,
-    defaultEnvironment = 0.75f,
-    defaultEducation   = 0.50f,
-    defaultEquality    = 0.50f,
-    defaultFreedom     = 0.50f;
-  
-  int     defaultFunding = 100  ;
-  float   defaultTrust   = 0.25f;
+  int     maxFacilities  = 3    ;
+  float   defaultTrust   = 0.00f;
   boolean defaultMember  = false;
   
   

@@ -91,14 +91,14 @@ public class Kidnapping extends Event {
   
   
   protected boolean checkFollowed(Lead lead, boolean success) {
-    final Nation nation = world().nationFor(region());
+    final District nation = world().nationFor(region());
     final Events events = world().events();
     
     if (lead.ID == LEAD_RESCUE) {
       if (success) {
         setComplete(true);
         events.log(missing+" escapes unharmed from their captors.");
-        nation.incTrust(5);
+        nation.incLevel(District.TRUST, 5);
       }
       else {
         Lead raid = leadWithID(LEAD_RAID);
@@ -111,7 +111,7 @@ public class Kidnapping extends Event {
       if (success) {
         setComplete(true);
         events.log("The captors keeping "+missing+" hostage were subdued.");
-        nation.incCrime(-5);
+        nation.incLevel(District.DETERRENCE, 5);
       }
       else {
         setComplete(false);
@@ -122,9 +122,9 @@ public class Kidnapping extends Event {
         }
         else {
           missing.receiveInjury(missing.maxHealth() * (Rand.num() + 0.5f));
-          nation.incTrust(-10);
+          nation.incLevel(District.TRUST, -10);
         }
-        nation.incCrime(10);
+        nation.incLevel(District.DETERRENCE, -10);
       }
     }
     
@@ -142,7 +142,7 @@ public class Kidnapping extends Event {
       
       Person boss    = Crooks.randomMobster (world);
       Person missing = Crooks.randomCivilian(world);
-      Nation nation  = (Nation) Rand.pickFrom(world.nations());
+      District nation  = (District) Rand.pickFrom(world.nations());
       
       Event s = new Kidnapping(boss, missing, nation.region, world);
       float time = world.timeDays() + Rand.index(5);

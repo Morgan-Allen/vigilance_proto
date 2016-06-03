@@ -34,7 +34,7 @@ public class MapView extends UINode {
   }
   
   
-  void attachOutlinesFor(Nation... nations) {
+  void attachOutlinesFor(District... nations) {
     if (this.attached != null) return;
     
     attached = new RegionAssets[nations.length];
@@ -77,12 +77,12 @@ public class MapView extends UINode {
   /**  Actual rendering methods-
     */
   void renderTo(Surface surface, Graphics2D g) {
-    Nation nations[] = mainView.world.nations();
+    District nations[] = mainView.world.nations();
     attachOutlinesFor(nations);
     //
     //  Draw the background image first-
     g.drawImage(mapImage, vx, vy, vw, vh, null);
-    Nation nationHovered = null;
+    District nationHovered = null;
     //
     //  Then draw the nations of the world on the satellite map.
     int imgWide = mapImage.getWidth(), imgHigh = mapImage.getHeight();
@@ -100,8 +100,8 @@ public class MapView extends UINode {
     }
     
     ///if (I.used60Frames) I.say("Pixel value is: "+pixVal);
-    Nation selectedArea = mainView.areaView.selectedNation();
-    for (Nation n : nations) if (n.region.view.colourKey == pixVal) {
+    District selectedArea = mainView.areaView.selectedNation();
+    for (District n : nations) if (n.region.view.colourKey == pixVal) {
       nationHovered = n;
     }
     if (nationHovered != null && surface.mouseClicked()) {
@@ -111,21 +111,17 @@ public class MapView extends UINode {
     renderOutline(selectedArea , surface, g, mapWRatio, mapHRatio);
     renderOutline(nationHovered, surface, g, mapWRatio, mapHRatio);
     
-    for (Nation n : nations) {
+    for (District n : nations) {
       int x = (int) ((n.region.view.centerX / mapWRatio) + vx);
       int y = (int) ((n.region.view.centerY / mapHRatio) + vy);
       
       g.setColor(Color.LIGHT_GRAY);
       g.drawString(n.region.name, x - 25, y + 25 + 15);
       
-      float crimeLevel = n.crimeLevel(), trustLevel = n.trustLevel();
+      float crimeLevel = n.currentValue(District.VIOLENCE) / 100f;
       ViewUtils.renderStatBar(
-        x - 25, y + 25 + 15 + 5, 25, 5,
+        x - 25, y + 25 + 15 + 5, 50, 5,
         Color.RED, Color.BLACK, crimeLevel, false, g
-      );
-      ViewUtils.renderStatBar(
-        x - 0, y + 25 + 15 + 5, 25, 5,
-        Color.BLUE, Color.BLACK, trustLevel, false, g
       );
       
       for (Event event : mainView.world.events().active()) {
@@ -138,7 +134,7 @@ public class MapView extends UINode {
   }
   
   
-  private Series <Person> visitors(Nation located) {
+  private Series <Person> visitors(District located) {
     final Batch <Person> visitors = new Batch();
     for (Person p : mainView.world.base().roster()) if (p.assignment() != null) {
       if (p.assignment().targetLocation() == located.region) {
@@ -150,7 +146,7 @@ public class MapView extends UINode {
   
   
   private void renderOutline(
-    Nation n, Surface surface, Graphics2D g, float mapWRatio, float mapHRatio
+    District n, Surface surface, Graphics2D g, float mapWRatio, float mapHRatio
   ) {
     if (n == null || n.region.view.outline == null) return;
     RegionAssets r = n.region.view;

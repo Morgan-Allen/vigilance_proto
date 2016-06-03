@@ -33,7 +33,7 @@ public class World implements Session.Saveable {
   
   MainView view = new MainView(this);
   
-  Nation nations[];
+  District nations[];
   Base base;
   Events events = new Events(this);
   
@@ -58,7 +58,7 @@ public class World implements Session.Saveable {
   public World(Session s) throws Exception {
     s.cacheInstance(this);
     
-    nations = (Nation[]) s.loadObjectArray(Nation.class);
+    nations = (District[]) s.loadObjectArray(District.class);
     base    = (Base) s.loadObject();
     events.loadState(s);
     
@@ -106,10 +106,10 @@ public class World implements Session.Saveable {
   
   public void initDefaultNations() {
     int numN = Region.ALL_REGIONS.length;
-    this.nations = new Nation[numN];
+    this.nations = new District[numN];
     
     for (int n = 0; n < numN; n++) {
-      nations[n] = new Nation(Region.ALL_REGIONS[n], this);
+      nations[n] = new District(Region.ALL_REGIONS[n], this);
     }
     events.addType(Kidnapping.TYPE);
     events.addType(Robbery   .TYPE);
@@ -147,13 +147,13 @@ public class World implements Session.Saveable {
   
   /**  General query methods-
     */
-  public Nation[] nations() {
+  public District[] nations() {
     return nations;
   }
   
   
-  public Nation nationFor(Region r) {
-    for (Nation n : nations) if (n.region == r) return n;
+  public District nationFor(Region r) {
+    for (District n : nations) if (n.region == r) return n;
     return null;
   }
   

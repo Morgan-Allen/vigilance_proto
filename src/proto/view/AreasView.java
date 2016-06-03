@@ -123,8 +123,8 @@ public class AreasView extends UINode {
   }
   
   
-  Nation selectedNation() {
-    if (selectedArea instanceof Nation) return (Nation) selectedArea;
+  District selectedNation() {
+    if (selectedArea instanceof District) return (District) selectedArea;
     return null;
   }
   

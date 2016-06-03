@@ -94,7 +94,7 @@ public class Murder extends Event {
   
   
   protected boolean checkFollowed(Lead lead, boolean success) {
-    final Nation nation = world().nationFor(region());
+    final District nation = world().nationFor(region());
     final Events events = world().events();
     
     final boolean
@@ -164,14 +164,15 @@ public class Murder extends Event {
           "scene properly.  You find a bloody paperweight stashed under the "+
           "floorboards that matches the victim's pattern of contusions."
         );
-        nation.incTrust(2);
+        nation.incLevel(District.TRUST     , 2);
+        nation.incLevel(District.DETERRENCE, 2);
       }
       else {
         events.log(
           "This looks like a dead end.  Lacking conclusive evidence, you'll "+
           "have to let this drop..."
         );
-        nation.incCrime(5);
+        nation.incLevel(District.DETERRENCE, -5);
       }
     }
     
@@ -188,7 +189,7 @@ public class Murder extends Event {
     public Event createRandomEvent(World world) {
       
       Person victim = new Person(CIVILIAN, world, randomCommonName());
-      Nation nation  = (Nation) Rand.pickFrom(world.nations());
+      District nation  = (District) Rand.pickFrom(world.nations());
       
       Event s = new Murder(victim, nation.region, world);
       float time = world.timeDays() + Rand.index(5);
