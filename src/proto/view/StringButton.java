@@ -12,7 +12,8 @@ public abstract class StringButton extends UINode {
   
   
   final String label;
-  public boolean toggled = false;
+  public boolean toggled = false, valid = true;
+  public Object refers = this;
   
   
   StringButton(String label, Box2D bounds, UINode parent) {
@@ -27,11 +28,12 @@ public abstract class StringButton extends UINode {
   
   
   void renderTo(Surface surface, Graphics2D g) {
-    boolean hovered = surface.tryHover(this);
+    final boolean hovered = surface.tryHover(vx, vy, vw, vh, refers) && valid;
     
-    if (toggled) g.setColor(Color.GREEN);
+    if      (toggled) g.setColor(Color.GREEN );
     else if (hovered) g.setColor(Color.YELLOW);
-    else g.setColor(Color.BLUE);
+    else if (! valid) g.setColor(Color.GRAY  );
+    else              g.setColor(Color.BLUE  );
     g.drawString(label, vx + 5, vy + 15);
     g.drawRect(vx, vy, vw, vh);
     

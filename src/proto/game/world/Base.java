@@ -19,6 +19,7 @@ public class Base implements Session.Saveable {
   World world;
   
   List <Person> roster = new List();
+  Person leader = null;
   final public BaseStocks stocks = new BaseStocks(this);
   
   Room rooms[] = new Room[MAX_FACILITIES];
@@ -35,8 +36,12 @@ public class Base implements Session.Saveable {
   
   public Base(Session s) throws Exception {
     s.cacheInstance(this);
+    
     world = (World) s.loadObject();
+    
     s.loadObjects(roster);
+    leader = (Person) s.loadObject();
+    
     for (int n = 0 ; n < MAX_FACILITIES; n++) {
       rooms[n] = (Room) s.loadObject();
     }
@@ -54,8 +59,12 @@ public class Base implements Session.Saveable {
   
   
   public void saveState(Session s) throws Exception {
+    
     s.saveObject(world);
+    
     s.saveObjects(roster);
+    s.saveObject(leader);
+    
     for (int n = 0 ; n < MAX_FACILITIES; n++) {
       s.saveObject(rooms[n]);
     }
@@ -99,7 +108,7 @@ public class Base implements Session.Saveable {
     this.supportUse  = 0;
     
     //  TODO:  Introduce investment projects for this!
-    this.income = 10;
+    //this.income = 10;
     /*
     for (Nation n : world.nations) if (n.member) {
       this.income += n.funding;
@@ -118,16 +127,32 @@ public class Base implements Session.Saveable {
   }
   
   
+  void updateBaseDaily() {
+    
+  }
+  
+  
   
   /**  Roster modification-
     */
-  public void addToRoster(Person hero) {
+  public Person addToRoster(Person hero) {
     roster.add(hero);
+    return hero;
   }
   
   
   public Series <Person> roster() {
     return roster;
+  }
+  
+  
+  public void setLeader(Person leader) {
+    this.leader = leader;
+  }
+  
+  
+  public Person leader() {
+    return leader;
   }
   
   

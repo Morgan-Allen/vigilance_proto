@@ -16,7 +16,6 @@ import java.awt.Graphics2D;
 public class RegionView extends UINode {
   
   
-
   final static Image
     NOT_BUILT   = Kind.loadImage(
       "media assets/tech icons/state_not_built.png"
@@ -26,13 +25,12 @@ public class RegionView extends UINode {
     );
   
   Lead selectedLead;
-  int lastBuildSlot = -1;
-  
   
   
   RegionView(UINode parent, Box2D viewBounds) {
     super(parent, viewBounds);
   }
+  
   
 
   /**  Actual rendering methods-
@@ -42,13 +40,36 @@ public class RegionView extends UINode {
     District nation = mainView.areaView.selectedNation();
     if (nation == null) return;
     
-    Image portrait = nation.region.view.portrait;
+    //Image portrait = nation.region.view.portrait;
     g.setColor(Color.WHITE);
     g.drawString(nation.region.name, vx + 20, vy + 20);
-    int portW = vw - 120, portH = (int) (portW / 2.5f);
+    //int portW = vw - 120, portH = (int) (portW / 2.5f);
     
+    int down = 50;
+    for (District.Stat stat : District.CIVIC_STATS) {
+      g.drawString(stat+": ", vx + 30, vy + down);
+      int max = nation.longTermValue(stat);
+      int current = (int) nation.currentValue(stat);
+      g.drawString(""+current+"/"+max, vx + 180, vy + down);
+      down += 20;
+    }
+    
+    down += 5;
+    for (District.Stat stat : District.SOCIAL_STATS) {
+      g.drawString(stat+": ", vx + 80, vy + down);
+      int current = (int) nation.currentValue(stat);
+      g.drawString(""+current, vx + 180, vy + down);
+      down += 20;
+    }
+    
+    int income = 0;// nation.baseIncome();
+    g.drawString("Income: ", vx + 30, vy + down);
+    g.drawString("Expense: ", vx + 130, vy + down);
+    
+    /*
     //
-    //  TODO:  Give a more comprehensive readout here!
+    //  TODO:  Give a more comprehensive readout here.  Then you'll have a more
+    //  reliable basis for making investment decisions.
     int trustPercent = (int) nation.currentValue(District.TRUST   );
     int crimePercent = (int) nation.currentValue(District.VIOLENCE);
     int income       = (int) nation.currentValue(District.INCOME  );
@@ -56,23 +77,24 @@ public class RegionView extends UINode {
     g.drawString("Trust: "   +trustPercent+"%" , vx + 30, vy + 50);
     g.drawString("Violence: "+crimePercent+"%" , vx + 30, vy + 65);
     g.drawString("Income: "  +income           , vx + 30, vy + 80);
+    //*/
     
     renderFacilities(nation, surface, g);
+    renderLeads(nation, surface, g);
     
-    if (lastBuildSlot != -1 && false) {
-      renderBuildOptions(nation, surface, g);
-    }
-    else {
-      renderLeads(nation, surface, g);
-    }
+    g.setColor(Color.DARK_GRAY);
+    g.drawRect(vx, vy, vw, vh);
   }
   
   
-  void renderFacilities(District d, Surface surface, Graphics2D g) {
+  void renderFacilities(
+    final District d, final Surface surface, final Graphics2D g
+  ) {
     final int maxF = d.maxFacilities();
-    int across = 0;
+    int across = 240, down = 10;
     
     for (int n = 0; n < maxF; n++) {
+      final int      slot  = n;
       final Facility built = d.builtInSlot  (n);
       final Person   owns  = d.ownerForSlot (n);
       final float    prog  = d.buildProgress(n);
@@ -85,53 +107,96 @@ public class RegionView extends UINode {
         icon = built.icon();
       }
       
-      final boolean hovers = surface.tryHover(
-        vx + 120 + across, vy + 20, 60, 60, built+"_slot_"+n
-      );
-      g.drawImage(icon, vx + 120 + across, vy + 20, 60, 60, null);
-      
-      if (hovers) {
-        g.setColor(Color.YELLOW);
-        g.drawRect(vx + 120 + across, vy + 20, 60, 60);
-      }
-      if (hovers && surface.mouseClicked()) {
-        lastBuildSlot = n;
-      }
+      final ImageButton button = new ImageButton(
+        icon, new Box2D(across, down, 60, 60), this
+      ) {
+        void whenClicked() {
+          presentBuildOptions(d, slot, surface, g);
+        }
+      };
+      button.refers = built+"_slot_"+n;
+      button.updateAndRender(surface, g);
       
       across += 60 + 10;
     }
   }
   
   
+  void presentBuildOptions(
+    District d, int slotID, Surface surface, Graphics2D g
+  ) {
+    final BuildOptionsView options = new BuildOptionsView(mainView, d, slotID);
+    mainView.queueMessage(options);
+  }
+  
+  
+  /*
   void renderBuildOptions(District d, Surface surface, Graphics2D g) {
-    
-    final int n = lastBuildSlot;
-    final Facility built = d.builtInSlot  (n);
-    final Person   owns  = d.ownerForSlot (n);
-    final float    prog  = d.buildProgress(n);
-    
-    int down = 100;
+
+    final District dist  = d;
+    final Base     base  = mainView.world.base();
+    final int      slot  = lastBuildSlot;
+    final Facility built = d.builtInSlot  (slot);
+    final Person   owns  = d.ownerForSlot (slot);
+    final float    prog  = d.buildProgress(slot);
+    int down = 200;
     
     if (built != null) {
       ViewUtils.drawWrappedString(
-        built.info(), g, vx + 20, vy + down, vw - 40, 60
+        built.info(), g, vx + 20, vy + down, vw - 40, 120
       );
     }
+    else if (owns != null && owns != base.leader()) {
+      //  TODO:  Allow a 'purchase' option.
+    }
     else {
-      int across = 20, maxWide = vw - 40;
-      for (Facility f : d.facilitiesAvailable()) {
-        g.drawImage(f.icon(), vx + across, vy + down, 60, 60, null);
-        across += 60 + 10;
-        if (across >= maxWide) { across = 0; down += 60 + 10; }
+      int minWide = 120, across = minWide, maxWide = vw - (minWide + 20);
+      final Vars.Ref <Facility> hoverRef = new Vars.Ref();
+      
+      for (final Facility f : d.facilitiesAvailable()) {
+        //
+        //  TODO:  Allow for purchase, salvage, or redevelopment.
+        //
+        //  TODO:  Consider presenting a dialogue-box for this.  (Or at least
+        //  to confirm construction.)
+        
+        final ImageButton button = new ImageButton(
+          f.icon(), new Box2D(across, down, 40, 40), this
+        ) {
+          
+          void whenClicked() {
+            dist.beginConstruction(f, base.leader(), slot);
+          }
+          
+          void whenHovered() {
+            hoverRef.value = f;
+          }
+        };
+        button.refers = f;
+        button.updateAndRender(surface, g);
+        
+        across += 40 + 5;
+        if (across >= maxWide) { across = minWide; down += 40 + 5; }
+        
+        //hoverRef.value = f;
+      }
+      
+      if (hoverRef.value != null) {
+        down += 40 + 5;
+        g.setColor(Color.LIGHT_GRAY);
+        ViewUtils.drawWrappedString(
+          hoverRef.value.info(), g, vx + 20, vy + down + 10, vw - 40, 120
+        );
       }
     }
   }
+  //*/
   
   
   
   void renderLeads(District d, Surface surface, Graphics2D g) {
     g.setColor(Color.LIGHT_GRAY);
-    int down = vy + 100;
+    int down = vy + 200;
     boolean noEvents = true;
     
     for (Event event : mainView.world.events().active()) {
@@ -178,9 +243,6 @@ public class RegionView extends UINode {
         g, vx + 25, down + 20, vw - 30, 150
       );
     }
-    
-    g.setColor(Color.DARK_GRAY);
-    g.drawRect(vx, vy, vw, vh);
   }
   
   

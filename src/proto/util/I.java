@@ -173,6 +173,12 @@ public class I {
   }
   
   
+  public static String signNum(int num) {
+    if (num >= 0) return "+"+num;
+    else return "-"+(0 - num);
+  }
+  
+  
   public static String list(Object array[]) {
     if (array == null) return "NULL";
     final StringBuffer s = new StringBuffer();

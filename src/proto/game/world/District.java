@@ -2,10 +2,12 @@
 
 package proto.game.world;
 import proto.common.*;
-import proto.content.techs.Facilities;
 import proto.game.person.*;
 import proto.game.scene.*;
 import proto.util.*;
+
+//  TODO:  Define this externally.
+import proto.content.techs.Facilities;
 
 
 
@@ -14,10 +16,10 @@ public class District implements Session.Saveable {
   
   /**  Data fields, construction and save/load methods-
     */
-  final World world;
+  final public World world;
   final public Region region;
   
-  static class Stat {
+  public static class Stat {
     
     final int ID;
     final String name, oppName;
@@ -30,6 +32,10 @@ public class District implements Session.Saveable {
       this.ID      = ID;
       this.name    = name;
       this.oppName = oppName;
+    }
+    
+    public String toString() {
+      return name;
     }
   }
 
@@ -204,6 +210,14 @@ public class District implements Session.Saveable {
   }
   
   
+  public void beginConstruction(Facility builds, Person owns, int slotID) {
+    final Slot slot = buildSlots[slotID];
+    slot.built    = builds;
+    slot.owns     = owns  ;
+    slot.progress = 0     ;
+  }
+  
+  
   
   /**  Updates and life-cycle:
     */
@@ -219,7 +233,7 @@ public class District implements Session.Saveable {
       final Facility built = buildSlots[i].built;
       final Person   owns  = buildSlots[i].owns;
       final float    prog  = buildSlots[i].progress;
-      if (built == null) continue;
+      if (built == null || prog < 1) continue;
       
       final int income = built.incomeFrom(this);
       totalIncome += Nums.max(0, income);
@@ -263,6 +277,8 @@ public class District implements Session.Saveable {
     
     //  TODO:  This isn't *quite* right.  You may need to wipe or incorporate
     //  direct bonuses to the last 3 stats first.
+    
+    //  TODO:  Also, you need to ensure this only updates once per day.
   }
   
   

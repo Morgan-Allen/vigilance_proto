@@ -29,11 +29,9 @@ public abstract class MessageView extends UINode {
     this.title     = title    ;
     this.mainText  = mainText ;
     this.options   = options  ;
-  }
-  
-  
-  void attachAt(int wide, int high) {
-    this.relBounds.set(600 - (wide / 2), 300 - (high / 2), wide, high);
+    
+    final int w = mainView.vw, h = mainView.vh;
+    this.relBounds.set(w / 4, h / 4, w / 2, h / 2);
   }
   
   
@@ -45,24 +43,41 @@ public abstract class MessageView extends UINode {
     g.setColor(Color.WHITE);
     g.drawRect(vx, vy, vw, vh);
     
-    int optionsSize = options.length * 15;
-    
+    int optionsSize = options.length * 20;
     g.drawString(title, vx + 5, vy + 20);
+    renderContent(surface, g, optionsSize);
+    
+    int down = vh - (optionsSize + 10);
+    
+    for (int i = 0; i < options.length; i++) {
+      final int index = i;
+      final MessageView view = this;
+      
+      final StringButton button = new StringButton(
+        options[i], 5, down, vw - 10, 20, this
+      ) {
+        void whenClicked() {
+          view.whenClicked(options[index], index);
+        }
+      };
+      button.valid = optionValid(index);
+      button.refers = options[index];
+      button.updateAndRender(surface, g);
+      down += 20;
+    }
+  }
+  
+  
+  protected void renderContent(Surface surface, Graphics2D g, int optionsSize) {
     ViewUtils.drawWrappedString(
       mainText, g,
       vx + 5, vy + 25, vw - 10, vh - (25 + 10 + optionsSize)
     );
-    
-    int down = vh - (optionsSize + 10);
-    for (int i = 0; i < options.length; i++) {
-      g.drawString(options[i], vx + 5, vy + down + 5 + 15);
-      
-      final boolean hovered = surface.tryHover(
-        vx + 5, vy + down + 5, vw - 10, 15, this
-      );
-      if (hovered) g.drawRect(vx + 3, vy + down + 3, vw - 6, 19);
-      if (hovered && surface.mouseClicked()) whenClicked(options[i], i);
-    }
+  }
+  
+  
+  protected boolean optionValid(int optionID) {
+    return true;
   }
   
   

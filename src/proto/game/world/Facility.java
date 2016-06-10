@@ -2,6 +2,8 @@
 
 package proto.game.world;
 import proto.common.*;
+import proto.game.person.*;
+import proto.game.scene.*;
 import proto.util.*;
 
 import java.awt.Image;
@@ -64,6 +66,11 @@ public class Facility extends Index.Entry implements Session.Saveable {
   }
   
   
+  protected float speedBonus(Task task) {
+    return 0;
+  }
+  
+  
   
   /**  Rendering, debug and interface methods-
     */
@@ -78,7 +85,18 @@ public class Facility extends Index.Entry implements Session.Saveable {
   
   
   public String info() {
+    
     final StringBuffer s = new StringBuffer();
+    s.append(name);
+    s.append("\n");
+    
+    for (int i = 0; i < stats.length; i++) {
+      s.append(stats[i].name+" "+I.signNum(statMods[i])+"\n");
+    }
+    
+    
+    
+    //s.append("This is some info on "+name);
     
     return s.toString();
   }

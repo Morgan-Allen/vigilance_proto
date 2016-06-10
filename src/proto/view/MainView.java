@@ -25,8 +25,8 @@ public class MainView extends UINode {
   
   Image alertMarker, selectCircle, selectSquare;
   
-  MessageView messageShown = null;
-  List <MessageView> messageQueue = new List();
+  UINode messageShown = null;
+  List <UINode> messageQueue = new List();
   ClickMenu clickMenu = null;
   
   
@@ -81,13 +81,13 @@ public class MainView extends UINode {
   
   /**  Various custom popup-presentation methods:
     */
-  public void queueMessage(MessageView message) {
+  public void queueMessage(UINode message) {
     messageQueue.add(message);
     world.pauseMonitoring();
   }
   
   
-  public void dismissMessage(MessageView message) {
+  public void dismissMessage(UINode message) {
     messageQueue.remove(message);
   }
   
@@ -109,21 +109,10 @@ public class MainView extends UINode {
     */
   protected void updateAndRender(Surface surface, Graphics2D g) {
     
-    /*
-    if (rosterView.selected() != null) {
-      personView.visible = true;
-      areaView.visible   = false;
-    }
-    else {
-      personView.visible = false;
-      areaView.visible   = true;
-    }
-    //*/
+    final UINode topMessage = messageQueue.first();
     
-    final MessageView topMessage = messageQueue.first();
     if (topMessage != messageShown) {
       if (topMessage != null) {
-        topMessage.attachAt(vw / 2, vh / 2);
         setChild(topMessage, true);
       }
       if (messageShown != null) {

@@ -33,7 +33,7 @@ public class World implements Session.Saveable {
   
   MainView view = new MainView(this);
   
-  District nations[];
+  District districts[];
   Base base;
   Events events = new Events(this);
   
@@ -58,7 +58,7 @@ public class World implements Session.Saveable {
   public World(Session s) throws Exception {
     s.cacheInstance(this);
     
-    nations = (District[]) s.loadObjectArray(District.class);
+    districts = (District[]) s.loadObjectArray(District.class);
     base    = (Base) s.loadObject();
     events.loadState(s);
     
@@ -69,7 +69,7 @@ public class World implements Session.Saveable {
   
   
   public void saveState(Session s) throws Exception {
-    s.saveObjectArray(nations);
+    s.saveObjectArray(districts);
     s.saveObject(base);
     events.saveState(s);
     s.saveInt  (timeDays );
@@ -106,10 +106,10 @@ public class World implements Session.Saveable {
   
   public void initDefaultNations() {
     int numN = Region.ALL_REGIONS.length;
-    this.nations = new District[numN];
+    this.districts = new District[numN];
     
     for (int n = 0; n < numN; n++) {
-      nations[n] = new District(Region.ALL_REGIONS[n], this);
+      districts[n] = new District(Region.ALL_REGIONS[n], this);
     }
     events.addType(Kidnapping.TYPE);
     events.addType(Robbery   .TYPE);
@@ -120,7 +120,7 @@ public class World implements Session.Saveable {
   public void initDefaultBase() {
     this.base = new Base(this);
     
-    base.addToRoster(new Person(Heroes.HERO_BATMAN   , this));
+    Person leader = base.addToRoster(new Person(Heroes.HERO_BATMAN, this));
     base.addToRoster(new Person(Heroes.HERO_ALFRED   , this));
     base.addToRoster(new Person(Heroes.HERO_SWARM    , this));
     base.addToRoster(new Person(Heroes.HERO_BATGIRL  , this));
@@ -130,6 +130,7 @@ public class World implements Session.Saveable {
     for (Person p : base.roster()) for (Person o : base.roster()) {
       if (p != o) p.bonds.incBond(o, 0.2f);
     }
+    base.setLeader(leader);
     
     base.addFacility(Gymnasium .BLUEPRINT, 0, 1f);
     base.addFacility(Library   .BLUEPRINT, 1, 1f);
@@ -148,12 +149,12 @@ public class World implements Session.Saveable {
   /**  General query methods-
     */
   public District[] nations() {
-    return nations;
+    return districts;
   }
   
   
   public District nationFor(Region r) {
-    for (District n : nations) if (n.region == r) return n;
+    for (District n : districts) if (n.region == r) return n;
     return null;
   }
   
@@ -211,6 +212,8 @@ public class World implements Session.Saveable {
       while (timeHours > HOURS_PER_DAY) {
         timeDays++;
         timeHours -= HOURS_PER_DAY;
+        for (District d : districts) d.updateDistrict();
+        base.updateBaseDaily();
       }
       
       events.updateEvents();

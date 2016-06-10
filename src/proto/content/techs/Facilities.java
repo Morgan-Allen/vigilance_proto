@@ -2,7 +2,12 @@
 
 package proto.content.techs;
 import proto.game.world.*;
+import proto.game.scene.*;
 import static proto.game.world.District.*;
+
+import proto.content.rooms.Laboratory;
+import proto.content.rooms.Workshop;
+import proto.game.scene.Task;
 
 
 
@@ -15,7 +20,14 @@ public class Facilities {
     JOBS_AND_SERVICES, 3,
     HEALTH_AND_ENVIRONMENT, -2,
     INCOME, 2
-  );  //  TODO:  Reduce cost of workshop projects!
+  ) {
+    protected float speedBonus(Task task) {
+      if (! (task instanceof Crafting)) return 0;
+      final Crafting craft = (Crafting) task;
+      if (craft.room().blueprint == Workshop.BLUEPRINT) return 0.1f;
+      return 0;
+    }
+  };
   
   final public static Facility CHEMICAL_PLANT = new Facility(
     "Chemical Plant", "facility_chemical_plant",
@@ -23,7 +35,14 @@ public class Facilities {
     JOBS_AND_SERVICES, 3,
     HEALTH_AND_ENVIRONMENT, -2,
     INCOME, 2
-  );  //  TODO:  Reduce cost of laboratory projects!
+  ){
+    protected float speedBonus(Task task) {
+      if (! (task instanceof Crafting)) return 0;
+      final Crafting craft = (Crafting) task;
+      if (craft.room().blueprint == Laboratory.BLUEPRINT) return 0.1f;
+      return 0;
+    }
+  };
   
   final public static Facility UNION_OFFICE = new Facility(
     "Union Office", "facility_union_office",
@@ -43,7 +62,7 @@ public class Facilities {
   
   final public static Facility TECH_STARTUP = new Facility(
     "Tech Startup", "facility_tech_startup",
-    "media assets/tech icons/icon_steel_mill.png",
+    "media assets/tech icons/icon_tech_startup.png",
     JOBS_AND_SERVICES, 1,
     EDUCATION_AND_CULTURE, 1,
     INCOME, -1
@@ -78,7 +97,6 @@ public class Facilities {
     TRUST, 1,
     INCOME, -1
   );
-  
   
   //  TODO:  I'm not supporting all these at the moment.  For testing, just a 
   //  couple.  Expand later.
