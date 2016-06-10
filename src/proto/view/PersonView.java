@@ -66,7 +66,7 @@ public class PersonView extends UINode {
     for (int i = 0; i < 3; i++) {
       final int modeID = i + 1;
       tabButtons[i] = new StringButton(
-        tabNames[i], vx + 0 + 5 + (60 * i), vy + 120 + 40, 60, 20, this
+        tabNames[i], vx + 0 + 5 + (60 * i), vy + 160 + 40, 60, 20, this
       ) {
         void whenClicked() {
           setTab(modeID, this);
@@ -103,7 +103,7 @@ public class PersonView extends UINode {
     g.drawString("Codename: "+person.name(), vx + 125, vy + 20);
     g.setColor(Color.LIGHT_GRAY);
     ViewUtils.drawWrappedString(
-      person.history.summary(), g, vx + 125, vy + 20, vw - (120 + 10), 100
+      person.history.summary(), g, vx + 125, vy + 20, vw - (120 + 10), 150
     );
     
     g.setColor(Color.WHITE);
@@ -113,7 +113,7 @@ public class PersonView extends UINode {
     //g.drawString("Assigned to: "+assignDesc, vx + 5, vy + 120 + 35);
     ViewUtils.drawWrappedString(
       "Assignment: "+assignDesc, g,
-      vx + 5, vy + 120, vw - 10, 40
+      vx + 5, vy + 160, vw - 10, 40
     );
 
     g.setColor(Color.LIGHT_GRAY);
@@ -158,7 +158,7 @@ public class PersonView extends UINode {
     Skill hovered = null;
     
     g.setColor(Color.WHITE);
-    int down = 120 + 60 + 10;
+    int down = 160 + 60 + 10;
     
     for (Skill t : ALL_STATS) {
       int index = Visit.indexOf(t, STAT_DISPLAY_COORDS);
@@ -223,7 +223,7 @@ public class PersonView extends UINode {
   
 
   void renderGear(Surface surface, Graphics2D g, Person person) {
-    int down = 120 + 60 + 10;
+    int down = 160 + 60 + 10;
     
     for (int slotID : Person.ALL_SLOTS) {
       Equipped inSlot = person.equippedInSlot(slotID);
@@ -279,7 +279,7 @@ public class PersonView extends UINode {
   void renderBonds(Surface surface, Graphics2D g, Person person) {
     
     g.setColor(Color.WHITE);
-    int down = vy + 120 + 60 + 20;
+    int down = vy + 160 + 60 + 20;
     
     final String friendDescs[] = {
       "Civil", "Friendly", "Close", "Soulmate"

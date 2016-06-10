@@ -30,15 +30,17 @@ public class BuildOptionsView extends MessageView {
   
   protected void renderContent(Surface surface, Graphics2D g, int optionsSize) {
     
-    int minWide = 20, across = minWide, maxWide = vw - (minWide + 20);
+    int minWide = 20, across = minWide, maxWide = (vw / 2) - minWide;
     int down = 50;
+    final int BS = 50;
+    
+    //
+    //  TODO:  Allow for purchase, salvage, or redevelopment!
     
     for (final Facility f : d.facilitiesAvailable()) {
-      //
-      //  TODO:  Allow for purchase, salvage, or redevelopment?
       
       final ImageButton button = new ImageButton(
-        f.icon(), new Box2D(across, down, 60, 60), this
+        f.icon(), new Box2D(across, down, BS, BS), this
       ) {
         
         void whenClicked() {
@@ -50,20 +52,22 @@ public class BuildOptionsView extends MessageView {
       button.toggled = selected == f;
       button.updateAndRender(surface, g);
       
-      across += 60 + 5;
-      if (across >= maxWide) { across = minWide; down += 40 + 5; }
+      across += BS + 5;
+      if (across >= maxWide) { across = minWide; down += BS + 5; }
     }
     
-    down += 60 + 5;
+    down += BS + 5;
     g.setColor(Color.LIGHT_GRAY);
     
     String info =
       "Select a facility to view information and order construction."
     ;
     if (selected != null) info = selected.info();
-
+    
     ViewUtils.drawWrappedString(
-      info, g, vx + 20, vy + down + 10, vw - 40, 120
+      info, g,
+      vx + maxWide + 5, vy + 10,
+      (vw / 2) - 5, vh - (50 + 10 + optionsSize)
     );
   }
   
@@ -82,6 +86,7 @@ public class BuildOptionsView extends MessageView {
     if (optionID == 0 && selected != null) {
       final Base base = d.world.base();
       d.beginConstruction(selected, base.leader(), slotID);
+      mainView.dismissMessage(this);
     }
     //
     //  If cancelled, go back.

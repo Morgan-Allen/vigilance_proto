@@ -21,16 +21,25 @@ public class Facility extends Index.Entry implements Session.Saveable {
   
   final District.Stat stats[];
   final int statMods[];
+  final int buildCost, buildTime;
   
   final String name;
+  final String info;
   final Image icon;
   
   
-  public Facility(String name, String ID, String imgPath, Object... args) {
+  public Facility(
+    String name, String ID, String imgPath, String info,
+    int buildCost, int buildTime, Object... args
+  ) {
     super(INDEX, ID);
     
     this.name = name;
+    this.info = info;
     this.icon = Kind.loadImage(imgPath);
+    
+    this.buildCost = buildCost;
+    this.buildTime = buildTime;
     
     final int numS = args.length / 2;
     this.stats = new District.Stat[numS];
@@ -85,19 +94,25 @@ public class Facility extends Index.Entry implements Session.Saveable {
   
   
   public String info() {
-    
     final StringBuffer s = new StringBuffer();
-    s.append(name);
-    s.append("\n");
     
+    s.append(name);
+    s.append("\n\n");
+    s.append(info);
+    s.append("\n\n");
+    s.append("Build cost: "+buildCost+" ("+(buildTime / 7)+" weeks to build)");
+    s.append("\n");
+    s.append(statInfo());
+    
+    return s.toString();
+  }
+  
+  
+  public String statInfo() {
+    final StringBuffer s = new StringBuffer();
     for (int i = 0; i < stats.length; i++) {
       s.append(stats[i].name+" "+I.signNum(statMods[i])+"\n");
     }
-    
-    
-    
-    //s.append("This is some info on "+name);
-    
     return s.toString();
   }
   

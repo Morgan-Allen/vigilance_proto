@@ -38,11 +38,15 @@ public class District implements Session.Saveable {
       return name;
     }
   }
-
-  final static int
+  
+  final public static int
     MAX_CIVIC_STAT   = 10,
     STAT_DRIFT_TIME  = World.DAYS_PER_WEEK * World.WEEKS_PER_YEAR * 10,
-    REPUTATION_DECAY = -1
+    REPUTATION_DECAY = -1,
+    
+    BUILD_TIME_SHORT  = 6  * World.DAYS_PER_WEEK * 4,
+    BUILD_TIME_MEDIUM = 12 * World.DAYS_PER_WEEK * 4,
+    BUILD_TIME_LONG   = 18 * World.DAYS_PER_WEEK * 4
   ;
   
   final public static Stat

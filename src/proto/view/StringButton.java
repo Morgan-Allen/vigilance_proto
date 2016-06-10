@@ -37,7 +37,13 @@ public abstract class StringButton extends UINode {
     g.drawString(label, vx + 5, vy + 15);
     g.drawRect(vx, vy, vw, vh);
     
+    if (hovered) whenHovered();
     if (hovered && surface.mouseClicked()) whenClicked();
+  }
+  
+  
+  void whenHovered() {
+    return;
   }
   
   

@@ -175,7 +175,7 @@ public class Equipped extends Index.Entry implements Session.Saveable {
     final StringBuffer s = new StringBuffer();
     for (Trait t : PersonStats.ALL_STATS) {
       final float mod = passiveModifierFor(person, t);
-      if (mod != 0) s.append(t+"+"+mod+" ");
+      if (mod != 0) s.append(t+""+I.signNum((int) mod)+" ");
     }
     return s.toString();
   }

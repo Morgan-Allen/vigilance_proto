@@ -63,8 +63,8 @@ public class RosterView extends UINode {
         down += size + pad + 50;
       }
       
-      x = vx + across;
-      y = vy + down;
+      x = vx + across + 10;
+      y = vy + down + 10;
       across += size + pad;
       
       g.drawImage(p.kind().sprite(), x, y, size, size, null);

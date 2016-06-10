@@ -17,7 +17,7 @@ public class Heroes {
   final static Ability TRAIT_ANIMAL = new Ability(
     "Animal", "trait_animal", null,
     "This agent is an animal.  They cannot be assigned to train or craft "+
-    "items, and may only otherwise accompany agents on physical assignments.",
+    "items, and may only accompany other agents on physical assignments.",
     Ability.IS_PASSIVE, 0, Ability.NO_HARM, Ability.NO_POWER
   ) {
     public boolean allowsAssignment(Person p, Assignment a) {

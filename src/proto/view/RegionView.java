@@ -93,11 +93,11 @@ public class RegionView extends UINode {
     final int maxF = d.maxFacilities();
     int across = 240, down = 10;
     
+    final Vars.Int hoverSlot = new Vars.Int(-1);
+    
     for (int n = 0; n < maxF; n++) {
       final int      slot  = n;
-      final Facility built = d.builtInSlot  (n);
-      final Person   owns  = d.ownerForSlot (n);
-      final float    prog  = d.buildProgress(n);
+      final Facility built = d.builtInSlot(n);
       
       Image icon = null;
       if (built == null) {
@@ -113,11 +113,37 @@ public class RegionView extends UINode {
         void whenClicked() {
           presentBuildOptions(d, slot, surface, g);
         }
+        void whenHovered() {
+          if (built != null) hoverSlot.val = slot;
+        }
       };
       button.refers = built+"_slot_"+n;
       button.updateAndRender(surface, g);
       
       across += 60 + 10;
+    }
+    
+    if (hoverSlot.val != -1) {
+      g.setColor(Color.LIGHT_GRAY);
+      
+      final int      slot  = hoverSlot.val;
+      final Facility built = d.builtInSlot(slot);
+      final Person   owns  = d.ownerForSlot(slot);
+      final float    prog  = d.buildProgress(slot);
+      
+      String desc = "";
+      desc += built.name();
+      if (prog < 1) desc += " ("+((int) (prog * 100))+"% complete)";
+      
+      desc += "\nOwned by: "+owns;
+      desc += "\n\n";
+      desc += built.statInfo();
+      
+      ViewUtils.drawWrappedString(
+        desc, g,
+        vx + 240, vy + 10 + 60 + 10,
+        vw - 240, 200 - 70
+      );
     }
   }
   
@@ -128,70 +154,6 @@ public class RegionView extends UINode {
     final BuildOptionsView options = new BuildOptionsView(mainView, d, slotID);
     mainView.queueMessage(options);
   }
-  
-  
-  /*
-  void renderBuildOptions(District d, Surface surface, Graphics2D g) {
-
-    final District dist  = d;
-    final Base     base  = mainView.world.base();
-    final int      slot  = lastBuildSlot;
-    final Facility built = d.builtInSlot  (slot);
-    final Person   owns  = d.ownerForSlot (slot);
-    final float    prog  = d.buildProgress(slot);
-    int down = 200;
-    
-    if (built != null) {
-      ViewUtils.drawWrappedString(
-        built.info(), g, vx + 20, vy + down, vw - 40, 120
-      );
-    }
-    else if (owns != null && owns != base.leader()) {
-      //  TODO:  Allow a 'purchase' option.
-    }
-    else {
-      int minWide = 120, across = minWide, maxWide = vw - (minWide + 20);
-      final Vars.Ref <Facility> hoverRef = new Vars.Ref();
-      
-      for (final Facility f : d.facilitiesAvailable()) {
-        //
-        //  TODO:  Allow for purchase, salvage, or redevelopment.
-        //
-        //  TODO:  Consider presenting a dialogue-box for this.  (Or at least
-        //  to confirm construction.)
-        
-        final ImageButton button = new ImageButton(
-          f.icon(), new Box2D(across, down, 40, 40), this
-        ) {
-          
-          void whenClicked() {
-            dist.beginConstruction(f, base.leader(), slot);
-          }
-          
-          void whenHovered() {
-            hoverRef.value = f;
-          }
-        };
-        button.refers = f;
-        button.updateAndRender(surface, g);
-        
-        across += 40 + 5;
-        if (across >= maxWide) { across = minWide; down += 40 + 5; }
-        
-        //hoverRef.value = f;
-      }
-      
-      if (hoverRef.value != null) {
-        down += 40 + 5;
-        g.setColor(Color.LIGHT_GRAY);
-        ViewUtils.drawWrappedString(
-          hoverRef.value.info(), g, vx + 20, vy + down + 10, vw - 40, 120
-        );
-      }
-    }
-  }
-  //*/
-  
   
   
   void renderLeads(District d, Surface surface, Graphics2D g) {
