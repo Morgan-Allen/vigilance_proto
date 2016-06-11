@@ -2,10 +2,11 @@
 
 package proto.content.rooms;
 import proto.common.*;
+import proto.content.items.Gadgets;
 import proto.game.person.*;
 import proto.game.scene.*;
 import proto.game.world.*;
-import static proto.game.person.PersonStats.*;
+import proto.util.List;
 
 
 
@@ -13,25 +14,39 @@ public class Laboratory extends Room {
   
   
   
+  final static Equipped LAB_ITEMS[] = {
+    Gadgets.MED_KIT ,
+    Gadgets.TEAR_GAS
+  };
+  
+  final List <Task> tasks = new List();
+  
+  
   
   public Laboratory(Base base, int slotIndex) {
     super(base, BLUEPRINT, slotIndex);
     
+    for (Equipped item : LAB_ITEMS) {
+      final Crafting crafting = new Crafting(item, this);
+      tasks.add(crafting);
+    }
   }
   
   
   public Laboratory(Session s) throws Exception {
     super(s);
+    s.loadObjects(tasks);
   }
   
   
   public void saveState(Session s) throws Exception {
     super.saveState(s);
+    s.saveObjects(tasks);
   }
   
   
   public Task[] possibleTasks() {
-    return new Task[0];
+    return tasks.toArray(Task.class);
   }
   
   

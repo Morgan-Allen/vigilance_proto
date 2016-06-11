@@ -15,6 +15,8 @@ public class Lead extends Task {
   
   /**  Data fields, construction and save/load methods-
     */
+  final String activeName, helpInfo;
+  
   final public Event parent;
   final public int ID;
   final public Object origin, goes[];
@@ -25,7 +27,11 @@ public class Lead extends Task {
     Event parent, int ID, Object origin, Object reveals,
     int timeHours, Object... args
   ) {
-    super(name, info, timeHours, parent.world, args);
+    super(timeHours, parent.world, args);
+    
+    this.activeName = name;
+    this.helpInfo   = info;
+    
     this.parent  = parent ;
     this.ID      = ID     ;
     this.origin  = origin ;
@@ -37,6 +43,10 @@ public class Lead extends Task {
   
   public Lead(Session s) throws Exception {
     super(s);
+    
+    activeName = s.loadString();
+    helpInfo   = s.loadString();
+    
     parent  = (Event) s.loadObject();
     ID      = s.loadInt   ();
     origin  = s.loadObject();
@@ -46,6 +56,10 @@ public class Lead extends Task {
   
   public void saveState(Session s) throws Exception {
     super.saveState(s);
+    
+    s.saveString(activeName);
+    s.saveString(helpInfo  );
+    
     s.saveObject(parent);
     s.saveInt   (ID    );
     s.saveObject(origin);
@@ -102,7 +116,7 @@ public class Lead extends Task {
     boolean noLeads = true;
     if (success) for (Lead l : parent.openLeadsFrom(this)) {
       s.append("\n\nNew lead: ");
-      s.append(l.info);
+      s.append(l.activeName);
       noLeads = false;
     }
     if (noLeads) s.append("\nNo new leads were uncovered.");
@@ -114,7 +128,7 @@ public class Lead extends Task {
     
     world.view().queueMessage(new MessageView(
       world.view(),
-      icon(), "Task complete: "+name,
+      icon(), "Task complete: "+activeName,
       s.toString(),
       "Dismiss"
     ) {
@@ -130,10 +144,25 @@ public class Lead extends Task {
   }
   
   
-  public String description() {
-    return name()+" ("+parent.name()+")";
+  public String choiceInfo() {
+    return activeName;
+  }
+  
+  
+  public String activeInfo() {
+    return activeName+" ("+parent.name()+")";
+  }
+  
+  
+  public String helpInfo() {
+    return helpInfo;
   }
 }
+
+
+
+
+
 
 
 

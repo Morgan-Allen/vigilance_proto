@@ -22,8 +22,6 @@ public class Training extends Task {
   
   public Training(Skill trained, Skill talking, Room room) {
     super(
-      "Train "+trained.name,
-      "Train "+trained.name,
       TIME_MEDIUM, room.base.world(),
       trained, 0
     );
@@ -112,8 +110,18 @@ public class Training extends Task {
   }
   
   
-  public String description() {
-    return name()+" in "+room.name();
+  public String choiceInfo() {
+    return "Training "+trained;
+  }
+  
+  
+  public String activeInfo() {
+    return "Training "+trained+" in "+room;
+  }
+  
+  
+  public String helpInfo() {
+    return trained.description;
   }
   
   
@@ -148,7 +156,7 @@ public class Training extends Task {
 
     world.view().queueMessage(new MessageView(
       world.view(),
-      icon(), "Task complete: "+name,
+      icon(), "Task complete: "+activeInfo(),
       s.toString(),
       "Dismiss"
     ) {

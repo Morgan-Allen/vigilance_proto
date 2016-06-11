@@ -29,9 +29,6 @@ public abstract class Task implements Assignment {
     EPIC_DC    = 9
   ;
   
-  final String name;
-  final String info;
-  
   World   world;
   Trait   tested [];
   int     testDCs[];
@@ -45,11 +42,8 @@ public abstract class Task implements Assignment {
   
   
   protected Task(
-    String name, String info, int timeHours, World world, Object... args
+    int timeHours, World world, Object... args
   ) {
-    this.name = name;
-    this.info = info;
-    
     this.timeTaken = timeHours * World.MINUTES_PER_HOUR;
     this.initTime  = -1;
     this.world     = world;
@@ -69,8 +63,6 @@ public abstract class Task implements Assignment {
   
   public Task(Session s) throws Exception {
     s.cacheInstance(this);
-    name = s.loadString();
-    info = s.loadString();
     
     final int numT = s.loadInt();
     tested  = new Trait  [numT];
@@ -94,8 +86,6 @@ public abstract class Task implements Assignment {
   
   
   public void saveState(Session s) throws Exception {
-    s.saveString(name);
-    s.saveString(info);
     
     s.saveInt(tested.length);
     for (int n = 0; n < tested.length; n++) {
@@ -229,13 +219,16 @@ public abstract class Task implements Assignment {
   
   protected boolean performTest() {
     boolean okay = true;
+    float xpRate = timeTaken * 1f / World.MINUTES_PER_HOUR;
+    xpRate = Nums.sqrt(xpRate);
     
     for (int n = tested.length; n-- > 0;) {
       Trait stat = tested [n];
       float winChance = testChance(n);
       okay &= results[n] = (Rand.num() < winChance);
+      
       if (stat instanceof Skill) for (Person p : assigned) {
-        p.stats.gainXP((Skill) stat, (1 - winChance) * 2);
+        p.stats.gainXP((Skill) stat, (1 - winChance) * 2 * xpRate);
       }
     }
     
@@ -271,16 +264,7 @@ public abstract class Task implements Assignment {
   /**  Rendering, debug and interface methods-
     */
   protected abstract void presentMessage(World world);
-  
-  
-  public String name() {
-    return name;
-  }
-  
-  
-  public String longInfo() {
-    return info;
-  }
+  public abstract String choiceInfo();
   
   
   public String testInfo() {
@@ -303,7 +287,7 @@ public abstract class Task implements Assignment {
   
   
   public String toString() {
-    return name;
+    return activeInfo();
   }
 }
 

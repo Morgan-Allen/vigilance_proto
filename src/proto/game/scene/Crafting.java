@@ -4,8 +4,8 @@ package proto.game.scene;
 import proto.common.*;
 import proto.game.person.*;
 import proto.game.world.*;
-import proto.util.Series;
 import proto.view.*;
+import proto.util.*;
 
 import java.awt.Image;
 
@@ -25,8 +25,6 @@ public class Crafting extends Task {
   
   public Crafting(Equipped made, Room room) {
     super(
-      "Crafting "+made.name,
-      "Craft "+made.name,
       TIME_LONG, room.base.world(),
       made.craftArgs
     );
@@ -88,6 +86,24 @@ public class Crafting extends Task {
   }
   
   
+  public String choiceInfo() {
+    String info = "Crafting "+made;
+    int total = room.base.stocks.numStored(made);
+    info += "  (In stock: "+total+")";
+    return info;
+  }
+  
+  
+  public String activeInfo() {
+    return "Crafting "+made+" in "+room;
+  }
+  
+  
+  public String helpInfo() {
+    return made.description+"\n\n"+made.describeStats(null);
+  }
+  
+  
   public String testInfo() {
     String info = super.testInfo();
     info += " Cost: "+made.buildCost;
@@ -95,19 +111,6 @@ public class Crafting extends Task {
   }
   
   
-  public String description() {
-    return name()+" in "+room.name();
-  }
-  
-  
-  public String longInfo() {
-    String info = super.longInfo();
-    int total = room.base.stocks.numStored(made);
-    info += "  (In stock: "+total+")";
-    return info;
-  }
-  
-
   public TaskView createView(MainView parent) {
     TaskView view = super.createView(parent);
     view.showIcon = false;
@@ -139,7 +142,7 @@ public class Crafting extends Task {
     
     world.view().queueMessage(new MessageView(
       world.view(),
-      icon(), "Task complete: "+name,
+      icon(), "Task complete: "+activeInfo(),
       s.toString(),
       "Dismiss"
     ) {
@@ -148,6 +151,7 @@ public class Crafting extends Task {
       }
     });
   }
+  
 }
 
 

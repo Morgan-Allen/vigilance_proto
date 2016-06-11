@@ -53,6 +53,8 @@ public class Events {
   public Series <Event> active() { return active; }
   public Series <Event> coming() { return coming; }
   
+  public Series <EventType> possibleTypes() { return eventTypes; }
+  
   
   
   /**  Regular updates and event-generation-

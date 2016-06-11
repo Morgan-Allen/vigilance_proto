@@ -72,17 +72,20 @@ public class RoomView extends UINode {
       down += view.relBounds.ydim() + 10;
     }
     
-    if (true) {
-      g.setColor(Color.LIGHT_GRAY);
-      ViewUtils.drawWrappedString(
-        "Select a task, then click in the bottom-left of roster portraits to "+
-        "assign agents to the task.",
-        g, vx + 25, down + 20, vw - 30, 150
-      );
+    Assignment selected = mainView.areaView.selectedTask();
+    String help =
+      "Select a task, then click in the bottom-left of roster portraits to "+
+      "assign agents to the task."
+    ;
+    if (Visit.arrayIncludes(room.possibleTasks(), selected)) {
+      help = ((Task) selected).helpInfo();
     }
+    g.setColor(Color.LIGHT_GRAY);
+    ViewUtils.drawWrappedString(help, g, vx + 25, down + 20, vw - 30, 150);
   }
   
 }
+
 
 
 

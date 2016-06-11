@@ -109,8 +109,7 @@ public class PersonView extends UINode {
     g.setColor(Color.WHITE);
     final Assignment task = person.assignment();
     String assignDesc = "None";
-    if (task != null) assignDesc = task.description();
-    //g.drawString("Assigned to: "+assignDesc, vx + 5, vy + 120 + 35);
+    if (task != null) assignDesc = task.activeInfo();
     ViewUtils.drawWrappedString(
       "Assignment: "+assignDesc, g,
       vx + 5, vy + 160, vw - 10, 40

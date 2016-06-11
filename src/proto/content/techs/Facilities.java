@@ -96,7 +96,7 @@ public class Facilities {
   );
   
   final public static Facility ROBINS_CAMP = new Facility(
-    "Robins Camp", "facility_robins_camp",
+    "Neighbourhood Robins Camp", "facility_robins_camp",
     "media assets/tech icons/icon_robins_camp.png",
     "Helping to give the city's troubled youth a sense of purpose and "+
     "direction, the Neighbourhood Robins teach wilderness survival, a code "+

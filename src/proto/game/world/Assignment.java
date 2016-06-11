@@ -11,8 +11,8 @@ import java.awt.Image;
 
 public interface Assignment extends Session.Saveable {
   
-  String name();
-  String description();
+  String activeInfo();
+  String helpInfo();
   Image icon();
   
   boolean allowsAssignment(Person p);

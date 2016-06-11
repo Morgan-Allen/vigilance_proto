@@ -137,7 +137,7 @@ public class District implements Session.Saveable {
     for (Slot slot : buildSlots) {
       s.saveObject(slot.built   );
       s.saveObject(slot.owns    );
-      s.saveObject(slot.progress);
+      s.saveFloat (slot.progress);
     }
   }
   
@@ -184,7 +184,10 @@ public class District implements Session.Saveable {
   
   private int incomeFor(Base base, boolean positive) {
     int total = 0;
-    for (Slot slot : buildSlots) if (slot.owns == base && slot.built != null) {
+    for (Slot slot : buildSlots) {
+      if (slot.owns != base || slot.built == null) continue;
+      if (slot.progress < 1) continue;
+      
       final int inc = slot.built.incomeFrom(this);
       if (positive) total += Nums.max(inc, 0      );
       else          total += Nums.max(0  , 0 - inc);
@@ -215,8 +218,15 @@ public class District implements Session.Saveable {
     //  TODO:  MOVE THIS SELECTION ELSEWHERE
     final Batch <Facility> all = new Batch();
     Visit.appendTo(all,
-      Facilities.BUSINESS_PARK, Facilities.CHEMICAL_PLANT,
-      Facilities.CITY_PARK, Facilities.COMMUNITY_COLLEGE
+      Facilities.BUSINESS_PARK,
+      Facilities.CHEMICAL_PLANT,
+      Facilities.STEEL_MILL,
+      Facilities.UNION_OFFICE,
+      Facilities.TECH_STARTUP,
+      Facilities.CITY_PARK,
+      Facilities.COMMUNITY_COLLEGE,
+      Facilities.ROBINS_CAMP,
+      Facilities.SOUP_KITCHEN
     );
     return all;
   }

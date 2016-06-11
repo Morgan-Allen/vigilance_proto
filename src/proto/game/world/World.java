@@ -139,8 +139,9 @@ public class World implements Session.Saveable {
     base.addFacility(Workshop  .BLUEPRINT, 2, 1f);
     base.addFacility(Laboratory.BLUEPRINT, 3, 1f);
     
-    base.stocks.incStock(Gadgets.BATARANGS  , 5);
+    base.stocks.incStock(Gadgets.BATARANGS  , 4);
     base.stocks.incStock(Gadgets.BODY_ARMOUR, 2);
+    base.stocks.incStock(Gadgets.MED_KIT    , 2);
     
     base.setIncomeFloor(20);
     base.incFunding(500);

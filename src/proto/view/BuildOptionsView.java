@@ -25,6 +25,7 @@ public class BuildOptionsView extends MessageView {
     );
     this.d      = d;
     this.slotID = slotID;
+    selected = d.builtInSlot(slotID);
   }
   
   
@@ -39,10 +40,12 @@ public class BuildOptionsView extends MessageView {
     
     for (final Facility f : d.facilitiesAvailable()) {
       
+      final int nextAcross = across + BS + 5;
+      if (nextAcross >= maxWide) { across = minWide; down += BS + 5; }
+      
       final ImageButton button = new ImageButton(
         f.icon(), new Box2D(across, down, BS, BS), this
       ) {
-        
         void whenClicked() {
           if (selected == f) selected = null;
           else selected = f;
@@ -78,6 +81,7 @@ public class BuildOptionsView extends MessageView {
     if (optionID == 0) {
       final Base base = d.world.base();
       if (selected == null) return false;
+      if (d.builtInSlot(slotID) == selected) return false;
       if (! selected.canBuild(base, d)) return false;
     }
     return true;
