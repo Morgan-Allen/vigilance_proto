@@ -97,9 +97,9 @@ public class RosterView extends UINode {
         assignHovered = p;
       }
       
-      int MH = p.maxHealth(), MS = p.maxStress();
-      int inj = (int) p.injury();//, fat = (int) p.stun();
-      int str = (int) p.stress();
+      int MH = p.health.maxHealth(), MS = p.health.maxStress();
+      int inj = (int) p.health.injury();
+      int str = (int) p.health.stress();
       float injLevel = (MH - inj) * 1f / MH, strLevel = str * 1f / MS;
       
       ViewUtils.renderStatBar(

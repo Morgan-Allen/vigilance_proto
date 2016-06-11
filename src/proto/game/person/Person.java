@@ -4,7 +4,6 @@ package proto.game.person;
 import proto.common.*;
 import proto.game.world.*;
 import proto.util.*;
-import static proto.game.person.PersonStats.*;
 
 
 
@@ -13,23 +12,6 @@ public class Person implements Session.Saveable {
   
   /**  Data fields and construction-
     */
-  final public static int
-    STATE_INIT    = -1,
-    STATE_AS_PC   =  0,
-    STATE_UNAWARE =  1,
-    STATE_ACTIVE  =  2,
-    STATE_RETREAT =  3;
-  final public static int
-    INIT_LUCK   = 3,
-    MAX_LUCK    = 3,
-    INIT_STRESS = 0,
-    MAX_STRESS  = 100;
-  final public static int
-    FULL_HEAL_WEEKS   = 8   ,
-    WAKEUP_PERCENT    = 50  ,
-    WEEK_STRESS_DECAY = 2   ,
-    WEEK_TRAINING_XP  = 250 ,
-    MIN_LEVEL_XP      = 1000;
   final public static int
     SLOT_WEAPON     = 0,
     SLOT_ARMOUR     = 1,
@@ -49,23 +31,16 @@ public class Person implements Session.Saveable {
   
   String name;
   
+  final public PersonHealth  health  = new PersonHealth (this);
   final public PersonStats   stats   = new PersonStats  (this);
   final public PersonBonds   bonds   = new PersonBonds  (this);
   final public PersonHistory history = new PersonHistory(this);
   
-  int luck = INIT_LUCK, stress = INIT_STRESS;
+  
   Equipped equipSlots[] = new Equipped[NUM_EQUIP_SLOTS];
-  float injury, stun;
-  boolean alive, conscious;
   
   Assignment assignment;
-  
-  int   AIstate    = STATE_INIT;
-  float confidence = 1.0f;
-  float wariness   = 0.0f;
-  
   float posX, posY;
-  int actionPoints;
   boolean turnDone;
   Object lastTarget;
   
@@ -86,7 +61,6 @@ public class Person implements Session.Saveable {
     else if (kind.type() == Kind.TYPE_CIVILIAN) side = Side.CIVILIANS;
     else side = Side.VILLAINS;
     
-    alive = conscious = true;
     stats.initStats();
   }
   
@@ -104,31 +78,20 @@ public class Person implements Session.Saveable {
     side  = (Side ) s.loadEnum(Side.values());
     name  = s.loadString();
     
-    stats    .loadState(s);
-    bonds.loadState(s);
-    history  .loadState(s);
+    health .loadState(s);
+    stats  .loadState(s);
+    bonds  .loadState(s);
+    history.loadState(s);
     
-    luck   = s.loadInt();
-    stress = s.loadInt();
     for (int i = 0 ; i < NUM_EQUIP_SLOTS; i++) {
       equipSlots[i] = (Equipped) s.loadObject();
     }
     
-    injury    = s.loadFloat();
-    stun      = s.loadFloat();
-    alive     = s.loadBool();
-    conscious = s.loadBool();
-    
     assignment = (Assignment) s.loadObject();
-    AIstate    = s.loadInt();
-    confidence = s.loadFloat();
-    wariness   = s.loadFloat();
-    
-    posX         = s.loadFloat();
-    posY         = s.loadFloat();
-    actionPoints = s.loadInt();
-    turnDone     = s.loadBool();
-    lastTarget   = s.loadObject();
+    posX       = s.loadFloat();
+    posY       = s.loadFloat();
+    turnDone   = s.loadBool();
+    lastTarget = s.loadObject();
   }
   
   
@@ -138,99 +101,26 @@ public class Person implements Session.Saveable {
     s.saveEnum  (side );
     s.saveString(name );
     
-    stats    .saveState(s);
-    bonds.saveState(s);
-    history  .saveState(s);
+    health .saveState(s);
+    stats  .saveState(s);
+    bonds  .saveState(s);
+    history.saveState(s);
     
-    s.saveInt(luck  );
-    s.saveInt(stress);
     for (int i = 0 ; i < NUM_EQUIP_SLOTS; i++) {
       s.saveObject(equipSlots[i]);
     }
     
-    s.saveFloat(injury   );
-    s.saveFloat(stun     );
-    s.saveBool (alive    );
-    s.saveBool (conscious);
-    
     s.saveObject(assignment);
-    s.saveInt   (AIstate   );
-    s.saveFloat (confidence);
-    s.saveFloat (wariness  );
-    
-    s.saveFloat (posX        );
-    s.saveFloat (posY        );
-    s.saveInt   (actionPoints);
-    s.saveBool  (turnDone    );
-    s.saveObject(lastTarget  );
+    s.saveFloat (posX      );
+    s.saveFloat (posY      );
+    s.saveBool  (turnDone  );
+    s.saveObject(lastTarget);
   }
   
   
   
   /**  General state queries-
     */
-  public int maxHealth() {
-    return stats.levelFor(HIT_POINTS);
-  }
-  
-  
-  public int maxStress() {
-    return stats.levelFor(WILLPOWER);
-  }
-  
-  
-  public float injury() {
-    return injury;
-  }
-  
-  
-  public float stun() {
-    return stun;
-  }
-  
-  
-  public float stress() {
-    return stress;
-  }
-  
-  
-  public float healthLevel() {
-    return Nums.clamp(1f - ((injury + stun) / maxHealth()), 0, 1);
-  }
-  
-  
-  public float bleedRisk() {
-    if (injury <= 0) return 0;
-    if (stun   <= 0) return 1;
-    return injury / (stun + injury);
-  }
-  
-  
-  public int currentAP() {
-    return actionPoints;
-  }
-  
-  
-  public float confidence() {
-    return confidence;
-  }
-  
-  
-  public boolean alive() {
-    return alive;
-  }
-  
-  
-  public boolean breathing() {
-    return true;
-  }
-  
-  
-  public boolean conscious() {
-    return conscious && alive;
-  }
-  
-  
   public Kind kind() {
     return kind;
   }
@@ -309,7 +199,7 @@ public class Person implements Session.Saveable {
   /**  Assigning jobs & missions-
     */
   public boolean freeForAssignment() {
-    if (! conscious()) return false;
+    if (! health.conscious()) return false;
     return assignment == null;
   }
   
@@ -333,48 +223,6 @@ public class Person implements Session.Saveable {
   
   
   
-  /**  State adjustments-
-    */
-  public void receiveStun(float stun) {
-    this.stun += stun;
-    checkState();
-    world.events().log(name()+" suffered "+stun+" stun.");
-  }
-  
-  
-  public void receiveInjury(float injury) {
-    this.injury += injury;
-    checkState();
-    world.events().log(name()+" suffered "+injury+" injury.");
-  }
-  
-  
-  public void liftInjury(float lift) {
-    injury = Nums.max(0, injury - lift);
-  }
-  
-  
-  public void liftStun(float lift) {
-    stun = Nums.max(0, stun - lift);
-  }
-  
-  
-  public void liftStress(int lift) {
-    stress = Nums.max(0, stress - lift);
-  }
-  
-  
-  public void modifyAP(int modifier) {
-    actionPoints += modifier;
-  }
-  
-  
-  public void setActionPoints(int AP) {
-    actionPoints = AP;
-  }
-  
-  
-  
   /**  Regular updates and life-cycle-
     */
   public void updateOnBase(float numWeeks) {
@@ -382,34 +230,9 @@ public class Person implements Session.Saveable {
       assignment = null;
     }
     
-    if (! alive) return;
-    if (conscious()) stun = 0;
-    
-    stats.updateStats();
-    
-    int maxHealth = maxHealth();
-    float regen = maxHealth * numWeeks / FULL_HEAL_WEEKS;
-    injury = Nums.max(0, injury - regen);
-    
-    if (conscious) {
-      stress = Nums.max(0, stress - (int) (WEEK_STRESS_DECAY * numWeeks));
-    }
-    else {
-      float wakeUp = maxHealth * 100f / WAKEUP_PERCENT;
-      if (injury < wakeUp) conscious = true;
-    }
-  }
-  
-  
-  void checkState() {
-    int maxHealth = maxHealth();
-    if (conscious && injury + stun > maxHealth) {
-      this.conscious = false;
-      world.events().log(name()+" fell unconscious!");
-    }
-    if (alive && injury > maxHealth * 1.5f) {
-      this.alive = false;
-      world.events().log(name()+" was killed!");
+    health.updateHealth(numWeeks);
+    if (health.alive()) {
+      stats.updateStats();
     }
   }
   
@@ -457,7 +280,7 @@ public class Person implements Session.Saveable {
   
   
   public boolean retreating() {
-    return AIstate == STATE_RETREAT;
+    return health.isDoing(PersonHealth.STATE_RETREAT);
   }
   
   
@@ -481,11 +304,12 @@ public class Person implements Session.Saveable {
   
   
   public String confidenceDescription() {
-    if (! alive     ()) return "Dead"       ;
-    if (! conscious ()) return "Unconscious";
+    if (! health.alive     ()) return "Dead"       ;
+    if (! health.conscious ()) return "Unconscious";
     if (  captive   ()) return "Captive"    ;
     if (  retreating()) return "Retreating" ;
     
+    float confidence = health.confidence(), wariness = health.wariness();
     String moraleDesc = "Determined", alertDesc = "Alert";
     if (confidence < 1.66f) moraleDesc = "Steady"  ;
     if (confidence < 1.33f) moraleDesc = "Shaken"  ;
