@@ -234,7 +234,7 @@ public class PersonStats {
     
     Batch <Ability> all = new Batch();
     for (Ability a : abilities) all.add(a);
-    for (Equipped e : person.equipSlots) if (e != null) {
+    for (Equipped e : person.gear.equipSlots) if (e != null) {
       for (Ability a : e.abilities) all.add(a);
     }
     return all;
@@ -269,7 +269,7 @@ public class PersonStats {
     for (Ability a : abilities) if (a.passive()) {
       a.applyPassiveStatsBonus(person);
     }
-    for (Equipped i : person.equipment()) {
+    for (Equipped i : person.gear.equipment()) {
       i.applyPassiveStatsBonus(person);
     }
   }

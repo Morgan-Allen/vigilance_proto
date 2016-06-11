@@ -12,14 +12,6 @@ public class Person implements Session.Saveable {
   
   /**  Data fields and construction-
     */
-  final public static int
-    SLOT_WEAPON     = 0,
-    SLOT_ARMOUR     = 1,
-    SLOT_ITEMS      = 2,
-    NUM_EQUIP_SLOTS = 3,
-    ALL_SLOTS[] = { 0, 1, 2 };
-  final public static String
-    SLOT_NAMES[] = { "Weapon", "Armour", "Items" };
   public static enum Side {
     HEROES, CIVILIANS, VILLAINS
   };
@@ -33,11 +25,9 @@ public class Person implements Session.Saveable {
   
   final public PersonHealth  health  = new PersonHealth (this);
   final public PersonStats   stats   = new PersonStats  (this);
+  final public PersonGear    gear    = new PersonGear   (this);
   final public PersonBonds   bonds   = new PersonBonds  (this);
   final public PersonHistory history = new PersonHistory(this);
-  
-  
-  Equipped equipSlots[] = new Equipped[NUM_EQUIP_SLOTS];
   
   Assignment assignment;
   float posX, posY;
@@ -54,7 +44,7 @@ public class Person implements Session.Saveable {
     history.setSummary(kind.defaultInfo());
     
     for (int n = 0; n < kind.baseEquipped().length; n++) {
-      equipItem(kind.baseEquipped()[n], null);
+      gear.equipItem(kind.baseEquipped()[n], null);
     }
     
     if      (kind.type() == Kind.TYPE_HERO    ) side = Side.HEROES   ;
@@ -80,12 +70,9 @@ public class Person implements Session.Saveable {
     
     health .loadState(s);
     stats  .loadState(s);
+    gear   .loadState(s);
     bonds  .loadState(s);
     history.loadState(s);
-    
-    for (int i = 0 ; i < NUM_EQUIP_SLOTS; i++) {
-      equipSlots[i] = (Equipped) s.loadObject();
-    }
     
     assignment = (Assignment) s.loadObject();
     posX       = s.loadFloat();
@@ -103,12 +90,9 @@ public class Person implements Session.Saveable {
     
     health .saveState(s);
     stats  .saveState(s);
+    gear   .saveState(s);
     bonds  .saveState(s);
     history.saveState(s);
-    
-    for (int i = 0 ; i < NUM_EQUIP_SLOTS; i++) {
-      s.saveObject(equipSlots[i]);
-    }
     
     s.saveObject(assignment);
     s.saveFloat (posX      );
@@ -129,71 +113,6 @@ public class Person implements Session.Saveable {
   public Side side() {
     return side;
   }
-  
-  
-  
-  /**  Assigning equipment loadout-
-    */
-  public void equipItem(Equipped item, Base from) {
-    Equipped oldItem = equipSlots[item.slotID];
-    equipSlots[item.slotID] = item;
-    stats.toggleItemAbilities(oldItem, false);
-    stats.toggleItemAbilities(item   , true );
-    
-    if (oldItem != null && from != null) from.stocks.incStock(oldItem,  1);
-    if (item    != null && from != null) from.stocks.incStock(item   , -1);
-  }
-  
-  
-  public int equipBonus(int slotID, int properties) {
-    Equipped item = equipSlots[slotID];
-    if (item == null || ! item.hasProperty(properties)) return 0;
-    return item.bonus;
-  }
-  
-  
-  public Equipped equippedInSlot(int slotID) {
-    return equipSlots[slotID];
-  }
-  
-  
-  public boolean hasEquipped(int slotID) {
-    return equipSlots[slotID] != null;
-  }
-  
-  
-  public boolean hasEquipped(Equipped item) {
-    for (Equipped i : equipSlots) if (i == item) return true;
-    return false;
-  }
-  
-  
-  public boolean canEquip(Equipped item) {
-    for (int slotID : ALL_SLOTS) {
-      if (item.slotID == slotID && equipSlots[slotID] == null) return true;
-    }
-    return false;
-  }
-  
-  
-  public Equipped currentWeapon() {
-    Equipped weapon = equippedInSlot(SLOT_WEAPON);
-    return weapon == null ? Common.UNARMED : weapon;
-  }
-  
-  
-  public Equipped currentArmour() {
-    Equipped armour = equippedInSlot(SLOT_ARMOUR);
-    return armour == null ? Common.UNARMOURED : armour;
-  }
-  
-  
-  public Series <Equipped> equipment() {
-    Batch <Equipped> all = new Batch();
-    for (Equipped e : equipSlots) if (e != null) all.add(e);
-    return all;
-  }
-  
   
   
   /**  Assigning jobs & missions-

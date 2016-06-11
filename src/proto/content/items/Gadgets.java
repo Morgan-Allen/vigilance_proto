@@ -4,7 +4,7 @@ package proto.content.items;
 import proto.game.person.*;
 import static proto.game.person.PersonStats.*;
 import static proto.game.person.Equipped.*;
-import static proto.game.person.Person.*;
+import static proto.game.person.PersonGear.*;
 
 
 
