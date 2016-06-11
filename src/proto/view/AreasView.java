@@ -29,12 +29,12 @@ public class AreasView extends UINode {
     ));
     
     int
-      across = (int) viewBounds.xdim() - 150,
+      across = (int) viewBounds.xdim() - 155,
       down   = (int) viewBounds.ydim() - 20 ;
     
     monitorButton = new StringButton(
       "Resume Monitoring",
-      new Box2D(10, down - 45, viewBounds.xdim() - 10, 20), this
+      new Box2D(5, down - 45, viewBounds.xdim() - 10, 20), this
     ) {
       void whenClicked() {
         final boolean active = mainView.world.monitorActive();

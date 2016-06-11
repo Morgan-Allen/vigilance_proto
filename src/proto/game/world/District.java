@@ -40,24 +40,26 @@ public class District implements Session.Saveable {
   }
   
   final public static int
+    BASE_CIVIC_STAT  = 5,
     MAX_CIVIC_STAT   = 10,
     STAT_DRIFT_TIME  = World.DAYS_PER_WEEK * World.WEEKS_PER_YEAR * 10,
-    REPUTATION_DECAY = -1,
+    REPUTATION_DECAY = 1,
     
     BUILD_TIME_SHORT  = 6  * World.DAYS_PER_WEEK * 4,
     BUILD_TIME_MEDIUM = 12 * World.DAYS_PER_WEEK * 4,
-    BUILD_TIME_LONG   = 18 * World.DAYS_PER_WEEK * 4
+    BUILD_TIME_LONG   = 18 * World.DAYS_PER_WEEK * 4,
+    BUILD_TIME_NONE   = -1
   ;
   
   final public static Stat
-    JOBS_AND_SERVICES      = new Stat("Jobs & Services"     , "Poverty", 0),
+    EMPLOYMENT             = new Stat("Employment"          , "Poverty", 0),
     EDUCATION_AND_CULTURE  = new Stat("Education & Culture" , "Vice"   , 1),
     HEALTH_AND_ENVIRONMENT = new Stat("Health & Environment", "Squalor", 2),
-    ENTERTAINMENT          = new Stat("Entertainment"       , "Boredom", 3),
+    ENTERTAINMENT          = new Stat("Entertainment"       , "Despair", 3),
     
     //  TODO:  Rename as something shorter?
     CIVIC_STATS[] = {
-      JOBS_AND_SERVICES     , EDUCATION_AND_CULTURE,
+      EMPLOYMENT            , EDUCATION_AND_CULTURE,
       HEALTH_AND_ENVIRONMENT, ENTERTAINMENT        ,
     },
     
@@ -77,7 +79,7 @@ public class District implements Session.Saveable {
   
   
   static class Level { Stat stat; int level, bonus; float current; }
-  static class Slot { Facility built; Person owns; float progress; }
+  static class Slot { Facility built; Base owns; float progress; }
   
   Level statLevels[];
   Slot buildSlots[];
@@ -117,7 +119,7 @@ public class District implements Session.Saveable {
     }
     for (Slot slot : buildSlots) {
       slot.built    = (Facility) s.loadObject();
-      slot.owns     = (Person  ) s.loadObject();
+      slot.owns     = (Base    ) s.loadObject();
       slot.progress = s.loadFloat();
     }
   }
@@ -163,8 +165,8 @@ public class District implements Session.Saveable {
   
   public void setLevel(Stat stat, int level, boolean asCurrent) {
     Level l = this.statLevels[stat.ID];
-    l.level = level;
-    if (asCurrent) l.current = level + l.bonus;
+    l.level = Nums.clamp(level, 1000);
+    if (asCurrent) l.current = l.level + l.bonus;
   }
   
   
@@ -177,6 +179,27 @@ public class District implements Session.Saveable {
   public float currentValue(Stat stat) {
     Level l = this.statLevels[stat.ID];
     return l.current;
+  }
+  
+  
+  private int incomeFor(Base base, boolean positive) {
+    int total = 0;
+    for (Slot slot : buildSlots) if (slot.owns == base && slot.built != null) {
+      final int inc = slot.built.incomeFrom(this);
+      if (positive) total += Nums.max(inc, 0      );
+      else          total += Nums.max(0  , 0 - inc);
+    }
+    return total;
+  }
+  
+  
+  public int incomeFor(Base base) {
+    return incomeFor(base, true);
+  }
+  
+  
+  public int expensesFor(Base base) {
+    return incomeFor(base, false);
   }
   
   
@@ -204,7 +227,7 @@ public class District implements Session.Saveable {
   }
   
   
-  public Person ownerForSlot(int slotID) {
+  public Base ownerForSlot(int slotID) {
     return buildSlots[slotID].owns;
   }
   
@@ -214,17 +237,29 @@ public class District implements Session.Saveable {
   }
   
   
-  public void beginConstruction(Facility builds, Person owns, int slotID) {
+  public void beginConstruction(Facility builds, Base owns, int slotID) {
     final Slot slot = buildSlots[slotID];
     slot.built    = builds;
     slot.owns     = owns  ;
     slot.progress = 0     ;
+    
+    owns.incFunding(0 - builds.buildCost);
   }
   
   
   
   /**  Updates and life-cycle:
     */
+  public void initialiseDistrict() {
+    updateDistrict();
+    for (Stat stat : CIVIC_STATS) {
+      final Level l = statLevels[stat.ID];
+      l.current = l.level + l.bonus;
+    }
+    updateDistrict();
+  }
+  
+  
   public void updateDistrict() {
     //
     //  Reset the bonus for all stats to zero, then iterate across all built
@@ -234,17 +269,25 @@ public class District implements Session.Saveable {
     }
     int baseIncome = 0, mobIncome = 0, totalIncome = 0;
     for (int i = 0 ; i < buildSlots.length; i++) {
-      final Facility built = buildSlots[i].built;
-      final Person   owns  = buildSlots[i].owns;
-      final float    prog  = buildSlots[i].progress;
-      if (built == null || prog < 1) continue;
+      final Slot     slot  = buildSlots[i];
+      final Facility built = slot.built;
+      final Base     owns  = slot.owns;
+      final float    prog  = slot.progress;
       
-      final int income = built.incomeFrom(this);
-      totalIncome += Nums.max(0, income);
-      if (owns != null && owns.isHero    ()) baseIncome += income;
-      if (owns != null && owns.isCriminal()) mobIncome  += income;
-      
-      built.applyStatEffects(this);
+      if (built == null) {
+        continue;
+      }
+      else if (prog < 1) {
+        float moreProg = 1f / built.buildTime;
+        slot.progress = Nums.clamp(slot.progress + moreProg, 0, 1);
+      }
+      else {
+        final int income = built.incomeFrom(this);
+        totalIncome += Nums.max(0, income);
+        if      (owns == world.base()) baseIncome += income;
+        else if (owns != null        ) mobIncome  += income;
+        built.applyStatEffects(this);
+      }
     }
     //
     //  All civic stats (employment, education, etc.) help to reduce crime, but
@@ -254,7 +297,9 @@ public class District implements Session.Saveable {
     
     for (Stat stat : CIVIC_STATS) {
       final Level l = statLevels[stat.ID];
+      
       float drift = MCS * 1f / STAT_DRIFT_TIME;
+      l.level = BASE_CIVIC_STAT;
       float longTerm = Nums.min(l.level + l.bonus, MCS);
       
       if (l.current >= longTerm) {
@@ -273,17 +318,19 @@ public class District implements Session.Saveable {
     //  further.)
     float deterrence = currentValue(DETERRENCE), corruption;
     crimeFactor = Nums.clamp(crimeFactor - deterrence, 0, 100);
+    setLevel(VIOLENCE, (int) crimeFactor, true);
+    crimeFactor = currentValue(VIOLENCE);
+    
     corruption  = mobIncome * 100f / Nums.max(1, totalIncome + baseIncome);
     corruption  = (corruption + crimeFactor) / 2;
-    setLevel(VIOLENCE  , (int) crimeFactor, true);
+    setLevel(DETERRENCE, (int) deterrence - REPUTATION_DECAY, true);
     setLevel(CORRUPTION, (int) corruption , true);
-    setLevel(INCOME    , (int) baseIncome , true);
+    setLevel(INCOME    , (int) totalIncome, true);
     
-    //  TODO:  This isn't *quite* right.  You may need to wipe or incorporate
-    //  direct bonuses to the last 3 stats first.
-    
-    //  TODO:  Also, you need to ensure this only updates once per day.
+    //  TODO:  Rate social stats out of a hundred, so you can see improvement
+    //  (or decay) within a week or two.
   }
+  
   
   
   
@@ -293,6 +340,9 @@ public class District implements Session.Saveable {
     return region.name;
   }
 }
+
+
+
 
 
 

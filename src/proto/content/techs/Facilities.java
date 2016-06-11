@@ -20,7 +20,7 @@ public class Facilities {
     "A Steel Mill provides income and steady blue-collar employment, along "+
     "with industrial pollution.\n\n10% bonus to Workshop projects",
     100, BUILD_TIME_MEDIUM,
-    JOBS_AND_SERVICES, 3,
+    EMPLOYMENT, 3,
     HEALTH_AND_ENVIRONMENT, -2,
     INCOME, 2
   ) {
@@ -38,7 +38,7 @@ public class Facilities {
     "Chemical plants provide basic laborers with a steady job, but won't "+
     "do their health any favours.\n\n10% bonus to Laboratory projects",
     100, BUILD_TIME_MEDIUM,
-    JOBS_AND_SERVICES, 3,
+    EMPLOYMENT, 3,
     HEALTH_AND_ENVIRONMENT, -2,
     INCOME, 2
   ){
@@ -57,7 +57,7 @@ public class Facilities {
     "helping to guarantee labour laws.  Luddite tendencies can hold back "+
     "modernisation, however, and union dues are steep.",
     40, BUILD_TIME_MEDIUM,
-    JOBS_AND_SERVICES, 2,
+    EMPLOYMENT, 2,
     EDUCATION_AND_CULTURE, -1,
     DETERRENCE, 1,
     INCOME, -1
@@ -69,7 +69,7 @@ public class Facilities {
     "Shopping malls and small commercial agencies can establish themselves in "+
     "a Business Park.",
     70, BUILD_TIME_MEDIUM,
-    JOBS_AND_SERVICES, 1,
+    EMPLOYMENT, 1,
     INCOME, 2
   );
   
@@ -80,7 +80,7 @@ public class Facilities {
     "kickstart great ideas.  If only they could make that seed funding last "+
     "longer...",
     120, BUILD_TIME_SHORT,
-    JOBS_AND_SERVICES, 1,
+    EMPLOYMENT, 1,
     EDUCATION_AND_CULTURE, 1,
     INCOME, -1
   );

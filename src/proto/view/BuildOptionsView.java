@@ -75,7 +75,11 @@ public class BuildOptionsView extends MessageView {
   protected boolean optionValid(int optionID) {
     //
     //  Cannot confirm construction if no facility is selected.
-    if (optionID == 0 && selected == null) return false;
+    if (optionID == 0) {
+      final Base base = d.world.base();
+      if (selected == null) return false;
+      if (! selected.canBuild(base, d)) return false;
+    }
     return true;
   }
   
@@ -85,7 +89,7 @@ public class BuildOptionsView extends MessageView {
     //  If confirmed, begin construction.
     if (optionID == 0 && selected != null) {
       final Base base = d.world.base();
-      d.beginConstruction(selected, base.leader(), slotID);
+      d.beginConstruction(selected, base, slotID);
       mainView.dismissMessage(this);
     }
     //

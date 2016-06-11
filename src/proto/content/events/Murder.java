@@ -165,7 +165,7 @@ public class Murder extends Event {
           "floorboards that matches the victim's pattern of contusions."
         );
         nation.incLevel(District.TRUST     , 2);
-        nation.incLevel(District.DETERRENCE, 2);
+        nation.incLevel(District.DETERRENCE, 5);
       }
       else {
         events.log(

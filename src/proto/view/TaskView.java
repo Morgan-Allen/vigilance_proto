@@ -37,7 +37,8 @@ public class TaskView extends UINode {
       g.drawImage(leadImg, vx + 20, vy, iconSize, iconSize, null);
     }
     ViewUtils.drawWrappedString(
-      task.longInfo(), g, vx + 20 + iconSize + 5, vy, vw - 95, vh - 15
+      task.longInfo(), g,
+      vx + 20 + iconSize + 5, vy, vw - (20 + iconSize + 20), vh - 15
     );
     g.drawString(task.testInfo(), vx + 20 + iconSize + 5, vy + vh);
     //

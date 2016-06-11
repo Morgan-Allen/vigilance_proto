@@ -62,6 +62,9 @@ public class Facility extends Index.Entry implements Session.Saveable {
   }
   
   
+  
+  /**  Active effects-
+    */
   protected void applyStatEffects(District district) {
     for (int i = 0; i < stats.length; i++) {
       district.statLevels[stats[i].ID].bonus += statMods[i];
@@ -77,6 +80,14 @@ public class Facility extends Index.Entry implements Session.Saveable {
   
   protected float speedBonus(Task task) {
     return 0;
+  }
+  
+  
+  
+  /**  Construction and prereqs-
+    */
+  public boolean canBuild(Base owner, District district) {
+    return owner.currentFunds() >= buildCost;
   }
   
   

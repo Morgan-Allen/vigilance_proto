@@ -41,9 +41,9 @@ public class RegionView extends UINode {
     if (nation == null) return;
     
     //Image portrait = nation.region.view.portrait;
+    final Base base = mainView.world.base();
     g.setColor(Color.WHITE);
     g.drawString(nation.region.name, vx + 20, vy + 20);
-    //int portW = vw - 120, portH = (int) (portW / 2.5f);
     
     int down = 50;
     for (District.Stat stat : District.CIVIC_STATS) {
@@ -57,27 +57,14 @@ public class RegionView extends UINode {
     down += 5;
     for (District.Stat stat : District.SOCIAL_STATS) {
       g.drawString(stat+": ", vx + 80, vy + down);
-      int current = (int) nation.currentValue(stat);
+      int current = (int) nation.longTermValue(stat);
       g.drawString(""+current, vx + 180, vy + down);
       down += 20;
     }
     
-    int income = 0;// nation.baseIncome();
-    g.drawString("Income: ", vx + 30, vy + down);
-    g.drawString("Expense: ", vx + 130, vy + down);
-    
-    /*
-    //
-    //  TODO:  Give a more comprehensive readout here.  Then you'll have a more
-    //  reliable basis for making investment decisions.
-    int trustPercent = (int) nation.currentValue(District.TRUST   );
-    int crimePercent = (int) nation.currentValue(District.VIOLENCE);
-    int income       = (int) nation.currentValue(District.INCOME  );
-    
-    g.drawString("Trust: "   +trustPercent+"%" , vx + 30, vy + 50);
-    g.drawString("Violence: "+crimePercent+"%" , vx + 30, vy + 65);
-    g.drawString("Income: "  +income           , vx + 30, vy + 80);
-    //*/
+    int income = nation.incomeFor(base), expense = nation.expensesFor(base);
+    g.drawString("Income: " +income , vx + 30 , vy + down);
+    g.drawString("Expense: "+expense, vx + 130, vy + down);
     
     renderFacilities(nation, surface, g);
     renderLeads(nation, surface, g);
@@ -92,12 +79,12 @@ public class RegionView extends UINode {
   ) {
     final int maxF = d.maxFacilities();
     int across = 240, down = 10;
-    
     final Vars.Int hoverSlot = new Vars.Int(-1);
     
     for (int n = 0; n < maxF; n++) {
       final int      slot  = n;
-      final Facility built = d.builtInSlot(n);
+      final Facility built = d.builtInSlot(slot);
+      final float    prog  = d.buildProgress(slot);
       
       Image icon = null;
       if (built == null) {
@@ -117,7 +104,8 @@ public class RegionView extends UINode {
           if (built != null) hoverSlot.val = slot;
         }
       };
-      button.refers = built+"_slot_"+n;
+      button.refers = built+"_slot_"+slot;
+      if (prog < 1 && built != null) button.attachOverlay(IN_PROGRESS);
       button.updateAndRender(surface, g);
       
       across += 60 + 10;
@@ -128,7 +116,7 @@ public class RegionView extends UINode {
       
       final int      slot  = hoverSlot.val;
       final Facility built = d.builtInSlot(slot);
-      final Person   owns  = d.ownerForSlot(slot);
+      final Base     owns  = d.ownerForSlot(slot);
       final float    prog  = d.buildProgress(slot);
       
       String desc = "";
@@ -158,7 +146,7 @@ public class RegionView extends UINode {
   
   void renderLeads(District d, Surface surface, Graphics2D g) {
     g.setColor(Color.LIGHT_GRAY);
-    int down = vy + 200;
+    int down = vy + 240;
     boolean noEvents = true;
     
     for (Event event : mainView.world.events().active()) {

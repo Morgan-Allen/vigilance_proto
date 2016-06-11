@@ -14,6 +14,7 @@ public abstract class ImageButton extends UINode {
   
   
   final Image icon;
+  private Image overlay[] = null;
   public boolean toggled = false, valid = true;
   public Object refers = this;
   
@@ -24,10 +25,19 @@ public abstract class ImageButton extends UINode {
   }
   
   
+  void attachOverlay(Image... overlay) {
+    this.overlay = overlay;
+  }
+  
+  
   void renderTo(Surface surface, Graphics2D g) {
     final boolean hovered = surface.tryHover(vx, vy, vw, vh, refers) && valid;
     
     g.drawImage(icon, vx, vy, vw, vh, null);
+    if (overlay != null) for (Image over : overlay) {
+      g.drawImage(over, vx, vy, vw, vh, null);
+    }
+    
     if (hovered || toggled) {
       g.setColor(toggled ? Color.GREEN : Color.YELLOW);
       g.drawRect(vx, vy, vw, vh);

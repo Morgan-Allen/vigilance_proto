@@ -114,11 +114,13 @@ public class World implements Session.Saveable {
     events.addType(Kidnapping.TYPE);
     events.addType(Robbery   .TYPE);
     events.addType(Murder    .TYPE);
+    
+    for (District d : districts) d.initialiseDistrict();
   }
   
   
   public void initDefaultBase() {
-    this.base = new Base(this);
+    this.base = new Base(this, "Wayne Foundation");
     
     Person leader = base.addToRoster(new Person(Heroes.HERO_BATMAN, this));
     base.addToRoster(new Person(Heroes.HERO_ALFRED   , this));
@@ -140,8 +142,9 @@ public class World implements Session.Saveable {
     base.stocks.incStock(Gadgets.BATARANGS  , 5);
     base.stocks.incStock(Gadgets.BODY_ARMOUR, 2);
     
+    base.setIncomeFloor(20);
+    base.incFunding(500);
     base.updateBase(0);
-    base.currentFunds = 500;
   }
   
   

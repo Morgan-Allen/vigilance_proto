@@ -17,6 +17,7 @@ public class Base implements Session.Saveable {
     SLOTS_WIDE     = 3 ;
   
   World world;
+  String name;
   
   List <Person> roster = new List();
   Person leader = null;
@@ -25,19 +26,21 @@ public class Base implements Session.Saveable {
   Room rooms[] = new Room[MAX_FACILITIES];
   List <Tech> knownTech = new List();
   
-  int currentFunds, income, maintenance;
+  int currentFunds, incomeFloor, income, maintenance;
   int powerUse, maxPower, supportUse, maxSupport;
   
   
-  Base(World world) {
+  Base(World world, String name) {
     this.world = world;
+    this.name  = name ;
   }
   
   
   public Base(Session s) throws Exception {
     s.cacheInstance(this);
     
-    world = (World) s.loadObject();
+    world = (World ) s.loadObject();
+    name  = (String) s.loadString();
     
     s.loadObjects(roster);
     leader = (Person) s.loadObject();
@@ -49,6 +52,7 @@ public class Base implements Session.Saveable {
     stocks.loadState(s);
     
     currentFunds = s.loadInt();
+    incomeFloor  = s.loadInt();
     income       = s.loadInt();
     maintenance  = s.loadInt();
     powerUse     = s.loadInt();
@@ -61,6 +65,7 @@ public class Base implements Session.Saveable {
   public void saveState(Session s) throws Exception {
     
     s.saveObject(world);
+    s.saveString(name );
     
     s.saveObjects(roster);
     s.saveObject(leader);
@@ -72,6 +77,7 @@ public class Base implements Session.Saveable {
     stocks.saveState(s);
     
     s.saveInt(currentFunds);
+    s.saveInt(incomeFloor );
     s.saveInt(income      );
     s.saveInt(maintenance );
     s.saveInt(powerUse    );
@@ -85,8 +91,10 @@ public class Base implements Session.Saveable {
   /**  General stat queries-
     */
   public int currentFunds() { return currentFunds; }
-  public int income() { return income; }
-  public int maintenance() { return maintenance; }
+  public int incomeFloor () { return incomeFloor ; }
+  public int income      () { return income      ; }
+  public int maintenance () { return maintenance ; }
+  
   public int powerUse() { return powerUse; }
   public int maxPower() { return maxPower; }
   public int supportUse() { return supportUse; }
@@ -107,22 +115,21 @@ public class Base implements Session.Saveable {
     this.maxSupport  = 0;
     this.supportUse  = 0;
     
-    //  TODO:  Introduce investment projects for this!
-    //this.income = 10;
-    /*
-    for (Nation n : world.nations) if (n.member) {
-      this.income += n.funding;
-    }
-    //*/
-    
     for (Person p : roster) {
       if (p.breathing()) supportUse += 1;
       p.updateOnBase(numWeeks);
     }
+    
     for (Room r : rooms) if (r != null) {
       r.updateRoom();
     }
     
+    for (District dist : world.districts) {
+      this.income      += dist.incomeFor  (this);
+      this.maintenance += dist.expensesFor(this);
+    }
+    
+    this.income += incomeFloor;
     this.currentFunds += (income - maintenance) * numWeeks;
   }
   
@@ -173,6 +180,12 @@ public class Base implements Session.Saveable {
   
   public boolean incFunding(int funds) {
     this.currentFunds += funds;
+    return true;
+  }
+  
+  
+  public boolean setIncomeFloor(int floor) {
+    this.incomeFloor = floor;
     return true;
   }
   
@@ -237,6 +250,16 @@ public class Base implements Session.Saveable {
   
   public Person atRosterIndex(int i) {
     return roster.atIndex(i);
+  }
+  
+  
+  public String name() {
+    return name;
+  }
+  
+  
+  public String toString() {
+    return name;
   }
 }
 
