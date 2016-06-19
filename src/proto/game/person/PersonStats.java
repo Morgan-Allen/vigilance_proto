@@ -11,6 +11,18 @@ public class PersonStats {
   final static String
     ICON_PATH = "media assets/stat icons/";
   
+  
+  final public static Trait
+    ARMOUR = new Trait(
+      "Armour", "stat_armour", null, ""
+    ),
+    MIN_DAMAGE = new Trait(
+      "Damage min.", "stat_min_damage", null, ""
+    ),
+    RNG_DAMAGE = new Trait(
+      "Damage max.", "stat_max_damage", null, ""
+    );
+  
   final public static Skill
     INTELLECT  = new Skill(
       "Intellect", "stat_intellect", ICON_PATH+"icon_intellect.png",

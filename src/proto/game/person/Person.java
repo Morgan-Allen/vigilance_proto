@@ -3,6 +3,7 @@
 package proto.game.person;
 import proto.common.*;
 import proto.game.world.*;
+import proto.game.scene.*;
 import proto.util.*;
 import static proto.game.person.PersonStats.*;
 
@@ -64,10 +65,12 @@ public class Person implements Session.Saveable {
   float confidence = 1.0f;
   float wariness   = 0.0f;
   
-  float posX, posY;
+  Vec3D exactPos = new Vec3D();
+  Tile location;
   int actionPoints;
   boolean turnDone;
   Object lastTarget;
+  Action nextAction;
   
   
   
@@ -116,19 +119,20 @@ public class Person implements Session.Saveable {
     
     injury    = s.loadFloat();
     stun      = s.loadFloat();
-    alive     = s.loadBool();
-    conscious = s.loadBool();
+    alive     = s.loadBool ();
+    conscious = s.loadBool ();
     
     assignment = (Assignment) s.loadObject();
-    AIstate    = s.loadInt();
+    AIstate    = s.loadInt  ();
     confidence = s.loadFloat();
     wariness   = s.loadFloat();
     
-    posX         = s.loadFloat();
-    posY         = s.loadFloat();
-    actionPoints = s.loadInt();
-    turnDone     = s.loadBool();
+    exactPos.loadFrom(s.input());
+    location     = (Tile) s.loadObject();
+    actionPoints = s.loadInt   ();
+    turnDone     = s.loadBool  ();
     lastTarget   = s.loadObject();
+    nextAction   = (Action) s.loadObject();
   }
   
   
@@ -158,11 +162,12 @@ public class Person implements Session.Saveable {
     s.saveFloat (confidence);
     s.saveFloat (wariness  );
     
-    s.saveFloat (posX        );
-    s.saveFloat (posY        );
+    exactPos.saveTo(s.output());
+    s.saveObject(location    );
     s.saveInt   (actionPoints);
     s.saveBool  (turnDone    );
     s.saveObject(lastTarget  );
+    s.saveObject(nextAction  );
   }
   
   
@@ -206,11 +211,6 @@ public class Person implements Session.Saveable {
   }
   
   
-  public int currentAP() {
-    return actionPoints;
-  }
-  
-  
   public float confidence() {
     return confidence;
   }
@@ -238,6 +238,53 @@ public class Person implements Session.Saveable {
   
   public Side side() {
     return side;
+  }
+  
+  
+  
+  /**  Senses and stealth-
+    */
+  public float sightRange() {
+    return (stats.levelFor(SURVEILLANCE) / 2.5f) + 2;
+  }
+  
+  
+  public float hidingRange() {
+    return 0 + (stats.levelFor(STEALTH) / 4f);
+  }
+  
+  
+  public boolean hasSight(Tile point) {
+    Scene scene = currentScene();
+    if (scene == null) return false;
+    return scene.fogAt(point, side) > 0;
+  }
+  
+  
+  public boolean canNotice(Object point) {
+    Scene scene = currentScene();
+    if (scene == null) return false;
+    
+    Tile  under      = scene.tileUnder(point);
+    float visibility = scene.fogAt(under, side);
+    if (visibility <= 0) return false;
+    
+    if (point instanceof Person) {
+      Person other = (Person) point;
+      if (other.isAlly(this)) return true;
+      
+      float   sighting = Nums.max(1, sightRange());
+      float   stealth  = other.hidingRange();
+      Action  action   = other.nextAction();
+      boolean focused  = lastTarget == other;
+      
+      sighting *= wariness + (focused ? 0.5f : 0);
+      stealth  *= action == null ? 0.5f : action.moveRoll();
+      stealth  /= sighting;
+      if (stealth > visibility) return false;
+    }
+    
+    return true;
   }
   
   
@@ -332,6 +379,12 @@ public class Person implements Session.Saveable {
   }
   
   
+  public Scene currentScene() {
+    if (assignment instanceof Scene) return (Scene) assignment;
+    return null;
+  }
+  
+  
   
   /**  State adjustments-
     */
@@ -346,6 +399,18 @@ public class Person implements Session.Saveable {
     this.injury += injury;
     checkState();
     world.events().log(name()+" suffered "+injury+" injury.");
+  }
+  
+  
+  public void receiveAttack(Volley attack) {
+    if (attack.didConnect) {
+      receiveInjury(attack.injureDamage);
+      receiveStun  (attack.stunDamage  );
+    }
+    else if (turnDone) {
+      actionPoints -= 1;
+    }
+    checkState();
   }
   
   
@@ -364,6 +429,25 @@ public class Person implements Session.Saveable {
   }
   
   
+  
+  /**  Scene-specific methods and accessors-
+    */
+  public void setExactPosition(Scene scene, float x, float y, float z) {
+    this.location = scene.tileAt((int) x, (int) y);
+    this.exactPos.set(x, y, z);
+  }
+  
+  
+  public Tile currentTile() {
+    return location;
+  }
+  
+  
+  public Vec3D exactPosition() {
+    return exactPos;
+  }
+  
+  
   public void modifyAP(int modifier) {
     actionPoints += modifier;
   }
@@ -371,6 +455,53 @@ public class Person implements Session.Saveable {
   
   public void setActionPoints(int AP) {
     actionPoints = AP;
+  }
+  
+  
+  public int currentAP() {
+    return actionPoints;
+  }
+  
+  
+  public void assignAction(Action nextAction) {
+    this.nextAction = nextAction;
+  }
+  
+  
+  public Action nextAction() {
+    return nextAction;
+  }
+  
+  
+  public boolean canTakeAction() {
+    return actionPoints >= 0 && conscious();
+  }
+  
+  
+  public boolean turnDone() {
+    return ! canTakeAction();
+  }
+  
+  
+  public boolean onTurnStart() {
+    return true;
+  }
+  
+  
+  public boolean onTurnEnd() {
+    return true;
+  }
+  
+  
+  public boolean updateDuringTurn() {
+    //  TODO:  FILL THIS IN!
+    return true;
+  }
+  
+  
+  public Action selectAIAction() {
+    //  TODO:  FILL THIS IN!
+    return null;
   }
   
   

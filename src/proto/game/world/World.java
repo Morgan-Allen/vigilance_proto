@@ -3,6 +3,7 @@
 package proto.game.world;
 import proto.common.*;
 import proto.game.person.*;
+import proto.game.scene.*;
 import proto.util.*;
 import proto.view.*;
 import proto.content.agents.*;
@@ -37,10 +38,11 @@ public class World implements Session.Saveable {
   Base base;
   Events events = new Events(this);
   
-  
   int timeDays = 0;
   float timeHours = 0;
   boolean amWatching = false;
+  
+  Scene activeScene = null;
   
   
   
@@ -59,12 +61,14 @@ public class World implements Session.Saveable {
     s.cacheInstance(this);
     
     districts = (District[]) s.loadObjectArray(District.class);
-    base    = (Base) s.loadObject();
+    base      = (Base) s.loadObject();
     events.loadState(s);
     
-    timeDays  = s.loadInt  ();
-    timeHours = s.loadFloat();
+    timeDays   = s.loadInt  ();
+    timeHours  = s.loadFloat();
     amWatching = s.loadBool();
+
+    activeScene = (Scene) s.loadObject();
   }
   
   
@@ -72,9 +76,12 @@ public class World implements Session.Saveable {
     s.saveObjectArray(districts);
     s.saveObject(base);
     events.saveState(s);
-    s.saveInt  (timeDays );
-    s.saveFloat(timeHours);
-    s.saveBool(amWatching);
+    
+    s.saveInt  (timeDays  );
+    s.saveFloat(timeHours );
+    s.saveBool (amWatching);
+    
+    s.saveObject(activeScene);
   }
   
   
@@ -202,13 +209,11 @@ public class World implements Session.Saveable {
   /**  Regular updates and activity cycle:
     */
   public void updateWorld() {
-
-    /*
-    if (enteredScene != null) {
-      enteredScene.updateScene();
+    
+    if (activeScene != null) {
+      activeScene.updateScene();
     }
-    //*/
-    if (amWatching) {
+    else if (amWatching) {
       final float realGap = 1f / RunGame.FRAME_RATE;
       final float timeGap = realGap * GAME_HOURS_PER_REAL_SECOND;
       timeHours += timeGap;
@@ -236,19 +241,14 @@ public class World implements Session.Saveable {
   }
   
   
-  public void beginNextMission() {
-    /*
-    Scene toEnter = missions().first();
-    if (toEnter != null) {
-      toEnter.setupScene();
-      toEnter.beginScene();
-    }
-    else {
-      base.updateBase(1);
-      currentTime += 1;
-    }
-    this.enteredScene = toEnter;
-    //*/
+  public void enterMission(Scene mission) {
+    this.activeScene = mission;
+  }
+  
+  
+  public void exitFromMission(Scene mission) {
+    if (this.activeScene != mission) I.complain(mission+" is not active!");
+    this.activeScene = null;
   }
   
   

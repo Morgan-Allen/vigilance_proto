@@ -2,6 +2,8 @@
 
 package proto.game.person;
 import proto.game.world.*;
+import proto.game.scene.*;
+import proto.view.*;
 import proto.util.*;
 
 import java.awt.Graphics2D;
@@ -48,6 +50,8 @@ public abstract class Ability extends Trait {
   
   final int properties, costAP;
   final float harmLevel, powerLevel;
+  
+  final public AbilityFX FX = new AbilityFX(this);
   
   
   public Ability(
@@ -145,6 +149,203 @@ public abstract class Ability extends Trait {
   
   
   
+  /**  Methods specific to scenes and actions-
+    */
+  public int costAP(Action derived) {
+    return 1;
+  }
+  
+  
+  public int maxRange() {
+    return -1;
+  }
+  
+  
+  public boolean allowsTarget(Object target, Scene scene, Person acting) {
+    return false;
+  }
+  
+  
+  public Action configAction(
+    Person acting, Tile dest, Object target,
+    Scene scene, Tile pathToTake[]
+  ) {
+    if (acting == null || ! allowsTarget(target, scene, acting)) return null;
+    if (requiresSight() && ! acting.hasSight(dest)) return null;
+    
+    final float range = scene.distance(acting.location, dest);
+    final int maxRange = maxRange();
+    if (maxRange > 0 && range > maxRange ) return null;
+    if (range > (acting.sightRange() + 2)) return null;
+    
+    Tile path[] = null;
+    if (pathToTake != null) {
+      path = pathToTake;
+    }
+    else if (ranged() || delayed()) {
+      path = new Tile[] { acting.location };
+    }
+    else {
+      MoveSearch search = new MoveSearch(acting, acting.location, dest);
+      search.doSearch();
+      if (! search.success()) return null;
+      else path = search.fullPath(Tile.class);
+    }
+    
+    Action newAction = new Action(this, acting, target);
+    newAction.attachPath(path, scene.time());
+    newAction.attachVolley(createVolley(newAction, target, scene));
+    
+    if (costAP(newAction) > acting.currentAP()) return null;
+    return newAction;
+  }
+  
+  
+  public Action takeFreeAction(
+    Person acting, Tile dest, Object target, Scene scene
+  ) {
+    Action newAction = new Action(this, acting, target);
+    newAction.attachPath(new Tile[] { acting.location }, scene.time());
+    newAction.attachVolley(createVolley(newAction, target, scene));
+    
+    applyOnActionStart(newAction);
+    checkForTriggers(newAction, true, false);
+    
+    newAction.setProgress(1);
+    
+    checkForTriggers(newAction, false, true);
+    applyOnActionEnd(newAction);
+    
+    return newAction;
+  }
+  
+  
+  protected Volley createVolley(Action use, Object target, Scene scene) {
+    return null;
+  }
+  
+  
+  protected void checkForTriggers(Action use, boolean start, boolean end) {
+    Scene  scene  = use.acting.currentScene();
+    Volley volley = use.volley();
+    
+    if (volley != null) {
+      Person self = volley.origAsPerson();
+      Person hits = volley.targAsPerson();
+      if (start) volley.beginVolley   ();
+      if (end  ) volley.completeVolley();
+      
+      if (self != null && self.nextAction() != null) {
+        Ability a = self.nextAction().used;
+        if (a.triggerOnAttack() && a.allowsTarget(self, scene, self)) {
+          if (start) a.applyOnAttackStart(volley);
+          if (end  ) a.applyOnAttackEnd  (volley);
+        }
+      }
+      
+      if (self != null) for (Ability a : self.stats.listAbilities()) {
+        if (! a.passive()) continue;
+        if (a.triggerOnAttack() && a.allowsTarget(self, scene, self)) {
+          if (start) a.applyOnAttackStart(volley);
+          if (end  ) a.applyOnAttackEnd  (volley);
+        }
+      }
+      
+      if (hits != null && hits.nextAction() != null) {
+        Ability a = hits.nextAction().used;
+        if (a.triggerOnDefend() && a.allowsTarget(hits, scene, hits)) {
+          if (start) a.applyOnDefendStart(volley);
+          if (end  ) a.applyOnDefendEnd  (volley);
+        }
+      }
+      
+      if (hits != null) for (Ability a : hits.stats.listAbilities()) {
+        if (! a.passive()) continue;
+        if (a.triggerOnDefend() && a.allowsTarget(hits, scene, hits)) {
+          if (start) a.applyOnDefendStart(volley);
+          if (end  ) a.applyOnDefendEnd  (volley);
+        }
+      }
+      
+      if (end && hits != null) hits.receiveAttack(volley);
+    }
+  }
+  
+  
+  public void applyOnActionStart(Action use) {
+    return;
+  }
+  
+  
+  public void applyOnActionEnd(Action use) {
+    return;
+  }
+  
+  
+  public void applyOnAttackStart(Volley volley) {
+    return;
+  }
+  
+  
+  public void applyOnAttackEnd(Volley volley) {
+    return;
+  }
+  
+  
+  public void applyOnDefendStart(Volley volley) {
+    return;
+  }
+  
+  
+  public void applyOnDefendEnd(Volley volley) {
+    return;
+  }
+  
+  
+  //  TODO:  Move these to an AI class.
+  
+  public Action bestMotionToward(Object point, Person acting, Scene scene) {
+    Tile at = scene.tileUnder(point);
+    if (at == null) return null;
+    if (point instanceof Person && ! acting.canNotice(point)) return null;
+    MoveSearch search = new MoveSearch(acting, acting.location, at);
+    search.doSearch();
+    if (! search.success()) return null;
+    
+    Tile path[] = search.fullPath(Tile.class);
+    for (int n = path.length; n-- > 0;) {
+      Tile shortPath[] = new Tile[n + 1], t = path[n];
+      System.arraycopy(path, 0, shortPath, 0, n + 1);
+      Action use = configAction(acting, t, t, scene, shortPath);
+      if (use != null) return use;
+    }
+    return null;
+  }
+  
+  
+  public float rateUsage(Action use) {
+    Person acts = use.acting;
+    float rating = 1, relation = 0;
+    
+    if (use.target instanceof Person) {
+      Person other = (Person) use.target;
+      if (other.isAlly (acts)) relation =  1;
+      if (other.isEnemy(acts)) relation = -1;
+      if (relation < 0 && ! other.conscious()) relation = 0;
+    }
+    
+    rating = harmLevel * relation * -1 * powerLevel;
+    Tile at = acts.currentScene().tileUnder(use.target);
+    rating *= 10f / (10 + at.scene.distance(acts.location, at));
+    
+    //  TODO:  Include a rating for hit-chance, assuming that a Volley is
+    //  involved?  (Maybe base on brains?)
+    
+    return rating;
+  }
+  
+  
+  
   /**  Rendering, interface and debug methods-
     */
   public String name() {
@@ -164,6 +365,11 @@ public abstract class Ability extends Trait {
   
   public Image missileSprite() {
     return null;
+  }
+  
+  
+  public void renderUsageFX(Action action, Scene scene, Graphics2D g) {
+    return;
   }
 }
 

@@ -2,7 +2,6 @@
 
 package proto.common;
 import proto.game.world.*;
-import proto.util.*;
 import proto.view.*;
 
 import java.awt.*;
