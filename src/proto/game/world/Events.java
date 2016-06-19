@@ -3,7 +3,7 @@
 
 package proto.game.world;
 import proto.common.*;
-import proto.game.scene.*;
+import proto.game.event.*;
 import proto.util.*;
 
 

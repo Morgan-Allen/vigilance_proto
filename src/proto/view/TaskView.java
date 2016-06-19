@@ -1,8 +1,8 @@
 
 
 package proto.view;
+import proto.game.event.*;
 import proto.game.person.*;
-import proto.game.scene.*;
 import proto.util.*;
 
 import java.awt.Color;

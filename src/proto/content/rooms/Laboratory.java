@@ -3,8 +3,8 @@
 package proto.content.rooms;
 import proto.common.*;
 import proto.content.items.Gadgets;
+import proto.game.event.*;
 import proto.game.person.*;
-import proto.game.scene.*;
 import proto.game.world.*;
 import proto.util.List;
 

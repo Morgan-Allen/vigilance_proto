@@ -1,13 +1,13 @@
 
 
 package proto.content.techs;
+import proto.game.event.*;
 import proto.game.world.*;
-import proto.game.scene.*;
+
 import static proto.game.world.District.*;
 
 import proto.content.rooms.Laboratory;
 import proto.content.rooms.Workshop;
-import proto.game.scene.Task;
 
 
 

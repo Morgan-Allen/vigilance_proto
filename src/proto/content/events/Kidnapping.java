@@ -3,8 +3,8 @@
 package proto.content.events;
 import proto.common.*;
 import proto.game.world.*;
+import proto.game.event.*;
 import proto.game.person.*;
-import proto.game.scene.*;
 import proto.util.*;
 import static proto.game.person.PersonStats.*;
 import proto.content.agents.*;
