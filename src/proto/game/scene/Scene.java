@@ -201,7 +201,8 @@ public class Scene implements Session.Saveable, Assignment {
   
   public Object topObjectAt(Tile at) {
     if (at == null) return null;
-    for (Person p : persons) if (p.currentTile() == at && p.conscious()) {
+    for (Person p : persons) {
+      if (p.currentTile() != at || ! p.health.conscious()) continue;
       return p;
     }
     if (at.prop() != null) return at.prop();
@@ -269,7 +270,9 @@ public class Scene implements Session.Saveable, Assignment {
   
   public boolean isExitPoint(Object point, Person exits) {
     Tile under = tileUnder(point);
-    if (under == null || exits == null || ! exits.retreating()) return false;
+    if (under == null || exits == null || ! exits.actions.retreating()) {
+      return false;
+    }
     if (under.x == 0 || under.x == size - 1) return true;
     if (under.y == 0 || under.y == size - 1) return true;
     return false;
@@ -278,7 +281,7 @@ public class Scene implements Session.Saveable, Assignment {
   
   public Action currentAction() {
     if (nextActing == null) return null;
-    return nextActing.nextAction();
+    return nextActing.actions.nextAction();
   }
   
   
@@ -395,16 +398,17 @@ public class Scene implements Session.Saveable, Assignment {
     playerTurn = true;
     
     updateFog();
-    for (Person p : persons) p.onTurnStart();
+    for (Person p : persons) p.actions.onTurnStart();
   }
   
   
   public void updateScene() {
     
     if (nextActing != null) {
-      Action last = nextActing.nextAction();
-      nextActing.updateDuringTurn();
-      Action taken = nextActing.nextAction();
+      final PersonActions nextPA = nextActing.actions;
+      Action last = nextPA.nextAction();
+      nextPA.updateDuringTurn();
+      Action taken = nextPA.nextAction();
       
       if (taken != null) {
         time += 1;
@@ -412,7 +416,7 @@ public class Scene implements Session.Saveable, Assignment {
       else {
         if (last != null) view.setSelection(nextActing, false);
         
-        if (! (nextActing.canTakeAction() && playerTurn)) {
+        if (! (nextPA.canTakeAction() && playerTurn)) {
           moveToNextPersonsTurn();
         }
       }
@@ -436,10 +440,10 @@ public class Scene implements Session.Saveable, Assignment {
     I.say("\n  Trying to find next active person...");
     I.say("  Active: "+nextActing);
     
-    Person n = nextActing;
-    if ((n != null) && (! n.turnDone()) && (! n.canTakeAction())) {
+    PersonActions PA = nextActing.actions;
+    if ((PA != null) && (! PA.turnDone()) && (! PA.canTakeAction())) {
       I.say("\n  Ending turn for "+nextActing);
-      nextActing.onTurnEnd();
+      PA.onTurnEnd();
     }
     nextActing = null;
     final int numTeams = 2;
@@ -452,25 +456,26 @@ public class Scene implements Session.Saveable, Assignment {
       if (playerTurn) I.add("player team"); else I.add("enemy team");
       
       for (Person p : team) {
-        if (! p.canTakeAction()) continue;
+        PA = p.actions;
+        if (! PA.canTakeAction()) continue;
         
         if (playerTurn) {
-          I.say("  ACTIVE PC: "+p+", AP: "+p.currentAP());
+          I.say("  ACTIVE PC: "+p+", AP: "+PA.currentAP());
           nextActing = p;
           break;
         }
         else {
-          I.say("  FOUND NPC: "+p+", AP: "+p.currentAP());
-          Action taken = p.selectAIAction();
+          I.say("  FOUND NPC: "+p+", AP: "+PA.currentAP());
+          Action taken = PA.selectAIAction();
           if (taken != null) {
             I.say("    "+p+" will take action: "+taken.used);
             nextActing = p;
-            p.assignAction(taken);
+            PA.assignAction(taken);
             break;
           }
           else {
             I.say("    "+p+" could not decide on action.");
-            p.setActionPoints(0);
+            PA.setActionPoints(0);
             continue;
           }
         }
@@ -479,7 +484,7 @@ public class Scene implements Session.Saveable, Assignment {
       if (nextActing == null) {
         I.say("  Will refresh AP and try other team...");
         for (Person p : nextTeam) if (p.currentScene() == this) {
-          p.onTurnStart();
+          p.actions.onTurnStart();
         }
         playerTurn = ! playerTurn;
       }
@@ -512,12 +517,12 @@ public class Scene implements Session.Saveable, Assignment {
       fogP[c.x][c.y] = 0;
       fogO[c.x][c.y] = 0;
     }
-    for (Person p : playerTeam) if (p.conscious()) {
-      final float radius = p.sightRange();
+    for (Person p : playerTeam) if (p.health.conscious()) {
+      final float radius = p.actions.sightRange();
       liftFogAround(p.currentTile(), radius, p, true);
     }
-    for (Person p : othersTeam) if (p.conscious())  {
-      final float radius = p.sightRange();
+    for (Person p : othersTeam) if (p.health.conscious())  {
+      final float radius = p.actions.sightRange();
       liftFogAround(p.currentTile(), radius, p, true);
     }
   }
@@ -553,10 +558,10 @@ public class Scene implements Session.Saveable, Assignment {
     
     boolean heroUp = false, criminalUp = false;
     for (Person p : playerTeam) if (p.isHero()) {
-      if (p.conscious() && p.currentScene() == this) heroUp = true;
+      if (p.health.conscious() && p.currentScene() == this) heroUp = true;
     }
     for (Person p : othersTeam) if (p.isCriminal()) {
-      if (p.conscious() && p.currentScene() == this) criminalUp = true;
+      if (p.health.conscious() && p.currentScene() == this) criminalUp = true;
     }
     if (! criminalUp) {
       return STATE_WON;
@@ -571,9 +576,9 @@ public class Scene implements Session.Saveable, Assignment {
   public float assessCollateral() {
     float sum = 0;
     for (Person p : othersTeam) {
-      float damage = p.injury() / p.maxHealth();
-      if (! p.alive     ()) damage += 3;
-      if (! p.isCriminal()) damage *= 2;
+      float damage = p.health.injury() / p.health.maxHealth();
+      if (! p.health.alive()) damage += 3;
+      if (! p.isCriminal()  ) damage *= 2;
       sum += Nums.max(0, damage - 0.5f) * 2;
     }
     return sum * 0.5f / othersTeam.size();
@@ -584,7 +589,7 @@ public class Scene implements Session.Saveable, Assignment {
     float sum = 0, numC = 0;
     for (Person p : othersTeam) if (p.isCriminal()) {
       numC++;
-      if (p.conscious() || p.currentScene() != this) sum++;
+      if (p.health.conscious() || p.currentScene() != this) sum++;
     }
     if (numC == 0) return 0;
     return sum / numC;

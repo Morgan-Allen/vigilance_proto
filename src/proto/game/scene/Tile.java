@@ -66,7 +66,7 @@ public class Tile implements Session.Saveable {
     if (blockState == -1 || true) {
       blockState = 0;
       if (prop != null && prop.kind.blockPath()) blockState = 1;
-      for (Person p : inside) if (p.conscious()) blockState = 1;
+      for (Person p : inside) if (p.health.conscious()) blockState = 1;
     }
     return blockState == 1;
   }

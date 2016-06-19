@@ -155,7 +155,7 @@ public class Volley implements Session.Saveable {
     this.targ   = hits  ;
     this.ranged = ranged;
     
-    Equipped weapon = self.currentWeapon();
+    Equipped weapon = self.gear.currentWeapon();
     damageType = weapon.properties;
     
     selfDamageBase  = self.stats.levelFor(MIN_DAMAGE);
@@ -171,7 +171,7 @@ public class Volley implements Session.Saveable {
     }
     if (ranged) {
       selfAccuracy = self.stats.levelFor(MARKSMAN);
-      float normRange = self.sightRange() - 2;
+      float normRange = self.actions.sightRange() - 2;
       float distance  = scene.distance(self.currentTile(), hits.currentTile());
       selfAccuracy -= 5 * (distance - normRange);
       hitsDefence = hits.stats.levelFor(GYMNASTICS);

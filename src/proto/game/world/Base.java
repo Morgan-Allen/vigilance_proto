@@ -25,9 +25,7 @@ public class Base implements Session.Saveable {
   
   Room rooms[] = new Room[MAX_FACILITIES];
   List <Tech> knownTech = new List();
-  
   int currentFunds, incomeFloor, income, maintenance;
-  int powerUse, maxPower, supportUse, maxSupport;
   
   
   Base(World world, String name) {
@@ -55,10 +53,6 @@ public class Base implements Session.Saveable {
     incomeFloor  = s.loadInt();
     income       = s.loadInt();
     maintenance  = s.loadInt();
-    powerUse     = s.loadInt();
-    maxPower     = s.loadInt();
-    supportUse   = s.loadInt();
-    maxSupport   = s.loadInt();
   }
   
   
@@ -80,10 +74,6 @@ public class Base implements Session.Saveable {
     s.saveInt(incomeFloor );
     s.saveInt(income      );
     s.saveInt(maintenance );
-    s.saveInt(powerUse    );
-    s.saveInt(maxPower    );
-    s.saveInt(supportUse  );
-    s.saveInt(maxSupport  );
   }
   
   
@@ -95,11 +85,6 @@ public class Base implements Session.Saveable {
   public int income      () { return income      ; }
   public int maintenance () { return maintenance ; }
   
-  public int powerUse() { return powerUse; }
-  public int maxPower() { return maxPower; }
-  public int supportUse() { return supportUse; }
-  public int maxSupport() { return maxSupport; }
-  
   public World world() { return world; }
   
   
@@ -107,16 +92,10 @@ public class Base implements Session.Saveable {
   /**  Regular updates and life-cycle methods:
     */
   void updateBase(float numWeeks) {
-    
     this.income      = 0;
     this.maintenance = 0;
-    this.maxPower    = 0;
-    this.powerUse    = 0;
-    this.maxSupport  = 0;
-    this.supportUse  = 0;
     
     for (Person p : roster) {
-      if (p.breathing()) supportUse += 1;
       p.updateOnBase(numWeeks);
     }
     

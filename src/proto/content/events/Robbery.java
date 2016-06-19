@@ -156,7 +156,7 @@ public class Robbery extends Event {
       }
       else {
         for (Person p : lead.assigned()) {
-          p.receiveInjury(2);
+          p.health.receiveInjury(2);
         }
         events.log(
           "Your bust was a failure.  The perps will have scattered and taken "+

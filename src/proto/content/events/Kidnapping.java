@@ -117,11 +117,13 @@ public class Kidnapping extends Event {
         setComplete(false);
         if (Rand.yes()) {
           for (Person p : lead.assigned()) {
-            p.receiveInjury(2);
+            p.health.receiveInjury(2);
           }
         }
         else {
-          missing.receiveInjury(missing.maxHealth() * (Rand.num() + 0.5f));
+          missing.health.receiveInjury(
+            missing.health.maxHealth() * (Rand.num() + 0.5f)
+          );
           nation.incLevel(District.TRUST, -10);
         }
         nation.incLevel(District.DETERRENCE, -10);

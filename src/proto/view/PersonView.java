@@ -224,11 +224,11 @@ public class PersonView extends UINode {
   void renderGear(Surface surface, Graphics2D g, Person person) {
     int down = 160 + 60 + 10;
     
-    for (int slotID : Person.ALL_SLOTS) {
-      Equipped inSlot = person.equippedInSlot(slotID);
+    for (int slotID : PersonGear.ALL_SLOTS) {
+      Equipped inSlot = person.gear.equippedInSlot(slotID);
       Image  icon = inSlot == null ? null   : inSlot.icon();
       String desc = inSlot == null ? "None" : inSlot.name;
-      String slotName = Person.SLOT_NAMES[slotID];
+      String slotName = PersonGear.SLOT_NAMES[slotID];
       
       final boolean hovered = surface.tryHover(
         vx + 5, vy + down, vw - 10, 40, "Slot_"+slotID
@@ -269,7 +269,7 @@ public class PersonView extends UINode {
       }
       
       protected void whenPicked(Equipped option, int optionID) {
-        person.equipItem(option, mainView.world.base());
+        person.gear.equipItem(option, mainView.world.base());
       }
     });
   }

@@ -5,7 +5,6 @@ import proto.common.*;
 import proto.game.world.*;
 import proto.game.scene.*;
 import proto.util.*;
-import static proto.game.person.PersonStats.*;
 
 
 
@@ -14,31 +13,6 @@ public class Person implements Session.Saveable {
   
   /**  Data fields and construction-
     */
-  final public static int
-    STATE_INIT    = -1,
-    STATE_AS_PC   =  0,
-    STATE_UNAWARE =  1,
-    STATE_ACTIVE  =  2,
-    STATE_RETREAT =  3;
-  final public static int
-    INIT_LUCK   = 3,
-    MAX_LUCK    = 3,
-    INIT_STRESS = 0,
-    MAX_STRESS  = 100;
-  final public static int
-    FULL_HEAL_WEEKS   = 8   ,
-    WAKEUP_PERCENT    = 50  ,
-    WEEK_STRESS_DECAY = 2   ,
-    WEEK_TRAINING_XP  = 250 ,
-    MIN_LEVEL_XP      = 1000;
-  final public static int
-    SLOT_WEAPON     = 0,
-    SLOT_ARMOUR     = 1,
-    SLOT_ITEMS      = 2,
-    NUM_EQUIP_SLOTS = 3,
-    ALL_SLOTS[] = { 0, 1, 2 };
-  final public static String
-    SLOT_NAMES[] = { "Weapon", "Armour", "Items" };
   public static enum Side {
     HEROES, CIVILIANS, VILLAINS
   };
@@ -50,27 +24,17 @@ public class Person implements Session.Saveable {
   
   String name;
   
+  final public PersonHealth  health  = new PersonHealth (this);
+  final public PersonActions actions = new PersonActions(this);
   final public PersonStats   stats   = new PersonStats  (this);
+  final public PersonGear    gear    = new PersonGear   (this);
   final public PersonBonds   bonds   = new PersonBonds  (this);
   final public PersonHistory history = new PersonHistory(this);
   
-  int luck = INIT_LUCK, stress = INIT_STRESS;
-  Equipped equipSlots[] = new Equipped[NUM_EQUIP_SLOTS];
-  float injury, stun;
-  boolean alive, conscious;
-  
   Assignment assignment;
   
-  int   AIstate    = STATE_INIT;
-  float confidence = 1.0f;
-  float wariness   = 0.0f;
-  
-  Vec3D exactPos = new Vec3D();
   Tile location;
-  int actionPoints;
-  boolean turnDone;
-  Object lastTarget;
-  Action nextAction;
+  Vec3D exactPos = new Vec3D();
   
   
   
@@ -82,14 +46,13 @@ public class Person implements Session.Saveable {
     history.setSummary(kind.defaultInfo());
     
     for (int n = 0; n < kind.baseEquipped().length; n++) {
-      equipItem(kind.baseEquipped()[n], null);
+      gear.equipItem(kind.baseEquipped()[n], null);
     }
     
     if      (kind.type() == Kind.TYPE_HERO    ) side = Side.HEROES   ;
     else if (kind.type() == Kind.TYPE_CIVILIAN) side = Side.CIVILIANS;
     else side = Side.VILLAINS;
     
-    alive = conscious = true;
     stats.initStats();
   }
   
@@ -107,32 +70,17 @@ public class Person implements Session.Saveable {
     side  = (Side ) s.loadEnum(Side.values());
     name  = s.loadString();
     
-    stats    .loadState(s);
-    bonds.loadState(s);
-    history  .loadState(s);
-    
-    luck   = s.loadInt();
-    stress = s.loadInt();
-    for (int i = 0 ; i < NUM_EQUIP_SLOTS; i++) {
-      equipSlots[i] = (Equipped) s.loadObject();
-    }
-    
-    injury    = s.loadFloat();
-    stun      = s.loadFloat();
-    alive     = s.loadBool ();
-    conscious = s.loadBool ();
+    health .loadState(s);
+    actions.loadState(s);
+    stats  .loadState(s);
+    gear   .loadState(s);
+    bonds  .loadState(s);
+    history.loadState(s);
     
     assignment = (Assignment) s.loadObject();
-    AIstate    = s.loadInt  ();
-    confidence = s.loadFloat();
-    wariness   = s.loadFloat();
     
+    location = (Tile) s.loadObject();
     exactPos.loadFrom(s.input());
-    location     = (Tile) s.loadObject();
-    actionPoints = s.loadInt   ();
-    turnDone     = s.loadBool  ();
-    lastTarget   = s.loadObject();
-    nextAction   = (Action) s.loadObject();
   }
   
   
@@ -142,95 +90,23 @@ public class Person implements Session.Saveable {
     s.saveEnum  (side );
     s.saveString(name );
     
-    stats    .saveState(s);
-    bonds.saveState(s);
-    history  .saveState(s);
-    
-    s.saveInt(luck  );
-    s.saveInt(stress);
-    for (int i = 0 ; i < NUM_EQUIP_SLOTS; i++) {
-      s.saveObject(equipSlots[i]);
-    }
-    
-    s.saveFloat(injury   );
-    s.saveFloat(stun     );
-    s.saveBool (alive    );
-    s.saveBool (conscious);
+    health .saveState(s);
+    actions.saveState(s);
+    stats  .saveState(s);
+    gear   .saveState(s);
+    bonds  .saveState(s);
+    history.saveState(s);
     
     s.saveObject(assignment);
-    s.saveInt   (AIstate   );
-    s.saveFloat (confidence);
-    s.saveFloat (wariness  );
     
+    s.saveObject(location);
     exactPos.saveTo(s.output());
-    s.saveObject(location    );
-    s.saveInt   (actionPoints);
-    s.saveBool  (turnDone    );
-    s.saveObject(lastTarget  );
-    s.saveObject(nextAction  );
   }
   
   
   
   /**  General state queries-
     */
-  public int maxHealth() {
-    return stats.levelFor(HIT_POINTS);
-  }
-  
-  
-  public int maxStress() {
-    return stats.levelFor(WILLPOWER);
-  }
-  
-  
-  public float injury() {
-    return injury;
-  }
-  
-  
-  public float stun() {
-    return stun;
-  }
-  
-  
-  public float stress() {
-    return stress;
-  }
-  
-  
-  public float healthLevel() {
-    return Nums.clamp(1f - ((injury + stun) / maxHealth()), 0, 1);
-  }
-  
-  
-  public float bleedRisk() {
-    if (injury <= 0) return 0;
-    if (stun   <= 0) return 1;
-    return injury / (stun + injury);
-  }
-  
-  
-  public float confidence() {
-    return confidence;
-  }
-  
-  
-  public boolean alive() {
-    return alive;
-  }
-  
-  
-  public boolean breathing() {
-    return true;
-  }
-  
-  
-  public boolean conscious() {
-    return conscious && alive;
-  }
-  
-  
   public Kind kind() {
     return kind;
   }
@@ -242,121 +118,11 @@ public class Person implements Session.Saveable {
   
   
   
-  /**  Senses and stealth-
-    */
-  public float sightRange() {
-    return (stats.levelFor(SURVEILLANCE) / 2.5f) + 2;
-  }
-  
-  
-  public float hidingRange() {
-    return 0 + (stats.levelFor(STEALTH) / 4f);
-  }
-  
-  
-  public boolean hasSight(Tile point) {
-    Scene scene = currentScene();
-    if (scene == null) return false;
-    return scene.fogAt(point, side) > 0;
-  }
-  
-  
-  public boolean canNotice(Object point) {
-    Scene scene = currentScene();
-    if (scene == null) return false;
-    
-    Tile  under      = scene.tileUnder(point);
-    float visibility = scene.fogAt(under, side);
-    if (visibility <= 0) return false;
-    
-    if (point instanceof Person) {
-      Person other = (Person) point;
-      if (other.isAlly(this)) return true;
-      
-      float   sighting = Nums.max(1, sightRange());
-      float   stealth  = other.hidingRange();
-      Action  action   = other.nextAction();
-      boolean focused  = lastTarget == other;
-      
-      sighting *= wariness + (focused ? 0.5f : 0);
-      stealth  *= action == null ? 0.5f : action.moveRoll();
-      stealth  /= sighting;
-      if (stealth > visibility) return false;
-    }
-    
-    return true;
-  }
-  
-  
-  
-  /**  Assigning equipment loadout-
-    */
-  public void equipItem(Equipped item, Base from) {
-    Equipped oldItem = equipSlots[item.slotID];
-    equipSlots[item.slotID] = item;
-    stats.toggleItemAbilities(oldItem, false);
-    stats.toggleItemAbilities(item   , true );
-    
-    if (oldItem != null && from != null) from.stocks.incStock(oldItem,  1);
-    if (item    != null && from != null) from.stocks.incStock(item   , -1);
-  }
-  
-  
-  public int equipBonus(int slotID, int properties) {
-    Equipped item = equipSlots[slotID];
-    if (item == null || ! item.hasProperty(properties)) return 0;
-    return item.bonus;
-  }
-  
-  
-  public Equipped equippedInSlot(int slotID) {
-    return equipSlots[slotID];
-  }
-  
-  
-  public boolean hasEquipped(int slotID) {
-    return equipSlots[slotID] != null;
-  }
-  
-  
-  public boolean hasEquipped(Equipped item) {
-    for (Equipped i : equipSlots) if (i == item) return true;
-    return false;
-  }
-  
-  
-  public boolean canEquip(Equipped item) {
-    for (int slotID : ALL_SLOTS) {
-      if (item.slotID == slotID && equipSlots[slotID] == null) return true;
-    }
-    return false;
-  }
-  
-  
-  public Equipped currentWeapon() {
-    Equipped weapon = equippedInSlot(SLOT_WEAPON);
-    return weapon == null ? Common.UNARMED : weapon;
-  }
-  
-  
-  public Equipped currentArmour() {
-    Equipped armour = equippedInSlot(SLOT_ARMOUR);
-    return armour == null ? Common.UNARMOURED : armour;
-  }
-  
-  
-  public Series <Equipped> equipment() {
-    Batch <Equipped> all = new Batch();
-    for (Equipped e : equipSlots) if (e != null) all.add(e);
-    return all;
-  }
-  
-  
   
   /**  Assigning jobs & missions-
     */
   public boolean freeForAssignment() {
-    if (! conscious()) return false;
+    if (! health.conscious()) return false;
     return assignment == null;
   }
   
@@ -386,48 +152,6 @@ public class Person implements Session.Saveable {
   
   
   
-  /**  State adjustments-
-    */
-  public void receiveStun(float stun) {
-    this.stun += stun;
-    checkState();
-    world.events().log(name()+" suffered "+stun+" stun.");
-  }
-  
-  
-  public void receiveInjury(float injury) {
-    this.injury += injury;
-    checkState();
-    world.events().log(name()+" suffered "+injury+" injury.");
-  }
-  
-  
-  public void receiveAttack(Volley attack) {
-    if (attack.didConnect) {
-      receiveInjury(attack.injureDamage);
-      receiveStun  (attack.stunDamage  );
-    }
-    else if (turnDone) {
-      actionPoints -= 1;
-    }
-    checkState();
-  }
-  
-  
-  public void liftInjury(float lift) {
-    injury = Nums.max(0, injury - lift);
-  }
-  
-  
-  public void liftStun(float lift) {
-    stun = Nums.max(0, stun - lift);
-  }
-  
-  
-  public void liftStress(int lift) {
-    stress = Nums.max(0, stress - lift);
-  }
-  
   
   
   /**  Scene-specific methods and accessors-
@@ -448,63 +172,6 @@ public class Person implements Session.Saveable {
   }
   
   
-  public void modifyAP(int modifier) {
-    actionPoints += modifier;
-  }
-  
-  
-  public void setActionPoints(int AP) {
-    actionPoints = AP;
-  }
-  
-  
-  public int currentAP() {
-    return actionPoints;
-  }
-  
-  
-  public void assignAction(Action nextAction) {
-    this.nextAction = nextAction;
-  }
-  
-  
-  public Action nextAction() {
-    return nextAction;
-  }
-  
-  
-  public boolean canTakeAction() {
-    return actionPoints >= 0 && conscious();
-  }
-  
-  
-  public boolean turnDone() {
-    return ! canTakeAction();
-  }
-  
-  
-  public boolean onTurnStart() {
-    return true;
-  }
-  
-  
-  public boolean onTurnEnd() {
-    return true;
-  }
-  
-  
-  public boolean updateDuringTurn() {
-    //  TODO:  FILL THIS IN!
-    return true;
-  }
-  
-  
-  public Action selectAIAction() {
-    //  TODO:  FILL THIS IN!
-    return null;
-  }
-  
-  
   
   /**  Regular updates and life-cycle-
     */
@@ -513,34 +180,9 @@ public class Person implements Session.Saveable {
       assignment = null;
     }
     
-    if (! alive) return;
-    if (conscious()) stun = 0;
-    
-    stats.updateStats();
-    
-    int maxHealth = maxHealth();
-    float regen = maxHealth * numWeeks / FULL_HEAL_WEEKS;
-    injury = Nums.max(0, injury - regen);
-    
-    if (conscious) {
-      stress = Nums.max(0, stress - (int) (WEEK_STRESS_DECAY * numWeeks));
-    }
-    else {
-      float wakeUp = maxHealth * 100f / WAKEUP_PERCENT;
-      if (injury < wakeUp) conscious = true;
-    }
-  }
-  
-  
-  void checkState() {
-    int maxHealth = maxHealth();
-    if (conscious && injury + stun > maxHealth) {
-      this.conscious = false;
-      world.events().log(name()+" fell unconscious!");
-    }
-    if (alive && injury > maxHealth * 1.5f) {
-      this.alive = false;
-      world.events().log(name()+" was killed!");
+    health.updateHealth(numWeeks);
+    if (health.alive()) {
+      stats.updateStats();
     }
   }
   
@@ -587,16 +229,6 @@ public class Person implements Session.Saveable {
   }
   
   
-  public boolean retreating() {
-    return AIstate == STATE_RETREAT;
-  }
-  
-  
-  public boolean captive() {
-    return false;
-  }
-  
-  
   
   
   /**  Interface, rendering and debug methods-
@@ -612,11 +244,12 @@ public class Person implements Session.Saveable {
   
   
   public String confidenceDescription() {
-    if (! alive     ()) return "Dead"       ;
-    if (! conscious ()) return "Unconscious";
-    if (  captive   ()) return "Captive"    ;
-    if (  retreating()) return "Retreating" ;
+    if (! health.alive      ()) return "Dead"       ;
+    if (! health.conscious  ()) return "Unconscious";
+    if (  actions.captive   ()) return "Captive"    ;
+    if (  actions.retreating()) return "Retreating" ;
     
+    float confidence = actions.confidence(), wariness = actions.wariness();
     String moraleDesc = "Determined", alertDesc = "Alert";
     if (confidence < 1.66f) moraleDesc = "Steady"  ;
     if (confidence < 1.33f) moraleDesc = "Shaken"  ;

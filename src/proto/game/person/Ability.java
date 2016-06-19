@@ -171,12 +171,12 @@ public abstract class Ability extends Trait {
     Scene scene, Tile pathToTake[]
   ) {
     if (acting == null || ! allowsTarget(target, scene, acting)) return null;
-    if (requiresSight() && ! acting.hasSight(dest)) return null;
+    if (requiresSight() && ! acting.actions.hasSight(dest)) return null;
     
     final float range = scene.distance(acting.location, dest);
     final int maxRange = maxRange();
     if (maxRange > 0 && range > maxRange ) return null;
-    if (range > (acting.sightRange() + 2)) return null;
+    if (range > (acting.actions.sightRange() + 2)) return null;
     
     Tile path[] = null;
     if (pathToTake != null) {
@@ -196,7 +196,7 @@ public abstract class Ability extends Trait {
     newAction.attachPath(path, scene.time());
     newAction.attachVolley(createVolley(newAction, target, scene));
     
-    if (costAP(newAction) > acting.currentAP()) return null;
+    if (costAP(newAction) > acting.actions.currentAP()) return null;
     return newAction;
   }
   
@@ -235,8 +235,8 @@ public abstract class Ability extends Trait {
       if (start) volley.beginVolley   ();
       if (end  ) volley.completeVolley();
       
-      if (self != null && self.nextAction() != null) {
-        Ability a = self.nextAction().used;
+      if (self != null && self.actions.nextAction() != null) {
+        Ability a = self.actions.nextAction().used;
         if (a.triggerOnAttack() && a.allowsTarget(self, scene, self)) {
           if (start) a.applyOnAttackStart(volley);
           if (end  ) a.applyOnAttackEnd  (volley);
@@ -251,8 +251,8 @@ public abstract class Ability extends Trait {
         }
       }
       
-      if (hits != null && hits.nextAction() != null) {
-        Ability a = hits.nextAction().used;
+      if (hits != null && hits.actions.nextAction() != null) {
+        Ability a = hits.actions.nextAction().used;
         if (a.triggerOnDefend() && a.allowsTarget(hits, scene, hits)) {
           if (start) a.applyOnDefendStart(volley);
           if (end  ) a.applyOnDefendEnd  (volley);
@@ -267,7 +267,7 @@ public abstract class Ability extends Trait {
         }
       }
       
-      if (end && hits != null) hits.receiveAttack(volley);
+      if (end && hits != null) hits.health.receiveAttack(volley);
     }
   }
   
@@ -307,7 +307,10 @@ public abstract class Ability extends Trait {
   public Action bestMotionToward(Object point, Person acting, Scene scene) {
     Tile at = scene.tileUnder(point);
     if (at == null) return null;
-    if (point instanceof Person && ! acting.canNotice(point)) return null;
+    
+    if (point instanceof Person && ! acting.actions.canNotice(point)) {
+      return null;
+    }
     MoveSearch search = new MoveSearch(acting, acting.location, at);
     search.doSearch();
     if (! search.success()) return null;
@@ -331,7 +334,7 @@ public abstract class Ability extends Trait {
       Person other = (Person) use.target;
       if (other.isAlly (acts)) relation =  1;
       if (other.isEnemy(acts)) relation = -1;
-      if (relation < 0 && ! other.conscious()) relation = 0;
+      if (relation < 0 && ! other.health.conscious()) relation = 0;
     }
     
     rating = harmLevel * relation * -1 * powerLevel;
