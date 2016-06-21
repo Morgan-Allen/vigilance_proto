@@ -24,7 +24,6 @@ public class Scene implements Session.Saveable, Assignment {
     STATE_WON   =  2,
     STATE_LOST  =  3;
   
-  //String name;
   Lead trigger;
   float dangerLevel;
   int expireTime;
@@ -46,8 +45,6 @@ public class Scene implements Session.Saveable, Assignment {
   boolean playerTurn;
   Person nextActing;
   
-  SceneView view = new SceneView(this);
-  
   
   public Scene(World world, int size) {
     this.world = world;
@@ -57,7 +54,7 @@ public class Scene implements Session.Saveable, Assignment {
   
   public Scene(Session s) throws Exception {
     s.cacheInstance(this);
-    view.loadState(s);
+    view().loadState(s);
     
     trigger     = (Lead) s.loadObject();
     dangerLevel = s.loadFloat();
@@ -88,7 +85,7 @@ public class Scene implements Session.Saveable, Assignment {
   
   
   public void saveState(Session s) throws Exception {
-    view.saveState(s);
+    view().saveState(s);
     
     s.saveObject (trigger    );
     s.saveFloat  (dangerLevel);
@@ -313,12 +310,13 @@ public class Scene implements Session.Saveable, Assignment {
   }
   
   
-  public boolean addPerson(Person p, int x, int y) {
+  public boolean enterScene(Person p, int x, int y) {
     Tile location = tileAt(x, y);
     if (location == null) return false;
     p.setAssignment(this);
     p.setExactPosition(this, x, y, 0);
     persons.add(p);
+    liftFogInSight(p);
     return true;
   }
   
@@ -364,7 +362,7 @@ public class Scene implements Session.Saveable, Assignment {
     this.trigger = trigger;
     this.site    = site   ;
     this.dangerLevel = dangerLevel;
-    this.expireTime = expireTime;
+    this.expireTime  = expireTime ;
     if (forces != null) for (Person p : forces) othersTeam.add(p);
   }
   
@@ -388,13 +386,13 @@ public class Scene implements Session.Saveable, Assignment {
     I.say("\nBEGINNING SCENE...");
     int numT = playerTeam.size();
     int x = (size - numT) / 2, y = 0;
-    view.setZoomPoint(tileAt(x, y));
+    view().setZoomPoint(tileAt(x, y));
     for (Person p : playerTeam) {
-      addPerson(p, x, y);
+      enterScene(p, x, y);
       x += 1;
     }
     nextActing = playerTeam.first();
-    view.setSelection(nextActing, false);
+    view().setSelection(nextActing, false);
     playerTurn = true;
     
     updateFog();
@@ -414,7 +412,7 @@ public class Scene implements Session.Saveable, Assignment {
         time += 1;
       }
       else {
-        if (last != null) view.setSelection(nextActing, false);
+        if (last != null) view().setSelection(nextActing, false);
         
         if (! (nextPA.canTakeAction() && playerTurn)) {
           moveToNextPersonsTurn();
@@ -440,10 +438,10 @@ public class Scene implements Session.Saveable, Assignment {
     I.say("\n  Trying to find next active person...");
     I.say("  Active: "+nextActing);
     
-    PersonActions PA = nextActing.actions;
-    if ((PA != null) && (! PA.turnDone()) && (! PA.canTakeAction())) {
+    PersonActions NA = nextActing == null ? null : nextActing.actions;
+    if ((NA != null) && (! NA.turnDone()) && (! NA.canTakeAction())) {
       I.say("\n  Ending turn for "+nextActing);
-      PA.onTurnEnd();
+      NA.onTurnEnd();
     }
     nextActing = null;
     final int numTeams = 2;
@@ -456,7 +454,7 @@ public class Scene implements Session.Saveable, Assignment {
       if (playerTurn) I.add("player team"); else I.add("enemy team");
       
       for (Person p : team) {
-        PA = p.actions;
+        final PersonActions PA = p.actions;
         if (! PA.canTakeAction()) continue;
         
         if (playerTurn) {
@@ -493,8 +491,8 @@ public class Scene implements Session.Saveable, Assignment {
         //  Zoom to the unit in question (if they're visible...)
         if (fogAt(nextActing.currentTile(), Person.Side.HEROES) > 0) {
           I.say("  Will zoom to "+nextActing);
-          view.setSelection(nextActing, false);
-          view.setZoomPoint(nextActing.currentTile());
+          view().setSelection(nextActing, false);
+          view().setZoomPoint(nextActing.currentTile());
         }
         return;
       }
@@ -505,7 +503,7 @@ public class Scene implements Session.Saveable, Assignment {
   
   public void endScene() {
     for (Person p : persons) removePerson(p);
-    world.exitFromMission(this);
+    world.exitFromScene(this);
   }
   
 
@@ -518,13 +516,17 @@ public class Scene implements Session.Saveable, Assignment {
       fogO[c.x][c.y] = 0;
     }
     for (Person p : playerTeam) if (p.health.conscious()) {
-      final float radius = p.actions.sightRange();
-      liftFogAround(p.currentTile(), radius, p, true);
+      liftFogInSight(p);
     }
     for (Person p : othersTeam) if (p.health.conscious())  {
-      final float radius = p.actions.sightRange();
-      liftFogAround(p.currentTile(), radius, p, true);
+      liftFogInSight(p);
     }
+  }
+  
+  
+  public void liftFogInSight(Person p) {
+    final float radius = p.actions.sightRange();
+    liftFogAround(p.currentTile(), radius, p, true);
   }
   
   
@@ -616,7 +618,7 @@ public class Scene implements Session.Saveable, Assignment {
   /**  Graphical/display routines:
     */
   public SceneView view() {
-    return view;
+    return world.view().sceneView();
   }
   
   
@@ -638,7 +640,6 @@ public class Scene implements Session.Saveable, Assignment {
   public Image icon() {
     return trigger.icon();
   }
-  
   
   
 }

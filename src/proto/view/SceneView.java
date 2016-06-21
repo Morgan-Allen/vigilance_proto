@@ -16,10 +16,8 @@ import java.awt.*;
 public class SceneView extends UINode {
   
   final static int
-    TILE_SIZE = 64;
+    TILE_SIZE = 32;
   final static String IMG_DIR = "media assets/scene view/";
-  
-  Scene scene;
   
   Tile zoomTile;
   int zoomX, zoomY;
@@ -30,8 +28,8 @@ public class SceneView extends UINode {
   Image hoverBox;
   
   
-  public SceneView(Scene scene) {
-    this.scene = scene;
+  public SceneView(UINode parent, Box2D bounds) {
+    super(parent, bounds);
     hoverBox = Kind.loadImage(IMG_DIR+"select_circle.png");
   }
   
@@ -72,6 +70,9 @@ public class SceneView extends UINode {
   
 
   void renderTo(Surface surface, Graphics2D g) {
+    final Scene scene = mainView.world.activeScene();
+    if (scene == null) return;
+    
     int size = scene.size();
     Action done = scene.currentAction();
     Batch <Person> visible = new Batch <Person> ();

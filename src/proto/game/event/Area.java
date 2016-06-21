@@ -6,7 +6,11 @@ import proto.game.world.*;
 
 
 
-public class Scene implements Session.Saveable {
+//  TODO:  Consider having District extend this, and just refer to arbitrary
+//         areas as parents.
+
+
+public class Area implements Session.Saveable {
   
   
   final String name;
@@ -14,13 +18,13 @@ public class Scene implements Session.Saveable {
   final Region region;
   
   
-  public Scene(String name, Region region) {
+  public Area(String name, Region region) {
     this.name = name;
     this.region = region;
   }
   
   
-  public Scene(Session s) throws Exception {
+  public Area(Session s) throws Exception {
     s.cacheInstance(this);
     name = s.loadString();
     region = (Region) s.loadObject();

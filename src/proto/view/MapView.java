@@ -77,8 +77,8 @@ public class MapView extends UINode {
   /**  Actual rendering methods-
     */
   void renderTo(Surface surface, Graphics2D g) {
-    District nations[] = mainView.world.nations();
-    attachOutlinesFor(nations);
+    District districts[] = mainView.world.districts();
+    attachOutlinesFor(districts);
     //
     //  Draw the background image first-
     g.drawImage(mapImage, vx, vy, vw, vh, null);
@@ -101,7 +101,7 @@ public class MapView extends UINode {
     
     ///if (I.used60Frames) I.say("Pixel value is: "+pixVal);
     District selectedArea = mainView.areaView.selectedNation();
-    for (District n : nations) if (n.region.view.colourKey == pixVal) {
+    for (District n : districts) if (n.region.view.colourKey == pixVal) {
       nationHovered = n;
     }
     if (nationHovered != null && surface.mouseClicked()) {
@@ -111,7 +111,7 @@ public class MapView extends UINode {
     renderOutline(selectedArea , surface, g, mapWRatio, mapHRatio);
     renderOutline(nationHovered, surface, g, mapWRatio, mapHRatio);
     
-    for (District n : nations) {
+    for (District n : districts) {
       int x = (int) ((n.region.view.centerX / mapWRatio) + vx);
       int y = (int) ((n.region.view.centerY / mapHRatio) + vy);
       

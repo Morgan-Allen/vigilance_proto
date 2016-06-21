@@ -22,8 +22,8 @@ public class Kidnapping extends Event {
   
   Person boss;
   Person missing;
-  Scene home;
-  Scene taken;
+  Area home;
+  Area taken;
   Clue fibres;
   
   
@@ -31,8 +31,8 @@ public class Kidnapping extends Event {
     super(s);
     boss    = (Person) s.loadObject();
     missing = (Person) s.loadObject();
-    home    = (Scene ) s.loadObject();
-    taken   = (Scene ) s.loadObject();
+    home    = (Area ) s.loadObject();
+    taken   = (Area ) s.loadObject();
     fibres  = (Clue  ) s.loadObject();
   }
   
@@ -54,8 +54,8 @@ public class Kidnapping extends Event {
     
     this.boss    = boss;
     this.missing = missing;
-    this.home    = new Scene("home"  , region);
-    this.taken   = new Scene("taken" , region);
+    this.home    = new Area("home"  , region);
+    this.taken   = new Area("taken" , region);
     this.fibres  = new Clue("fibres");
     
     this.setKnown(home);
@@ -91,7 +91,7 @@ public class Kidnapping extends Event {
   
   
   protected boolean checkFollowed(Lead lead, boolean success) {
-    final District nation = world().nationFor(region());
+    final District nation = world().districtFor(region());
     final Events events = world().events();
     
     if (lead.ID == LEAD_RESCUE) {
@@ -144,7 +144,7 @@ public class Kidnapping extends Event {
       
       Person boss    = Crooks.randomMobster (world);
       Person missing = Crooks.randomCivilian(world);
-      District nation  = (District) Rand.pickFrom(world.nations());
+      District nation  = (District) Rand.pickFrom(world.districts());
       
       Event s = new Kidnapping(boss, missing, nation.region, world);
       float time = world.timeDays() + Rand.index(5);

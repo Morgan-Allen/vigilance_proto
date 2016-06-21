@@ -22,7 +22,7 @@ public class RunGame extends JFrame implements ActionListener {
   public static void main(String[] args) {
     EventQueue.invokeLater(new Runnable() {
       public void run() {
-        RunGame ex = new RunGame();
+        RunGame ex = new RunGame(DEFAULT_SAVE_PATH);
         ex.setVisible(true);
       }
     });
@@ -44,14 +44,23 @@ public class RunGame extends JFrame implements ActionListener {
   
   /**  Setup and construction-
     */
+  String savePath;
   Surface surface;
   World world;
   
   
-  public RunGame() {
+  public RunGame(String savePath) {
+    this.savePath = savePath;
+    
     setupAssets();
-    setupWorld();
     initUI();
+
+    if (! attemptReload(savePath)) {
+      this.world = setupWorld();
+    }
+    
+    Timer timer = new Timer(1000 / FRAME_RATE, this);
+    timer.start();
   }
   
   
@@ -62,16 +71,11 @@ public class RunGame extends JFrame implements ActionListener {
   }
   
   
-  private void setupWorld() {
-    
-    if (! attemptReload(DEFAULT_SAVE_PATH)) {
-      this.world = new World(this, DEFAULT_SAVE_PATH);
-      world.initDefaultNations();
-      world.initDefaultBase();
-    }
-    
-    Timer timer = new Timer(1000 / FRAME_RATE, this);
-    timer.start();
+  protected World setupWorld() {
+    this.world = new World(this, savePath);
+    world.initDefaultNations();
+    world.initDefaultBase();
+    return world;
   }
   
   

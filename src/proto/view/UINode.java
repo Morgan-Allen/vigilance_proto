@@ -22,7 +22,7 @@ public abstract class UINode {
   
   
   UINode() {
-    this.parent = null;
+    this.parent   = null;
     this.mainView = (MainView) this;
   }
   
@@ -60,6 +60,7 @@ public abstract class UINode {
     vy = (int) b.ypos();
     vw = (int) b.xdim();
     vh = (int) b.ydim();
+    
     if (parent != null) {
       vx += parent.vx;
       vy += parent.vy;

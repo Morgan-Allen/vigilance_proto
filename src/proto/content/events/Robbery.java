@@ -21,21 +21,21 @@ public class Robbery extends Event {
     LEAD_STASH  = 4
   ;
   
-  Scene business;
+  Area business;
   Person owner;
   Person mole;
   Person boss;
-  Scene stash;
+  Area stash;
   
   
   public Robbery(Session s) throws Exception {
     super(s);
     
-    business = (Scene ) s.loadObject();
+    business = (Area ) s.loadObject();
     owner    = (Person) s.loadObject();
     mole     = (Person) s.loadObject();
     boss     = (Person) s.loadObject();
-    stash    = (Scene ) s.loadObject();
+    stash    = (Area ) s.loadObject();
   }
   
   
@@ -54,11 +54,11 @@ public class Robbery extends Event {
       world, region
     );
     
-    this.business = new Scene(busName, region);
+    this.business = new Area(busName, region);
     this.owner    = Crooks.randomCivilian(world);
     this.mole     = Crooks.randomCivilian(world);
     this.boss     = boss;
-    this.stash    = new Scene("Stash Safehouse", region);
+    this.stash    = new Area("Stash Safehouse", region);
     
     this.setKnown(business, owner);
     
@@ -105,7 +105,7 @@ public class Robbery extends Event {
   
   
   protected boolean checkFollowed(Lead lead, boolean success) {
-    final District nation = world().nationFor(region());
+    final District nation = world().districtFor(region());
     final Events events = world().events();
     
     if (lead.ID == LEAD_CAMERA) {
@@ -178,7 +178,7 @@ public class Robbery extends Event {
   ) {
     public Event createRandomEvent(World world) {
       Person boss    = Crooks.randomMobster(world);
-      District nation  = (District) Rand.pickFrom(world.nations());
+      District nation  = (District) Rand.pickFrom(world.districts());
       
       Event s = new Robbery(boss, "The Central Bank", nation.region, world);
       float time = world.timeDays() + Rand.index(5);

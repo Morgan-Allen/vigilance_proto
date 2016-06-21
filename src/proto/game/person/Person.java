@@ -159,6 +159,8 @@ public class Person implements Session.Saveable {
   public void setExactPosition(Scene scene, float x, float y, float z) {
     this.location = scene.tileAt((int) x, (int) y);
     this.exactPos.set(x, y, z);
+    
+    I.say(this+" entered scene, location: "+location);
   }
   
   

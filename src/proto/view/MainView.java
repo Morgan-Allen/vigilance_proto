@@ -16,6 +16,9 @@ public class MainView extends UINode {
   
   final World world;
   
+  SceneView  sceneView ;
+  UINode     mainUI    ;
+  
   AreasView  areaView  ;
   RoomView   roomView  ;
   RegionView regionView;
@@ -39,29 +42,40 @@ public class MainView extends UINode {
     this.relBounds.set(0, 0, fullWide, fullHigh);
     int paneDown = 20 + rosterHigh, paneHigh = fullHigh - (10 + paneDown);
     
-    personView = new PersonView(this, new Box2D(
+    sceneView = new SceneView(this, new Box2D(
+      0, 0, fullWide, fullHigh
+    ));
+    mainUI = new UINode(this, new Box2D(
+      0, 0, fullWide, fullHigh
+    )) {
+      void renderTo(Surface surface, Graphics2D g) {
+      }
+    };
+    addChildren(sceneView, mainUI);
+    
+    personView = new PersonView(mainUI, new Box2D(
       0  , 0,
       320, fullHigh
     ));
-    rosterView = new RosterView(this, new Box2D(
+    rosterView = new RosterView(mainUI, new Box2D(
       320, 0,
       fullWide - 320, 120
     ));
-    addChildren(personView, rosterView);
+    mainUI.addChildren(personView, rosterView);
     
-    areaView = new AreasView(this, new Box2D(
+    areaView = new AreasView(mainUI, new Box2D(
       320, paneDown,
       400, paneHigh
     ));
-    roomView = new RoomView(this, new Box2D(
+    roomView = new RoomView(mainUI, new Box2D(
       720, paneDown,
       480, paneHigh
     ));
-    regionView = new RegionView(this, new Box2D(
+    regionView = new RegionView(mainUI, new Box2D(
       720, paneDown,
       480, paneHigh
     ));
-    addChildren(areaView, roomView, regionView);
+    mainUI.addChildren(areaView, roomView, regionView);
     
     final String
       MAPS_DIR = "media assets/city map/",
@@ -75,6 +89,11 @@ public class MainView extends UINode {
     alertMarker   = Kind.loadImage(MAPS_DIR+"alert_symbol.png" );
     selectCircle  = Kind.loadImage(ACTS_DIR+"select_circle.png");
     selectSquare  = Kind.loadImage(MNUI_DIR+"select_square.png");
+  }
+  
+  
+  public SceneView sceneView() {
+    return sceneView;
   }
   
   
@@ -110,6 +129,15 @@ public class MainView extends UINode {
   protected void updateAndRender(Surface surface, Graphics2D g) {
     
     final UINode topMessage = messageQueue.first();
+    
+    if (world.activeScene() != null) {
+      sceneView.visible = true ;
+      mainUI   .visible = false;
+    }
+    else {
+      sceneView.visible = false;
+      mainUI   .visible = true ;
+    }
     
     if (topMessage != messageShown) {
       if (topMessage != null) {

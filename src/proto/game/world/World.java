@@ -6,6 +6,8 @@ import proto.game.person.*;
 import proto.game.scene.*;
 import proto.util.*;
 import proto.view.*;
+
+import proto.content.scenes.*;
 import proto.content.agents.*;
 import proto.content.events.*;
 import proto.content.items.*;
@@ -112,11 +114,11 @@ public class World implements Session.Saveable {
   
   
   public void initDefaultNations() {
-    int numN = Region.ALL_REGIONS.length;
+    int numN = Regions.ALL_REGIONS.length;
     this.districts = new District[numN];
     
     for (int n = 0; n < numN; n++) {
-      districts[n] = new District(Region.ALL_REGIONS[n], this);
+      districts[n] = new District(Regions.ALL_REGIONS[n], this);
     }
     events.addType(Kidnapping.TYPE);
     events.addType(Robbery   .TYPE);
@@ -159,13 +161,13 @@ public class World implements Session.Saveable {
   
   /**  General query methods-
     */
-  public District[] nations() {
+  public District[] districts() {
     return districts;
   }
   
   
-  public District nationFor(Region r) {
-    for (District n : districts) if (n.region == r) return n;
+  public District districtFor(Region r) {
+    for (District d : districts) if (d.region == r) return d;
     return null;
   }
   
@@ -241,12 +243,17 @@ public class World implements Session.Saveable {
   }
   
   
-  public void enterMission(Scene mission) {
+  public Scene activeScene() {
+    return activeScene;
+  }
+  
+  
+  public void enterScene(Scene mission) {
     this.activeScene = mission;
   }
   
   
-  public void exitFromMission(Scene mission) {
+  public void exitFromScene(Scene mission) {
     if (this.activeScene != mission) I.complain(mission+" is not active!");
     this.activeScene = null;
   }

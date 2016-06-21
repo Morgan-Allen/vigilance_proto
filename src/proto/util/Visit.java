@@ -51,6 +51,100 @@ public abstract class Visit <T> implements Iterable <T>, Iterator <T> {
   }
   
   
+  public static Visit <Coord> perimeter(
+    final int minX, final int minY, final int xD, final int yD
+  ) {
+    final int dirs[] = TileConstants.T_ADJACENT;
+    final Coord passed = new Coord();
+    return new Visit <Coord> () {
+      
+      int dirIndex = 0, sideCount = xD;
+      int dir = dirs[0], x = minX - 1, y = minY - 1;
+      
+      public boolean hasNext() {
+        return dirIndex != -1;
+      }
+      
+      public Coord next() {
+        passed.x = x;
+        passed.y = y;
+        x += TileConstants.T_X[dir];
+        y += TileConstants.T_Y[dir];
+        
+        if (--sideCount < 0) {
+          if (++dirIndex >= dirs.length) { dirIndex = -1; return passed; }
+          dir       = dirs[dirIndex];
+          sideCount = (dirIndex % 2 == 0) ? xD : yD;
+        }
+        return passed;
+      }
+    };
+  }
+  
+  
+  public static Visit <Coord> coordsOnLine(
+    final Vec2D orig, final Vec2D dest
+  ) {
+    final Vec2D
+      disp = new Vec2D(dest).sub(orig),
+      perp = disp.perp(new Vec2D()),
+      temp = new Vec2D()
+    ;
+    final int
+      signX = disp.x > 0 ? 1 : -1,
+      signY = disp.y > 0 ? 1 : -1
+    ;
+    final Coord
+      last = new Coord(),
+      next = new Coord((int) orig.x, (int) orig.y),
+      ends = new Coord((int) dest.x, (int) dest.y)
+    ;
+    final Box2D bounds = new Box2D(next.x, next.y, 0, 0);
+    bounds.include(ends.x, ends.y, 0);
+    
+    return new Visit <Coord> () {
+      boolean done = false;
+      
+      public boolean hasNext() {
+        return ! done;
+      }
+      
+      public Coord next() {
+        if (ends.matches(next)) {
+          done = true;
+          return next;
+        }
+        //
+        //  Essentially, we check each corner to see what 'side' of the line it
+        //  lies on, and head through whatever goalposts are marked by the
+        //  difference.  (NOTE:  The order of operations here is important,
+        //  please don't tamper.)
+        last.setTo(next);
+        final byte
+          side00 = cornerSide(0, 0),
+          side01 = cornerSide(0, 1),
+          side10 = cornerSide(1, 0),
+          side11 = cornerSide(1, 1)
+        ;
+        if      (side11 != side10 && signX > 0) next.x++;
+        else if (side11 != side01 && signY > 0) next.y++;
+        else if (side00 != side01 && signX < 0) next.x--;
+        else if (side00 != side10 && signY < 0) next.y--;
+        if (! bounds.contains(next.x, next.y)) done = true;
+        if (last.matches(next)) done = true;
+        return last;
+      }
+      
+      private byte cornerSide(int offx, int offy) {
+        temp.set(next.x + offx - orig.x, next.y + offy - orig.y);
+        final float dot = perp.dot(temp);
+        return (byte) (dot == 0 ? 0 : (dot > 0 ? 1 : -1));
+      }
+    };
+  }
+  
+  
+  
   /**  Couple of list-utility methods-
     */
   public static Object matchFor(Class matchClass, Series series) {

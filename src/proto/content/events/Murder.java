@@ -21,21 +21,21 @@ public class Murder extends Event {
     LEAD_RIVAL   = 2,
     LEAD_WEAPON  = 3;
   
-  Scene  morgue ;
+  Area  morgue ;
   Person victim ;
   Person partner;
   Person rival  ;
-  Scene  hides  ;
+  Area  hides  ;
   Clue   weapon ;
   
   
   public Murder(Session s) throws Exception {
     super(s);
-    morgue  = (Scene ) s.loadObject();
+    morgue  = (Area ) s.loadObject();
     victim  = (Person) s.loadObject();
     partner = (Person) s.loadObject();
     rival   = (Person) s.loadObject();
-    hides   = (Scene ) s.loadObject();
+    hides   = (Area ) s.loadObject();
     weapon  = (Clue  ) s.loadObject();
   }
   
@@ -55,11 +55,11 @@ public class Murder extends Event {
       world, region
     );
     
-    this.morgue  = new Scene("The Morgue", region);
+    this.morgue  = new Area("The Morgue", region);
     this.victim  = victim;
     this.rival   = Crooks.randomCivilian(world);
     this.partner = Crooks.randomCivilian(world);
-    this.hides   = new Scene("Hidden Area", region);
+    this.hides   = new Area("Hidden Area", region);
     this.weapon  = new Clue("Murder Weapon");
     this.setKnown(morgue, victim, partner, rival);
     
@@ -94,7 +94,7 @@ public class Murder extends Event {
   
   
   protected boolean checkFollowed(Lead lead, boolean success) {
-    final District nation = world().nationFor(region());
+    final District nation = world().districtFor(region());
     final Events events = world().events();
     
     final boolean
@@ -189,7 +189,7 @@ public class Murder extends Event {
     public Event createRandomEvent(World world) {
       
       Person victim = new Person(CIVILIAN, world, randomCommonName());
-      District nation  = (District) Rand.pickFrom(world.nations());
+      District nation  = (District) Rand.pickFrom(world.districts());
       
       Event s = new Murder(victim, nation.region, world);
       float time = world.timeDays() + Rand.index(5);
