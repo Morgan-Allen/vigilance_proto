@@ -78,7 +78,7 @@ public class ViewUtils {
       if (hovered) {
         g.drawOval(x, y, 20, 20);
         if (surface.mouseClicked()) {
-          parent.rosterView.setSelection(p);
+          parent.setSelection(p);
         }
       }
       x -= moveX;

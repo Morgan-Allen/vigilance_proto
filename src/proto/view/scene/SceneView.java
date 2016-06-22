@@ -75,9 +75,9 @@ public class SceneView extends UINode {
   }
   
   
-  protected void renderTo(Surface surface, Graphics2D g) {
+  protected boolean renderTo(Surface surface, Graphics2D g) {
     final Scene scene = mainView.world().activeScene();
-    if (scene == null) return;
+    if (scene == null) return false;
     
     int size = scene.size();
     Action done = scene.currentAction();
@@ -162,7 +162,7 @@ public class SceneView extends UINode {
     //
     //  If complete, display a summary of the results!
     if (scene.complete()) {
-      return;
+      return true;
     }
     
     //
@@ -201,6 +201,8 @@ public class SceneView extends UINode {
         }
       }
     }
+    
+    return true;
   }
   
   

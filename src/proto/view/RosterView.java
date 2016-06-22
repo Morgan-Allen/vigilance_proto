@@ -29,9 +29,6 @@ public class RosterView extends UINode {
   
   
   final Color statColors[] = new Color[4];
-  //final Image statIcons [] = new Image[4];
-  
-  private Person selectedPerson;
   
   
   RosterView(UINode parent, Box2D viewBounds) {
@@ -43,9 +40,10 @@ public class RosterView extends UINode {
   }
   
   
-  protected void renderTo(Surface surface, Graphics2D g) {
+  protected boolean renderTo(Surface surface, Graphics2D g) {
     Base base = mainView.world.base();
-    Assignment assignTo = mainView.areaView.selectedTask();
+    Assignment assignTo = mainView.selectedTask();
+    Person selectedPerson = mainView.selectedPerson();
     
     Image selectCircle = mainView.selectCircle;
     int across = 0, down = 15, size = 75, sizeA = 25, pad = 25, x, y;
@@ -120,21 +118,13 @@ public class RosterView extends UINode {
     }
     if (personHovered != null && surface.mouseClicked()) {
       if (selectedPerson == personHovered) personHovered = null;
-      setSelection(personHovered);
+      mainView.setSelection(personHovered);
     }
     
     g.setColor(Color.DARK_GRAY);
     g.drawRect(vx, vy, vw, vh);
-  }
-  
-  
-  void setSelection(Person selected) {
-    selectedPerson = selected;
-  }
-  
-  
-  Person selected() {
-    return selectedPerson;
+    
+    return true;
   }
 }
 

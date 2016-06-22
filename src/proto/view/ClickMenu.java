@@ -29,7 +29,7 @@ public abstract class ClickMenu <T> extends UINode {
   
   
   
-  protected void renderTo(Surface surface, Graphics2D g) {
+  protected boolean renderTo(Surface surface, Graphics2D g) {
     Image  images[] = new Image [options.size()];
     String labels[] = new String[options.size()];
     
@@ -92,6 +92,8 @@ public abstract class ClickMenu <T> extends UINode {
     if (hoverMenu && surface.mouseClicked()) {
       mainView.hideClickMenu(this);
     }
+    
+    return true;
   }
   
   

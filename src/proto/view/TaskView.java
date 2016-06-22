@@ -27,7 +27,7 @@ public class TaskView extends UINode {
   
   
   
-  protected void renderTo(Surface surface, Graphics2D g) {
+  protected boolean renderTo(Surface surface, Graphics2D g) {
     //
     //  Draw the icon and description for this particular task-
     g.setColor(Color.WHITE);
@@ -47,7 +47,7 @@ public class TaskView extends UINode {
     final boolean hovered = surface.tryHover(
       vx + 20 - 5, vy + 0, vw + 10 - 40, vh - 0, task
     );
-    final boolean selected = mainView.areaView.selectedTask() == task;
+    final boolean selected = mainView.selectedTask() == task;
     
     Color              boxColor = Color.DARK_GRAY;
     if      (selected) boxColor = Color.YELLOW;
@@ -57,7 +57,7 @@ public class TaskView extends UINode {
     g.drawRect(vx + 20 -5, vy - 5, vw + 10 - 41, vh + 9);
     
     if (surface.mouseClicked() && hovered) {
-      mainView.areaView.setSelectedTask(selected ? null : task);
+      mainView.setSelectedTask(selected ? null : task);
     }
     //
     //  Finally, draw any persons assigned to this task...
@@ -65,6 +65,8 @@ public class TaskView extends UINode {
     ViewUtils.renderAssigned(
       task.assigned(), across - 20, vy + vh, surface, g
     );
+    
+    return true;
   }
   
 }

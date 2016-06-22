@@ -26,12 +26,12 @@ public class RoomView extends UINode {
   
   /**  Actual rendering methods-
     */
-  protected void renderTo(Surface surface, Graphics2D g) {
+  protected boolean renderTo(Surface surface, Graphics2D g) {
     
+    /*
     //  TODO:  This should properly be independent of either RoomView or
     //  RegionView.  Either merge the two or move this warning outside!
-    AreasView BV = mainView.areaView;
-    if (BV.selectedRoom() == null && BV.selectedNation() == null) {
+    if (mainView.selectedRoom() == null && mainView.selectedNation() == null) {
       g.setColor(Color.LIGHT_GRAY);
       ViewUtils.drawWrappedString(
         "Select an agent from your roster to view their gear, skills and "+
@@ -40,9 +40,10 @@ public class RoomView extends UINode {
         g, vx + 25, vy + 0, vw - 30, 150
       );
     }
+    //*/
     
-    Room room = mainView.areaView.selectedRoom();
-    if (room == null) return;
+    Room room = mainView.selectedRoom();
+    if (room == null) return false;
     
     //Image portrait = nation.region.view.portrait;
     /*
@@ -72,7 +73,7 @@ public class RoomView extends UINode {
       down += view.relBounds.ydim() + 10;
     }
     
-    Assignment selected = mainView.areaView.selectedTask();
+    Assignment selected = mainView.selectedTask();
     String help =
       "Select a task, then click in the bottom-left of roster portraits to "+
       "assign agents to the task."
@@ -82,6 +83,8 @@ public class RoomView extends UINode {
     }
     g.setColor(Color.LIGHT_GRAY);
     ViewUtils.drawWrappedString(help, g, vx + 25, down + 20, vw - 30, 150);
+    
+    return true;
   }
   
 }

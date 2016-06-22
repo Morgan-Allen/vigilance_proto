@@ -35,7 +35,7 @@ public abstract class MessageView extends UINode {
   }
   
   
-  protected void renderTo(Surface surface, Graphics2D g) {
+  protected boolean renderTo(Surface surface, Graphics2D g) {
     surface.tryHover(0, 0, surface.getWidth(), surface.getWidth(), this);
     
     g.setColor(background);
@@ -65,6 +65,8 @@ public abstract class MessageView extends UINode {
       button.updateAndRender(surface, g);
       down += 20;
     }
+    
+    return true;
   }
   
   

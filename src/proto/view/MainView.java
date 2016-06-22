@@ -3,6 +3,7 @@ package proto.view;
 
 import proto.common.*;
 import proto.game.world.*;
+import proto.game.person.*;
 import proto.util.*;
 import proto.view.scene.SceneView;
 
@@ -33,6 +34,9 @@ public class MainView extends UINode {
   List <UINode> messageQueue = new List();
   ClickMenu clickMenu = null;
   
+  private Object selectedObject;
+  private Assignment selectedTask;
+  
   
   
   public MainView(World world) {
@@ -49,34 +53,35 @@ public class MainView extends UINode {
     mainUI = new UINode(this, new Box2D(
       0, 0, fullWide, fullHigh
     )) {
-      protected void renderTo(Surface surface, Graphics2D g) {
+      protected boolean renderTo(Surface surface, Graphics2D g) {
+        return true;
       }
     };
     addChildren(sceneView, mainUI);
+    
+    rosterView = new RosterView(mainUI, new Box2D(
+      320, 0,
+      fullWide - 320, 120
+    ));
+    areaView = new AreasView(mainUI, new Box2D(
+      320, paneDown,
+      400, paneHigh
+    ));
+    mainUI.addChildren(areaView, rosterView);
     
     personView = new PersonView(mainUI, new Box2D(
       0  , 0,
       320, fullHigh
     ));
-    rosterView = new RosterView(mainUI, new Box2D(
-      320, 0,
-      fullWide - 320, 120
-    ));
-    mainUI.addChildren(personView, rosterView);
-    
-    areaView = new AreasView(mainUI, new Box2D(
-      320, paneDown,
-      400, paneHigh
-    ));
     roomView = new RoomView(mainUI, new Box2D(
-      720, paneDown,
-      480, paneHigh
+      0  , 0,
+      320, fullHigh
     ));
     regionView = new RegionView(mainUI, new Box2D(
-      720, paneDown,
-      480, paneHigh
+      0  , 0,
+      320, fullHigh
     ));
-    mainUI.addChildren(areaView, roomView, regionView);
+    mainUI.addChildren(personView, roomView, regionView);
     
     final String
       MAPS_DIR = "media assets/city map/",
@@ -100,6 +105,51 @@ public class MainView extends UINode {
   
   public World world() {
     return world;
+  }
+  
+  
+  
+  /**  Selection handling-
+    */
+  void setSelection(Object selected) {
+    I.say("Setting selection: "+selected);
+    
+    final Object old = selectedObject;
+    this.selectedObject = selected;
+    if (old != selected && ! (selected instanceof Person)) selectedTask = null;
+  }
+  
+  
+  Room selectedRoom() {
+    if (selectedObject instanceof Room) return (Room) selectedObject;
+    return null;
+  }
+  
+  
+  District selectedNation() {
+    if (selectedObject instanceof District) return (District) selectedObject;
+    return null;
+  }
+  
+  
+  Person selectedPerson() {
+    if (selectedObject instanceof Person) return (Person) selectedObject;
+    return null;
+  }
+  
+  
+  Object selectedObject() {
+    return selectedObject;
+  }
+  
+  
+  void setSelectedTask(Assignment task) {
+    this.selectedTask = task;
+  }
+  
+  
+  Assignment selectedTask() {
+    return selectedTask;
   }
   
   
@@ -159,9 +209,10 @@ public class MainView extends UINode {
   }
   
   
-  protected void renderTo(Surface surface, Graphics2D g) {
+  protected boolean renderTo(Surface surface, Graphics2D g) {
     g.setColor(Color.BLACK);
     g.fillRect(vx, vy, vw, vh);
+    return true;
   }
   
 }

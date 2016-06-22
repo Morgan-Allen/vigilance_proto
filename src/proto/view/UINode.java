@@ -71,7 +71,7 @@ public abstract class UINode {
       //g = g.create(vx, vy, vw, vh);
     }
     
-    renderTo(surface, g);
+    if (! renderTo(surface, g)) return;
     
     for (UINode kid : kids) {
       kid.updateAndRender(surface, g);
@@ -79,7 +79,7 @@ public abstract class UINode {
   }
   
   
-  protected abstract void renderTo(Surface surface, Graphics2D g);
+  protected abstract boolean renderTo(Surface surface, Graphics2D g);
 }
 
 

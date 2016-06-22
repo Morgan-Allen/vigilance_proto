@@ -35,10 +35,10 @@ public class RegionView extends UINode {
 
   /**  Actual rendering methods-
     */
-  protected void renderTo(Surface surface, Graphics2D g) {
+  protected boolean renderTo(Surface surface, Graphics2D g) {
     
-    District nation = mainView.areaView.selectedNation();
-    if (nation == null) return;
+    District nation = mainView.selectedNation();
+    if (nation == null) return false;
     
     //Image portrait = nation.region.view.portrait;
     final Base base = mainView.world.base();
@@ -71,6 +71,8 @@ public class RegionView extends UINode {
     
     g.setColor(Color.DARK_GRAY);
     g.drawRect(vx, vy, vw, vh);
+    
+    return true;
   }
   
   
@@ -108,7 +110,7 @@ public class RegionView extends UINode {
       if (prog < 1 && built != null) button.attachOverlay(IN_PROGRESS);
       button.updateAndRender(surface, g);
       
-      across += 60 + 10;
+      down += 60 + 10;
     }
     
     if (hoverSlot.val != -1) {

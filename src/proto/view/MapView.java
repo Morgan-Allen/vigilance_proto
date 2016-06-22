@@ -76,7 +76,7 @@ public class MapView extends UINode {
   
   /**  Actual rendering methods-
     */
-  protected void renderTo(Surface surface, Graphics2D g) {
+  protected boolean renderTo(Surface surface, Graphics2D g) {
     District districts[] = mainView.world.districts();
     attachOutlinesFor(districts);
     //
@@ -100,12 +100,13 @@ public class MapView extends UINode {
     }
     
     ///if (I.used60Frames) I.say("Pixel value is: "+pixVal);
-    District selectedArea = mainView.areaView.selectedNation();
+    
+    District selectedArea = mainView.selectedNation();
     for (District n : districts) if (n.region.view.colourKey == pixVal) {
       nationHovered = n;
     }
     if (nationHovered != null && surface.mouseClicked()) {
-      mainView.areaView.setSelection(nationHovered);
+      mainView.setSelection(nationHovered);
     }
     
     renderOutline(selectedArea , surface, g, mapWRatio, mapHRatio);
@@ -131,6 +132,8 @@ public class MapView extends UINode {
       }
       ViewUtils.renderAssigned(visitors(n), x + 25, y + 25, surface, g);
     }
+    
+    return true;
   }
   
   

@@ -88,14 +88,9 @@ public class PersonView extends UINode {
   }
   
   
-  protected void renderTo(Surface surface, Graphics2D g) {
-    
-    Person person = mainView.rosterView.selected();
-    if (person == null) {
-      person = mainView.world.base().atRosterIndex(0);
-      mainView.rosterView.setSelection(person);
-      if (person == null) return;
-    }
+  protected boolean renderTo(Surface surface, Graphics2D g) {
+    Person person = mainView.selectedPerson();
+    if (person == null) return false;
     
     g.setColor(Color.WHITE);
     g.drawImage(person.kind().sprite(), vx, vy, 120, 120, null);
@@ -128,12 +123,14 @@ public class PersonView extends UINode {
     
     g.setColor(Color.DARK_GRAY);
     g.drawRect(vx, vy, vw, vh);
+    
+    return true;
   }
   
   
   void performNavigation(int actionID, Person person) {
     if (actionID == ACTION_BACK) {
-      mainView.rosterView.setSelection(null);
+      mainView.setSelection(null);
       return;
     }
     
@@ -143,11 +140,11 @@ public class PersonView extends UINode {
     
     if (actionID == ACTION_NEXT) {
       personID = (personID + 1) % roster.size();
-      mainView.rosterView.setSelection(base.atRosterIndex(personID));
+      mainView.setSelection(base.atRosterIndex(personID));
     }
     if (actionID == ACTION_LAST) {
       personID = (personID + roster.size() - 1) % roster.size();
-      mainView.rosterView.setSelection(base.atRosterIndex(personID));
+      mainView.setSelection(base.atRosterIndex(personID));
     }
   }
   
@@ -296,7 +293,7 @@ public class PersonView extends UINode {
       if (hoverP) {
         g.drawImage(mainView.selectCircle, vx + 5, down + 5, 40, 40, null);
         if (surface.mouseClicked()) {
-          mainView.rosterView.setSelection(other);
+          mainView.setSelection(other);
         }
       }
       

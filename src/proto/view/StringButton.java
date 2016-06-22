@@ -27,7 +27,7 @@ public abstract class StringButton extends UINode {
   }
   
   
-  protected void renderTo(Surface surface, Graphics2D g) {
+  protected boolean renderTo(Surface surface, Graphics2D g) {
     final boolean hovered = surface.tryHover(vx, vy, vw, vh, refers) && valid;
     
     if      (toggled) g.setColor(Color.GREEN );
@@ -39,6 +39,8 @@ public abstract class StringButton extends UINode {
     
     if (hovered) whenHovered();
     if (hovered && surface.mouseClicked()) whenClicked();
+    
+    return true;
   }
   
   

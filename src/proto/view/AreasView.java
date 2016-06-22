@@ -16,8 +16,6 @@ public class AreasView extends UINode {
   final MapView mapView;
   final StringButton monitorButton, saveButton, loadButton, quitButton;
   
-  private Object selectedArea;
-  private Assignment selectedTask;
   
   
   AreasView(final UINode parent, Box2D viewBounds) {
@@ -69,10 +67,11 @@ public class AreasView extends UINode {
   }
   
   
-  protected void renderTo(Surface surface, Graphics2D g) {
+  protected boolean renderTo(Surface surface, Graphics2D g) {
     
     final World world = mainView.world;
     final Base  base  = world.base();
+    Object selection = mainView.selectedObject();
     
     int down = 10;
     
@@ -80,12 +79,12 @@ public class AreasView extends UINode {
       g.drawImage(room.icon(), vx + 10, vy + down, 60, 60, null);
       boolean hover = surface.tryHover(vx + 10, vy + down, 60, 60, room);
       
-      if (hover || selectedArea == room) {
+      if (hover || selection == room) {
         g.drawImage(mainView.selectSquare, vx + 10, vy + down, 60, 60, null);
       }
       
       if (hover && surface.mouseClicked()) {
-        selectedArea = room;
+        mainView.setSelection(room);
       }
       
       ViewUtils.renderAssigned(
@@ -107,35 +106,8 @@ public class AreasView extends UINode {
     
     g.setColor(Color.DARK_GRAY);
     g.drawRect(vx, vy, vw, vh);
-  }
-  
-  
-  void setSelection(Object selected) {
-    final Object old = selectedArea;
-    this.selectedArea = selected;
-    if (old != selected) selectedTask = null;
-  }
-  
-  
-  Room selectedRoom() {
-    if (selectedArea instanceof Room) return (Room) selectedArea;
-    return null;
-  }
-  
-  
-  District selectedNation() {
-    if (selectedArea instanceof District) return (District) selectedArea;
-    return null;
-  }
-  
-  
-  void setSelectedTask(Assignment task) {
-    this.selectedTask = task;
-  }
-  
-  
-  Assignment selectedTask() {
-    return selectedTask;
+    
+    return true;
   }
 }
 

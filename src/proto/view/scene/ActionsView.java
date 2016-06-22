@@ -62,7 +62,7 @@ public class ActionsView extends UINode {
   }
   
   
-  protected void renderTo(Surface surface, Graphics2D g) {
+  protected boolean renderTo(Surface surface, Graphics2D g) {
     
     g.setColor(new Color(0, 0, 0, 0.66f));
     g.fillRect(vx, vy, vw, vh);
@@ -70,6 +70,8 @@ public class ActionsView extends UINode {
     String desc = description(surface);
     g.setColor(Color.LIGHT_GRAY);
     ViewUtils.drawWrappedString(desc, g, vx, vy, vw, vh);
+    
+    return true;
   }
   
 
