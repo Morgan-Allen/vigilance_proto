@@ -4,7 +4,7 @@ package proto.common;
 import proto.game.world.*;
 import proto.game.person.*;
 import proto.game.event.*;
-
+import proto.content.agents.Heroes;
 import proto.content.events.*;
 import proto.content.scenes.*;
 import java.awt.EventQueue;
@@ -39,10 +39,12 @@ public class DebugScene extends RunGame {
       "Test event", "test event info", played, 101, played, null
     );
     
+    final Base base = world.base();
     UrbanScene mission = new UrbanScene(world, 32);
-    for (Person p : world.base().roster()) {
-      mission.addToTeam(p);
-    }
+    mission.addToTeam(base.firstOfKind(Heroes.HERO_BATMAN   ));
+    mission.addToTeam(base.firstOfKind(Heroes.HERO_NIGHTWING));
+    mission.addToTeam(base.firstOfKind(Heroes.HERO_BATGIRL  ));
+    
     mission.assignMissionParameters(
       combat, world.districtFor(played.region()), 0.5f, 100, null
     );

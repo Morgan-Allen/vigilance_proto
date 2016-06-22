@@ -19,7 +19,7 @@ import java.util.StringTokenizer;
 public class ViewUtils {
   
   
-  static void drawWrappedString(
+  public static void drawWrappedString(
     String s, Graphics2D g, int x, int y, int w, int h
   ) {
     StringTokenizer t = new StringTokenizer(s, " \n", true);
@@ -58,7 +58,7 @@ public class ViewUtils {
   
   /**  Rendering persons and stats-
     */
-  static void renderAssigned(
+  public static void renderAssigned(
     Series <Person> assigned, int atX, int atY,
     Surface surface, Graphics2D g
   ) {
@@ -86,7 +86,7 @@ public class ViewUtils {
   }
   
   
-  static void renderStatBar(
+  public static void renderStatBar(
     int x, int y, int w, int h,
     Color tint, Color back, float fill, boolean vertical, Graphics g
   ) {

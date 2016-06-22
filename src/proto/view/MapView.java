@@ -76,7 +76,7 @@ public class MapView extends UINode {
   
   /**  Actual rendering methods-
     */
-  void renderTo(Surface surface, Graphics2D g) {
+  protected void renderTo(Surface surface, Graphics2D g) {
     District districts[] = mainView.world.districts();
     attachOutlinesFor(districts);
     //

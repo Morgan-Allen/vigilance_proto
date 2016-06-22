@@ -7,6 +7,7 @@ import proto.game.world.*;
 import proto.game.event.*;
 import proto.util.*;
 import proto.view.*;
+import proto.view.scene.SceneView;
 
 import java.awt.Image;
 

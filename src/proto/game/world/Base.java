@@ -142,6 +142,12 @@ public class Base implements Session.Saveable {
   }
   
   
+  public Person firstOfKind(Kind kind) {
+    for (Person p : roster) if (p.kind() == kind) return p;
+    return null;
+  }
+  
+  
   
   /**  Tech levels and funding-
     */

@@ -35,7 +35,7 @@ public class RegionView extends UINode {
 
   /**  Actual rendering methods-
     */
-  void renderTo(Surface surface, Graphics2D g) {
+  protected void renderTo(Surface surface, Graphics2D g) {
     
     District nation = mainView.areaView.selectedNation();
     if (nation == null) return;

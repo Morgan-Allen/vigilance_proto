@@ -4,6 +4,7 @@ package proto.view;
 import proto.common.*;
 import proto.game.world.*;
 import proto.util.*;
+import proto.view.scene.SceneView;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -26,7 +27,7 @@ public class MainView extends UINode {
   RosterView rosterView;
   PersonView personView;
   
-  Image alertMarker, selectCircle, selectSquare;
+  final public Image alertMarker, selectCircle, selectSquare;
   
   UINode messageShown = null;
   List <UINode> messageQueue = new List();
@@ -48,7 +49,7 @@ public class MainView extends UINode {
     mainUI = new UINode(this, new Box2D(
       0, 0, fullWide, fullHigh
     )) {
-      void renderTo(Surface surface, Graphics2D g) {
+      protected void renderTo(Surface surface, Graphics2D g) {
       }
     };
     addChildren(sceneView, mainUI);
@@ -94,6 +95,11 @@ public class MainView extends UINode {
   
   public SceneView sceneView() {
     return sceneView;
+  }
+  
+  
+  public World world() {
+    return world;
   }
   
   
@@ -153,7 +159,7 @@ public class MainView extends UINode {
   }
   
   
-  void renderTo(Surface surface, Graphics2D g) {
+  protected void renderTo(Surface surface, Graphics2D g) {
     g.setColor(Color.BLACK);
     g.fillRect(vx, vy, vw, vh);
   }

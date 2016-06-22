@@ -69,7 +69,7 @@ public class AreasView extends UINode {
   }
   
   
-  void renderTo(Surface surface, Graphics2D g) {
+  protected void renderTo(Surface surface, Graphics2D g) {
     
     final World world = mainView.world;
     final Base  base  = world.base();

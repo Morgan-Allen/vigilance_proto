@@ -26,7 +26,7 @@ public class RoomView extends UINode {
   
   /**  Actual rendering methods-
     */
-  void renderTo(Surface surface, Graphics2D g) {
+  protected void renderTo(Surface surface, Graphics2D g) {
     
     //  TODO:  This should properly be independent of either RoomView or
     //  RegionView.  Either merge the two or move this warning outside!

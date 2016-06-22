@@ -10,13 +10,13 @@ import java.awt.Graphics2D;
 public abstract class UINode {
   
   
-  final MainView mainView;
-  final UINode parent;
-  final Box2D relBounds = new Box2D();
-  final List <UINode> kids = new List();
+  final protected MainView mainView;
+  final protected UINode parent;
   
+  final public Box2D relBounds = new Box2D();
   public boolean visible = true;
   
+  final List <UINode> kids = new List();
   protected int vx, vy, vw, vh;
   protected boolean clipContent = false;
   
@@ -79,7 +79,7 @@ public abstract class UINode {
   }
   
   
-  abstract void renderTo(Surface surface, Graphics2D g);
+  protected abstract void renderTo(Surface surface, Graphics2D g);
 }
 
 

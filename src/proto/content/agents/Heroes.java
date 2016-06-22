@@ -6,6 +6,7 @@ import proto.game.world.*;
 import proto.game.event.*;
 import proto.game.person.*;
 
+import static proto.game.person.Common.*;
 import static proto.game.person.PersonStats.*;
 
 
@@ -86,7 +87,9 @@ public class Heroes {
       INTIMIDATE   , 8,
       GYMNASTICS   , 7,
       CLOSE_COMBAT , 7,
-      STAMINA      , 7
+      STAMINA      , 7,
+      
+      MOVE, 1
     )
   ;
   
@@ -122,7 +125,9 @@ public class Heroes {
       CLOSE_COMBAT , 5,
       STAMINA      , 5,
       
-      TRAIT_CIVILIAN, 1
+      TRAIT_CIVILIAN, 1,
+      
+      MOVE, 1
     )
   ;
   
@@ -138,7 +143,9 @@ public class Heroes {
       HIT_POINTS, 8 ,
       WILLPOWER , 8 ,
       
-      TRAIT_ANIMAL, 1
+      TRAIT_ANIMAL, 1,
+      
+      MOVE, 1
     )
   ;
   
@@ -172,7 +179,9 @@ public class Heroes {
       INTIMIDATE   , 5,
       GYMNASTICS   , 7,
       CLOSE_COMBAT , 7,
-      STAMINA      , 7
+      STAMINA      , 7,
+      
+      MOVE, 1
     )
   ;
   
@@ -207,7 +216,9 @@ public class Heroes {
       INTIMIDATE   , 0,
       GYMNASTICS   , 7,
       CLOSE_COMBAT , 8,
-      STAMINA      , 5
+      STAMINA      , 5,
+      
+      MOVE, 1
     )
   ;
   
@@ -241,7 +252,9 @@ public class Heroes {
       INTIMIDATE   , 4,
       GYMNASTICS   , 4,
       CLOSE_COMBAT , 5,
-      STAMINA      , 4
+      STAMINA      , 4,
+      
+      MOVE, 1
     )
   ;
   

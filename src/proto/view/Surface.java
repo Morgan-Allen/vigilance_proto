@@ -30,10 +30,7 @@ public class Surface extends JPanel implements
   
   public Surface(RunGame runGame) {
     this.game = runGame;
-    
     this.setPreferredSize(new Dimension(1200, 750));
-    addMouseListener(this);
-    addMouseMotionListener(this);
   }
   
   

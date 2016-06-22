@@ -43,7 +43,7 @@ public class RosterView extends UINode {
   }
   
   
-  void renderTo(Surface surface, Graphics2D g) {
+  protected void renderTo(Surface surface, Graphics2D g) {
     Base base = mainView.world.base();
     Assignment assignTo = mainView.areaView.selectedTask();
     

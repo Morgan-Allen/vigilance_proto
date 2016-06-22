@@ -81,12 +81,16 @@ public class RunGame extends JFrame implements ActionListener {
   
   private void initUI() {
     this.setLayout(new BorderLayout());
-    add(this.surface = new Surface (this), BorderLayout.CENTER);
+    add(this.surface = new Surface(this), BorderLayout.CENTER);
     
     pack();
     setTitle("Run Game");
     setLocationRelativeTo(null);
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+    this   .addKeyListener        (surface);
+    surface.addMouseListener      (surface);
+    surface.addMouseMotionListener(surface);
   }
   
   

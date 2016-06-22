@@ -27,7 +27,7 @@ public class TaskView extends UINode {
   
   
   
-  void renderTo(Surface surface, Graphics2D g) {
+  protected void renderTo(Surface surface, Graphics2D g) {
     //
     //  Draw the icon and description for this particular task-
     g.setColor(Color.WHITE);

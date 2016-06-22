@@ -88,7 +88,7 @@ public class PersonView extends UINode {
   }
   
   
-  void renderTo(Surface surface, Graphics2D g) {
+  protected void renderTo(Surface surface, Graphics2D g) {
     
     Person person = mainView.rosterView.selected();
     if (person == null) {

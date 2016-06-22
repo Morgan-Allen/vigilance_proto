@@ -18,7 +18,6 @@ public abstract class Ability extends Trait {
   
   /**  Data fields, construction and save/load methods-
     */
-  
   final public static int
     NONE              = 0     ,
     IS_MELEE          = 1 << 0,
@@ -151,8 +150,18 @@ public abstract class Ability extends Trait {
   
   /**  Methods specific to scenes and actions-
     */
-  public int costAP(Action derived) {
+  public int minCostAP() {
     return 1;
+  }
+  
+  
+  public int motionCostAP(int pathLength) {
+    return (pathLength - 1) / 2;
+  }
+  
+  
+  public int costAP(Action use) {
+    return minCostAP() + motionCostAP(use.path().length);
   }
   
   

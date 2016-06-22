@@ -29,7 +29,7 @@ public abstract class ClickMenu <T> extends UINode {
   
   
   
-  void renderTo(Surface surface, Graphics2D g) {
+  protected void renderTo(Surface surface, Graphics2D g) {
     Image  images[] = new Image [options.size()];
     String labels[] = new String[options.size()];
     

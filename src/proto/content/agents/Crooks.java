@@ -5,6 +5,8 @@ import proto.common.*;
 import proto.game.world.*;
 import proto.game.person.*;
 import proto.util.*;
+
+import static proto.game.person.Common.MOVE;
 import static proto.game.person.PersonStats.*;
 
 
@@ -24,7 +26,9 @@ public class Crooks {
       SOCIAL    , 4 ,
       STRENGTH  , 4 ,
       HIT_POINTS, 10,
-      WILLPOWER , 8
+      WILLPOWER , 8 ,
+      
+      MOVE, 1
     )
   ;
   
@@ -38,7 +42,9 @@ public class Crooks {
       SOCIAL    , 2 ,
       STRENGTH  , 2 ,
       HIT_POINTS, 6 ,
-      WILLPOWER , 4
+      WILLPOWER , 4 ,
+      
+      MOVE, 1
     )
   ;
   
