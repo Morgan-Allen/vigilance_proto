@@ -1,11 +1,13 @@
 
 
-package proto.view;
+package proto.view.world;
 import proto.common.*;
 import proto.game.world.*;
 import proto.game.event.*;
 import proto.game.person.*;
+
 import proto.util.*;
+import proto.view.common.*;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -28,7 +30,7 @@ public class MapView extends UINode {
   }
   
   
-  void loadMapImages(String mapImageName, String keyImageName) {
+  public void loadMapImages(String mapImageName, String keyImageName) {
     mapImage = (BufferedImage) Kind.loadImage(mapImageName);
     keyImage = (BufferedImage) Kind.loadImage(keyImageName);
   }
@@ -77,7 +79,7 @@ public class MapView extends UINode {
   /**  Actual rendering methods-
     */
   protected boolean renderTo(Surface surface, Graphics2D g) {
-    District districts[] = mainView.world.districts();
+    District districts[] = mainView.world().districts();
     attachOutlinesFor(districts);
     //
     //  Draw the background image first-
@@ -125,7 +127,7 @@ public class MapView extends UINode {
         Color.RED, Color.BLACK, crimeLevel, false, g
       );
       
-      for (Event event : mainView.world.events().active()) {
+      for (Event event : mainView.world().events().active()) {
         if (event.region() == n.region) {
           g.drawImage(mainView.alertMarker, x - 25, y - 25, 50, 50, null);
         }
@@ -139,7 +141,8 @@ public class MapView extends UINode {
   
   private Series <Person> visitors(District located) {
     final Batch <Person> visitors = new Batch();
-    for (Person p : mainView.world.base().roster()) if (p.assignment() != null) {
+    final Series <Person> roster = mainView.world().base().roster();
+    for (Person p : roster) if (p.assignment() != null) {
       if (p.assignment().targetLocation() == located.region) {
         visitors.include(p);
       }

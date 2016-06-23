@@ -4,6 +4,7 @@ package proto.game.person;
 import proto.game.world.*;
 import proto.game.scene.*;
 import proto.view.*;
+import proto.view.scene.AbilityFX;
 import proto.util.*;
 
 import java.awt.Graphics2D;

@@ -1,11 +1,12 @@
 
 
-package proto.view;
-import proto.common.*;
+package proto.view.world;
 import proto.game.world.*;
 import proto.game.person.*;
-import proto.util.*;
 import static proto.game.person.PersonStats.*;
+
+import proto.util.*;
+import proto.view.common.*;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -58,7 +59,7 @@ public class PersonView extends UINode {
   StringButton tabButtons[];
   
   
-  PersonView(UINode parent, Box2D viewBounds) {
+  public PersonView(UINode parent, Box2D viewBounds) {
     super(parent, viewBounds);
     
     tabButtons = new StringButton[3];
@@ -68,7 +69,7 @@ public class PersonView extends UINode {
       tabButtons[i] = new StringButton(
         tabNames[i], vx + 0 + 5 + (60 * i), vy + 160 + 40, 60, 20, this
       ) {
-        void whenClicked() {
+        protected void whenClicked() {
           setTab(modeID, this);
         }
       };
@@ -134,7 +135,7 @@ public class PersonView extends UINode {
       return;
     }
     
-    final Base base = mainView.world.base();
+    final Base base = mainView.world().base();
     final Series <Person> roster = base.roster();
     int personID = base.rosterIndex(person);
     
@@ -247,7 +248,7 @@ public class PersonView extends UINode {
   
   void createItemMenu(final Person person, final int slotID, int x, int y) {
     final Batch <Equipped> types = new Batch();
-    final BaseStocks stocks = mainView.world.base().stocks;
+    final BaseStocks stocks = mainView.world().base().stocks;
     
     for (Equipped type : stocks.availableItems(person, slotID)) {
       types.add(type);
@@ -266,7 +267,7 @@ public class PersonView extends UINode {
       }
       
       protected void whenPicked(Equipped option, int optionID) {
-        person.gear.equipItem(option, mainView.world.base());
+        person.gear.equipItem(option, mainView.world().base());
       }
     });
   }

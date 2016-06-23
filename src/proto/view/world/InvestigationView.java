@@ -1,6 +1,6 @@
 
 
-package proto.view;
+package proto.view.world;
 
 
 public class InvestigationView {

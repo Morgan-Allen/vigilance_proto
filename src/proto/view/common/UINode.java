@@ -1,6 +1,6 @@
 
 
-package proto.view;
+package proto.view.common;
 import proto.util.*;
 
 import java.awt.Graphics2D;
@@ -49,6 +49,11 @@ public abstract class UINode {
   
   protected void addChildren(UINode... kids) {
     for (UINode k : kids) setChild(k, true);
+  }
+  
+  
+  public void renderNow(Surface surface, Graphics2D g) {
+    updateAndRender(surface, g);
   }
   
   

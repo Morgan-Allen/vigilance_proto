@@ -4,11 +4,10 @@ package proto.view.scene;
 import proto.common.*;
 import proto.game.person.*;
 import proto.game.scene.*;
-import proto.game.world.*;
-import proto.util.*;
 
-import proto.view.Surface;
-import proto.view.UINode;
+import proto.util.*;
+import proto.view.common.*;
+
 import java.awt.*;
 
 

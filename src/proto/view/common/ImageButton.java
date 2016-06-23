@@ -1,7 +1,7 @@
 
 
 
-package proto.view;
+package proto.view.common;
 import proto.util.*;
 
 import java.awt.Color;
@@ -19,13 +19,13 @@ public abstract class ImageButton extends UINode {
   public Object refers = this;
   
   
-  ImageButton(Image icon, Box2D bounds, UINode parent) {
+  public ImageButton(Image icon, Box2D bounds, UINode parent) {
     super(parent, bounds);
     this.icon = icon;
   }
   
   
-  void attachOverlay(Image... overlay) {
+  public void attachOverlay(Image... overlay) {
     this.overlay = overlay;
   }
   
@@ -50,12 +50,12 @@ public abstract class ImageButton extends UINode {
   }
   
   
-  void whenHovered() {
+  protected void whenHovered() {
     return;
   }
   
   
-  abstract void whenClicked();
+  protected abstract void whenClicked();
   
   
 }

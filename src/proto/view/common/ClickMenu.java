@@ -1,6 +1,6 @@
 
 
-package proto.view;
+package proto.view.common;
 import proto.util.*;
 
 import java.awt.Image;
@@ -19,7 +19,7 @@ public abstract class ClickMenu <T> extends UINode {
   
   
   
-  ClickMenu(Series <T> options, int atX, int atY, MainView parent) {
+  public ClickMenu(Series <T> options, int atX, int atY, MainView parent) {
     super(parent);
     this.options = options;
     this.atX = atX;

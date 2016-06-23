@@ -3,6 +3,7 @@
 package proto.common;
 import proto.game.world.*;
 import proto.view.*;
+import proto.view.common.Surface;
 
 import java.awt.*;
 import java.awt.event.*;

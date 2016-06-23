@@ -1,6 +1,6 @@
 
 
-package proto.view;
+package proto.view.common;
 import proto.util.*;
 
 import java.awt.Image;
@@ -56,7 +56,7 @@ public abstract class MessageView extends UINode {
       final StringButton button = new StringButton(
         options[i], 5, down, vw - 10, 20, this
       ) {
-        void whenClicked() {
+        protected void whenClicked() {
           view.whenClicked(options[index], index);
         }
       };

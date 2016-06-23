@@ -1,6 +1,6 @@
 
 
-package proto.view;
+package proto.view.common;
 import proto.game.world.*;
 import proto.game.person.*;
 import proto.util.*;
@@ -119,7 +119,7 @@ public class ViewUtils {
     catch (Exception e) {}
   }
   
-  static String getTimeString(World world) {
+  public static String getTimeString(World world) {
     
     long timeMS = 0;
     timeMS += world.timeDays();

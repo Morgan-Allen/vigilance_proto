@@ -1,9 +1,11 @@
 
 
-package proto.view;
+package proto.view.world;
 import proto.game.world.*;
 import proto.game.person.*;
+
 import proto.util.*;
+import proto.view.common.*;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -13,12 +15,12 @@ import java.awt.Graphics2D;
 public class AreasView extends UINode {
   
   
-  final MapView mapView;
+  final public MapView mapView;
   final StringButton monitorButton, saveButton, loadButton, quitButton;
   
   
   
-  AreasView(final UINode parent, Box2D viewBounds) {
+  public AreasView(final UINode parent, Box2D viewBounds) {
     super(parent, viewBounds);
     
     mapView = new MapView(this, new Box2D(
@@ -34,10 +36,11 @@ public class AreasView extends UINode {
       "Resume Monitoring",
       new Box2D(5, down - 45, viewBounds.xdim() - 10, 20), this
     ) {
-      void whenClicked() {
-        final boolean active = mainView.world.monitorActive();
-        if (active) mainView.world.pauseMonitoring();
-        else        mainView.world.beginMonitoring();
+      protected void whenClicked() {
+        final World world = mainView.world();
+        final boolean active = world.monitorActive();
+        if (active) world.pauseMonitoring();
+        else        world.beginMonitoring();
       }
     };
     addChildren(mapView, monitorButton);
@@ -45,22 +48,22 @@ public class AreasView extends UINode {
     saveButton = new StringButton(
       "Save", new Box2D(across + 0, down, 50, 20), this
     ) {
-      void whenClicked() {
-        mainView.world.performSave();
+      protected void whenClicked() {
+        mainView.world().performSave();
       }
     };
     loadButton = new StringButton(
       "Reload", new Box2D(across + 50, down, 50, 20), this
     ) {
-      void whenClicked() {
-        mainView.world.reloadFromSave();
+      protected void whenClicked() {
+        mainView.world().reloadFromSave();
       }
     };
     quitButton = new StringButton(
       "Quit", new Box2D(across + 100, down, 50, 20), this
     ) {
-      void whenClicked() {
-        mainView.world.performSaveAndQuit();
+      protected void whenClicked() {
+        mainView.world().performSaveAndQuit();
       }
     };
     addChildren(saveButton, loadButton, quitButton);
@@ -69,7 +72,7 @@ public class AreasView extends UINode {
   
   protected boolean renderTo(Surface surface, Graphics2D g) {
     
-    final World world = mainView.world;
+    final World world = mainView.world();
     final Base  base  = world.base();
     Object selection = mainView.selectedObject();
     

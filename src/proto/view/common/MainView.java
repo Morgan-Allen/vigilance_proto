@@ -1,11 +1,13 @@
 
-package proto.view;
+package proto.view.common;
 
 import proto.common.*;
 import proto.game.world.*;
 import proto.game.person.*;
+
 import proto.util.*;
-import proto.view.scene.SceneView;
+import proto.view.scene.*;
+import proto.view.world.*;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -16,7 +18,8 @@ import java.awt.Image;
 
 public class MainView extends UINode {
   
-  final World world;
+  
+  private World world;
   
   SceneView  sceneView ;
   UINode     mainUI    ;
@@ -111,7 +114,7 @@ public class MainView extends UINode {
   
   /**  Selection handling-
     */
-  void setSelection(Object selected) {
+  public void setSelection(Object selected) {
     I.say("Setting selection: "+selected);
     
     final Object old = selectedObject;
@@ -120,35 +123,35 @@ public class MainView extends UINode {
   }
   
   
-  Room selectedRoom() {
+  public Room selectedRoom() {
     if (selectedObject instanceof Room) return (Room) selectedObject;
     return null;
   }
   
   
-  District selectedNation() {
+  public District selectedNation() {
     if (selectedObject instanceof District) return (District) selectedObject;
     return null;
   }
   
   
-  Person selectedPerson() {
+  public Person selectedPerson() {
     if (selectedObject instanceof Person) return (Person) selectedObject;
     return null;
   }
   
   
-  Object selectedObject() {
+  public Object selectedObject() {
     return selectedObject;
   }
   
   
-  void setSelectedTask(Assignment task) {
+  public void setSelectedTask(Assignment task) {
     this.selectedTask = task;
   }
   
   
-  Assignment selectedTask() {
+  public Assignment selectedTask() {
     return selectedTask;
   }
   

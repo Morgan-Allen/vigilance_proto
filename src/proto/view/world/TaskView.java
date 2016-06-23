@@ -1,9 +1,9 @@
 
 
-package proto.view;
+package proto.view.world;
 import proto.game.event.*;
-import proto.game.person.*;
-import proto.util.*;
+
+import proto.view.common.*;
 
 import java.awt.Color;
 import java.awt.Graphics2D;

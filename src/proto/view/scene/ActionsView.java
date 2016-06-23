@@ -5,6 +5,8 @@ import proto.game.world.*;
 import proto.game.person.*;
 import proto.game.scene.*;
 import proto.view.*;
+
+import proto.view.common.*;
 import proto.util.*;
 
 import java.awt.Color;

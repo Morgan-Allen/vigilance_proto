@@ -1,9 +1,10 @@
 
 
-package proto.view;
+package proto.view.world;
 import proto.game.person.*;
 import proto.game.world.*;
 import proto.util.*;
+import proto.view.common.*;
 
 import java.awt.Graphics2D;
 import java.awt.Color;
@@ -46,14 +47,14 @@ public class BuildOptionsView extends MessageView {
       final ImageButton button = new ImageButton(
         f.icon(), new Box2D(across, down, BS, BS), this
       ) {
-        void whenClicked() {
+        protected void whenClicked() {
           if (selected == f) selected = null;
           else selected = f;
         }
       };
       button.refers = f;
       button.toggled = selected == f;
-      button.updateAndRender(surface, g);
+      button.renderNow(surface, g);
       
       across += BS + 5;
       if (across >= maxWide) { across = minWide; down += BS + 5; }

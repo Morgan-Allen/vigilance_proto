@@ -6,6 +6,8 @@ import proto.game.person.*;
 import proto.game.world.*;
 import proto.util.*;
 import proto.view.*;
+import proto.view.common.MessageView;
+
 import java.awt.Image;
 
 

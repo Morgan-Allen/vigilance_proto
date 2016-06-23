@@ -1,10 +1,12 @@
 
 
-package proto.view;
-import proto.util.*;
+package proto.view.world;
+import proto.common.*;
 import proto.game.world.*;
-import proto.common.Kind;
 import proto.game.person.*;
+
+import proto.util.*;
+import proto.view.common.*;
 
 import java.awt.*;
 import java.awt.image.*;
@@ -31,7 +33,7 @@ public class RosterView extends UINode {
   final Color statColors[] = new Color[4];
   
   
-  RosterView(UINode parent, Box2D viewBounds) {
+  public RosterView(UINode parent, Box2D viewBounds) {
     super(parent, viewBounds);
     statColors[0] = new Color(0.0f, 0.0f, 1.0f);
     statColors[1] = new Color(0.0f, 1.0f, 0.0f);
@@ -41,7 +43,7 @@ public class RosterView extends UINode {
   
   
   protected boolean renderTo(Surface surface, Graphics2D g) {
-    Base base = mainView.world.base();
+    Base base = mainView.world().base();
     Assignment assignTo = mainView.selectedTask();
     Person selectedPerson = mainView.selectedPerson();
     

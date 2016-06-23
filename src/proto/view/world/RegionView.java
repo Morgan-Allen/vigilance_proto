@@ -1,11 +1,12 @@
 
 
-package proto.view;
+package proto.view.world;
 import proto.common.*;
 import proto.game.event.*;
-import proto.game.person.*;
 import proto.game.world.*;
+
 import proto.util.*;
+import proto.view.common.*;
 
 import java.awt.Image;
 import java.awt.Color;
@@ -27,7 +28,7 @@ public class RegionView extends UINode {
   Lead selectedLead;
   
   
-  RegionView(UINode parent, Box2D viewBounds) {
+  public RegionView(UINode parent, Box2D viewBounds) {
     super(parent, viewBounds);
   }
   
@@ -41,7 +42,7 @@ public class RegionView extends UINode {
     if (nation == null) return false;
     
     //Image portrait = nation.region.view.portrait;
-    final Base base = mainView.world.base();
+    final Base base = mainView.world().base();
     g.setColor(Color.WHITE);
     g.drawString(nation.region.name, vx + 20, vy + 20);
     
@@ -99,16 +100,16 @@ public class RegionView extends UINode {
       final ImageButton button = new ImageButton(
         icon, new Box2D(across, down, 60, 60), this
       ) {
-        void whenClicked() {
+        protected void whenClicked() {
           presentBuildOptions(d, slot, surface, g);
         }
-        void whenHovered() {
+        protected void whenHovered() {
           if (built != null) hoverSlot.val = slot;
         }
       };
       button.refers = built+"_slot_"+slot;
       if (prog < 1 && built != null) button.attachOverlay(IN_PROGRESS);
-      button.updateAndRender(surface, g);
+      button.renderNow(surface, g);
       
       down += 60 + 10;
     }
@@ -151,7 +152,7 @@ public class RegionView extends UINode {
     int down = vy + 240;
     boolean noEvents = true;
     
-    for (Event event : mainView.world.events().active()) {
+    for (Event event : mainView.world().events().active()) {
       //
       //  Firstly, check to see if there's an event occurring in this region:
       if (event.region() != d.region) continue;
@@ -173,7 +174,7 @@ public class RegionView extends UINode {
       for (Lead l : leads) {
         TaskView view = l.createView(parent);
         view.relBounds.set(vx, down, vw, 65);
-        view.updateAndRender(surface, g);
+        view.renderNow(surface, g);
         down += view.relBounds.ydim() + 10;
       }
       g.setColor(Color.DARK_GRAY);

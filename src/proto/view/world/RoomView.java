@@ -1,10 +1,11 @@
 
 
-package proto.view;
+package proto.view.world;
 import proto.game.event.*;
-import proto.game.person.*;
 import proto.game.world.*;
+
 import proto.util.*;
+import proto.view.common.*;
 
 import java.awt.Image;
 import java.awt.Color;
@@ -18,7 +19,7 @@ public class RoomView extends UINode {
   Task selectedTask = null;
   
   
-  RoomView(UINode parent, Box2D viewBounds) {
+  public RoomView(UINode parent, Box2D viewBounds) {
     super(parent, viewBounds);
   }
   
@@ -69,7 +70,7 @@ public class RoomView extends UINode {
     for (Task task : room.possibleTasks()) {
       TaskView view = task.createView(parent);
       view.relBounds.set(vx, 0 + down, vw, 50);
-      view.updateAndRender(surface, g);
+      view.renderNow(surface, g);
       down += view.relBounds.ydim() + 10;
     }
     

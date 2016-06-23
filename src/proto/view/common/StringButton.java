@@ -1,6 +1,6 @@
 
 
-package proto.view;
+package proto.view.common;
 import proto.util.*;
 
 import java.awt.Color;
@@ -16,13 +16,13 @@ public abstract class StringButton extends UINode {
   public Object refers = this;
   
   
-  StringButton(String label, Box2D bounds, UINode parent) {
+  public StringButton(String label, Box2D bounds, UINode parent) {
     super(parent, bounds);
     this.label = label;
   }
   
   
-  StringButton(String label, int x, int y, int w, int h, UINode parent) {
+  public StringButton(String label, int x, int y, int w, int h, UINode parent) {
     this(label, new Box2D(x, y, w, h), parent);
   }
   
@@ -44,12 +44,12 @@ public abstract class StringButton extends UINode {
   }
   
   
-  void whenHovered() {
+  protected void whenHovered() {
     return;
   }
   
   
-  abstract void whenClicked();
+  protected abstract void whenClicked();
   
 }
 
