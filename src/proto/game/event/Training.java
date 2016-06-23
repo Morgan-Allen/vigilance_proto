@@ -79,7 +79,7 @@ public class Training extends Task {
       //
       //  Then you boost any related relationships.
       for (Person o : assigned()) if (o != p) {
-        p.bonds.incBond(o, (1f + trainBonus) / 100);
+        p.history.incBond(o, (1f + trainBonus) / 100);
       }
     }
     

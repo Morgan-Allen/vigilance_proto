@@ -284,8 +284,8 @@ public class PersonView extends UINode {
       "Tense", "Unfriendly", "Hostile", "Nemesis"
     };
     
-    for (Person other : person.bonds.sortedBonds()) {
-      float value = person.bonds.valueFor(other);
+    for (Person other : person.history.sortedBonds()) {
+      float value = person.history.valueFor(other);
       
       g.drawImage(other.kind().sprite(), vx + 5, down + 5, 40, 40, null);
       boolean hoverP = surface.tryHover(vx + 5, down + 5, 40, 40, other);

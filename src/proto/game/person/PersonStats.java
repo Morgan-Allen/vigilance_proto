@@ -252,6 +252,14 @@ public class PersonStats {
   }
   
   
+  public float powerLevel() {
+    //  TODO:  Refine this!
+    if (person.isHero    ()) return 4;
+    if (person.isCriminal()) return 1;
+    return 0;
+  }
+  
+  
   
   /**  Regular updates-
     */
@@ -259,6 +267,9 @@ public class PersonStats {
     for (Trait s : person.kind.baseTraits()) {
       float base = person.kind().baseLevel(s);
       setLevel(s, base, true);
+    }
+    for (Ability a : Common.BASIC_ABILITIES) {
+      setLevel(a, 1, true);
     }
     updateStats();
   }

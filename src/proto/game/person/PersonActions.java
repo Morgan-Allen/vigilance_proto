@@ -13,19 +13,7 @@ public class PersonActions {
   
   /**  Data fields, constructors and save/load methods-
     */
-  final public static int
-    STATE_INIT    = -1,
-    STATE_AS_PC   =  0,
-    STATE_UNAWARE =  1,
-    STATE_ACTIVE  =  2,
-    STATE_RETREAT =  3;
-  
-  
   final Person person;
-  
-  int   AIstate    = STATE_INIT;
-  float confidence = 1.0f;
-  float wariness   = 0.0f;
   
   int actionPoints;
   boolean turnDone;
@@ -39,9 +27,6 @@ public class PersonActions {
   
   
   void loadState(Session s) throws Exception {
-    AIstate      = s.loadInt   ();
-    confidence   = s.loadFloat ();
-    wariness     = s.loadFloat ();
     actionPoints = s.loadInt   ();
     turnDone     = s.loadBool  ();
     lastTarget   = s.loadObject();
@@ -50,9 +35,6 @@ public class PersonActions {
   
   
   void saveState(Session s) throws Exception {
-    s.saveInt   (AIstate     );
-    s.saveFloat (confidence  );
-    s.saveFloat (wariness    );
     s.saveInt   (actionPoints);
     s.saveBool  (turnDone    );
     s.saveObject(lastTarget  );
@@ -73,28 +55,9 @@ public class PersonActions {
   }
   
   
-  public float confidence() {
-    return confidence;
-  }
-  
-  
-  public float wariness() {
-    return wariness;
-  }
-  
-  
-  public boolean isDoing(int AIstate) {
-    return this.AIstate == AIstate;
-  }
-  
-  
-  public boolean retreating() {
-    return isDoing(STATE_RETREAT);
-  }
-  
-  
   public boolean captive() {
-    return false;
+    //  TODO:  Add some nuance here!
+    return person.isCivilian();// && side == Side.VILLAINS;
   }
   
   
@@ -125,7 +88,9 @@ public class PersonActions {
   
   
   public boolean canTakeAction() {
-    return actionPoints >= 0 && person.health.conscious();
+    if (person.currentScene() == null) return false;
+    if (nextAction != null && nextAction.used.delayed()) return false;
+    return person.health.conscious() && actionPoints > 0 && ! turnDone;
   }
   
   
@@ -139,7 +104,7 @@ public class PersonActions {
     nextAction   = null;
     turnDone     = false;
     person.stats.updateStats();
-    assessConfidence();
+    person.mind.assessConfidence();
     return true;
   }
   
@@ -195,70 +160,6 @@ public class PersonActions {
   }
   
   
-  public Action selectAIAction() {
-    //  TODO:  FILL THIS IN!
-    return null;
-  }
-  
-  
-  
-  /**  Confidence and power assessment-
-    */
-  private void assessConfidence() {
-    Scene scene = person.currentScene();
-    float teamHealth = 0, teamPower = 0, enemySight = 0;
-    
-    I.say("Assessing confidence for "+person);
-    
-    for (Person p : scene.persons()) {
-      if (p.isAlly(person)) {
-        teamPower  += p.actions.powerLevel();
-        teamHealth += p.actions.powerLevel() * p.health.healthLevel();
-      }
-      else if (p.isEnemy(person) && hasSight(p.currentTile())) {
-        enemySight++;
-        if (canNotice(p)) enemySight++;
-      }
-    }
-    
-    //  TODO:  Refine these, and use constants to define the math.
-    
-    float courage = 0.2f, minAlert = (
-      person.stats.levelFor(REFLEX  ) +
-      person.stats.levelFor(STRENGTH)
-    ) / 100f;
-    if (enemySight > 0) {
-      wariness += enemySight / 4f;
-    }
-    else {
-      wariness -= 0.25f;
-    }
-    wariness = Nums.clamp(wariness, minAlert, 1);
-    
-    if (person.isHero    ()) courage = 1.5f;
-    if (person.isCriminal()) courage = 0.5f;
-    
-    if (teamPower <= 0) {
-      confidence = 0;
-    }
-    else {
-      confidence = teamHealth / teamPower;
-      confidence = (confidence + person.health.healthLevel()) / 2;
-      if (! retreating()) confidence += courage;
-      
-      I.say("Confidence for "+this+": "+confidence);
-    }
-  }
-  
-  
-  private float powerLevel() {
-    //  TODO:  Refine this!
-    if (person.isHero    ()) return 4;
-    if (person.isCriminal()) return 1;
-    return 0;
-  }
-  
-  
   
   /**  Sight and stealth methods-
     */
@@ -296,7 +197,7 @@ public class PersonActions {
       Action  action   = other.actions.nextAction();
       boolean focused  = lastTarget == other;
       
-      sighting *= wariness + (focused ? 0.5f : 0);
+      sighting *= person.mind.wariness() + (focused ? 0.5f : 0);
       stealth  *= action == null ? 0.5f : action.moveRoll();
       stealth  /= sighting;
       if (stealth > visibility) return false;

@@ -139,7 +139,7 @@ public class World implements Session.Saveable {
     base.addToRoster(new Person(Heroes.HERO_QUESTION , this));
     
     for (Person p : base.roster()) for (Person o : base.roster()) {
-      if (p != o) p.bonds.incBond(o, 0.2f);
+      if (p != o) p.history.incBond(o, 0.2f);
     }
     base.setLeader(leader);
     

@@ -173,12 +173,6 @@ public class SceneView extends UINode {
     int hoverY = (surface.mouseY() + zoomY + HT - vy) / TILE_SIZE;
     Tile hoverT = scene.tileAt(hoverX, hoverY);
     
-    if (I.used60Frames) {
-      I.say("\nHover point: "+hoverX+"|"+hoverY);
-      I.say("  Zoom x/y: "+zoomX+"/"+zoomY);
-      I.say("  Mouse pos: "+surface.mouseX()+"/"+surface.mouseY());
-    }
-    
     if (hoverT != null) {
       renderAt(hoverT.x, hoverT.y, 1, 1, hoverBox, null, g);
       Object hovered = scene.topObjectAt(hoverT);

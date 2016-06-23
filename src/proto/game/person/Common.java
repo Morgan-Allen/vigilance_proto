@@ -72,7 +72,11 @@ public class Common {
       
       public boolean allowsTarget(Object target, Scene scene, Person acting) {
         if (! acting.gear.currentWeapon().melee()) return false;
-        return target instanceof Person;
+        if (target instanceof Person) {
+          final Person other = (Person) target;
+          return other.isEnemy(acting);
+        }
+        return false;
       }
       
       protected Volley createVolley(Action use, Object target, Scene scene) {
@@ -84,8 +88,9 @@ public class Common {
       
       final Image missile = Kind.loadImage(IMG_DIR+"sprite_punch.png");
       public Image missileSprite() { return missile; }
-    }
+    },
     
+    BASIC_ABILITIES[] = { MOVE, STRIKE }
     
     /*
     

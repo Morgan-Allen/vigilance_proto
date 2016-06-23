@@ -268,7 +268,7 @@ public class Scene implements Session.Saveable, Assignment {
   
   public boolean isExitPoint(Object point, Person exits) {
     Tile under = tileUnder(point);
-    if (under == null || exits == null || ! exits.actions.retreating()) {
+    if (under == null || exits == null || ! exits.mind.retreating()) {
       return false;
     }
     if (under.x == 0 || under.x == size - 1) return true;
@@ -441,7 +441,7 @@ public class Scene implements Session.Saveable, Assignment {
     
     PersonActions NA = nextActing == null ? null : nextActing.actions;
     if ((NA != null) && (! NA.turnDone()) && (! NA.canTakeAction())) {
-      I.say("\n  Ending turn for "+nextActing);
+      I.say("\n    Ending turn for "+nextActing);
       NA.onTurnEnd();
     }
     nextActing = null;
@@ -451,7 +451,7 @@ public class Scene implements Session.Saveable, Assignment {
       Series <Person> team     = playerTurn ? playerTeam : othersTeam;
       Series <Person> nextTeam = playerTurn ? othersTeam : playerTeam;
       
-      I.say("\n  Trying to find active person from ");
+      I.say("\n    Trying to find active person from ");
       if (playerTurn) I.add("player team"); else I.add("enemy team");
       
       for (Person p : team) {
@@ -459,13 +459,13 @@ public class Scene implements Session.Saveable, Assignment {
         if (! PA.canTakeAction()) continue;
         
         if (playerTurn) {
-          I.say("  ACTIVE PC: "+p+", AP: "+PA.currentAP());
+          I.say("    ACTIVE PC: "+p+", AP: "+PA.currentAP());
           nextActing = p;
           break;
         }
         else {
-          I.say("  FOUND NPC: "+p+", AP: "+PA.currentAP());
-          Action taken = PA.selectAIAction();
+          I.say("    FOUND NPC: "+p+", AP: "+PA.currentAP());
+          Action taken = p.mind.selectActionAsAI();
           if (taken != null) {
             I.say("    "+p+" will take action: "+taken.used);
             nextActing = p;
@@ -481,7 +481,7 @@ public class Scene implements Session.Saveable, Assignment {
       }
       
       if (nextActing == null) {
-        I.say("  Will refresh AP and try other team...");
+        I.say("    Will refresh AP and try other team...");
         for (Person p : nextTeam) if (p.currentScene() == this) {
           p.actions.onTurnStart();
         }
@@ -491,7 +491,7 @@ public class Scene implements Session.Saveable, Assignment {
         //
         //  Zoom to the unit in question (if they're visible...)
         if (fogAt(nextActing.currentTile(), Person.Side.HEROES) > 0) {
-          I.say("  Will zoom to "+nextActing);
+          I.say("    Will zoom to "+nextActing);
           view().setSelection(nextActing, false);
           view().setZoomPoint(nextActing.currentTile());
         }

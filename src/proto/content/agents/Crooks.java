@@ -26,9 +26,7 @@ public class Crooks {
       SOCIAL    , 4 ,
       STRENGTH  , 4 ,
       HIT_POINTS, 10,
-      WILLPOWER , 8 ,
-      
-      MOVE, 1
+      WILLPOWER , 8 
     )
   ;
   
@@ -42,9 +40,7 @@ public class Crooks {
       SOCIAL    , 2 ,
       STRENGTH  , 2 ,
       HIT_POINTS, 6 ,
-      WILLPOWER , 4 ,
-      
-      MOVE, 1
+      WILLPOWER , 4 
     )
   ;
   

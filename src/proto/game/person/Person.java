@@ -24,12 +24,12 @@ public class Person implements Session.Saveable {
   
   String name;
   
-  final public PersonHealth  health  = new PersonHealth (this);
+  final public PersonMind    mind    = new PersonMind   (this);
+  final public PersonHistory history = new PersonHistory(this);
   final public PersonActions actions = new PersonActions(this);
   final public PersonStats   stats   = new PersonStats  (this);
+  final public PersonHealth  health  = new PersonHealth (this);
   final public PersonGear    gear    = new PersonGear   (this);
-  final public PersonBonds   bonds   = new PersonBonds  (this);
-  final public PersonHistory history = new PersonHistory(this);
   
   Assignment assignment;
   
@@ -70,12 +70,12 @@ public class Person implements Session.Saveable {
     side  = (Side ) s.loadEnum(Side.values());
     name  = s.loadString();
     
-    health .loadState(s);
+    mind   .loadState(s);
+    history.loadState(s);
     actions.loadState(s);
     stats  .loadState(s);
+    health .loadState(s);
     gear   .loadState(s);
-    bonds  .loadState(s);
-    history.loadState(s);
     
     assignment = (Assignment) s.loadObject();
     
@@ -90,12 +90,12 @@ public class Person implements Session.Saveable {
     s.saveEnum  (side );
     s.saveString(name );
     
-    health .saveState(s);
+    mind   .saveState(s);
+    history.saveState(s);
     actions.saveState(s);
     stats  .saveState(s);
+    health .saveState(s);
     gear   .saveState(s);
-    bonds  .saveState(s);
-    history.saveState(s);
     
     s.saveObject(assignment);
     
@@ -244,12 +244,12 @@ public class Person implements Session.Saveable {
   
   
   public String confidenceDescription() {
-    if (! health.alive      ()) return "Dead"       ;
-    if (! health.conscious  ()) return "Unconscious";
+    if (! health .alive     ()) return "Dead"       ;
+    if (! health .conscious ()) return "Unconscious";
     if (  actions.captive   ()) return "Captive"    ;
-    if (  actions.retreating()) return "Retreating" ;
+    if (  mind   .retreating()) return "Retreating" ;
     
-    float confidence = actions.confidence(), wariness = actions.wariness();
+    float confidence = mind.confidence(), wariness = mind.wariness();
     String moraleDesc = "Determined", alertDesc = "Alert";
     if (confidence < 1.66f) moraleDesc = "Steady"  ;
     if (confidence < 1.33f) moraleDesc = "Shaken"  ;
