@@ -54,6 +54,7 @@ public class ActionsView extends UINode {
     }
     if (selectAction != null) {
       int costAP = selectAction.used.costAP(selectAction);
+      selectAction.used.FX.tracePath(selectAction.path(), scene, g);
       sceneView.renderString(at.x, at.y - 0.5f, "AP: "+costAP, Color.GREEN, g);
       return true;
     }

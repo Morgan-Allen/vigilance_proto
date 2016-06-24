@@ -31,10 +31,12 @@ public class AbilityFX {
   public String describeAction(Action action, Scene scene) {
     StringBuffer s = new StringBuffer();
     s.append(basis.description);
+    
     if (action != null && action.volley() != null) {
       Volley v = action.volley();
       int minDamage = Nums.floor(v.minDamage());
       int maxDamage = Nums.ceil (v.maxDamage());
+      
       s.append("\n  "+minDamage+"-"+maxDamage+" damage");
       int hitPercent = Nums.clamp(v.accuracyPercent, 101);
       s.append("\n  "+hitPercent+"% to hit (armour "+v.hitsArmour+")");
@@ -43,7 +45,25 @@ public class AbilityFX {
   }
   
   
-  //  TODO:  Move this out to the 'view' package?
+  public void tracePath(Tile path[], Scene s, Graphics2D g) {
+    final int TS = SceneView.TILE_SIZE;
+    final SceneView SV = s.view();
+    int offX = SV.zoomX, offY = SV.zoomY;
+    
+    g.setStroke(new BasicStroke(2));
+    g.setColor(new Color(1, 1, 1, 0.5f));
+    
+    for (int i = 0; i < path.length - 1; i++) {
+      Tile a = path[i], b = path[i + 1];
+      g.drawLine(
+        (a.x * TS) - offX,
+        (a.y * TS) - offY,
+        (b.x * TS) - offX,
+        (b.y * TS) - offY
+      );
+    }
+  }
+  
   
   public void renderMissile(Action action, Scene s, Graphics2D g) {
     renderMissile(action, s, missileSprite(), g);

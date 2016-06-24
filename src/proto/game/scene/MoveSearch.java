@@ -65,3 +65,6 @@ public class MoveSearch extends Search <Tile> {
     return (Entry) spot.flag;
   }
 }
+
+
+

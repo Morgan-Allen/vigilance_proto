@@ -157,8 +157,15 @@ public class Person implements Session.Saveable {
   /**  Scene-specific methods and accessors-
     */
   public void setExactPosition(Scene scene, float x, float y, float z) {
-    this.location = scene.tileAt((int) x, (int) y);
-    this.exactPos.set(x, y, z);
+    final Tile old = this.location;
+    
+    location = scene == null ? null : scene.tileAt((int) x, (int) y);
+    exactPos.set(x, y, z);
+    
+    if (old != location) {
+      if (old      != null) old     .setInside(this, false);
+      if (location != null) location.setInside(this, true );
+    }
   }
   
   

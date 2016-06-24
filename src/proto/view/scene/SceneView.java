@@ -174,7 +174,7 @@ public class SceneView extends UINode {
     
     if (hoverT != null) {
       renderAt(hoverT.x, hoverT.y, 1, 1, hoverBox, null, g);
-      Object hovered = scene.topObjectAt(hoverT);
+      Object hovered = topObjectAt(hoverT);
       boolean canDoAction = false;
       
       if (actionsView.previewActionDelivery(hovered, hoverT, surface, g)) {
@@ -230,6 +230,19 @@ public class SceneView extends UINode {
       g.setColor(fill);
       g.fillRect(x - zoomX, y - zoomY, (int) w, (int) h);
     }
+  }
+  
+  
+  public Object topObjectAt(Tile at) {
+    if (at == null) return null;
+    
+    //  TODO:  Move this to SceneView?  It's really about UI-selection...
+    final Pick <Object> pick = new Pick();
+    for (Person p : at.inside()) {
+      pick.compare(p, p.health.conscious() ? 1.5f : 1);
+    }
+    pick.compare(at.prop(), 0.5f);
+    return pick.result();
   }
   
   

@@ -197,17 +197,6 @@ public class Scene implements Session.Saveable, Assignment {
   }
   
   
-  public Object topObjectAt(Tile at) {
-    if (at == null) return null;
-    for (Person p : persons) {
-      if (p.currentTile() != at || ! p.health.conscious()) continue;
-      return p;
-    }
-    if (at.prop() != null) return at.prop();
-    return at;
-  }
-  
-  
   public Tile tileUnder(Object object) {
     if (object instanceof Tile  ) return  (Tile  ) object;
     if (object instanceof Person) return ((Person) object).currentTile();
@@ -324,14 +313,11 @@ public class Scene implements Session.Saveable, Assignment {
   
   public boolean removePerson(Person p) {
     if (p.currentScene() != this) return false;
-    Tile under = p.currentTile();
-    if (under != null) {
-      under.setInside(p, false);
-    }
-    else {
-      playerTeam.remove(p);
-      othersTeam.remove(p);
-    }
+    
+    playerTeam.remove(p);
+    othersTeam.remove(p);
+    
+    p.setExactPosition(null, 0, 0, 0);
     p.setAssignment(null);
     persons.remove(p);
     return true;
