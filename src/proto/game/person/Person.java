@@ -8,7 +8,7 @@ import proto.util.*;
 
 
 
-public class Person implements Session.Saveable {
+public class Person extends Element {
   
   
   /**  Data fields and construction-
@@ -19,7 +19,6 @@ public class Person implements Session.Saveable {
   
   
   Kind kind;
-  World world;
   Side side;
   
   String name;
@@ -39,8 +38,8 @@ public class Person implements Session.Saveable {
   
   
   public Person(Kind kind, World world, String name) {
+    super(world);
     this.kind  = kind;
-    this.world = world;
     this.name  = name;
     
     history.setSummary(kind.defaultInfo());
@@ -63,10 +62,9 @@ public class Person implements Session.Saveable {
   
   
   public Person(Session s) throws Exception {
-    s.cacheInstance(this);
+    super(s);
     
     kind  = (Kind ) s.loadObject();
-    world = (World) s.loadObject();
     side  = (Side ) s.loadEnum(Side.values());
     name  = s.loadString();
     
@@ -85,8 +83,9 @@ public class Person implements Session.Saveable {
   
   
   public void saveState(Session s) throws Exception {
+    super.saveState(s);
+    
     s.saveObject(kind );
-    s.saveObject(world);
     s.saveEnum  (side );
     s.saveString(name );
     

@@ -20,14 +20,14 @@ import java.awt.Image;
 public class Crafting extends Task {
   
   
-  final Room room;
+  final Place room;
   final Equipped made;
   float progress = 0;
   
   
-  public Crafting(Equipped made, Room room) {
+  public Crafting(Equipped made, Place room) {
     super(
-      TIME_LONG, room.base.world(),
+      TIME_LONG, room.world(),
       made.craftArgs
     );
     this.room = room;
@@ -37,7 +37,7 @@ public class Crafting extends Task {
   
   public Crafting(Session s) throws Exception {
     super(s);
-    room = (Room    ) s.loadObject();
+    room = (Place    ) s.loadObject();
     made = (Equipped) s.loadObject();
     progress = s.loadFloat();
   }
@@ -55,17 +55,17 @@ public class Crafting extends Task {
   /**  Task performance and completion-
     */
   protected void onFailure() {
-    room.base.incFunding(0 - made.buildCost / 2);
+    room.owner().incFunding(0 - made.buildCost / 2);
   }
   
   
   protected void onSuccess() {
-    room.base.incFunding(0 - made.buildCost);
-    room.base.stocks.incStock(made, 1);
+    room.owner().incFunding(0 - made.buildCost);
+    room.owner().stocks.incStock(made, 1);
   }
   
   
-  public Room room() {
+  public Place room() {
     return room;
   }
   
@@ -90,7 +90,7 @@ public class Crafting extends Task {
   
   public String choiceInfo() {
     String info = "Crafting "+made;
-    int total = room.base.stocks.numStored(made);
+    int total = room.owner().stocks.numStored(made);
     info += "  (In stock: "+total+")";
     return info;
   }

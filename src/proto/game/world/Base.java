@@ -23,7 +23,7 @@ public class Base implements Session.Saveable {
   Person leader = null;
   final public BaseStocks stocks = new BaseStocks(this);
   
-  Room rooms[] = new Room[MAX_FACILITIES];
+  Place rooms[] = new Place[MAX_FACILITIES];
   List <Tech> knownTech = new List();
   int currentFunds, incomeFloor, income, maintenance;
   
@@ -44,7 +44,7 @@ public class Base implements Session.Saveable {
     leader = (Person) s.loadObject();
     
     for (int n = 0 ; n < MAX_FACILITIES; n++) {
-      rooms[n] = (Room) s.loadObject();
+      rooms[n] = (Place) s.loadObject();
     }
     s.loadObjects(knownTech);
     stocks.loadState(s);
@@ -99,8 +99,8 @@ public class Base implements Session.Saveable {
       p.updateOnBase(numWeeks);
     }
     
-    for (Room r : rooms) if (r != null) {
-      r.updateRoom();
+    for (Place r : rooms) if (r != null) {
+      r.updatePlace();
     }
     
     for (District dist : world.districts) {
@@ -188,23 +188,23 @@ public class Base implements Session.Saveable {
   
   public float buildRate(Blueprint print) {
     float rate = 1f, numBuilding = 0;
-    for (Room r : rooms) if (r.buildProgress < 1) numBuilding++;
+    for (Place r : rooms) if (r.buildProgress() < 1) numBuilding++;
     if (numBuilding == 0) return 1;
     return rate / (numBuilding * print.buildTime);
   }
   
   
   public int buildETA(int slot) {
-    Room room = rooms[slot];
-    return Nums.ceil((1 - room.buildProgress) / buildRate(room.blueprint));
+    Place room = rooms[slot];
+    return Nums.ceil((1 - room.buildProgress()) / buildRate(room.built()));
   }
   
   
   public void addFacility(Blueprint print, int slot, float progress) {
     if (print == null) { rooms[slot] = null; return; }
-    Room room = rooms[slot];
+    Place room = rooms[slot];
     if (room == null) room = rooms[slot] = print.createRoom(this, slot);
-    room.buildProgress = progress;
+    room.setBuildProgress(progress);
   }
   
   
@@ -215,12 +215,12 @@ public class Base implements Session.Saveable {
   
   
   public void beginSalvage(int slot) {
-    currentFunds += rooms[slot].blueprint.buildCost / 2f;
+    currentFunds += rooms[slot].built().buildCost / 2f;
     addFacility(null, slot, 1);
   }
   
   
-  public Room[] rooms() {
+  public Place[] rooms() {
     return rooms;
   }
   

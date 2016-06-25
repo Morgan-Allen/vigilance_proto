@@ -9,7 +9,7 @@ import static proto.game.person.PersonStats.*;
 
 
 
-public class Library extends Room {
+public class Library extends Place {
   
   final static Skill LIB_SKILLS[] = {
     ENGINEERING,
@@ -56,10 +56,10 @@ public class Library extends Room {
     */
   final public static Blueprint BLUEPRINT = new Blueprint(
     "Library", "blueprint_library",
-    "Permits training in most intellectual skills.",
-    "media assets/main UI/room_library.png"
+    "media assets/main UI/room_library.png",
+    "Permits training in most intellectual skills."
   ) {
-    protected Room createRoom(Base base, int slotID) {
+    protected Place createRoom(Base base, int slotID) {
       return new Library(base, slotID);
     }
   };

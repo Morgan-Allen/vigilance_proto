@@ -14,7 +14,7 @@ import proto.content.rooms.Workshop;
 public class Facilities {
   
   
-  final public static Facility STEEL_MILL = new Facility(
+  final public static Blueprint STEEL_MILL = new Blueprint(
     "Steel Mill", "facility_steel_mill",
     "media assets/tech icons/icon_steel_mill.png",
     "A Steel Mill provides income and steady blue-collar employment, along "+
@@ -27,12 +27,12 @@ public class Facilities {
     protected float speedBonus(Task task) {
       if (! (task instanceof Crafting)) return 0;
       final Crafting craft = (Crafting) task;
-      if (craft.room().blueprint == Workshop.BLUEPRINT) return 0.1f;
+      if (craft.room().built() == Workshop.BLUEPRINT) return 0.1f;
       return 0;
     }
   };
   
-  final public static Facility CHEMICAL_PLANT = new Facility(
+  final public static Blueprint CHEMICAL_PLANT = new Blueprint(
     "Chemical Plant", "facility_chemical_plant",
     "media assets/tech icons/icon_chemical_plant.png",
     "Chemical plants provide basic laborers with a steady job, but won't "+
@@ -45,12 +45,12 @@ public class Facilities {
     protected float speedBonus(Task task) {
       if (! (task instanceof Crafting)) return 0;
       final Crafting craft = (Crafting) task;
-      if (craft.room().blueprint == Laboratory.BLUEPRINT) return 0.1f;
+      if (craft.room().built() == Laboratory.BLUEPRINT) return 0.1f;
       return 0;
     }
   };
   
-  final public static Facility UNION_OFFICE = new Facility(
+  final public static Blueprint UNION_OFFICE = new Blueprint(
     "Union Office", "facility_union_office",
     "media assets/tech icons/icon_union_office.png",
     "The Union Office bolsters relations between workers and management, "+
@@ -63,7 +63,7 @@ public class Facilities {
     INCOME, -1
   );
   
-  final public static Facility BUSINESS_PARK = new Facility(
+  final public static Blueprint BUSINESS_PARK = new Blueprint(
     "Business Park", "facility_business_park",
     "media assets/tech icons/icon_business_park.png",
     "Shopping malls and small commercial agencies can establish themselves in "+
@@ -73,7 +73,7 @@ public class Facilities {
     INCOME, 2
   );
   
-  final public static Facility TECH_STARTUP = new Facility(
+  final public static Blueprint TECH_STARTUP = new Blueprint(
     "Tech Startup", "facility_tech_startup",
     "media assets/tech icons/icon_tech_startup.png",
     "Entrepreneurs, hackers and gurus can come together under one roof to "+
@@ -85,7 +85,7 @@ public class Facilities {
     INCOME, -1
   );
   
-  final public static Facility CITY_PARK = new Facility(
+  final public static Blueprint CITY_PARK = new Blueprint(
     "City Park", "facility_city_park",
     "media assets/tech icons/icon_city_park.png",
     "Fresh air, lush lawns and open spaces help to invigorate the body and "+
@@ -95,7 +95,7 @@ public class Facilities {
     ENTERTAINMENT, 1
   );
   
-  final public static Facility ROBINS_CAMP = new Facility(
+  final public static Blueprint ROBINS_CAMP = new Blueprint(
     "Neighbourhood Robins Camp", "facility_robins_camp",
     "media assets/tech icons/icon_robins_camp.png",
     "Helping to give the city's troubled youth a sense of purpose and "+
@@ -107,7 +107,7 @@ public class Facilities {
     DETERRENCE, 1
   );
   
-  final public static Facility SOUP_KITCHEN = new Facility(
+  final public static Blueprint SOUP_KITCHEN = new Blueprint(
     "Soup Kitchen", "facility_soup_kitchen",
     "media assets/tech icons/icon_soup_kitchen.png",
     "A place of refuge for the city's most desperate, Soup Kitchens afford "+
@@ -118,7 +118,7 @@ public class Facilities {
     INCOME, -1
   );
   
-  final public static Facility COMMUNITY_COLLEGE = new Facility(
+  final public static Blueprint COMMUNITY_COLLEGE = new Blueprint(
     "Community College", "facility_community_college",
     "media assets/tech icons/icon_community_college.png",
     "Community Colleges allow for wider enrollment in education, including "+

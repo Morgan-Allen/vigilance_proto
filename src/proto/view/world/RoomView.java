@@ -43,8 +43,8 @@ public class RoomView extends UINode {
     }
     //*/
     
-    Room room = mainView.selectedRoom();
-    if (room == null) return false;
+    Place room = mainView.selectedRoom();
+    if (room == null || room.built() == null) return false;
     
     //Image portrait = nation.region.view.portrait;
     /*
@@ -59,12 +59,12 @@ public class RoomView extends UINode {
     //
     //  TODO:  Render information on the room type!
     
-    String info = room.blueprint.description;
+    String info = room.built().info;
     ViewUtils.drawWrappedString(info,
       g, vx + 25, vy + 20, vw - 30, 80
     );
     
-    int down = vy + 50;
+    int down = vy + 100;
     
     //  TODO:  Should be using attachment/detachment here?
     for (Task task : room.possibleTasks()) {

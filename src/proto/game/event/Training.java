@@ -18,14 +18,14 @@ public class Training extends Task {
   
   
   
-  Room room;
+  Place room;
   Skill trained;
   Skill talking;
   
   
-  public Training(Skill trained, Skill talking, Room room) {
+  public Training(Skill trained, Skill talking, Place room) {
     super(
-      TIME_MEDIUM, room.base.world(),
+      TIME_MEDIUM, room.world(),
       trained, 0
     );
     this.room    = room   ;
@@ -36,7 +36,7 @@ public class Training extends Task {
   
   public Training(Session s) throws Exception {
     super(s);
-    room    = (Room ) s.loadObject();
+    room    = (Place ) s.loadObject();
     trained = (Skill) s.loadObject();
     talking = (Skill) s.loadObject();
   }

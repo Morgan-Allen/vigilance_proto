@@ -85,9 +85,9 @@ public class RegionView extends UINode {
     final Vars.Int hoverSlot = new Vars.Int(-1);
     
     for (int n = 0; n < maxF; n++) {
-      final int      slot  = n;
-      final Facility built = d.builtInSlot(slot);
-      final float    prog  = d.buildProgress(slot);
+      final Place     slot  = d.buildSlot(n);
+      final Blueprint built = slot.built();
+      final float     prog  = slot.buildProgress();
       
       Image icon = null;
       if (built == null) {
@@ -101,10 +101,10 @@ public class RegionView extends UINode {
         icon, new Box2D(across, down, 60, 60), this
       ) {
         protected void whenClicked() {
-          presentBuildOptions(d, slot, surface, g);
+          presentBuildOptions(d, slot.slotID, surface, g);
         }
         protected void whenHovered() {
-          if (built != null) hoverSlot.val = slot;
+          if (built != null) hoverSlot.val = slot.slotID;
         }
       };
       button.refers = built+"_slot_"+slot;
@@ -117,10 +117,10 @@ public class RegionView extends UINode {
     if (hoverSlot.val != -1) {
       g.setColor(Color.LIGHT_GRAY);
       
-      final int      slot  = hoverSlot.val;
-      final Facility built = d.builtInSlot(slot);
-      final Base     owns  = d.ownerForSlot(slot);
-      final float    prog  = d.buildProgress(slot);
+      final Place     slot  = d.buildSlot(hoverSlot.val);
+      final Blueprint built = slot.built();
+      final Base      owns  = slot.owner();
+      final float     prog  = slot.buildProgress();
       
       String desc = "";
       desc += built.name();

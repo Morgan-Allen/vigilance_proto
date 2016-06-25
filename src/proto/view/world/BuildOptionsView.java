@@ -16,17 +16,17 @@ public class BuildOptionsView extends MessageView {
   
   final District d;
   final int slotID;
-  Facility selected = null;
+  Blueprint selected = null;
   
   
   BuildOptionsView(UINode parent, District d, int slotID) {
     super(
-      parent, null, "Build Facility", "",
+      parent, null, "Build Blueprint", "",
       "Begin Construction", "Cancel"
     );
     this.d      = d;
     this.slotID = slotID;
-    selected = d.builtInSlot(slotID);
+    selected = d.buildSlot(slotID).built();
   }
   
   
@@ -39,7 +39,7 @@ public class BuildOptionsView extends MessageView {
     //
     //  TODO:  Allow for purchase, salvage, or redevelopment!
     
-    for (final Facility f : d.facilitiesAvailable()) {
+    for (final Blueprint f : d.facilitiesAvailable()) {
       
       final int nextAcross = across + BS + 5;
       if (nextAcross >= maxWide) { across = minWide; down += BS + 5; }
@@ -82,7 +82,7 @@ public class BuildOptionsView extends MessageView {
     if (optionID == 0) {
       final Base base = d.world.base();
       if (selected == null) return false;
-      if (d.builtInSlot(slotID) == selected) return false;
+      if (d.buildSlot(slotID).built() == selected) return false;
       if (! selected.canBuild(base, d)) return false;
     }
     return true;
@@ -94,7 +94,7 @@ public class BuildOptionsView extends MessageView {
     //  If confirmed, begin construction.
     if (optionID == 0 && selected != null) {
       final Base base = d.world.base();
-      d.beginConstruction(selected, base, slotID);
+      d.buildSlot(slotID).beginConstruction(selected, base, slotID);
       mainView.dismissMessage(this);
     }
     //

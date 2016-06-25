@@ -78,7 +78,7 @@ public class AreasView extends UINode {
     
     int down = 10;
     
-    for (Room room : base.rooms()) if (room != null) {
+    for (Place room : base.rooms()) if (room != null) {
       g.drawImage(room.icon(), vx + 10, vy + down, 60, 60, null);
       boolean hover = surface.tryHover(vx + 10, vy + down, 60, 60, room);
       

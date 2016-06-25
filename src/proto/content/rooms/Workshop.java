@@ -10,7 +10,7 @@ import proto.content.items.Gadgets;
 
 
 
-public class Workshop extends Room {
+public class Workshop extends Place {
   
   
   final static Equipped SHOP_ITEMS[] = {
@@ -55,10 +55,10 @@ public class Workshop extends Room {
     */
   final public static Blueprint BLUEPRINT = new Blueprint(
     "Workshop", "blueprint_workshop",
-    "Allows agents to repair or manufacture gadgets and armour.",
-    "media assets/main UI/room_workshop.png"
+    "media assets/main UI/room_workshop.png",
+    "Allows agents to repair or manufacture gadgets and armour."
   ) {
-    protected Room createRoom(Base base, int slotID) {
+    protected Place createRoom(Base base, int slotID) {
       return new Workshop(base, slotID);
     }
   };

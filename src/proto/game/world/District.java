@@ -79,29 +79,28 @@ public class District implements Session.Saveable {
   
   
   static class Level { Stat stat; int level, bonus; float current; }
-  static class Slot { Facility built; Base owns; float progress; }
-  
   Level statLevels[];
-  Slot buildSlots[];
+  Place buildSlots[];
   
   
   
   District(Region region, World world) {
     this.world  = world ;
     this.region = region;
-    initStatsAndSlots();
+    initStats();
+    
+    buildSlots = new Place[region.maxFacilities];
+    for (int i = 0; i < buildSlots.length; i++) {
+      buildSlots[i] = new Place(world, i);
+    }
   }
   
   
-  private void initStatsAndSlots() {
+  private void initStats() {
     statLevels = new Level[ALL_STATS.length];
     for (int i = 0; i < ALL_STATS.length; i++) {
       final Level l = this.statLevels[i] = new Level();
       l.stat = ALL_STATS[i];
-    }
-    buildSlots = new Slot[region.maxFacilities];
-    for (int i = 0; i < buildSlots.length; i++) {
-      final Slot s = this.buildSlots[i] = new Slot();
     }
   }
   
@@ -110,18 +109,14 @@ public class District implements Session.Saveable {
     s.cacheInstance(this);
     world  = (World ) s.loadObject();
     region = (Region) s.loadObject();
-    initStatsAndSlots();
+    initStats();
     
     for (Level l : statLevels) {
       l.bonus   = s.loadInt  ();
       l.level   = s.loadInt  ();
       l.current = s.loadFloat();
     }
-    for (Slot slot : buildSlots) {
-      slot.built    = (Facility) s.loadObject();
-      slot.owns     = (Base    ) s.loadObject();
-      slot.progress = s.loadFloat();
-    }
+    buildSlots = (Place[]) s.loadObjectArray(Place.class);
   }
   
   
@@ -134,11 +129,7 @@ public class District implements Session.Saveable {
       s.saveInt(l.level);
       s.saveFloat(l.current);
     }
-    for (Slot slot : buildSlots) {
-      s.saveObject(slot.built   );
-      s.saveObject(slot.owns    );
-      s.saveFloat (slot.progress);
-    }
+    s.saveObjectArray(buildSlots);
   }
   
   
@@ -184,11 +175,12 @@ public class District implements Session.Saveable {
   
   private int incomeFor(Base base, boolean positive) {
     int total = 0;
-    for (Slot slot : buildSlots) {
-      if (slot.owns != base || slot.built == null) continue;
-      if (slot.progress < 1) continue;
+    
+    for (Place slot : buildSlots) {
+      if (slot.owner() != base || slot.built() == null) continue;
+      if (slot.buildProgress() < 1) continue;
       
-      final int inc = slot.built.incomeFrom(this);
+      final int inc = slot.built().incomeFrom(this);
       if (positive) total += Nums.max(inc, 0      );
       else          total += Nums.max(0  , 0 - inc);
     }
@@ -214,9 +206,9 @@ public class District implements Session.Saveable {
   }
   
   
-  public Series <Facility> facilitiesAvailable() {
+  public Series <Blueprint> facilitiesAvailable() {
     //  TODO:  MOVE THIS SELECTION ELSEWHERE
-    final Batch <Facility> all = new Batch();
+    final Batch <Blueprint> all = new Batch();
     Visit.appendTo(all,
       Facilities.BUSINESS_PARK,
       Facilities.CHEMICAL_PLANT,
@@ -232,28 +224,8 @@ public class District implements Session.Saveable {
   }
   
   
-  public Facility builtInSlot(int slotID) {
-    return buildSlots[slotID].built;
-  }
-  
-  
-  public Base ownerForSlot(int slotID) {
-    return buildSlots[slotID].owns;
-  }
-  
-  
-  public float buildProgress(int slotID) {
-    return buildSlots[slotID].progress;
-  }
-  
-  
-  public void beginConstruction(Facility builds, Base owns, int slotID) {
-    final Slot slot = buildSlots[slotID];
-    slot.built    = builds;
-    slot.owns     = owns  ;
-    slot.progress = 0     ;
-    
-    owns.incFunding(0 - builds.buildCost);
+  public Place buildSlot(int slotID) {
+    return buildSlots[slotID];
   }
   
   
@@ -278,18 +250,21 @@ public class District implements Session.Saveable {
       l.bonus = 0;
     }
     int baseIncome = 0, mobIncome = 0, totalIncome = 0;
+    
+    
     for (int i = 0 ; i < buildSlots.length; i++) {
-      final Slot     slot  = buildSlots[i];
-      final Facility built = slot.built;
-      final Base     owns  = slot.owns;
-      final float    prog  = slot.progress;
+      
+      final Place     slot  = buildSlots[i];
+      final Blueprint built = slot.built();
+      final Base      owns  = slot.owner();
+      final float     prog  = slot.buildProgress();
       
       if (built == null) {
         continue;
       }
       else if (prog < 1) {
         float moreProg = 1f / built.buildTime;
-        slot.progress = Nums.clamp(slot.progress + moreProg, 0, 1);
+        slot.setBuildProgress(prog + moreProg);
       }
       else {
         final int income = built.incomeFrom(this);

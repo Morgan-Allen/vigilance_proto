@@ -10,7 +10,7 @@ import proto.util.List;
 
 
 
-public class Laboratory extends Room {
+public class Laboratory extends Place {
   
   
   
@@ -55,10 +55,10 @@ public class Laboratory extends Room {
     */
   final public static Blueprint BLUEPRINT = new Blueprint(
     "Laboratory", "blueprint_laboratory",
-    "Allows agents to synthesise medicine, serums and chemicals.",
-    "media assets/main UI/room_laboratory.png"
+    "media assets/main UI/room_laboratory.png",
+    "Allows agents to synthesise medicine, serums and chemicals."
   ) {
-    protected Room createRoom(Base base, int slotID) {
+    protected Place createRoom(Base base, int slotID) {
       return new Laboratory(base, slotID);
     }
   };

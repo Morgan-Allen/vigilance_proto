@@ -9,7 +9,7 @@ import static proto.game.person.PersonStats.*;
 
 
 
-public class Gymnasium extends Room {
+public class Gymnasium extends Place {
   
   final static Skill GYM_SKILLS[] = {
     MARKSMAN, GYMNASTICS, CLOSE_COMBAT, STAMINA
@@ -51,10 +51,10 @@ public class Gymnasium extends Room {
     */
   final public static Blueprint BLUEPRINT = new Blueprint(
     "Gymnasium", "blueprint_gymnasium",
-    "Permits training in physical skills involving strength or reflex.",
-    "media assets/main UI/room_gymnasium.png"
+    "media assets/main UI/room_gymnasium.png",
+    "Permits training in physical skills involving strength or reflex."
   ) {
-    protected Room createRoom(Base base, int slotID) {
+    protected Place createRoom(Base base, int slotID) {
       return new Gymnasium(base, slotID);
     }
   };

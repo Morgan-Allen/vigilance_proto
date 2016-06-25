@@ -123,8 +123,8 @@ public class MainView extends UINode {
   }
   
   
-  public Room selectedRoom() {
-    if (selectedObject instanceof Room) return (Room) selectedObject;
+  public Place selectedRoom() {
+    if (selectedObject instanceof Place) return (Place) selectedObject;
     return null;
   }
   

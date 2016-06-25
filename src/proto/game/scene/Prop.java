@@ -3,7 +3,6 @@
 package proto.game.scene;
 import proto.common.Kind;
 import proto.common.Session;
-import proto.common.Session.Saveable;
 import proto.util.*;
 
 
