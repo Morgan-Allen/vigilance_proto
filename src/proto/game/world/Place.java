@@ -27,9 +27,9 @@ public class Place extends Element {
   }
   
   
-  protected Place(Base base, Blueprint print, int slotIndex) {
+  protected Place(Base base, Blueprint print, int slotID) {
     super(base.world);
-    this.slotID     = slotIndex;
+    this.slotID        = slotID;
     this.owner         = base;
     this.built         = print;
     this.buildProgress = 1.0f;
@@ -72,16 +72,21 @@ public class Place extends Element {
   }
   
   
-  public void setBuildProgress(float progress) {
-    this.buildProgress = Nums.clamp(progress, 0, 1);
+  public void assignConstruction(Blueprint builds, Base owns, float progress) {
+    built         = builds  ;
+    owner         = owns    ;
+    buildProgress = progress;
   }
   
   
-  public void beginConstruction(Blueprint builds, Base owns, int slotID) {
-    built         = builds;
-    owner         = owns  ;
-    buildProgress = 0     ;
+  public void beginConstruction(Blueprint builds, Base owns) {
+    assignConstruction(builds, owns, 0);
     owns.incFunding(0 - builds.buildCost);
+  }
+  
+  
+  public void setBuildProgress(float progress) {
+    this.buildProgress = Nums.clamp(progress, 0, 1);
   }
   
   
@@ -116,16 +121,18 @@ public class Place extends Element {
   /**  Rendering, debug and interface methods-
     */
   public String toString() {
-    return built.name;
+    return name();
   }
   
   
   public String name() {
+    if (built == null) return "Place";
     return built.name;
   }
   
   
   public Image icon() {
+    if (built == null) return null;
     return built.icon;
   }
 }

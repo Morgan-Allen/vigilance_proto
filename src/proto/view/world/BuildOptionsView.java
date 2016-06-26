@@ -94,7 +94,7 @@ public class BuildOptionsView extends MessageView {
     //  If confirmed, begin construction.
     if (optionID == 0 && selected != null) {
       final Base base = d.world.base();
-      d.buildSlot(slotID).beginConstruction(selected, base, slotID);
+      d.buildSlot(slotID).beginConstruction(selected, base);
       mainView.dismissMessage(this);
     }
     //

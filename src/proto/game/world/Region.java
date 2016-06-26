@@ -27,6 +27,7 @@ public class Region extends Index.Entry implements Session.Saveable {
   int     maxFacilities  = 3    ;
   float   defaultTrust   = 0.00f;
   boolean defaultMember  = false;
+  Blueprint defaultFacilities[];
   
   
   public Region(String name, String ID) {
@@ -42,6 +43,14 @@ public class Region extends Index.Entry implements Session.Saveable {
   
   public void saveState(Session s) throws Exception {
     INDEX.saveEntry(this, s.output());
+  }
+  
+  
+  
+  /**  Assigning default stats and facilities-
+    */
+  public void attachDefaultFacilities(Blueprint... facilities) {
+    this.defaultFacilities = facilities;
   }
   
   

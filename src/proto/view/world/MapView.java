@@ -36,6 +36,31 @@ public class MapView extends UINode {
   }
   
   
+  public void resizeToFitAspectRatio() {
+    float
+      mapW  = mapImage.getWidth (),
+      mapH  = mapImage.getHeight(),
+      selfW = relBounds.xdim(),
+      selfH = relBounds.ydim(),
+      relW  = mapW / selfW,
+      relH  = mapH / selfH
+    ;
+    //*
+    
+    if (relW < relH) {
+      float shrink = selfW * ((relH / relW) - 1);
+      relBounds.incWide(0 - shrink);
+      relBounds.incX   (shrink / 2);
+    }
+    if (relH < relW) {
+      float shrink = selfH * ((relW / relH) - 1);
+      relBounds.incHigh(0 - shrink);
+      relBounds.incY   (shrink / 2);
+    }
+    //*/
+  }
+  
+  
   void attachOutlinesFor(District... nations) {
     if (this.attached != null) return;
     
@@ -86,7 +111,7 @@ public class MapView extends UINode {
     g.drawImage(mapImage, vx, vy, vw, vh, null);
     District nationHovered = null;
     //
-    //  Then draw the nations of the world on the satellite map.
+    //  Then draw the nations of the world on the overhead map.
     int imgWide = mapImage.getWidth(), imgHigh = mapImage.getHeight();
     float mapWRatio = 1, mapHRatio = 1;
     mapWRatio *= (imgWide * 1f) / vw;

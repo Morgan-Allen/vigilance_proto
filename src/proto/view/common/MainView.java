@@ -18,18 +18,25 @@ import java.awt.Image;
 
 public class MainView extends UINode {
   
+  final public static String
+    MAPS_DIR = "media assets/city map/",
+    ACTS_DIR = "media assets/action view/",
+    MNUI_DIR = "media assets/main UI/"
+  ;
   
   private World world;
   
   SceneView  sceneView ;
   UINode     mainUI    ;
   
+  RosterView rosterView;
   AreasView  areaView  ;
+  StatsReadoutView    readoutView ;
+  ProgressOptionsView progressView;
+  
+  PersonView personView;
   RoomView   roomView  ;
   RegionView regionView;
-  
-  RosterView rosterView;
-  PersonView personView;
   
   final public Image alertMarker, selectCircle, selectSquare;
   
@@ -46,9 +53,8 @@ public class MainView extends UINode {
     super();
     this.world = world;
     
-    int fullHigh = 750, fullWide = 1200, rosterHigh = 125;
+    int fullHigh = 750, fullWide = 1200;
     this.relBounds.set(0, 0, fullWide, fullHigh);
-    int paneDown = 20 + rosterHigh, paneHigh = fullHigh - (10 + paneDown);
     
     sceneView = new SceneView(this, new Box2D(
       0, 0, fullWide, fullHigh
@@ -63,38 +69,26 @@ public class MainView extends UINode {
     addChildren(sceneView, mainUI);
     
     rosterView = new RosterView(mainUI, new Box2D(
-      320, 0,
-      fullWide - 320, 120
+      320, 0, fullWide - 320, 120
+    ));
+    readoutView = new StatsReadoutView(mainUI, new Box2D(
+      320, 120, fullWide - 320, 20
     ));
     areaView = new AreasView(mainUI, new Box2D(
-      320, paneDown,
-      400, paneHigh
+      320, 140, fullWide - 320, fullHigh - (140 + 50)
     ));
-    mainUI.addChildren(areaView, rosterView);
+    progressView = new ProgressOptionsView(mainUI, new Box2D(
+      (fullWide / 2) - 100, fullHigh - 50, 200, 50
+    ));
+    mainUI.addChildren(rosterView, readoutView, areaView, progressView);
     
-    personView = new PersonView(mainUI, new Box2D(
-      0  , 0,
-      320, fullHigh
-    ));
-    roomView = new RoomView(mainUI, new Box2D(
-      0  , 0,
-      320, fullHigh
-    ));
-    regionView = new RegionView(mainUI, new Box2D(
-      0  , 0,
-      320, fullHigh
-    ));
+    final Box2D panesBound = new Box2D(0, 0, 320, fullHigh);
+    
+    personView = new PersonView(mainUI, panesBound);
+    roomView   = new RoomView  (mainUI, panesBound);
+    regionView = new RegionView(mainUI, panesBound);
     mainUI.addChildren(personView, roomView, regionView);
     
-    final String
-      MAPS_DIR = "media assets/city map/",
-      ACTS_DIR = "media assets/action view/",
-      MNUI_DIR = "media assets/main UI/"
-    ;
-    areaView.mapView.loadMapImages(
-      MAPS_DIR+"city_map.png",
-      MAPS_DIR+"city_districts_key.png"
-    );
     alertMarker   = Kind.loadImage(MAPS_DIR+"alert_symbol.png" );
     selectCircle  = Kind.loadImage(ACTS_DIR+"select_circle.png");
     selectSquare  = Kind.loadImage(MNUI_DIR+"select_square.png");

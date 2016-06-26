@@ -90,8 +90,11 @@ public class District implements Session.Saveable {
     initStats();
     
     buildSlots = new Place[region.maxFacilities];
+    final Blueprint DF[] = region.defaultFacilities;
+    
     for (int i = 0; i < buildSlots.length; i++) {
-      buildSlots[i] = new Place(world, i);
+      final Place slot = buildSlots[i] = new Place(world, i);
+      if (DF != null && DF.length > i) slot.assignConstruction(DF[i], null, 1);
     }
   }
   

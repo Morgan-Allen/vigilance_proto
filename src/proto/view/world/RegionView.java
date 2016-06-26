@@ -107,7 +107,7 @@ public class RegionView extends UINode {
           if (built != null) hoverSlot.val = slot.slotID;
         }
       };
-      button.refers = built+"_slot_"+slot;
+      button.refers = built+"_slot_"+slot.slotID;
       if (prog < 1 && built != null) button.attachOverlay(IN_PROGRESS);
       button.renderNow(surface, g);
       

@@ -16,7 +16,6 @@ public class AreasView extends UINode {
   
   
   final public MapView mapView;
-  final StringButton monitorButton, saveButton, loadButton, quitButton;
   
   
   
@@ -25,48 +24,14 @@ public class AreasView extends UINode {
     
     mapView = new MapView(this, new Box2D(
       80, 10,
-      viewBounds.xdim() - 80, viewBounds.ydim() - 80
+      viewBounds.xdim() - 90, viewBounds.ydim() - 20
     ));
-    
-    int
-      across = (int) viewBounds.xdim() - 155,
-      down   = (int) viewBounds.ydim() - 20 ;
-    
-    monitorButton = new StringButton(
-      "Resume Monitoring",
-      new Box2D(5, down - 45, viewBounds.xdim() - 10, 20), this
-    ) {
-      protected void whenClicked() {
-        final World world = mainView.world();
-        final boolean active = world.monitorActive();
-        if (active) world.pauseMonitoring();
-        else        world.beginMonitoring();
-      }
-    };
-    addChildren(mapView, monitorButton);
-    
-    saveButton = new StringButton(
-      "Save", new Box2D(across + 0, down, 50, 20), this
-    ) {
-      protected void whenClicked() {
-        mainView.world().performSave();
-      }
-    };
-    loadButton = new StringButton(
-      "Reload", new Box2D(across + 50, down, 50, 20), this
-    ) {
-      protected void whenClicked() {
-        mainView.world().reloadFromSave();
-      }
-    };
-    quitButton = new StringButton(
-      "Quit", new Box2D(across + 100, down, 50, 20), this
-    ) {
-      protected void whenClicked() {
-        mainView.world().performSaveAndQuit();
-      }
-    };
-    addChildren(saveButton, loadButton, quitButton);
+    mapView.loadMapImages(
+      MainView.MAPS_DIR+"city_map.png",
+      MainView.MAPS_DIR+"city_districts_key.png"
+    );
+    mapView.resizeToFitAspectRatio();
+    addChildren(mapView);
   }
   
   
@@ -95,20 +60,6 @@ public class AreasView extends UINode {
       );
       down += 60 + 10;
     }
-    
-    //  TODO:  This might belong in a separate UI node?
-    g.setColor(Color.WHITE);
-    String timeString = "Time: "+ViewUtils.getTimeString(world);
-    g.drawString(timeString, vx + 10, vy + vh - 5);
-    
-    String cashString = "";
-    cashString +=  "Funds: " +base.currentFunds()+"";
-    cashString += " Income: "+base.income      ()+"";
-    cashString += " Outlay: "+base.maintenance ()+"";
-    g.drawString(cashString, vx + 10, vy + vh - 25);
-    
-    g.setColor(Color.DARK_GRAY);
-    g.drawRect(vx, vy, vw, vh);
     
     return true;
   }

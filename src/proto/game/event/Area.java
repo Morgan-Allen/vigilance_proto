@@ -19,7 +19,7 @@ public class Area implements Session.Saveable {
   
   
   public Area(String name, Region region) {
-    this.name = name;
+    this.name   = name;
     this.region = region;
   }
   
