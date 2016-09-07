@@ -80,7 +80,7 @@ public class BuildOptionsView extends MessageView {
     //
     //  Cannot confirm construction if no facility is selected.
     if (optionID == 0) {
-      final Base base = d.world.base();
+      final Base base = d.world.playerBase();
       if (selected == null) return false;
       if (d.buildSlot(slotID).built() == selected) return false;
       if (! selected.canBuild(base, d)) return false;
@@ -93,7 +93,7 @@ public class BuildOptionsView extends MessageView {
     //
     //  If confirmed, begin construction.
     if (optionID == 0 && selected != null) {
-      final Base base = d.world.base();
+      final Base base = d.world.playerBase();
       d.buildSlot(slotID).beginConstruction(selected, base);
       mainView.dismissMessage(this);
     }

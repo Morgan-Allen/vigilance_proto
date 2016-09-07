@@ -12,7 +12,7 @@ import static proto.content.agents.Crooks.*;
 
 
 
-
+/*
 public class Murder extends Event {
   
   final static int
@@ -21,21 +21,21 @@ public class Murder extends Event {
     LEAD_RIVAL   = 2,
     LEAD_WEAPON  = 3;
   
-  Area  morgue ;
+  Area   morgue ;
   Person victim ;
   Person partner;
   Person rival  ;
-  Area  hides  ;
+  Area   hides  ;
   Clue   weapon ;
   
   
   public Murder(Session s) throws Exception {
     super(s);
-    morgue  = (Area ) s.loadObject();
+    morgue  = (Area  ) s.loadObject();
     victim  = (Person) s.loadObject();
     partner = (Person) s.loadObject();
     rival   = (Person) s.loadObject();
-    hides   = (Area ) s.loadObject();
+    hides   = (Area  ) s.loadObject();
     weapon  = (Clue  ) s.loadObject();
   }
   
@@ -183,6 +183,7 @@ public class Murder extends Event {
   
   /**  And, last but not least, a generator/type for the event-
     */
+  /*
   final public static EventType TYPE = new EventType(
     "Murder", "event_murder"
   ) {
@@ -202,7 +203,7 @@ public class Murder extends Event {
     }
   };
 }
-
+//*/
 
 
 

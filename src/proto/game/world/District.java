@@ -77,14 +77,13 @@ public class District implements Session.Saveable {
     )
   ;
   
-  
   static class Level { Stat stat; int level, bonus; float current; }
   Level statLevels[];
   Place buildSlots[];
   
   
   
-  District(Region region, World world) {
+  public District(Region region, World world) {
     this.world  = world ;
     this.region = region;
     initStats();
@@ -93,7 +92,7 @@ public class District implements Session.Saveable {
     final Blueprint DF[] = region.defaultFacilities;
     
     for (int i = 0; i < buildSlots.length; i++) {
-      final Place slot = buildSlots[i] = new Place(world, i);
+      final Place slot = buildSlots[i] = new Place(this, i);
       if (DF != null && DF.length > i) slot.assignConstruction(DF[i], null, 1);
     }
   }
@@ -272,7 +271,7 @@ public class District implements Session.Saveable {
       else {
         final int income = built.incomeFrom(this);
         totalIncome += Nums.max(0, income);
-        if      (owns == world.base()) baseIncome += income;
+        if      (owns == world.playerBase()) baseIncome += income;
         else if (owns != null        ) mobIncome  += income;
         built.applyStatEffects(this);
       }

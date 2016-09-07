@@ -34,6 +34,12 @@ public abstract class EventType extends Index.Entry implements
   
   public abstract Event createRandomEvent(World world);
   public abstract float eventChance(Event event);
+  
+  
+  /**  Rendering, interface and debug methods-
+    */
+  protected abstract String nameFor(Event event);
+  protected abstract String infoFor(Event event);
 }
 
 

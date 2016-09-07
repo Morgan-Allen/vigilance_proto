@@ -24,6 +24,8 @@ public class Blueprint extends Index.Entry implements Session.Saveable {
   final int statMods[];
   final int buildCost, buildTime;
   
+  int security, lighting, cover;
+  
   
   
   public Blueprint(String name, String ID, String imgPath, String info) {

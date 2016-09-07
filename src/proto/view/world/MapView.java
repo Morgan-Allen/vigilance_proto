@@ -153,7 +153,7 @@ public class MapView extends UINode {
       );
       
       for (Event event : mainView.world().events().active()) {
-        if (event.region() == n.region) {
+        if (event.place().parent == n) {
           g.drawImage(mainView.alertMarker, x - 25, y - 25, 50, 50, null);
         }
       }
@@ -166,11 +166,9 @@ public class MapView extends UINode {
   
   private Series <Person> visitors(District located) {
     final Batch <Person> visitors = new Batch();
-    final Series <Person> roster = mainView.world().base().roster();
-    for (Person p : roster) if (p.assignment() != null) {
-      if (p.assignment().targetLocation() == located.region) {
-        visitors.include(p);
-      }
+    final Series <Person> roster = mainView.world().playerBase().roster();
+    for (Person p : roster) if (p.currentDistrict() == located) {
+      visitors.include(p);
     }
     return visitors;
   }

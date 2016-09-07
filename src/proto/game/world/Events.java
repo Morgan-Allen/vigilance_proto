@@ -42,7 +42,7 @@ public class Events {
   }
   
   
-  void addType(EventType type) {
+  public void addType(EventType type) {
     eventTypes.include(type);
   }
   

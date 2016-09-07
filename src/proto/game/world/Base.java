@@ -28,7 +28,7 @@ public class Base implements Session.Saveable {
   int currentFunds, incomeFloor, income, maintenance;
   
   
-  Base(World world, String name) {
+  public Base(World world, String name) {
     this.world = world;
     this.name  = name ;
   }

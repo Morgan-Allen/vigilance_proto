@@ -37,7 +37,8 @@ public class World implements Session.Saveable {
   MainView view = new MainView(this);
   
   District districts[];
-  Base base;
+  Base played;
+  List <Base> bases = new List();
   Events events = new Events(this);
   
   int timeDays = 0;
@@ -63,7 +64,8 @@ public class World implements Session.Saveable {
     s.cacheInstance(this);
     
     districts = (District[]) s.loadObjectArray(District.class);
-    base      = (Base) s.loadObject();
+    played    = (Base) s.loadObject();
+    s.loadObjects(bases);
     events.loadState(s);
     
     timeDays   = s.loadInt  ();
@@ -76,7 +78,8 @@ public class World implements Session.Saveable {
   
   public void saveState(Session s) throws Exception {
     s.saveObjectArray(districts);
-    s.saveObject(base);
+    s.saveObject(played);
+    s.saveObjects(bases);
     events.saveState(s);
     
     s.saveInt  (timeDays  );
@@ -113,47 +116,17 @@ public class World implements Session.Saveable {
   }
   
   
-  public void initDefaultNations() {
-    int numN = Regions.ALL_REGIONS.length;
-    this.districts = new District[numN];
-    
-    for (int n = 0; n < numN; n++) {
-      districts[n] = new District(Regions.ALL_REGIONS[n], this);
-    }
-    events.addType(Kidnapping.TYPE);
-    events.addType(Robbery   .TYPE);
-    events.addType(Murder    .TYPE);
-    
-    for (District d : districts) d.initialiseDistrict();
+  
+  /**  Supplementary setup methods:
+    */
+  public void attachDistricts(District... districts) {
+    this.districts = districts;
   }
   
   
-  public void initDefaultBase() {
-    this.base = new Base(this, "Wayne Foundation");
-    
-    Person leader = base.addToRoster(new Person(Heroes.HERO_BATMAN, this));
-    base.addToRoster(new Person(Heroes.HERO_ALFRED   , this));
-    base.addToRoster(new Person(Heroes.HERO_SWARM    , this));
-    base.addToRoster(new Person(Heroes.HERO_BATGIRL  , this));
-    base.addToRoster(new Person(Heroes.HERO_NIGHTWING, this));
-    base.addToRoster(new Person(Heroes.HERO_QUESTION , this));
-    
-    for (Person p : base.roster()) for (Person o : base.roster()) {
-      if (p != o) p.history.incBond(o, 0.2f);
-    }
-    base.setLeader(leader);
-    
-    base.addFacility(Gymnasium .BLUEPRINT, 0, 1f);
-    base.addFacility(Library   .BLUEPRINT, 1, 1f);
-    base.addFacility(Workshop  .BLUEPRINT, 2, 1f);
-    base.addFacility(Laboratory.BLUEPRINT, 3, 1f);
-    
-    base.stocks.incStock(Gadgets.BATARANGS  , 4);
-    base.stocks.incStock(Gadgets.BODY_ARMOUR, 2);
-    base.stocks.incStock(Gadgets.MED_KIT    , 2);
-    
-    base.setIncomeFloor(20);
-    base.incFunding(500);
+  public void addBase(Base base, boolean played) {
+    bases.add(base);
+    if (played) this.played = base;
     base.updateBase(0);
   }
   
@@ -172,8 +145,8 @@ public class World implements Session.Saveable {
   }
   
   
-  public Base base() {
-    return base;
+  public Base playerBase() {
+    return played;
   }
   
   
@@ -224,11 +197,11 @@ public class World implements Session.Saveable {
         timeDays++;
         timeHours -= HOURS_PER_DAY;
         for (District d : districts) d.updateDistrict();
-        base.updateBaseDaily();
+        played.updateBaseDaily();
       }
       
       events.updateEvents();
-      base.updateBase(timeGap / (HOURS_PER_DAY * DAYS_PER_WEEK));
+      played.updateBase(timeGap / (HOURS_PER_DAY * DAYS_PER_WEEK));
     }
   }
   

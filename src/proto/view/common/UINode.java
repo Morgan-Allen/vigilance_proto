@@ -72,8 +72,8 @@ public abstract class UINode {
     }
     
     if (clipContent) {
-      //  TODO:  IMPLEMENT THIS!
-      //g = g.create(vx, vy, vw, vh);
+      g = (Graphics2D) g.create();
+      g.setClip(vx, vy, vw, vh);
     }
     
     if (! renderTo(surface, g)) return;

@@ -11,36 +11,7 @@ import javax.swing.*;
 
 
 
-public class RunGame extends JFrame implements ActionListener {
-  
-  
-  final public static int
-    FRAME_RATE = 25;
-  final public static String
-    DEFAULT_SAVE_PATH = "saves/main_save.vgl";
-  
-  
-  public static void main(String[] args) {
-    EventQueue.invokeLater(new Runnable() {
-      public void run() {
-        RunGame ex = new RunGame(DEFAULT_SAVE_PATH);
-        ex.setVisible(true);
-      }
-    });
-  }
-  
-  
-  public static boolean onMainThread() {
-    //  Filler method- replace later!
-    return true;
-  }
-  
-  
-  public static boolean mainThreadBegun() {
-    //  Filler method- replace later!
-    return true;
-  }
-  
+public abstract class RunGame extends JFrame implements ActionListener {
   
   
   /**  Setup and construction-
@@ -72,12 +43,7 @@ public class RunGame extends JFrame implements ActionListener {
   }
   
   
-  protected World setupWorld() {
-    this.world = new World(this, savePath);
-    world.initDefaultNations();
-    world.initDefaultBase();
-    return world;
-  }
+  protected abstract World setupWorld();
   
   
   private void initUI() {
@@ -111,9 +77,25 @@ public class RunGame extends JFrame implements ActionListener {
   }
   
   
+  public static boolean onMainThread() {
+    //  Filler method- replace later!
+    return true;
+  }
+  
+  
+  public static boolean mainThreadBegun() {
+    //  Filler method- replace later!
+    return true;
+  }
+  
+  
   
   /**  Public access methods-
     */
+  final public static int
+    FRAME_RATE = 25;
+  
+  
   public World world() {
     return world;
   }

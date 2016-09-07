@@ -75,7 +75,7 @@ public class Crafting extends Task {
   }
   
   
-  public Object targetLocation() {
+  public Place targetLocation() {
     return room;
   }
   

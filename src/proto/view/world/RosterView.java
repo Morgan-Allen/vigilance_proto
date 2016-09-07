@@ -43,7 +43,7 @@ public class RosterView extends UINode {
   
   
   protected boolean renderTo(Surface surface, Graphics2D g) {
-    Base base = mainView.world().base();
+    Base base = mainView.world().playerBase();
     Assignment assignTo = mainView.selectedTask();
     Person selectedPerson = mainView.selectedPerson();
     

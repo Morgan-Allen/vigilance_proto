@@ -99,7 +99,7 @@ public class Training extends Task {
   }
   
   
-  public Object targetLocation() {
+  public Place targetLocation() {
     return room;
   }
   

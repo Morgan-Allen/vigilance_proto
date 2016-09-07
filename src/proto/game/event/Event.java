@@ -28,56 +28,35 @@ public class Event implements Session.Saveable {
     );
   
   
-  final String name, info;
-  
-  final World world;
-  final Region region;
-  
+  final EventType type;
+  Place place;
   float timeBegins, timeEnds;
-  List <Lead> leads = new List();
-  
-  List <Object> known = new List();
-  boolean closed, solved;
+  boolean complete;
   
   
-  protected Event(String name, String info, World world, Region region) {
-    this.name   = name  ;
-    this.info   = info  ;
-    this.world  = world ;
-    this.region = region;
+  protected Event(EventType type) {
+    this.type = type;
   }
   
   
   public Event(Session s) throws Exception {
     s.cacheInstance(this);
+    type = (EventType) s.loadObject();
     
-    name = s.loadString();
-    info = s.loadString();
-    
-    world      = (World ) s.loadObject();
-    region     = (Region) s.loadObject();
+    place      = (Place) s.loadObject();
     timeBegins = s.loadFloat();
     timeEnds   = s.loadFloat();
-    s.loadObjects(leads);
-    s.loadObjects(known);
-    closed = s.loadBool();
-    solved = s.loadBool();
+    complete   = s.loadBool ();
   }
   
   
   public void saveState(Session s) throws Exception {
+    s.saveObject(type);
     
-    s.saveString(name);
-    s.saveString(info);
-    
-    s.saveObject(world );
-    s.saveObject(region);
-    s.saveFloat(timeBegins);
-    s.saveFloat(timeEnds  );
-    s.saveObjects(leads);
-    s.saveObjects(known);
-    s.saveBool(closed);
-    s.saveBool(solved);
+    s.saveObject(place     );
+    s.saveFloat (timeBegins);
+    s.saveFloat (timeEnds  );
+    s.saveBool  (complete  );
   }
   
   
@@ -91,12 +70,12 @@ public class Event implements Session.Saveable {
   
   
   public World world() {
-    return world;
+    return place.world();
   }
   
   
-  public Region region() {
-    return region;
+  public Place place() {
+    return place;
   }
   
   
@@ -110,6 +89,38 @@ public class Event implements Session.Saveable {
   }
   
   
+  
+  
+  
+  
+  
+
+  public Series <Lead> knownOpenLeads() {
+    final Batch <Lead> matches = new Batch();
+    /*
+    for (Lead l : leads) {
+      if (l.open()) matches.add(l);
+    }
+    //*/
+    return matches;
+  }
+  
+  
+  public void updateEvent() {
+    /*
+    for (Lead lead : leads) {
+      lead.updateAssignment();
+    }
+    //*/
+  }
+  
+  
+  public boolean complete() {
+    return complete;
+  }
+  
+  
+  /*
   protected void assignLeads(Lead... leads) {
     for (Lead l : leads) this.leads.add(l);
   }
@@ -139,21 +150,7 @@ public class Event implements Session.Saveable {
   }
   
   
-  public void updateEvent() {
-    for (Lead lead : leads) {
-      lead.updateAssignment();
-    }
-  }
   
-  
-  public boolean complete() {
-    return closed;
-  }
-  
-  
-  
-  /**  Lead-compilation for general assessment and UI purposes-
-    */
   public Series <Lead> knownOpenLeads() {
     final Batch <Lead> matches = new Batch();
     for (Lead l : leads) {
@@ -177,18 +174,20 @@ public class Event implements Session.Saveable {
     }
     return from;
   }
+  //*/
+  
   
   
   
   /**  Rendering, debug and interface methods-
     */
   public String name() {
-    return name;
+    return type.nameFor(this);
   }
   
   
   public String info() {
-    return info;
+    return type.infoFor(this);
   }
   
   
@@ -198,7 +197,7 @@ public class Event implements Session.Saveable {
   
   
   public String toString() {
-    return name;
+    return name();
   }
 }
 

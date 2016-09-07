@@ -12,6 +12,7 @@ import static proto.content.agents.Crooks.*;
 
 
 
+/*
 public class Kidnapping extends Event {
   
   final static int
@@ -31,8 +32,8 @@ public class Kidnapping extends Event {
     super(s);
     boss    = (Person) s.loadObject();
     missing = (Person) s.loadObject();
-    home    = (Area ) s.loadObject();
-    taken   = (Area ) s.loadObject();
+    home    = (Area  ) s.loadObject();
+    taken   = (Area  ) s.loadObject();
     fibres  = (Clue  ) s.loadObject();
   }
   
@@ -137,6 +138,7 @@ public class Kidnapping extends Event {
   
   /**  And, last but not least, a generator/type for the event-
     */
+/*
   final public static EventType TYPE = new EventType(
     "Kidnapping", "event_kidnapping"
   ) {
@@ -157,6 +159,8 @@ public class Kidnapping extends Event {
     }
   };
 }
+//*/
+
 
 
 

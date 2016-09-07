@@ -22,7 +22,7 @@ public class StatsReadoutView extends UINode {
   protected boolean renderTo(Surface surface, Graphics2D g) {
     
     final World world = mainView.world();
-    final Base  base  = world.base();
+    final Base  base  = world.playerBase();
     
     g.setColor(Color.WHITE);
     String timeString = "Time: "+ViewUtils.getTimeString(world);

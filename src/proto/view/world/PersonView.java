@@ -135,7 +135,7 @@ public class PersonView extends UINode {
       return;
     }
     
-    final Base base = mainView.world().base();
+    final Base base = mainView.world().playerBase();
     final Series <Person> roster = base.roster();
     int personID = base.rosterIndex(person);
     
@@ -248,7 +248,7 @@ public class PersonView extends UINode {
   
   void createItemMenu(final Person person, final int slotID, int x, int y) {
     final Batch <Equipped> types = new Batch();
-    final BaseStocks stocks = mainView.world().base().stocks;
+    final BaseStocks stocks = mainView.world().playerBase().stocks;
     
     for (Equipped type : stocks.availableItems(person, slotID)) {
       types.add(type);
@@ -267,7 +267,7 @@ public class PersonView extends UINode {
       }
       
       protected void whenPicked(Equipped option, int optionID) {
-        person.gear.equipItem(option, mainView.world().base());
+        person.gear.equipItem(option, mainView.world().playerBase());
       }
     });
   }

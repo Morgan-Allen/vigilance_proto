@@ -38,9 +38,9 @@ public class FightLead extends Lead {
   
   public boolean attemptTask() {
     
-    final World world = parent.world;
-    final District site = world.districtFor(parent.region);
-    this.groundScene = parent.region.generateScene(site, this);
+    final World world = parent.world();
+    final District site = parent.place.parent;
+    this.groundScene = site.region.generateScene(site, this);
     
     /*
     this.groundScene = new Scene(world, 32);

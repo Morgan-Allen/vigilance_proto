@@ -11,6 +11,7 @@ import proto.content.agents.*;
 
 
 
+/*
 public class Robbery extends Event {
   
   final static int
@@ -31,11 +32,11 @@ public class Robbery extends Event {
   public Robbery(Session s) throws Exception {
     super(s);
     
-    business = (Area ) s.loadObject();
+    business = (Area  ) s.loadObject();
     owner    = (Person) s.loadObject();
     mole     = (Person) s.loadObject();
     boss     = (Person) s.loadObject();
-    stash    = (Area ) s.loadObject();
+    stash    = (Area  ) s.loadObject();
   }
   
   
@@ -173,6 +174,7 @@ public class Robbery extends Event {
   
   /**  And, last but not least, a generator/type for the event-
     */
+  /*
   final public static EventType TYPE = new EventType(
     "Robbery", "event_robbery"
   ) {
@@ -192,7 +194,7 @@ public class Robbery extends Event {
   };
 }
 
-
+//*/
 
 
 

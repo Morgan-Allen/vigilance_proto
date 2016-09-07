@@ -38,7 +38,7 @@ public class AreasView extends UINode {
   protected boolean renderTo(Surface surface, Graphics2D g) {
     
     final World world = mainView.world();
-    final Base  base  = world.base();
+    final Base  base  = world.playerBase();
     Object selection = mainView.selectedObject();
     
     int down = 10;

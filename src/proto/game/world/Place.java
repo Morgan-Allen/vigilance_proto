@@ -15,21 +15,25 @@ public class Place extends Element {
   /**  Data fields, construction and save/load methods-
     */
   final public int slotID;
+  final public District parent;
   
   private Base owner;
   private Blueprint built;
   private float buildProgress;
   
   
-  protected Place(World world, int slotID) {
-    super(world);
+  
+  protected Place(District parent, int slotID) {
+    super(parent.world);
     this.slotID = slotID;
+    this.parent = parent;
   }
   
   
   protected Place(Base base, Blueprint print, int slotID) {
     super(base.world);
     this.slotID        = slotID;
+    this.parent        = null;
     this.owner         = base;
     this.built         = print;
     this.buildProgress = 1.0f;
@@ -38,8 +42,9 @@ public class Place extends Element {
   
   public Place(Session s) throws Exception {
     super(s);
-    owner         = (Base) s.loadObject();
     slotID        = s.loadInt();
+    owner         = (Base     ) s.loadObject();
+    parent        = (District ) s.loadObject();
     built         = (Blueprint) s.loadObject();
     buildProgress = s.loadFloat();
   }
@@ -47,8 +52,9 @@ public class Place extends Element {
   
   public void saveState(Session s) throws Exception {
     super.saveState(s);
-    s.saveObject(owner        );
     s.saveInt   (slotID       );
+    s.saveObject(owner        );
+    s.saveObject(parent       );
     s.saveObject(built        );
     s.saveFloat (buildProgress);
   }

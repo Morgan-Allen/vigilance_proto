@@ -23,13 +23,16 @@ public class Lead extends Task {
   final public int ID;
   final public Object origin, goes[];
   
+  float chance;
+  boolean red, cold;
+  
   
   public Lead(
     String name, String info,
     Event parent, int ID, Object origin, Object reveals,
     int timeHours, Object... args
   ) {
-    super(timeHours, parent.world, args);
+    super(timeHours, parent.world(), args);
     
     this.activeName = name;
     this.helpInfo   = info;
@@ -73,24 +76,26 @@ public class Lead extends Task {
   /**  Follow-up and execution-
     */
   protected void onSuccess() {
-    if (! parent.checkFollowed(this, true)) return;
+    //if (! parent.checkFollowed(this, true)) return;
   }
   
   
   protected void onFailure() {
-    if (! parent.checkFollowed(this, false)) return;
+    //if (! parent.checkFollowed(this, false)) return;
   }
   
   
   public boolean open() {
-    boolean known = parent.known.includes(origin);
+    //  TODO:  You need to have a central fact-repository for the investigating
+    //  player instead.
+    boolean known = false;//parent.known.includes(origin);
     boolean done = complete();
     return known && ! done;
   }
   
   
-  public Object targetLocation() {
-    return parent.region();
+  public Place targetLocation() {
+    return parent.place();
   }
   
   
@@ -116,11 +121,15 @@ public class Lead extends Task {
     else           s.append("  They had no luck."    );
     
     boolean noLeads = true;
+    //  TODO:  You need to have a central fact-repository for the investigating
+    //  player instead.
+    /*
     if (success) for (Lead l : parent.openLeadsFrom(this)) {
       s.append("\n\nNew lead: ");
       s.append(l.activeName);
       noLeads = false;
     }
+    //*/
     if (noLeads) s.append("\nNo new leads were uncovered.");
     
     for (String action : world.events().extractLogInfo(this)) {

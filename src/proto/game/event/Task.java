@@ -165,7 +165,7 @@ public abstract class Task implements Assignment {
   }
   
   
-  public abstract Object targetLocation();
+  public abstract Place targetLocation();
   
   
   

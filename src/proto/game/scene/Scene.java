@@ -30,7 +30,7 @@ public class Scene implements Session.Saveable, Assignment {
   int expireTime;
   
   World world;
-  District site;
+  Place site;
   List <Person> playerTeam = new List();
   List <Person> othersTeam = new List();
   int state = STATE_INIT;
@@ -61,7 +61,7 @@ public class Scene implements Session.Saveable, Assignment {
     dangerLevel = s.loadFloat();
     expireTime  = s.loadInt();
     world       = (World) s.loadObject();
-    site        = (District) s.loadObject();
+    site        = (Place) s.loadObject();
     s.loadObjects(playerTeam);
     s.loadObjects(othersTeam);
     state = s.loadInt();
@@ -133,7 +133,7 @@ public class Scene implements Session.Saveable, Assignment {
   }
   
   
-  public Object targetLocation() {
+  public Place targetLocation() {
     return site;
   }
   
@@ -146,7 +146,7 @@ public class Scene implements Session.Saveable, Assignment {
   
   /**  Supplemental query and setup methods-
     */
-  public District site() {
+  public Place site() {
     return site;
   }
 
@@ -343,7 +343,7 @@ public class Scene implements Session.Saveable, Assignment {
   /**  Regular updates and activity cycle:
     */
   public void assignMissionParameters(
-    Lead trigger, District site, float dangerLevel, int expireTime,
+    Lead trigger, Place site, float dangerLevel, int expireTime,
     Series <Person> forces
   ) {
     this.trigger = trigger;

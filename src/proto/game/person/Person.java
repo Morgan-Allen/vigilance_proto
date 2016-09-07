@@ -31,6 +31,7 @@ public class Person extends Element {
   final public PersonGear    gear    = new PersonGear   (this);
   
   Assignment assignment;
+  Place resides;
   
   Tile location;
   Vec3D exactPos = new Vec3D();
@@ -76,6 +77,7 @@ public class Person extends Element {
     gear   .loadState(s);
     
     assignment = (Assignment) s.loadObject();
+    resides    = (Place     ) s.loadObject();
     
     location = (Tile) s.loadObject();
     exactPos.loadFrom(s.input());
@@ -97,6 +99,7 @@ public class Person extends Element {
     gear   .saveState(s);
     
     s.saveObject(assignment);
+    s.saveObject(resides   );
     
     s.saveObject(location);
     exactPos.saveTo(s.output());
@@ -116,6 +119,18 @@ public class Person extends Element {
   }
   
   
+  public Place currentPlace() {
+    if (assignment == null) return null;
+    return assignment.targetLocation();
+  }
+  
+  
+  public District currentDistrict() {
+    if (currentPlace() == null) return null;
+    return currentPlace().parent;
+  }
+  
+  
   
   
   /**  Assigning jobs & missions-
@@ -128,6 +143,16 @@ public class Person extends Element {
   
   public Assignment assignment() {
     return assignment;
+  }
+  
+  
+  public Place resides() {
+    return resides;
+  }
+  
+  
+  public void setResidence(Place resides) {
+    this.resides = resides;
   }
   
   

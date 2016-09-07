@@ -31,26 +31,29 @@ public class DebugScene extends RunGame {
   
   protected World setupWorld() {
     this.world = new World(this, savePath);
-    world.initDefaultNations();
-    world.initDefaultBase();
+    DefaultGame.initDefaultNations(world);
+    DefaultGame.initDefaultBase   (world);
+    DefaultGame.initDefaultCrime  (world);
     
+    /*
     Event played = Kidnapping.TYPE.createRandomEvent(world);
     final FightLead combat = new FightLead(
       "Test event", "test event info", played, 101, played, null
     );
     
-    final Base base = world.base();
+    final Base base = world.playerBase();
     UrbanScene mission = new UrbanScene(world, 32);
     mission.addToTeam(base.firstOfKind(Heroes.HERO_BATMAN   ));
     mission.addToTeam(base.firstOfKind(Heroes.HERO_NIGHTWING));
     mission.addToTeam(base.firstOfKind(Heroes.HERO_BATGIRL  ));
     
     mission.assignMissionParameters(
-      combat, world.districtFor(played.region()), 0.5f, 100, null
+      combat, played.place(), 0.5f, 100, null
     );
     mission.setupScene();
     
     world.enterScene(mission);
+    //*/
     
     return world;
   }

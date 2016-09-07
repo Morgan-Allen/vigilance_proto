@@ -42,7 +42,7 @@ public class RegionView extends UINode {
     if (nation == null) return false;
     
     //Image portrait = nation.region.view.portrait;
-    final Base base = mainView.world().base();
+    final Base base = mainView.world().playerBase();
     g.setColor(Color.WHITE);
     g.drawString(nation.region.name, vx + 20, vy + 20);
     
@@ -155,7 +155,7 @@ public class RegionView extends UINode {
     for (Event event : mainView.world().events().active()) {
       //
       //  Firstly, check to see if there's an event occurring in this region:
-      if (event.region() != d.region) continue;
+      if (event.place().parent != d) continue;
       final Series <Lead> leads = event.knownOpenLeads();
       if (leads.empty()) continue;
       noEvents = false;
