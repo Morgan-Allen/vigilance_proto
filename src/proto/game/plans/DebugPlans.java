@@ -25,9 +25,13 @@ public class DebugPlans {
     }
     I.say(world.longDescription());
     
+    Thing bank = new Thing(Thing.TYPE_PLACE, "Bank");
+    bank.setValue(Thing.PROP_SAFE, true);
+    world.setInside(bank, true);
+    
     I.say("\nBeginning plan-generation...");
     Plan plan = new Plan(boss, world);
-    Action firstStep = new Action(ActionTypes.HEIST, plan);
+    PlanStep firstStep = new PlanStep(StepTypes.HEIST, plan);
     plan.addGoal(firstStep, 10);
     for (Thing crook : crooks) plan.addObtained(crook);
     
@@ -48,7 +52,7 @@ public class DebugPlans {
     String name = pickFrom(FIRST_NAMES)+" "+pickFrom(LAST_NAMES);
     Thing person = new Thing(Thing.TYPE_PERSON, name);
     
-    for (String stat : Thing.ALL_STATS) {
+    for (String stat : Thing.PERSON_STATS) {
       person.setValue(stat, (int) (Math.random() * 10));
     }
     return person;

@@ -5,33 +5,30 @@ import proto.util.*;
 
 
 
-public class TypeCoerce extends ActionType {
+public class TypeCoerce extends StepType {
   
   TypeCoerce() { super(
     "Coerce",
-    rolesFor("coercing"),
+    rolesFor("talking", "under coercion"),
     rolesFor(),
     rolesFor("coerced")
   ); }
   
   
   
-  Action toProvide(Thing needed, Action by) {
+  PlanStep toProvide(Thing needed, PlanStep by) {
     if (needed.type == Thing.TYPE_PERSON) {
-      return new Action(this, by.plan).bindGives(needed);
+      return new PlanStep(this, by.plan).bindGives(needed);
     }
-    return super.toProvide(needed, by);
+    return null;
   }
   
   
-  float calcSuccessChance(Action action) {
+  float calcSuccessChance(PlanStep action) {
     Thing coerced = action.gives[roleID("coerced")];
     float talk = action.plan.agent.statValue(Thing.STAT_CHARM);
     talk += 5 - coerced.statValue(Thing.STAT_CHARM);
-    return Nums.max(0, talk / 10f);
+    return Nums.clamp(talk / 10f, 0, 1);
   }
-  
-  
-  
   
 }

@@ -4,8 +4,13 @@ package proto.game.plans;
 
 
 
-public class TypeHeist extends ActionType {
+public class TypeHeist extends StepType {
   
+  
+  //  TODO:  Replace with 'mole', 'explosives', 'getaway', 'lookout' and
+  //  a generic 'muscle' role.
+  //  Also, you need to remember the site of the crime, as neither a need or
+  //  an output- just a variable.
   
   final static Role
     DRIVER = new Role("Driver", 0),
@@ -23,7 +28,7 @@ public class TypeHeist extends ActionType {
   ); }
   
   
-  float calcSuitability(Thing used, Role role, Action action) {
+  float calcSuitability(Thing used, Role role, PlanStep action) {
     if (used.type != Thing.TYPE_PERSON) return 0;
     
     if (role == DRIVER) {
@@ -40,7 +45,6 @@ public class TypeHeist extends ActionType {
     }
     return 0;
   }
-  
 }
 
 

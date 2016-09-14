@@ -8,10 +8,13 @@ import proto.util.*;
 public class Thing {
 
   
+  /**  Data fields, constructors and save/load methods-
+    */
   final static Object
     TYPE_PERSON = "Person",
     TYPE_ITEM   = "Item"  ,
     TYPE_PLACE  = "Place" ,
+    TYPE_INFO   = "Info"  ,
     TYPE_LIST   = "List"  ,
     TYPE_FACT   = "Fact"
   ;
@@ -22,10 +25,13 @@ public class Thing {
     STAT_WIRING  = "Wiring",
     STAT_CHARM   = "Charm",
     STAT_SMARTS  = "Smarts",
-    ALL_STATS[] = {
+    PERSON_STATS[] = {
       STAT_GUNS, STAT_BRAWL, STAT_DRIVING,
       STAT_WIRING, STAT_CHARM, STAT_SMARTS
-    }
+    },
+    
+    STAT_MAKE_DC = "Make DC",
+    PROP_SAFE    = "Safe"
   ;
   
   static int nextID = 0;
@@ -64,6 +70,9 @@ public class Thing {
   }
   
   
+  
+  /**  Setting and accessing properties/values-
+    */
   void setValue(String label, Object val) {
     props.put(label, val);
   }
@@ -82,6 +91,12 @@ public class Thing {
   }
   
   
+  boolean propValue(String label) {
+    Object val = props.get(label);
+    return val != null && val.equals(true);
+  }
+  
+  
   boolean propEquals(String label, Object val) {
     Object current = props.get(label);
     if (val == null && current == null) return true ;
@@ -90,6 +105,9 @@ public class Thing {
   }
   
   
+  
+  /**  Debugging and interface methods-
+    */
   public String toString() {
     return name+" (#"+uniqueID+")";
   }

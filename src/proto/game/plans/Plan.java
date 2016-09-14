@@ -2,7 +2,7 @@
 
 package proto.game.plans;
 import proto.util.*;
-import static proto.game.plans.ActionType.*;
+import static proto.game.plans.StepType.*;
 
 
 
@@ -12,7 +12,7 @@ public class Plan {
   Thing world;
   
   List <Thing> preObtained = new List();
-  List <Action> steps = new List();
+  List <PlanStep> steps = new List();
   
   
   Plan(Thing agent, Thing world) {
@@ -26,7 +26,7 @@ public class Plan {
   }
   
   
-  void addGoal(Action goal, float priority) {
+  void addGoal(PlanStep goal, float priority) {
     goal.rating = priority;
     addStep(goal);
     fillNeeds(goal);
@@ -37,12 +37,12 @@ public class Plan {
   void advancePlan() {
     I.say("\nAdvancing plan...");
     
-    Batch <Action> nextGen = new Batch();
-    for (Action step : steps) addStepsFrom(step, nextGen);
+    Batch <PlanStep> nextGen = new Batch();
+    for (PlanStep step : steps) addStepsFrom(step, nextGen);
     
-    Action picked = null;
+    PlanStep picked = null;
     float bestRating = 0;
-    for (Action child : nextGen) {
+    for (PlanStep child : nextGen) {
       if (child.rating <= bestRating) continue;
       picked     = child;
       bestRating = child.rating;
@@ -58,24 +58,22 @@ public class Plan {
   
   /**  TODO:  Move these both out to the ActionType class?
     */
-  private void addStep(Action step) {
+  private void addStep(PlanStep step) {
     step.uniqueID = steps.size();
     steps.addFirst(step);
     if (step.parent != null) step.parent.needSteps[step.parentNeedID] = step;
   }
   
   
-  private void fillNeeds(Action step) {
-    for (Role role : step.type.needs) {
+  private void fillNeeds(PlanStep step) {
+    for (Role role : step.needsRoles()) {
       Thing used = step.needs[role.ID];
       if (used != null) continue;
       
-      //  TODO:  You need to skip over anything current required by another
-      //  step.
       float bestRating = 0;
       for (Thing match : world.inside) {
         if (neededDuring(step, match)) continue;
-        float rating = step.type.calcSuitability(match, role, step);
+        float rating = step.calcSuitability(match, role);
         if (rating > bestRating) { used = match; bestRating = rating; }
       }
       step.needs[role.ID] = used;
@@ -83,21 +81,21 @@ public class Plan {
   }
   
   
-  private void addStepsFrom(Action step, Batch <Action> toEval) {
-    for (Role role : step.type.needs) {
+  private void addStepsFrom(PlanStep step, Batch <PlanStep> toEval) {
+    for (Role role : step.needsRoles()) {
       Thing needed = step.needs[role.ID];
       if (needed == null                 ) continue;
       if (step.needSteps[role.ID] != null) continue;
       if (obtainedBefore(step, needed)   ) continue;
       
-      Action possible[] = step.type.actionsToObtain(needed, role, step);
-      for (Action child : possible) {
+      PlanStep possible[] = step.actionsToObtain(needed, role);
+      for (PlanStep child : possible) {
         fillNeeds(child);
         child.bindParent(step, role);
         
-        float chance = child.type.calcSuccessChance(child);
+        float chance = child.calcSuccessChance();
         child.rating = chance * step.rating;
-        child.rating += child.type.baseAppeal(child, this);
+        child.rating += chance * child.baseAppeal();
         
         toEval.add(child);
       }
@@ -108,18 +106,18 @@ public class Plan {
   
   /**  Determining pre-conditions and keeping track of resource-reservations.
     */
-  private boolean obtainedBefore(Action step, Thing used) {
+  private boolean obtainedBefore(PlanStep step, Thing used) {
     if (preObtained.includes(used)) return true;
-    for (Action prior : steps) {
+    for (PlanStep prior : steps) {
       if (prior == step) break;
-      if (prior.type.provides(prior, used)) return true;
+      if (prior.doesGive(used)) return true;
     }
     return false;
   }
   
   
-  private boolean neededDuring(Action step, Thing used) {
-    for (Action other : steps) if (other.type.activeDuring(other, step)) {
+  private boolean neededDuring(PlanStep step, Thing used) {
+    for (PlanStep other : steps) if (other.activeDuring(step)) {
       for (Thing o : other.needs) if (o == used) return true;
     }
     return false;
@@ -131,8 +129,8 @@ public class Plan {
     */
   public float successChance() {
     float chance = 1.0f;
-    for (Action step : steps) {
-      chance *= step.type.calcSuccessChance(step);
+    for (PlanStep step : steps) {
+      chance *= step.calcSuccessChance();
     }
     return chance;
   }
@@ -140,8 +138,8 @@ public class Plan {
   
   public float calcPlanRating() {
     float rating = 0, chance = 1.0f;
-    for (Action step : steps) {
-      chance *= step.type.calcSuccessChance(step);
+    for (PlanStep step : steps) {
+      chance *= step.calcSuccessChance();
       rating += step.rating * chance;
     }
     return rating;
