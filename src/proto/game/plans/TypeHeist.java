@@ -8,68 +8,101 @@ import proto.util.*;
 public class TypeHeist extends StepType {
   
   
-  //  TODO:  Replace with 'mole', 'explosives', 'getaway', 'lookout' and
-  //  a generic 'muscle' role- plus the venue itself.
-  
-  final static Role
-    VENUE     = new Role("Venue"    , 0),
-    EXPLOSIVE = new Role("Explosive", 1),
-    MOLE      = new Role("Mole"     , 2),
-    DRIVER    = new Role("Driver"   , 3),
-    LOOKOUT   = new Role("Lookout"  , 4),
-    MUSCLE    = new Role("Muscle"   , 5)
-  ;
-  
+  static enum Stages {
+    PLAN, TRAVEL, SCENE, GETAWAY
+  };
+  static enum Needs {
+    VENUE, EXPLOSIVE, MOLE, DRIVER, LOOKOUT, MUSCLE
+  };
+  static enum Gives {
+    LOOT
+  };
   
   TypeHeist() { super(
     "Heist",
-    rolesFor("plan", "travel", "scene", "getaway"),
-    new Role[] { VENUE, EXPLOSIVE, MOLE, DRIVER, LOOKOUT, MUSCLE },
-    rolesFor("loot")
+    Stages.values(), Needs.values(), Gives.values()
   ); }
   
   
+  PlanStep toProvide(Thing needed, PlanStep by) {
+    //  TODO:  Use this step-type to acquire items or cash...
+    return null;
+  }
+  
 
-  Series <Thing> availableTargets(Role role, Thing world) {
-    if (role == EXPLOSIVE) {
+  Series <Thing> availableTargets(Object needType, Thing world) {
+    if (needType == Needs.EXPLOSIVE) {
       Thing bomb = new Thing(Thing.TYPE_ITEM, "bomb");
       bomb.setValue(Thing.STAT_MAKE_DC, 5);
       bomb.setValue(Thing.PROP_BOMB, true);
       return new Batch(bomb);
     }
-    return super.availableTargets(role, world);
+    return super.availableTargets(needType, world);
   }
   
   
-  float calcSuitability(Thing used, Role role, PlanStep step) {
-    if (role == VENUE) {
+  float calcSuitability(Thing used, Object needType, PlanStep step) {
+    
+    Thing venue = step.need(Needs.VENUE);
+    if (needType == Needs.VENUE) {
       if (used.type != Thing.TYPE_PLACE) return 0;
       return 1;
     }
-    if (role == EXPLOSIVE) {
-      if (used.type != Thing.TYPE_ITEM     ) return 0;
-      if (! used.propValue(Thing.PROP_BOMB)) return 0;
+    if (venue == null) return -1;
+    
+    if (needType == Needs.EXPLOSIVE) {
+      if (used.type != Thing.TYPE_ITEM      ) return 0;
+      if (! venue.propValue(Thing.PROP_SAFE)) return 0;
+      if (! used .propValue(Thing.PROP_BOMB)) return 0;
       return 1;
     }
-    if (role == MOLE) {
+    
+    if (needType == Needs.MOLE) {
       if (used.type != Thing.TYPE_PERSON) return 0;
-      Thing venue = step.needs[VENUE.ID];
-      if (venue == null || used.owner != venue) return 0;
+      if (used.owner != venue           ) return 0;
       return 1;
     }
-    if (role == DRIVER) {
-      if (used.type != Thing.TYPE_PERSON) return 0;
-      return used.statValue(Thing.STAT_DRIVING) / 10;
+    
+    if (needType == Needs.DRIVER) {
+      return rateStatLevel(used, Thing.STAT_DRIVING);
     }
-    if (role == LOOKOUT) {
-      if (used.type != Thing.TYPE_PERSON) return 0;
-      return used.statValue(Thing.STAT_SMARTS) / 10;
+    if (needType == Needs.LOOKOUT) {
+      return rateStatLevel(used, Thing.STAT_SMARTS);
     }
-    if (role == MUSCLE) {
-      if (used.type != Thing.TYPE_PERSON) return 0;
-      return used.statValue(Thing.STAT_BRAWL) / 10;
+    if (needType == Needs.MUSCLE) {
+      return rateStatLevel(used, Thing.STAT_BRAWL);
     }
     return 0;
   }
+  
+  
+  float baseSuccessChance(PlanStep step) {
+    float chance = 1.0f;
+    
+    float mookRatings = 0;
+    mookRatings += rateStatLevel(step.need(Needs.DRIVER ), Thing.STAT_DRIVING);
+    mookRatings += rateStatLevel(step.need(Needs.LOOKOUT), Thing.STAT_SMARTS );
+    mookRatings += rateStatLevel(step.need(Needs.MUSCLE ), Thing.STAT_BRAWL  );
+    chance *= mookRatings / 3;
+    
+    return chance;
+  }
+  
+  
+  float baseAppeal(PlanStep step) {
+    return 0;
+  }
+  
+  
+  
 }
+
+
+
+
+
+
+
+
+
 

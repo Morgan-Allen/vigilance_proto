@@ -7,11 +7,19 @@ import proto.util.*;
 
 public class TypeCoerce extends StepType {
   
+  
+  static enum Stages {
+    TALKING, UNDER_COERCION
+  };
+  static enum Needs {
+  };
+  static enum Gives {
+    COERCED
+  };
+  
   TypeCoerce() { super(
     "Coerce",
-    rolesFor("talking", "under coercion"),
-    rolesFor(),
-    rolesFor("coerced")
+    Stages.values(), Needs.values(), Gives.values()
   ); }
   
   
@@ -24,11 +32,15 @@ public class TypeCoerce extends StepType {
   }
   
   
-  float calcSuccessChance(PlanStep action) {
-    Thing coerced = action.gives[roleID("coerced")];
-    float talk = action.plan.agent.statValue(Thing.STAT_CHARM);
+  float calcSuccessChance(PlanStep step) {
+    Thing coerced = step.give(Gives.COERCED);
+    float talk = step.plan.agent.statValue(Thing.STAT_CHARM);
     talk += 5 - coerced.statValue(Thing.STAT_CHARM);
     return Nums.clamp(talk / 10f, 0, 1);
   }
   
 }
+
+
+
+

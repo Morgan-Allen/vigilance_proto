@@ -56,18 +56,20 @@ public class Plan {
   
   
   
-  /**  TODO:  Move these both out to the ActionType class?
+  /**  TODO:  Move some of these out to the PlanStep class?
     */
   private void addStep(PlanStep step) {
     step.uniqueID = steps.size();
     steps.addFirst(step);
-    if (step.parent != null) step.parent.needSteps[step.parentNeedID] = step;
+    if (step.parent != null) {
+      step.parent.setStepForNeed(step.parentNeedType, step);
+    }
   }
   
   
   private void fillNeeds(PlanStep step) {
-    for (Role role : step.needsRoles()) {
-      Thing used = step.needs[role.ID];
+    for (Object role : step.needTypes()) {
+      Thing used = step.need(role);
       Series <Thing> available = step.type.availableTargets(role, world);
       if (available == null || used != null) continue;
       
@@ -77,17 +79,17 @@ public class Plan {
         float rating = step.calcSuitability(match, role);
         if (rating > bestRating) { used = match; bestRating = rating; }
       }
-      step.needs[role.ID] = used;
+      step.setNeed(role, used);
     }
   }
   
   
   private void addStepsFrom(PlanStep step, Batch <PlanStep> toEval) {
-    for (Role role : step.needsRoles()) {
-      Thing needed = step.needs[role.ID];
-      if (needed == null                 ) continue;
-      if (step.needSteps[role.ID] != null) continue;
-      if (canAccessBy(step, needed)   ) continue;
+    for (Object role : step.needTypes()) {
+      Thing    needed   = step.need (role);
+      PlanStep needStep = step.stepForNeed(role);
+      if (needed == null || needStep != null) continue;
+      if (canAccessBy(step, needed)         ) continue;
       
       PlanStep possible[] = step.actionsToObtain(needed, role);
       for (PlanStep child : possible) {
@@ -122,7 +124,7 @@ public class Plan {
   
   private boolean neededDuring(PlanStep step, Thing used) {
     for (PlanStep other : steps) if (other.activeDuring(step)) {
-      for (Thing o : other.needs) if (o == used) return true;
+      for (Thing o : other.needs()) if (o == used) return true;
     }
     return false;
   }

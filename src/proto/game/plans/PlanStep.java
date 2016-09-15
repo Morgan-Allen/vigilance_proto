@@ -1,7 +1,7 @@
 
+
 package proto.game.plans;
 import proto.util.*;
-import static proto.game.plans.StepType.*;
 
 
 
@@ -13,20 +13,21 @@ public class PlanStep {
   
   Plan plan;
   int stageID;
-  Thing needs[], gives[];
+  private Thing needs[], gives[];
   float rating;
   
-  PlanStep needSteps[];
+  private PlanStep needSteps[];
   PlanStep parent;
-  int parentNeedID;
+  Object parentNeedType;
   
   
   PlanStep(StepType type, Plan plan) {
     this.type = type;
     this.plan = plan;
-    this.gives     = new Thing   [type.gives.length];
-    this.needs     = new Thing   [type.needs.length];
-    this.needSteps = new PlanStep[type.needs.length];
+    final Object needT[] = needTypes(), giveT[] = giveTypes();
+    this.gives     = new Thing   [giveT.length];
+    this.needs     = new Thing   [needT.length];
+    this.needSteps = new PlanStep[needT.length];
   }
   
   
@@ -42,20 +43,20 @@ public class PlanStep {
   }
   
   
-  PlanStep bindParent(PlanStep parent, Role need) {
-    this.parent       = parent ;
-    this.parentNeedID = need.ID;
+  PlanStep bindParent(PlanStep parent, Object needType) {
+    this.parent         = parent  ;
+    this.parentNeedType = needType;
     return this;
   }
   
   
-  Role[] needsRoles() {
-    return type.needs;
+  Object[] needTypes() {
+    return type.needTypes;
   }
   
   
-  Role[] givesRoles() {
-    return type.gives;
+  Object[] giveTypes() {
+    return type.giveTypes;
   }
   
   
@@ -69,6 +70,36 @@ public class PlanStep {
   }
   
   
+  void setNeed(Object needType, Thing value) {
+    needs[Visit.indexOf(needType, needTypes())] = value;
+  }
+  
+  
+  void setGive(Object giveType, Thing value) {
+    gives[Visit.indexOf(giveType, giveTypes())] = value;
+  }
+  
+  
+  Thing need(Object needType) {
+    return needs[Visit.indexOf(needType, needTypes())];
+  }
+  
+  
+  Thing give(Object giveType) {
+    return gives[Visit.indexOf(giveType, giveTypes())];
+  }
+  
+  
+  PlanStep stepForNeed(Object needType) {
+    return needSteps[Visit.indexOf(needType, needTypes())];
+  }
+  
+  
+  void setStepForNeed(Object needType, PlanStep step) {
+    needSteps[Visit.indexOf(needType, needTypes())] = step;
+  }
+  
+  
   boolean doesGive(Thing needs) {
     return Visit.arrayIncludes(gives, needs);
   }
@@ -79,6 +110,9 @@ public class PlanStep {
   }
   
   
+  
+  /**
+    */
   float baseSuccessChance() {
     return type.baseSuccessChance(this);
   }
@@ -89,8 +123,8 @@ public class PlanStep {
   }
   
   
-  float calcSuitability(Thing used, Role role) {
-    return type.calcSuitability(used, role, this);
+  float calcSuitability(Thing used, Object needType) {
+    return type.calcSuitability(used, needType, this);
   }
   
   
@@ -108,7 +142,7 @@ public class PlanStep {
   }
   
   
-  PlanStep[] actionsToObtain(Thing used, Role role) {
+  PlanStep[] actionsToObtain(Thing used, Object needType) {
     final Batch <PlanStep> actions = new Batch();
     for (StepType type : StepTypes.ALL_TYPES) {
       PlanStep provides = type.toProvide(used, this);
@@ -138,7 +172,7 @@ public class PlanStep {
     s.append("\n  Parent: "+parent);
     s.append("\n  Chance: "+calcSuccessChance());
     
-    final Object needR[] = needsRoles(), giveR[] = givesRoles();
+    final Object needR[] = needTypes(), giveR[] = giveTypes();
     
     s.append("\n  Needs:");
     for (int n = 0; n < needR.length; n++) {
@@ -146,8 +180,8 @@ public class PlanStep {
       if (needSteps[n] != null) s.append(" ("+needSteps[n]+")");
     }
     s.append("\n  Gives:");
-    for (int r = 0; r < giveR.length; r++) {
-      s.append("\n    "+type.gives[r].name+"- "+gives[r]);
+    for (int g = 0; g < giveR.length; g++) {
+      s.append("\n    "+giveR[g]+"- "+gives[g]);
     }
     
     s.append("\n");

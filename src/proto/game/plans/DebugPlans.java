@@ -13,21 +13,26 @@ public class DebugPlans {
     
     Thing world = new Thing(Thing.TYPE_PLACE , "World"     );
     Thing boss  = new Thing(Thing.TYPE_PERSON, "Crime Boss");
-    Batch <Thing> crooks = new Batch();
+    Batch <Thing> civvies = new Batch();
+    Batch <Thing> crooks  = new Batch();
     
     for (int n = 5; n-- > 0;) {
       Thing civvy = genRandomPerson();
-      civvy.setInside(world, true);
+      civvy.beInside(world, true);
+      civvies.add(civvy);
       Thing crook = genRandomPerson();
       crook.setOwner(boss);
-      crook.setInside(world, true);
+      crook.beInside(world, true);
       crooks.add(crook);
     }
-    I.say(world.longDescription());
     
     Thing bank = new Thing(Thing.TYPE_PLACE, "Bank");
     bank.setValue(Thing.PROP_SAFE, true);
-    world.setInside(bank, true);
+    bank.beInside(world, true);
+    Thing worker = (Thing) Rand.pickFrom(civvies);
+    worker.setOwner(bank);
+
+    I.say(world.longDescription());
     
     I.say("\nBeginning plan-generation...");
     Plan plan = new Plan(boss, world);

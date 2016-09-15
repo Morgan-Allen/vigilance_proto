@@ -59,7 +59,7 @@ public class Thing {
   }
   
   
-  void setInside(Thing contains, boolean is) {
+  void beInside(Thing contains, boolean is) {
     if (is) {
       contains.inside.add(this);
       this.contains = contains;
