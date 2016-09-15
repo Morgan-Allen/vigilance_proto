@@ -30,9 +30,10 @@ public class Thing {
       STAT_WIRING, STAT_CHARM, STAT_SMARTS
     },
     
-    STAT_MAKE_DC = "Make DC" ,
-    PROP_SAFE    = "Has Safe",
-    PROP_BOMB    = "Is Bomb"
+    STAT_MAKE_DC  = "Make DC" ,
+    STAT_BUY_COST = "Buy Cost",
+    PROP_SAFE     = "Has Safe",
+    PROP_BOMB     = "Is Bomb"
   ;
   
   static int nextID = 0;

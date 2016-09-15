@@ -123,6 +123,11 @@ public class PlanStep {
   }
   
   
+  float baseFailRisk() {
+    return type.baseFailRisk(this);
+  }
+  
+  
   float calcSuitability(Thing used, Object needType) {
     return type.calcSuitability(used, needType, this);
   }

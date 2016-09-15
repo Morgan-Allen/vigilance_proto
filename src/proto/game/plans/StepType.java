@@ -30,7 +30,7 @@ public abstract class StepType {
   
   
   
-  /**  Evaluating suitability of nominees for various roles, providing suitable
+  /**  Evaluating suitability of nominees for various roles, providing viable
     *  targets, generating the initial step, and evaluating the odds and appeal
     *  of such an action.
     */
@@ -59,7 +59,7 @@ public abstract class StepType {
   }
   
   
-  float failRisk(PlanStep step) {
+  float baseFailRisk(PlanStep step) {
     return 0;
   }
   

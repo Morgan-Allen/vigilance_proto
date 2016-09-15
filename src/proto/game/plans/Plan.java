@@ -99,6 +99,7 @@ public class Plan {
         float chance = child.calcSuccessChance();
         child.rating = chance * step.rating;
         child.rating += chance * child.baseAppeal();
+        child.rating -= (1 - chance) * child.baseFailRisk();
         
         toEval.add(child);
       }
