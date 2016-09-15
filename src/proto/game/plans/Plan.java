@@ -68,10 +68,11 @@ public class Plan {
   private void fillNeeds(PlanStep step) {
     for (Role role : step.needsRoles()) {
       Thing used = step.needs[role.ID];
-      if (used != null) continue;
+      Series <Thing> available = step.type.availableTargets(role, world);
+      if (available == null || used != null) continue;
       
       float bestRating = 0;
-      for (Thing match : world.inside) {
+      for (Thing match : available) {
         if (neededDuring(step, match)) continue;
         float rating = step.calcSuitability(match, role);
         if (rating > bestRating) { used = match; bestRating = rating; }
@@ -86,7 +87,7 @@ public class Plan {
       Thing needed = step.needs[role.ID];
       if (needed == null                 ) continue;
       if (step.needSteps[role.ID] != null) continue;
-      if (obtainedBefore(step, needed)   ) continue;
+      if (canAccessBy(step, needed)   ) continue;
       
       PlanStep possible[] = step.actionsToObtain(needed, role);
       for (PlanStep child : possible) {
@@ -106,7 +107,10 @@ public class Plan {
   
   /**  Determining pre-conditions and keeping track of resource-reservations.
     */
-  private boolean obtainedBefore(PlanStep step, Thing used) {
+  private boolean canAccessBy(PlanStep step, Thing used) {
+    //  TODO:  Make this a generic check for 'publicly known' things.
+    if (used.type == Thing.TYPE_PLACE) return true;
+    
     if (preObtained.includes(used)) return true;
     for (PlanStep prior : steps) {
       if (prior == step) break;

@@ -19,19 +19,20 @@ public class Thing {
     TYPE_FACT   = "Fact"
   ;
   final static String
-    STAT_GUNS    = "Guns",
-    STAT_BRAWL   = "Brawl",
+    STAT_GUNS    = "Guns"   ,
+    STAT_BRAWL   = "Brawl"  ,
     STAT_DRIVING = "Driving",
-    STAT_WIRING  = "Wiring",
-    STAT_CHARM   = "Charm",
-    STAT_SMARTS  = "Smarts",
+    STAT_WIRING  = "Wiring" ,
+    STAT_CHARM   = "Charm"  ,
+    STAT_SMARTS  = "Smarts" ,
     PERSON_STATS[] = {
       STAT_GUNS, STAT_BRAWL, STAT_DRIVING,
       STAT_WIRING, STAT_CHARM, STAT_SMARTS
     },
     
-    STAT_MAKE_DC = "Make DC",
-    PROP_SAFE    = "Safe"
+    STAT_MAKE_DC = "Make DC" ,
+    PROP_SAFE    = "Has Safe",
+    PROP_BOMB    = "Is Bomb"
   ;
   
   static int nextID = 0;

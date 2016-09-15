@@ -10,17 +10,40 @@ public abstract class StepType {
   
   /**  Data fields, construction and state restoration-
     */
-  final String name;
-  
   //  TODO:  You'll need to get rid of this in favour of arbitrary object
-  //  keys.
+  //  keys.  e.g:
+  /*
+  StepType sample = new StepType(
+    "sample",
+    STAGE_A, STAGE,
+    STAGE_B, STAGE,
+    NEED_A , NEED ,
+    NEED_B , NEED ,
+    GIVE_A , GIVE ,
+    GIVE_B , GIVE 
+  );
+  
+  followed by-
+  
+  PlanStep step = new PlanStep(sample, plan);
+  step.bindRoles(
+    NEED_A, bob,
+    GIVE_A, platinum_dollars,
+    GIVE_B, metal_shavings
+  );
+  
+  //*/
   //*
   static class Role {
     final String name;
     final int ID;
     Role(String name, int ID) { this.name = name; this.ID = ID; }
+    public String toString() { return name; }
   }
   //*/
+  
+  
+  final String name;
   
   final Role stages[], needs[], gives[];
   
@@ -53,6 +76,11 @@ public abstract class StepType {
   
   /**  Evaluating suitability of nominees for various roles, plus 
     */
+  Series <Thing> availableTargets(Role role, Thing world) {
+    return world.inside;
+  }
+  
+  
   PlanStep toProvide(Thing needed, PlanStep by) {
     return null;
   }

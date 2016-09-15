@@ -7,7 +7,8 @@ import static proto.game.plans.StepType.*;
 
 public class PlanStep {
   
-  final private StepType type;
+  
+  final StepType type;
   int uniqueID;
   
   Plan plan;
@@ -136,19 +137,27 @@ public class PlanStep {
     s.append("\nStep ID: "+this);
     s.append("\n  Parent: "+parent);
     s.append("\n  Chance: "+calcSuccessChance());
+    
+    final Object needR[] = needsRoles(), giveR[] = givesRoles();
+    
     s.append("\n  Needs:");
-    for (int r = type.needs.length; r-- > 0;) {
-      s.append("\n    "+type.needs[r].name+"- "+needs[r]);
-      if (needSteps[r] != null) s.append(" ("+needSteps[r]+")");
+    for (int n = 0; n < needR.length; n++) {
+      s.append("\n    "+needR[n]+"- "+needs[n]);
+      if (needSteps[n] != null) s.append(" ("+needSteps[n]+")");
     }
     s.append("\n  Gives:");
-    for (int r = type.gives.length; r-- > 0;) {
+    for (int r = 0; r < giveR.length; r++) {
       s.append("\n    "+type.gives[r].name+"- "+gives[r]);
     }
+    
     s.append("\n");
     return s.toString();
   }
 }
+
+
+
+
 
 
 
