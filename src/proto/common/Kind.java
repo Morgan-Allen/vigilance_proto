@@ -13,13 +13,13 @@ public class Kind extends Index.Entry implements Session.Saveable {
   
   
   final static Index <Kind> INDEX = new Index <Kind> ();
-
   final public static int
     TYPE_PROP     = 0,
     TYPE_CIVILIAN = 1,
     TYPE_HERO     = 2,
     TYPE_MOOK     = 3,
-    TYPE_BOSS     = 4;
+    TYPE_BOSS     = 4
+  ;
   
   String name;
   String defaultInfo;

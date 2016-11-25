@@ -7,10 +7,8 @@ package proto.game.plans;
 public class TypePurchase extends StepType {
   
   
-  static enum Stages {
-    BUYING
-  };
   static enum Needs {
+    VENDOR
   };
   static enum Gives {
     BOUGHT
@@ -18,7 +16,7 @@ public class TypePurchase extends StepType {
   
   TypePurchase() { super(
     "Purchase",
-    Stages.values(), Needs.values(), Gives.values()
+    Needs.values(), Gives.values()
   ); }
   
   
@@ -36,13 +34,12 @@ public class TypePurchase extends StepType {
     return (0 - bought.statValue(Thing.STAT_BUY_COST)) / 10f;
   }
   
+  
+  protected String langDescription(PlanStep step) {
+    return "Buy "+step.give(Gives.BOUGHT)+" from "+step.need(Needs.VENDOR);
+  }
+  
 }
-
-
-
-
-
-
 
 
 

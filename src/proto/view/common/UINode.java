@@ -2,7 +2,6 @@
 
 package proto.view.common;
 import proto.util.*;
-
 import java.awt.Graphics2D;
 
 
@@ -40,9 +39,7 @@ public abstract class UINode {
   
   
   protected void setChild(UINode kid, boolean is) {
-    if (kid.parent != this) {
-      I.complain("Must have matching parent: "+kid+", "+kid.parent+" vs "+this);
-    }
+    if (kid.parent != this) kid.parent.setChild(kid, false);
     kids.toggleMember(kid, is);
   }
   

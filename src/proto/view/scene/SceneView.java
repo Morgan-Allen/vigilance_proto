@@ -67,7 +67,6 @@ public class SceneView extends UINode {
   
   
   protected void updateAndRender(Surface surface, Graphics2D g) {
-    
     final Box2D b = this.relBounds;
     actionsView.relBounds.set(0, 0, b.xdim() / 4f, b.ydim());
     super.updateAndRender(surface, g);

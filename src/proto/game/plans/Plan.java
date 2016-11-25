@@ -30,7 +30,7 @@ public class Plan {
     goal.rating = priority;
     addStep(goal);
     fillNeeds(goal);
-    I.say("Have added goal: "+goal.longDescription());
+    I.say("Have added goal: "+goal.langDescription());
   }
   
   
@@ -43,6 +43,7 @@ public class Plan {
     PlanStep picked = null;
     float bestRating = 0;
     for (PlanStep child : nextGen) {
+      I.say("  Rating for "+child.langDescription()+": "+child.rating);
       if (child.rating <= bestRating) continue;
       picked     = child;
       bestRating = child.rating;
@@ -50,7 +51,10 @@ public class Plan {
     
     if (picked != null) {
       addStep(picked);
-      I.say("  Adding step: "+picked.longDescription());
+      I.say("  Adding step: "+picked.langDescription());
+    }
+    else {
+      I.say("  No new step chosen!");
     }
   }
   
@@ -69,6 +73,7 @@ public class Plan {
   
   private void fillNeeds(PlanStep step) {
     for (Object role : step.needTypes()) {
+      if (! step.type.isNeeded(role, step)) continue;
       Thing used = step.need(role);
       Series <Thing> available = step.type.availableTargets(role, world);
       if (available == null || used != null) continue;
@@ -151,7 +156,6 @@ public class Plan {
     }
     return rating;
   }
-  
 }
 
 

@@ -50,6 +50,12 @@ public class PlanStep {
   }
   
   
+  Object givesToParent() {
+    if (parent == null) return null;
+    return parent.need(parentNeedType);
+  }
+  
+  
   Object[] needTypes() {
     return type.needTypes;
   }
@@ -168,6 +174,11 @@ public class PlanStep {
     */
   public String toString() {
     return type.name+" #"+uniqueID;
+  }
+  
+  
+  public String langDescription() {
+    return type.langDescription(this);
   }
   
   

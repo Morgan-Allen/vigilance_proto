@@ -6,12 +6,9 @@ import proto.util.*;
 
 public class TypeMake extends StepType {
   
-
-  static enum Stages {
-    MAKING
-  };
+  
   static enum Needs {
-    MAKES
+    MAKES, MATERIALS
   };
   static enum Gives {
     MADE
@@ -19,7 +16,7 @@ public class TypeMake extends StepType {
   
   TypeMake() { super(
     "Make",
-    Stages.values(), Needs.values(), Gives.values()
+    Needs.values(), Gives.values()
   ); }
   
   
@@ -41,5 +38,11 @@ public class TypeMake extends StepType {
     return Nums.clamp(skill / 10f, 0, 1);
   }
   
+  
+  protected String langDescription(PlanStep step) {
+    return "Make "+step.give(Gives.MADE)+" from "+step.need(Needs.MATERIALS);
+  }
 }
+
+
 

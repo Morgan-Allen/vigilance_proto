@@ -11,14 +11,13 @@ public abstract class StepType {
   /**  Data fields, construction and state restoration-
     */
   final String name;
-  final Object stages[], needTypes[], giveTypes[];
+  final Object needTypes[], giveTypes[];
   
   
   StepType(
-    String name, Object stages[], Object needTypes[], Object giveTypes[]
+    String name, Object needTypes[], Object giveTypes[]
   ) {
     this.name      = name     ;
-    this.stages    = stages   ;
     this.needTypes = needTypes;
     this.giveTypes = giveTypes;
   }
@@ -41,6 +40,11 @@ public abstract class StepType {
 
   Series <Thing> availableTargets(Object needType, Thing world) {
     return world.inside;
+  }
+  
+  
+  boolean isNeeded(Object needType, PlanStep step) {
+    return true;
   }
   
   
@@ -71,6 +75,12 @@ public abstract class StepType {
     if (used.type != Thing.TYPE_PERSON) return 0;
     return Nums.clamp(used.statValue(stat) / 10f, 0, 1);
   }
+  
+  
+  
+  /**  Rendering and interface methods-
+    */
+  protected abstract String langDescription(PlanStep step);
 }
 
 

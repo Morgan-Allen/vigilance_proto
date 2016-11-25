@@ -14,7 +14,7 @@ public class Thing {
     TYPE_PERSON = "Person",
     TYPE_ITEM   = "Item"  ,
     TYPE_PLACE  = "Place" ,
-    TYPE_INFO   = "Info"  ,
+    TYPE_CLUE   = "Clue"  ,
     TYPE_LIST   = "List"  ,
     TYPE_FACT   = "Fact"
   ;
@@ -30,10 +30,13 @@ public class Thing {
       STAT_WIRING, STAT_CHARM, STAT_SMARTS
     },
     
-    STAT_MAKE_DC  = "Make DC" ,
-    STAT_BUY_COST = "Buy Cost",
-    PROP_SAFE     = "Has Safe",
-    PROP_BOMB     = "Is Bomb"
+    STAT_MAKE_DC   = "Make DC" ,
+    STAT_BUY_COST  = "Buy Cost",
+    
+    PROP_SAFE      = "Has Safe" ,
+    PROP_BOMB      = "Is Bomb"  ,
+    PROP_BLUEPRINT = "Blueprint",
+    PROP_DIRT      = "Is Dirt"
   ;
   
   static int nextID = 0;
@@ -104,6 +107,16 @@ public class Thing {
     if (val == null && current == null) return true ;
     if (val == null || current == null) return false;
     return val.equals(current);
+  }
+  
+  
+  float relationValue(Thing other) {
+    return statValue("relation__"+other);
+  }
+  
+  
+  void setRelation(Thing other, float value) {
+    setValue("relation__"+other, value);
   }
   
   

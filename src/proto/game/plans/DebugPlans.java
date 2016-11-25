@@ -40,8 +40,12 @@ public class DebugPlans {
     plan.addGoal(firstStep, 10);
     for (Thing crook : crooks) plan.addObtained(crook);
     
-    for (int n = 2; n-- > 0;) plan.advancePlan();
+    for (int n = 6; n-- > 0;) plan.advancePlan();
     
+    I.say("\n\nFinal plan: ");
+    for (PlanStep step : plan.steps) {
+      I.say("  "+step.langDescription());
+    }
   }
   
   
