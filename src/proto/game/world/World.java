@@ -39,14 +39,18 @@ public class World implements Session.Saveable {
   District districts[];
   Base played;
   List <Base> bases = new List();
-  Events events = new Events(this);
+  List <Element> elements = new List();
   
+  Events events = new Events(this);
   int timeDays = 0;
   float timeHours = 0;
   boolean amWatching = false;
   
   Scene activeScene = null;
   
+  
+  public World() {
+  }
   
   
   public World(RunGame game, String savePath) {
@@ -131,6 +135,11 @@ public class World implements Session.Saveable {
   }
   
   
+  public void setInside(Element e, boolean is) {
+    elements.toggleMember(e, is);
+  }
+  
+  
   
   /**  General query methods-
     */
@@ -139,8 +148,13 @@ public class World implements Session.Saveable {
   }
   
   
+  public Series <Element> inside() {
+    return elements;
+  }
+  
+  
   public District districtFor(Region r) {
-    for (District d : districts) if (d.region == r) return d;
+    for (District d : districts) if (d.region() == r) return d;
     return null;
   }
   

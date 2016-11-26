@@ -40,7 +40,7 @@ public class FightLead extends Lead {
     
     final World world = parent.world();
     final District site = parent.place.parent;
-    this.groundScene = site.region.generateScene(site, this);
+    this.groundScene = site.region().generateScene(site, this);
     
     /*
     this.groundScene = new Scene(world, 32);

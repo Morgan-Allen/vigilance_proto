@@ -1,6 +1,7 @@
 
 
 package proto.content.techs;
+import proto.game.person.*;
 import proto.game.event.*;
 import proto.game.world.*;
 
@@ -12,6 +13,11 @@ import proto.content.rooms.Workshop;
 
 
 public class Facilities {
+  
+  
+  final public static Trait REINFORCED = new Trait(
+    "Reinforced", "trait_reinforced", null, ""
+  );
   
   
   final public static Blueprint STEEL_MILL = new Blueprint(
@@ -27,7 +33,7 @@ public class Facilities {
     protected float speedBonus(Task task) {
       if (! (task instanceof Crafting)) return 0;
       final Crafting craft = (Crafting) task;
-      if (craft.room().built() == Workshop.BLUEPRINT) return 0.1f;
+      if (craft.room().blueprint() == Workshop.BLUEPRINT) return 0.1f;
       return 0;
     }
   };
@@ -45,7 +51,7 @@ public class Facilities {
     protected float speedBonus(Task task) {
       if (! (task instanceof Crafting)) return 0;
       final Crafting craft = (Crafting) task;
-      if (craft.room().built() == Laboratory.BLUEPRINT) return 0.1f;
+      if (craft.room().blueprint() == Laboratory.BLUEPRINT) return 0.1f;
       return 0;
     }
   };

@@ -1,6 +1,8 @@
 
 
 package proto.game.plans;
+import proto.game.world.*;
+import proto.game.person.*;
 import proto.util.*;
 import static proto.game.plans.StepType.*;
 
@@ -8,25 +10,32 @@ import static proto.game.plans.StepType.*;
 
 public class Plan {
   
-  Thing agent;
-  Thing world;
+  final public Person agent;
+  final public World world;
   
-  List <Thing> preObtained = new List();
+  StepType stepTypes[];
+  List <Element> preObtained = new List();
   List <PlanStep> steps = new List();
   
   
-  Plan(Thing agent, Thing world) {
+  public Plan(Person agent, World world, StepType... stepTypes) {
     this.agent = agent;
     this.world = world;
+    this.stepTypes = stepTypes;
   }
   
   
-  void addObtained(Thing thing) {
+  public Series <PlanStep> steps() {
+    return steps;
+  }
+  
+  
+  public void addObtained(Element thing) {
     preObtained.add(thing);
   }
   
   
-  void addGoal(PlanStep goal, float priority) {
+  public void addGoal(PlanStep goal, float priority) {
     goal.assignRating(priority);
     addStep(goal);
     fillNeeds(goal);
@@ -34,7 +43,7 @@ public class Plan {
   }
   
   
-  void advancePlan() {
+  public void advancePlan() {
     I.say("\nAdvancing plan-");
     
     Batch <PlanStep> nextGen = new Batch();
@@ -80,12 +89,12 @@ public class Plan {
   private void fillNeeds(PlanStep step) {
     for (Object role : step.needTypes()) {
       if (! step.type.isNeeded(role, step)) continue;
-      Thing used = step.need(role);
-      Series <Thing> available = step.type.availableTargets(role, world);
+      Element used = step.need(role);
+      Series <Element> available = step.type.availableTargets(role, world);
       if (available == null || used != null) continue;
       
       float bestRating = 0;
-      for (Thing match : available) {
+      for (Element match : available) {
         if (step.doesGive(match)     ) continue;
         if (neededDuring(step, match)) continue;
         float rating = step.calcSuitability(match, role) * (Rand.num() + 0.5f);
@@ -102,7 +111,7 @@ public class Plan {
   
   private void addStepsFrom(PlanStep step, Batch <PlanStep> toEval) {
     for (Object role : step.needTypes()) {
-      Thing    needed   = step.need(role);
+      Element  needed   = step.need(role);
       PlanStep needStep = step.stepForNeed(role);
       if (needed == null || needStep != null) continue;
       if (obtainedBefore(step, needed)      ) continue;
@@ -121,9 +130,9 @@ public class Plan {
   
   /**  Determining pre-conditions and keeping track of resource-reservations.
     */
-  private boolean obtainedBefore(PlanStep step, Thing need) {
+  private boolean obtainedBefore(PlanStep step, Element need) {
     //  TODO:  Make this a generic check for 'publicly known' things.
-    if (need.type == Thing.TYPE_PLACE) return true;
+    if (need.type == Element.TYPE_PLACE) return true;
     if (preObtained.includes(need)) return true;
     
     for (PlanStep prior : steps) {
@@ -134,9 +143,9 @@ public class Plan {
   }
   
   
-  private boolean neededDuring(PlanStep step, Thing used) {
+  private boolean neededDuring(PlanStep step, Element used) {
     for (PlanStep other : steps) if (other.activeDuring(step)) {
-      for (Thing o : other.needs()) if (o == used) return true;
+      for (Element o : other.needs()) if (o == used) return true;
     }
     return false;
   }

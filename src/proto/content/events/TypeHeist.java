@@ -1,6 +1,8 @@
 
 
-package proto.game.plans;
+package proto.content.events;
+import proto.game.plans.PlanStep;
+import proto.game.world.*;
 import proto.util.*;
 
 
@@ -17,10 +19,10 @@ public class TypeHeist extends TypeMajorCrime {
   }
   
   
-  PlanStep toProvide(Thing needed, PlanStep by) {
+  protected PlanStep toProvide(Element needed, PlanStep by) {
     
     //  TODO:  Include bulk cash as a form of item!
-    if (needed.type == Thing.TYPE_ITEM) {
+    if (needed.type == Element.TYPE_ITEM) {
       PlanStep step = new PlanStep(this, by.plan);
       step.setGives(needed);
       return step;
@@ -29,7 +31,9 @@ public class TypeHeist extends TypeMajorCrime {
   }
   
   
-  float calcSuitability(Thing used, Object needType, PlanStep step) {
+  protected float calcSuitability(
+    Element used, Object needType, PlanStep step
+  ) {
     if (needType == Needs.VENUE) {
       //  TODO:  You need to ensure that the venue in question can produce this
       //  item!

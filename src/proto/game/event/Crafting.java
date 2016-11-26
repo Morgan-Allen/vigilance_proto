@@ -37,7 +37,7 @@ public class Crafting extends Task {
   
   public Crafting(Session s) throws Exception {
     super(s);
-    room = (Place    ) s.loadObject();
+    room = (Place   ) s.loadObject();
     made = (Equipped) s.loadObject();
     progress = s.loadFloat();
   }
@@ -102,7 +102,7 @@ public class Crafting extends Task {
   
   
   public String helpInfo() {
-    return made.description+"\n\n"+made.describeStats(null);
+    return made.defaultInfo()+"\n\n"+made.describeStats(null);
   }
   
   

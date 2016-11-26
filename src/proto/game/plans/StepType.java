@@ -1,6 +1,7 @@
 
 
 package proto.game.plans;
+import proto.game.world.*;
 import proto.util.*;
 
 
@@ -14,7 +15,7 @@ public abstract class StepType {
   final Object needTypes[], giveTypes[];
   
   
-  StepType(
+  protected StepType(
     String name, Object needTypes[], Object giveTypes[]
   ) {
     this.name      = name     ;
@@ -33,52 +34,43 @@ public abstract class StepType {
     *  targets, generating the initial step, and evaluating the odds and appeal
     *  of such an action.
     */
-  PlanStep toProvide(Thing needed, PlanStep by) {
+  protected PlanStep toProvide(Element needed, PlanStep by) {
     return null;
   }
   
-
-  Series <Thing> availableTargets(Object needType, Thing world) {
-    return world.inside;
+  
+  protected Series <Element> availableTargets(Object needType, World world) {
+    return world.inside();
   }
   
   
-  boolean activeDuring(PlanStep step, PlanStep other) {
+  protected boolean activeDuring(PlanStep step, PlanStep other) {
     return step == other;
   }
   
   
-  boolean isNeeded(Object needType, PlanStep step) {
+  protected boolean isNeeded(Object needType, PlanStep step) {
     return true;
   }
   
   
-  float calcSuitability(Thing used, Object needType, PlanStep step) {
+  protected float calcSuitability(Element used, Object needType, PlanStep step) {
     return 0;
   }
   
   
-  float baseSuccessChance(PlanStep step) {
+  protected float baseSuccessChance(PlanStep step) {
     return 0.5f;
   }
   
   
-  float baseAppeal(PlanStep step) {
+  protected float baseAppeal(PlanStep step) {
     return 0;
   }
   
   
-  float baseFailRisk(PlanStep step) {
+  protected float baseFailRisk(PlanStep step) {
     return 0;
-  }
-  
-  
-  
-  /**  Other utility/helper methods-
-    */
-  float rateStatLevel(Thing used, String stat) {
-    if (used.type != Thing.TYPE_PERSON) return 0;
-    return Nums.clamp(used.statValue(stat) / 10f, 0, 1);
   }
   
   

@@ -1,12 +1,13 @@
 
 
 package proto.game.plans;
+import proto.game.world.*;
 import proto.util.*;
 
 
 
 
-abstract class Clue {
+public abstract class Clue {
   
   final static int
     TYPE_FORENSIC = 0,
@@ -16,15 +17,11 @@ abstract class Clue {
   
   int type;
   float chanceLeft;
-  Thing attached;
+  Element attached;
   
-  Thing revealed;
+  Element revealed;
   String propKey;
   Object propVal;
   
-  
-  
-  //abstract Action[] analyses();
-  //abstract Fact[] revealed();
 }
 

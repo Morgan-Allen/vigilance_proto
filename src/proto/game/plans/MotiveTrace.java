@@ -1,6 +1,8 @@
 
 
 package proto.game.plans;
+import proto.game.person.*;
+import proto.game.world.*;
 import proto.util.*;
 
 
@@ -14,7 +16,7 @@ public class MotiveTrace {
   
   
   
-  void performTrace(Plan plan, Thing evaluator) {
+  void performTrace(Plan plan, Person evaluator) {
     //  TODO:  Fill this out.
     
     Motive motives[] = new Motive[0];// evaluator.motives();
@@ -22,7 +24,7 @@ public class MotiveTrace {
     report.clear();
     
     for (PlanStep step : plan.steps) {
-      for (Thing given : step.gives()) {
+      for (Element given : step.gives()) {
         for (Motive motive : motives) {
           float value = motive.valueFor(given);
           if (value == 0) continue;
@@ -33,18 +35,4 @@ public class MotiveTrace {
     }
   }
   
-  
-  
 }
-
-
-
-
-
-
-
-
-
-
-
-

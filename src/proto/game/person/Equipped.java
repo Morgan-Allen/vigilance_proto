@@ -8,13 +8,11 @@ import java.awt.*;
 
 
 
-public class Equipped extends Index.Entry implements Session.Saveable {
+public class Equipped extends Kind {
   
   
   /**  Data fields, construction and save/load methods-
     */
-  final static Index <Equipped> INDEX = new Index <Equipped> ();
-  
   final public static int
     NONE        = 0      ,
     IS_COMMON   = 1 << 0 ,
@@ -33,7 +31,6 @@ public class Equipped extends Index.Entry implements Session.Saveable {
     IS_AREA_FX  = 1 << 11
   ;
   
-  final public String name, description;
   final Image icon;
   final Object media;
   
@@ -56,11 +53,9 @@ public class Equipped extends Index.Entry implements Session.Saveable {
     int properties, int bonus,
     Ability... abilities
   ) {
-    super(INDEX, ID);
-    this.name        = name;
-    this.description = description;
-    this.icon        = Kind.loadImage(iconImgPath);
-    this.media       = null;
+    super(name, ID, description);
+    this.icon  = Kind.loadImage(iconImgPath);
+    this.media = null;
     
     this.slotID     = slotID;
     this.buildCost  = buildCost;
@@ -75,16 +70,6 @@ public class Equipped extends Index.Entry implements Session.Saveable {
     this.inventor = inventor;
     this.required = required;
     return this;
-  }
-  
-  
-  public static Equipped loadConstant(Session s) throws Exception {
-    return INDEX.loadEntry(s.input());
-  }
-  
-  
-  public void saveState(Session s) throws Exception {
-    INDEX.saveEntry(this, s.output());
   }
   
   
@@ -166,11 +151,6 @@ public class Equipped extends Index.Entry implements Session.Saveable {
   
   /**  Rendering, debug and interface methods-
     */
-  public String toString() {
-    return name;
-  }
-  
-  
   public String describeStats(Person person) {
     final StringBuffer s = new StringBuffer();
     for (Trait t : PersonStats.ALL_STATS) {
@@ -178,11 +158,6 @@ public class Equipped extends Index.Entry implements Session.Saveable {
       if (mod != 0) s.append(t+""+I.signNum((int) mod)+" ");
     }
     return s.toString();
-  }
-  
-  
-  public String name() {
-    return name;
   }
   
   

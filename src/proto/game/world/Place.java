@@ -18,24 +18,15 @@ public class Place extends Element {
   final public District parent;
   
   private Base owner;
-  private Blueprint built;
   private float buildProgress;
+  private List <Trait> properties = new List();
   
   
-  
-  protected Place(District parent, int slotID) {
-    super(parent.world);
-    this.slotID = slotID;
-    this.parent = parent;
-  }
-  
-  
-  protected Place(Base base, Blueprint print, int slotID) {
-    super(base.world);
+  public Place(Base base, Blueprint print, int slotID) {
+    super(print, Element.TYPE_PLACE, base.world);
     this.slotID        = slotID;
     this.parent        = null;
     this.owner         = base;
-    this.built         = print;
     this.buildProgress = 1.0f;
   }
   
@@ -45,8 +36,8 @@ public class Place extends Element {
     slotID        = s.loadInt();
     owner         = (Base     ) s.loadObject();
     parent        = (District ) s.loadObject();
-    built         = (Blueprint) s.loadObject();
     buildProgress = s.loadFloat();
+    s.loadObjects(properties);
   }
   
   
@@ -55,16 +46,16 @@ public class Place extends Element {
     s.saveInt   (slotID       );
     s.saveObject(owner        );
     s.saveObject(parent       );
-    s.saveObject(built        );
     s.saveFloat (buildProgress);
+    s.saveObjects(properties);
   }
   
   
   
   /**  Construction progress-
     */
-  public Blueprint built() {
-    return built;
+  public Blueprint blueprint() {
+    return (Blueprint) kind;
   }
   
   
@@ -78,21 +69,24 @@ public class Place extends Element {
   }
   
   
-  public void assignConstruction(Blueprint builds, Base owns, float progress) {
-    built         = builds  ;
-    owner         = owns    ;
-    buildProgress = progress;
-  }
-  
-  
-  public void beginConstruction(Blueprint builds, Base owns) {
-    assignConstruction(builds, owns, 0);
-    owns.incFunding(0 - builds.buildCost);
+  public void beginConstruction(Base owns, float initProgress) {
+    this.owner = owns;
+    owns.incFunding(0 - blueprint().buildCost);
+    setBuildProgress(initProgress);
   }
   
   
   public void setBuildProgress(float progress) {
     this.buildProgress = Nums.clamp(progress, 0, 1);
+  }
+  
+  
+  public boolean hasProperty(Trait t) {
+    return properties.includes(t);
+  }
+  
+  public void setProperty(Trait t, boolean is) {
+    properties.toggleMember(t, is);
   }
   
   
@@ -132,14 +126,12 @@ public class Place extends Element {
   
   
   public String name() {
-    if (built == null) return "Place";
-    return built.name;
+    return blueprint().name();
   }
   
   
   public Image icon() {
-    if (built == null) return null;
-    return built.icon;
+    return blueprint().icon();
   }
 }
 

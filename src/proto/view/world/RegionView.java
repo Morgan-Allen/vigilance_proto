@@ -44,7 +44,7 @@ public class RegionView extends UINode {
     //Image portrait = nation.region.view.portrait;
     final Base base = mainView.world().playerBase();
     g.setColor(Color.WHITE);
-    g.drawString(nation.region.name, vx + 20, vy + 20);
+    g.drawString(nation.region().name(), vx + 20, vy + 20);
     
     int down = 50;
     for (District.Stat stat : District.CIVIC_STATS) {
@@ -86,8 +86,8 @@ public class RegionView extends UINode {
     
     for (int n = 0; n < maxF; n++) {
       final Place     slot  = d.buildSlot(n);
-      final Blueprint built = slot.built();
-      final float     prog  = slot.buildProgress();
+      final Blueprint built = slot == null ? null : slot.blueprint();
+      final float     prog  = slot == null ? 0 : slot.buildProgress();
       
       Image icon = null;
       if (built == null) {
@@ -118,7 +118,7 @@ public class RegionView extends UINode {
       g.setColor(Color.LIGHT_GRAY);
       
       final Place     slot  = d.buildSlot(hoverSlot.val);
-      final Blueprint built = slot.built();
+      final Blueprint built = slot.blueprint();
       final Base      owns  = slot.owner();
       final float     prog  = slot.buildProgress();
       

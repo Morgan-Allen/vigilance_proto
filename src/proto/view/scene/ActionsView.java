@@ -117,7 +117,7 @@ public class ActionsView extends UINode {
       Series <Equipped> equipped = p.gear.equipment();
       if (equipped.size() > 0) {
         s.append("\n  Equipment:");
-        for (Equipped e : equipped) s.append(" "+e.name+" ("+e.bonus+")");
+        for (Equipped e : equipped) s.append(" "+e.name()+" ("+e.bonus+")");
       }
       
       boolean canCommand =

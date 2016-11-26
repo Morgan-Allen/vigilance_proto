@@ -1,6 +1,11 @@
 
 
-package proto.game.plans;
+package proto.content.events;
+import proto.game.world.*;
+import proto.game.person.*;
+import proto.game.plans.PlanStep;
+import proto.game.plans.StepType;
+import proto.util.*;
 
 
 
@@ -21,17 +26,17 @@ public class TypePurchase extends StepType {
   
   
   
-  PlanStep toProvide(Thing needed, PlanStep by) {
-    if (needed.type == Thing.TYPE_ITEM) {
+  protected PlanStep toProvide(Element needed, PlanStep by) {
+    if (needed.type == Element.TYPE_ITEM) {
       return new PlanStep(this, by.plan).setGives(needed);
     }
     return null;
   }
   
   
-  float baseAppeal(PlanStep step) {
-    final Thing bought = step.need(Gives.BOUGHT);
-    return (0 - bought.statValue(Thing.STAT_BUY_COST)) / 10f;
+  protected float baseAppeal(PlanStep step) {
+    final Item bought = (Item) step.need(Gives.BOUGHT);
+    return (0 - bought.kind().buildCost) / 10f;
   }
   
   

@@ -44,7 +44,7 @@ public class RoomView extends UINode {
     //*/
     
     Place room = mainView.selectedRoom();
-    if (room == null || room.built() == null) return false;
+    if (room == null) return false;
     
     //Image portrait = nation.region.view.portrait;
     /*
@@ -59,7 +59,7 @@ public class RoomView extends UINode {
     //
     //  TODO:  Render information on the room type!
     
-    String info = room.built().info;
+    String info = room.blueprint().info();
     ViewUtils.drawWrappedString(info,
       g, vx + 25, vy + 20, vw - 30, 80
     );

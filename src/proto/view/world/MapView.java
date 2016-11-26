@@ -66,7 +66,7 @@ public class MapView extends UINode {
     
     attached = new RegionAssets[nations.length];
     for (int i = attached.length; i-- > 0;) {
-      attached[i] = nations[i].region.view;
+      attached[i] = nations[i].region().view;
     }
     
     int imgWide = keyImage.getWidth(), imgHigh = keyImage.getHeight();
@@ -129,7 +129,7 @@ public class MapView extends UINode {
     ///if (I.used60Frames) I.say("Pixel value is: "+pixVal);
     
     District selectedArea = mainView.selectedNation();
-    for (District n : districts) if (n.region.view.colourKey == pixVal) {
+    for (District n : districts) if (n.region().view.colourKey == pixVal) {
       nationHovered = n;
     }
     if (nationHovered != null && surface.mouseClicked()) {
@@ -140,11 +140,11 @@ public class MapView extends UINode {
     renderOutline(nationHovered, surface, g, mapWRatio, mapHRatio);
     
     for (District n : districts) {
-      int x = (int) ((n.region.view.centerX / mapWRatio) + vx);
-      int y = (int) ((n.region.view.centerY / mapHRatio) + vy);
+      int x = (int) ((n.region().view.centerX / mapWRatio) + vx);
+      int y = (int) ((n.region().view.centerY / mapHRatio) + vy);
       
       g.setColor(Color.LIGHT_GRAY);
-      g.drawString(n.region.name, x - 25, y + 25 + 15);
+      g.drawString(n.region().name(), x - 25, y + 25 + 15);
       
       float crimeLevel = n.currentValue(District.VIOLENCE) / 100f;
       ViewUtils.renderStatBar(
@@ -177,8 +177,8 @@ public class MapView extends UINode {
   private void renderOutline(
     District n, Surface surface, Graphics2D g, float mapWRatio, float mapHRatio
   ) {
-    if (n == null || n.region.view.outline == null) return;
-    RegionAssets r = n.region.view;
+    if (n == null || n.region().view.outline == null) return;
+    RegionAssets r = n.region().view;
     int
       x = (int) (vx + (r.outlineX / mapWRatio) + 0.5f),
       y = (int) (vy + (r.outlineY / mapHRatio) + 0.5f),

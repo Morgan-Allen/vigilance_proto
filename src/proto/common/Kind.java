@@ -37,8 +37,10 @@ public class Kind extends Index.Entry implements Session.Saveable {
   Equipped customItems [] = new Equipped[0];
   
   
-  Kind(String uniqueID) {
+  protected Kind(String name, String uniqueID, String info) {
     super(INDEX, uniqueID);
+    this.name        = name;
+    this.defaultInfo = info;
   }
   
   
@@ -57,7 +59,7 @@ public class Kind extends Index.Entry implements Session.Saveable {
     String name, String ID, String spritePath, String defaultInfo,
     int type, Object... initStats
   ) {
-    Kind k = new Kind(ID);
+    Kind k = new Kind(name, ID, defaultInfo);
     k.type = type;
     k.wide = k.high = 1;
     k.blockPath = k.blockSight = false;
@@ -91,8 +93,6 @@ public class Kind extends Index.Entry implements Session.Saveable {
     k.baseEquipped = allE.toArray(Equipped.class);
     k.customItems  = allC.toArray(Equipped.class);
     
-    k.name = name;
-    k.defaultInfo = defaultInfo;
     k.sprite = loadImage(spritePath);
     return k;
   }
@@ -102,14 +102,13 @@ public class Kind extends Index.Entry implements Session.Saveable {
     String name, String ID, String spritePath,
     int wide, int high, boolean blockPath, boolean blockSight
   ) {
-    Kind k = new Kind(ID);
+    Kind k = new Kind(name, ID, "");
     k.type = TYPE_PROP;
     k.wide = wide;
     k.high = high;
     k.blockPath  = blockPath ;
     k.blockSight = blockSight;
     
-    k.name = name;
     k.sprite = loadImage(spritePath);
     return k;
   }

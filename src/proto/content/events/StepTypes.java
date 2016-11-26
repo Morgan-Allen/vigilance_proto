@@ -1,6 +1,7 @@
 
 
-package proto.game.plans;
+package proto.content.events;
+import proto.game.plans.StepType;
 import proto.util.*;
 
 

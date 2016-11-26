@@ -1,7 +1,11 @@
 
 
-package proto.game.plans;
+package proto.content.events;
+import proto.game.person.*;
+import proto.game.plans.PlanStep;
+import proto.game.world.*;
 import proto.util.*;
+
 
 
 
@@ -17,11 +21,12 @@ public class TypeKidnapping extends TypeMajorCrime {
   }
   
   
-  PlanStep toProvide(Thing needed, PlanStep by) {
-    if (needed.type == Thing.TYPE_PERSON) {
+  protected PlanStep toProvide(Element needed, PlanStep by) {
+    if (needed.type == Element.TYPE_PERSON) {
       PlanStep step = new PlanStep(this, by.plan);
-      step.setGives(needed);
-      step.setNeed(Needs.VENUE, needed.owner);
+      Person victim = (Person) needed;
+      step.setGives(victim);
+      step.setNeed(Needs.VENUE, victim.resides());
       return step;
     }
     return null;
@@ -32,3 +37,6 @@ public class TypeKidnapping extends TypeMajorCrime {
     return "Kidnap "+step.give(Gives.VICTIM);
   }
 }
+
+
+

@@ -18,9 +18,7 @@ public class Person extends Element {
   };
   
   
-  Kind kind;
   Side side;
-  
   String name;
   
   final public PersonMind    mind    = new PersonMind   (this);
@@ -37,10 +35,8 @@ public class Person extends Element {
   Vec3D exactPos = new Vec3D();
   
   
-  
   public Person(Kind kind, World world, String name) {
-    super(world);
-    this.kind  = kind;
+    super(kind, TYPE_PERSON, world);
     this.name  = name;
     
     history.setSummary(kind.defaultInfo());
@@ -65,7 +61,6 @@ public class Person extends Element {
   public Person(Session s) throws Exception {
     super(s);
     
-    kind  = (Kind ) s.loadObject();
     side  = (Side ) s.loadEnum(Side.values());
     name  = s.loadString();
     
@@ -87,9 +82,8 @@ public class Person extends Element {
   public void saveState(Session s) throws Exception {
     super.saveState(s);
     
-    s.saveObject(kind );
-    s.saveEnum  (side );
-    s.saveString(name );
+    s.saveEnum  (side);
+    s.saveString(name);
     
     mind   .saveState(s);
     history.saveState(s);

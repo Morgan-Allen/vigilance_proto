@@ -225,7 +225,7 @@ public class PersonView extends UINode {
     for (int slotID : PersonGear.ALL_SLOTS) {
       Equipped inSlot = person.gear.equippedInSlot(slotID);
       Image  icon = inSlot == null ? null   : inSlot.icon();
-      String desc = inSlot == null ? "None" : inSlot.name;
+      String desc = inSlot == null ? "None" : inSlot.name();
       String slotName = PersonGear.SLOT_NAMES[slotID];
       
       final boolean hovered = surface.tryHover(
@@ -263,7 +263,7 @@ public class PersonView extends UINode {
       }
       
       protected String labelFor(Equipped option) {
-        return option.name+" ("+option.describeStats(person)+")";
+        return option.name()+" ("+option.describeStats(person)+")";
       }
       
       protected void whenPicked(Equipped option, int optionID) {

@@ -11,14 +11,11 @@ import proto.content.techs.Facilities;
 
 
 
-public class District implements Session.Saveable {
+public class District extends Element {
   
   
   /**  Data fields, construction and save/load methods-
     */
-  final public World world;
-  final public Region region;
-  
   public static class Stat {
     
     final int ID;
@@ -83,17 +80,15 @@ public class District implements Session.Saveable {
   
   
   
-  public District(Region region, World world) {
-    this.world  = world ;
-    this.region = region;
+  public District(Region kind, World world) {
+    super(kind, Element.TYPE_REGION, world);
     initStats();
     
-    buildSlots = new Place[region.maxFacilities];
-    final Blueprint DF[] = region.defaultFacilities;
+    buildSlots = new Place[kind.maxFacilities];
+    final Blueprint DF[] = kind.defaultFacilities;
     
     for (int i = 0; i < buildSlots.length; i++) {
-      final Place slot = buildSlots[i] = new Place(this, i);
-      if (DF != null && DF.length > i) slot.assignConstruction(DF[i], null, 1);
+      final Place slot = buildSlots[i] = new Place(null, DF[i], i);
     }
   }
   
@@ -108,9 +103,7 @@ public class District implements Session.Saveable {
   
   
   public District(Session s) throws Exception {
-    s.cacheInstance(this);
-    world  = (World ) s.loadObject();
-    region = (Region) s.loadObject();
+    super(s);
     initStats();
     
     for (Level l : statLevels) {
@@ -123,15 +116,17 @@ public class District implements Session.Saveable {
   
   
   public void saveState(Session s) throws Exception {
-    s.saveObject(world );
-    s.saveObject(region);
-    
     for (Level l : statLevels) {
       s.saveInt(l.bonus);
       s.saveInt(l.level);
       s.saveFloat(l.current);
     }
     s.saveObjectArray(buildSlots);
+  }
+  
+  
+  public Region region() {
+    return (Region) kind;
   }
   
   
@@ -149,7 +144,7 @@ public class District implements Session.Saveable {
       if (inc > 0) desc += stat.name+" +"+inc;
       else if (stat.oppName != null) desc += stat.oppName+" +"+(0 - inc);
       else desc += stat.name+" -"+(0 - inc);
-      desc += ": "+region;
+      desc += ": "+region();
       
       world.events.log(desc, Event.EVENT_MAJOR);
     }
@@ -179,10 +174,10 @@ public class District implements Session.Saveable {
     int total = 0;
     
     for (Place slot : buildSlots) {
-      if (slot.owner() != base || slot.built() == null) continue;
+      if (slot == null || slot.owner() != base) continue;
       if (slot.buildProgress() < 1) continue;
       
-      final int inc = slot.built().incomeFrom(this);
+      final int inc = slot.blueprint().incomeFrom(this);
       if (positive) total += Nums.max(inc, 0      );
       else          total += Nums.max(0  , 0 - inc);
     }
@@ -204,7 +199,7 @@ public class District implements Session.Saveable {
   /**  Construction and ownership-
     */
   public int maxFacilities() {
-    return region.maxFacilities;
+    return region().maxFacilities;
   }
   
   
@@ -228,6 +223,19 @@ public class District implements Session.Saveable {
   
   public Place buildSlot(int slotID) {
     return buildSlots[slotID];
+  }
+  
+  
+  public Blueprint slotType(int slotID) {
+    Place slot = buildSlots[slotID];
+    return slot == null ? null : slot.blueprint();
+  }
+  
+  
+  public void beginConstruction(Blueprint print, int slotID, Base owns) {
+    final Place place = new Place(owns, print, slotID);
+    buildSlots[slotID] = place;
+    place.beginConstruction(owns, 0);
   }
   
   
@@ -257,7 +265,7 @@ public class District implements Session.Saveable {
     for (int i = 0 ; i < buildSlots.length; i++) {
       
       final Place     slot  = buildSlots[i];
-      final Blueprint built = slot.built();
+      final Blueprint built = slot.blueprint();
       final Base      owns  = slot.owner();
       final float     prog  = slot.buildProgress();
       
@@ -324,7 +332,7 @@ public class District implements Session.Saveable {
   /**  Rendering and debug methods-
     */
   public String toString() {
-    return region.name;
+    return region().name();
   }
 }
 

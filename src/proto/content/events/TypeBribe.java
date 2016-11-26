@@ -1,6 +1,9 @@
 
 
-package proto.game.plans;
+package proto.content.events;
+import proto.game.plans.PlanStep;
+import proto.game.plans.StepType;
+import proto.game.world.*;
 
 
 
@@ -21,8 +24,8 @@ public class TypeBribe extends StepType {
   
   
   
-  PlanStep toProvide(Thing needed, PlanStep by) {
-    if (needed.type == Thing.TYPE_PERSON) {
+  protected PlanStep toProvide(Element needed, PlanStep by) {
+    if (needed.type == Element.TYPE_PERSON) {
       return new PlanStep(this, by.plan).setGives(needed);
     }
     return null;
@@ -35,11 +38,5 @@ public class TypeBribe extends StepType {
   
   
 }
-
-
-
-
-
-
 
 

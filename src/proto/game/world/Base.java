@@ -7,6 +7,9 @@ import proto.util.*;
 
 
 
+//  TODO:  Have this extend the District or Place class?
+
+
 public class Base implements Session.Saveable {
   
   
@@ -196,7 +199,8 @@ public class Base implements Session.Saveable {
   
   public int buildETA(int slot) {
     Place room = rooms[slot];
-    return Nums.ceil((1 - room.buildProgress()) / buildRate(room.built()));
+    if (room == null) return -1;
+    return Nums.ceil((1 - room.buildProgress()) / buildRate(room.blueprint()));
   }
   
   
@@ -215,7 +219,9 @@ public class Base implements Session.Saveable {
   
   
   public void beginSalvage(int slot) {
-    currentFunds += rooms[slot].built().buildCost / 2f;
+    Place room = rooms[slot];
+    if (room == null) return;
+    currentFunds += room.blueprint().buildCost / 2f;
     addFacility(null, slot, 1);
   }
   

@@ -8,7 +8,7 @@ import java.awt.Image;
 
 
 
-public class Trait extends Index.Entry implements Session.Saveable  {
+public class Trait extends Index.Entry implements Session.Saveable {
   
   
   final static Index <Trait> INDEX = new Index <Trait> ();
@@ -19,7 +19,7 @@ public class Trait extends Index.Entry implements Session.Saveable  {
   final public Image icon;
   
   
-  protected Trait(String name, String ID, String imgPath, String description) {
+  public Trait(String name, String ID, String imgPath, String description) {
     super(INDEX, ID);
     this.name        = name;
     this.description = description;

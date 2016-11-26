@@ -1,6 +1,7 @@
 
 
 package proto.game.plans;
+import proto.game.world.*;
 import proto.util.*;
 
 
@@ -8,12 +9,11 @@ import proto.util.*;
 public class PlanStep {
   
   
-  final StepType type;
+  final public StepType type;
   int uniqueID = -1;
   
-  Plan plan;
-  int stageID;
-  private Thing needs[], gives[];
+  final public Plan plan;
+  private Element needs[], gives[];
   private float rating;
   
   private PlanStep needSteps[];
@@ -21,97 +21,97 @@ public class PlanStep {
   Object parentNeedType;
   
   
-  PlanStep(StepType type, Plan plan) {
+  public PlanStep(StepType type, Plan plan) {
     this.type = type;
     this.plan = plan;
     final Object needT[] = needTypes(), giveT[] = giveTypes();
-    this.gives     = new Thing   [giveT.length];
-    this.needs     = new Thing   [needT.length];
+    this.gives     = new Element   [giveT.length];
+    this.needs     = new Element   [needT.length];
     this.needSteps = new PlanStep[needT.length];
   }
   
   
-  PlanStep setGives(Thing... gives) {
+  public PlanStep setGives(Element... gives) {
     for (int g = gives.length; g-- > 0;) this.gives[g] = gives[g];
     return this;
   }
   
   
-  PlanStep setNeeds(Thing... needs) {
+  public PlanStep setNeeds(Element... needs) {
     for (int n = needs.length; n-- > 0;) this.needs[n] = needs[n];
     return this;
   }
   
   
-  PlanStep setParent(PlanStep parent, Object needType) {
+  public PlanStep setParent(PlanStep parent, Object needType) {
     this.parent         = parent  ;
     this.parentNeedType = needType;
     return this;
   }
   
   
-  Object givesToParent() {
+  public Object givesToParent() {
     if (parent == null) return null;
     return parent.need(parentNeedType);
   }
   
   
-  Object[] needTypes() {
+  public Object[] needTypes() {
     return type.needTypes;
   }
   
   
-  Object[] giveTypes() {
+  public Object[] giveTypes() {
     return type.giveTypes;
   }
   
   
-  Thing[] needs() {
+  public Element[] needs() {
     return needs;
   }
   
   
-  Thing[] gives() {
+  public Element[] gives() {
     return gives;
   }
   
   
-  void setNeed(Object needType, Thing value) {
+  public void setNeed(Object needType, Element value) {
     needs[Visit.indexOf(needType, needTypes())] = value;
   }
   
   
-  void setGive(Object giveType, Thing value) {
+  public void setGive(Object giveType, Element value) {
     gives[Visit.indexOf(giveType, giveTypes())] = value;
   }
   
   
-  Thing need(Object needType) {
+  public Element need(Object needType) {
     return needs[Visit.indexOf(needType, needTypes())];
   }
   
   
-  Thing give(Object giveType) {
+  public Element give(Object giveType) {
     return gives[Visit.indexOf(giveType, giveTypes())];
   }
   
   
-  PlanStep stepForNeed(Object needType) {
+  public PlanStep stepForNeed(Object needType) {
     return needSteps[Visit.indexOf(needType, needTypes())];
   }
   
   
-  void setStepForNeed(Object needType, PlanStep step) {
+  public void setStepForNeed(Object needType, PlanStep step) {
     needSteps[Visit.indexOf(needType, needTypes())] = step;
   }
   
   
-  boolean doesGive(Thing needs) {
+  public boolean doesGive(Element needs) {
     return Visit.arrayIncludes(gives, needs);
   }
   
   
-  boolean doesNeed(Thing gives) {
+  public boolean doesNeed(Element gives) {
     return Visit.arrayIncludes(needs, gives);
   }
   
@@ -134,7 +134,7 @@ public class PlanStep {
   }
   
   
-  float calcSuitability(Thing used, Object needType) {
+  float calcSuitability(Element used, Object needType) {
     return type.calcSuitability(used, needType, this);
   }
   
@@ -172,9 +172,9 @@ public class PlanStep {
   }
   
   
-  PlanStep[] actionsToObtain(Thing used, Object needType) {
+  PlanStep[] actionsToObtain(Element used, Object needType) {
     final Batch <PlanStep> actions = new Batch();
-    for (StepType type : StepTypes.ALL_TYPES) {
+    for (StepType type : plan.stepTypes) {
       PlanStep provides = type.toProvide(used, this);
       if (provides != null) actions.add(provides);
     }
@@ -187,7 +187,7 @@ public class PlanStep {
   }
   
   
-  float rating() {
+  public float rating() {
     return rating;
   }
   

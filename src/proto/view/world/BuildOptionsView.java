@@ -26,7 +26,7 @@ public class BuildOptionsView extends MessageView {
     );
     this.d      = d;
     this.slotID = slotID;
-    selected = d.buildSlot(slotID).built();
+    selected    = d.slotType(slotID);
   }
   
   
@@ -80,9 +80,9 @@ public class BuildOptionsView extends MessageView {
     //
     //  Cannot confirm construction if no facility is selected.
     if (optionID == 0) {
-      final Base base = d.world.playerBase();
+      final Base base = d.world().playerBase();
       if (selected == null) return false;
-      if (d.buildSlot(slotID).built() == selected) return false;
+      if (d.slotType(slotID) == selected) return false;
       if (! selected.canBuild(base, d)) return false;
     }
     return true;
@@ -93,8 +93,8 @@ public class BuildOptionsView extends MessageView {
     //
     //  If confirmed, begin construction.
     if (optionID == 0 && selected != null) {
-      final Base base = d.world.playerBase();
-      d.buildSlot(slotID).beginConstruction(selected, base);
+      final Base base = d.world().playerBase();
+      d.beginConstruction(selected, optionID, base);
       mainView.dismissMessage(this);
     }
     //

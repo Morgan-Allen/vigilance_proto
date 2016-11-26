@@ -10,14 +10,11 @@ import java.awt.Image;
 
 
 
-public class Blueprint extends Index.Entry implements Session.Saveable {
+public class Blueprint extends Kind {
   
   
   /**  Data fields, construction and save/load methods-
     */
-  final static Index <Blueprint> INDEX = new Index <Blueprint> ();
-  
-  final public String name, info;
   final Image icon;
   
   final District.Stat stats[];
@@ -37,9 +34,7 @@ public class Blueprint extends Index.Entry implements Session.Saveable {
     String name, String ID, String imgPath, String info,
     int buildCost, int buildTime, Object... args
   ) {
-    super(INDEX, ID);
-    this.name = name;
-    this.info = info;
+    super(name, ID, info);
 
     this.icon = Kind.loadImage(imgPath);
     
@@ -55,19 +50,6 @@ public class Blueprint extends Index.Entry implements Session.Saveable {
       statMods[n] = (Integer      ) args[(n * 2) + 1];
     }
   }
-  
-  
-  public static Blueprint loadConstant(Session s) throws Exception {
-    return INDEX.loadEntry(s.input());
-  }
-  
-  
-  public void saveState(Session s) throws Exception {
-    INDEX.saveEntry(this, s.output());
-  }
-  
-  
-
   
   
   
@@ -107,27 +89,17 @@ public class Blueprint extends Index.Entry implements Session.Saveable {
   
   /**  Rendering, debug and interface methods-
     */
-  public String name() {
-    return name;
-  }
-  
-  
   public Image icon() {
     return icon;
-  }
-  
-  
-  public String toString() {
-    return name;
   }
   
   
   public String info() {
     final StringBuffer s = new StringBuffer();
     
-    s.append(name);
+    s.append(name());
     s.append("\n\n");
-    s.append(info);
+    s.append(info());
     s.append("\n\n");
     s.append("Build cost: "+buildCost+" ("+(buildTime / 7)+" weeks to build)");
     s.append("\n");
