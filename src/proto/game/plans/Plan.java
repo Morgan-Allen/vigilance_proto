@@ -27,7 +27,7 @@ public class Plan {
   
   
   void addGoal(PlanStep goal, float priority) {
-    goal.rating = priority;
+    goal.assignRating(priority);
     addStep(goal);
     fillNeeds(goal);
     I.say("Have added goal: "+goal.langDescription());
@@ -35,18 +35,24 @@ public class Plan {
   
   
   void advancePlan() {
-    I.say("\nAdvancing plan...");
+    I.say("\nAdvancing plan-");
     
     Batch <PlanStep> nextGen = new Batch();
-    for (PlanStep step : steps) addStepsFrom(step, nextGen);
+    for (PlanStep step : steps) {
+      addStepsFrom(step, nextGen);
+    }
     
-    PlanStep picked = null;
-    float bestRating = 0;
+    float sumRatings = 0;
     for (PlanStep child : nextGen) {
-      I.say("  Rating for "+child.langDescription()+": "+child.rating);
-      if (child.rating <= bestRating) continue;
-      picked     = child;
-      bestRating = child.rating;
+      I.say("  Rating for "+child.langDescription()+": "+child.rating());
+      sumRatings += child.rating();
+    }
+    
+    float rollInSum = Rand.num() * sumRatings;
+    PlanStep picked = null;
+    for (PlanStep child : nextGen) {
+      rollInSum -= child.rating();
+      if (rollInSum <= 0) { picked = child; break; }
     }
     
     if (picked != null) {
@@ -80,32 +86,32 @@ public class Plan {
       
       float bestRating = 0;
       for (Thing match : available) {
+        if (step.doesGive(match)     ) continue;
         if (neededDuring(step, match)) continue;
-        float rating = step.calcSuitability(match, role);
+        float rating = step.calcSuitability(match, role) * (Rand.num() + 0.5f);
         if (rating > bestRating) { used = match; bestRating = rating; }
       }
-      step.setNeed(role, used);
+      
+      if (used == null) {
+        ///I.say("No match found for: "+role+"/"+step);
+      }
+      else step.setNeed(role, used);
     }
   }
   
   
   private void addStepsFrom(PlanStep step, Batch <PlanStep> toEval) {
     for (Object role : step.needTypes()) {
-      Thing    needed   = step.need (role);
+      Thing    needed   = step.need(role);
       PlanStep needStep = step.stepForNeed(role);
       if (needed == null || needStep != null) continue;
-      if (canAccessBy(step, needed)         ) continue;
+      if (obtainedBefore(step, needed)      ) continue;
       
       PlanStep possible[] = step.actionsToObtain(needed, role);
       for (PlanStep child : possible) {
         fillNeeds(child);
-        child.bindParent(step, role);
-        
-        float chance = child.calcSuccessChance();
-        child.rating = chance * step.rating;
-        child.rating += chance * child.baseAppeal();
-        child.rating -= (1 - chance) * child.baseFailRisk();
-        
+        child.setParent(step, role);
+        child.calcStepRatingFromParent(step);
         toEval.add(child);
       }
     }
@@ -115,14 +121,14 @@ public class Plan {
   
   /**  Determining pre-conditions and keeping track of resource-reservations.
     */
-  private boolean canAccessBy(PlanStep step, Thing used) {
+  private boolean obtainedBefore(PlanStep step, Thing need) {
     //  TODO:  Make this a generic check for 'publicly known' things.
-    if (used.type == Thing.TYPE_PLACE) return true;
+    if (need.type == Thing.TYPE_PLACE) return true;
+    if (preObtained.includes(need)) return true;
     
-    if (preObtained.includes(used)) return true;
     for (PlanStep prior : steps) {
       if (prior == step) break;
-      if (prior.doesGive(used)) return true;
+      if (prior.doesGive(need)) return true;
     }
     return false;
   }
@@ -149,12 +155,13 @@ public class Plan {
   
   
   public float calcPlanRating() {
-    float rating = 0, chance = 1.0f;
+    float rating = 0, numSteps = 0;
     for (PlanStep step : steps) {
-      chance *= step.calcSuccessChance();
-      rating += step.rating * chance;
+      rating += step.rating();
+      numSteps++;
     }
-    return rating;
+    if (numSteps <= 0) return -1;
+    return rating / numSteps;
   }
 }
 

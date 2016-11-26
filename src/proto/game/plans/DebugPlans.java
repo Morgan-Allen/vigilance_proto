@@ -44,7 +44,7 @@ public class DebugPlans {
     
     I.say("\n\nFinal plan: ");
     for (PlanStep step : plan.steps) {
-      I.say("  "+step.langDescription());
+      I.say("  "+step.langDescription()+": "+step.rating());
     }
   }
   

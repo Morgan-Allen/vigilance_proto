@@ -23,9 +23,22 @@ public class TypeMake extends StepType {
   
   PlanStep toProvide(Thing needed, PlanStep by) {
     if (needed.type == Thing.TYPE_ITEM) {
-      return new PlanStep(this, by.plan).bindGives(needed);
+      return new PlanStep(this, by.plan).setGives(needed);
     }
     return null;
+  }
+  
+  
+  float calcSuitability(Thing used, Object needType, PlanStep step) {
+    if (needType == Needs.MAKES) {
+      if (used.type != Thing.TYPE_PERSON) return 0;
+      float skill = used.statValue(Thing.STAT_WIRING);
+      return skill / 10f;
+    }
+    if (needType == Needs.MATERIALS) {
+      return 0;
+    }
+    return 0;
   }
   
   
@@ -40,7 +53,7 @@ public class TypeMake extends StepType {
   
   
   protected String langDescription(PlanStep step) {
-    return "Make "+step.give(Gives.MADE)+" from "+step.need(Needs.MATERIALS);
+    return "Make "+step.give(Gives.MADE);
   }
 }
 

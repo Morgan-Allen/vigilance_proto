@@ -12,14 +12,17 @@ public class TypeKidnapping extends TypeMajorCrime {
   };
   
   
-  TypeKidnapping() { super(
-    "Kidnapping", Needs.values(), Gives.values()
-  ); }
+  TypeKidnapping() {
+    super("Kidnapping", Needs.values(), Gives.values());
+  }
   
   
   PlanStep toProvide(Thing needed, PlanStep by) {
     if (needed.type == Thing.TYPE_PERSON) {
-      return new PlanStep(this, by.plan).bindGives(needed);
+      PlanStep step = new PlanStep(this, by.plan);
+      step.setGives(needed);
+      step.setNeed(Needs.VENUE, needed.owner);
+      return step;
     }
     return null;
   }

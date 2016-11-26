@@ -24,7 +24,7 @@ public class TypeCoerce extends StepType {
   
   PlanStep toProvide(Thing needed, PlanStep by) {
     if (needed.type == Thing.TYPE_PERSON) {
-      return new PlanStep(this, by.plan).bindGives(needed);
+      return new PlanStep(this, by.plan).setGives(needed);
     }
     return null;
   }
@@ -62,7 +62,7 @@ public class TypeCoerce extends StepType {
   
   
   protected String langDescription(PlanStep step) {
-    return "Coerce "+step.give(Gives.COERCED)+" as "+step.parentNeedType;
+    return "Coerce "+step.give(Gives.COERCED);
   }
 }
 

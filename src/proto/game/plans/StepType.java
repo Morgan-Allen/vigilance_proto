@@ -43,6 +43,11 @@ public abstract class StepType {
   }
   
   
+  boolean activeDuring(PlanStep step, PlanStep other) {
+    return step == other;
+  }
+  
+  
   boolean isNeeded(Object needType, PlanStep step) {
     return true;
   }
@@ -54,7 +59,7 @@ public abstract class StepType {
   
   
   float baseSuccessChance(PlanStep step) {
-    return 1;
+    return 0.5f;
   }
   
   

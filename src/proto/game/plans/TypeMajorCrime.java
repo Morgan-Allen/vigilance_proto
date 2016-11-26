@@ -56,8 +56,8 @@ public abstract class TypeMajorCrime extends StepType {
     }
     return true;
   }
-
-
+  
+  
   float calcSuitability(Thing used, Object needType, PlanStep step) {
     
     Thing venue = step.need(Needs.VENUE);
@@ -98,7 +98,7 @@ public abstract class TypeMajorCrime extends StepType {
   float baseSuccessChance(PlanStep step) {
     float chance = 1.0f;
     
-    float mookRatings = 3.0f;
+    float mookRatings = 1.5f;
     chance *= mookRatings / 3;
     
     return chance;

@@ -23,7 +23,7 @@ public class TypeBribe extends StepType {
   
   PlanStep toProvide(Thing needed, PlanStep by) {
     if (needed.type == Thing.TYPE_PERSON) {
-      return new PlanStep(this, by.plan).bindGives(needed);
+      return new PlanStep(this, by.plan).setGives(needed);
     }
     return null;
   }

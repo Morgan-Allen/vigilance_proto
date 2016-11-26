@@ -23,7 +23,7 @@ public class TypePurchase extends StepType {
   
   PlanStep toProvide(Thing needed, PlanStep by) {
     if (needed.type == Thing.TYPE_ITEM) {
-      return new PlanStep(this, by.plan).bindGives(needed);
+      return new PlanStep(this, by.plan).setGives(needed);
     }
     return null;
   }

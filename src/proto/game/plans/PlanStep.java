@@ -9,12 +9,12 @@ public class PlanStep {
   
   
   final StepType type;
-  int uniqueID;
+  int uniqueID = -1;
   
   Plan plan;
   int stageID;
   private Thing needs[], gives[];
-  float rating;
+  private float rating;
   
   private PlanStep needSteps[];
   PlanStep parent;
@@ -31,19 +31,19 @@ public class PlanStep {
   }
   
   
-  PlanStep bindGives(Thing... gives) {
+  PlanStep setGives(Thing... gives) {
     for (int g = gives.length; g-- > 0;) this.gives[g] = gives[g];
     return this;
   }
   
   
-  PlanStep bindNeeds(Thing... needs) {
+  PlanStep setNeeds(Thing... needs) {
     for (int n = needs.length; n-- > 0;) this.needs[n] = needs[n];
     return this;
   }
   
   
-  PlanStep bindParent(PlanStep parent, Object needType) {
+  PlanStep setParent(PlanStep parent, Object needType) {
     this.parent         = parent  ;
     this.parentNeedType = needType;
     return this;
@@ -125,7 +125,7 @@ public class PlanStep {
   
   
   float baseAppeal() {
-    return type.baseSuccessChance(this);
+    return type.baseAppeal(this);
   }
   
   
@@ -142,12 +142,31 @@ public class PlanStep {
   
   /**  Utility methods for action-execution-
     */
+  void assignRating(float rating) {
+    this.rating = rating;
+  }
+  
+  
+  void calcStepRatingFromParent(PlanStep parent) {
+    float chance = calcSuccessChance();
+    rating = chance * parent.rating;
+    rating += chance * baseAppeal();
+    rating -= (1 - chance) * baseFailRisk();
+  }
+  
+  
   float calcSuccessChance() {
     float chance = 1.0f;
+    
+    //  TODO:  You need to have a better method for modifying this estimate
+    //  when essential pre-reqs aren't yet met (while still giving a decent
+    //  rating for the raw step until expanded.)
+    
     for (int r = needs.length; r-- > 0;) {
       PlanStep getStep = needSteps[r];
       if (getStep != null) chance *= getStep.calcSuccessChance();
     }
+    
     chance *= baseSuccessChance();
     return chance;
   }
@@ -164,8 +183,12 @@ public class PlanStep {
   
   
   boolean activeDuring(PlanStep other) {
-    if (other == this) return true;
-    return false;
+    return type.activeDuring(this, other);
+  }
+  
+  
+  float rating() {
+    return rating;
   }
   
   
@@ -173,12 +196,25 @@ public class PlanStep {
   /**  Rendering, debug and feedback methods-
     */
   public String toString() {
-    return type.name+" #"+uniqueID;
+    return langDescription();
+    //return type.name+" #"+uniqueID;
   }
   
   
   public String langDescription() {
-    return type.langDescription(this);
+    String desc = "";
+    if (uniqueID != -1) desc+="#"+uniqueID+": ";
+    desc+=type.langDescription(this);
+    if (parent != null) desc+=" ("+parentNeedType+" for #"+parent.uniqueID+")";
+    
+    String needs = "";
+    for (Object type : needTypes()) {
+      if (need(type) != null) continue;
+      needs+="["+type+"]";
+    }
+    if (needs.length() > 0) desc+=" (Need "+needs+")";
+    
+    return desc;
   }
   
   
@@ -204,13 +240,6 @@ public class PlanStep {
     return s.toString();
   }
 }
-
-
-
-
-
-
-
 
 
 
