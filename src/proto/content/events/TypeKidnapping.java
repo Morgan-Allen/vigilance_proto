@@ -1,8 +1,8 @@
 
 
 package proto.content.events;
+import proto.game.event.PlanStep;
 import proto.game.person.*;
-import proto.game.plans.PlanStep;
 import proto.game.world.*;
 import proto.util.*;
 
@@ -17,11 +17,11 @@ public class TypeKidnapping extends TypeMajorCrime {
   
   
   TypeKidnapping() {
-    super("Kidnapping", Needs.values(), Gives.values());
+    super("Kidnapping", "step_type_kidnap", Needs.values(), Gives.values());
   }
   
   
-  protected PlanStep toProvide(Element needed, PlanStep by) {
+  public PlanStep toProvide(Element needed, PlanStep by) {
     if (needed.type == Element.TYPE_PERSON) {
       PlanStep step = new PlanStep(this, by.plan);
       Person victim = (Person) needed;

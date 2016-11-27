@@ -29,6 +29,7 @@ public class Event implements Session.Saveable {
   
   
   final EventType type;
+  PlanStep step;
   Place place;
   float timeBegins, timeEnds;
   boolean complete;
@@ -41,9 +42,9 @@ public class Event implements Session.Saveable {
   
   public Event(Session s) throws Exception {
     s.cacheInstance(this);
-    type = (EventType) s.loadObject();
-    
-    place      = (Place) s.loadObject();
+    type       = (EventType) s.loadObject();
+    step       = (PlanStep ) s.loadObject();
+    place      = (Place    ) s.loadObject();
     timeBegins = s.loadFloat();
     timeEnds   = s.loadFloat();
     complete   = s.loadBool ();
@@ -51,8 +52,8 @@ public class Event implements Session.Saveable {
   
   
   public void saveState(Session s) throws Exception {
-    s.saveObject(type);
-    
+    s.saveObject(type      );
+    s.saveObject(step      );
     s.saveObject(place     );
     s.saveFloat (timeBegins);
     s.saveFloat (timeEnds  );
@@ -63,7 +64,11 @@ public class Event implements Session.Saveable {
   
   /**  Supplemental setup/progression methods-
     */
-  public void assignDates(float begins, float ends) {
+  public void assignParameters(
+    PlanStep step, Place place, float begins, float ends
+  ) {
+    this.step       = step  ;
+    this.place      = place ;
     this.timeBegins = begins;
     this.timeEnds   = ends  ;
   }
@@ -87,12 +92,6 @@ public class Event implements Session.Saveable {
   public float timeEnds() {
     return timeEnds;
   }
-  
-  
-  
-  
-  
-  
   
 
   public Series <Lead> knownOpenLeads() {

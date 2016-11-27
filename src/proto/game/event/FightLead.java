@@ -8,6 +8,7 @@ import proto.game.world.*;
 import proto.util.*;
 
 
+
 public class FightLead extends Lead {
   
   
@@ -16,10 +17,9 @@ public class FightLead extends Lead {
   
   
   public FightLead(
-    String name, String info, Event parent, int ID,
-    Object origin, Object reveals, Person... fought
+    int ID, Place origin, Person... fought
   ) {
-    super(name, info, parent, ID, origin, reveals, Task.TIME_SHORT);
+    super(ID, origin, new Object[0], Task.TIME_SHORT, origin.world());
     Visit.appendTo(this.fought, (Object[]) fought);
   }
   
@@ -37,19 +37,15 @@ public class FightLead extends Lead {
   
   
   public boolean attemptTask() {
+    final Place place = targetLocation();
+    final District district = place.parent;
     
-    final World world = parent.world();
-    final District site = parent.place.parent;
-    this.groundScene = site.region().generateScene(site, this);
-    
-    /*
-    this.groundScene = new Scene(world, 32);
-    
+    //*
     //  TODO:  Have the Region in question, or the various types of facility,
     //  populate the landscape appropriately.
-    
+    this.groundScene = district.region().generateScene(district, this);
     groundScene.assignMissionParameters(
-      this, site, 0.5f, initTime + timeTaken, fought
+      this, place, 0.5f, initTime + timeTaken, fought
     );
     //*/
     
@@ -58,10 +54,6 @@ public class FightLead extends Lead {
     
     return true;
   }
-  
-  
-  
-  
 }
 
 

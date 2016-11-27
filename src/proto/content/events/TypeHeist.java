@@ -1,7 +1,7 @@
 
 
 package proto.content.events;
-import proto.game.plans.PlanStep;
+import proto.game.event.PlanStep;
 import proto.game.world.*;
 import proto.util.*;
 
@@ -15,11 +15,11 @@ public class TypeHeist extends TypeMajorCrime {
   
   
   TypeHeist() {
-    super("Heist", Needs.values(), Gives.values());
+    super("Heist", "step_type_heist", Needs.values(), Gives.values());
   }
   
   
-  protected PlanStep toProvide(Element needed, PlanStep by) {
+  public PlanStep toProvide(Element needed, PlanStep by) {
     
     //  TODO:  Include bulk cash as a form of item!
     if (needed.type == Element.TYPE_ITEM) {

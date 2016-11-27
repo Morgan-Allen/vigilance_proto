@@ -25,6 +25,7 @@ public class Base implements Session.Saveable {
   List <Person> roster = new List();
   Person leader = null;
   final public BaseStocks stocks = new BaseStocks(this);
+  final public BaseLeads  leads  = new BaseLeads (this);
   
   Place rooms[] = new Place[MAX_FACILITIES];
   List <Tech> knownTech = new List();
@@ -45,12 +46,13 @@ public class Base implements Session.Saveable {
     
     s.loadObjects(roster);
     leader = (Person) s.loadObject();
+    stocks.loadState(s);
+    leads .loadState(s);
     
     for (int n = 0 ; n < MAX_FACILITIES; n++) {
       rooms[n] = (Place) s.loadObject();
     }
     s.loadObjects(knownTech);
-    stocks.loadState(s);
     
     currentFunds = s.loadInt();
     incomeFloor  = s.loadInt();
@@ -66,12 +68,13 @@ public class Base implements Session.Saveable {
     
     s.saveObjects(roster);
     s.saveObject(leader);
+    stocks.saveState(s);
+    leads .saveState(s);
     
     for (int n = 0 ; n < MAX_FACILITIES; n++) {
       s.saveObject(rooms[n]);
     }
     s.saveObjects(knownTech);
-    stocks.saveState(s);
     
     s.saveInt(currentFunds);
     s.saveInt(incomeFloor );

@@ -1,8 +1,8 @@
 
 
 package proto.content.events;
-import proto.game.plans.PlanStep;
-import proto.game.plans.StepType;
+import proto.game.event.PlanStep;
+import proto.game.event.StepType;
 import proto.game.world.*;
 import proto.util.*;
 
@@ -19,13 +19,12 @@ public class TypeGetDirt extends StepType {
   
   
   
-  TypeGetDirt() { super(
-    "Get Dirt",
-    Needs.values(), Gives.values()
-  ); }
+  TypeGetDirt() {
+    super("Get Dirt", "step_type_get_dirt", Needs.values(), Gives.values());
+  }
   
   
-  protected PlanStep toProvide(Element needed, PlanStep by) {
+  public PlanStep toProvide(Element needed, PlanStep by) {
     //  TODO:  You need to be able to look for dirt without a definite idea of
     //  what you're looking for.  (i.e, you specify some property of the thing
     //  needed.

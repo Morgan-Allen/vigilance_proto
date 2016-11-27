@@ -1,24 +1,23 @@
 
 
-package proto.game.plans;
+package proto.game.event;
 import proto.game.world.*;
 import proto.util.*;
 
 
 
-public abstract class StepType {
+public abstract class StepType extends EventType {
   
   
   /**  Data fields, construction and state restoration-
     */
-  final String name;
   final Object needTypes[], giveTypes[];
   
   
   protected StepType(
-    String name, Object needTypes[], Object giveTypes[]
+    String name, String ID, Object needTypes[], Object giveTypes[]
   ) {
-    this.name      = name     ;
+    super(name, ID);
     this.needTypes = needTypes;
     this.giveTypes = giveTypes;
   }
@@ -34,7 +33,7 @@ public abstract class StepType {
     *  targets, generating the initial step, and evaluating the odds and appeal
     *  of such an action.
     */
-  protected PlanStep toProvide(Element needed, PlanStep by) {
+  public PlanStep toProvide(Element needed, PlanStep by) {
     return null;
   }
   
@@ -78,7 +77,21 @@ public abstract class StepType {
   /**  Rendering and interface methods-
     */
   protected abstract String langDescription(PlanStep step);
+  
+
+  protected String nameFor(Event event) {
+    PlanStep step = event.step;
+    return langDescription(step);
+  }
+  
+  
+  protected String infoFor(Event event) {
+    PlanStep step = event.step;
+    return step.longDescription();
+  }
 }
+
+
 
 
 

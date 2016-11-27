@@ -2,9 +2,9 @@
 
 package proto.content.events;
 import proto.game.world.*;
+import proto.game.event.PlanStep;
+import proto.game.event.StepType;
 import proto.game.person.*;
-import proto.game.plans.PlanStep;
-import proto.game.plans.StepType;
 import proto.content.items.*;
 import proto.util.*;
 
@@ -20,14 +20,13 @@ public class TypeMake extends StepType {
     MADE
   };
   
-  TypeMake() { super(
-    "Make",
-    Needs.values(), Gives.values()
-  ); }
+  TypeMake() {
+    super("Make", "step_type_make", Needs.values(), Gives.values());
+  }
   
   
   
-  protected PlanStep toProvide(Element needed, PlanStep by) {
+  public PlanStep toProvide(Element needed, PlanStep by) {
     if (needed.type == Element.TYPE_ITEM) {
       return new PlanStep(this, by.plan).setGives(needed);
     }

@@ -1,6 +1,6 @@
 
 
-package proto.game.plans;
+package proto.game.event;
 import proto.game.world.*;
 
 

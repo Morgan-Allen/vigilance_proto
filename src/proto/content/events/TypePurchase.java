@@ -2,9 +2,9 @@
 
 package proto.content.events;
 import proto.game.world.*;
+import proto.game.event.PlanStep;
+import proto.game.event.StepType;
 import proto.game.person.*;
-import proto.game.plans.PlanStep;
-import proto.game.plans.StepType;
 import proto.util.*;
 
 
@@ -19,14 +19,13 @@ public class TypePurchase extends StepType {
     BOUGHT
   };
   
-  TypePurchase() { super(
-    "Purchase",
-    Needs.values(), Gives.values()
-  ); }
+  TypePurchase() {
+    super("Purchase", "step_type_purchase", Needs.values(), Gives.values());
+  }
   
   
   
-  protected PlanStep toProvide(Element needed, PlanStep by) {
+  public PlanStep toProvide(Element needed, PlanStep by) {
     if (needed.type == Element.TYPE_ITEM) {
       return new PlanStep(this, by.plan).setGives(needed);
     }

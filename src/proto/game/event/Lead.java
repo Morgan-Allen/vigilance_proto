@@ -5,9 +5,8 @@ import proto.common.*;
 import proto.game.person.*;
 import proto.game.world.*;
 import proto.util.*;
-import proto.view.*;
-import proto.view.common.MessageView;
 
+import proto.view.common.*;
 import java.awt.Image;
 
 
@@ -17,58 +16,48 @@ public class Lead extends Task {
   
   /**  Data fields, construction and save/load methods-
     */
-  final String activeName, helpInfo;
-  
-  final public Event parent;
   final public int ID;
-  final public Object origin, goes[];
+  final public Element origin;
+  final public Element goes[];
   
   float chance;
   boolean red, cold;
   
   
   public Lead(
-    String name, String info,
-    Event parent, int ID, Object origin, Object reveals,
-    int timeHours, Object... args
+    int ID, Element origin, Object reveals,
+    int timeHours, World world, Object... args
   ) {
-    super(timeHours, parent.world(), args);
+    super(timeHours, world, args);
     
-    this.activeName = name;
-    this.helpInfo   = info;
-    
-    this.parent  = parent ;
-    this.ID      = ID     ;
-    this.origin  = origin ;
-    
-    if (reveals instanceof Object[]) this.goes = (Object[]) reveals;
-    else this.goes = new Object[] { reveals };
+    this.ID      = ID    ;
+    this.origin  = origin;
+    if (reveals instanceof Element[]) this.goes = (Element[]) reveals;
+    else this.goes = new Element[] { (Element) reveals };
   }
   
   
   public Lead(Session s) throws Exception {
     super(s);
+    ID     = s.loadInt();
+    origin = (Element) s.loadObject();
+    goes   = (Element[]) s.loadObjectArray(Element.class);
     
-    activeName = s.loadString();
-    helpInfo   = s.loadString();
-    
-    parent  = (Event) s.loadObject();
-    ID      = s.loadInt   ();
-    origin  = s.loadObject();
-    goes    = s.loadObjectArray(Object.class);
+    chance = s.loadFloat();
+    red    = s.loadBool();
+    cold   = s.loadBool();
   }
   
   
   public void saveState(Session s) throws Exception {
     super.saveState(s);
-    
-    s.saveString(activeName);
-    s.saveString(helpInfo  );
-    
-    s.saveObject(parent);
     s.saveInt   (ID    );
     s.saveObject(origin);
     s.saveObjectArray(goes);
+    
+    s.saveFloat(chance);
+    s.saveBool (red   );
+    s.saveBool (cold  );
   }
   
   
@@ -84,7 +73,7 @@ public class Lead extends Task {
     //if (! parent.checkFollowed(this, false)) return;
   }
   
-  
+  /*
   public boolean open() {
     //  TODO:  You need to have a central fact-repository for the investigating
     //  player instead.
@@ -92,10 +81,11 @@ public class Lead extends Task {
     boolean done = complete();
     return known && ! done;
   }
+  //*/
   
   
   public Place targetLocation() {
-    return parent.place();
+    return origin.location();
   }
   
   
@@ -139,7 +129,7 @@ public class Lead extends Task {
     
     world.view().queueMessage(new MessageView(
       world.view(),
-      icon(), "Task complete: "+activeName,
+      icon(), "Task complete: "+choiceInfo(),
       s.toString(),
       "Dismiss"
     ) {
@@ -151,22 +141,22 @@ public class Lead extends Task {
   
   
   public Image icon() {
-    return parent.imageFor(this);
+    return origin.kind.sprite();
   }
   
   
   public String choiceInfo() {
-    return activeName;
+    return "";// activeName;
   }
   
   
   public String activeInfo() {
-    return activeName+" ("+parent.name()+")";
+    return "";// activeName+" ("+parent.name()+")";
   }
   
   
   public String helpInfo() {
-    return helpInfo;
+    return "";// helpInfo;
   }
 }
 

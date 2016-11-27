@@ -1,13 +1,12 @@
 
 
-package proto.content.events;
-import proto.common.*;
+package proto.common;
 import proto.content.agents.*;
-import proto.content.techs.Facilities;
 import proto.game.world.*;
+import proto.game.event.*;
 import proto.game.person.*;
-import proto.game.plans.Plan;
-import proto.game.plans.PlanStep;
+import proto.content.events.StepTypes;
+import proto.content.techs.Facilities;
 import proto.util.*;
 
 

@@ -2,7 +2,7 @@
 
 package proto.game.world;
 import proto.common.*;
-import proto.game.plans.*;
+import proto.game.event.*;
 import proto.util.*;
 
 
@@ -56,6 +56,11 @@ public class Element implements Session.Saveable {
   
   public World world() {
     return world;
+  }
+  
+  
+  public Place location() {
+    return location;
   }
 }
 

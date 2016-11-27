@@ -1,14 +1,14 @@
 
 
-package proto.game.plans;
+package proto.game.event;
+import proto.common.*;
 import proto.game.world.*;
 import proto.game.person.*;
 import proto.util.*;
-import static proto.game.plans.StepType.*;
 
 
 
-public class Plan {
+public class Plan implements Session.Saveable {
   
   final public Person agent;
   final public World world;
@@ -17,12 +17,38 @@ public class Plan {
   List <Element> preObtained = new List();
   List <PlanStep> steps = new List();
   
+  public boolean verbose = false;
+  
   
   public Plan(Person agent, World world, StepType... stepTypes) {
     this.agent = agent;
     this.world = world;
     this.stepTypes = stepTypes;
   }
+  
+  
+  public Plan(Session s) throws Exception {
+    s.cacheInstance(this);
+    
+    agent = (Person) s.loadObject();
+    world = (World ) s.loadObject();
+    
+    stepTypes = (StepType[]) s.loadObjectArray(StepType.class);
+    s.loadObjects(preObtained);
+    s.loadObjects(steps);
+  }
+  
+  
+  public void saveState(Session s) throws Exception {
+    s.saveObject(agent);
+    s.saveObject(world);
+    
+    s.saveObjectArray(stepTypes);
+    s.saveObjects(preObtained);
+    s.saveObjects(steps);
+  }
+  
+  
   
   
   public Series <PlanStep> steps() {
@@ -39,12 +65,12 @@ public class Plan {
     goal.assignRating(priority);
     addStep(goal);
     fillNeeds(goal);
-    I.say("Have added goal: "+goal.langDescription());
+    if (verbose) I.say("Have added goal: "+goal.langDescription());
   }
   
   
   public void advancePlan() {
-    I.say("\nAdvancing plan-");
+    if (verbose) I.say("\nAdvancing plan-");
     
     Batch <PlanStep> nextGen = new Batch();
     for (PlanStep step : steps) {
@@ -53,7 +79,7 @@ public class Plan {
     
     float sumRatings = 0;
     for (PlanStep child : nextGen) {
-      I.say("  Rating for "+child.langDescription()+": "+child.rating());
+      if (verbose) I.say("  Rating for "+child+": "+child.rating());
       sumRatings += child.rating();
     }
     
@@ -66,10 +92,10 @@ public class Plan {
     
     if (picked != null) {
       addStep(picked);
-      I.say("  Adding step: "+picked.langDescription());
+      if (verbose) I.say("  Adding step: "+picked);
     }
     else {
-      I.say("  No new step chosen!");
+      if (verbose) I.say("  No new step chosen!");
     }
   }
   
@@ -81,7 +107,7 @@ public class Plan {
     step.uniqueID = steps.size();
     steps.addFirst(step);
     if (step.parent != null) {
-      step.parent.setStepForNeed(step.parentNeedType, step);
+      step.parent.setStepForNeed(step.parentNeedID, step);
     }
   }
   

@@ -1,33 +1,65 @@
 
 
-package proto.game.plans;
+package proto.game.event;
+import proto.common.*;
 import proto.game.world.*;
 import proto.util.*;
 
 
 
-public class PlanStep {
+public class PlanStep implements Session.Saveable {
   
   
   final public StepType type;
   int uniqueID = -1;
   
   final public Plan plan;
-  private Element needs[], gives[];
-  private float rating;
-  
-  private PlanStep needSteps[];
   PlanStep parent;
-  Object parentNeedType;
+  int parentNeedID;
+  private Element needs[], gives[];
+  private PlanStep needSteps[];
+  
+  private float rating;
   
   
   public PlanStep(StepType type, Plan plan) {
     this.type = type;
     this.plan = plan;
     final Object needT[] = needTypes(), giveT[] = giveTypes();
-    this.gives     = new Element   [giveT.length];
-    this.needs     = new Element   [needT.length];
+    this.gives     = new Element [giveT.length];
+    this.needs     = new Element [needT.length];
     this.needSteps = new PlanStep[needT.length];
+  }
+  
+  
+  public PlanStep(Session s) throws Exception {
+    s.cacheInstance(this);
+    type = (StepType) s.loadObject();
+    uniqueID = s.loadInt();
+    
+    plan = (Plan) s.loadObject();
+    parent = (PlanStep) s.loadObject();
+    parentNeedID = s.loadInt();
+    needs     = (Element []) s.loadObjectArray(Element.class);
+    gives     = (Element []) s.loadObjectArray(Element.class);
+    needSteps = (PlanStep[]) s.loadObjectArray(PlanStep.class);
+    
+    rating = s.loadFloat();
+  }
+  
+  
+  public void saveState(Session s) throws Exception {
+    s.saveObject(type);
+    s.saveInt(uniqueID);
+    
+    s.saveObject(plan);
+    s.saveObject(parent);
+    s.saveInt(parentNeedID);
+    s.saveObjectArray(needs);
+    s.saveObjectArray(gives);
+    s.saveObjectArray(needSteps);
+    
+    s.saveFloat(rating);
   }
   
   
@@ -44,15 +76,15 @@ public class PlanStep {
   
   
   public PlanStep setParent(PlanStep parent, Object needType) {
-    this.parent         = parent  ;
-    this.parentNeedType = needType;
+    this.parent       = parent;
+    this.parentNeedID = Visit.indexOf(needType, parent.needTypes());
     return this;
   }
   
   
   public Object givesToParent() {
     if (parent == null) return null;
-    return parent.need(parentNeedType);
+    return parent.needs()[parentNeedID];
   }
   
   
@@ -101,8 +133,8 @@ public class PlanStep {
   }
   
   
-  public void setStepForNeed(Object needType, PlanStep step) {
-    needSteps[Visit.indexOf(needType, needTypes())] = step;
+  public void setStepForNeed(int needID, PlanStep step) {
+    needSteps[needID] = step;
   }
   
   
@@ -140,7 +172,7 @@ public class PlanStep {
   
   
   
-  /**  Utility methods for action-execution-
+  /**  Utility methods for plan-evaluation-
     */
   void assignRating(float rating) {
     this.rating = rating;
@@ -193,6 +225,25 @@ public class PlanStep {
   
   
   
+  /**  Translating into concrete events:
+    */
+  public Event spawnEvent(World world) {
+    Event event = new Event(type);
+    
+    int time = world.totalMinutes();
+    int ends = time + (Task.TIME_SHORT * World.MINUTES_PER_HOUR);
+    Place place = null;
+    for (Element e : needs) if (e.type == Element.TYPE_PLACE) {
+      place = (Place) e;
+      break;
+    }
+    
+    event.assignParameters(this, place, time, ends);
+    return event;
+  }
+  
+  
+  
   /**  Rendering, debug and feedback methods-
     */
   public String toString() {
@@ -203,9 +254,15 @@ public class PlanStep {
   
   public String langDescription() {
     String desc = "";
-    if (uniqueID != -1) desc+="#"+uniqueID+": ";
+    if (uniqueID != -1) {
+      desc+="#"+uniqueID+": ";
+    }
     desc+=type.langDescription(this);
-    if (parent != null) desc+=" ("+parentNeedType+" for #"+parent.uniqueID+")";
+    
+    if (parent != null) {
+      Object role = parent.needTypes()[parentNeedID];
+      desc+=" ("+role+" for #"+parent.uniqueID+")";
+    }
     
     String needs = "";
     for (Object type : needTypes()) {

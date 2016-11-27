@@ -6,7 +6,6 @@ import proto.game.world.*;
 import proto.util.*;
 
 
-
 public abstract class EventType extends Index.Entry implements
   Session.Saveable
 {
@@ -32,8 +31,8 @@ public abstract class EventType extends Index.Entry implements
   }
   
   
-  public abstract Event createRandomEvent(World world);
-  public abstract float eventChance(Event event);
+  //public abstract Event createRandomEvent(World world);
+  //public abstract float eventChance(Event event);
   
   
   /**  Rendering, interface and debug methods-
@@ -41,7 +40,6 @@ public abstract class EventType extends Index.Entry implements
   protected abstract String nameFor(Event event);
   protected abstract String infoFor(Event event);
 }
-
 
 
 

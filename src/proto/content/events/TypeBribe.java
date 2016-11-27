@@ -1,8 +1,8 @@
 
 
 package proto.content.events;
-import proto.game.plans.PlanStep;
-import proto.game.plans.StepType;
+import proto.game.event.PlanStep;
+import proto.game.event.StepType;
 import proto.game.world.*;
 
 
@@ -16,15 +16,14 @@ public class TypeBribe extends StepType {
     BRIBED
   };
   
-  TypeBribe() { super(
-    "Bribe",
-    Needs.values(), Gives.values()
-  ); }
+  TypeBribe() {
+    super("Bribe", "step_type_bribe", Needs.values(), Gives.values());
+  }
   
   
   
   
-  protected PlanStep toProvide(Element needed, PlanStep by) {
+  public PlanStep toProvide(Element needed, PlanStep by) {
     if (needed.type == Element.TYPE_PERSON) {
       return new PlanStep(this, by.plan).setGives(needed);
     }

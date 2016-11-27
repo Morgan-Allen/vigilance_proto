@@ -3,9 +3,9 @@
 
 package proto.content.events;
 import proto.game.world.*;
+import proto.game.event.PlanStep;
+import proto.game.event.StepType;
 import proto.game.person.*;
-import proto.game.plans.PlanStep;
-import proto.game.plans.StepType;
 import proto.content.items.*;
 import proto.content.techs.*;
 import proto.util.*;
@@ -21,9 +21,9 @@ public abstract class TypeMajorCrime extends StepType {
   
   
   TypeMajorCrime(
-    String name, Object needTypes[], Object giveTypes[]
+    String name, String ID, Object needTypes[], Object giveTypes[]
   ) {
-    super(name, needTypes, giveTypes);
+    super(name, ID, needTypes, giveTypes);
   }
   
 

@@ -1,12 +1,12 @@
 
 
 package proto.content.events;
-import proto.game.plans.StepType;
+import proto.game.event.StepType;
 import proto.util.*;
 
 
 
-class StepTypes {
+public class StepTypes {
   
   
   private static Batch <StepType> types = new Batch();
@@ -15,7 +15,7 @@ class StepTypes {
     return type;
   }
   
-  final static StepType
+  final public static StepType
     HEIST  = register(new TypeHeist()),
     MURDER = register(new TypeAssassination()),
     KIDNAP = register(new TypeKidnapping()),
