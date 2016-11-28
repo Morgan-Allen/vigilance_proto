@@ -148,6 +148,8 @@ public class RegionView extends UINode {
   
   
   void renderLeads(District d, Surface surface, Graphics2D g) {
+    
+    /*
     g.setColor(Color.LIGHT_GRAY);
     int down = vy + 240;
     boolean noEvents = true;
@@ -196,6 +198,7 @@ public class RegionView extends UINode {
         g, vx + 25, down + 20, vw - 30, 150
       );
     }
+    //*/
   }
   
   

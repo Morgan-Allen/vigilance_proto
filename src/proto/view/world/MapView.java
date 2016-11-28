@@ -151,12 +151,13 @@ public class MapView extends UINode {
         x - 25, y + 25 + 15 + 5, 50, 5,
         Color.RED, Color.BLACK, crimeLevel, false, g
       );
-      
+      /*
       for (Event event : mainView.world().events().active()) {
         if (event.place().parent == n) {
           g.drawImage(mainView.alertMarker, x - 25, y - 25, 50, 50, null);
         }
       }
+      //*/
       ViewUtils.renderAssigned(visitors(n), x + 25, y + 25, surface, g);
     }
     
