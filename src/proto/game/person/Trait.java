@@ -3,7 +3,6 @@
 package proto.game.person;
 import proto.common.*;
 import proto.util.*;
-
 import java.awt.Image;
 
 
@@ -11,6 +10,8 @@ import java.awt.Image;
 public class Trait extends Index.Entry implements Session.Saveable {
   
   
+  /**  Data fields, construction, and save/load methods-
+    */
   final static Index <Trait> INDEX = new Index <Trait> ();
   final static Skill NO_ROOTS[] = new Skill[0];
   

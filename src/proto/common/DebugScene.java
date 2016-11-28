@@ -5,10 +5,11 @@ import proto.game.world.*;
 import proto.util.Rand;
 import proto.game.person.*;
 import proto.game.event.*;
-import proto.content.agents.Crooks;
-import proto.content.agents.Heroes;
+import proto.content.agents.*;
 import proto.content.events.*;
 import proto.content.scenes.*;
+import proto.content.techs.Facilities;
+
 import java.awt.EventQueue;
 
 
@@ -53,9 +54,14 @@ public class DebugScene extends RunGame {
     Person boss = new Person(Crooks.MOBSTER, world, "Crime Boss");
     Person victim = Crooks.randomOfKind(Crooks.CIVILIAN, world);
     
+    Place home = new Place(Facilities.COMMUNITY_COLLEGE, 0, world);
+    world.setInside(home, true);
+    victim.setResidence(home);
+    
     Plan plan = new Plan(boss, world, StepTypes.ALL_TYPES);
     PlanStep kidnapStep = new PlanStep(StepTypes.KIDNAP, plan);
     kidnapStep.setGives(victim);
+    kidnapStep.setNeed(TypeKidnapping.Needs.VENUE, home);
     
     Event kidnapEvent = kidnapStep.spawnEvent(world);
     final FightLead combat = new FightLead(101, kidnapEvent.place());

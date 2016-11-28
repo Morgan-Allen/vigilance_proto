@@ -88,6 +88,7 @@ public class District extends Element {
     final Blueprint DF[] = kind.defaultFacilities;
     
     for (int i = 0; i < buildSlots.length; i++) {
+      if (DF == null || i >= DF.length) break;
       final Place slot = buildSlots[i] = new Place(DF[i], i, world);
     }
   }
@@ -262,9 +263,7 @@ public class District extends Element {
     int baseIncome = 0, mobIncome = 0, totalIncome = 0;
     
     
-    for (int i = 0 ; i < buildSlots.length; i++) {
-      
-      final Place     slot  = buildSlots[i];
+    for (Place slot : buildSlots) if (slot != null) {
       final Blueprint built = slot.blueprint();
       final Base      owns  = slot.owner();
       final float     prog  = slot.buildProgress();

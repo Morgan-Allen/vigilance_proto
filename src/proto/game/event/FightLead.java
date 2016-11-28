@@ -19,7 +19,7 @@ public class FightLead extends Lead {
   public FightLead(
     int ID, Place origin, Person... fought
   ) {
-    super(ID, origin, new Object[0], Task.TIME_SHORT, origin.world());
+    super(ID, origin, new Element[0], Task.TIME_SHORT, origin.world());
     Visit.appendTo(this.fought, (Object[]) fought);
   }
   

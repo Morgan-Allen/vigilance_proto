@@ -15,7 +15,7 @@ import proto.util.*;
 public abstract class TypeMajorCrime extends StepType {
   
   
-  static enum Needs {
+  public static enum Needs {
     VENUE, EXPLOSIVE, BLUEPRINT, MOLE, ALARM_CRACKER
   };
   

@@ -246,7 +246,7 @@ public class PlanStep implements Session.Saveable {
     int time = world.totalMinutes();
     int ends = time + (Task.TIME_SHORT * World.MINUTES_PER_HOUR);
     Place place = null;
-    for (Element e : needs) if (e.type == Element.TYPE_PLACE) {
+    for (Element e : needs) if (e != null && e.type == Element.TYPE_PLACE) {
       place = (Place) e;
       break;
     }
