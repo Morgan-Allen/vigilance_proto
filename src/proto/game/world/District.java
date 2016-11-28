@@ -88,7 +88,7 @@ public class District extends Element {
     final Blueprint DF[] = kind.defaultFacilities;
     
     for (int i = 0; i < buildSlots.length; i++) {
-      final Place slot = buildSlots[i] = new Place(null, DF[i], i);
+      final Place slot = buildSlots[i] = new Place(DF[i], i, world);
     }
   }
   
@@ -233,7 +233,7 @@ public class District extends Element {
   
   
   public void beginConstruction(Blueprint print, int slotID, Base owns) {
-    final Place place = new Place(owns, print, slotID);
+    final Place place = new Place(print, slotID, owns.world);
     buildSlots[slotID] = place;
     place.beginConstruction(owns, 0);
   }

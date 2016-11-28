@@ -18,7 +18,8 @@ public class Kind extends Index.Entry implements Session.Saveable {
     TYPE_CIVILIAN = 1,
     TYPE_HERO     = 2,
     TYPE_MOOK     = 3,
-    TYPE_BOSS     = 4
+    TYPE_EXPERT   = 4,
+    TYPE_BOSS     = 5
   ;
   
   String name;
@@ -141,6 +142,7 @@ public class Kind extends Index.Entry implements Session.Saveable {
   
   
   public static Image loadImage(String imgPath) {
+    if (imgPath == null) return null;
     try { return ImageIO.read(new File(imgPath)); }
     catch (Exception e) { I.say("Could not load: "+imgPath); return null; }
   }

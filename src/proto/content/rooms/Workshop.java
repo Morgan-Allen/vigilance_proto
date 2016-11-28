@@ -24,7 +24,8 @@ public class Workshop extends Place {
   
   
   public Workshop(Base base, int slotIndex) {
-    super(base, BLUEPRINT, slotIndex);
+    super(BLUEPRINT, slotIndex, base.world());
+    setOwner(base);
     
     for (Equipped item : SHOP_ITEMS) {
       final Crafting crafting = new Crafting(item, this);

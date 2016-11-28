@@ -25,7 +25,8 @@ public class Library extends Place {
   
   
   public Library(Base base, int slotIndex) {
-    super(base, BLUEPRINT, slotIndex);
+    super(BLUEPRINT, slotIndex, base.world());
+    setOwner(base);
     
     tasks = new Task[LIB_SKILLS.length];
     for (int i = 0; i < LIB_SKILLS.length; i++) {

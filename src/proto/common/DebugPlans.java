@@ -31,7 +31,7 @@ public class DebugPlans {
       crooks.add(crook);
     }
     
-    Place bank = new Place(null, Facilities.BUSINESS_PARK, 0);
+    Place bank = new Place(Facilities.BUSINESS_PARK, 0, world);
     bank.setProperty(Facilities.REINFORCED, true);
     world.setInside(bank, true);
     Person worker = (Person) Rand.pickFrom(civvies);

@@ -82,7 +82,9 @@ public class Blueprint extends Kind {
   
   
   protected Place createRoom(Base base, int slotID) {
-    return new Place(base, this, slotID);
+    Place place = new Place(this, slotID, base.world);
+    place.setOwner(base);
+    return place;
   }
   
   

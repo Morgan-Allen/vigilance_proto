@@ -11,15 +11,16 @@ public class PlanStep implements Session.Saveable {
   
   
   final public StepType type;
-  int uniqueID = -1;
-  
   final public Plan plan;
+  
   PlanStep parent;
   int parentNeedID;
   private Element needs[], gives[];
   private PlanStep needSteps[];
-  
+
+  int uniqueID = -1;
   private float rating;
+  private Session.Saveable extraData;
   
   
   public PlanStep(StepType type, Plan plan) {
@@ -35,31 +36,33 @@ public class PlanStep implements Session.Saveable {
   public PlanStep(Session s) throws Exception {
     s.cacheInstance(this);
     type = (StepType) s.loadObject();
-    uniqueID = s.loadInt();
-    
     plan = (Plan) s.loadObject();
+    
     parent = (PlanStep) s.loadObject();
     parentNeedID = s.loadInt();
     needs     = (Element []) s.loadObjectArray(Element.class);
     gives     = (Element []) s.loadObjectArray(Element.class);
     needSteps = (PlanStep[]) s.loadObjectArray(PlanStep.class);
     
-    rating = s.loadFloat();
+    uniqueID  = s.loadInt();
+    rating    = s.loadFloat();
+    extraData = s.loadObject();
   }
   
   
   public void saveState(Session s) throws Exception {
     s.saveObject(type);
-    s.saveInt(uniqueID);
-    
     s.saveObject(plan);
+    
     s.saveObject(parent);
     s.saveInt(parentNeedID);
     s.saveObjectArray(needs);
     s.saveObjectArray(gives);
     s.saveObjectArray(needSteps);
     
+    s.saveInt(uniqueID);
     s.saveFloat(rating);
+    s.saveObject(extraData);
   }
   
   
@@ -145,6 +148,16 @@ public class PlanStep implements Session.Saveable {
   
   public boolean doesNeed(Element gives) {
     return Visit.arrayIncludes(needs, gives);
+  }
+  
+  
+  public Session.Saveable extraData() {
+    return extraData;
+  }
+  
+  
+  public void setExtraData(Session.Saveable data) {
+    this.extraData = data;
   }
   
   

@@ -2,10 +2,8 @@
 
 package proto.content.events;
 import proto.game.world.*;
-import proto.game.event.PlanStep;
-import proto.game.event.StepType;
+import proto.game.event.*;
 import proto.game.person.*;
-import proto.content.items.*;
 import proto.util.*;
 
 
@@ -39,11 +37,7 @@ public class TypeMake extends StepType {
   ) {
     if (needType == Needs.MAKES) {
       if (used.type != Element.TYPE_PERSON) return 0;
-      Person makes = (Person) used;
-      Item   made  = (Item  ) step.need(Gives.MADE);
-      float skill = makes.stats.levelFor(PersonStats.ENGINEERING);
-      skill       -= (Integer) made.kind().craftArgs[1];
-      return skill / 10f;
+      return craftChance((Person) used, (Item) step.give(Gives.MADE));
     }
     if (needType == Needs.MATERIALS) {
       return 0;
@@ -55,9 +49,16 @@ public class TypeMake extends StepType {
   protected float calcSuccessChance(PlanStep step) {
     Person makes = (Person) step.need(Needs.MAKES);
     Item   made  = (Item  ) step.need(Gives.MADE );
-    
-    float skill = makes.stats.levelFor(PersonStats.ENGINEERING);
-    skill       -= (Integer) made.kind().craftArgs[1];
+    return craftChance(makes, made);
+  }
+  
+  
+  private float craftChance(Person makes, Item made) {
+    //  TODO:  Adapt this to a wider array of potential skills, and unify with
+    //  similar methods in the Task or Crafting class.
+    float skill = 0;
+    skill += makes.stats.levelFor(PersonStats.ENGINEERING);
+    skill -= made.kind().craftDC(PersonStats.ENGINEERING);
     return Nums.clamp(skill / 10f, 0, 1);
   }
   

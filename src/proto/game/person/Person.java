@@ -263,11 +263,6 @@ public class Person extends Element {
   }
   
   
-  public String toString() {
-    return name;
-  }
-  
-  
   public String confidenceDescription() {
     if (! health .alive     ()) return "Dead"       ;
     if (! health .conscious ()) return "Unconscious";

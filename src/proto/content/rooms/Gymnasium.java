@@ -20,7 +20,8 @@ public class Gymnasium extends Place {
   
   
   public Gymnasium(Base base, int slotIndex) {
-    super(base, BLUEPRINT, slotIndex);
+    super(BLUEPRINT, slotIndex, base.world());
+    setOwner(base);
     
     tasks = new Task[GYM_SKILLS.length];
     for (int i = 0; i < GYM_SKILLS.length; i++) {

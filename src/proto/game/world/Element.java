@@ -10,6 +10,8 @@ import proto.util.*;
 public class Element implements Session.Saveable {
   
   
+  /**  Data fields, construction and save/load methods.
+    */
   final public static int
     TYPE_INIT   = -1,
     TYPE_WORLD  =  0,
@@ -54,6 +56,9 @@ public class Element implements Session.Saveable {
   }
   
   
+  
+  /**  Generic no-brainer getters and setters.
+    */
   public World world() {
     return world;
   }
@@ -61,6 +66,19 @@ public class Element implements Session.Saveable {
   
   public Place location() {
     return location;
+  }
+  
+  
+  
+  /**  Rendering, debug and interface methods-
+    */
+  public String name() {
+    return kind.name();
+  }
+  
+  
+  public String toString() {
+    return name();
   }
 }
 

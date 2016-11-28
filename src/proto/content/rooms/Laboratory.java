@@ -24,7 +24,8 @@ public class Laboratory extends Place {
   
   
   public Laboratory(Base base, int slotIndex) {
-    super(base, BLUEPRINT, slotIndex);
+    super(BLUEPRINT, slotIndex, base.world());
+    setOwner(base);
     
     for (Equipped item : LAB_ITEMS) {
       final Crafting crafting = new Crafting(item, this);

@@ -73,6 +73,13 @@ public class Equipped extends Kind {
   }
   
   
+  public float craftDC(Trait skill) {
+    final int index = Visit.indexOf(skill, craftArgs);
+    if (index == -1 || index >= craftArgs.length -1) return 100;
+    return (Integer) craftArgs[index + 1];
+  }
+  
+  
   
   /**  General property queries-
     */

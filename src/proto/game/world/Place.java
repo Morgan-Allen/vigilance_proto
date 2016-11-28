@@ -22,11 +22,10 @@ public class Place extends Element {
   private List <Trait> properties = new List();
   
   
-  public Place(Base base, Blueprint print, int slotID) {
-    super(print, Element.TYPE_PLACE, base.world);
+  public Place(Blueprint print, int slotID, World world) {
+    super(print, Element.TYPE_PLACE, world);
     this.slotID        = slotID;
     this.parent        = null;
-    this.owner         = base;
     this.buildProgress = 1.0f;
   }
   
@@ -70,9 +69,14 @@ public class Place extends Element {
   
   
   public void beginConstruction(Base owns, float initProgress) {
-    this.owner = owns;
+    setOwner(owns);
     owns.incFunding(0 - blueprint().buildCost);
     setBuildProgress(initProgress);
+  }
+  
+  
+  public void setOwner(Base owns) {
+    this.owner = owns;
   }
   
   
