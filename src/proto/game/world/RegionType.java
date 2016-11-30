@@ -34,16 +34,6 @@ public class RegionType extends Kind {
   public void attachDefaultFacilities(PlaceType... facilities) {
     this.defaultFacilities = facilities;
   }
-  
-  
-  
-  /**  Scene generation-
-    */
-  /*
-  public Scene generateScene(Region district, Lead trigger) {
-    return null;
-  }
-  //*/
 }
 
 

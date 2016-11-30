@@ -3,6 +3,8 @@
 package proto.content.rooms;
 import proto.common.*;
 import proto.content.items.Gadgets;
+import proto.content.places.Facilities;
+import proto.content.places.UrbanScenes;
 import proto.game.event.*;
 import proto.game.person.*;
 import proto.game.world.*;
@@ -57,7 +59,8 @@ public class Laboratory extends Place {
   final public static PlaceType BLUEPRINT = new PlaceType(
     "Laboratory", "blueprint_laboratory",
     "media assets/main UI/room_laboratory.png",
-    "Allows agents to synthesise medicine, serums and chemicals."
+    "Allows agents to synthesise medicine, serums and chemicals.",
+    UrbanScenes.MANSION_SCENE
   ) {
     protected Place createRoom(Base base, int slotID) {
       return new Laboratory(base, slotID);

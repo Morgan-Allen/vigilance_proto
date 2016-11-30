@@ -31,7 +31,7 @@ public class TaskInterrogate extends Task {
   
   
   public Place targetLocation() {
-    return tailed.location();
+    return tailed.place();
   }
   
   

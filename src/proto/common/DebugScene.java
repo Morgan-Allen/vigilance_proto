@@ -2,12 +2,12 @@
 
 package proto.common;
 import proto.game.world.*;
+import proto.util.I;
 import proto.game.person.*;
 import proto.game.event.*;
 import proto.content.agents.*;
 import proto.content.events.*;
-import proto.content.scenes.*;
-import proto.content.techs.Facilities;
+import proto.content.places.*;
 
 import java.awt.EventQueue;
 
@@ -35,8 +35,6 @@ public class DebugScene extends RunGame {
     this.world = new World(this, savePath);
     DefaultGame.initDefaultNations(world);
     DefaultGame.initDefaultBase   (world);
-    
-    /*
     DefaultGame.initDefaultCrime  (world);
     
     //  Create bosses and create experts.
@@ -51,24 +49,35 @@ public class DebugScene extends RunGame {
     
     //  Clues point from one object to another object.
     
-    
-    
     Person boss = new Person(Crooks.MOBSTER, world, "Crime Boss");
+    Person perp = Crooks.randomOfKind(Crooks.GOON, world);
     Person victim = Crooks.randomOfKind(Crooks.CIVILIAN, world);
+    Region port = world.regionFor(Regions.PORT_ADAMS);
+    Place building = port.buildSlot(0);
     
     Place home = new Place(Facilities.COMMUNITY_COLLEGE, 0, world);
     world.setInside(home, true);
+    world.regionFor(Regions.BLACKGATE).setAttached(home, true);
     victim.setResidence(home);
     
     Plan plan = new Plan(boss, world, StepTypes.ALL_TYPES);
     PlanStep kidnapStep = new PlanStep(StepTypes.KIDNAP, plan);
     kidnapStep.setGives(victim);
     kidnapStep.setNeed(TypeKidnapping.Needs.VENUE, home);
+    kidnapStep.setNeed(TypeKidnapping.Needs.ALARM_CRACKER, perp);
     
-    Event kidnapEvent = kidnapStep.spawnEvent(world);
-    Clue tipoff = new Clue(ClueTypes.TIPOFF, world, kidnapEvent);
-    world.playerBase().leads.addLead(tipoff);
-    //*/
+    Event kidnapEvent = kidnapStep.spawnEvent(world, 24);
+    world.events.scheduleEvent(kidnapEvent);
+    
+    Clue tipoff = new Clue(ClueTypes.TIPOFF, world, perp);
+    building.setAttached(tipoff, true);
+    building.setAttached(perp, true);
+    world.playerBase().leads.addLead(perp);
+    
+    //  Okay.  So.  You get a tipoff suggesting that a given perp is involved
+    //  in an upcoming crime.  You investigate them, they lead you to the main
+    //  crime.  Once you have the main crime, you can Guard the location (or
+    //  the victim, or whatev) to prevent the crime taking place.
     
     /*
     Event kidnapEvent = kidnapStep.spawnEvent(world);
@@ -89,6 +98,7 @@ public class DebugScene extends RunGame {
     return world;
   }
 }
+
 
 
 

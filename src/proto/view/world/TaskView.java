@@ -2,7 +2,7 @@
 
 package proto.view.world;
 import proto.game.event.*;
-
+import proto.util.I;
 import proto.view.common.*;
 
 import java.awt.Color;
@@ -24,7 +24,6 @@ public class TaskView extends UINode {
     super(parent);
     this.task = task;
   }
-  
   
   
   protected boolean renderTo(Surface surface, Graphics2D g) {

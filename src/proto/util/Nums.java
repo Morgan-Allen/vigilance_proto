@@ -63,15 +63,8 @@ public final class Nums {
   }
   
   
-  /*
-  public static float log(float base, float f) {
-    return (float) Math.log(base, f);
-  }
-  //*/
-  
-  
-  public static float pow(float base, float f) {
-    return (float) Math.pow(base, f);
+  public static float pow(float num, float exp) {
+    return (float) Math.pow(num, exp);
   }
   
   

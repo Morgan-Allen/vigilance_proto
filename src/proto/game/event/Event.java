@@ -88,61 +88,12 @@ public class Event implements Session.Saveable {
   }
   
   
-  /*
-  protected void assignLeads(Lead... leads) {
-    for (Lead l : leads) this.leads.add(l);
+  public boolean involves(Element element) {
+    if (step == null) return false;
+    if (Visit.arrayIncludes(step.needs(), element)) return true;
+    if (Visit.arrayIncludes(step.gives(), element)) return true;
+    return false;
   }
-  
-  
-  protected void setKnown(Object... known) {
-    Visit.appendTo(this.known, known);
-  }
-  
-  
-  protected Lead leadWithID(int ID) {
-    for (Lead l : leads) if (l.ID == ID) return l;
-    return null;
-  }
-  
-  
-  protected boolean checkFollowed(Lead lead, boolean success) {
-    if (success) for (Object r : lead.goes) known.include(r);
-    if (complete()) world.events().closeEvent(this);
-    return true;
-  }
-  
-  
-  protected void setComplete(boolean solved) {
-    this.closed = true;
-    this.solved = solved;
-  }
-  
-  
-  
-  public Series <Lead> knownOpenLeads() {
-    final Batch <Lead> matches = new Batch();
-    for (Lead l : leads) {
-      if (l.open()) matches.add(l);
-    }
-    return matches;
-  }
-  
-  
-  public Series <Object> knownObjects() {
-    return known;
-  }
-  
-  
-  public Series <Lead> openLeadsFrom(Lead lead) {
-    final Batch <Lead> from = new Batch();
-    for (Lead l : leads) {
-      boolean match = false;
-      for (Object o : lead.goes) if (o == l.origin) match = true;
-      if (match) from.add(l);
-    }
-    return from;
-  }
-  //*/
   
   
   

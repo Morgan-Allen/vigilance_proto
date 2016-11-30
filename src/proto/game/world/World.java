@@ -7,10 +7,10 @@ import proto.game.scene.*;
 import proto.util.*;
 import proto.view.*;
 import proto.view.common.MainView;
-import proto.content.scenes.*;
 import proto.content.agents.*;
 import proto.content.events.*;
 import proto.content.items.*;
+import proto.content.places.*;
 import proto.content.rooms.*;
 
 
@@ -36,12 +36,12 @@ public class World implements Session.Saveable {
   
   MainView view = new MainView(this);
   
-  Region districts[];
+  Region regions[];
   Base played;
   List <Base> bases = new List();
   List <Element> elements = new List();
   
-  Events events = new Events(this);
+  final public Events events = new Events(this);
   int timeDays = 0;
   float timeHours = 0;
   boolean amWatching = false;
@@ -67,7 +67,7 @@ public class World implements Session.Saveable {
   public World(Session s) throws Exception {
     s.cacheInstance(this);
     
-    districts = (Region[]) s.loadObjectArray(Region.class);
+    regions = (Region[]) s.loadObjectArray(Region.class);
     played    = (Base) s.loadObject();
     s.loadObjects(bases);
     events.loadState(s);
@@ -81,7 +81,7 @@ public class World implements Session.Saveable {
   
   
   public void saveState(Session s) throws Exception {
-    s.saveObjectArray(districts);
+    s.saveObjectArray(regions);
     
     s.saveObject(played);
     s.saveObjects(bases);
@@ -125,7 +125,7 @@ public class World implements Session.Saveable {
   /**  Supplementary setup methods:
     */
   public void attachDistricts(Region... districts) {
-    this.districts = districts;
+    this.regions = districts;
   }
   
   
@@ -145,7 +145,7 @@ public class World implements Session.Saveable {
   /**  General query methods-
     */
   public Region[] districts() {
-    return districts;
+    return regions;
   }
   
   
@@ -154,19 +154,14 @@ public class World implements Session.Saveable {
   }
   
   
-  public Region districtFor(RegionType r) {
-    for (Region d : districts) if (d.region() == r) return d;
+  public Region regionFor(RegionType r) {
+    for (Region d : regions) if (d.kind() == r) return d;
     return null;
   }
   
   
   public Base playerBase() {
     return played;
-  }
-  
-  
-  public Events events() {
-    return events;
   }
   
   
@@ -211,7 +206,7 @@ public class World implements Session.Saveable {
       while (timeHours > HOURS_PER_DAY) {
         timeDays++;
         timeHours -= HOURS_PER_DAY;
-        for (Region d : districts) d.updateDistrict();
+        for (Region d : regions) d.updateRegion();
         played.updateBaseDaily();
       }
       

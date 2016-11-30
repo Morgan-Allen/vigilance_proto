@@ -4,8 +4,8 @@
 package proto.common;
 import proto.content.agents.*;
 import proto.content.items.*;
+import proto.content.places.*;
 import proto.content.rooms.*;
-import proto.content.scenes.*;
 import proto.content.events.*;
 import proto.game.person.*;
 import proto.game.world.*;
@@ -43,7 +43,7 @@ public class DefaultGame extends RunGame {
     for (int n = 0; n < numN; n++) {
       districts[n] = new Region(Regions.ALL_REGIONS[n], world);
     }
-    for (Region d : districts) d.initialiseDistrict();
+    for (Region d : districts) d.initialiseRegion();
     world.attachDistricts(districts);
   }
   

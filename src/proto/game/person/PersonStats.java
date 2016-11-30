@@ -362,7 +362,7 @@ public class PersonStats {
     while (l.practice >= l.level + 1) {
       l.practice -= l.level + 1;
       l.level++;
-      person.world().events().log(person+" reached level "+l.level+" in "+stat);
+      person.world().events.log(person+" reached level "+l.level+" in "+stat);
     }
     for (Skill root : stat.roots) {
       gainXP(root, XP / (3f * stat.roots.length));

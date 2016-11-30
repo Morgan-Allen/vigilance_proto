@@ -3,11 +3,10 @@
 
 package proto.content.events;
 import proto.game.world.*;
-import proto.game.event.PlanStep;
-import proto.game.event.StepType;
+import proto.game.event.*;
 import proto.game.person.*;
 import proto.content.items.*;
-import proto.content.techs.*;
+import proto.content.places.*;
 import proto.util.*;
 
 

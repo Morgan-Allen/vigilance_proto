@@ -1,14 +1,12 @@
 
 
-package proto.content.techs;
+package proto.content.places;
 import proto.game.person.*;
 import proto.game.event.*;
 import proto.game.world.*;
-
+import proto.content.rooms.*;
 import static proto.game.world.Region.*;
-
-import proto.content.rooms.Laboratory;
-import proto.content.rooms.Workshop;
+import static proto.content.places.UrbanScenes.*;
 
 
 
@@ -25,7 +23,7 @@ public class Facilities {
     "media assets/tech icons/icon_steel_mill.png",
     "A Steel Mill provides income and steady blue-collar employment, along "+
     "with industrial pollution.\n\n10% bonus to Workshop projects",
-    100, BUILD_TIME_MEDIUM,
+    100, BUILD_TIME_MEDIUM, URBAN_SCENE,
     EMPLOYMENT, 3,
     HEALTH_AND_ENVIRONMENT, -2,
     INCOME, 2
@@ -43,7 +41,7 @@ public class Facilities {
     "media assets/tech icons/icon_chemical_plant.png",
     "Chemical plants provide basic laborers with a steady job, but won't "+
     "do their health any favours.\n\n10% bonus to Laboratory projects",
-    100, BUILD_TIME_MEDIUM,
+    100, BUILD_TIME_MEDIUM, URBAN_SCENE,
     EMPLOYMENT, 3,
     HEALTH_AND_ENVIRONMENT, -2,
     INCOME, 2
@@ -62,7 +60,7 @@ public class Facilities {
     "The Union Office bolsters relations between workers and management, "+
     "helping to guarantee labour laws.  Luddite tendencies can hold back "+
     "modernisation, however, and union dues are steep.",
-    40, BUILD_TIME_MEDIUM,
+    40, BUILD_TIME_MEDIUM, URBAN_SCENE,
     EMPLOYMENT, 2,
     EDUCATION_AND_CULTURE, -1,
     DETERRENCE, 1,
@@ -74,7 +72,7 @@ public class Facilities {
     "media assets/tech icons/icon_business_park.png",
     "Shopping malls and small commercial agencies can establish themselves in "+
     "a Business Park.",
-    70, BUILD_TIME_MEDIUM,
+    70, BUILD_TIME_MEDIUM, URBAN_SCENE,
     EMPLOYMENT, 1,
     INCOME, 2
   );
@@ -85,7 +83,7 @@ public class Facilities {
     "Entrepreneurs, hackers and gurus can come together under one roof to "+
     "kickstart great ideas.  If only they could make that seed funding last "+
     "longer...",
-    120, BUILD_TIME_SHORT,
+    120, BUILD_TIME_SHORT, URBAN_SCENE,
     EMPLOYMENT, 1,
     EDUCATION_AND_CULTURE, 1,
     INCOME, -1
@@ -96,7 +94,7 @@ public class Facilities {
     "media assets/tech icons/icon_city_park.png",
     "Fresh air, lush lawns and open spaces help to invigorate the body and "+
     "mind.",
-    50, BUILD_TIME_LONG,
+    50, BUILD_TIME_LONG, URBAN_SCENE,
     HEALTH_AND_ENVIRONMENT, 1,
     ENTERTAINMENT, 1
   );
@@ -108,7 +106,7 @@ public class Facilities {
     "direction, the Neighbourhood Robins teach wilderness survival, a code "+
     "of ethics and various martial arts.  Any rumours of collusion with "+
     "masked vigilantes are... greatly exxaggerated.",
-    50, BUILD_TIME_LONG,
+    50, BUILD_TIME_LONG, URBAN_SCENE,
     TRUST, 1,
     DETERRENCE, 1
   );
@@ -118,7 +116,7 @@ public class Facilities {
     "media assets/tech icons/icon_soup_kitchen.png",
     "A place of refuge for the city's most desperate, Soup Kitchens afford "+
     "shelter from bad weather, gnawing hunger and cruel intentions.",
-    60, BUILD_TIME_SHORT,
+    60, BUILD_TIME_SHORT, URBAN_SCENE,
     TRUST, 1,
     VIOLENCE, -1,
     INCOME, -1
@@ -130,7 +128,7 @@ public class Facilities {
     "Community Colleges allow for wider enrollment in education, including "+
     "for adults or poorer families.  Left-leaning academics often take up "+
     "tenure.",
-    120, BUILD_TIME_LONG,
+    120, BUILD_TIME_LONG, URBAN_SCENE,
     EDUCATION_AND_CULTURE, 2,
     TRUST, 1,
     INCOME, -1

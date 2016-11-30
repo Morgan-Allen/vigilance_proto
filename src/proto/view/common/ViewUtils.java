@@ -22,6 +22,8 @@ public class ViewUtils {
   public static void drawWrappedString(
     String s, Graphics2D g, int x, int y, int w, int h
   ) {
+    if (s == null || g == null) return;
+    
     StringTokenizer t = new StringTokenizer(s, " \n", true);
     final List <String> tokens = new List();
     while (t.hasMoreTokens()) tokens.add(t.nextToken());

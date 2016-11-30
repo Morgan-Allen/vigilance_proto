@@ -240,10 +240,10 @@ public class PlanStep implements Session.Saveable {
   
   /**  Translating into concrete events:
     */
-  public Event spawnEvent(World world) {
+  public Event spawnEvent(World world, int delayHours) {
     Event event = new Event(type);
     
-    int time = world.totalMinutes();
+    int time = world.totalMinutes() + (delayHours * World.MINUTES_PER_HOUR);
     int ends = time + (Task.TIME_SHORT * World.MINUTES_PER_HOUR);
     Place place = null;
     for (Element e : needs) if (e != null && e.type == Element.TYPE_PLACE) {

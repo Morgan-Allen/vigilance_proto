@@ -2,7 +2,8 @@
 
 package proto.game.world;
 import proto.common.*;
-import proto.game.event.Task;
+import proto.game.event.*;
+import proto.game.scene.*;
 import proto.util.*;
 import java.awt.Image;
 
@@ -20,18 +21,23 @@ public class PlaceType extends Kind {
   final int statMods[];
   final int buildCost, buildTime;
   
+  final SceneType sceneType;
   int security, lighting, cover;
   
   
   
-  public PlaceType(String name, String ID, String imgPath, String info) {
-    this(name, ID, imgPath, info, 0, -1);
+  public PlaceType(
+    String name, String ID, String imgPath, String info,
+    SceneType sceneType
+  ) {
+    this(name, ID, imgPath, info, 0, -1, sceneType);
   }
   
   
   public PlaceType(
     String name, String ID, String imgPath, String info,
-    int buildCost, int buildTime, Object... args
+    int buildCost, int buildTime, SceneType sceneType,
+    Object... args
   ) {
     super(name, ID, info);
 
@@ -48,6 +54,13 @@ public class PlaceType extends Kind {
       stats   [n] = (Region.Stat) args[ n * 2     ];
       statMods[n] = (Integer      ) args[(n * 2) + 1];
     }
+    
+    this.sceneType = sceneType;
+  }
+  
+  
+  public SceneType sceneType() {
+    return sceneType;
   }
   
   

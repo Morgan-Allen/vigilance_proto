@@ -7,6 +7,7 @@ import proto.game.person.*;
 import proto.game.world.*;
 import proto.util.*;
 import proto.content.items.Gadgets;
+import proto.content.places.*;
 
 
 
@@ -57,7 +58,8 @@ public class Workshop extends Place {
   final public static PlaceType BLUEPRINT = new PlaceType(
     "Workshop", "blueprint_workshop",
     "media assets/main UI/room_workshop.png",
-    "Allows agents to repair or manufacture gadgets and armour."
+    "Allows agents to repair or manufacture gadgets and armour.",
+    UrbanScenes.MANSION_SCENE
   ) {
     protected Place createRoom(Base base, int slotID) {
       return new Workshop(base, slotID);

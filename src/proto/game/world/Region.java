@@ -2,12 +2,10 @@
 
 package proto.game.world;
 import proto.common.*;
+import proto.content.places.Facilities;
 import proto.game.event.*;
 import proto.game.person.*;
 import proto.util.*;
-
-//  TODO:  Define this externally.
-import proto.content.techs.Facilities;
 
 
 
@@ -90,6 +88,7 @@ public class Region extends Element {
     for (int i = 0; i < buildSlots.length; i++) {
       if (DF == null || i >= DF.length) break;
       final Place slot = buildSlots[i] = new Place(DF[i], i, world);
+      setAttached(slot, true);
     }
   }
   
@@ -127,7 +126,7 @@ public class Region extends Element {
   }
   
   
-  public RegionType region() {
+  public RegionType kind() {
     return (RegionType) kind;
   }
   
@@ -146,7 +145,7 @@ public class Region extends Element {
       if (inc > 0) desc += stat.name+" +"+inc;
       else if (stat.oppName != null) desc += stat.oppName+" +"+(0 - inc);
       else desc += stat.name+" -"+(0 - inc);
-      desc += ": "+region();
+      desc += ": "+kind();
       
       world.events.log(desc, Events.EVENT_MAJOR);
     }
@@ -201,7 +200,7 @@ public class Region extends Element {
   /**  Construction and ownership-
     */
   public int maxFacilities() {
-    return region().maxFacilities;
+    return kind().maxFacilities;
   }
   
   
@@ -237,6 +236,7 @@ public class Region extends Element {
   public void beginConstruction(PlaceType print, int slotID, Base owns) {
     final Place place = new Place(print, slotID, owns.world);
     buildSlots[slotID] = place;
+    setAttached(place, true);
     place.beginConstruction(owns, 0);
   }
   
@@ -244,17 +244,17 @@ public class Region extends Element {
   
   /**  Updates and life-cycle:
     */
-  public void initialiseDistrict() {
-    updateDistrict();
+  public void initialiseRegion() {
+    updateRegion();
     for (Stat stat : CIVIC_STATS) {
       final Level l = statLevels[stat.ID];
       l.current = l.level + l.bonus;
     }
-    updateDistrict();
+    updateRegion();
   }
   
   
-  public void updateDistrict() {
+  public void updateRegion() {
     //
     //  Reset the bonus for all stats to zero, then iterate across all built
     //  facilities and collect their bonuses (including for income.)
@@ -332,7 +332,7 @@ public class Region extends Element {
   /**  Rendering and debug methods-
     */
   public String toString() {
-    return region().name();
+    return kind().name();
   }
 }
 

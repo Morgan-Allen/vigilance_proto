@@ -116,14 +116,14 @@ public class PersonHealth {
   public void receiveStun(float stun) {
     this.stun += stun;
     checkState();
-    person.world().events().log(person+" suffered "+stun+" stun.");
+    person.world().events.log(person+" suffered "+stun+" stun.");
   }
   
   
   public void receiveInjury(float injury) {
     this.injury += injury;
     checkState();
-    person.world().events().log(person+" suffered "+injury+" injury.");
+    person.world().events.log(person+" suffered "+injury+" injury.");
   }
   
   
@@ -176,11 +176,11 @@ public class PersonHealth {
     int maxHealth = maxHealth();
     if (conscious && injury + stun > maxHealth) {
       this.conscious = false;
-      person.world().events().log(person+" fell unconscious!");
+      person.world().events.log(person+" fell unconscious!");
     }
     if (alive && injury > maxHealth * 1.5f) {
       this.alive = false;
-      person.world().events().log(person+" was killed!");
+      person.world().events.log(person+" was killed!");
     }
   }
   

@@ -87,13 +87,23 @@ public class Element implements Session.Saveable {
   }
   
   
-  public Place location() {
-    Element e = attachedTo;
+  public Element parentOfType(int type) {
+    Element e = this;
     while (e != null) {
-      if (e.type == TYPE_PLACE) return (Place) e;
+      if (e.type == type) return e;
       e = e.attachedTo;
     }
     return null;
+  }
+  
+  
+  public Place place() {
+    return (Place) parentOfType(TYPE_PLACE);
+  }
+  
+  
+  public Region region() {
+    return (Region) parentOfType(TYPE_REGION);
   }
   
   

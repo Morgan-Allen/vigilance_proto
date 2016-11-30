@@ -175,11 +175,13 @@ public abstract class Task implements Assignment {
   public void updateAssignment() {
     if (assigned.empty() || complete) return;
     
-    base.world().events().logAssignment(this);
+    base.world().events.logAssignment(this);
     
     final int time = base.world().totalMinutes();
     if (initTime == -1) initTime = time;
     if ((time - initTime) > timeTaken) attemptTask();
+    
+    I.say("Time is: "+(time - initTime)+"/"+timeTaken);
   }
   
   

@@ -1,8 +1,9 @@
 
 
-package proto.content.scenes;
+package proto.content.places;
+import static proto.content.places.Facilities.*;
+
 import proto.game.world.*;
-import static proto.content.techs.Facilities.*;
 
 
 

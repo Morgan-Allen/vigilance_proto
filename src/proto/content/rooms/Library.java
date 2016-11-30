@@ -6,6 +6,7 @@ import proto.game.event.*;
 import proto.game.person.*;
 import proto.game.world.*;
 import static proto.game.person.PersonStats.*;
+import proto.content.places.*;
 
 
 
@@ -58,7 +59,8 @@ public class Library extends Place {
   final public static PlaceType BLUEPRINT = new PlaceType(
     "Library", "blueprint_library",
     "media assets/main UI/room_library.png",
-    "Permits training in most intellectual skills."
+    "Permits training in most intellectual skills.",
+    UrbanScenes.MANSION_SCENE
   ) {
     protected Place createRoom(Base base, int slotID) {
       return new Library(base, slotID);

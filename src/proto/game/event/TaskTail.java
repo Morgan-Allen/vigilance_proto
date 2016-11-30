@@ -3,6 +3,7 @@
 package proto.game.event;
 import proto.common.*;
 import proto.game.world.*;
+import proto.util.I;
 import proto.game.person.*;
 import java.awt.Image;
 
@@ -34,7 +35,7 @@ public class TaskTail extends Task {
   
   
   public Place targetLocation() {
-    return tailed.location();
+    return tailed.place();
   }
   
   
@@ -45,28 +46,24 @@ public class TaskTail extends Task {
     
     //  TODO:  You need to alert the player if the person tailed visits a new
     //  location or undertakes a new task that is related to an open case.
-    
-    /*
-    if (tailed.assignment() instanceof Event) {
-      
-    }
-    if (base.leads.hasOpenLead(tailed.location())) {
-      
-    }
-    //*/
-  }
-  
-
-  protected void onCompletion() {
-    resetTask();
   }
   
   
   protected void onSuccess() {
+    I.say("Tailing succeeded!");
+    
+    //  TODO:  Present a message for either success or failure.
+    
+    Event involved = base.world().events.nextEventInvolving(tailed);
+    if (involved != null) base.leads.addLead(involved);
+    base.leads.closeLead(tailed);
   }
   
   
   protected void onFailure() {
+    I.say("Tailing failed!");
+    
+    base.leads.closeLead(tailed);
   }
   
   
@@ -78,22 +75,28 @@ public class TaskTail extends Task {
   }
   
   
+  public String choiceInfo() {
+    return "Tail "+tailed;
+  }
+  
+  
   public String activeInfo() {
-    return null;
+    return "Tailing "+tailed;
   }
   
   
   public String helpInfo() {
-    return null;
+    return "Follow "+tailed+" for any sign of criminal activity.";
   }
   
   
   public Image icon() {
-    return null;
-  }
-  
-  
-  public String choiceInfo() {
-    return null;
+    return tailed.kind().sprite();
   }
 }
+
+
+
+
+
+

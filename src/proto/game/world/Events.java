@@ -56,18 +56,6 @@ public class Events {
   /**  Regular updates and event-generation-
     */
   void updateEvents() {
-    /*
-    int MAX_EVENTS = 2;
-    if (coming.size() < MAX_EVENTS) {
-      Pick <Event> pickEvent = new Pick();
-      for (EventType type : eventTypes) {
-        Event e = type.createRandomEvent(world);
-        pickEvent.compare(e, type.eventChance(e) * Rand.num());
-      }
-      Event event = pickEvent.result();
-      if (event != null) coming.add(event);
-    }
-    //*/
     
     for (Event event : coming) {
       if (event.timeBegins() <= world.timeDays()) {
@@ -88,9 +76,27 @@ public class Events {
   }
   
   
+  public void scheduleEvent(Event event) {
+    coming.include(event);
+  }
+  
+  
   public void closeEvent(Event event) {
     coming.remove(event);
     active.remove(event);
+  }
+  
+  
+  public Event nextEventInvolving(Element e) {
+    Event next = null;
+    float earliestTime = Float.POSITIVE_INFINITY;
+    for (Event event : coming) {
+      if (! event.involves(e)) continue;
+      if (event.timeBegins() >= earliestTime) continue;
+      next = event;
+      earliestTime = event.timeBegins();
+    }
+    return next;
   }
   
   

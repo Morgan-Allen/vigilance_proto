@@ -44,7 +44,7 @@ public class RegionView extends UINode {
     //Image portrait = nation.region.view.portrait;
     final Base base = mainView.world().playerBase();
     g.setColor(Color.WHITE);
-    g.drawString(nation.region().name(), vx + 20, vy + 20);
+    g.drawString(nation.kind().name(), vx + 20, vy + 20);
     
     int down = 50;
     for (Region.Stat stat : Region.CIVIC_STATS) {
@@ -149,11 +149,42 @@ public class RegionView extends UINode {
   
   
   void renderLeads(Region d, Surface surface, Graphics2D g) {
-    /*
     g.setColor(Color.LIGHT_GRAY);
     int down = vy + 240;
     boolean noEvents = true;
+    Base played = mainView.world().playerBase();
+    Batch <Task> allTasks = new Batch();
     
+    for (Object lead : played.leads.openLeadsAround(d)) {
+      noEvents = false;
+      Visit.appendTo(allTasks, played.leads.investigationOptions(lead));
+    }
+    
+    for (Task task : allTasks) {
+      TaskView view = task.createView(parent);
+      view.relBounds.set(vx, down, vw, 65);
+      view.renderNow(surface, g);
+      down += view.relBounds.ydim() + 10;
+    }
+    
+    if (noEvents) {
+      g.setColor(Color.LIGHT_GRAY);
+      ViewUtils.drawWrappedString(
+        "You have no leads on serious criminal activity in this district.",
+        g, vx + 25, down + 20, vw - 30, 150
+      );
+    }
+    else if (true) {
+      g.setColor(Color.LIGHT_GRAY);
+      ViewUtils.drawWrappedString(
+        "Select a task, then click in the bottom-left of roster portraits to "+
+        "assign agents to the task.",
+        g, vx + 25, down + 20, vw - 30, 150
+      );
+    }
+    
+    
+    /*
     for (Event event : mainView.world().events().active()) {
       //
       //  Firstly, check to see if there's an event occurring in this region:

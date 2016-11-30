@@ -109,13 +109,15 @@ public class Base implements Session.Saveable {
       r.updatePlace();
     }
     
-    for (Region dist : world.districts) {
+    for (Region dist : world.regions) {
       this.income      += dist.incomeFor  (this);
       this.maintenance += dist.expensesFor(this);
     }
     
     this.income += incomeFloor;
     this.currentFunds += (income - maintenance) * numWeeks;
+    
+    leads.updateInvestigations();
   }
   
   

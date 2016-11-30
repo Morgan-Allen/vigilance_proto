@@ -1,23 +1,14 @@
 
 
-package proto.content.scenes;
+package proto.content.places;
 import proto.common.*;
-import proto.game.event.*;
-import proto.game.person.*;
-import proto.game.scene.*;
-import proto.game.world.*;
-import proto.util.*;
-import static proto.util.TileConstants.*;
-
-import proto.content.agents.Crooks;
+import proto.game.scene.SceneType;
 
 
 
-//  Get furniture from the region.  Get forces from the event.
-
-public class UrbanScene extends Scene {
+public class UrbanScenes {
   
-  
+
   final static String IMG_DIR = "media assets/scene layout/bar scene/";
   final static Kind
     KIND_WALL = Kind.ofProp(
@@ -42,42 +33,23 @@ public class UrbanScene extends Scene {
     );
   
   
+  final public static SceneType URBAN_SCENE = new SceneType(
+    "urban scene", "type_urban_scene"
+  );
+  
+  final public static SceneType MANSION_SCENE = new SceneType(
+    "mansion scene", "type_mansion_scene"
+  );
   
   
-  public UrbanScene(World world, int size) {
-    super(world, size);
-  }
   
-  
-  public UrbanScene(Session s) throws Exception {
-    super(s);
-  }
-  
-  
-  public void saveState(Session s) throws Exception {
-    super.saveState(s);
-  }
-  
-  
-  public void assignMissionParameters(
-    Task trigger, Place site,
-    float dangerLevel, int expireTime, Series<Person> forces
-  ) {
-    super.assignMissionParameters(
-      trigger, site, dangerLevel, expireTime, forces
-    );
-    if (forces == null) generateForces();
-  }
-
-
+  /*
   private void generateForces() {
     final World world = this.world();
-    /*
     final Kind BOSSES[] = {
       Villains.KIND_SLADE,
       Villains.KIND_MR_FREEZE
     };
-    //*/
     final Kind GOONS[] = {
       Crooks.MOBSTER,
       Crooks.MOBSTER,
@@ -157,16 +129,9 @@ public class UrbanScene extends Scene {
     
     //  TODO:  Some patrol routes for goons would be nice...?
   }
-  
-  
-  public void beginScene() {
-    super.beginScene();
-  }
   //*/
   
 }
-
-
 
 
 

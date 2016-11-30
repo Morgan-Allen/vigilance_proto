@@ -5,6 +5,7 @@ import proto.common.*;
 import proto.game.event.*;
 import proto.game.person.*;
 import proto.game.world.*;
+import proto.content.places.*;
 import static proto.game.person.PersonStats.*;
 
 
@@ -53,7 +54,8 @@ public class Gymnasium extends Place {
   final public static PlaceType BLUEPRINT = new PlaceType(
     "Gymnasium", "blueprint_gymnasium",
     "media assets/main UI/room_gymnasium.png",
-    "Permits training in physical skills involving strength or reflex."
+    "Permits training in physical skills involving strength or reflex.",
+    UrbanScenes.MANSION_SCENE
   ) {
     protected Place createRoom(Base base, int slotID) {
       return new Gymnasium(base, slotID);

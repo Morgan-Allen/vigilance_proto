@@ -136,7 +136,7 @@ public class TaskTrain extends Task {
   
   
   protected void presentMessage(final World world) {
-    final Series <String> logs = world.events().extractLogInfo(this);
+    final Series <String> logs = world.events.extractLogInfo(this);
     if (logs.empty()) return;
     
     StringBuffer s = new StringBuffer();

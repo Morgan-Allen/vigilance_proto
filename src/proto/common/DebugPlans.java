@@ -6,7 +6,7 @@ import proto.game.world.*;
 import proto.game.event.*;
 import proto.game.person.*;
 import proto.content.events.StepTypes;
-import proto.content.techs.Facilities;
+import proto.content.places.Facilities;
 import proto.util.*;
 
 

@@ -113,12 +113,6 @@ public class Person extends Element {
   }
   
   
-  public Region currentDistrict() {
-    if (location() == null) return null;
-    return location().parent;
-  }
-  
-  
   
   
   /**  Assigning jobs & missions-

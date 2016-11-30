@@ -33,7 +33,7 @@ public class TaskAnalyse extends Task {
   
   
   public Place targetLocation() {
-    return analysed.location();
+    return analysed.place();
   }
   
   

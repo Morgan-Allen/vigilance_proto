@@ -1,10 +1,13 @@
 
 
 package proto.game.event;
-import java.awt.Image;
-
 import proto.common.*;
 import proto.game.world.*;
+import proto.game.scene.*;
+import proto.game.person.*;
+import proto.util.*;
+
+import java.awt.Image;
 
 
 
@@ -39,12 +42,29 @@ public class TaskGuard extends Task {
   
   
   protected void onSuccess() {
+    base.leads.closeLead(event);
+    
+    //  TODO:  This should only be triggered when the event itself is either
+    //  going down or about to do so!
+    
+    Place place = event.place();
+    SceneType sceneType = place.kind().sceneType();
+    Scene mission = sceneType.generateScene(place, base.world(), 32);
+    for (Person p : assigned()) mission.addToTeam(p);
+    
+    //  TODO:  Populate with suitable enemy forces based on the type of crime
+    //  underway!
+    
+    final Batch <Person> enemies = new Batch();
+    mission.assignMissionParameters(this, place, 0.5f, 100, enemies);
+    mission.setupScene();
+    base.world().enterScene(mission);
     
   }
   
   
   protected void onFailure() {
-    
+    base.leads.closeLead(event);
   }
   
   

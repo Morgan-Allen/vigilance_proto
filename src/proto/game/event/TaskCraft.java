@@ -118,7 +118,7 @@ public class TaskCraft extends Task {
   
 
   protected void presentMessage(final World world) {
-    final Series <String> logs = world.events().extractLogInfo(this);
+    final Series <String> logs = world.events.extractLogInfo(this);
     StringBuffer s = new StringBuffer();
     
     for (Person p : assigned) {

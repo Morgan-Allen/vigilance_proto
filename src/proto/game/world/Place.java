@@ -15,7 +15,6 @@ public class Place extends Element {
   /**  Data fields, construction and save/load methods-
     */
   final public int slotID;
-  final public Region parent;
   
   private Base owner;
   private float buildProgress;
@@ -25,7 +24,6 @@ public class Place extends Element {
   public Place(PlaceType print, int slotID, World world) {
     super(print, Element.TYPE_PLACE, world);
     this.slotID        = slotID;
-    this.parent        = null;
     this.buildProgress = 1.0f;
   }
   
@@ -34,7 +32,6 @@ public class Place extends Element {
     super(s);
     slotID        = s.loadInt();
     owner         = (Base  ) s.loadObject();
-    parent        = (Region) s.loadObject();
     buildProgress = s.loadFloat();
     s.loadObjects(properties);
   }
@@ -44,7 +41,6 @@ public class Place extends Element {
     super.saveState(s);
     s.saveInt   (slotID       );
     s.saveObject(owner        );
-    s.saveObject(parent       );
     s.saveFloat (buildProgress);
     s.saveObjects(properties);
   }
