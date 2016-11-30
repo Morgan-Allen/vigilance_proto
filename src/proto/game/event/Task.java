@@ -113,7 +113,8 @@ public abstract class Task implements Assignment {
     */
   public void setAssigned(Person p, boolean is) {
     assigned.toggleMember(p, is);
-    p.setAssignment(is ? this : null);
+    if (is) p.setAssignment(this);
+    else if (p.assignment() == this) p.setAssignment(null);
   }
   
   
@@ -180,8 +181,6 @@ public abstract class Task implements Assignment {
     final int time = base.world().totalMinutes();
     if (initTime == -1) initTime = time;
     if ((time - initTime) > timeTaken) attemptTask();
-    
-    I.say("Time is: "+(time - initTime)+"/"+timeTaken);
   }
   
   

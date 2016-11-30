@@ -148,6 +148,7 @@ public class Person extends Element {
   
   public void setAssignment(Assignment assigned) {
     this.assignment = assigned;
+    I.say(this+" assigned to "+assigned);
   }
   
   

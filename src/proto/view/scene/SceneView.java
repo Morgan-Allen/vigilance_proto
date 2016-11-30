@@ -160,6 +160,7 @@ public class SceneView extends UINode {
     //
     //  If complete, display a summary of the results!
     if (scene.complete()) {
+      if (I.used60Frames) I.say("scene complete!");
       return true;
     }
     
@@ -170,6 +171,8 @@ public class SceneView extends UINode {
     int hoverX = (surface.mouseX() + zoomX + HT - vx) / TILE_SIZE;
     int hoverY = (surface.mouseY() + zoomY + HT - vy) / TILE_SIZE;
     Tile hoverT = scene.tileAt(hoverX, hoverY);
+    
+    if (I.used60Frames) I.say("Hovered tile: "+hoverT);
     
     if (hoverT != null) {
       renderAt(hoverT.x, hoverT.y, 1, 1, hoverBox, null, g);

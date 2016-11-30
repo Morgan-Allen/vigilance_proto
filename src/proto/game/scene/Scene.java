@@ -47,9 +47,10 @@ public class Scene implements Session.Saveable, Assignment {
   Person nextActing;
   
   
-  public Scene(World world, int size) {
-    this.world = world;
-    this.size = size;
+  public Scene(Place place, int size) {
+    this.world = place.world();
+    this.site  = place;
+    this.size  = size;
   }
   
   
@@ -342,18 +343,6 @@ public class Scene implements Session.Saveable, Assignment {
   
   /**  Regular updates and activity cycle:
     */
-  public void assignMissionParameters(
-    Task trigger, Place site, float dangerLevel, int expireTime,
-    Series <Person> forces
-  ) {
-    this.trigger = trigger;
-    this.site    = site   ;
-    this.dangerLevel = dangerLevel;
-    this.expireTime  = expireTime ;
-    if (forces != null) for (Person p : forces) othersTeam.add(p);
-  }
-  
-  
   public void setupScene() {
     this.state = STATE_SETUP;
     
@@ -364,6 +353,18 @@ public class Scene implements Session.Saveable, Assignment {
     for (Coord c : Visit.grid(0, 0, size, size, 1)) {
       tiles[c.x][c.y] = new Tile(this, c.x, c.y);
     }
+  }
+  
+  
+  public void assignMissionParameters(
+    Task trigger, Place site, float dangerLevel, int expireTime,
+    Series <Person> forces
+  ) {
+    this.trigger = trigger;
+    this.site    = site   ;
+    this.dangerLevel = dangerLevel;
+    this.expireTime  = expireTime ;
+    if (forces != null) for (Person p : forces) othersTeam.add(p);
   }
   
   
@@ -610,21 +611,25 @@ public class Scene implements Session.Saveable, Assignment {
   
   
   public String toString() {
+    if (trigger == null) return site.name();
     return trigger.toString();
   }
   
   
   public String activeInfo() {
+    if (trigger == null) return site.name();
     return "On mission: "+trigger.activeInfo();
   }
   
   
   public String helpInfo() {
+    if (trigger == null) return site.name();
     return trigger.helpInfo();
   }
   
   
   public Image icon() {
+    if (trigger == null) return site.kind().icon();
     return trigger.icon();
   }
   

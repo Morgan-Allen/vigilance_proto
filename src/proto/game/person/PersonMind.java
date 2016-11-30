@@ -191,7 +191,7 @@ public class PersonMind {
       confidence = (confidence + person.health.healthLevel()) / 2;
       if (! retreating()) confidence += courage;
       
-      I.say("Confidence for "+this+": "+confidence);
+      I.say("Confidence for "+person+": "+confidence);
     }
   }
 }

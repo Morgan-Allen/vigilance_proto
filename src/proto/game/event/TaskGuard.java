@@ -49,17 +49,23 @@ public class TaskGuard extends Task {
     
     Place place = event.place();
     SceneType sceneType = place.kind().sceneType();
-    Scene mission = sceneType.generateScene(place, base.world(), 32);
-    for (Person p : assigned()) mission.addToTeam(p);
+    Scene mission = sceneType.generateScene(place, 32);
     
     //  TODO:  Populate with suitable enemy forces based on the type of crime
     //  underway!
     
     final Batch <Person> enemies = new Batch();
     mission.assignMissionParameters(this, place, 0.5f, 100, enemies);
-    mission.setupScene();
-    base.world().enterScene(mission);
     
+    //
+    //  Finally, introduce the agents themselves-
+    int across = (32 - (assigned().size())) / 2;
+    for (Person p : assigned()) {
+      mission.addToTeam(p);
+      mission.enterScene(p, across++, 0);
+    }
+    
+    base.world().enterScene(mission);
   }
   
   
@@ -76,23 +82,23 @@ public class TaskGuard extends Task {
   }
   
   
-  public String activeInfo() {
-    return null;
-  }
-  
-  
-  public String helpInfo() {
-    return null;
-  }
-  
-  
   public Image icon() {
-    return null;
+    return event.place().icon();
   }
   
   
   public String choiceInfo() {
-    return null;
+    return "Guard "+event.place()+" during event: "+event;
+  }
+  
+  
+  public String activeInfo() {
+    return "Guarding "+event.place();
+  }
+  
+  
+  public String helpInfo() {
+    return "Guard "+event.place()+" to foil event: "+event;
   }
   
   
