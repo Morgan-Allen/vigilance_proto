@@ -22,11 +22,10 @@ public class Heroes {
     Ability.IS_PASSIVE, 0, Ability.NO_HARM, Ability.NO_POWER
   ) {
     public boolean allowsAssignment(Person p, Assignment a) {
-      if (a instanceof Training) return false;
-      if (a instanceof Crafting) return false;
-      
-      if (a instanceof Lead) {
-        final Lead l = (Lead) a;
+      if (a instanceof TaskTrain) return false;
+      if (a instanceof TaskCraft) return false;
+      if (a instanceof Task) {
+        final Task l = (Task) a;
         if (l.mental()) return false;
         
         boolean company = false;
@@ -47,8 +46,8 @@ public class Heroes {
     Ability.IS_PASSIVE, 0, Ability.NO_HARM, Ability.NO_POWER
   ) {
     public boolean allowsAssignment(Person p, Assignment a) {
-      if (a instanceof Training) return true;
-      if (a instanceof Crafting) return true;
+      if (a instanceof TaskTrain) return true;
+      if (a instanceof TaskCraft) return true;
       return false;
     }
   };

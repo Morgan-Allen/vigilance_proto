@@ -17,7 +17,7 @@ import java.awt.Image;
 //  completion-criteria.
 
 
-public class Crafting extends Task {
+public class TaskCraft extends Task {
   
   
   final Place room;
@@ -25,17 +25,14 @@ public class Crafting extends Task {
   float progress = 0;
   
   
-  public Crafting(Equipped made, Place room) {
-    super(
-      TIME_LONG, room.world(),
-      made.craftArgs
-    );
+  public TaskCraft(Equipped made, Place room, Base base) {
+    super(base, TIME_LONG, made.craftArgs);
     this.room = room;
     this.made = made;
   }
   
   
-  public Crafting(Session s) throws Exception {
+  public TaskCraft(Session s) throws Exception {
     super(s);
     room = (Place   ) s.loadObject();
     made = (Equipped) s.loadObject();

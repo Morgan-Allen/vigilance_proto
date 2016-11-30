@@ -25,7 +25,7 @@ public class RegionView extends UINode {
       "media assets/tech icons/state_in_progress.png"
     );
   
-  Lead selectedLead;
+  //Lead selectedLead;
   
   
   public RegionView(UINode parent, Box2D viewBounds) {
@@ -38,7 +38,7 @@ public class RegionView extends UINode {
     */
   protected boolean renderTo(Surface surface, Graphics2D g) {
     
-    District nation = mainView.selectedNation();
+    Region nation = mainView.selectedNation();
     if (nation == null) return false;
     
     //Image portrait = nation.region.view.portrait;
@@ -47,7 +47,7 @@ public class RegionView extends UINode {
     g.drawString(nation.region().name(), vx + 20, vy + 20);
     
     int down = 50;
-    for (District.Stat stat : District.CIVIC_STATS) {
+    for (Region.Stat stat : Region.CIVIC_STATS) {
       g.drawString(stat+": ", vx + 30, vy + down);
       int max = nation.longTermValue(stat);
       int current = (int) nation.currentValue(stat);
@@ -56,7 +56,7 @@ public class RegionView extends UINode {
     }
     
     down += 5;
-    for (District.Stat stat : District.SOCIAL_STATS) {
+    for (Region.Stat stat : Region.SOCIAL_STATS) {
       g.drawString(stat+": ", vx + 80, vy + down);
       int current = (int) nation.longTermValue(stat);
       g.drawString(""+current, vx + 180, vy + down);
@@ -78,7 +78,7 @@ public class RegionView extends UINode {
   
   
   void renderFacilities(
-    final District d, final Surface surface, final Graphics2D g
+    final Region d, final Surface surface, final Graphics2D g
   ) {
     final int maxF = d.maxFacilities();
     int across = 240, down = 10;
@@ -86,8 +86,9 @@ public class RegionView extends UINode {
     
     for (int n = 0; n < maxF; n++) {
       final Place     slot  = d.buildSlot(n);
-      final Blueprint built = slot == null ? null : slot.blueprint();
+      final PlaceType built = slot == null ? null : slot.kind();
       final float     prog  = slot == null ? 0 : slot.buildProgress();
+      final int slotID = n;
       
       Image icon = null;
       if (built == null) {
@@ -101,13 +102,13 @@ public class RegionView extends UINode {
         icon, new Box2D(across, down, 60, 60), this
       ) {
         protected void whenClicked() {
-          presentBuildOptions(d, slot.slotID, surface, g);
+          presentBuildOptions(d, slotID, surface, g);
         }
         protected void whenHovered() {
-          if (built != null) hoverSlot.val = slot.slotID;
+          if (built != null) hoverSlot.val = slotID;
         }
       };
-      button.refers = built+"_slot_"+slot.slotID;
+      button.refers = built+"_slot_"+slotID;
       if (prog < 1 && built != null) button.attachOverlay(IN_PROGRESS);
       button.renderNow(surface, g);
       
@@ -118,7 +119,7 @@ public class RegionView extends UINode {
       g.setColor(Color.LIGHT_GRAY);
       
       final Place     slot  = d.buildSlot(hoverSlot.val);
-      final Blueprint built = slot.blueprint();
+      final PlaceType built = slot.kind();
       final Base      owns  = slot.owner();
       final float     prog  = slot.buildProgress();
       
@@ -140,15 +141,14 @@ public class RegionView extends UINode {
   
   
   void presentBuildOptions(
-    District d, int slotID, Surface surface, Graphics2D g
+    Region d, int slotID, Surface surface, Graphics2D g
   ) {
     final BuildOptionsView options = new BuildOptionsView(mainView, d, slotID);
     mainView.queueMessage(options);
   }
   
   
-  void renderLeads(District d, Surface surface, Graphics2D g) {
-    
+  void renderLeads(Region d, Surface surface, Graphics2D g) {
     /*
     g.setColor(Color.LIGHT_GRAY);
     int down = vy + 240;

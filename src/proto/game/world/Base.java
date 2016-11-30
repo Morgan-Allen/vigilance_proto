@@ -109,7 +109,7 @@ public class Base implements Session.Saveable {
       r.updatePlace();
     }
     
-    for (District dist : world.districts) {
+    for (Region dist : world.districts) {
       this.income      += dist.incomeFor  (this);
       this.maintenance += dist.expensesFor(this);
     }
@@ -185,14 +185,14 @@ public class Base implements Session.Saveable {
   
   /**  Construction and salvage-
     */
-  public boolean canConstruct(Blueprint print, int slot) {
+  public boolean canConstruct(PlaceType print, int slot) {
     if (rooms[slot] != null) return false;
     if (print.buildCost > currentFunds) return false;
     return true;
   }
   
   
-  public float buildRate(Blueprint print) {
+  public float buildRate(PlaceType print) {
     float rate = 1f, numBuilding = 0;
     for (Place r : rooms) if (r.buildProgress() < 1) numBuilding++;
     if (numBuilding == 0) return 1;
@@ -203,11 +203,11 @@ public class Base implements Session.Saveable {
   public int buildETA(int slot) {
     Place room = rooms[slot];
     if (room == null) return -1;
-    return Nums.ceil((1 - room.buildProgress()) / buildRate(room.blueprint()));
+    return Nums.ceil((1 - room.buildProgress()) / buildRate(room.kind()));
   }
   
   
-  public void addFacility(Blueprint print, int slot, float progress) {
+  public void addFacility(PlaceType print, int slot, float progress) {
     if (print == null) { rooms[slot] = null; return; }
     Place room = rooms[slot];
     if (room == null) room = rooms[slot] = print.createRoom(this, slot);
@@ -215,7 +215,7 @@ public class Base implements Session.Saveable {
   }
   
   
-  public void beginConstruction(Blueprint print, int slot) {
+  public void beginConstruction(PlaceType print, int slot) {
     currentFunds -= print.buildCost;
     addFacility(print, slot, 0);
   }
@@ -224,7 +224,7 @@ public class Base implements Session.Saveable {
   public void beginSalvage(int slot) {
     Place room = rooms[slot];
     if (room == null) return;
-    currentFunds += room.blueprint().buildCost / 2f;
+    currentFunds += room.kind().buildCost / 2f;
     addFacility(null, slot, 1);
   }
   

@@ -24,9 +24,10 @@ public class Element implements Session.Saveable {
   
   final public Kind kind;
   final public int type;
+  
   World world;
-  Place location;
-  List <Clue> attached = new List();
+  Element attachedTo;
+  List <Element> attached = new List();
   
   
   
@@ -39,10 +40,10 @@ public class Element implements Session.Saveable {
   
   public Element(Session s) throws Exception {
     s.cacheInstance(this);
-    kind     = (Kind ) s.loadObject();
-    type     = s.loadInt();
-    world    = (World) s.loadObject();
-    location = (Place) s.loadObject();
+    kind       = (Kind   ) s.loadObject();
+    type       = s.loadInt();
+    world      = (World  ) s.loadObject();
+    attachedTo = (Element) s.loadObject();
     s.loadObjects(attached);
   }
   
@@ -51,7 +52,7 @@ public class Element implements Session.Saveable {
     s.saveObject(kind);
     s.saveInt(type);
     s.saveObject(world);
-    s.saveObject(location);
+    s.saveObject(attachedTo);
     s.saveObjects(attached);
   }
   
@@ -64,8 +65,35 @@ public class Element implements Session.Saveable {
   }
   
   
+  public Kind kind() {
+    return kind;
+  }
+  
+  
+  public void setAttached(Element other, boolean is) {
+    if (other.attachedTo != null) other.attachedTo.setAttached(other, false);
+    attached.toggleMember(other, is);
+    other.attachedTo = is ? this : null;
+  }
+  
+  
+  public Series <Element> attached() {
+    return attached;
+  }
+  
+  
+  public Element attachedTo() {
+    return attachedTo;
+  }
+  
+  
   public Place location() {
-    return location;
+    Element e = attachedTo;
+    while (e != null) {
+      if (e.type == TYPE_PLACE) return (Place) e;
+      e = e.attachedTo;
+    }
+    return null;
   }
   
   

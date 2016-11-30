@@ -9,13 +9,11 @@ import proto.view.*;
 import proto.view.common.MainView;
 import proto.view.common.MessageView;
 import proto.view.world.TaskView;
-
 import java.awt.Image;
 
 
 
-public class Training extends Task {
-  
+public class TaskTrain extends Task {
   
   
   Place room;
@@ -23,18 +21,15 @@ public class Training extends Task {
   Skill talking;
   
   
-  public Training(Skill trained, Skill talking, Place room) {
-    super(
-      TIME_MEDIUM, room.world(),
-      trained, 0
-    );
+  public TaskTrain(Skill trained, Skill talking, Place room, Base base) {
+    super(base, TIME_MEDIUM, trained, 0);
     this.room    = room   ;
     this.trained = trained;
     this.talking = talking;
   }
   
   
-  public Training(Session s) throws Exception {
+  public TaskTrain(Session s) throws Exception {
     super(s);
     room    = (Place ) s.loadObject();
     trained = (Skill) s.loadObject();
@@ -86,7 +81,7 @@ public class Training extends Task {
       }
     }
     
-    presentMessage(world);
+    presentMessage(base.world());
     resetTask();
   }
   

@@ -28,7 +28,7 @@ public class Laboratory extends Place {
     setOwner(base);
     
     for (Equipped item : LAB_ITEMS) {
-      final Crafting crafting = new Crafting(item, this);
+      final TaskCraft crafting = new TaskCraft(item, this, base);
       tasks.add(crafting);
     }
   }
@@ -54,7 +54,7 @@ public class Laboratory extends Place {
   
   /**  Type definition for ease of enumeration and reference-
     */
-  final public static Blueprint BLUEPRINT = new Blueprint(
+  final public static PlaceType BLUEPRINT = new PlaceType(
     "Laboratory", "blueprint_laboratory",
     "media assets/main UI/room_laboratory.png",
     "Allows agents to synthesise medicine, serums and chemicals."

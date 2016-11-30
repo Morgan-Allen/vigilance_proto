@@ -60,7 +60,7 @@ public class UrbanScene extends Scene {
   
   
   public void assignMissionParameters(
-    Lead trigger, Place site,
+    Task trigger, Place site,
     float dangerLevel, int expireTime, Series<Person> forces
   ) {
     super.assignMissionParameters(

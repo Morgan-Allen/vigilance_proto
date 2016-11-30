@@ -32,7 +32,8 @@ public abstract class Task implements Assignment {
     EPIC_DC    = 9
   ;
   
-  World   world;
+  //World   world;
+  final Base base;
   Trait   tested [];
   int     testDCs[];
   int     testMod[];
@@ -45,11 +46,11 @@ public abstract class Task implements Assignment {
   
   
   protected Task(
-    int timeHours, World world, Object... args
+    Base base, int timeHours, Object... args
   ) {
     this.timeTaken = timeHours * World.MINUTES_PER_HOUR;
     this.initTime  = -1;
-    this.world     = world;
+    this.base      = base;
     
     final int numT = args.length / 2;
     tested  = new Trait  [numT];
@@ -80,7 +81,7 @@ public abstract class Task implements Assignment {
     }
     
     s.loadObjects(assigned);
-    world     = (World) s.loadObject();
+    base      = (Base) s.loadObject();
     timeTaken = s.loadInt ();
     initTime  = s.loadInt ();
     complete  = s.loadBool();
@@ -99,7 +100,7 @@ public abstract class Task implements Assignment {
     }
     
     s.saveObjects(assigned);
-    s.saveObject(world);
+    s.saveObject(base);
     s.saveInt (timeTaken);
     s.saveInt (initTime );
     s.saveBool(complete );
@@ -174,9 +175,9 @@ public abstract class Task implements Assignment {
   public void updateAssignment() {
     if (assigned.empty() || complete) return;
     
-    world.events().logAssignment(this);
+    base.world().events().logAssignment(this);
     
-    final int time = world.totalMinutes();
+    final int time = base.world().totalMinutes();
     if (initTime == -1) initTime = time;
     if ((time - initTime) > timeTaken) attemptTask();
   }
@@ -197,7 +198,7 @@ public abstract class Task implements Assignment {
   
   
   protected void onCompletion() {
-    presentMessage(world);
+    presentMessage(base.world());
     for (Person p : assigned) setAssigned(p, false);
   }
   

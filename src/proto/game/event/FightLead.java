@@ -9,6 +9,7 @@ import proto.util.*;
 
 
 
+/*
 public class FightLead extends Lead {
   
   
@@ -38,7 +39,7 @@ public class FightLead extends Lead {
   
   public boolean attemptTask() {
     final Place place = targetLocation();
-    final District district = place.parent;
+    final Region district = place.parent;
     
     //*
     //  TODO:  Have the Region in question, or the various types of facility,
@@ -48,6 +49,7 @@ public class FightLead extends Lead {
       this, place, 0.5f, initTime + timeTaken, fought
     );
     //*/
+    /*
     
     for (Person p : assigned()) groundScene.addToTeam(p);
     world.enterScene(groundScene);
@@ -55,6 +57,7 @@ public class FightLead extends Lead {
     return true;
   }
 }
+//*/
 
 
 

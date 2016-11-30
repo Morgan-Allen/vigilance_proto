@@ -59,7 +59,7 @@ public class RoomView extends UINode {
     //
     //  TODO:  Render information on the room type!
     
-    String info = room.blueprint().info();
+    String info = room.kind().defaultInfo();
     ViewUtils.drawWrappedString(info,
       g, vx + 25, vy + 20, vw - 30, 80
     );

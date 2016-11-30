@@ -15,14 +15,14 @@ public class Place extends Element {
   /**  Data fields, construction and save/load methods-
     */
   final public int slotID;
-  final public District parent;
+  final public Region parent;
   
   private Base owner;
   private float buildProgress;
   private List <Trait> properties = new List();
   
   
-  public Place(Blueprint print, int slotID, World world) {
+  public Place(PlaceType print, int slotID, World world) {
     super(print, Element.TYPE_PLACE, world);
     this.slotID        = slotID;
     this.parent        = null;
@@ -33,8 +33,8 @@ public class Place extends Element {
   public Place(Session s) throws Exception {
     super(s);
     slotID        = s.loadInt();
-    owner         = (Base     ) s.loadObject();
-    parent        = (District ) s.loadObject();
+    owner         = (Base  ) s.loadObject();
+    parent        = (Region) s.loadObject();
     buildProgress = s.loadFloat();
     s.loadObjects(properties);
   }
@@ -53,8 +53,8 @@ public class Place extends Element {
   
   /**  Construction progress-
     */
-  public Blueprint blueprint() {
-    return (Blueprint) kind;
+  public PlaceType kind() {
+    return (PlaceType) kind;
   }
   
   
@@ -70,7 +70,7 @@ public class Place extends Element {
   
   public void beginConstruction(Base owns, float initProgress) {
     setOwner(owns);
-    owns.incFunding(0 - blueprint().buildCost);
+    owns.incFunding(0 - kind().buildCost);
     setBuildProgress(initProgress);
   }
   
@@ -130,12 +130,12 @@ public class Place extends Element {
   
   
   public String name() {
-    return blueprint().name();
+    return kind().name();
   }
   
   
   public Image icon() {
-    return blueprint().icon();
+    return kind().icon();
   }
 }
 

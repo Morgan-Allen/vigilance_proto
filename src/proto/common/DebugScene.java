@@ -2,7 +2,6 @@
 
 package proto.common;
 import proto.game.world.*;
-import proto.util.Rand;
 import proto.game.person.*;
 import proto.game.event.*;
 import proto.content.agents.*;
@@ -28,7 +27,7 @@ public class DebugScene extends RunGame {
   
   
   DebugScene() {
-    super("debug_scene");
+    super("saves/debug_scene");
   }
   
   
@@ -36,20 +35,23 @@ public class DebugScene extends RunGame {
     this.world = new World(this, savePath);
     DefaultGame.initDefaultNations(world);
     DefaultGame.initDefaultBase   (world);
+    
+    /*
     DefaultGame.initDefaultCrime  (world);
     
     //  Create bosses and create experts.
+    //  Associate bosses and experts with Bases.
     //  Have bosses create plans.
     //  Have bosses execute those plans until they get interrupted and/or have
     //  to be revised and/or are abandoned for fear of exposure.
     
-    //  Create Events for either the plans in general and/or individuals steps
-    //  in those plans, and pop them into the event queue associated with
-    //  particular areas on the map.
+    //  Create Events for steps in those plans, and pop them into the event
+    //  queue.  After they transpire, attach clues to persons, places or things
+    //  involved (and/or generate tipoffs.)
     
-    //  Generate leads either toward or from those events, and associate with
-    //  particular regions and particular cases.  Use those to either perform
-    //  perform forensic analysis and/or catch the criminals red-handed.
+    //  Clues point from one object to another object.
+    
+    
     
     Person boss = new Person(Crooks.MOBSTER, world, "Crime Boss");
     Person victim = Crooks.randomOfKind(Crooks.CIVILIAN, world);
@@ -64,8 +66,13 @@ public class DebugScene extends RunGame {
     kidnapStep.setNeed(TypeKidnapping.Needs.VENUE, home);
     
     Event kidnapEvent = kidnapStep.spawnEvent(world);
-    final FightLead combat = new FightLead(101, kidnapEvent.place());
+    Clue tipoff = new Clue(ClueTypes.TIPOFF, world, kidnapEvent);
+    world.playerBase().leads.addLead(tipoff);
+    //*/
     
+    /*
+    Event kidnapEvent = kidnapStep.spawnEvent(world);
+    final FightLead combat = new FightLead(101, kidnapEvent.place());
     final Base base = world.playerBase();
     UrbanScene mission = new UrbanScene(world, 32);
     mission.addToTeam(base.firstOfKind(Heroes.HERO_BATMAN   ));
@@ -76,8 +83,8 @@ public class DebugScene extends RunGame {
       combat, kidnapEvent.place(), 0.5f, 100, null
     );
     mission.setupScene();
-    
     world.enterScene(mission);
+    //*/
     
     return world;
   }

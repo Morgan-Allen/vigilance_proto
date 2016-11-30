@@ -3,21 +3,20 @@
 package proto.game.world;
 import proto.common.*;
 import proto.game.event.Task;
-import proto.game.person.*;
 import proto.util.*;
 import java.awt.Image;
 
 
 
 
-public class Blueprint extends Kind {
+public class PlaceType extends Kind {
   
   
   /**  Data fields, construction and save/load methods-
     */
   final Image icon;
   
-  final District.Stat stats[];
+  final Region.Stat stats[];
   final int statMods[];
   final int buildCost, buildTime;
   
@@ -25,12 +24,12 @@ public class Blueprint extends Kind {
   
   
   
-  public Blueprint(String name, String ID, String imgPath, String info) {
+  public PlaceType(String name, String ID, String imgPath, String info) {
     this(name, ID, imgPath, info, 0, -1);
   }
   
   
-  public Blueprint(
+  public PlaceType(
     String name, String ID, String imgPath, String info,
     int buildCost, int buildTime, Object... args
   ) {
@@ -42,11 +41,11 @@ public class Blueprint extends Kind {
     this.buildTime = buildTime;
     
     final int numS = args.length / 2;
-    this.stats = new District.Stat[numS];
+    this.stats = new Region.Stat[numS];
     this.statMods = new int[numS];
     
     for (int n = 0; n < numS; n++) {
-      stats   [n] = (District.Stat) args[ n * 2     ];
+      stats   [n] = (Region.Stat) args[ n * 2     ];
       statMods[n] = (Integer      ) args[(n * 2) + 1];
     }
   }
@@ -55,15 +54,15 @@ public class Blueprint extends Kind {
   
   /**  Active effects-
     */
-  protected void applyStatEffects(District district) {
+  protected void applyStatEffects(Region district) {
     for (int i = 0; i < stats.length; i++) {
       district.statLevels[stats[i].ID].bonus += statMods[i];
     }
   }
   
   
-  protected int incomeFrom(District district) {
-    final int index = Visit.indexOf(District.INCOME, stats);
+  protected int incomeFrom(Region district) {
+    final int index = Visit.indexOf(Region.INCOME, stats);
     return index == -1 ? 0 : statMods[index];
   }
   
@@ -76,7 +75,7 @@ public class Blueprint extends Kind {
   
   /**  Construction and prereqs-
     */
-  public boolean canBuild(Base owner, District district) {
+  public boolean canBuild(Base owner, Region district) {
     return owner.currentFunds() >= buildCost;
   }
   
@@ -96,12 +95,12 @@ public class Blueprint extends Kind {
   }
   
   
-  public String info() {
+  public String defaultInfo() {
     final StringBuffer s = new StringBuffer();
     
     s.append(name());
     s.append("\n\n");
-    s.append(info());
+    s.append(super.defaultInfo());
     s.append("\n\n");
     s.append("Build cost: "+buildCost+" ("+(buildTime / 7)+" weeks to build)");
     s.append("\n");

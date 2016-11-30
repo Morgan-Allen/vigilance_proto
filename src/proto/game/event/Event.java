@@ -13,21 +13,6 @@ public class Event implements Session.Saveable {
   
   /**  Data fields, construction and save/load methods-
     */
-  final public static int
-    EVENT_MINOR  = 0,
-    EVENT_NORMAL = 1,
-    EVENT_MAJOR  = 2
-  ;
-  final static Image
-    LEAD_IMAGES[] = Kind.loadImages(
-      "media assets/scene backgrounds/",
-      "crime_generic_1.png",
-      "crime_generic_2.png",
-      "crime_generic_3.png",
-      "crime_generic_4.png"
-    );
-  
-  
   final EventType type;
   PlanStep step;
   Place place;
@@ -93,24 +78,8 @@ public class Event implements Session.Saveable {
     return timeEnds;
   }
   
-
-  public Series <Lead> knownOpenLeads() {
-    final Batch <Lead> matches = new Batch();
-    /*
-    for (Lead l : leads) {
-      if (l.open()) matches.add(l);
-    }
-    //*/
-    return matches;
-  }
-  
   
   public void updateEvent() {
-    /*
-    for (Lead lead : leads) {
-      lead.updateAssignment();
-    }
-    //*/
   }
   
   
@@ -187,11 +156,6 @@ public class Event implements Session.Saveable {
   
   public String info() {
     return type.infoFor(this);
-  }
-  
-  
-  public Image imageFor(Lead lead) {
-    return LEAD_IMAGES[lead.ID % LEAD_IMAGES.length];
   }
   
   

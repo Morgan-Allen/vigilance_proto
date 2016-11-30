@@ -25,7 +25,7 @@ public class Gymnasium extends Place {
     
     tasks = new Task[GYM_SKILLS.length];
     for (int i = 0; i < GYM_SKILLS.length; i++) {
-      tasks[i] = new Training(GYM_SKILLS[i], INTIMIDATE, this);
+      tasks[i] = new TaskTrain(GYM_SKILLS[i], INTIMIDATE, this, base);
     }
   }
   
@@ -50,7 +50,7 @@ public class Gymnasium extends Place {
   
   /**  Type definition for ease of enumeration and reference-
     */
-  final public static Blueprint BLUEPRINT = new Blueprint(
+  final public static PlaceType BLUEPRINT = new PlaceType(
     "Gymnasium", "blueprint_gymnasium",
     "media assets/main UI/room_gymnasium.png",
     "Permits training in physical skills involving strength or reflex."

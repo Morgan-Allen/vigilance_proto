@@ -30,7 +30,7 @@ public class Library extends Place {
     
     tasks = new Task[LIB_SKILLS.length];
     for (int i = 0; i < LIB_SKILLS.length; i++) {
-      tasks[i] = new Training(LIB_SKILLS[i], QUESTION, this);
+      tasks[i] = new TaskTrain(LIB_SKILLS[i], QUESTION, this, base);
     }
   }
   
@@ -55,7 +55,7 @@ public class Library extends Place {
   
   /**  Type definition for ease of enumeration and reference-
     */
-  final public static Blueprint BLUEPRINT = new Blueprint(
+  final public static PlaceType BLUEPRINT = new PlaceType(
     "Library", "blueprint_library",
     "media assets/main UI/room_library.png",
     "Permits training in most intellectual skills."

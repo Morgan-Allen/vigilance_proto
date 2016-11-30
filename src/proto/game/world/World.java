@@ -36,7 +36,7 @@ public class World implements Session.Saveable {
   
   MainView view = new MainView(this);
   
-  District districts[];
+  Region districts[];
   Base played;
   List <Base> bases = new List();
   List <Element> elements = new List();
@@ -67,21 +67,22 @@ public class World implements Session.Saveable {
   public World(Session s) throws Exception {
     s.cacheInstance(this);
     
-    districts = (District[]) s.loadObjectArray(District.class);
+    districts = (Region[]) s.loadObjectArray(Region.class);
     played    = (Base) s.loadObject();
     s.loadObjects(bases);
     events.loadState(s);
     
     timeDays   = s.loadInt  ();
     timeHours  = s.loadFloat();
-    amWatching = s.loadBool();
-
+    amWatching = s.loadBool ();
+    
     activeScene = (Scene) s.loadObject();
   }
   
   
   public void saveState(Session s) throws Exception {
     s.saveObjectArray(districts);
+    
     s.saveObject(played);
     s.saveObjects(bases);
     events.saveState(s);
@@ -123,7 +124,7 @@ public class World implements Session.Saveable {
   
   /**  Supplementary setup methods:
     */
-  public void attachDistricts(District... districts) {
+  public void attachDistricts(Region... districts) {
     this.districts = districts;
   }
   
@@ -143,7 +144,7 @@ public class World implements Session.Saveable {
   
   /**  General query methods-
     */
-  public District[] districts() {
+  public Region[] districts() {
     return districts;
   }
   
@@ -153,8 +154,8 @@ public class World implements Session.Saveable {
   }
   
   
-  public District districtFor(Region r) {
-    for (District d : districts) if (d.region() == r) return d;
+  public Region districtFor(RegionType r) {
+    for (Region d : districts) if (d.region() == r) return d;
     return null;
   }
   
@@ -210,7 +211,7 @@ public class World implements Session.Saveable {
       while (timeHours > HOURS_PER_DAY) {
         timeDays++;
         timeHours -= HOURS_PER_DAY;
-        for (District d : districts) d.updateDistrict();
+        for (Region d : districts) d.updateDistrict();
         played.updateBaseDaily();
       }
       

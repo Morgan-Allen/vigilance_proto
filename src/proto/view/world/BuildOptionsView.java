@@ -14,12 +14,12 @@ import java.awt.Color;
 public class BuildOptionsView extends MessageView {
   
   
-  final District d;
+  final Region d;
   final int slotID;
-  Blueprint selected = null;
+  PlaceType selected = null;
   
   
-  BuildOptionsView(UINode parent, District d, int slotID) {
+  BuildOptionsView(UINode parent, Region d, int slotID) {
     super(
       parent, null, "Build Blueprint", "",
       "Begin Construction", "Cancel"
@@ -39,7 +39,7 @@ public class BuildOptionsView extends MessageView {
     //
     //  TODO:  Allow for purchase, salvage, or redevelopment!
     
-    for (final Blueprint f : d.facilitiesAvailable()) {
+    for (final PlaceType f : d.facilitiesAvailable()) {
       
       final int nextAcross = across + BS + 5;
       if (nextAcross >= maxWide) { across = minWide; down += BS + 5; }
@@ -66,7 +66,7 @@ public class BuildOptionsView extends MessageView {
     String info =
       "Select a facility to view information and order construction."
     ;
-    if (selected != null) info = selected.info();
+    if (selected != null) info = selected.defaultInfo();
     
     ViewUtils.drawWrappedString(
       info, g,

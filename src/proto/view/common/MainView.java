@@ -123,8 +123,8 @@ public class MainView extends UINode {
   }
   
   
-  public District selectedNation() {
-    if (selectedObject instanceof District) return (District) selectedObject;
+  public Region selectedNation() {
+    if (selectedObject instanceof Region) return (Region) selectedObject;
     return null;
   }
   

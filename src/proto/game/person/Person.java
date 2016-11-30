@@ -113,15 +113,9 @@ public class Person extends Element {
   }
   
   
-  public Place currentPlace() {
-    if (assignment == null) return null;
-    return assignment.targetLocation();
-  }
-  
-  
-  public District currentDistrict() {
-    if (currentPlace() == null) return null;
-    return currentPlace().parent;
+  public Region currentDistrict() {
+    if (location() == null) return null;
+    return location().parent;
   }
   
   

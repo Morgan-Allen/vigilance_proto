@@ -11,11 +11,16 @@ import java.awt.Image;
 
 
 
+
+
+
+/*
 public class Lead extends Task {
   
   
   /**  Data fields, construction and save/load methods-
     */
+  /*
   final public int ID;
   final public Element origin;
   final public Element goes[];
@@ -64,6 +69,7 @@ public class Lead extends Task {
   
   /**  Follow-up and execution-
     */
+/*
   protected void onSuccess() {
     //if (! parent.checkFollowed(this, true)) return;
   }
@@ -82,6 +88,7 @@ public class Lead extends Task {
     return known && ! done;
   }
   //*/
+/*
   
   
   public Place targetLocation() {
@@ -92,6 +99,7 @@ public class Lead extends Task {
   
   /**  Rendering, debug and interface methods-
     */
+/*
   protected void presentMessage(final World world) {
     
     //  TODO:  Move this out to the View directory!
@@ -120,6 +128,7 @@ public class Lead extends Task {
       noLeads = false;
     }
     //*/
+/*
     if (noLeads) s.append("\nNo new leads were uncovered.");
     
     for (String action : world.events().extractLogInfo(this)) {
@@ -160,7 +169,7 @@ public class Lead extends Task {
   }
 }
 
-
+//*/
 
 
 

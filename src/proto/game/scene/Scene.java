@@ -25,7 +25,7 @@ public class Scene implements Session.Saveable, Assignment {
     STATE_WON   =  2,
     STATE_LOST  =  3;
   
-  Lead trigger;
+  Task trigger;
   float dangerLevel;
   int expireTime;
   
@@ -57,7 +57,7 @@ public class Scene implements Session.Saveable, Assignment {
     s.cacheInstance(this);
     view().loadState(s);
     
-    trigger     = (Lead) s.loadObject();
+    trigger     = (Task) s.loadObject();
     dangerLevel = s.loadFloat();
     expireTime  = s.loadInt();
     world       = (World) s.loadObject();
@@ -343,7 +343,7 @@ public class Scene implements Session.Saveable, Assignment {
   /**  Regular updates and activity cycle:
     */
   public void assignMissionParameters(
-    Lead trigger, Place site, float dangerLevel, int expireTime,
+    Task trigger, Place site, float dangerLevel, int expireTime,
     Series <Person> forces
   ) {
     this.trigger = trigger;

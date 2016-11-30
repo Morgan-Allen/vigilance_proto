@@ -13,6 +13,12 @@ public class Events {
   
   /**  Data fields, constructors, setup and save/load methods-
     */
+  final public static int
+    EVENT_MINOR  = 0,
+    EVENT_NORMAL = 1,
+    EVENT_MAJOR  = 2
+  ;
+  
   final World world;
   List <Event> coming = new List();
   List <Event> active = new List();
@@ -107,7 +113,7 @@ public class Events {
   
   
   public void log(String info) {
-    log(info, Event.EVENT_NORMAL);
+    log(info, EVENT_NORMAL);
   }
   
   
@@ -125,7 +131,7 @@ public class Events {
   
   
   public Series <String> extractLogInfo(Assignment action) {
-    return extractLogInfo(action, Event.EVENT_NORMAL);
+    return extractLogInfo(action, EVENT_NORMAL);
   }
 }
 
