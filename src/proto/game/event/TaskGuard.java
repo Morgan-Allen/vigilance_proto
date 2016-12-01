@@ -54,8 +54,8 @@ public class TaskGuard extends Task {
     //  TODO:  Populate with suitable enemy forces based on the type of crime
     //  underway!
     
-    final Batch <Person> enemies = new Batch();
-    mission.assignMissionParameters(this, place, 0.5f, 100, enemies);
+    event.populateScene(mission);
+    mission.assignMissionParameters(this, place, 0.5f, 100, null);
     
     //
     //  Finally, introduce the agents themselves-

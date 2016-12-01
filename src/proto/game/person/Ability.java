@@ -20,17 +20,18 @@ public abstract class Ability extends Trait {
   /**  Data fields, construction and save/load methods-
     */
   final public static int
-    NONE              = 0     ,
-    IS_MELEE          = 1 << 0,
-    IS_RANGED         = 1 << 1,
-    IS_ACTIVE         = 1 << 2,
-    IS_PASSIVE        = 1 << 3,
-    IS_DELAYED        = 1 << 4,
-    NO_NEED_SIGHT     = 1 << 5,
-    IS_BASIC          = 1 << 6,
-    IS_EQUIPPED       = 1 << 7,
-    TRIGGER_ON_ATTACK = 1 << 8,
-    TRIGGER_ON_DEFEND = 1 << 9;
+    NONE              = 0      ,
+    IS_MELEE          = 1 << 0 ,
+    IS_RANGED         = 1 << 1 ,
+    IS_ACTIVE         = 1 << 2 ,
+    IS_PASSIVE        = 1 << 3 ,
+    IS_DELAYED        = 1 << 4 ,
+    NO_NEED_FOG       = 1 << 5 ,
+    NO_NEED_LOS       = 1 << 6 ,
+    IS_BASIC          = 1 << 7 ,
+    IS_EQUIPPED       = 1 << 8 ,
+    TRIGGER_ON_ATTACK = 1 << 9 ,
+    TRIGGER_ON_DEFEND = 1 << 10;
   final public static float
     MAJOR_HELP = -2.0f,
     REAL_HELP  = -1.0f,
@@ -75,8 +76,13 @@ public abstract class Ability extends Trait {
   }
   
   
+  public boolean requiresFog() {
+    return ! hasProperty(NO_NEED_FOG);
+  }
+  
+  
   public boolean requiresSight() {
-    return ! hasProperty(NO_NEED_SIGHT);
+    return ! hasProperty(NO_NEED_LOS);
   }
   
   
@@ -157,6 +163,7 @@ public abstract class Ability extends Trait {
   
   
   public int motionCostAP(int pathLength) {
+    if (pathLength <= 0) return 0;
     return (pathLength - 1) / 2;
   }
   
@@ -181,12 +188,15 @@ public abstract class Ability extends Trait {
     Scene scene, Tile pathToTake[]
   ) {
     if (acting == null || ! allowsTarget(target, scene, acting)) return null;
-    if (requiresSight() && ! acting.actions.hasSight(dest)) return null;
+    if (requiresFog() && ! acting.actions.hasSight(dest)) return null;
     
     final float range = scene.distance(acting.location, dest);
     final int maxRange = maxRange();
-    if (maxRange > 0 && range > maxRange ) return null;
-    if (range > (acting.actions.sightRange() + 2)) return null;
+    if (maxRange > 0 && range > maxRange) return null;
+    if (requiresSight()) {
+      if (range > (acting.actions.sightRange() + 1)) return null;
+      if (scene.degreeOfSight(acting.location, dest, acting) <= 0) return null;
+    }
     
     Tile path[] = null;
     if (pathToTake != null) {
@@ -205,8 +215,9 @@ public abstract class Ability extends Trait {
     Action newAction = new Action(this, acting, target);
     newAction.attachPath(path, scene.time());
     newAction.attachVolley(createVolley(newAction, target, scene));
+    final int costAP = costAP(newAction);
     
-    if (costAP(newAction) > acting.actions.currentAP()) return null;
+    if (costAP > acting.actions.currentAP()) return null;
     return newAction;
   }
   

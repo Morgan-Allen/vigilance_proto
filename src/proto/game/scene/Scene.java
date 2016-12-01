@@ -13,7 +13,7 @@ import java.awt.Image;
 
 
 
-public class Scene implements Session.Saveable, Assignment {
+public class Scene implements Session.Saveable, Assignment, TileConstants {
   
   
   /**  Data fields, constructors and save/load methods-
@@ -264,6 +264,21 @@ public class Scene implements Session.Saveable, Assignment {
     if (under.x == 0 || under.x == size - 1) return true;
     if (under.y == 0 || under.y == size - 1) return true;
     return false;
+  }
+  
+  
+  public Tile findEntryPoint(int x, int y, Person enters) {
+    Tile under = tileAt(x, y);
+    int dir = T_INDEX[Rand.index(T_INDEX.length)], size = size();
+    
+    while (under != null) {
+      if (x != Nums.clamp(x, size) || y != Nums.clamp(y, size)) break;
+      if (! under.blocked()) return under;
+      x += T_X[dir];
+      y += T_Y[dir];
+      under = tileAt(x, y);
+    }
+    return under;
   }
   
   

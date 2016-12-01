@@ -3,8 +3,14 @@
 package proto.game.event;
 import proto.common.*;
 import proto.game.world.*;
+import proto.game.scene.*;
+import proto.game.person.*;
 import proto.util.*;
+
 import java.awt.Image;
+
+//  TODO:  Remove this direct reference!
+import proto.content.agents.Crooks;
 
 
 
@@ -97,6 +103,57 @@ public class Event implements Session.Saveable {
   
   
   
+  /**  Helping with scene configuration:
+    */
+  public Series <Person> populateScene(Scene scene) {
+    final List <Person> forces = new List();
+    if (step == null) return forces;
+    
+    for (Element e : step.needs()) {
+      if (e == null || e.type != Element.TYPE_PERSON) continue;
+      forces.add((Person) e);
+    }
+    
+    //  TODO:  You also need to populate with civilian passerbys and/or
+    //  hostages!  Also, the types of goon/civilian should be specified under
+    //  types in the content package.
+    
+    final float dangerLevel = 0.5f;
+    final Kind GOONS[] = {
+      Crooks.MOBSTER,
+      Crooks.GOON   ,
+      Crooks.GOON   ,
+    };
+    final float GOON_CHANCES[] = { 1, 1, 1 };
+    
+    float forceLimit = dangerLevel * 10;
+    float forceSum   = 0;
+    while (forceSum < forceLimit) {
+      Kind ofGoon = (Kind) Rand.pickFrom(GOONS, GOON_CHANCES);
+      Person goon = new Person(ofGoon, scene.world());
+      forceSum += goon.stats.powerLevel();
+      forces.add(goon);
+    }
+    
+    for (Person p : forces) {
+      int nX = scene.size() / 2, nY = scene.size() / 2;
+      nX += 5 - Rand.index(10);
+      nY += 5 - Rand.index(10);
+      Tile entry = scene.findEntryPoint(nX, nY, p);
+      if (entry == null) { forces.remove(p); continue; }
+      scene.addToTeam(p);
+      scene.enterScene(p, entry.x, entry.y);
+    }
+    return forces;
+  }
+  
+  
+  //  TODO:  You also need to supply AI behaviours specific to a given event
+  //  type (patrolling, escort, threatening hostages, moving bombs, blowing a
+  //  safe, et cetera.)  (This will probably require a separate behaviour model
+  //  supplied by StepTypes.)
+  
+  
   
   /**  Rendering, debug and interface methods-
     */
@@ -114,11 +171,6 @@ public class Event implements Session.Saveable {
     return name();
   }
 }
-
-
-
-
-
 
 
 

@@ -73,7 +73,7 @@ public class PersonMind {
   
   public Action selectActionAsAI() {
     Scene scene = person.currentScene();
-    if (scene == null || person.actions.canTakeAction()) return null;
+    if (scene == null || ! person.actions.canTakeAction()) return null;
     boolean report = I.talkAbout == this;
     if (report) I.say("\nGetting next AI action for "+this);
     

@@ -42,7 +42,8 @@ public class Common {
       "Move", "ability_move",
       IMG_DIR+"move.png",
       "Move to the chosen point.",
-      Ability.IS_BASIC, 1, Ability.NO_HARM, Ability.MINOR_POWER
+      Ability.IS_BASIC | Ability.NO_NEED_LOS, 1,
+      Ability.NO_HARM, Ability.MINOR_POWER
     ) {
       
       public boolean allowsTarget(Object target, Scene scene, Person acting) {
