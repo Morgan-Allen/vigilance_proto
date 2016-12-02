@@ -11,7 +11,6 @@ public class SceneType extends Index.Entry implements
   TileConstants, Session.Saveable
 {
   
-  
   /**  Data fields, construction and save/load methods-
     */
   final static Index <SceneType> INDEX = new Index <SceneType> ();

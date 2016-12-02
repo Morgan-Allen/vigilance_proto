@@ -25,12 +25,10 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     STATE_WON   =  2,
     STATE_LOST  =  3;
   
-  Task trigger;
-  float dangerLevel;
-  int expireTime;
-  
   World world;
   Place site;
+  Task playerTask;
+  Event triggerEvent;
   List <Person> playerTeam = new List();
   List <Person> othersTeam = new List();
   int state = STATE_INIT;
@@ -58,11 +56,10 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     s.cacheInstance(this);
     view().loadState(s);
     
-    trigger     = (Task) s.loadObject();
-    dangerLevel = s.loadFloat();
-    expireTime  = s.loadInt();
-    world       = (World) s.loadObject();
-    site        = (Place) s.loadObject();
+    world        = (World) s.loadObject();
+    site         = (Place) s.loadObject();
+    playerTask   = (Task ) s.loadObject();
+    triggerEvent = (Event) s.loadObject();
     s.loadObjects(playerTeam);
     s.loadObjects(othersTeam);
     state = s.loadInt();
@@ -89,14 +86,13 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   public void saveState(Session s) throws Exception {
     view().saveState(s);
     
-    s.saveObject (trigger    );
-    s.saveFloat  (dangerLevel);
-    s.saveInt    (expireTime );
-    s.saveObject (world      );
-    s.saveObject (site       );
-    s.saveObjects(playerTeam );
-    s.saveObjects(othersTeam );
-    s.saveInt    (state      );
+    s.saveObject (world       );
+    s.saveObject (site        );
+    s.saveObject (playerTask  );
+    s.saveObject (triggerEvent);
+    s.saveObjects(playerTeam  );
+    s.saveObjects(othersTeam  );
+    s.saveInt    (state       );
     
     s.saveInt(size);
     s.saveInt(time);
@@ -147,18 +143,28 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   
   /**  Supplemental query and setup methods-
     */
-  public Place site() {
-    return site;
-  }
-
-
   public World world() {
     return world;
   }
   
   
-  public int expireTime() {
-    return expireTime;
+  public Place site() {
+    return site;
+  }
+  
+  
+  public Task playerTask() {
+    return playerTask;
+  }
+  
+  
+  public Event triggerEvent() {
+    return triggerEvent;
+  }
+  
+  
+  public PlanStep triggerEventPlanStep() {
+    return triggerEvent == null ? null : triggerEvent.planStep();
   }
   
   
@@ -174,11 +180,6 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   
   public boolean wasLost() {
     return state == STATE_LOST;
-  }
-  
-  
-  public float dangerLevel() {
-    return dangerLevel;
   }
   
   
@@ -304,6 +305,13 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   }
   
   
+  public boolean removeProp(Prop prop) {
+    prop.origin.setProp(null);
+    props.remove(prop);
+    return true;
+  }
+  
+  
   public Series <Prop> props() {
     return props;
   }
@@ -355,6 +363,13 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   }
   
   
+  public Series <Prop> propsOfKind(Kind type) {
+    Batch ofKind = new Batch();
+    for (Prop p : props) if (p.kind == type) ofKind.add(p);
+    return ofKind;
+  }
+  
+  
   
   /**  Regular updates and activity cycle:
     */
@@ -372,14 +387,11 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   
   
   public void assignMissionParameters(
-    Task trigger, Place site, float dangerLevel, int expireTime,
-    Series <Person> forces
+    Place site, Task playerTask, Event triggerEvent
   ) {
-    this.trigger = trigger;
-    this.site    = site   ;
-    this.dangerLevel = dangerLevel;
-    this.expireTime  = expireTime ;
-    if (forces != null) for (Person p : forces) othersTeam.add(p);
+    this.site         = site        ;
+    this.playerTask   = playerTask  ;
+    this.triggerEvent = triggerEvent;
   }
   
   
@@ -626,26 +638,26 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   
   
   public String toString() {
-    if (trigger == null) return site.name();
-    return trigger.toString();
+    if (playerTask == null) return site.name();
+    return playerTask.toString();
   }
   
   
   public String activeInfo() {
-    if (trigger == null) return site.name();
-    return "On mission: "+trigger.activeInfo();
+    if (playerTask == null) return site.name();
+    return "On mission: "+playerTask.activeInfo();
   }
   
   
   public String helpInfo() {
-    if (trigger == null) return site.name();
-    return trigger.helpInfo();
+    if (playerTask == null) return site.name();
+    return playerTask.helpInfo();
   }
   
   
   public Image icon() {
-    if (trigger == null) return site.kind().icon();
-    return trigger.icon();
+    if (playerTask == null) return site.kind().icon();
+    return playerTask.icon();
   }
   
   

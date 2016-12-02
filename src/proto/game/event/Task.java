@@ -32,7 +32,6 @@ public abstract class Task implements Assignment {
     EPIC_DC    = 9
   ;
   
-  //World   world;
   final Base base;
   Trait   tested [];
   int     testDCs[];

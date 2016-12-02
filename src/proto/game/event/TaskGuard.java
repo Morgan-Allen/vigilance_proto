@@ -51,11 +51,7 @@ public class TaskGuard extends Task {
     SceneType sceneType = place.kind().sceneType();
     Scene mission = sceneType.generateScene(place, 32);
     
-    //  TODO:  Populate with suitable enemy forces based on the type of crime
-    //  underway!
-    
     event.populateScene(mission);
-    mission.assignMissionParameters(this, place, 0.5f, 100, null);
     
     //
     //  Finally, introduce the agents themselves-
@@ -65,6 +61,7 @@ public class TaskGuard extends Task {
       mission.enterScene(p, across++, 0);
     }
     
+    mission.assignMissionParameters(place, this, event);
     base.world().enterScene(mission);
   }
   

@@ -37,7 +37,7 @@ public class TypeMake extends StepType {
   ) {
     if (needType == Needs.MAKES) {
       if (used.type != Element.TYPE_PERSON) return 0;
-      return craftChance((Person) used, (Item) step.give(Gives.MADE));
+      return makesChance((Person) used, (Item) step.give(Gives.MADE));
     }
     if (needType == Needs.MATERIALS) {
       return 0;
@@ -46,14 +46,14 @@ public class TypeMake extends StepType {
   }
   
   
-  protected float calcSuccessChance(PlanStep step) {
+  protected float baseSuccessChance(PlanStep step) {
     Person makes = (Person) step.need(Needs.MAKES);
     Item   made  = (Item  ) step.need(Gives.MADE );
-    return craftChance(makes, made);
+    return makesChance(makes, made);
   }
   
   
-  private float craftChance(Person makes, Item made) {
+  private float makesChance(Person makes, Item made) {
     //  TODO:  Adapt this to a wider array of potential skills, and unify with
     //  similar methods in the Task or Crafting class.
     float skill = 0;

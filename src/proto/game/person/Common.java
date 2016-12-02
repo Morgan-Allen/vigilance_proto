@@ -91,7 +91,26 @@ public class Common {
       public Image missileSprite() { return missile; }
     },
     
-    BASIC_ABILITIES[] = { MOVE, STRIKE }
+    BASIC_ABILITIES[] = { MOVE, STRIKE };
+  
+  
+  final public static Ability SPECIAL_ACTION = new Ability(
+    "Special Action", "ability_special_action",
+    null, "Perform a special action associated with a criminal plot.",
+    Ability.NO_NEED_FOG | Ability.NO_NEED_LOS,
+    1, Ability.NO_HARM, Ability.NO_POWER
+  ) {
+    
+    public float rateUsage(Action use) {
+      PlanStep step = use.scene().triggerEventPlanStep();
+      return step == null ? 0 : step.type.rateSpecialAction(use);
+    }
+    
+    public void applyOnActionEnd(Action use) {
+      PlanStep step = use.scene().triggerEventPlanStep();
+      if (step != null) step.type.onSpecialActionEnd(use);
+    }
+  };
     
     /*
     
@@ -223,7 +242,6 @@ public class Common {
     //*/
     
     //  TODO:  Add Overwatch!
-  ;
 }
 
 

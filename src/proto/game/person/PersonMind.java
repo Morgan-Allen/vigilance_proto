@@ -85,8 +85,11 @@ public class PersonMind {
     }
     else {
       AIstate = STATE_ACTIVE;
+      
       for (Person p : scene.persons()) {
-        if (! person.actions.canNotice(p)) continue;
+        if (! person.actions.canNotice(p)) {
+          continue;
+        }
         for (Ability a : abilities) {
           Action use = a.configAction(person, p.location, p, scene, null);
           if (use == null) continue;
@@ -94,6 +97,13 @@ public class PersonMind {
           if (report) I.say("  Rating for "+a+" is "+rating);
           pick.compare(use, rating);
         }
+      }
+      
+      PlanStep planStep = scene.triggerEventPlanStep();
+      if (planStep != null) {
+        Action special = planStep.type.specialAction(person, planStep, scene);
+        float rating = special.used.rateUsage(special) * 0.5f;
+        pick.compare(special, rating);
       }
     }
     if (pick.empty()) {

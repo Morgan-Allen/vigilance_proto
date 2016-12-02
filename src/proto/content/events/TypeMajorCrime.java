@@ -5,6 +5,7 @@ package proto.content.events;
 import proto.game.world.*;
 import proto.game.event.*;
 import proto.game.person.*;
+import proto.game.scene.*;
 import proto.content.items.*;
 import proto.content.places.*;
 import proto.util.*;
@@ -112,7 +113,47 @@ public abstract class TypeMajorCrime extends StepType {
   }
   
   
+  
+  /**  Scene-specific AI directions-
+    */
+  public Action specialAction(Person onTeam, PlanStep step, Scene scene) {
+    
+    //  TODO:  Implement suitable auxiliary steps here!
+    
+    /*
+    if (onTeam == step.need(Needs.ALARM_CRACKER)) {
+      for (Prop match : scene.propsWithTrait(Facilities.REINFORCED)) {
+        Action action = new Action(Common.SPECIAL_ACTION, onTeam, match);
+        return action;
+      }
+    }
+    if (onTeam == step.need(Needs.MOLE)) {
+      
+    }
+    //*/
+    
+    //  TODO:  Include the use of explosives and blueprints as well.
+    return null;
+  }
+  
+  
+  public boolean onSpecialActionEnd(Action action) {
+    
+    //  TODO:  Implement suitable auxiliary actions here!
+    
+    //Prop safe = (Prop) action.target;
+    //action.scene().removeProp(safe);
+    return true;
+  }
+  
+  
 }
+
+
+
+
+
+
 
 
 

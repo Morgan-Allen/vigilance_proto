@@ -33,6 +33,18 @@ public class TypePurchase extends StepType {
   }
   
   
+  protected float calcSuitability(
+    Element used, Object needType, PlanStep step
+  ) {
+    return super.calcSuitability(used, needType, step);
+  }
+  
+  
+  protected float baseSuccessChance(PlanStep step) {
+    return 1;
+  }
+  
+  
   protected float baseAppeal(PlanStep step) {
     final Item bought = (Item) step.need(Gives.BOUGHT);
     return (0 - bought.kind().buildCost) / 10f;

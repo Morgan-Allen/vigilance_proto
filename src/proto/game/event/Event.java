@@ -75,6 +75,11 @@ public class Event implements Session.Saveable {
   }
   
   
+  public PlanStep planStep() {
+    return step;
+  }
+  
+  
   public float timeBegins() {
     return timeBegins;
   }
@@ -114,6 +119,9 @@ public class Event implements Session.Saveable {
       forces.add((Person) e);
     }
     
+    //  TODO:  Move this out to the StepType class, so that any special items
+    //  can also be equipped...
+    
     //  TODO:  You also need to populate with civilian passerbys and/or
     //  hostages!  Also, the types of goon/civilian should be specified under
     //  types in the content package.
@@ -146,12 +154,6 @@ public class Event implements Session.Saveable {
     }
     return forces;
   }
-  
-  
-  //  TODO:  You also need to supply AI behaviours specific to a given event
-  //  type (patrolling, escort, threatening hostages, moving bombs, blowing a
-  //  safe, et cetera.)  (This will probably require a separate behaviour model
-  //  supplied by StepTypes.)
   
   
   

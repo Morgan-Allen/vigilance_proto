@@ -8,8 +8,9 @@ import proto.util.*;
 
 
 public class Prop implements Session.Saveable {
-
-  Kind kind;
+  
+  
+  final Kind kind;
   Tile origin;
   
   

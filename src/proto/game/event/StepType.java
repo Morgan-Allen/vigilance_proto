@@ -2,6 +2,8 @@
 
 package proto.game.event;
 import proto.game.world.*;
+import proto.game.person.*;
+import proto.game.scene.*;
 import proto.util.*;
 
 
@@ -70,6 +72,24 @@ public abstract class StepType extends EventType {
   
   protected float baseFailRisk(PlanStep step) {
     return 0;
+  }
+  
+  
+  
+  /**  AI-control methods for within a particular scene:
+    */
+  public Action specialAction(Person onTeam, PlanStep step, Scene scene) {
+    return null;
+  }
+  
+  
+  public float rateSpecialAction(Action action) {
+    return 5;
+  }
+  
+  
+  public boolean onSpecialActionEnd(Action action) {
+    return false;
   }
   
   
