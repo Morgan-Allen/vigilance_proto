@@ -42,6 +42,7 @@ public class DefaultGame extends RunGame {
     Region[] districts = new Region[numN];
     for (int n = 0; n < numN; n++) {
       districts[n] = new Region(Regions.ALL_REGIONS[n], world);
+      districts[n].initDefaultFacilities(null);
     }
     for (Region d : districts) d.initialiseRegion();
     world.attachDistricts(districts);
@@ -87,28 +88,30 @@ public class DefaultGame extends RunGame {
     
     Batch <Person> bosses  = new Batch();
     Batch <Person> seniors = new Batch();
-    Batch <Person> hoods   = new Batch();
-    
-    int numSeniors = 3, numHoods = 8;
-    
+    int numSeniors = 3;
     final Person
       falcone = new Person(Crooks.FALCONE , world),
       twoFace = new Person(Crooks.TWO_FACE, world)
     ;
     bosses.add(falcone);
-    bosses.add(twoFace);
+    //bosses.add(twoFace);
     
     //  TODO:  Actually, don't.  Have each boss control a certain number of
     //  assigned territories, and generate subordinates for each region.
     
     for (Person boss : bosses) {
+      final Base base = new Base(world, boss.name());
+      base.setLeader(boss);
+      base.addToRoster(boss);
+      base.plans.assignStepTypes(StepTypes.ALL_TYPES);
+      world.addBase(base, false);
+      world.setInside(boss, true);
+      
       for (int n = numSeniors; n-- > 0;) {
         Person senior = Crooks.randomOfKind(Crooks.MOBSTER, world);
         seniors.add(senior);
-      }
-      for (int n = numHoods; n-- > 0;) {
-        Person hood = Crooks.randomOfKind(Crooks.GOON, world);
-        hoods.add(hood);
+        base.addToRoster(senior);
+        world.setInside(senior, true);
       }
     }
   }

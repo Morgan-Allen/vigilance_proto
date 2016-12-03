@@ -61,7 +61,7 @@ public class Workshop extends Place {
     "Allows agents to repair or manufacture gadgets and armour.",
     UrbanScenes.MANSION_SCENE
   ) {
-    protected Place createRoom(Base base, int slotID) {
+    public Place createRoom(Base base, int slotID) {
       return new Workshop(base, slotID);
     }
   };

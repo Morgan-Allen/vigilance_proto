@@ -64,13 +64,6 @@ public class Place extends Element {
   }
   
   
-  public void beginConstruction(Base owns, float initProgress) {
-    setOwner(owns);
-    owns.incFunding(0 - kind().buildCost);
-    setBuildProgress(initProgress);
-  }
-  
-  
   public void setOwner(Base owns) {
     this.owner = owns;
   }

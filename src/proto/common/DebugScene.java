@@ -2,7 +2,7 @@
 
 package proto.common;
 import proto.game.world.*;
-import proto.util.I;
+import proto.util.*;
 import proto.game.person.*;
 import proto.game.event.*;
 import proto.content.agents.*;
@@ -37,18 +37,13 @@ public class DebugScene extends RunGame {
     DefaultGame.initDefaultBase   (world);
     DefaultGame.initDefaultCrime  (world);
     
-    //  Create bosses and create experts.
-    //  Associate bosses and experts with Bases.
-    //  Have bosses create plans.
-    //  Have bosses execute those plans until they get interrupted and/or have
-    //  to be revised and/or are abandoned for fear of exposure.
+    //  TODO:  You still need to generate tipoffs to indicate a plan is in
+    //  progress.
     
-    //  Create Events for steps in those plans, and pop them into the event
-    //  queue.  After they transpire, attach clues to persons, places or things
-    //  involved (and/or generate tipoffs.)
+    //  TODO:  Also, you need to avoid different bosses interfering with
+    //  eachother (if reasonably possible.)
     
-    //  Clues point from one object to another object.
-    
+    /*
     Person boss = new Person(Crooks.MOBSTER, world, "Crime Boss");
     Person perp = Crooks.randomOfKind(Crooks.GOON, world);
     Person victim = Crooks.randomOfKind(Crooks.CIVILIAN, world);
@@ -73,26 +68,6 @@ public class DebugScene extends RunGame {
     building.setAttached(tipoff, true);
     building.setAttached(perp, true);
     world.playerBase().leads.addLead(perp);
-    
-    //  Okay.  So.  You get a tipoff suggesting that a given perp is involved
-    //  in an upcoming crime.  You investigate them, they lead you to the main
-    //  crime.  Once you have the main crime, you can Guard the location (or
-    //  the victim, or whatev) to prevent the crime taking place.
-    
-    /*
-    Event kidnapEvent = kidnapStep.spawnEvent(world);
-    final FightLead combat = new FightLead(101, kidnapEvent.place());
-    final Base base = world.playerBase();
-    UrbanScene mission = new UrbanScene(world, 32);
-    mission.addToTeam(base.firstOfKind(Heroes.HERO_BATMAN   ));
-    mission.addToTeam(base.firstOfKind(Heroes.HERO_NIGHTWING));
-    mission.addToTeam(base.firstOfKind(Heroes.HERO_BATGIRL  ));
-    
-    mission.assignMissionParameters(
-      combat, kidnapEvent.place(), 0.5f, 100, null
-    );
-    mission.setupScene();
-    world.enterScene(mission);
     //*/
     
     return world;

@@ -15,6 +15,7 @@ public interface Series <T> extends Iterable <T> {
   T last();
   boolean empty();
   
+  int indexOf(T t);
   T atIndex(int index);
   Object[] toArray();
   T[] toArray(Class typeClass);

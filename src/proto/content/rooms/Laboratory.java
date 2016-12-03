@@ -62,7 +62,7 @@ public class Laboratory extends Place {
     "Allows agents to synthesise medicine, serums and chemicals.",
     UrbanScenes.MANSION_SCENE
   ) {
-    protected Place createRoom(Base base, int slotID) {
+    public Place createRoom(Base base, int slotID) {
       return new Laboratory(base, slotID);
     }
   };

@@ -62,7 +62,7 @@ public class Library extends Place {
     "Permits training in most intellectual skills.",
     UrbanScenes.MANSION_SCENE
   ) {
-    protected Place createRoom(Base base, int slotID) {
+    public Place createRoom(Base base, int slotID) {
       return new Library(base, slotID);
     }
   };

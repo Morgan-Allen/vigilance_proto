@@ -435,6 +435,13 @@ public abstract class Sorting <K> implements Series <K> {
     return null;
   }
   
+  
+  public int indexOf(K value) {
+    int index = 0;
+    for (K k : this) if (k == value) break; else index++;
+    return index;
+  }
+  
 
   final public Iterator <K> iterator() {
     final int height = heightFor(root);

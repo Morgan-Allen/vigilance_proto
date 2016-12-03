@@ -48,12 +48,13 @@ public class TypeMake extends StepType {
   
   protected float baseSuccessChance(PlanStep step) {
     Person makes = (Person) step.need(Needs.MAKES);
-    Item   made  = (Item  ) step.need(Gives.MADE );
+    Item   made  = (Item  ) step.give(Gives.MADE );
     return makesChance(makes, made);
   }
   
   
   private float makesChance(Person makes, Item made) {
+    if (makes == null || made == null) return 0.1f;
     //  TODO:  Adapt this to a wider array of potential skills, and unify with
     //  similar methods in the Task or Crafting class.
     float skill = 0;

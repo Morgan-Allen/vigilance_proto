@@ -81,15 +81,7 @@ public class Region extends Element {
   public Region(RegionType kind, World world) {
     super(kind, Element.TYPE_REGION, world);
     initStats();
-    
     buildSlots = new Place[kind.maxFacilities];
-    final PlaceType DF[] = kind.defaultFacilities;
-    
-    for (int i = 0; i < buildSlots.length; i++) {
-      if (DF == null || i >= DF.length) break;
-      final Place slot = buildSlots[i] = new Place(DF[i], i, world);
-      setAttached(slot, true);
-    }
   }
   
   
@@ -128,6 +120,15 @@ public class Region extends Element {
   
   public RegionType kind() {
     return (RegionType) kind;
+  }
+  
+  
+  public void initDefaultFacilities(Base owns) {
+    final PlaceType DF[] = kind().defaultFacilities;
+    for (int i = 0; i < buildSlots.length; i++) {
+      if (DF == null || i >= DF.length) break;
+      setupFacility(DF[i], i, owns, true);
+    }
   }
   
   
@@ -233,11 +234,27 @@ public class Region extends Element {
   }
   
   
-  public void beginConstruction(PlaceType print, int slotID, Base owns) {
-    final Place place = new Place(print, slotID, owns.world);
+  public Place setupFacility(
+    PlaceType print, int slotID, Base owns, boolean complete
+  ) {
+    final Place oldPlace = buildSlots[slotID];
+    if (oldPlace != null) world.setInside(oldPlace, false);
+    
+    final Place place = new Place(print, slotID, world);
+    if (complete || owns == null) {
+      place.setOwner(owns);
+      place.setBuildProgress(1);
+    }
+    else {
+      place.setOwner(owns);
+      owns.incFunding(0 - place.kind().buildCost);
+      place.setBuildProgress(0);
+    }
+    
     buildSlots[slotID] = place;
     setAttached(place, true);
-    place.beginConstruction(owns, 0);
+    world.setInside(place, true);
+    return place;
   }
   
   

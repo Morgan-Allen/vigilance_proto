@@ -74,13 +74,13 @@ public class PlaceType extends Kind {
   }
   
   
-  protected int incomeFrom(Region district) {
+  public int incomeFrom(Region district) {
     final int index = Visit.indexOf(Region.INCOME, stats);
     return index == -1 ? 0 : statMods[index];
   }
   
   
-  protected float speedBonus(Task task) {
+  public float speedBonus(Task task) {
     return 0;
   }
   
@@ -93,7 +93,7 @@ public class PlaceType extends Kind {
   }
   
   
-  protected Place createRoom(Base base, int slotID) {
+  public Place createRoom(Base base, int slotID) {
     Place place = new Place(this, slotID, base.world);
     place.setOwner(base);
     return place;

@@ -49,8 +49,6 @@ public class Plan implements Session.Saveable {
   }
   
   
-  
-  
   public Series <PlanStep> steps() {
     return steps;
   }
@@ -65,18 +63,47 @@ public class Plan implements Session.Saveable {
     goal.assignRating(priority);
     addStep(goal);
     fillNeeds(goal);
-    if (verbose) I.say("Have added goal: "+goal.langDescription());
   }
   
   
-  public void advancePlan() {
-    if (verbose) I.say("\nAdvancing plan-");
+  public void selectInitialGoal() {
+    if (verbose) I.say("\nSelecting goal-");
+    final Batch <PlanStep> goals = new Batch();
+    final Series <Element> targets = world.inside();
     
-    Batch <PlanStep> nextGen = new Batch();
-    for (PlanStep step : steps) {
-      addStepsFrom(step, nextGen);
+    for (StepType type : stepTypes) {
+      for (Element target : targets) {
+        PlanStep goal = type.asGoal(target, this);
+        if (goal == null) continue;
+        goal.assignRating(type.baseAppeal(goal));
+        goals.add(goal);
+        if (verbose) I.say("  considering: "+goal.langDescription());
+      }
     }
     
+    PlanStep picked = pickStepFrom(goals);
+    if (picked != null) addGoal(picked, picked.rating());
+    else if (verbose) I.say("  No goal selected!");
+  }
+  
+  
+  public void advancePlan(int maxIterations) {
+    while (maxIterations-- > 0) {
+      if (verbose) I.say("\nAdvancing plan-");
+      
+      Batch <PlanStep> nextGen = new Batch();
+      for (PlanStep step : steps) {
+        addStepsFrom(step, nextGen);
+      }
+      
+      PlanStep picked = pickStepFrom(nextGen);
+      if (picked != null) addStep(picked);
+      else { if (verbose) I.say("  No new step chosen!"); break; }
+    }
+  }
+  
+  
+  private PlanStep pickStepFrom(Series <PlanStep> nextGen) {
     float sumRatings = 0;
     for (PlanStep child : nextGen) {
       if (verbose) I.say("  Rating for "+child+": "+child.rating());
@@ -90,13 +117,7 @@ public class Plan implements Session.Saveable {
       if (rollInSum <= 0) { picked = child; break; }
     }
     
-    if (picked != null) {
-      addStep(picked);
-      if (verbose) I.say("  Adding step: "+picked);
-    }
-    else {
-      if (verbose) I.say("  No new step chosen!");
-    }
+    return picked;
   }
   
   
@@ -109,6 +130,7 @@ public class Plan implements Session.Saveable {
     if (step.parent != null) {
       step.parent.setStepForNeed(step.parentNeedID, step);
     }
+    if (verbose) I.say("Have added step: "+step.langDescription());
   }
   
   
@@ -198,7 +220,20 @@ public class Plan implements Session.Saveable {
     if (numSteps <= 0) return -1;
     return rating / numSteps;
   }
+  
+  
+  
+  /**  Debugging, graphics and interface methods-
+    */
+  public void printFullPlan() {
+    I.say("\n\nFinal plan: ");
+    for (PlanStep step : steps()) {
+      I.say("  "+step.langDescription()+": "+step.rating());
+    }
+  }
 }
+
+
 
 
 

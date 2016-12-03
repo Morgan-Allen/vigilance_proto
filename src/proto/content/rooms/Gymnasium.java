@@ -57,7 +57,7 @@ public class Gymnasium extends Place {
     "Permits training in physical skills involving strength or reflex.",
     UrbanScenes.MANSION_SCENE
   ) {
-    protected Place createRoom(Base base, int slotID) {
+    public Place createRoom(Base base, int slotID) {
       return new Gymnasium(base, slotID);
     }
   };

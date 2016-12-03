@@ -14,19 +14,19 @@ import java.awt.Color;
 public class BuildOptionsView extends MessageView {
   
   
-  final Region d;
+  final Region region;
   final int slotID;
   PlaceType selected = null;
   
   
-  BuildOptionsView(UINode parent, Region d, int slotID) {
+  BuildOptionsView(UINode parent, Region region, int slotID) {
     super(
       parent, null, "Build Blueprint", "",
       "Begin Construction", "Cancel"
     );
-    this.d      = d;
+    this.region = region;
     this.slotID = slotID;
-    selected    = d.slotType(slotID);
+    selected    = region.slotType(slotID);
   }
   
   
@@ -39,7 +39,7 @@ public class BuildOptionsView extends MessageView {
     //
     //  TODO:  Allow for purchase, salvage, or redevelopment!
     
-    for (final PlaceType f : d.facilitiesAvailable()) {
+    for (final PlaceType f : region.facilitiesAvailable()) {
       
       final int nextAcross = across + BS + 5;
       if (nextAcross >= maxWide) { across = minWide; down += BS + 5; }
@@ -80,10 +80,10 @@ public class BuildOptionsView extends MessageView {
     //
     //  Cannot confirm construction if no facility is selected.
     if (optionID == 0) {
-      final Base base = d.world().playerBase();
+      final Base base = region.world().playerBase();
       if (selected == null) return false;
-      if (d.slotType(slotID) == selected) return false;
-      if (! selected.canBuild(base, d)) return false;
+      if (region.slotType(slotID) == selected) return false;
+      if (! selected.canBuild(base, region)) return false;
     }
     return true;
   }
@@ -93,8 +93,8 @@ public class BuildOptionsView extends MessageView {
     //
     //  If confirmed, begin construction.
     if (optionID == 0 && selected != null) {
-      final Base base = d.world().playerBase();
-      d.beginConstruction(selected, optionID, base);
+      final Base base = region.world().playerBase();
+      region.setupFacility(selected, optionID, base, false);
       mainView.dismissMessage(this);
     }
     //

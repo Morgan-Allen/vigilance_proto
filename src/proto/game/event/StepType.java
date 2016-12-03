@@ -35,6 +35,11 @@ public abstract class StepType extends EventType {
     *  targets, generating the initial step, and evaluating the odds and appeal
     *  of such an action.
     */
+  public PlanStep asGoal(Element target, Plan plan) {
+    return null;
+  }
+  
+  
   public PlanStep toProvide(Element needed, PlanStep by) {
     return null;
   }

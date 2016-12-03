@@ -28,7 +28,7 @@ public class Facilities {
     HEALTH_AND_ENVIRONMENT, -2,
     INCOME, 2
   ) {
-    protected float speedBonus(Task task) {
+    public float speedBonus(Task task) {
       if (! (task instanceof TaskCraft)) return 0;
       final TaskCraft craft = (TaskCraft) task;
       if (craft.room().kind() == Workshop.BLUEPRINT) return 0.1f;
@@ -46,7 +46,7 @@ public class Facilities {
     HEALTH_AND_ENVIRONMENT, -2,
     INCOME, 2
   ){
-    protected float speedBonus(Task task) {
+    public float speedBonus(Task task) {
       if (! (task instanceof TaskCraft)) return 0;
       final TaskCraft craft = (TaskCraft) task;
       if (craft.room().kind() == Laboratory.BLUEPRINT) return 0.1f;

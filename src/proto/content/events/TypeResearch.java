@@ -58,7 +58,7 @@ public class TypeResearch extends StepType {
   
   protected float baseSuccessChance(PlanStep step) {
     Person makes = (Person) step.need(Needs.MAKES);
-    Item   made  = (Item  ) step.need(Gives.FINDS);
+    Item   made  = (Item  ) step.give(Gives.FINDS);
     return findsChance(makes, made);
   }
   

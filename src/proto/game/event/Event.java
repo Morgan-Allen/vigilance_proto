@@ -138,7 +138,7 @@ public class Event implements Session.Saveable {
     float forceSum   = 0;
     while (forceSum < forceLimit) {
       Kind ofGoon = (Kind) Rand.pickFrom(GOONS, GOON_CHANCES);
-      Person goon = new Person(ofGoon, scene.world());
+      Person goon = Crooks.randomOfKind(ofGoon, scene.world());
       forceSum += goon.stats.powerLevel();
       forces.add(goon);
     }

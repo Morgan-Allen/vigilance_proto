@@ -206,12 +206,18 @@ public class World implements Session.Saveable {
       while (timeHours > HOURS_PER_DAY) {
         timeDays++;
         timeHours -= HOURS_PER_DAY;
-        for (Region d : regions) d.updateRegion();
-        played.updateBaseDaily();
+        for (Region d : regions) {
+          d.updateRegion();
+        }
+        for (Base base : bases) {
+          base.updateBaseDaily();
+        }
       }
       
       events.updateEvents();
-      played.updateBase(timeGap / (HOURS_PER_DAY * DAYS_PER_WEEK));
+      for (Base base : bases) {
+        base.updateBase(timeGap / (HOURS_PER_DAY * DAYS_PER_WEEK));
+      }
     }
   }
   
