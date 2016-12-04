@@ -28,8 +28,8 @@ public class TypeHeist extends TypeMajorCrime {
       
       PlanStep step = new PlanStep(this, plan);
       Item cash = new Item(Clues.CASH, plan.world);
-      step.setGives(cash);
-      step.setNeed(Needs.VENUE, place);
+      step.setGive(Gives.LOOT, cash);
+      step.setNeed(Needs.VENUE, place, step);
       return step;
     }
     return null;
@@ -39,7 +39,7 @@ public class TypeHeist extends TypeMajorCrime {
   public PlanStep toProvide(Element needed, PlanStep by) {
     if (needed.type == Element.TYPE_ITEM) {
       PlanStep step = new PlanStep(this, by.plan);
-      step.setGives(needed);
+      step.setGive(Gives.LOOT, needed);
       return step;
     }
     return null;
@@ -59,9 +59,14 @@ public class TypeHeist extends TypeMajorCrime {
   protected float calcSuitability(
     Element used, Object needType, PlanStep step
   ) {
+    Item loot = (Item) step.give(Gives.LOOT);
+    if (loot == null) return 0;
+    
     if (needType == Needs.VENUE) {
-      //  TODO:  You need to ensure that the venue in question can produce this
-      //  item!
+      if (used.type != Element.TYPE_PLACE) return 0;
+      final Place place = (Place) used;
+      if (! place.kind().providesItemType(loot.kind())) return 0;
+      return 1;
     }
     return super.calcSuitability(used, needType, step);
   }

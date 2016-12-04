@@ -6,7 +6,9 @@ import proto.game.world.*;
 import proto.game.event.*;
 import proto.game.person.*;
 import proto.content.events.StepTypes;
+import proto.content.events.TypeMajorCrime;
 import proto.content.places.Facilities;
+import proto.content.places.UrbanScenes;
 import proto.util.*;
 
 
@@ -15,6 +17,10 @@ public class DebugPlans {
   
   
   public static void main(String args[]) {
+    
+    Assets.compileAssetList("proto");
+    Assets.advanceAssetLoading(-1);
+    
     I.say("Now running sketch!\n");
     
     World world = new World();
@@ -32,18 +38,17 @@ public class DebugPlans {
     }
     
     Place bank = new Place(Facilities.BUSINESS_PARK, 0, world);
-    bank.setProperty(Facilities.REINFORCED, true);
     world.setInside(bank, true);
     Person worker = (Person) Rand.pickFrom(civvies);
-    worker.setResidence(bank);
-    //I.say(world.longDescription());
+    Place.setResident(worker, bank, true);
     
     I.say("\nBeginning plan-generation...");
     Plan plan = new Plan(boss, world, StepTypes.ALL_TYPES);
-    PlanStep firstStep = new PlanStep(StepTypes.HEIST, plan);
-    plan.addGoal(firstStep, 10);
+    plan.verbose = true;
     for (Element crook : crooks) plan.addObtained(crook);
     
+    PlanStep firstStep = StepTypes.HEIST.asGoal(bank, plan);
+    plan.addGoal(firstStep, 10);
     plan.advancePlan(6);
     plan.printFullPlan();
   }

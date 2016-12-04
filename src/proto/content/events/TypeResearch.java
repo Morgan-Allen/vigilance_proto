@@ -69,7 +69,7 @@ public class TypeResearch extends StepType {
     float skill = 0;
     skill += makes.stats.levelFor(PersonStats.INFORMATICS);
     skill -= made.kind().craftDC(PersonStats.INFORMATICS);
-    return Nums.clamp(skill / 10f, 0, 1);
+    return Nums.clamp(skill / 5f, 0, 1);
   }
   
   

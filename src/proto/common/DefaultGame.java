@@ -39,20 +39,21 @@ public class DefaultGame extends RunGame {
   public static void initDefaultNations(World world) {
     int numN = Regions.ALL_REGIONS.length;
     
-    Region[] districts = new Region[numN];
+    Region[] regions = new Region[numN];
     for (int n = 0; n < numN; n++) {
-      districts[n] = new Region(Regions.ALL_REGIONS[n], world);
-      districts[n].initDefaultFacilities(null);
+      regions[n] = new Region(Regions.ALL_REGIONS[n], world);
     }
-    for (Region d : districts) d.initialiseRegion();
-    world.attachDistricts(districts);
+    for (Region region : regions) {
+      region.initialiseRegion(null);
+      //  TODO:  Initialise residents!
+    }
+    world.attachDistricts(regions);
   }
   
   
   public static void initDefaultBase(World world) {
     final Base base = new Base(world, "Wayne Foundation");
     
-    //*
     Person leader = base.addToRoster(new Person(Heroes.HERO_BATMAN, world));
     base.addToRoster(new Person(Heroes.HERO_ALFRED   , world));
     base.addToRoster(new Person(Heroes.HERO_SWARM    , world));
@@ -73,7 +74,6 @@ public class DefaultGame extends RunGame {
     base.stocks.incStock(Gadgets.BATARANGS  , 4);
     base.stocks.incStock(Gadgets.BODY_ARMOUR, 2);
     base.stocks.incStock(Gadgets.MED_KIT    , 2);
-    //*/
     
     base.setIncomeFloor(20);
     base.incFunding(500);
@@ -101,17 +101,17 @@ public class DefaultGame extends RunGame {
     
     for (Person boss : bosses) {
       final Base base = new Base(world, boss.name());
+      world.addBase(base, false);
+      world.setInside(boss, true);
       base.setLeader(boss);
       base.addToRoster(boss);
       base.plans.assignStepTypes(StepTypes.ALL_TYPES);
-      world.addBase(base, false);
-      world.setInside(boss, true);
       
       for (int n = numSeniors; n-- > 0;) {
         Person senior = Crooks.randomOfKind(Crooks.MOBSTER, world);
+        world.setInside(senior, true);
         seniors.add(senior);
         base.addToRoster(senior);
-        world.setInside(senior, true);
       }
     }
   }

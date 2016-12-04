@@ -20,6 +20,7 @@ public class PersonGear {
   
   final Person person;
   Equipped equipSlots[] = new Equipped[NUM_EQUIP_SLOTS];
+  Element carried = null;
   
   
   
@@ -32,6 +33,7 @@ public class PersonGear {
     for (int i = 0 ; i < NUM_EQUIP_SLOTS; i++) {
       equipSlots[i] = (Equipped) s.loadObject();
     }
+    carried = (Element) s.loadObject();
   }
   
   
@@ -39,6 +41,7 @@ public class PersonGear {
     for (int i = 0 ; i < NUM_EQUIP_SLOTS; i++) {
       s.saveObject(equipSlots[i]);
     }
+    s.saveObject(carried);
   }
   
 

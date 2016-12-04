@@ -47,6 +47,7 @@ public class BasePlans {
   
   
   void updatePlanning() {
+    if (Visit.empty(stepTypes)) return;
     
     if (currentPlan == null || planComplete()) {
       

@@ -16,7 +16,7 @@ public abstract class TypeMajorCrime extends StepType {
   
   
   public static enum Needs {
-    VENUE, EXPLOSIVE, BLUEPRINT, MOLE, ALARM_CRACKER
+    VENUE, ENFORCER, EXPLOSIVE, BLUEPRINT, MOLE, ALARM_CRACKER
   };
   
   
@@ -26,7 +26,7 @@ public abstract class TypeMajorCrime extends StepType {
     super(name, ID, needTypes, giveTypes);
   }
   
-
+  
   protected Series <Element> availableTargets(Object needType, World world) {
     if (needType == Needs.EXPLOSIVE) {
       Item bomb = new Item(Clues.BOMB, world);
@@ -44,8 +44,14 @@ public abstract class TypeMajorCrime extends StepType {
     Place venue = (Place) step.need(Needs.VENUE);
     if (venue == null) return needType == Needs.VENUE;
     
+    boolean reinforced = venue.kind().hasFurnitureType(Facilities.REINFORCED);
+    boolean alarmed    = venue.kind().hasFurnitureType(Facilities.ALARMED   );
+    
     if (needType == Needs.EXPLOSIVE) {
-      return venue.hasProperty(Facilities.REINFORCED);
+      return reinforced;
+    }
+    if (needType == Needs.ENFORCER) {
+      return true;
     }
     if (needType == Needs.BLUEPRINT) {
       return true;
@@ -54,7 +60,7 @@ public abstract class TypeMajorCrime extends StepType {
       return true;
     }
     if (needType == Needs.ALARM_CRACKER) {
-      return venue.hasProperty(Facilities.REINFORCED);
+      return alarmed;
     }
     return true;
   }
@@ -70,36 +76,39 @@ public abstract class TypeMajorCrime extends StepType {
     }
     if (venue == null) return -1;
     
+    if (needType == Needs.ENFORCER) {
+      if (used.type != Element.TYPE_PERSON) return 0;
+      Person enforcer = (Person) used;
+      if (step.plan.agent.base() != enforcer.base()) return 0;
+      return enforcer.stats.powerLevel();
+    }
     if (needType == Needs.EXPLOSIVE) {
-      if (! venue.hasProperty(Facilities.REINFORCED)) return 0;
       if (used.kind != Clues.BOMB) return 0;
       return 1;
     }
-    
     if (needType == Needs.BLUEPRINT) {
       if (used.kind != Clues.BLUEPRINT) return 0;
       return 1;
     }
-    
     if (needType == Needs.MOLE) {
       if (used.type != Element.TYPE_PERSON) return 0;
       Person mole = (Person) used;
       if (mole.resides() != venue) return 0;
       return 1;
     }
-
     if (needType == Needs.ALARM_CRACKER) {
       if (used.type != Element.TYPE_PERSON) return 0;
       final Person agent = (Person) used;
       return agent.stats.levelFor(PersonStats.ENGINEERING);
     }
-    
     return 0;
   }
   
   
   protected float baseSuccessChance(PlanStep step) {
     float chance = 1.0f;
+    
+    //  TODO:  Update this!
     
     float mookRatings = 1.5f;
     chance *= mookRatings / 3;

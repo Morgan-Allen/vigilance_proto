@@ -99,7 +99,7 @@ public abstract class StepType extends EventType {
   
   
   
-  /**  Rendering and interface methods-
+  /**  Rendering, debug and interface methods-
     */
   protected abstract String langDescription(PlanStep step);
   

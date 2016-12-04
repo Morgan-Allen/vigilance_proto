@@ -6,6 +6,7 @@ import proto.game.event.*;
 import proto.game.person.*;
 import proto.util.*;
 import java.awt.Image;
+import proto.content.agents.Crooks;
 
 
 
@@ -19,6 +20,7 @@ public class Place extends Element {
   private Base owner;
   private float buildProgress;
   private List <Trait> properties = new List();
+  private List <Person> residents = new List();
   
   
   public Place(PlaceType print, int slotID, World world) {
@@ -34,6 +36,7 @@ public class Place extends Element {
     owner         = (Base  ) s.loadObject();
     buildProgress = s.loadFloat();
     s.loadObjects(properties);
+    s.loadObjects(residents);
   }
   
   
@@ -43,6 +46,7 @@ public class Place extends Element {
     s.saveObject(owner        );
     s.saveFloat (buildProgress);
     s.saveObjects(properties);
+    s.saveObjects(residents);
   }
   
   
@@ -74,12 +78,13 @@ public class Place extends Element {
   }
   
   
-  public boolean hasProperty(Trait t) {
-    return properties.includes(t);
+  public void setProperty(Trait trait, boolean is) {
+    properties.toggleMember(trait, true);
   }
   
-  public void setProperty(Trait t, boolean is) {
-    properties.toggleMember(t, is);
+  
+  public boolean hasProperty(Trait trait) {
+    return properties.includes(trait);
   }
   
   
@@ -93,8 +98,19 @@ public class Place extends Element {
   }
   
   
+  public void updateResidents() {
+    //  TODO:  You might need to make this more nuanced.  And derive the types
+    //  of employee from the PlaceType in the content package!
+    while (residents.size() < 3) {
+      Person resides = Crooks.randomOfKind(Crooks.CIVILIAN, world);
+      world.setInside(resides, true);
+      Place.setResident(resides, this, true);
+    }
+  }
   
-  /**  Toggling visitors-
+  
+  
+  /**  Toggling visitors and residents-
     */
   public Series <Person> visitors() {
     final Batch <Person> visitors = new Batch();
@@ -107,6 +123,31 @@ public class Place extends Element {
   
   public Task[] possibleTasks() {
     return new Task[0];
+  }
+  
+  
+  public void setResident(Person person, boolean is) {
+    residents.toggleMember(person, is);
+  }
+  
+  
+  public static void setResident(Person person, Place place, boolean is) {
+    //  NOTE:  This is intended to allow residence to be specified from either
+    //  the person or place without entering a loop or forgetting to update one
+    //  side or another...
+    final boolean
+      there = person.resides() == place,
+      here  = place.residents.includes(person);
+    if (is) {
+      if (there && here) return;
+      if (! here) place.setResident(person, true);
+      if (! there) person.setResidence(place);
+    }
+    else {
+      if ((! there) && (! here)) return;
+      if (here) place.setResident(person, false);
+      if (there) person.setResidence(null);
+    }
   }
   
   

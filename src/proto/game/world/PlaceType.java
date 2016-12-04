@@ -4,6 +4,7 @@ package proto.game.world;
 import proto.common.*;
 import proto.game.event.*;
 import proto.game.scene.*;
+import proto.game.person.*;
 import proto.util.*;
 import java.awt.Image;
 
@@ -16,13 +17,11 @@ public class PlaceType extends Kind {
   /**  Data fields, construction and save/load methods-
     */
   final Image icon;
-  
+  final SceneType sceneType;
   final Region.Stat stats[];
   final int statMods[];
-  final int buildCost, buildTime;
-  
-  final SceneType sceneType;
-  int security, lighting, cover;
+  final List <Equipped> itemsVended = new List();
+  final public int buildCost, buildTime;
   
   
   
@@ -52,7 +51,7 @@ public class PlaceType extends Kind {
     
     for (int n = 0; n < numS; n++) {
       stats   [n] = (Region.Stat) args[ n * 2     ];
-      statMods[n] = (Integer      ) args[(n * 2) + 1];
+      statMods[n] = (Integer    ) args[(n * 2) + 1];
     }
     
     this.sceneType = sceneType;
@@ -61,6 +60,16 @@ public class PlaceType extends Kind {
   
   public SceneType sceneType() {
     return sceneType;
+  }
+  
+  
+  public boolean providesItemType(Equipped type) {
+    return itemsVended.includes(type);
+  }
+  
+  
+  public boolean hasFurnitureType(Trait trait) {
+    return sceneType.hasFurnitureOfType(trait);
   }
   
   

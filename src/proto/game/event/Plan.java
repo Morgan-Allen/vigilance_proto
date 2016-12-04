@@ -61,13 +61,17 @@ public class Plan implements Session.Saveable {
   
   public void addGoal(PlanStep goal, float priority) {
     goal.assignRating(priority);
+    if (! fillNeeds(goal)) {
+      if (verbose) I.say("Could not fill needs for: "+goal);
+      return;
+    }
     addStep(goal);
-    fillNeeds(goal);
   }
   
   
   public void selectInitialGoal() {
     if (verbose) I.say("\nSelecting goal-");
+    
     final Batch <PlanStep> goals = new Batch();
     final Series <Element> targets = world.inside();
     
@@ -77,7 +81,6 @@ public class Plan implements Session.Saveable {
         if (goal == null) continue;
         goal.assignRating(type.baseAppeal(goal));
         goals.add(goal);
-        if (verbose) I.say("  considering: "+goal.langDescription());
       }
     }
     
@@ -89,7 +92,7 @@ public class Plan implements Session.Saveable {
   
   public void advancePlan(int maxIterations) {
     while (maxIterations-- > 0) {
-      if (verbose) I.say("\nAdvancing plan-");
+      if (verbose) I.say("\nAdvancing plan- "+this.hashCode());
       
       Batch <PlanStep> nextGen = new Batch();
       for (PlanStep step : steps) {
@@ -104,17 +107,13 @@ public class Plan implements Session.Saveable {
   
   
   private PlanStep pickStepFrom(Series <PlanStep> nextGen) {
-    float sumRatings = 0;
+    PlanStep picked = null;
+    float bestRating = 0;
+    
     for (PlanStep child : nextGen) {
       if (verbose) I.say("  Rating for "+child+": "+child.rating());
-      sumRatings += child.rating();
-    }
-    
-    float rollInSum = Rand.num() * sumRatings;
-    PlanStep picked = null;
-    for (PlanStep child : nextGen) {
-      rollInSum -= child.rating();
-      if (rollInSum <= 0) { picked = child; break; }
+      float rating = child.rating() * (Rand.num() + 0.5f);
+      if (rating > bestRating) { picked = child; bestRating = rating; }
     }
     
     return picked;
@@ -134,12 +133,13 @@ public class Plan implements Session.Saveable {
   }
   
   
-  private void fillNeeds(PlanStep step) {
+  private boolean fillNeeds(PlanStep step) {
     for (Object role : step.needTypes()) {
       if (! step.type.isNeeded(role, step)) continue;
       Element used = step.need(role);
+      if (used != null) continue;
       Series <Element> available = step.type.availableTargets(role, world);
-      if (available == null || used != null) continue;
+      if (available == null || available.empty()) continue;
       
       float bestRating = 0;
       for (Element match : available) {
@@ -149,11 +149,10 @@ public class Plan implements Session.Saveable {
         if (rating > bestRating) { used = match; bestRating = rating; }
       }
       
-      if (used == null) {
-        ///I.say("No match found for: "+role+"/"+step);
-      }
-      else step.setNeed(role, used);
+      if (used == null) return false;
+      else step.setNeed(role, used, null);
     }
+    return true;
   }
   
   
@@ -162,11 +161,15 @@ public class Plan implements Session.Saveable {
       Element  needed   = step.need(role);
       PlanStep needStep = step.stepForNeed(role);
       if (needed == null || needStep != null) continue;
-      if (obtainedBefore(step, needed)      ) continue;
+      
+      if (obtainedBefore(step, needed)) {
+        step.setNeed(role, needed, step);
+        continue;
+      }
       
       PlanStep possible[] = step.actionsToObtain(needed, role);
       for (PlanStep child : possible) {
-        fillNeeds(child);
+        if (! fillNeeds(child)) continue;
         child.setParent(step, role);
         child.calcStepRatingFromParent(step);
         toEval.add(child);
@@ -226,7 +229,7 @@ public class Plan implements Session.Saveable {
   /**  Debugging, graphics and interface methods-
     */
   public void printFullPlan() {
-    I.say("\n\nFinal plan: ");
+    I.say("\n\nFinal plan: "+this.hashCode());
     for (PlanStep step : steps()) {
       I.say("  "+step.langDescription()+": "+step.rating());
     }

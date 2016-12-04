@@ -26,7 +26,6 @@ public class Kind extends Index.Entry implements Session.Saveable {
   String defaultInfo;
   Image sprite;
   
-  //  TODO:  Move these out into a dedicated person/prop-kind class.
   int type;
   int wide, high;
   boolean blockSight;
@@ -55,7 +54,6 @@ public class Kind extends Index.Entry implements Session.Saveable {
   }
   
   
-  
   public static Kind ofPerson(
     String name, String ID, String spritePath, String defaultInfo,
     int type, Object... initStats
@@ -64,7 +62,32 @@ public class Kind extends Index.Entry implements Session.Saveable {
     k.type = type;
     k.wide = k.high = 1;
     k.blockPath = k.blockSight = false;
+    initStatsFor(k, initStats);
     
+    k.sprite = loadImage(spritePath);
+    return k;
+  }
+  
+  
+  public static Kind ofProp(
+    String name, String ID, String spritePath,
+    int wide, int high, boolean blockPath, boolean blockSight,
+    Object... initStats
+  ) {
+    Kind k = new Kind(name, ID, "");
+    k.type = TYPE_PROP;
+    k.wide = wide;
+    k.high = high;
+    k.blockPath  = blockPath ;
+    k.blockSight = blockSight;
+    initStatsFor(k, initStats);
+    
+    k.sprite = loadImage(spritePath);
+    return k;
+  }
+  
+  
+  private static void initStatsFor(Kind k, Object... initStats) {
     Batch <Trait   > allT = new Batch();
     Batch <Equipped> allE = new Batch();
     Batch <Equipped> allC = new Batch();
@@ -93,25 +116,6 @@ public class Kind extends Index.Entry implements Session.Saveable {
     k.baseTraits   = allT.toArray(Trait   .class);
     k.baseEquipped = allE.toArray(Equipped.class);
     k.customItems  = allC.toArray(Equipped.class);
-    
-    k.sprite = loadImage(spritePath);
-    return k;
-  }
-  
-  
-  public static Kind ofProp(
-    String name, String ID, String spritePath,
-    int wide, int high, boolean blockPath, boolean blockSight
-  ) {
-    Kind k = new Kind(name, ID, "");
-    k.type = TYPE_PROP;
-    k.wide = wide;
-    k.high = high;
-    k.blockPath  = blockPath ;
-    k.blockSight = blockSight;
-    
-    k.sprite = loadImage(spritePath);
-    return k;
   }
   
   
@@ -139,6 +143,8 @@ public class Kind extends Index.Entry implements Session.Saveable {
   public Image  sprite() { return sprite; }
   
   public String defaultInfo() { return defaultInfo; }
+  
+  public String toString() { return name; }
   
   
   public static Image loadImage(String imgPath) {

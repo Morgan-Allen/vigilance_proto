@@ -25,8 +25,8 @@ public class TypeKidnapping extends TypeMajorCrime {
     if (needed.type == Element.TYPE_PERSON) {
       PlanStep step = new PlanStep(this, by.plan);
       Person victim = (Person) needed;
-      step.setGives(victim);
-      step.setNeed(Needs.VENUE, victim.resides());
+      step.setGive(Gives.VICTIM, victim);
+      step.setNeed(Needs.VENUE, victim.resides(), step);
       return step;
     }
     return null;

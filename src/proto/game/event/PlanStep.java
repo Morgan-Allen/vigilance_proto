@@ -66,6 +66,7 @@ public class PlanStep implements Session.Saveable {
   }
   
   
+  /*
   public PlanStep setGives(Element... gives) {
     for (int g = gives.length; g-- > 0;) this.gives[g] = gives[g];
     return this;
@@ -76,6 +77,7 @@ public class PlanStep implements Session.Saveable {
     for (int n = needs.length; n-- > 0;) this.needs[n] = needs[n];
     return this;
   }
+  //*/
   
   
   public PlanStep setParent(PlanStep parent, Object needType) {
@@ -111,13 +113,17 @@ public class PlanStep implements Session.Saveable {
   }
   
   
-  public void setNeed(Object needType, Element value) {
-    needs[Visit.indexOf(needType, needTypes())] = value;
+  public PlanStep setNeed(Object needType, Element value, PlanStep gives) {
+    final int index = Visit.indexOf(needType, needTypes());
+    needs    [index] = value;
+    needSteps[index] = gives;
+    return this;
   }
   
   
-  public void setGive(Object giveType, Element value) {
+  public PlanStep setGive(Object giveType, Element value) {
     gives[Visit.indexOf(giveType, giveTypes())] = value;
+    return this;
   }
   
   
@@ -279,8 +285,11 @@ public class PlanStep implements Session.Saveable {
     
     String needs = "";
     for (Object type : needTypes()) {
-      if (need(type) != null) continue;
-      needs+="["+type+"]";
+      if (! this.type.isNeeded(type, this)) continue;
+      Element needed = need(type);
+      PlanStep getStep = stepForNeed(type);
+      if (needed != null && getStep != null) continue;
+      needs+="["+type+(needed == null ? "" : " = "+needed)+"]";
     }
     if (needs.length() > 0) desc+=" (Need "+needs+")";
     
@@ -298,6 +307,7 @@ public class PlanStep implements Session.Saveable {
     
     s.append("\n  Needs:");
     for (int n = 0; n < needR.length; n++) {
+      if (! type.isNeeded(needR[n], this)) continue;
       s.append("\n    "+needR[n]+"- "+needs[n]);
       if (needSteps[n] != null) s.append(" ("+needSteps[n]+")");
     }

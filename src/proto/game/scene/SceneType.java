@@ -3,6 +3,7 @@
 package proto.game.scene;
 import proto.common.*;
 import proto.game.world.*;
+import proto.game.person.*;
 import proto.util.*;
 
 
@@ -29,8 +30,9 @@ public class SceneType extends Index.Entry implements
   Kind props[];
   float propWeights[];
   
-  SceneType childPatterns[];
+  SceneType childPatterns[] = new SceneType[0];
   Box2D childLayouts[];
+  Table <Trait, Boolean> traitQueryCache = new Table();
   
   
   public SceneType(
@@ -60,6 +62,28 @@ public class SceneType extends Index.Entry implements
   
   public void saveState(Session s) throws Exception {
     INDEX.saveEntry(this, s.output());
+  }
+  
+  
+  public boolean hasFurnitureOfType(Trait trait) {
+    Boolean cached = traitQueryCache.get(trait);
+    if (cached != null) return cached;
+    
+    Kind all[] = { borders, door, window, floors };
+    Boolean result = false;
+    
+    for (Kind kind : all) {
+      if (kind != null && kind.baseLevel(trait) > 0) result = true;
+    }
+    for (Kind kind : props) {
+      if (kind != null && kind.baseLevel(trait) > 0) result = true;
+    }
+    for (SceneType kid : childPatterns) {
+      if (kid.hasFurnitureOfType(trait)) result = true;
+    }
+    
+    traitQueryCache.put(trait, result);
+    return result;
   }
   
   

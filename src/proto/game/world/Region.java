@@ -123,15 +123,6 @@ public class Region extends Element {
   }
   
   
-  public void initDefaultFacilities(Base owns) {
-    final PlaceType DF[] = kind().defaultFacilities;
-    for (int i = 0; i < buildSlots.length; i++) {
-      if (DF == null || i >= DF.length) break;
-      setupFacility(DF[i], i, owns, true);
-    }
-  }
-  
-  
   
   /**  General stat-queries and modifications-
     */
@@ -244,6 +235,7 @@ public class Region extends Element {
     if (complete || owns == null) {
       place.setOwner(owns);
       place.setBuildProgress(1);
+      place.updateResidents();
     }
     else {
       place.setOwner(owns);
@@ -261,8 +253,15 @@ public class Region extends Element {
   
   /**  Updates and life-cycle:
     */
-  public void initialiseRegion() {
+  public void initialiseRegion(Base owns) {
+    
+    final PlaceType DF[] = kind().defaultFacilities;
+    for (int i = 0; i < buildSlots.length; i++) {
+      if (DF == null || i >= DF.length) break;
+      setupFacility(DF[i], i, owns, true);
+    }
     updateRegion();
+    
     for (Stat stat : CIVIC_STATS) {
       final Level l = statLevels[stat.ID];
       l.current = l.level + l.bonus;

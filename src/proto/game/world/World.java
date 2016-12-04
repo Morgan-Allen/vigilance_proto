@@ -132,7 +132,6 @@ public class World implements Session.Saveable {
   public void addBase(Base base, boolean played) {
     bases.add(base);
     if (played) this.played = base;
-    base.updateBase(0);
   }
   
   

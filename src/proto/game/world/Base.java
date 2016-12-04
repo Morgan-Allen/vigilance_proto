@@ -133,9 +133,10 @@ public class Base implements Session.Saveable {
   
   /**  Roster modification-
     */
-  public Person addToRoster(Person hero) {
-    roster.add(hero);
-    return hero;
+  public Person addToRoster(Person member) {
+    roster.add(member);
+    member.setBase(this);
+    return member;
   }
   
   

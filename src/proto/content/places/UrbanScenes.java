@@ -11,7 +11,7 @@ public class UrbanScenes {
   
 
   final static String IMG_DIR = "media assets/scene layout/bar scene/";
-  final static Kind
+  final public static Kind
     KIND_WALL = Kind.ofProp(
       "Wall", "prop_wall_urban", IMG_DIR+"sprite_wall.png",
       1, 1, true, true
@@ -22,17 +22,18 @@ public class UrbanScenes {
     ),
     KIND_DOOR = Kind.ofProp(
       "Door", "prop_door_urban", IMG_DIR+"sprite_door.png",
-      1, 1, false, true
+      1, 1, false, true,
+      Facilities.ALARMED, 1
     ),
     KIND_WINDOW = Kind.ofProp(
       "Window", "prop_window_urban", IMG_DIR+"sprite_window.png",
-      1, 1, true, false
+      1, 1, true, false,
+      Facilities.ALARMED, 1
     ),
     KIND_POOL_TABLE = Kind.ofProp(
       "Pool Table", "prop_pool_table_urban", IMG_DIR+"sprite_pool_table.png",
       3, 2, true, false
     );
-  
   
   final public static SceneType URBAN_SCENE = new SceneType(
     "urban scene", "type_urban_scene",

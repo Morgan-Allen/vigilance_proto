@@ -37,38 +37,31 @@ public class DebugScene extends RunGame {
     DefaultGame.initDefaultBase   (world);
     DefaultGame.initDefaultCrime  (world);
     
+    //  TODO:  At the moment you have a problem where the needs for an initial
+    //  goal might be impossible to satisfy (e.g, nobody has any initial
+    //  engineering skills, so alarm-crackers can't be found.)
+    
+    //  So, you'll need some specialists:
+    
+    //  Civilians with modest random skills
+    //  Doctors, for anatomy & pharmacy
+    //  Inventors, for engineering & informatics
+    //  Politicians, for law/finance & suasion
+    //  Police, for combat & social skills
+    //  The various individual heroes
+    
+    //  Goons with some basic muscle
+    //  Mobsters, for vehicles, marksman & languages
+    //  Fences, for law/finance & suasion
+    //  Hitmen, for stealth, disguise & weapon skill
+    //  Psychos, for the occult and random expertise
+    //  The various individual villains
+    
     //  TODO:  You still need to generate tipoffs to indicate a plan is in
     //  progress.
     
     //  TODO:  Also, you need to avoid different bosses interfering with
     //  eachother (if reasonably possible.)
-    
-    /*
-    Person boss = new Person(Crooks.MOBSTER, world, "Crime Boss");
-    Person perp = Crooks.randomOfKind(Crooks.GOON, world);
-    Person victim = Crooks.randomOfKind(Crooks.CIVILIAN, world);
-    Region port = world.regionFor(Regions.PORT_ADAMS);
-    Place building = port.buildSlot(0);
-    
-    Place home = new Place(Facilities.COMMUNITY_COLLEGE, 0, world);
-    world.setInside(home, true);
-    world.regionFor(Regions.BLACKGATE).setAttached(home, true);
-    victim.setResidence(home);
-    
-    Plan plan = new Plan(boss, world, StepTypes.ALL_TYPES);
-    PlanStep kidnapStep = new PlanStep(StepTypes.KIDNAP, plan);
-    kidnapStep.setGives(victim);
-    kidnapStep.setNeed(TypeKidnapping.Needs.VENUE, home);
-    kidnapStep.setNeed(TypeKidnapping.Needs.ALARM_CRACKER, perp);
-    
-    Event kidnapEvent = kidnapStep.spawnEvent(world, 24);
-    world.events.scheduleEvent(kidnapEvent);
-    
-    Clue tipoff = new Clue(ClueTypes.TIPOFF, world, perp);
-    building.setAttached(tipoff, true);
-    building.setAttached(perp, true);
-    world.playerBase().leads.addLead(perp);
-    //*/
     
     return world;
   }

@@ -26,7 +26,7 @@ public class TypeMake extends StepType {
   
   public PlanStep toProvide(Element needed, PlanStep by) {
     if (needed.type == Element.TYPE_ITEM) {
-      return new PlanStep(this, by.plan).setGives(needed);
+      return new PlanStep(this, by.plan).setGive(Gives.MADE, needed);
     }
     return null;
   }
@@ -54,13 +54,13 @@ public class TypeMake extends StepType {
   
   
   private float makesChance(Person makes, Item made) {
-    if (makes == null || made == null) return 0.1f;
+    if (makes == null || made == null) return 0;
     //  TODO:  Adapt this to a wider array of potential skills, and unify with
     //  similar methods in the Task or Crafting class.
     float skill = 0;
     skill += makes.stats.levelFor(PersonStats.ENGINEERING);
     skill -= made.kind().craftDC(PersonStats.ENGINEERING);
-    return Nums.clamp(skill / 10f, 0, 1);
+    return Nums.clamp(skill / 5f, 0, 1);
   }
   
   

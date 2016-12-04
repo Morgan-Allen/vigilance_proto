@@ -28,6 +28,7 @@ public class Person extends Element {
   final public PersonHealth  health  = new PersonHealth (this);
   final public PersonGear    gear    = new PersonGear   (this);
   
+  Base base;
   Assignment assignment;
   Place resides;
   
@@ -71,6 +72,7 @@ public class Person extends Element {
     health .loadState(s);
     gear   .loadState(s);
     
+    base       = (Base      ) s.loadObject();
     assignment = (Assignment) s.loadObject();
     resides    = (Place     ) s.loadObject();
     
@@ -92,6 +94,7 @@ public class Person extends Element {
     health .saveState(s);
     gear   .saveState(s);
     
+    s.saveObject(base      );
     s.saveObject(assignment);
     s.saveObject(resides   );
     
@@ -108,8 +111,23 @@ public class Person extends Element {
   }
   
   
+  public Base base() {
+    return base;
+  }
+  
+  
   public Side side() {
     return side;
+  }
+  
+  
+  public Assignment assignment() {
+    return assignment;
+  }
+  
+  
+  public Place resides() {
+    return resides;
   }
   
   
@@ -123,13 +141,8 @@ public class Person extends Element {
   }
   
   
-  public Assignment assignment() {
-    return assignment;
-  }
-  
-  
-  public Place resides() {
-    return resides;
+  public void setBase(Base base) {
+    this.base = base;
   }
   
   
@@ -156,8 +169,6 @@ public class Person extends Element {
     if (assignment instanceof Scene) return (Scene) assignment;
     return null;
   }
-  
-  
   
   
   
