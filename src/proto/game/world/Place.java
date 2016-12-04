@@ -107,7 +107,7 @@ public class Place extends Element {
       int count = 0;
       for (Person p : residents) if (p.kind() == type) count++;
       
-      while (count < max) {
+      while (count++ < max) {
         Person resides = Person.randomOfKind(type, world);
         world.setInside(resides, true);
         Place.setResident(resides, this, true);

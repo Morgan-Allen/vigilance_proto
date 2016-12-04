@@ -52,6 +52,7 @@ public class Kind extends Index.Entry implements Session.Saveable {
     super(INDEX, uniqueID);
     this.name        = name;
     this.defaultInfo = info;
+    this.type        = type;
   }
   
   

@@ -185,10 +185,12 @@ public class PlanStep implements Session.Saveable {
   
   
   void calcStepRatingFromParent(PlanStep parent) {
+    //I.say("STARTED CALC");
     float chance = calcSuccessChance();
     rating = chance * parent.rating;
     rating += chance * baseAppeal();
     rating -= (1 - chance) * baseFailRisk();
+    //I.say("ENDED CALC");
   }
   
   
@@ -201,7 +203,9 @@ public class PlanStep implements Session.Saveable {
     
     for (int r = needs.length; r-- > 0;) {
       PlanStep getStep = needSteps[r];
-      if (getStep != null) chance *= getStep.calcSuccessChance();
+      if (getStep != null && getStep != this) {
+        chance *= getStep.calcSuccessChance();
+      }
     }
     
     chance *= baseSuccessChance();

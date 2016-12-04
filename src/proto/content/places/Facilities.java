@@ -6,6 +6,7 @@ import proto.game.event.*;
 import proto.game.world.*;
 import proto.content.rooms.*;
 import static proto.game.world.Region.*;
+import proto.content.agents.Civilians;
 import static proto.content.places.UrbanScenes.*;
 
 
@@ -29,7 +30,8 @@ public class Facilities {
     100, BUILD_TIME_MEDIUM, URBAN_SCENE,
     EMPLOYMENT, 3,
     HEALTH_AND_ENVIRONMENT, -2,
-    INCOME, 2
+    INCOME, 2,
+    Civilians.CIVILIAN, 2
   ) {
     public float speedBonus(Task task) {
       if (! (task instanceof TaskCraft)) return 0;

@@ -36,7 +36,7 @@ public class PlaceType extends Kind {
     Object... initStats
   ) {
     super(name, ID, info, Kind.TYPE_PLACE);
-
+    
     this.icon = Kind.loadImage(imgPath);
     
     this.buildCost = buildCost;
