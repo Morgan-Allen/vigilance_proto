@@ -38,17 +38,6 @@ public class Crooks {
       HIT_POINTS, 12,
       WILLPOWER , 10
     ),
-    BROKER = Kind.ofPerson(
-      "Broker", "person_kind_broker", IMG_DIR+"icon_broker.png",
-      "", Civilians.COMMON_NAMES,
-      Kind.SUBTYPE_CIVILIAN,
-      INTELLECT , 6 ,
-      REFLEX    , 3 ,
-      SOCIAL    , 5 ,
-      STRENGTH  , 2 ,
-      HIT_POINTS, 6 ,
-      WILLPOWER , 9
-    ),
     HITMAN = null,
     PSYCHO = null
   ;

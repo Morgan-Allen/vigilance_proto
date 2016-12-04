@@ -33,8 +33,49 @@ public class Civilians {
       HIT_POINTS, 6 ,
       WILLPOWER , 4 
     ),
-    DOCTOR     = null,
-    INVENTOR   = null,
+    DOCTOR = Kind.ofPerson(
+      "Doctor", "person_kind_doctor", IMG_DIR+"icon_civilian_2.png",
+      "", COMMON_NAMES,
+      Kind.SUBTYPE_CIVILIAN,
+      INTELLECT , 7 ,
+      REFLEX    , 3 ,
+      SOCIAL    , 5 ,
+      STRENGTH  , 2 ,
+      HIT_POINTS, 6 ,
+      WILLPOWER , 5 ,
+      
+      PHARMACY   , 7,
+      ANATOMY    , 7
+    ),
+    INVENTOR = Kind.ofPerson(
+      "Inventor", "person_kind_inventor", IMG_DIR+"icon_civilian_2.png",
+      "", COMMON_NAMES,
+      Kind.SUBTYPE_CIVILIAN,
+      INTELLECT , 7 ,
+      REFLEX    , 3 ,
+      SOCIAL    , 5 ,
+      STRENGTH  , 2 ,
+      HIT_POINTS, 6 ,
+      WILLPOWER , 5 ,
+      
+      ENGINEERING, 7,
+      INFORMATICS, 7
+    ),
+    BROKER = Kind.ofPerson(
+      "Broker", "person_kind_broker", IMG_DIR+"icon_broker.png",
+      "", Civilians.COMMON_NAMES,
+      Kind.SUBTYPE_CIVILIAN,
+      INTELLECT , 6 ,
+      REFLEX    , 3 ,
+      SOCIAL    , 5 ,
+      STRENGTH  , 2 ,
+      HIT_POINTS, 6 ,
+      WILLPOWER , 6 ,
+      
+      INFORMATICS  , 5,
+      LAW_N_FINANCE, 5,
+      SUASION      , 7
+    ),
     POLITICIAN = null,
     POLICE     = null
   ;

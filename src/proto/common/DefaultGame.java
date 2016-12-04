@@ -86,7 +86,11 @@ public class DefaultGame extends RunGame {
     
     Batch <Person> bosses  = new Batch();
     Batch <Person> seniors = new Batch();
-    int numSeniors = 3;
+    
+    final Kind seniorTypes[] = {
+      Crooks.MOBSTER, Crooks.MOBSTER, Crooks.MOBSTER,
+      Civilians.DOCTOR, Civilians.INVENTOR, Civilians.BROKER
+    };
     final Person
       falcone = new Person(Villains.FALCONE , world),
       twoFace = new Person(Villains.TWO_FACE, world)
@@ -105,8 +109,8 @@ public class DefaultGame extends RunGame {
       base.addToRoster(boss);
       base.plans.assignStepTypes(StepTypes.ALL_TYPES);
       
-      for (int n = numSeniors; n-- > 0;) {
-        Person senior = Person.randomOfKind(Crooks.MOBSTER, world);
+      for (Kind type : seniorTypes) {
+        Person senior = Person.randomOfKind(type, world);
         world.setInside(senior, true);
         seniors.add(senior);
         base.addToRoster(senior);
