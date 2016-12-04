@@ -11,7 +11,7 @@ public class BaseStocks {
   
   
   final Base base;
-  Tally <Equipped> stocks = new Tally();
+  Tally <ItemType> stocks = new Tally();
   
   
   BaseStocks(Base base) {
@@ -30,10 +30,10 @@ public class BaseStocks {
   
   
   
-  public Series <Equipped> availableItems(Person person, int slotID) {
-    Batch <Equipped> available = new Batch();
+  public Series <ItemType> availableItems(Person person, int slotID) {
+    Batch <ItemType> available = new Batch();
     
-    for (Equipped item : stocks.keys()) {
+    for (ItemType item : stocks.keys()) {
       if (item.slotID != slotID || ! item.availableFor(person, base)) continue;
       available.add(item);
     }
@@ -41,19 +41,19 @@ public class BaseStocks {
   }
   
   
-  public boolean incStock(Equipped item, int amount) {
+  public boolean incStock(ItemType item, int amount) {
     if (item == null) return false;
     stocks.add(amount, item);
     return true;
   }
   
   
-  public void removeFromStore(Equipped item) {
+  public void removeFromStore(ItemType item) {
     incStock(item, -1);
   }
   
   
-  public int numStored(Equipped item) {
+  public int numStored(ItemType item) {
     return (int) stocks.valueFor(item);
   }
   

@@ -13,31 +13,42 @@ public class Kind extends Index.Entry implements Session.Saveable {
   
   
   final static Index <Kind> INDEX = new Index <Kind> ();
+  
   final public static int
-    TYPE_PROP     = 0,
-    TYPE_CIVILIAN = 1,
-    TYPE_HERO     = 2,
-    TYPE_MOOK     = 3,
-    TYPE_EXPERT   = 4,
-    TYPE_BOSS     = 5
+    TYPE_INIT   = -1,
+    TYPE_WORLD  =  0,
+    TYPE_REGION =  1,
+    TYPE_PLACE  =  2,
+    TYPE_PERSON =  3,
+    TYPE_ITEM   =  5,
+    TYPE_PROP   =  6,
+    TYPE_CLUE   =  7
+  ;
+  final public static int
+    SUBTYPE_CIVILIAN = 1,
+    SUBTYPE_MOOK     = 2,
+    SUBTYPE_HERO     = 3,
+    SUBTYPE_BOSS     = 4
   ;
   
   String name;
   String defaultInfo;
   Image sprite;
+  String firstNames[], lastNames[];
   
-  int type;
+  int type, subtype;
   int wide, high;
   boolean blockSight;
   boolean blockPath;
   
-  Table <Trait, Integer> traitLevels = new Table();
+  Table <Object, Integer> traitLevels = new Table();
   Trait    baseTraits  [] = new Trait   [0];
-  Equipped baseEquipped[] = new Equipped[0];
-  Equipped customItems [] = new Equipped[0];
+  ItemType baseEquipped[] = new ItemType[0];
+  ItemType customItems [] = new ItemType[0];
+  Kind     childTypes  [] = new Kind    [0];
   
   
-  protected Kind(String name, String uniqueID, String info) {
+  protected Kind(String name, String uniqueID, String info, int type) {
     super(INDEX, uniqueID);
     this.name        = name;
     this.defaultInfo = info;
@@ -56,15 +67,20 @@ public class Kind extends Index.Entry implements Session.Saveable {
   
   public static Kind ofPerson(
     String name, String ID, String spritePath, String defaultInfo,
-    int type, Object... initStats
+    String personNames[][],
+    int subtype, Object... initStats
   ) {
-    Kind k = new Kind(name, ID, defaultInfo);
-    k.type = type;
+    Kind k = new Kind(name, ID, defaultInfo, TYPE_PERSON);
+    k.subtype = subtype;
     k.wide = k.high = 1;
     k.blockPath = k.blockSight = false;
     initStatsFor(k, initStats);
     
     k.sprite = loadImage(spritePath);
+    if (personNames == null) personNames = new String[2][0];
+    k.firstNames = personNames[0];
+    k.lastNames  = personNames[1];
+    
     return k;
   }
   
@@ -74,8 +90,7 @@ public class Kind extends Index.Entry implements Session.Saveable {
     int wide, int high, boolean blockPath, boolean blockSight,
     Object... initStats
   ) {
-    Kind k = new Kind(name, ID, "");
-    k.type = TYPE_PROP;
+    Kind k = new Kind(name, ID, "", TYPE_PROP);
     k.wide = wide;
     k.high = high;
     k.blockPath  = blockPath ;
@@ -87,63 +102,77 @@ public class Kind extends Index.Entry implements Session.Saveable {
   }
   
   
-  private static void initStatsFor(Kind k, Object... initStats) {
-    Batch <Trait   > allT = new Batch();
-    Batch <Equipped> allE = new Batch();
-    Batch <Equipped> allC = new Batch();
-    Trait   readT = null;
+  protected static void initStatsFor(Kind k, Object... initStats) {
+    Batch <Object> allKeys = new Batch();
+    Object  readK = null;
     Integer readL = null;
     
     for (Object o : initStats) {
-      if (o instanceof Trait) {
-        readT = (Trait) o;
-      }
       if (o instanceof Integer) {
         readL = (Integer) o;
       }
-      if (o instanceof Equipped) {
-        Equipped e = (Equipped) o;
-        allE.add(e);
-        if (e.isCustom()) allC.add(e);
+      else if (o instanceof Float) {
+        readL = (int) (float) (Float) o;
       }
-      if (readT != null && readL != null) {
-        allT.add(readT);
-        k.traitLevels.put(readT, readL);
-        readT = null;
+      else {
+        if (readL == null && readK != null) {
+          allKeys.add(readK);
+          k.traitLevels.put(readK, 1);
+        }
+        readK = o;
+      }
+      if (readL != null && readL != null) {
+        allKeys.add(readK);
+        k.traitLevels.put(readK, readL);
+        readK = null;
         readL = null;
       }
     }
+
+    Batch <Trait   > allT = new Batch();
+    Batch <ItemType> allE = new Batch();
+    Batch <ItemType> allC = new Batch();
+    Batch <Kind    > allK = new Batch();
+    
+    for (Object o : allKeys) {
+      if (o instanceof Trait) allT.add((Trait) o);
+      if (o instanceof Kind ) allK.add((Kind ) o);
+      if (o instanceof ItemType) {
+        ItemType e = (ItemType) o;
+        allE.add(e);
+        if (e.isCustom()) allC.add(e);
+      }
+    }
     k.baseTraits   = allT.toArray(Trait   .class);
-    k.baseEquipped = allE.toArray(Equipped.class);
-    k.customItems  = allC.toArray(Equipped.class);
+    k.baseEquipped = allE.toArray(ItemType.class);
+    k.customItems  = allC.toArray(ItemType.class);
+    k.childTypes   = allK.toArray(Kind    .class);
   }
   
   
-  public int baseLevel(Trait t) {
+  public int baseLevel(Object t) {
     final Integer l = traitLevels.get(t);
     return l == null ? 0 : l;
   }
   
   
-  public Trait[] baseTraits() {
-    return baseTraits;
-  }
-  
+  public Trait   [] baseTraits  () { return baseTraits  ; }
+  public ItemType[] baseEquipped() { return baseEquipped; }
+  public ItemType[] customItems () { return customItems ; }
+  public Kind    [] childTypes  () { return childTypes  ; }
   
   public int type() { return type; }
   public int wide() { return wide; }
   public int high() { return high; }
+  public int subtype() { return subtype; }
   public boolean blockSight() { return blockSight; }
   public boolean blockPath () { return blockPath ; }
   
-  public Equipped[] baseEquipped() { return baseEquipped; }
-  public Equipped[] customItems () { return customItems ; }
-  
   public String name  () { return name  ; }
   public Image  sprite() { return sprite; }
-  
   public String defaultInfo() { return defaultInfo; }
-  
+  public String[] firstNames() { return firstNames; }
+  public String[] lastNames () { return lastNames ; }
   public String toString() { return name; }
   
   

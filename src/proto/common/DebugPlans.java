@@ -5,10 +5,8 @@ import proto.content.agents.*;
 import proto.game.world.*;
 import proto.game.event.*;
 import proto.game.person.*;
-import proto.content.events.StepTypes;
-import proto.content.events.TypeMajorCrime;
-import proto.content.places.Facilities;
-import proto.content.places.UrbanScenes;
+import proto.content.events.*;
+import proto.content.places.*;
 import proto.util.*;
 
 
@@ -29,7 +27,7 @@ public class DebugPlans {
     Batch <Person> crooks  = new Batch();
     
     for (int n = 5; n-- > 0;) {
-      Person civvy = genRandomPerson(Crooks.CIVILIAN, world);
+      Person civvy = genRandomPerson(Civilians.CIVILIAN, world);
       world.setInside(civvy, true);
       civvies.add(civvy);
       Person crook = genRandomPerson(Crooks.GOON, world);

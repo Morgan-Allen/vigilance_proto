@@ -1,6 +1,7 @@
 
 
 package proto.content.events;
+import proto.common.*;
 import proto.game.world.*;
 import proto.game.event.PlanStep;
 import proto.game.event.StepType;
@@ -26,7 +27,7 @@ public class TypePurchase extends StepType {
   
   
   public PlanStep toProvide(Element needed, PlanStep by) {
-    if (needed.type == Element.TYPE_ITEM) {
+    if (needed.type == Kind.TYPE_ITEM) {
       return new PlanStep(this, by.plan).setGive(Gives.BOUGHT, needed);
     }
     return null;

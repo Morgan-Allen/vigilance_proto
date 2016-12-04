@@ -16,7 +16,7 @@ public class Laboratory extends Place {
   
   
   
-  final static Equipped LAB_ITEMS[] = {
+  final static ItemType LAB_ITEMS[] = {
     Gadgets.MED_KIT ,
     Gadgets.TEAR_GAS
   };
@@ -29,7 +29,7 @@ public class Laboratory extends Place {
     super(BLUEPRINT, slotIndex, base.world());
     setOwner(base);
     
-    for (Equipped item : LAB_ITEMS) {
+    for (ItemType item : LAB_ITEMS) {
       final TaskCraft crafting = new TaskCraft(item, this, base);
       tasks.add(crafting);
     }

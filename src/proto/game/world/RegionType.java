@@ -24,7 +24,7 @@ public class RegionType extends Kind {
   
   
   public RegionType(String name, String ID) {
-    super(name, ID, "");
+    super(name, ID, "", Kind.TYPE_REGION);
   }
   
   

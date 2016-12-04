@@ -37,7 +37,7 @@ public class Person extends Element {
   
   
   public Person(Kind kind, World world, String name) {
-    super(kind, TYPE_PERSON, world);
+    super(kind, world);
     this.name  = name;
     
     history.setSummary(kind.defaultInfo());
@@ -46,8 +46,8 @@ public class Person extends Element {
       gear.equipItem(kind.baseEquipped()[n], null);
     }
     
-    if      (kind.type() == Kind.TYPE_HERO    ) side = Side.HEROES   ;
-    else if (kind.type() == Kind.TYPE_CIVILIAN) side = Side.CIVILIANS;
+    if      (kind.subtype() == Kind.SUBTYPE_HERO    ) side = Side.HEROES   ;
+    else if (kind.subtype() == Kind.SUBTYPE_CIVILIAN) side = Side.CIVILIANS;
     else side = Side.VILLAINS;
     
     stats.initStats();
@@ -100,6 +100,15 @@ public class Person extends Element {
     
     s.saveObject(location);
     exactPos.saveTo(s.output());
+  }
+  
+  
+  public static Person randomOfKind(Kind kind, World world) {
+    final String
+      firsts[] = kind.firstNames(), lasts[] = kind.lastNames(),
+      name = Rand.pickFrom(firsts)+" "+Rand.pickFrom(lasts);
+    Person person = new Person(kind, world, name);
+    return person;
   }
   
   
@@ -226,7 +235,7 @@ public class Person extends Element {
   
   
   public boolean isCivilian() {
-    return kind.type() == Kind.TYPE_CIVILIAN;
+    return kind.type() == Kind.SUBTYPE_CIVILIAN;
   }
   
   

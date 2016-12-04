@@ -3,14 +3,14 @@
 package proto.content.items;
 import proto.game.person.*;
 import static proto.game.person.PersonStats.*;
-import static proto.game.person.Equipped.*;
+import static proto.game.person.ItemType.*;
 import static proto.game.person.PersonGear.*;
 
 
 
 public class Gadgets {
   
-  final public static Equipped BATARANGS = new Equipped(
+  final public static ItemType BATARANGS = new ItemType(
     "Batarang Set", "item_batarangs",
     "Lightweight, throwable projectiles, useful to disarm or startle foes.",
     "media assets/item icons/icon_batarangs.png",
@@ -25,7 +25,7 @@ public class Gadgets {
     }
   };
   
-  final public static Equipped CABLE_GUN = new Equipped(
+  final public static ItemType CABLE_GUN = new ItemType(
     "Cable Gun", "item_cable_gun",
     "Launches a climbing cable over long distances, assisting infiltration "+
     "and escape.",
@@ -41,7 +41,7 @@ public class Gadgets {
     }
   };
   
-  final public static Equipped BODY_ARMOUR = new Equipped(
+  final public static ItemType BODY_ARMOUR = new ItemType(
     "Body Armour", "item_body_armour",
     "Heavy ceramic body armour, virtually impervious to handgun fire.",
     "media assets/item icons/icon_body_armour.png",
@@ -57,7 +57,7 @@ public class Gadgets {
     }
   };
   
-  final public static Equipped KEVLAR_VEST = new Equipped(
+  final public static ItemType KEVLAR_VEST = new ItemType(
     "Kevlar Vest", "item_kevlar_vest",
     "Lightweight kevlar provides reasonable protection and good mobility.",
     "media assets/item icons/icon_kevlar_vest.png",
@@ -72,7 +72,7 @@ public class Gadgets {
     }
   };
   
-  final public static Equipped MED_KIT = new Equipped(
+  final public static ItemType MED_KIT = new ItemType(
     "Med Kit", "item_med_kit",
     "Med Kits can provide vital first aid to bleeding or incapacitated "+
     "subjects.",
@@ -88,7 +88,7 @@ public class Gadgets {
     }
   };
 
-  final public static Equipped TEAR_GAS = new Equipped(
+  final public static ItemType TEAR_GAS = new ItemType(
     "Tear Gas", "item_tear_gas",
     "Tear Gas can blind and suffocate opponents long enough to finish them "+
     "with relative impunity.",

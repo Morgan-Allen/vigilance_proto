@@ -16,8 +16,8 @@ public class Volley implements Session.Saveable {
     */
   Object orig;
   Object targ;
-  Equipped weaponType;
-  Equipped armourType;
+  ItemType weaponType;
+  ItemType armourType;
   int damageType;
   boolean ranged;
   
@@ -53,8 +53,8 @@ public class Volley implements Session.Saveable {
     s.cacheInstance(this);
     orig = s.loadObject();
     targ = s.loadObject();
-    weaponType = (Equipped) s.loadObject();
-    armourType = (Equipped) s.loadObject();
+    weaponType = (ItemType) s.loadObject();
+    armourType = (ItemType) s.loadObject();
     ranged     = s.loadBool();
     damageType = s.loadInt();
     
@@ -155,7 +155,7 @@ public class Volley implements Session.Saveable {
     this.targ   = hits  ;
     this.ranged = ranged;
     
-    Equipped weapon = self.gear.currentWeapon();
+    ItemType weapon = self.gear.currentWeapon();
     damageType = weapon.properties;
     
     selfDamageBase  = self.stats.levelFor(MIN_DAMAGE);

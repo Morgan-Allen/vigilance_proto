@@ -1,6 +1,7 @@
 
 
 package proto.content.events;
+import proto.common.*;
 import proto.game.event.*;
 import proto.game.world.*;
 import proto.game.person.*;
@@ -22,7 +23,7 @@ public class TypeHeist extends TypeMajorCrime {
   
   
   public PlanStep asGoal(Element target, Plan plan) {
-    if (target.type == Element.TYPE_PLACE) {
+    if (target.type == Kind.TYPE_PLACE) {
       final Place place = (Place) target;
       if (place.kind().incomeFrom(place.region()) <= 0) return null;
       
@@ -37,7 +38,7 @@ public class TypeHeist extends TypeMajorCrime {
   
   
   public PlanStep toProvide(Element needed, PlanStep by) {
-    if (needed.type == Element.TYPE_ITEM) {
+    if (needed.type == Kind.TYPE_ITEM) {
       PlanStep step = new PlanStep(this, by.plan);
       step.setGive(Gives.LOOT, needed);
       return step;
@@ -63,7 +64,7 @@ public class TypeHeist extends TypeMajorCrime {
     if (loot == null) return 0;
     
     if (needType == Needs.VENUE) {
-      if (used.type != Element.TYPE_PLACE) return 0;
+      if (used.type != Kind.TYPE_PLACE) return 0;
       final Place place = (Place) used;
       if (! place.kind().providesItemType(loot.kind())) return 0;
       return 1;

@@ -10,8 +10,8 @@ import proto.util.*;
 public class Item extends Element {
   
   
-  public Item(Equipped kind, World world) {
-    super(kind, Element.TYPE_ITEM, world);
+  public Item(ItemType kind, World world) {
+    super(kind, world);
   }
   
   
@@ -25,8 +25,8 @@ public class Item extends Element {
   }
   
   
-  public Equipped kind() {
-    return (Equipped) kind;
+  public ItemType kind() {
+    return (ItemType) kind;
   }
   
   

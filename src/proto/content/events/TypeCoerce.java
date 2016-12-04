@@ -5,6 +5,7 @@ import proto.game.world.*;
 import proto.game.event.PlanStep;
 import proto.game.event.StepType;
 import proto.game.person.*;
+import proto.common.*;
 import proto.content.items.*;
 import proto.util.*;
 
@@ -27,7 +28,7 @@ public class TypeCoerce extends StepType {
   
   
   public PlanStep toProvide(Element needed, PlanStep by) {
-    if (needed.type == Element.TYPE_PERSON) {
+    if (needed.type == Kind.TYPE_PERSON) {
       return new PlanStep(this, by.plan).setGive(Gives.COERCED, needed);
     }
     return null;

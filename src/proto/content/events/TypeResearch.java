@@ -1,13 +1,9 @@
 
 
 package proto.content.events;
-import proto.content.events.TypeMake.Gives;
-import proto.content.events.TypeMake.Needs;
-import proto.game.event.PlanStep;
-import proto.game.event.StepType;
-import proto.game.person.Item;
-import proto.game.person.Person;
-import proto.game.person.PersonStats;
+import proto.common.*;
+import proto.game.event.*;
+import proto.game.person.*;
 import proto.game.world.*;
 import proto.util.*;
 
@@ -36,7 +32,7 @@ public class TypeResearch extends StepType {
     //  needed.
     
     /*
-    if (needed.type == Element.TYPE_CLUE) {
+    if (needed.type == Kind.TYPE_CLUE) {
       return new PlanStep(this, by.plan).bindGives(needed);
     }
     //*/
@@ -48,7 +44,7 @@ public class TypeResearch extends StepType {
     Element used, Object needType, PlanStep step
   ) {
     if (needType == Needs.MAKES) {
-      if (used.type != Element.TYPE_PERSON) return 0;
+      if (used.type != Kind.TYPE_PERSON) return 0;
       return findsChance((Person) used, (Item) step.give(Gives.FINDS));
     }
     return 0;

@@ -1,7 +1,8 @@
 
 
 package proto.content.events;
-import proto.game.event.PlanStep;
+import proto.common.*;
+import proto.game.event.*;
 import proto.game.person.*;
 import proto.game.world.*;
 import proto.util.*;
@@ -22,7 +23,7 @@ public class TypeKidnapping extends TypeMajorCrime {
   
   
   public PlanStep toProvide(Element needed, PlanStep by) {
-    if (needed.type == Element.TYPE_PERSON) {
+    if (needed.type == Kind.TYPE_PERSON) {
       PlanStep step = new PlanStep(this, by.plan);
       Person victim = (Person) needed;
       step.setGive(Gives.VICTIM, victim);

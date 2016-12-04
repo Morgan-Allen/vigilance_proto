@@ -18,9 +18,6 @@ public class PlaceType extends Kind {
     */
   final Image icon;
   final SceneType sceneType;
-  final Region.Stat stats[];
-  final int statMods[];
-  final List <Equipped> itemsVended = new List();
   final public int buildCost, buildTime;
   
   
@@ -36,24 +33,16 @@ public class PlaceType extends Kind {
   public PlaceType(
     String name, String ID, String imgPath, String info,
     int buildCost, int buildTime, SceneType sceneType,
-    Object... args
+    Object... initStats
   ) {
-    super(name, ID, info);
+    super(name, ID, info, Kind.TYPE_PLACE);
 
     this.icon = Kind.loadImage(imgPath);
     
     this.buildCost = buildCost;
     this.buildTime = buildTime;
     
-    final int numS = args.length / 2;
-    this.stats = new Region.Stat[numS];
-    this.statMods = new int[numS];
-    
-    for (int n = 0; n < numS; n++) {
-      stats   [n] = (Region.Stat) args[ n * 2     ];
-      statMods[n] = (Integer    ) args[(n * 2) + 1];
-    }
-    
+    initStatsFor(this, initStats);
     this.sceneType = sceneType;
   }
   
@@ -63,8 +52,8 @@ public class PlaceType extends Kind {
   }
   
   
-  public boolean providesItemType(Equipped type) {
-    return itemsVended.includes(type);
+  public boolean providesItemType(ItemType type) {
+    return Visit.arrayIncludes(baseEquipped(), type);
   }
   
   
@@ -77,15 +66,16 @@ public class PlaceType extends Kind {
   /**  Active effects-
     */
   protected void applyStatEffects(Region district) {
-    for (int i = 0; i < stats.length; i++) {
-      district.statLevels[stats[i].ID].bonus += statMods[i];
+    for (Region.Stat stat : Region.ALL_STATS) {
+      int level = baseLevel(stat);
+      if (level == 0) continue;
+      district.statLevels[stat.ID].bonus += level;
     }
   }
   
   
   public int incomeFrom(Region district) {
-    final int index = Visit.indexOf(Region.INCOME, stats);
-    return index == -1 ? 0 : statMods[index];
+    return baseLevel(Region.INCOME);
   }
   
   
@@ -134,8 +124,10 @@ public class PlaceType extends Kind {
   
   public String statInfo() {
     final StringBuffer s = new StringBuffer();
-    for (int i = 0; i < stats.length; i++) {
-      s.append(stats[i].name+" "+I.signNum(statMods[i])+"\n");
+    for (Region.Stat stat : Region.ALL_STATS) {
+      int level = baseLevel(stat);
+      if (level == 0) continue;
+      s.append(stat.name+" "+I.signNum(level)+"\n");
     }
     return s.toString();
   }

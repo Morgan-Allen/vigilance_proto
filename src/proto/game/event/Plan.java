@@ -183,7 +183,7 @@ public class Plan implements Session.Saveable {
     */
   private boolean obtainedBefore(PlanStep step, Element need) {
     //  TODO:  Make this a generic check for 'publicly known' things.
-    if (need.type == Element.TYPE_PLACE) return true;
+    if (need.type == Kind.TYPE_PLACE) return true;
     if (preObtained.includes(need)) return true;
     
     for (PlanStep prior : steps) {

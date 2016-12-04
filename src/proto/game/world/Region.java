@@ -79,7 +79,7 @@ public class Region extends Element {
   
   
   public Region(RegionType kind, World world) {
-    super(kind, Element.TYPE_REGION, world);
+    super(kind, world);
     initStats();
     buildSlots = new Place[kind.maxFacilities];
   }

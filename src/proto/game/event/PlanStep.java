@@ -66,20 +66,6 @@ public class PlanStep implements Session.Saveable {
   }
   
   
-  /*
-  public PlanStep setGives(Element... gives) {
-    for (int g = gives.length; g-- > 0;) this.gives[g] = gives[g];
-    return this;
-  }
-  
-  
-  public PlanStep setNeeds(Element... needs) {
-    for (int n = needs.length; n-- > 0;) this.needs[n] = needs[n];
-    return this;
-  }
-  //*/
-  
-  
   public PlanStep setParent(PlanStep parent, Object needType) {
     this.parent       = parent;
     this.parentNeedID = Visit.indexOf(needType, parent.needTypes());
@@ -252,7 +238,7 @@ public class PlanStep implements Session.Saveable {
     int time = world.totalMinutes() + (delayHours * World.MINUTES_PER_HOUR);
     int ends = time + (Task.TIME_SHORT * World.MINUTES_PER_HOUR);
     Place place = null;
-    for (Element e : needs) if (e != null && e.type == Element.TYPE_PLACE) {
+    for (Element e : needs) if (e != null && e.type == Kind.TYPE_PLACE) {
       place = (Place) e;
       break;
     }

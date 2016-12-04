@@ -14,7 +14,7 @@ import proto.content.places.*;
 public class Workshop extends Place {
   
   
-  final static Equipped SHOP_ITEMS[] = {
+  final static ItemType SHOP_ITEMS[] = {
     Gadgets.BATARANGS   ,
     Gadgets.CABLE_GUN  ,
     Gadgets.BODY_ARMOUR,
@@ -28,7 +28,7 @@ public class Workshop extends Place {
     super(BLUEPRINT, slotIndex, base.world());
     setOwner(base);
     
-    for (Equipped item : SHOP_ITEMS) {
+    for (ItemType item : SHOP_ITEMS) {
       final TaskCraft crafting = new TaskCraft(item, this, base);
       tasks.add(crafting);
     }

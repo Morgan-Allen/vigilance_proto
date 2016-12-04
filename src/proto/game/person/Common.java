@@ -6,7 +6,7 @@ import proto.game.event.*;
 import proto.game.scene.*;
 
 //import static proto.game.person.Ability.*;
-import static proto.game.person.Equipped.*;
+import static proto.game.person.ItemType.*;
 import static proto.game.person.PersonGear.*;
 
 import java.awt.Image;
@@ -19,15 +19,15 @@ public class Common {
   final static String IMG_DIR = "media assets/character sprites/";
   
   
-  final public static Equipped
-    UNARMED = new Equipped(
+  final public static ItemType
+    UNARMED = new ItemType(
       "Unarmed", "item_unarmed",
       "Bare fists and moxy.",
       null,
       SLOT_WEAPON, 0, new Object[0],
       IS_WEAPON | IS_MELEE | IS_KINETIC, 0
     ),
-    UNARMOURED = new Equipped(
+    UNARMOURED = new ItemType(
       "Unarmoured", "item_unarmoured",
       "Nothin' but the clothes on your back.",
       null,

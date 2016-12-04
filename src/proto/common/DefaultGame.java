@@ -55,8 +55,6 @@ public class DefaultGame extends RunGame {
     final Base base = new Base(world, "Wayne Foundation");
     
     Person leader = base.addToRoster(new Person(Heroes.HERO_BATMAN, world));
-    base.addToRoster(new Person(Heroes.HERO_ALFRED   , world));
-    base.addToRoster(new Person(Heroes.HERO_SWARM    , world));
     base.addToRoster(new Person(Heroes.HERO_BATGIRL  , world));
     base.addToRoster(new Person(Heroes.HERO_NIGHTWING, world));
     base.addToRoster(new Person(Heroes.HERO_QUESTION , world));
@@ -90,8 +88,8 @@ public class DefaultGame extends RunGame {
     Batch <Person> seniors = new Batch();
     int numSeniors = 3;
     final Person
-      falcone = new Person(Crooks.FALCONE , world),
-      twoFace = new Person(Crooks.TWO_FACE, world)
+      falcone = new Person(Villains.FALCONE , world),
+      twoFace = new Person(Villains.TWO_FACE, world)
     ;
     bosses.add(falcone);
     //bosses.add(twoFace);
@@ -108,7 +106,7 @@ public class DefaultGame extends RunGame {
       base.plans.assignStepTypes(StepTypes.ALL_TYPES);
       
       for (int n = numSeniors; n-- > 0;) {
-        Person senior = Crooks.randomOfKind(Crooks.MOBSTER, world);
+        Person senior = Person.randomOfKind(Crooks.MOBSTER, world);
         world.setInside(senior, true);
         seniors.add(senior);
         base.addToRoster(senior);

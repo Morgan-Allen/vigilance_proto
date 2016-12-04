@@ -12,16 +12,6 @@ public class Element implements Session.Saveable {
   
   /**  Data fields, construction and save/load methods.
     */
-  final public static int
-    TYPE_INIT   = -1,
-    TYPE_WORLD  =  0,
-    TYPE_REGION =  1,
-    TYPE_PLACE  =  2,
-    TYPE_PERSON =  3,
-    TYPE_ITEM   =  5,
-    TYPE_CLUE   =  5
-  ;
-  
   final public Kind kind;
   final public int type;
   
@@ -30,10 +20,9 @@ public class Element implements Session.Saveable {
   List <Element> attached = new List();
   
   
-  
-  protected Element(Kind kind, int type, World world) {
-    this.kind  = kind ;
-    this.type  = type ;
+  protected Element(Kind kind, World world) {
+    this.kind  = kind;
+    this.type  = kind.type();
     this.world = world;
   }
   
@@ -98,12 +87,12 @@ public class Element implements Session.Saveable {
   
   
   public Place place() {
-    return (Place) parentOfType(TYPE_PLACE);
+    return (Place) parentOfType(Kind.TYPE_PLACE);
   }
   
   
   public Region region() {
-    return (Region) parentOfType(TYPE_REGION);
+    return (Region) parentOfType(Kind.TYPE_REGION);
   }
   
   

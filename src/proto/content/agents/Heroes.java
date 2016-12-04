@@ -5,52 +5,12 @@ import proto.common.*;
 import proto.game.world.*;
 import proto.game.event.*;
 import proto.game.person.*;
-
 import static proto.game.person.Common.*;
 import static proto.game.person.PersonStats.*;
 
 
 
 public class Heroes {
-  
-  
-  
-  final static Ability TRAIT_ANIMAL = new Ability(
-    "Animal", "trait_animal", null,
-    "This agent is an animal.  They cannot be assigned to train or craft "+
-    "items, and may only accompany other agents on physical assignments.",
-    Ability.IS_PASSIVE, 0, Ability.NO_HARM, Ability.NO_POWER
-  ) {
-    public boolean allowsAssignment(Person p, Assignment a) {
-      if (a instanceof TaskTrain) return false;
-      if (a instanceof TaskCraft) return false;
-      if (a instanceof Task) {
-        final Task l = (Task) a;
-        if (l.mental()) return false;
-        
-        boolean company = false;
-        for (Person o : a.assigned()) if (p != o) company = true;
-        if (! company) return false;
-        
-        return true;
-      }
-      return false;
-    }
-  };
-  
-  
-  final static Ability TRAIT_CIVILIAN = new Ability(
-    "Civilian", "trait_civilian", null,
-    "This agent is a civilian.  They can assist in training, crafting and "+
-    "research, but will not become directly involved in investigations.",
-    Ability.IS_PASSIVE, 0, Ability.NO_HARM, Ability.NO_POWER
-  ) {
-    public boolean allowsAssignment(Person p, Assignment a) {
-      if (a instanceof TaskTrain) return true;
-      if (a instanceof TaskCraft) return true;
-      return false;
-    }
-  };
   
   
   final static String IMG_DIR = "media assets/character icons/";
@@ -61,7 +21,8 @@ public class Heroes {
       "The son of Thomas and Martha Wayne, wealthy socialites and "+
       "philanthropists, Bruce Wayne swore to repay their deaths at the hands "+
       "of a criminal by warring upon Gotham's underworld.",
-      Kind.TYPE_HERO,
+      null,
+      Kind.SUBTYPE_HERO,
       INTELLECT , 7 ,
       REFLEX    , 7 ,
       SOCIAL    , 7 ,
@@ -90,6 +51,117 @@ public class Heroes {
     )
   ;
   
+  final public static Kind
+    HERO_NIGHTWING = Kind.ofPerson(
+      "Nightwing", "hero_kind_nightwing", IMG_DIR+"icon_nightwing.png",
+      "A former ward of Bruce Wayne, united in his dedication to fighting "+
+      "crime but separated by differences over methods and motivation.",
+      null,
+      Kind.SUBTYPE_HERO,
+      INTELLECT , 5 ,
+      REFLEX    , 6 ,
+      SOCIAL    , 7 ,
+      STRENGTH  , 6 ,
+      HIT_POINTS, 20,
+      WILLPOWER , 18,
+      
+      ENGINEERING  , 3,
+      INFORMATICS  , 2,
+      PHARMACY     , 3,
+      ANATOMY      , 2,
+      LAW_N_FINANCE, 0,
+      THE_OCCULT   , 0,
+      LANGUAGES    , 2,
+      QUESTION     , 5,
+      DISGUISE     , 6,
+      SUASION      , 7,
+      STEALTH      , 7,
+      SURVEILLANCE , 7,
+      VEHICLES     , 7,
+      MARKSMAN     , 7,
+      INTIMIDATE   , 5,
+      GYMNASTICS   , 7,
+      CLOSE_COMBAT , 7,
+      STAMINA      , 7
+    )
+  ;
+  
+  final public static Kind
+    HERO_BATGIRL = Kind.ofPerson(
+      "Batgirl", "hero_kind_batgirl", IMG_DIR+"icon_batgirl.png",
+      "Indoctrinated from birth by her mother, Lady Shiva, to be the perfect "+
+      "assassin, Ms. Cain possesses uncanny reflexes and steely resolve but "+
+      "is functionally mute and easily manipulated.",
+      null,
+      Kind.SUBTYPE_HERO,
+      INTELLECT , 6 ,
+      REFLEX    , 8 ,
+      SOCIAL    , 2 ,
+      STRENGTH  , 4 ,
+      HIT_POINTS, 16,
+      WILLPOWER , 16,
+      
+      ENGINEERING  , 0,
+      INFORMATICS  , 0,
+      PHARMACY     , 0,
+      ANATOMY      , 2,
+      LAW_N_FINANCE, 0,
+      THE_OCCULT   , 0,
+      LANGUAGES    , 0,
+      QUESTION     , 0,
+      DISGUISE     , 4,
+      SUASION      , 0,
+      STEALTH      , 7,
+      SURVEILLANCE , 6,
+      VEHICLES     , 6,
+      MARKSMAN     , 7,
+      INTIMIDATE   , 0,
+      GYMNASTICS   , 7,
+      CLOSE_COMBAT , 8,
+      STAMINA      , 5
+    )
+  ;
+  
+  final public static Kind
+    HERO_QUESTION = Kind.ofPerson(
+      "Question", "hero_kind_question", IMG_DIR+"icon_question.png",
+      "Paranoid conspiracist or the smartest guy left in the room?  That is "+
+      "the Question.",
+      null,
+      Kind.SUBTYPE_HERO,
+      INTELLECT , 8 ,
+      REFLEX    , 5 ,
+      SOCIAL    , 6 ,
+      STRENGTH  , 5 ,
+      HIT_POINTS, 16,
+      WILLPOWER , 14,
+      
+      ENGINEERING  , 4,
+      INFORMATICS  , 8,
+      PHARMACY     , 4,
+      ANATOMY      , 6,
+      LAW_N_FINANCE, 8,
+      THE_OCCULT   , 4,
+      LANGUAGES    , 8,
+      QUESTION     , 8,
+      DISGUISE     , 8,
+      SUASION      , 5,
+      STEALTH      , 7,
+      SURVEILLANCE , 7,
+      VEHICLES     , 3,
+      MARKSMAN     , 5,
+      INTIMIDATE   , 4,
+      GYMNASTICS   , 4,
+      CLOSE_COMBAT , 5,
+      STAMINA      , 4
+    )
+  ;
+  
+  
+  
+  //  TODO:  I'm taking these out for the moment...
+  
+  /*
   final public static Kind
     HERO_ALFRED = Kind.ofPerson(
       "Alfred", "hero_kind_alfred", IMG_DIR+"icon_alfred.png",
@@ -142,110 +214,45 @@ public class Heroes {
     )
   ;
   
-  final public static Kind
-    HERO_NIGHTWING = Kind.ofPerson(
-      "Nightwing", "hero_kind_nightwing", IMG_DIR+"icon_nightwing.png",
-      "A former ward of Bruce Wayne, united in his dedication to fighting "+
-      "crime but separated by differences over methods and motivation.",
-      Kind.TYPE_HERO,
-      INTELLECT , 5 ,
-      REFLEX    , 6 ,
-      SOCIAL    , 7 ,
-      STRENGTH  , 6 ,
-      HIT_POINTS, 20,
-      WILLPOWER , 18,
-      
-      ENGINEERING  , 3,
-      INFORMATICS  , 2,
-      PHARMACY     , 3,
-      ANATOMY      , 2,
-      LAW_N_FINANCE, 0,
-      THE_OCCULT   , 0,
-      LANGUAGES    , 2,
-      QUESTION     , 5,
-      DISGUISE     , 6,
-      SUASION      , 7,
-      STEALTH      , 7,
-      SURVEILLANCE , 7,
-      VEHICLES     , 7,
-      MARKSMAN     , 7,
-      INTIMIDATE   , 5,
-      GYMNASTICS   , 7,
-      CLOSE_COMBAT , 7,
-      STAMINA      , 7
-    )
-  ;
-  
-  final public static Kind
-    HERO_BATGIRL = Kind.ofPerson(
-      "Batgirl", "hero_kind_batgirl", IMG_DIR+"icon_batgirl.png",
-      "Indoctrinated from birth by her mother, Lady Shiva, to be the perfect "+
-      "assassin, Ms. Cain possesses uncanny reflexes and steely resolve but "+
-      "is functionally mute and easily manipulated.",
-      Kind.TYPE_HERO,
-      INTELLECT , 6 ,
-      REFLEX    , 8 ,
-      SOCIAL    , 2 ,
-      STRENGTH  , 4 ,
-      HIT_POINTS, 16,
-      WILLPOWER , 16,
-      
-      ENGINEERING  , 0,
-      INFORMATICS  , 0,
-      PHARMACY     , 0,
-      ANATOMY      , 2,
-      LAW_N_FINANCE, 0,
-      THE_OCCULT   , 0,
-      LANGUAGES    , 0,
-      QUESTION     , 0,
-      DISGUISE     , 4,
-      SUASION      , 0,
-      STEALTH      , 7,
-      SURVEILLANCE , 6,
-      VEHICLES     , 6,
-      MARKSMAN     , 7,
-      INTIMIDATE   , 0,
-      GYMNASTICS   , 7,
-      CLOSE_COMBAT , 8,
-      STAMINA      , 5
-    )
-  ;
-  
-  final public static Kind
-    HERO_QUESTION = Kind.ofPerson(
-      "Question", "hero_kind_question", IMG_DIR+"icon_question.png",
-      "Paranoid conspiracist or the smartest guy left in the room?  That is "+
-      "the Question.",
-      Kind.TYPE_HERO,
-      INTELLECT , 8 ,
-      REFLEX    , 5 ,
-      SOCIAL    , 6 ,
-      STRENGTH  , 5 ,
-      HIT_POINTS, 16,
-      WILLPOWER , 14,
-      
-      ENGINEERING  , 4,
-      INFORMATICS  , 8,
-      PHARMACY     , 4,
-      ANATOMY      , 6,
-      LAW_N_FINANCE, 8,
-      THE_OCCULT   , 4,
-      LANGUAGES    , 8,
-      QUESTION     , 8,
-      DISGUISE     , 8,
-      SUASION      , 5,
-      STEALTH      , 7,
-      SURVEILLANCE , 7,
-      VEHICLES     , 3,
-      MARKSMAN     , 5,
-      INTIMIDATE   , 4,
-      GYMNASTICS   , 4,
-      CLOSE_COMBAT , 5,
-      STAMINA      , 4
-    )
-  ;
+  final static Ability TRAIT_ANIMAL = new Ability(
+    "Animal", "trait_animal", null,
+    "This agent is an animal.  They cannot be assigned to train or craft "+
+    "items, and may only accompany other agents on physical assignments.",
+    Ability.IS_PASSIVE, 0, Ability.NO_HARM, Ability.NO_POWER
+  ) {
+    public boolean allowsAssignment(Person p, Assignment a) {
+      if (a instanceof TaskTrain) return false;
+      if (a instanceof TaskCraft) return false;
+      if (a instanceof Task) {
+        final Task l = (Task) a;
+        if (l.mental()) return false;
+        
+        boolean company = false;
+        for (Person o : a.assigned()) if (p != o) company = true;
+        if (! company) return false;
+        
+        return true;
+      }
+      return false;
+    }
+  };
   
   
+  final static Ability TRAIT_CIVILIAN = new Ability(
+    "Civilian", "trait_civilian", null,
+    "This agent is a civilian.  They can assist in training, crafting and "+
+    "research, but will not become directly involved in investigations.",
+    Ability.IS_PASSIVE, 0, Ability.NO_HARM, Ability.NO_POWER
+  ) {
+    public boolean allowsAssignment(Person p, Assignment a) {
+      if (a instanceof TaskTrain) return true;
+      if (a instanceof TaskCraft) return true;
+      return false;
+    }
+  };
+  //*/
+  
+  //*/
 }
 
 

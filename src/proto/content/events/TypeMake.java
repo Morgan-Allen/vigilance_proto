@@ -1,6 +1,7 @@
 
 
 package proto.content.events;
+import proto.common.*;
 import proto.game.world.*;
 import proto.game.event.*;
 import proto.game.person.*;
@@ -25,7 +26,7 @@ public class TypeMake extends StepType {
   
   
   public PlanStep toProvide(Element needed, PlanStep by) {
-    if (needed.type == Element.TYPE_ITEM) {
+    if (needed.type == Kind.TYPE_ITEM) {
       return new PlanStep(this, by.plan).setGive(Gives.MADE, needed);
     }
     return null;
@@ -36,7 +37,7 @@ public class TypeMake extends StepType {
     Element used, Object needType, PlanStep step
   ) {
     if (needType == Needs.MAKES) {
-      if (used.type != Element.TYPE_PERSON) return 0;
+      if (used.type != Kind.TYPE_PERSON) return 0;
       return makesChance((Person) used, (Item) step.give(Gives.MADE));
     }
     if (needType == Needs.MATERIALS) {

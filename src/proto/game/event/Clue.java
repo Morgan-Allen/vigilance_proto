@@ -18,7 +18,7 @@ public class Clue extends Element {
   
   
   public Clue(ClueType kind, World world, Session.Saveable revealed) {
-    super(kind, Element.TYPE_CLUE, world);
+    super(kind, world);
     this.revealed = revealed;
   }
   

@@ -8,7 +8,7 @@ import java.awt.*;
 
 
 
-public class Equipped extends Kind {
+public class ItemType extends Kind {
   
   
   /**  Data fields, construction and save/load methods-
@@ -46,14 +46,14 @@ public class Equipped extends Kind {
   private Tech required[];
   
   
-  public Equipped(
+  public ItemType(
     String name, String ID, String description,
     String iconImgPath,
     int slotID, int buildCost, Object craftArgs[],
     int properties, int bonus,
     Ability... abilities
   ) {
-    super(name, ID, description);
+    super(name, ID, description, Kind.TYPE_ITEM);
     this.icon  = Kind.loadImage(iconImgPath);
     this.media = null;
     
@@ -66,7 +66,7 @@ public class Equipped extends Kind {
   }
   
   
-  public Equipped setRequirements(Kind inventor, Tech... required) {
+  public ItemType setRequirements(Kind inventor, Tech... required) {
     this.inventor = inventor;
     this.required = required;
     return this;

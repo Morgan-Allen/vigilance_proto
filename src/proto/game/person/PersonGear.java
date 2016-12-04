@@ -19,7 +19,7 @@ public class PersonGear {
     SLOT_NAMES[] = { "Weapon", "Armour", "Items" };
   
   final Person person;
-  Equipped equipSlots[] = new Equipped[NUM_EQUIP_SLOTS];
+  ItemType equipSlots[] = new ItemType[NUM_EQUIP_SLOTS];
   Element carried = null;
   
   
@@ -31,7 +31,7 @@ public class PersonGear {
   
   void loadState(Session s) throws Exception {
     for (int i = 0 ; i < NUM_EQUIP_SLOTS; i++) {
-      equipSlots[i] = (Equipped) s.loadObject();
+      equipSlots[i] = (ItemType) s.loadObject();
     }
     carried = (Element) s.loadObject();
   }
@@ -47,8 +47,8 @@ public class PersonGear {
 
   /**  Assigning equipment loadout-
     */
-  public void equipItem(Equipped item, Base from) {
-    Equipped oldItem = equipSlots[item.slotID];
+  public void equipItem(ItemType item, Base from) {
+    ItemType oldItem = equipSlots[item.slotID];
     equipSlots[item.slotID] = item;
     person.stats.toggleItemAbilities(oldItem, false);
     person.stats.toggleItemAbilities(item   , true );
@@ -59,13 +59,13 @@ public class PersonGear {
   
   
   public int equipBonus(int slotID, int properties) {
-    Equipped item = equipSlots[slotID];
+    ItemType item = equipSlots[slotID];
     if (item == null || ! item.hasProperty(properties)) return 0;
     return item.bonus;
   }
   
   
-  public Equipped equippedInSlot(int slotID) {
+  public ItemType equippedInSlot(int slotID) {
     return equipSlots[slotID];
   }
   
@@ -75,13 +75,13 @@ public class PersonGear {
   }
   
   
-  public boolean hasEquipped(Equipped item) {
-    for (Equipped i : equipSlots) if (i == item) return true;
+  public boolean hasEquipped(ItemType item) {
+    for (ItemType i : equipSlots) if (i == item) return true;
     return false;
   }
   
   
-  public boolean canEquip(Equipped item) {
+  public boolean canEquip(ItemType item) {
     for (int slotID : ALL_SLOTS) {
       if (item.slotID == slotID && equipSlots[slotID] == null) return true;
     }
@@ -89,21 +89,21 @@ public class PersonGear {
   }
   
   
-  public Equipped currentWeapon() {
-    Equipped weapon = equippedInSlot(SLOT_WEAPON);
+  public ItemType currentWeapon() {
+    ItemType weapon = equippedInSlot(SLOT_WEAPON);
     return weapon == null ? Common.UNARMED : weapon;
   }
   
   
-  public Equipped currentArmour() {
-    Equipped armour = equippedInSlot(SLOT_ARMOUR);
+  public ItemType currentArmour() {
+    ItemType armour = equippedInSlot(SLOT_ARMOUR);
     return armour == null ? Common.UNARMOURED : armour;
   }
   
   
-  public Series <Equipped> equipment() {
-    Batch <Equipped> all = new Batch();
-    for (Equipped e : equipSlots) if (e != null) all.add(e);
+  public Series <ItemType> equipment() {
+    Batch <ItemType> all = new Batch();
+    for (ItemType e : equipSlots) if (e != null) all.add(e);
     return all;
   }
 }

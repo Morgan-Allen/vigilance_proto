@@ -6,6 +6,8 @@ import proto.game.event.*;
 import proto.game.person.*;
 import proto.util.*;
 import java.awt.Image;
+
+import proto.content.agents.Civilians;
 import proto.content.agents.Crooks;
 
 
@@ -23,8 +25,8 @@ public class Place extends Element {
   private List <Person> residents = new List();
   
   
-  public Place(PlaceType print, int slotID, World world) {
-    super(print, Element.TYPE_PLACE, world);
+  public Place(PlaceType kind, int slotID, World world) {
+    super(kind, world);
     this.slotID        = slotID;
     this.buildProgress = 1.0f;
   }
@@ -99,12 +101,17 @@ public class Place extends Element {
   
   
   public void updateResidents() {
-    //  TODO:  You might need to make this more nuanced.  And derive the types
-    //  of employee from the PlaceType in the content package!
-    while (residents.size() < 3) {
-      Person resides = Crooks.randomOfKind(Crooks.CIVILIAN, world);
-      world.setInside(resides, true);
-      Place.setResident(resides, this, true);
+    final Kind hired[] = kind().childTypes();
+    for (Kind type : hired) if (type.type() == Kind.TYPE_PERSON) {
+      final int max = kind.baseLevel(type);
+      int count = 0;
+      for (Person p : residents) if (p.kind() == type) count++;
+      
+      while (count < max) {
+        Person resides = Person.randomOfKind(type, world);
+        world.setInside(resides, true);
+        Place.setResident(resides, this, true);
+      }
     }
   }
   

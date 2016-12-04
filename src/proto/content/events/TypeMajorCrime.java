@@ -2,6 +2,7 @@
 
 
 package proto.content.events;
+import proto.common.*;
 import proto.game.world.*;
 import proto.game.event.*;
 import proto.game.person.*;
@@ -71,13 +72,13 @@ public abstract class TypeMajorCrime extends StepType {
   ) {
     Place venue = (Place) step.need(Needs.VENUE);
     if (needType == Needs.VENUE) {
-      if (used.type != Element.TYPE_PLACE) return 0;
+      if (used.type != Kind.TYPE_PLACE) return 0;
       return 1;
     }
     if (venue == null) return -1;
     
     if (needType == Needs.ENFORCER) {
-      if (used.type != Element.TYPE_PERSON) return 0;
+      if (used.type != Kind.TYPE_PERSON) return 0;
       Person enforcer = (Person) used;
       if (step.plan.agent.base() != enforcer.base()) return 0;
       return enforcer.stats.powerLevel();
@@ -91,13 +92,13 @@ public abstract class TypeMajorCrime extends StepType {
       return 1;
     }
     if (needType == Needs.MOLE) {
-      if (used.type != Element.TYPE_PERSON) return 0;
+      if (used.type != Kind.TYPE_PERSON) return 0;
       Person mole = (Person) used;
       if (mole.resides() != venue) return 0;
       return 1;
     }
     if (needType == Needs.ALARM_CRACKER) {
-      if (used.type != Element.TYPE_PERSON) return 0;
+      if (used.type != Kind.TYPE_PERSON) return 0;
       final Person agent = (Person) used;
       return agent.stats.levelFor(PersonStats.ENGINEERING);
     }

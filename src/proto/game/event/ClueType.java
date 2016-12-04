@@ -19,7 +19,7 @@ public abstract class ClueType extends Kind {
   
   
   public ClueType(String name, String uniqueID, String info, int clueType) {
-    super(name, uniqueID, info);
+    super(name, uniqueID, info, Kind.TYPE_CLUE);
     this.clueType = clueType;
   }
   

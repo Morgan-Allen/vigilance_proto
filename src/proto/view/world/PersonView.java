@@ -223,7 +223,7 @@ public class PersonView extends UINode {
     int down = 160 + 60 + 10;
     
     for (int slotID : PersonGear.ALL_SLOTS) {
-      Equipped inSlot = person.gear.equippedInSlot(slotID);
+      ItemType inSlot = person.gear.equippedInSlot(slotID);
       Image  icon = inSlot == null ? null   : inSlot.icon();
       String desc = inSlot == null ? "None" : inSlot.name();
       String slotName = PersonGear.SLOT_NAMES[slotID];
@@ -247,26 +247,26 @@ public class PersonView extends UINode {
   
   
   void createItemMenu(final Person person, final int slotID, int x, int y) {
-    final Batch <Equipped> types = new Batch();
+    final Batch <ItemType> types = new Batch();
     final BaseStocks stocks = mainView.world().playerBase().stocks;
     
-    for (Equipped type : stocks.availableItems(person, slotID)) {
+    for (ItemType type : stocks.availableItems(person, slotID)) {
       types.add(type);
     }
     if (types.empty()) return;
     
-    mainView.showClickMenu(new ClickMenu <Equipped> (
+    mainView.showClickMenu(new ClickMenu <ItemType> (
       types, x, y, mainView
     ) {
-      protected Image imageFor(Equipped option) {
+      protected Image imageFor(ItemType option) {
         return option.icon();
       }
       
-      protected String labelFor(Equipped option) {
+      protected String labelFor(ItemType option) {
         return option.name()+" ("+option.describeStats(person)+")";
       }
       
-      protected void whenPicked(Equipped option, int optionID) {
+      protected void whenPicked(ItemType option, int optionID) {
         person.gear.equipItem(option, mainView.world().playerBase());
       }
     });

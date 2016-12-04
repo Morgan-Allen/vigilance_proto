@@ -7,8 +7,6 @@ import proto.game.scene.*;
 import proto.game.person.*;
 import proto.util.*;
 
-import java.awt.Image;
-
 //  TODO:  Remove this direct reference!
 import proto.content.agents.Crooks;
 
@@ -115,7 +113,7 @@ public class Event implements Session.Saveable {
     if (step == null) return forces;
     
     for (Element e : step.needs()) {
-      if (e == null || e.type != Element.TYPE_PERSON) continue;
+      if (e == null || e.type != Kind.TYPE_PERSON) continue;
       forces.add((Person) e);
     }
     
@@ -138,7 +136,7 @@ public class Event implements Session.Saveable {
     float forceSum   = 0;
     while (forceSum < forceLimit) {
       Kind ofGoon = (Kind) Rand.pickFrom(GOONS, GOON_CHANCES);
-      Person goon = Crooks.randomOfKind(ofGoon, scene.world());
+      Person goon = Person.randomOfKind(ofGoon, scene.world());
       forceSum += goon.stats.powerLevel();
       forces.add(goon);
     }

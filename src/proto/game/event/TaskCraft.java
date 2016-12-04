@@ -21,11 +21,11 @@ public class TaskCraft extends Task {
   
   
   final Place room;
-  final Equipped made;
+  final ItemType made;
   float progress = 0;
   
   
-  public TaskCraft(Equipped made, Place room, Base base) {
+  public TaskCraft(ItemType made, Place room, Base base) {
     super(base, TIME_LONG, made.craftArgs);
     this.room = room;
     this.made = made;
@@ -35,7 +35,7 @@ public class TaskCraft extends Task {
   public TaskCraft(Session s) throws Exception {
     super(s);
     room = (Place   ) s.loadObject();
-    made = (Equipped) s.loadObject();
+    made = (ItemType) s.loadObject();
     progress = s.loadFloat();
   }
   
@@ -67,7 +67,7 @@ public class TaskCraft extends Task {
   }
   
   
-  public Equipped made() {
+  public ItemType made() {
     return made;
   }
   
