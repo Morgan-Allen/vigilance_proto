@@ -33,7 +33,7 @@ public class TypeMake extends StepType {
   }
   
   
-  protected float calcSuitability(
+  protected float calcFitness(
     Element used, Object needType, PlanStep step
   ) {
     if (needType == Needs.MAKES) {
@@ -60,7 +60,7 @@ public class TypeMake extends StepType {
     //  similar methods in the Task or Crafting class.
     float skill = 0;
     skill += makes.stats.levelFor(PersonStats.ENGINEERING);
-    skill -= made.kind().craftDC(PersonStats.ENGINEERING);
+    skill -= made.kind().craftDC (PersonStats.ENGINEERING);
     return Nums.clamp(skill / 5f, 0, 1);
   }
   

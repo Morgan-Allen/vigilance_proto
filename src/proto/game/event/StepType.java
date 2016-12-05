@@ -25,7 +25,7 @@ public abstract class StepType extends EventType {
   }
   
   
-  static Object[] rolesFor(Object... roleTypes) {
+  protected static Object[] rolesFor(Object... roleTypes) {
     return roleTypes;
   }
   
@@ -55,18 +55,13 @@ public abstract class StepType extends EventType {
   }
   
   
-  protected boolean isNeeded(Object needType, PlanStep step) {
-    return true;
+  protected float urgency(Object needType, PlanStep step) {
+    return 1;
   }
   
   
-  protected float calcSuitability(Element used, Object needType, PlanStep step) {
+  protected float calcFitness(Element used, Object needType, PlanStep step) {
     return 0;
-  }
-  
-  
-  protected float baseSuccessChance(PlanStep step) {
-    return 0.5f;
   }
   
   
@@ -75,8 +70,29 @@ public abstract class StepType extends EventType {
   }
   
   
-  protected float baseFailRisk(PlanStep step) {
+  protected float baseFailCost(PlanStep step) {
     return 0;
+  }
+  
+  
+  protected float baseSuccessChance(PlanStep step) {
+    float chance = 0, numF = 0;
+    
+    for (Object role : needTypes) {
+      float urgency = urgency(role, step);
+      if (urgency <= 0) continue;
+      
+      final Element used = step.need(role);
+      float fitness = used == null ? 0 : calcFitness(used, role, step);
+      if (urgency >= 1 && fitness <= 0) return 0;
+      
+      urgency = Nums.clamp(urgency, 0, 1);
+      fitness = Nums.clamp(fitness, 0, 1);
+      chance += (1 - ((1 - fitness) * urgency));
+      numF++;
+    }
+    
+    return (numF == 0) ? 1 : (chance / numF);
   }
   
   

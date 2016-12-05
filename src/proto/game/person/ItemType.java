@@ -75,7 +75,7 @@ public class ItemType extends Kind {
   
   public float craftDC(Trait skill) {
     final int index = Visit.indexOf(skill, craftArgs);
-    if (index == -1 || index >= craftArgs.length -1) return 100;
+    if (index == -1 || index >= craftArgs.length -1) return 0;
     return (Integer) craftArgs[index + 1];
   }
   

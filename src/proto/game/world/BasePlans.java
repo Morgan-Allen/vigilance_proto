@@ -66,10 +66,6 @@ public class BasePlans {
       }
       
       currentPlan = picked;
-      if (picked != null) {
-        picked.printFullPlan();
-        I.say("Plan picked...");
-      }
     }
     
     if (currentPlan != null && (nextEvent == null || nextEvent.complete())) {

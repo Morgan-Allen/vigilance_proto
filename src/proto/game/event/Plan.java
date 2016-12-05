@@ -61,10 +61,7 @@ public class Plan implements Session.Saveable {
   
   public void addGoal(PlanStep goal, float priority) {
     goal.assignRating(priority);
-    if (! fillNeeds(goal)) {
-      if (verbose) I.say("Could not fill needs for: "+goal);
-      return;
-    }
+    fillNeeds(goal);
     addStep(goal);
   }
   
@@ -133,9 +130,32 @@ public class Plan implements Session.Saveable {
   }
   
   
-  private boolean fillNeeds(PlanStep step) {
-    for (Object role : step.needTypes()) {
-      if (! step.type.isNeeded(role, step)) continue;
+  private void fillNeeds(PlanStep step) {
+    final Object roles[] = step.needTypes();
+    final boolean markDone[] = new boolean[roles.length];
+    while (true) {
+      //
+      //  Our first task is to find the single most urgent need to fulfil, with
+      //  a little bit of random weighting for spice-
+      int roleIndex = -1;
+      float maxUrgency = 0;
+      for (int i = roles.length; i-- > 0;) if (! markDone[i]) {
+        float u = step.type.urgency(roles[i], step);
+        if (u <= 0) continue;
+        if (u <  1) u = (u + Rand.num()) / 2;
+        else u += Rand.num() / 2;
+        if (u > maxUrgency) { roleIndex = i; maxUrgency = u; }
+      }
+      if (roleIndex == -1) break;
+      //
+      //  (We mark any previous attempts to avoid infinite loops in the event
+      //  that satisfaction is impossible.)
+      markDone[roleIndex] = true;
+      Object role = roles[roleIndex];
+      //
+      //  Having identified the need to fulfill, we identify possible matches
+      //  that could satisfy it, and pick whichever has the highest fitness
+      //  rating (again, with some random spice.)
       Element used = step.need(role);
       if (used != null) continue;
       Series <Element> available = step.type.availableTargets(role, world);
@@ -145,14 +165,11 @@ public class Plan implements Session.Saveable {
       for (Element match : available) {
         if (step.doesGive(match)     ) continue;
         if (neededDuring(step, match)) continue;
-        float rating = step.calcSuitability(match, role) * (Rand.num() + 0.5f);
+        float rating = step.calcFitness(match, role) * (Rand.num() + 0.5f);
         if (rating > bestRating) { used = match; bestRating = rating; }
       }
-      
-      if (used == null) return false;
-      else step.setNeed(role, used, null);
+      if (used != null) step.setNeed(role, used, null);
     }
-    return true;
   }
   
   
@@ -169,7 +186,7 @@ public class Plan implements Session.Saveable {
       
       PlanStep possible[] = step.actionsToObtain(needed, role);
       for (PlanStep child : possible) {
-        if (! fillNeeds(child)) continue;
+        fillNeeds(child);
         child.setParent(step, role);
         child.calcStepRatingFromParent(step);
         toEval.add(child);

@@ -34,10 +34,10 @@ public class TypePurchase extends StepType {
   }
   
   
-  protected float calcSuitability(
+  protected float calcFitness(
     Element used, Object needType, PlanStep step
   ) {
-    return super.calcSuitability(used, needType, step);
+    return super.calcFitness(used, needType, step);
   }
   
   

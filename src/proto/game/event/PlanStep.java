@@ -73,7 +73,13 @@ public class PlanStep implements Session.Saveable {
   }
   
   
-  public Object givesToParent() {
+  public Object roleForParent() {
+    if (parent == null) return null;
+    return parent.type.needTypes[parentNeedID];
+  }
+  
+  
+  public Element givesToParent() {
     if (parent == null) return null;
     return parent.needs()[parentNeedID];
   }
@@ -143,6 +149,23 @@ public class PlanStep implements Session.Saveable {
   }
   
   
+  public boolean satisfied(Object needType) {
+    return need(needType) != null;
+  }
+  
+  
+  public boolean satisfiedAny(Object... needTypes) {
+    for (Object type : needTypes) if (need(type) != null) return true;
+    return false;
+  }
+  
+  
+  public boolean satisfiedAll(Object... needTypes) {
+    for (Object type : needTypes) if (need(type) == null) return false;
+    return true;
+  }
+  
+  
   public Session.Saveable extraData() {
     return extraData;
   }
@@ -166,13 +189,13 @@ public class PlanStep implements Session.Saveable {
   }
   
   
-  float baseFailRisk() {
-    return type.baseFailRisk(this);
+  float baseFailCost() {
+    return type.baseFailCost(this);
   }
   
   
-  float calcSuitability(Element used, Object needType) {
-    return type.calcSuitability(used, needType, this);
+  float calcFitness(Element used, Object needType) {
+    return type.calcFitness(used, needType, this);
   }
   
   
@@ -185,21 +208,22 @@ public class PlanStep implements Session.Saveable {
   
   
   void calcStepRatingFromParent(PlanStep parent) {
-    //I.say("STARTED CALC");
     float chance = calcSuccessChance();
-    rating = chance * parent.rating;
-    rating += chance * baseAppeal();
-    rating -= (1 - chance) * baseFailRisk();
-    //I.say("ENDED CALC");
+    float urgency = parent.type.urgency(roleForParent(), parent);
+    rating = 0;
+    rating += chance * (parent.rating * Nums.clamp(urgency, 0, 1));
+    rating += (chance * baseAppeal()) - ((1 - chance) * baseFailCost());
   }
   
   
   float calcSuccessChance() {
-    float chance = 1.0f;
-    
+    //
     //  TODO:  You need to have a better method for modifying this estimate
     //  when essential pre-reqs aren't yet met (while still giving a decent
     //  rating for the raw step until expanded.)
+    return type.baseSuccessChance(this);
+    /*
+    float chance = 1.0f;
     
     for (int r = needs.length; r-- > 0;) {
       PlanStep getStep = needSteps[r];
@@ -210,6 +234,7 @@ public class PlanStep implements Session.Saveable {
     
     chance *= baseSuccessChance();
     return chance;
+    //*/
   }
   
   
@@ -275,7 +300,7 @@ public class PlanStep implements Session.Saveable {
     
     String needs = "";
     for (Object type : needTypes()) {
-      if (! this.type.isNeeded(type, this)) continue;
+      if (this.type.urgency(type, this) <= 0) continue;
       Element needed = need(type);
       PlanStep getStep = stepForNeed(type);
       if (needed != null && getStep != null) continue;
@@ -297,7 +322,7 @@ public class PlanStep implements Session.Saveable {
     
     s.append("\n  Needs:");
     for (int n = 0; n < needR.length; n++) {
-      if (! type.isNeeded(needR[n], this)) continue;
+      if (type.urgency(needR[n], this) <= 0) continue;
       s.append("\n    "+needR[n]+"- "+needs[n]);
       if (needSteps[n] != null) s.append(" ("+needSteps[n]+")");
     }

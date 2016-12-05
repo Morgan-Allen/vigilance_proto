@@ -57,7 +57,7 @@ public class TypeHeist extends TypeMajorCrime {
   }
   
   
-  protected float calcSuitability(
+  protected float calcFitness(
     Element used, Object needType, PlanStep step
   ) {
     Item loot = (Item) step.give(Gives.LOOT);
@@ -69,7 +69,7 @@ public class TypeHeist extends TypeMajorCrime {
       if (! place.kind().providesItemType(loot.kind())) return 0;
       return 1;
     }
-    return super.calcSuitability(used, needType, step);
+    return super.calcFitness(used, needType, step);
   }
 
 

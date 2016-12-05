@@ -16,12 +16,13 @@ public class StepTypes {
   }
   
   final public static StepType
-    HEIST  = register(new TypeHeist()),
-    MURDER = register(new TypeAssassination()),
-    KIDNAP = register(new TypeKidnapping()),
-    COERCE = register(new TypeCoerce()),
-    BRIBE  = register(new TypeBribe()),
-    MAKE   = register(new TypeMake()),
+    HEIST    = register(new TypeHeist()),
+    MURDER   = register(new TypeAssassination()),
+    KIDNAP   = register(new TypeKidnapping()),
+    COERCE   = register(new TypeCoerce()),
+    BRIBE    = register(new TypeBribe()),
+    MAKE     = register(new TypeMake()),
+    RESEARCH = register(new TypeResearch()),
     ALL_TYPES[] = types.toArray(StepType.class)
   ;
   

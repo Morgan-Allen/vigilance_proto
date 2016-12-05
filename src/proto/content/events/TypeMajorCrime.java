@@ -41,33 +41,41 @@ public abstract class TypeMajorCrime extends StepType {
   }
   
   
-  protected boolean isNeeded(Object needType, PlanStep step) {
+  protected float urgency(Object needType, PlanStep step) {
+    if (needType == Needs.VENUE) return 2;
+    
     Place venue = (Place) step.need(Needs.VENUE);
-    if (venue == null) return needType == Needs.VENUE;
+    if (venue == null) return 0;
     
     boolean reinforced = venue.kind().hasFurnitureType(Facilities.REINFORCED);
     boolean alarmed    = venue.kind().hasFurnitureType(Facilities.ALARMED   );
     
-    if (needType == Needs.EXPLOSIVE) {
-      return reinforced;
-    }
+    //  TODO:  Don't bother with the mutual exclusion- just have the needs-set
+    //  tweaked by the rigors of individual sub-classes and/or the properties
+    //  of the mark during object setup.
+    
     if (needType == Needs.ENFORCER) {
-      return true;
+      return 1;
     }
     if (needType == Needs.BLUEPRINT) {
-      return true;
+      if (step.satisfied(Needs.MOLE)) return 0;
+      return 0.5f;
     }
     if (needType == Needs.MOLE) {
-      return true;
+      if (step.satisfied(Needs.BLUEPRINT)) return 0;
+      return 0.5f;
+    }
+    if (needType == Needs.EXPLOSIVE) {
+      return reinforced ? 1 : 0;
     }
     if (needType == Needs.ALARM_CRACKER) {
-      return alarmed;
+      return alarmed ? 0.5f : 0;
     }
-    return true;
+    return 0;
   }
   
   
-  protected float calcSuitability(
+  protected float calcFitness(
     Element used, Object needType, PlanStep step
   ) {
     Place venue = (Place) step.need(Needs.VENUE);
@@ -106,20 +114,11 @@ public abstract class TypeMajorCrime extends StepType {
   }
   
   
-  protected float baseSuccessChance(PlanStep step) {
-    float chance = 1.0f;
-    
-    //  TODO:  Update this!
-    
-    float mookRatings = 1.5f;
-    chance *= mookRatings / 3;
-    
-    return chance;
-  }
-  
-  
-  protected float baseAppeal(PlanStep step) {
-    return 0;
+  protected float baseFailCost(PlanStep step) {
+    //
+    //  There's always an element of risk involved in flouting the law this
+    //  blatantly.  TODO:  Modify based on local/global conviction stats?
+    return 5;
   }
   
   
@@ -158,11 +157,6 @@ public abstract class TypeMajorCrime extends StepType {
   
   
 }
-
-
-
-
-
 
 
 

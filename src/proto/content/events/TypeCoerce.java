@@ -44,7 +44,7 @@ public class TypeCoerce extends StepType {
   }
   
   
-  protected float calcSuitability(
+  protected float calcFitness(
     Element used, Object needType, PlanStep step
   ) {
     if (needType == Needs.DIRT) {
