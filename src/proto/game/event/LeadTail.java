@@ -3,26 +3,26 @@
 package proto.game.event;
 import proto.common.*;
 import proto.game.world.*;
-import proto.util.I;
+import proto.util.*;
 import proto.game.person.*;
 import java.awt.Image;
 
 
 
 
-public class TaskTail extends Task {
+public class LeadTail extends Lead {
   
   
   Person tailed;
   
   
-  public TaskTail(Base base, Person tailed) {
-    super(base, Task.TIME_SHORT, new Object[0]);
+  public LeadTail(Base base, Lead prior, Person tailed) {
+    super(base, Task.TIME_SHORT, prior.subject, tailed, new Object[0]);
     this.tailed = tailed;
   }
   
   
-  public TaskTail(Session s) throws Exception {
+  public LeadTail(Session s) throws Exception {
     super(s);
     tailed = (Person) s.loadObject();
   }
@@ -51,11 +51,10 @@ public class TaskTail extends Task {
   
   protected void onSuccess() {
     I.say("Tailing succeeded!");
-    
     //  TODO:  Present a message for either success or failure.
     
     Event involved = base.world().events.nextEventInvolving(tailed);
-    if (involved != null) base.leads.addLead(involved);
+    if (involved != null) base.leads.leadOpened(this);
     base.leads.closeLead(tailed);
   }
   

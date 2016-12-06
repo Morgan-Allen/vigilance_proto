@@ -1,7 +1,7 @@
 
 
-package proto.game.event;
-import proto.game.person.*;
+package proto.game.person;
+import proto.game.event.*;
 import proto.game.world.*;
 import proto.util.*;
 
@@ -23,7 +23,7 @@ public class MotiveTrace {
     valueSum = 0;
     report.clear();
     
-    for (PlanStep step : plan.steps) {
+    for (PlanStep step : plan.steps()) {
       for (Element given : step.gives()) {
         for (Motive motive : motives) {
           float value = motive.valueFor(given);

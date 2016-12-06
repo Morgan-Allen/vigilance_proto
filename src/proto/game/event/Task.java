@@ -13,6 +13,9 @@ import static proto.game.person.PersonStats.*;
 
 
 
+//  TODO:  Consider merging Tasks with Events, or having one extend the other?
+
+
 public abstract class Task implements Assignment {
   
   

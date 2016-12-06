@@ -8,16 +8,14 @@ import proto.game.person.*;
 import proto.util.*;
 
 
-//  TODO:  You need a certain chance to deposit tipoffs for each of the actors
-//  involved- and definitely once the event has transpired!
-
-
 
 public class Event implements Session.Saveable {
   
   
   /**  Data fields, construction and save/load methods-
     */
+  public static boolean freeTipoffs = true;
+  
   final public EventType type;
   
   PlanStep step;
@@ -123,8 +121,8 @@ public class Event implements Session.Saveable {
         if (e == null || e.type != Kind.TYPE_PERSON) continue;
         final Person perp = (Person) e;
         
-        if (Rand.num() < tipoffChance) {
-          played.leads.addLead(perp);
+        if (Rand.num() < tipoffChance || freeTipoffs) {
+          played.leads.leadOpened(new LeadTipoff(played, perp));
           I.say("  Generating tipoff from: "+perp);
         }
         else I.say("No tipoff generated from "+perp);
@@ -141,7 +139,7 @@ public class Event implements Session.Saveable {
   public void onEventComplete() {
     if (step != null && step.type.isDangerous(this)) {
       Base played = world().playerBase();
-      played.leads.addLead(this);
+      played.leads.leadOpened(new LeadTipoff(played, this));
     }
   }
   

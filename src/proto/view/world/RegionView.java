@@ -25,8 +25,6 @@ public class RegionView extends UINode {
       "media assets/tech icons/state_in_progress.png"
     );
   
-  //Lead selectedLead;
-  
   
   public RegionView(UINode parent, Box2D viewBounds) {
     super(parent, viewBounds);
@@ -153,18 +151,37 @@ public class RegionView extends UINode {
     int down = vy + 240;
     boolean noEvents = true;
     Base played = mainView.world().playerBase();
-    Batch <Task> allTasks = new Batch();
     
-    for (Object lead : played.leads.openLeadsAround(d)) {
-      noEvents = false;
-      Visit.appendTo(allTasks, played.leads.investigationOptions(lead));
-    }
-    
-    for (Task task : allTasks) {
-      TaskView view = task.createView(parent);
-      view.relBounds.set(vx, down, vw, 65);
-      view.renderNow(surface, g);
-      down += view.relBounds.ydim() + 10;
+    for (Lead lead : played.leads.openLeadsAround(d)) {
+      //
+      //  Firstly, draw an illustrative icon for the lead we've picked up and
+      //  some basic info on how it was acquired.
+      Image icon = lead.icon();
+      g.drawImage(icon, vx + 5, vy + 5, 40, 40, null);
+      
+      int initDown = down;
+      ViewUtils.drawWrappedString(
+        lead.choiceInfo(), g, vx + 60, down + 15, vw - 60, 20
+      );
+      down += 20;
+      ViewUtils.drawWrappedString(
+        lead.helpInfo(), g, vx + 20, down, vw - 40, 60
+      );
+      down += 60;
+      //
+      //  Then, render the options for pursuing the investigation further:
+      for (Task option : lead.investigationOptions()) {
+        TaskView view = option.createView(parent);
+        view.showIcon = false;
+        view.relBounds.set(vx, down, vw, 45);
+        view.renderNow(surface, g);
+        down += view.relBounds.ydim() + 10;
+        noEvents = false;
+      }
+      //
+      //  Finally, box it all in with a nice border-
+      g.setColor(Color.DARK_GRAY);
+      g.drawRect(vx + 10, initDown, vw - 20, down - initDown);
     }
     
     if (noEvents) {
@@ -182,54 +199,6 @@ public class RegionView extends UINode {
         g, vx + 25, down + 20, vw - 30, 150
       );
     }
-    
-    
-    /*
-    for (Event event : mainView.world().events().active()) {
-      //
-      //  Firstly, check to see if there's an event occurring in this region:
-      if (event.place().parent != d) continue;
-      final Series <Lead> leads = event.knownOpenLeads();
-      if (leads.empty()) continue;
-      noEvents = false;
-      int initDown = down;
-      //
-      //  If so, draw the name and info for the investigation as a whole:
-      g.drawString(event.name(), vx + 20, down + 15);
-      down += 20;
-      ViewUtils.drawWrappedString(
-        event.info(), g, vx + 20, down, vw - 40, 60
-      );
-      down += 60;
-      //
-      //  Then, draw info for any individual leads:
-      //  TODO:  Should I be using attachment/detachment here?
-      for (Lead l : leads) {
-        TaskView view = l.createView(parent);
-        view.relBounds.set(vx, down, vw, 65);
-        view.renderNow(surface, g);
-        down += view.relBounds.ydim() + 10;
-      }
-      g.setColor(Color.DARK_GRAY);
-      g.drawRect(vx + 10, initDown, vw - 20, down - initDown);
-    }
-    
-    if (noEvents) {
-      g.setColor(Color.LIGHT_GRAY);
-      ViewUtils.drawWrappedString(
-        "You have no intelligence on any major crimes in this district.",
-        g, vx + 25, down + 20, vw - 30, 150
-      );
-    }
-    else if (true) {
-      g.setColor(Color.LIGHT_GRAY);
-      ViewUtils.drawWrappedString(
-        "Select a task, then click in the bottom-left of roster portraits to "+
-        "assign agents to the task.",
-        g, vx + 25, down + 20, vw - 30, 150
-      );
-    }
-    //*/
   }
   
   

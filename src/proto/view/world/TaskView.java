@@ -10,8 +10,6 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 
 
-//  TODO:  Crafting items is going to require a listing for total number of
-//  items present and the option to equip/dequip.
 
 public class TaskView extends UINode {
   

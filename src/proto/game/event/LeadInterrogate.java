@@ -9,33 +9,29 @@ import java.awt.Image;
 
 
 
-public class TaskSearch extends Task {
+public class LeadInterrogate extends Lead {
   
   
+  Person tailed;
   
-  Place searched;
   
-  
-  public TaskSearch(Base base, Place searched) {
-    super(base, Task.TIME_SHORT, new Object[0]);
-    this.searched = searched;
+  public LeadInterrogate(Base base, Lead prior, Person tailed) {
+    super(base, Task.TIME_SHORT, prior.subject, tailed, new Object[0]);
   }
   
   
-  public TaskSearch(Session s) throws Exception {
+  public LeadInterrogate(Session s) throws Exception {
     super(s);
-    searched = (Place) s.loadObject();
   }
   
   
   public void saveState(Session s) throws Exception {
     super.saveState(s);
-    s.saveObject(searched);
   }
   
   
   public Place targetLocation() {
-    return searched;
+    return tailed.place();
   }
   
   
@@ -98,7 +94,3 @@ public class TaskSearch extends Task {
     return null;
   }
 }
-
-
-
-

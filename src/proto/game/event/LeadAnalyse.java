@@ -8,30 +8,32 @@ import java.awt.Image;
 
 
 
-
-public class TaskInterrogate extends Task {
+public class LeadAnalyse extends Lead {
   
   
-  Person tailed;
+  Item analysed;
   
   
-  public TaskInterrogate(Base base, Person tailed) {
-    super(base, Task.TIME_SHORT, new Object[0]);
+  public LeadAnalyse(Base base, Lead prior, Item analysed) {
+    super(base, Task.TIME_SHORT, prior.subject, analysed, new Object[0]);
+    this.analysed = analysed;
   }
   
   
-  public TaskInterrogate(Session s) throws Exception {
+  public LeadAnalyse(Session s) throws Exception {
     super(s);
+    analysed = (Item) s.loadObject();
   }
   
   
   public void saveState(Session s) throws Exception {
     super.saveState(s);
+    s.saveObject(analysed);
   }
   
   
   public Place targetLocation() {
-    return tailed.place();
+    return analysed.place();
   }
   
   
@@ -94,3 +96,6 @@ public class TaskInterrogate extends Task {
     return null;
   }
 }
+
+
+

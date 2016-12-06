@@ -8,32 +8,33 @@ import java.awt.Image;
 
 
 
-public class TaskAnalyse extends Task {
+
+public class LeadSearch extends Lead {
   
   
-  Item analysed;
+  Place searched;
   
   
-  public TaskAnalyse(Base base, Item analysed) {
-    super(base, Task.TIME_SHORT, new Object[0]);
-    this.analysed = analysed;
+  public LeadSearch(Base base, Lead prior, Place searched) {
+    super(base, Task.TIME_SHORT, prior.subject, searched, new Object[0]);
+    this.searched = searched;
   }
   
   
-  public TaskAnalyse(Session s) throws Exception {
+  public LeadSearch(Session s) throws Exception {
     super(s);
-    analysed = (Item) s.loadObject();
+    searched = (Place) s.loadObject();
   }
   
   
   public void saveState(Session s) throws Exception {
     super.saveState(s);
-    s.saveObject(analysed);
+    s.saveObject(searched);
   }
   
   
   public Place targetLocation() {
-    return analysed.place();
+    return searched;
   }
   
   
@@ -96,6 +97,7 @@ public class TaskAnalyse extends Task {
     return null;
   }
 }
+
 
 
 

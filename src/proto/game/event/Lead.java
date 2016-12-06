@@ -6,99 +6,106 @@ import proto.game.person.*;
 import proto.game.world.*;
 import proto.util.*;
 
-import proto.view.common.*;
-import java.awt.Image;
 
 
-
-
-
-
-/*
-public class Lead extends Task {
+public abstract class Lead extends Task {
   
   
-  /**  Data fields, construction and save/load methods-
-    */
-  /*
-  final public int ID;
-  final public Element origin;
-  final public Element goes[];
-  
-  float chance;
-  boolean red, cold;
+  Object origin, subject;
+  List <Task> followOptions = new List();
+  boolean open;
   
   
-  public Lead(
-    int ID, Element origin, Object reveals,
-    int timeHours, World world, Object... args
+  Lead(
+    Base base, int timeHours, Object origin, Object subject,
+    Object... args
   ) {
-    super(timeHours, world, args);
-    
-    this.ID      = ID    ;
-    this.origin  = origin;
-    if (reveals instanceof Element[]) this.goes = (Element[]) reveals;
-    else this.goes = new Element[] { (Element) reveals };
+    super(base, timeHours, args);
+    this.origin  = origin ;
+    this.subject = subject;
   }
   
   
   public Lead(Session s) throws Exception {
     super(s);
-    ID     = s.loadInt();
-    origin = (Element) s.loadObject();
-    goes   = (Element[]) s.loadObjectArray(Element.class);
-    
-    chance = s.loadFloat();
-    red    = s.loadBool();
-    cold   = s.loadBool();
+    origin  = s.loadObject();
+    subject = s.loadObject();
+    s.loadObjects(followOptions);
+    open = s.loadBool();
   }
   
   
   public void saveState(Session s) throws Exception {
     super.saveState(s);
-    s.saveInt   (ID    );
-    s.saveObject(origin);
-    s.saveObjectArray(goes);
+    s.saveObject(origin );
+    s.saveObject(subject);
+    s.saveObjects(followOptions);
+    s.saveBool(open);
+  }
+  
+  
+  
+  void populateInvestigationOptions() {
     
-    s.saveFloat(chance);
-    s.saveBool (red   );
-    s.saveBool (cold  );
+    //  In addition, there may be multiple methods for investigating a single
+    //  object (e.g, you could either tail, persuade or intimidate a suspect,
+    //  stake out or guard a building, bug or sabotage a vehicle, swab or dust
+    //  for clues, etc..)  And not all methods will yield immediate dividends.
+    followOptions.clear();
+    
+    if (subject instanceof Item || subject instanceof Clue) {
+      //  TODO:  Forensics.
+    }
+    
+    if (subject instanceof Person) {
+      //  TODO:  Tailing, Guard, Dialog, Interrogate/Detain.
+      final Person person = (Person) subject;
+      Task tailing = new LeadTail(base, this, person);
+      followOptions.add(tailing);
+    }
+    
+    if (subject instanceof Place) {
+      //  TODO:  Stake-out, Guard, Search/Inspect.
+    }
+    
+    if (subject instanceof Event) {
+      final Event event = (Event) subject;
+      final boolean dangerous = event.type.isDangerous(event);
+      
+      if (dangerous && ! event.complete()) {
+        Task guarding = new TaskGuard(base, event);
+        followOptions.add(guarding);
+      }
+      if (dangerous && event.complete()) {
+        Task searching = new LeadSearch(base, this, event.place());
+        followOptions.add(searching);
+      }
+      
+      //  TODO:  Allow a search for *all* completed events?
+      
+      if (event.planStep() != null && ! dangerous) {
+        for (Element e : event.planStep().gives()) {
+          Person carries = (Person) e.parentOfType(Kind.TYPE_PERSON);
+          if (carries == null) continue;
+          Task tailing = new LeadTail(base, this, carries);
+          followOptions.add(tailing);
+        }
+        //closeLead(event);
+      }
+    }
+  }
+  
+  
+  public Series <Task> investigationOptions() {
+    return followOptions;
   }
   
   
   
-  /**  Follow-up and execution-
-    */
-/*
-  protected void onSuccess() {
-    //if (! parent.checkFollowed(this, true)) return;
-  }
   
-  
-  protected void onFailure() {
-    //if (! parent.checkFollowed(this, false)) return;
-  }
-  
-  /*
-  public boolean open() {
-    //  TODO:  You need to have a central fact-repository for the investigating
-    //  player instead.
-    boolean known = false;//parent.known.includes(origin);
-    boolean done = complete();
-    return known && ! done;
-  }
-  //*/
-/*
-  
-  
-  public Place targetLocation() {
-    return origin.location();
-  }
-  
-  
-  
-  /**  Rendering, debug and interface methods-
-    */
+}
+
+
 /*
   protected void presentMessage(final World world) {
     
@@ -147,28 +154,6 @@ public class Lead extends Task {
       }
     });
   }
-  
-  
-  public Image icon() {
-    return origin.kind.sprite();
-  }
-  
-  
-  public String choiceInfo() {
-    return "";// activeName;
-  }
-  
-  
-  public String activeInfo() {
-    return "";// activeName+" ("+parent.name()+")";
-  }
-  
-  
-  public String helpInfo() {
-    return "";// helpInfo;
-  }
-}
-
 //*/
 
 

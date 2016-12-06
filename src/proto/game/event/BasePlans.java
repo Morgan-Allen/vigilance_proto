@@ -1,7 +1,7 @@
 
 
-package proto.game.world;
-import proto.game.event.*;
+package proto.game.event;
+import proto.game.world.*;
 import proto.common.*;
 import proto.util.*;
 
@@ -19,19 +19,19 @@ public class BasePlans {
   private Event nextEvent;
   
   
-  BasePlans(Base base) {
+  public BasePlans(Base base) {
     this.base = base;
   }
   
   
-  void loadState(Session s) throws Exception {
+  public void loadState(Session s) throws Exception {
     stepTypes   = (StepType[]) s.loadObjectArray(StepType.class);
     currentPlan = (Plan ) s.loadObject();
     nextEvent   = (Event) s.loadObject();
   }
   
   
-  void saveState(Session s) throws Exception {
+  public void saveState(Session s) throws Exception {
     s.saveObjectArray(stepTypes);
     s.saveObject(currentPlan);
     s.saveObject(nextEvent  );
@@ -46,7 +46,7 @@ public class BasePlans {
   }
   
   
-  void updatePlanning() {
+  public void updatePlanning() {
     if (Visit.empty(stepTypes)) return;
     
     if (currentPlan == null || planComplete()) {
@@ -56,7 +56,7 @@ public class BasePlans {
       float bestRating = 0;
       
       for (int n = numPlans; n-- > 0;) {
-        final Plan plan = new Plan(base.leader, base.world, stepTypes);
+        final Plan plan = new Plan(base.leader(), base.world(), stepTypes);
         for (Element goon : base.roster()) plan.addObtained(goon);
         plan.selectInitialGoal();
         plan.advancePlan(maxDepth);
@@ -75,9 +75,8 @@ public class BasePlans {
       else next = steps.atIndex(steps.indexOf(nextEvent.planStep()) + 1);
       
       if (next != null) {
-        nextEvent = next.spawnEvent(base.world, 20 + Rand.index(5));
-        I.say("Spawning next event for plan: "+nextEvent);
-        base.world.events.scheduleEvent(nextEvent);
+        nextEvent = next.spawnEvent(base.world(), 20 + Rand.index(5));
+        base.world().events.scheduleEvent(nextEvent);
       }
     }
   }

@@ -2,6 +2,7 @@
 
 package proto.game.world;
 import proto.common.*;
+import proto.game.event.*;
 import proto.game.person.*;
 import proto.util.*;
 
