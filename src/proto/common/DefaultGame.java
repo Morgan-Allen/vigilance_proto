@@ -1,6 +1,5 @@
 
 
-
 package proto.common;
 import proto.content.agents.*;
 import proto.content.items.*;
@@ -29,14 +28,14 @@ public class DefaultGame extends RunGame {
   
   protected World setupWorld() {
     this.world = new World(this, savePath);
-    initDefaultNations(world);
+    initDefaultRegions(world);
     initDefaultBase(world);
     initDefaultCrime(world);
     return world;
   }
   
   
-  public static void initDefaultNations(World world) {
+  public static void initDefaultRegions(World world) {
     int numN = Regions.ALL_REGIONS.length;
     
     Region[] regions = new Region[numN];
@@ -45,16 +44,19 @@ public class DefaultGame extends RunGame {
     }
     for (Region region : regions) {
       region.initialiseRegion(null);
-      //  TODO:  Initialise residents!
+      region.nudgeCurrentStat(Region.TRUST     , 25);
+      region.nudgeCurrentStat(Region.DETERRENCE, 25);
     }
     world.attachDistricts(regions);
   }
   
   
   public static void initDefaultBase(World world) {
-    final Base base = new Base(world, "Wayne Foundation");
+    final Base base = new Base(Facilities.WAYNE_MANOR, world);
     
-    Person leader = base.addToRoster(new Person(Heroes.HERO_BATMAN, world));
+    Person leader = new Person(Heroes.HERO_BATMAN, world);
+    base.setLeader(leader);
+    base.addToRoster(leader);
     base.addToRoster(new Person(Heroes.HERO_BATGIRL  , world));
     base.addToRoster(new Person(Heroes.HERO_NIGHTWING, world));
     base.addToRoster(new Person(Heroes.HERO_QUESTION , world));
@@ -62,7 +64,12 @@ public class DefaultGame extends RunGame {
     for (Person p : base.roster()) for (Person o : base.roster()) {
       if (p != o) p.history.incBond(o, 0.2f);
     }
-    base.setLeader(leader);
+    world.regionFor(Regions.OLD_GOTHAM).setAttached(base, true);
+    
+    for (Person p : base.roster()) {
+      world.setInside(p, true);
+      base.setAttached(p, true);
+    }
     
     base.addFacility(Gymnasium .BLUEPRINT, 0, 1f);
     base.addFacility(Library   .BLUEPRINT, 1, 1f);
@@ -81,39 +88,44 @@ public class DefaultGame extends RunGame {
   
   public static void initDefaultCrime(World world) {
     
-    //  TODO:  Generate an initial set of crooks (low-level hoods, lieutenants
-    //  and bosses.)  And these all need unique characteristics.
-    
-    Batch <Person> bosses  = new Batch();
-    Batch <Person> seniors = new Batch();
-    
-    final Kind seniorTypes[] = {
-      Crooks.MOBSTER, Crooks.MOBSTER, Crooks.MOBSTER,
-      Civilians.DOCTOR, Civilians.INVENTOR, Civilians.BROKER
+    final Kind goonTypes[] = {
+      Crooks.GOON, Crooks.GOON, Crooks.MOBSTER
     };
-    final Person
-      falcone = new Person(Villains.FALCONE , world),
-      twoFace = new Person(Villains.TWO_FACE, world)
-    ;
-    bosses.add(falcone);
-    //bosses.add(twoFace);
+    final Kind seniorTypes[] = {
+      Crooks.MOBSTER, Civilians.DOCTOR, Civilians.INVENTOR, Civilians.BROKER
+    };
     
-    //  TODO:  Actually, don't.  Have each boss control a certain number of
-    //  assigned territories, and generate subordinates for each region.
+    final Batch <Base> hideouts = new Batch();
     
-    for (Person boss : bosses) {
-      final Base base = new Base(world, boss.name());
+    final Person falcone = new Person(Villains.FALCONE, world);
+    final Base falconeBase = new Base(Facilities.HIDEOUT, world);
+    world.regionFor(Regions.CAPE_FINGER).setAttached(falconeBase, true);
+    falconeBase.setLeader(falcone);
+    falconeBase.incFunding(100);
+    hideouts.add(falconeBase);
+    
+    /*
+    final Person twoFace = new Person(Villains.TWO_FACE, world);
+    final Base twoFaceBase = new Base(Facilities.HIDEOUT, world);
+    world.regionFor(Regions.MILLER_BAY).setAttached(twoFaceBase, true);
+    twoFaceBase.setLeader(twoFace);
+    hideouts.add(twoFaceBase);
+    //*/
+    
+    for (Base base : hideouts) {
       world.addBase(base, false);
-      world.setInside(boss, true);
-      base.setLeader(boss);
-      base.addToRoster(boss);
+      base.addToRoster(base.leader());
+      base.setGoonTypes(goonTypes);
       base.plans.assignStepTypes(StepTypes.ALL_TYPES);
       
       for (Kind type : seniorTypes) {
         Person senior = Person.randomOfKind(type, world);
-        world.setInside(senior, true);
-        seniors.add(senior);
         base.addToRoster(senior);
+      }
+      
+      for (Person p : base.roster()) {
+        world.setInside(p, true);
+        base.setAttached(p, true);
       }
     }
   }

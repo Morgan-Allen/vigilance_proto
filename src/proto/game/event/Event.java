@@ -7,8 +7,9 @@ import proto.game.scene.*;
 import proto.game.person.*;
 import proto.util.*;
 
-//  TODO:  Remove this direct reference!
-import proto.content.agents.Crooks;
+
+//  TODO:  You need a certain chance to deposit tipoffs for each of the actors
+//  involved- and definitely once the event has transpired!
 
 
 
@@ -17,7 +18,8 @@ public class Event implements Session.Saveable {
   
   /**  Data fields, construction and save/load methods-
     */
-  final EventType type;
+  final public EventType type;
+  
   PlanStep step;
   Place place;
   float timeBegins, timeEnds;
@@ -56,6 +58,10 @@ public class Event implements Session.Saveable {
   public void assignParameters(
     PlanStep step, Place place, float begins, float ends
   ) {
+    if (step == null || place == null) {
+      I.complain("Step/place were: "+step+"/"+place+", must be non-null!");
+      return;
+    }
     this.step       = step  ;
     this.place      = place ;
     this.timeBegins = begins;
@@ -88,10 +94,6 @@ public class Event implements Session.Saveable {
   }
   
   
-  public void updateEvent() {
-  }
-  
-  
   public boolean complete() {
     return complete;
   }
@@ -102,6 +104,45 @@ public class Event implements Session.Saveable {
     if (Visit.arrayIncludes(step.needs(), element)) return true;
     if (Visit.arrayIncludes(step.gives(), element)) return true;
     return false;
+  }
+  
+  
+  
+  /**  Regular updates and life cycle:
+    */
+  public void onEventBegun() {
+    if (step != null) {
+      Base played = world().playerBase();
+      Region region = place().region();
+      float tipoffChance = region.currentValue(Region.TRUST) / 100f;
+      
+      I.say("Event begun: "+this);
+      I.say("  Tipoff chance in "+region+": "+tipoffChance);
+      
+      for (Element e : step.needs()) {
+        if (e == null || e.type != Kind.TYPE_PERSON) continue;
+        final Person perp = (Person) e;
+        
+        if (Rand.num() < tipoffChance) {
+          played.leads.addLead(perp);
+          I.say("  Generating tipoff from: "+perp);
+        }
+        else I.say("No tipoff generated from "+perp);
+      }
+    }
+  }
+  
+  
+  public void updateEvent() {
+    
+  }
+  
+  
+  public void onEventComplete() {
+    if (step != null && step.type.isDangerous(this)) {
+      Base played = world().playerBase();
+      played.leads.addLead(this);
+    }
   }
   
   
@@ -118,24 +159,21 @@ public class Event implements Session.Saveable {
     }
     
     //  TODO:  Move this out to the StepType class, so that any special items
-    //  can also be equipped...
+    //  can also be equipped?
     
     //  TODO:  You also need to populate with civilian passerbys and/or
     //  hostages!  Also, the types of goon/civilian should be specified under
-    //  types in the content package.
+    //  types in the content package- or perhaps associated with a given base/
+    //  faction.  Yeah.
     
     final float dangerLevel = 0.5f;
-    final Kind GOONS[] = {
-      Crooks.MOBSTER,
-      Crooks.GOON   ,
-      Crooks.GOON   ,
-    };
-    final float GOON_CHANCES[] = { 1, 1, 1 };
-    
+    final Base faction = step.plan.agent.base();
+    final Kind GOONS[] = faction.goonTypes().toArray(Kind.class);
     float forceLimit = dangerLevel * 10;
     float forceSum   = 0;
+    
     while (forceSum < forceLimit) {
-      Kind ofGoon = (Kind) Rand.pickFrom(GOONS, GOON_CHANCES);
+      Kind ofGoon = (Kind) Rand.pickFrom(GOONS);
       Person goon = Person.randomOfKind(ofGoon, scene.world());
       forceSum += goon.stats.powerLevel();
       forces.add(goon);

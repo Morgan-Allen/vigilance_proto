@@ -7,9 +7,6 @@ import proto.game.person.*;
 import proto.util.*;
 import java.awt.Image;
 
-import proto.content.agents.Civilians;
-import proto.content.agents.Crooks;
-
 
 
 public class Place extends Element {
@@ -17,9 +14,8 @@ public class Place extends Element {
   
   /**  Data fields, construction and save/load methods-
     */
-  final public int slotID;
-  
   private Base owner;
+  private int slotID;
   private float buildProgress;
   private List <Trait> properties = new List();
   private List <Person> residents = new List();
@@ -110,6 +106,7 @@ public class Place extends Element {
       while (count++ < max) {
         Person resides = Person.randomOfKind(type, world);
         world.setInside(resides, true);
+        setAttached(resides, true);
         Place.setResident(resides, this, true);
       }
     }
@@ -155,6 +152,11 @@ public class Place extends Element {
       if (here) place.setResident(person, false);
       if (there) person.setResidence(null);
     }
+  }
+  
+  
+  public Access accessLevel(Base base) {
+    return Access.GRANTED;
   }
   
   

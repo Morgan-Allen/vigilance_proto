@@ -131,6 +131,7 @@ public class Plan implements Session.Saveable {
   
   
   private void fillNeeds(PlanStep step) {
+    final Base base = agent.base();
     final Object roles[] = step.needTypes();
     final boolean markDone[] = new boolean[roles.length];
     while (true) {
@@ -162,7 +163,8 @@ public class Plan implements Session.Saveable {
       if (available == null || available.empty()) continue;
       
       float bestRating = 0;
-      for (Element match : available) {
+      for (Element match : available) if (match != null) {
+        if (match.accessLevel(base) == Element.Access.SECRET) continue;
         if (step.doesGive(match)     ) continue;
         if (neededDuring(step, match)) continue;
         float rating = step.calcFitness(match, role) * (Rand.num() + 0.5f);
@@ -188,7 +190,7 @@ public class Plan implements Session.Saveable {
       for (PlanStep child : possible) {
         fillNeeds(child);
         child.setParent(step, role);
-        child.calcStepRatingFromParent(step);
+        child.calcRatingFromBase(step.rating());
         toEval.add(child);
       }
     }
@@ -199,8 +201,8 @@ public class Plan implements Session.Saveable {
   /**  Determining pre-conditions and keeping track of resource-reservations.
     */
   private boolean obtainedBefore(PlanStep step, Element need) {
-    //  TODO:  Make this a generic check for 'publicly known' things.
-    if (need.type == Kind.TYPE_PLACE) return true;
+    final Base base = agent.base();
+    if (need.accessLevel(base) == Element.Access.GRANTED) return true;
     if (preObtained.includes(need)) return true;
     
     for (PlanStep prior : steps) {

@@ -58,13 +58,20 @@ public class BaseLeads {
   /**  Processing open and dead leads-
     */
   public void addLead(Session.Saveable origin) {
-    if (allLeads.containsKey(origin)) return;
+    final Lead match = allLeads.get(origin);
+    if (match != null) closeLead(origin);
     
     Lead lead = new Lead();
     lead.origin = origin;
     addInvestigationOptions(origin, lead.followOptions);
     allLeads.put(origin, lead);
     leadsList.add(lead);
+    
+    //  TODO:  You need to present a pop-up message for the sake of alerting
+    //  the player.
+    if (base == base.world.playerBase()) {
+      base.world.pauseMonitoring();
+    }
   }
   
   
@@ -74,6 +81,8 @@ public class BaseLeads {
     match.open = false;
     allLeads.remove(origin);
     leadsList.remove(match);
+    
+    //  TODO:  Close up any associated investigation tasks.
   }
   
   
@@ -126,22 +135,11 @@ public class BaseLeads {
   
   //  TODO:  Examine where this should belong?
   private void addInvestigationOptions(Object origin, Series <Task> options) {
-    //  TODO:  Having obtained leads, however, you still need to generate
-    //  associated tasks for investigation.
     
     //  In addition, there may be multiple methods for investigating a single
     //  object (e.g, you could either tail, persuade or intimidate a suspect,
     //  stake out or guard a building, bug or sabotage a vehicle, swab or dust
     //  for clues, etc..)  And not all methods will yield immediate dividends.
-    
-    //  So... each of these methods of investigation will reveal different
-    //  leads.  I think.
-    
-    //  Each Kind of element should yield different methods of investigation.
-    
-    
-    //  As a general rule... whenever a given object becomes (or is shown to be)
-    //  involved in an ongoing criminal plot, then it should be added as a lead.
     
     if (origin instanceof Item || origin instanceof Clue) {
       //  TODO:  Forensics.
@@ -160,12 +158,31 @@ public class BaseLeads {
     
     if (origin instanceof Event) {
       final Event event = (Event) origin;
-      Task guarding = new TaskGuard(base, event);
-      options.add(guarding);
+      final boolean dangerous = event.type.isDangerous(event);
+      
+      if (dangerous && ! event.complete()) {
+        Task guarding = new TaskGuard(base, event);
+        options.add(guarding);
+      }
+      if (dangerous && event.complete()) {
+        Task searching = new TaskSearch(base, event.place());
+        options.add(searching);
+      }
+      
+      //  TODO:  Allow a search for *all* completed events?
+      
+      if (event.planStep() != null && ! dangerous) {
+        for (Element e : event.planStep().gives()) {
+          Person carries = (Person) e.parentOfType(Kind.TYPE_PERSON);
+          if (carries == null) continue;
+          Task tailing = new TaskTail(base, carries);
+          options.add(tailing);
+        }
+        closeLead(event);
+      }
     }
   }
 }
-
 
 
 

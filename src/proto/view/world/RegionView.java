@@ -58,7 +58,7 @@ public class RegionView extends UINode {
     down += 5;
     for (Region.Stat stat : Region.SOCIAL_STATS) {
       g.drawString(stat+": ", vx + 80, vy + down);
-      int current = (int) nation.longTermValue(stat);
+      int current = (int) nation.currentValue(stat);
       g.drawString(""+current, vx + 180, vy + down);
       down += 20;
     }

@@ -263,6 +263,11 @@ public class Person extends Element {
   }
   
   
+  public Access accessLevel(Base base) {
+    if (! isHero()) return Access.POSSIBLE;
+    return base == this.base ? Access.GRANTED : Access.SECRET;
+  }
+  
   
   
   /**  Interface, rendering and debug methods-

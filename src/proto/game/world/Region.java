@@ -3,8 +3,6 @@
 package proto.game.world;
 import proto.common.*;
 import proto.content.places.Facilities;
-import proto.game.event.*;
-import proto.game.person.*;
 import proto.util.*;
 
 
@@ -126,21 +124,12 @@ public class Region extends Element {
   
   /**  General stat-queries and modifications-
     */
-  public void incLevel(Stat stat, int inc) {
+  public void nudgeCurrentStat(Stat stat, int inc) {
     Level l = this.statLevels[stat.ID];
+    final float oldL = l.current;
+    l.current = Nums.clamp(l.current + inc, 0, 100);
     
-    final int oldL = l.level;
-    l.level = Nums.clamp(l.level + inc, 100);
-
-    if (oldL != l.level) {
-      String desc = "";
-      if (inc > 0) desc += stat.name+" +"+inc;
-      else if (stat.oppName != null) desc += stat.oppName+" +"+(0 - inc);
-      else desc += stat.name+" -"+(0 - inc);
-      desc += ": "+kind();
-      
-      world.events.log(desc, Events.EVENT_MAJOR);
-    }
+    if (oldL != l.current) recordChange(stat, oldL, l.current);
   }
   
   
@@ -197,7 +186,7 @@ public class Region extends Element {
   
   
   public Series <PlaceType> facilitiesAvailable() {
-    //  TODO:  MOVE THIS SELECTION ELSEWHERE
+    //  TODO:  MOVE THIS SELECTION TO THE OWNING BASE!
     final Batch <PlaceType> all = new Batch();
     Visit.appendTo(all,
       Facilities.BUSINESS_PARK,
@@ -350,7 +339,21 @@ public class Region extends Element {
   public String toString() {
     return kind().name();
   }
+  
+  
+  public void recordChange(Stat stat, float oldLevel, float newLevel) {
+    float inc = newLevel - oldLevel;
+    String desc = "";
+    if (inc > 0) desc += stat.name+" +"+inc;
+    else if (stat.oppName != null) desc += stat.oppName+" +"+(0 - inc);
+    else desc += stat.name+" -"+(0 - inc);
+    desc += ": "+kind();
+    world.events.log(desc, Events.EVENT_MAJOR);
+  }
 }
+
+
+
 
 
 

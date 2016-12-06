@@ -97,6 +97,18 @@ public class Element implements Session.Saveable {
   
   
   
+  /**  AI-support methods-
+    */
+  public static enum Access {
+    GRANTED, POSSIBLE, SECRET
+  };
+  
+  public Access accessLevel(Base base) {
+    return Access.POSSIBLE;
+  }
+  
+  
+  
   /**  Rendering, debug and interface methods-
     */
   public String name() {

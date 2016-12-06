@@ -7,10 +7,7 @@ import proto.util.*;
 
 
 
-//  TODO:  Have this extend the District or Place class?
-
-
-public class Base implements Session.Saveable {
+public class Base extends Place {
   
   
   /**  Data fields, constructors and save/load methods-
@@ -19,11 +16,11 @@ public class Base implements Session.Saveable {
     MAX_FACILITIES = 12,
     SLOTS_WIDE     = 3 ;
   
-  World world;
-  String name;
   
-  List <Person> roster = new List();
   Person leader = null;
+  List <Person> roster = new List();
+  List <Kind> goonTypes = new List();
+  
   final public BaseStocks stocks = new BaseStocks(this);
   final public BaseLeads  leads  = new BaseLeads (this);
   final public BasePlans  plans  = new BasePlans (this);
@@ -33,20 +30,18 @@ public class Base implements Session.Saveable {
   int currentFunds, incomeFloor, income, maintenance;
   
   
-  public Base(World world, String name) {
-    this.world = world;
-    this.name  = name ;
+  public Base(PlaceType kind, World world) {
+    super(kind, 0, world);
   }
   
   
   public Base(Session s) throws Exception {
-    s.cacheInstance(this);
+    super(s);
     
-    world = (World ) s.loadObject();
-    name  = (String) s.loadString();
-    
-    s.loadObjects(roster);
     leader = (Person) s.loadObject();
+    s.loadObjects(roster);
+    s.loadObjects(goonTypes);
+    
     stocks.loadState(s);
     leads .loadState(s);
     plans .loadState(s);
@@ -64,12 +59,12 @@ public class Base implements Session.Saveable {
   
   
   public void saveState(Session s) throws Exception {
+    super.saveState(s);
     
-    s.saveObject(world);
-    s.saveString(name );
-    
-    s.saveObjects(roster);
     s.saveObject(leader);
+    s.saveObjects(roster);
+    s.saveObjects(goonTypes);
+    
     stocks.saveState(s);
     leads .saveState(s);
     plans .saveState(s);
@@ -161,6 +156,21 @@ public class Base implements Session.Saveable {
   }
   
   
+  public Series <Kind> goonTypes() {
+    return goonTypes;
+  }
+  
+  
+  public void setGoonTypes(Kind... types) {
+    for (Kind type: types) goonTypes.add(type);
+  }
+  
+  
+  public Access accessLevel(Base base) {
+    return base == this ? Access.GRANTED : Access.SECRET;
+  }
+  
+  
   
   /**  Tech levels and funding-
     */
@@ -186,7 +196,6 @@ public class Base implements Session.Saveable {
     this.incomeFloor = floor;
     return true;
   }
-  
   
   
   
@@ -254,13 +263,8 @@ public class Base implements Session.Saveable {
   }
   
   
-  public String name() {
-    return name;
-  }
-  
-  
   public String toString() {
-    return name;
+    return "Base ("+leader+")";
   }
 }
 

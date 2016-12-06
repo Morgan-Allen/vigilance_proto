@@ -58,11 +58,9 @@ public abstract class TypeMajorCrime extends StepType {
       return 1;
     }
     if (needType == Needs.BLUEPRINT) {
-      if (step.satisfied(Needs.MOLE)) return 0;
       return 0.5f;
     }
     if (needType == Needs.MOLE) {
-      if (step.satisfied(Needs.BLUEPRINT)) return 0;
       return 0.5f;
     }
     if (needType == Needs.EXPLOSIVE) {
@@ -119,6 +117,14 @@ public abstract class TypeMajorCrime extends StepType {
     //  There's always an element of risk involved in flouting the law this
     //  blatantly.  TODO:  Modify based on local/global conviction stats?
     return 5;
+  }
+  
+  
+  
+  /**  Generating clues and tipoffs-
+    */
+  public boolean isDangerous(PlanStep step) {
+    return true;
   }
   
   

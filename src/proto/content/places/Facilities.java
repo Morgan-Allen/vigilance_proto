@@ -4,9 +4,9 @@ package proto.content.places;
 import proto.game.person.*;
 import proto.game.event.*;
 import proto.game.world.*;
+import proto.content.agents.Civilians;
 import proto.content.rooms.*;
 import static proto.game.world.Region.*;
-import proto.content.agents.Civilians;
 import static proto.content.places.UrbanScenes.*;
 
 
@@ -20,6 +20,20 @@ public class Facilities {
   final public static Trait ALARMED = new Trait(
     "Alarmed", "trait_alarmed", null, ""
   );
+  
+  
+  final public static PlaceType WAYNE_MANOR = new PlaceType(
+    "Wayne Manor", "base_type_manor",
+    null, "",
+    0, BUILD_TIME_NONE, MANSION_SCENE
+  );
+  
+  final public static PlaceType HIDEOUT = new PlaceType(
+    "Hideout", "base_type_hideout",
+    null, "",
+    0, BUILD_TIME_NONE, URBAN_SCENE
+  );
+  
   
   
   final public static PlaceType STEEL_MILL = new PlaceType(
@@ -49,7 +63,8 @@ public class Facilities {
     100, BUILD_TIME_MEDIUM, URBAN_SCENE,
     EMPLOYMENT, 3,
     HEALTH_AND_ENVIRONMENT, -2,
-    INCOME, 2
+    INCOME, 2,
+    Civilians.CIVILIAN, 2
   ){
     public float speedBonus(Task task) {
       if (! (task instanceof TaskCraft)) return 0;
@@ -69,7 +84,8 @@ public class Facilities {
     EMPLOYMENT, 2,
     EDUCATION_AND_CULTURE, -1,
     DETERRENCE, 1,
-    INCOME, -1
+    INCOME, -1,
+    Civilians.CIVILIAN, 1
   );
   
   final public static PlaceType BUSINESS_PARK = new PlaceType(
@@ -79,7 +95,8 @@ public class Facilities {
     "a Business Park.",
     70, BUILD_TIME_MEDIUM, URBAN_SCENE,
     EMPLOYMENT, 1,
-    INCOME, 2
+    INCOME, 2,
+    Civilians.BROKER, 1
   );
   
   final public static PlaceType TECH_STARTUP = new PlaceType(
@@ -91,7 +108,8 @@ public class Facilities {
     120, BUILD_TIME_SHORT, URBAN_SCENE,
     EMPLOYMENT, 1,
     EDUCATION_AND_CULTURE, 1,
-    INCOME, -1
+    INCOME, -1,
+    Civilians.INVENTOR, 1
   );
   
   final public static PlaceType CITY_PARK = new PlaceType(
@@ -136,7 +154,8 @@ public class Facilities {
     120, BUILD_TIME_LONG, URBAN_SCENE,
     EDUCATION_AND_CULTURE, 2,
     TRUST, 1,
-    INCOME, -1
+    INCOME, -1,
+    Civilians.DOCTOR, 1
   );
   
   //  TODO:  I'm not supporting all these at the moment.  For testing, just a 

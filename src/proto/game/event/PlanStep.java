@@ -120,12 +120,14 @@ public class PlanStep implements Session.Saveable {
   
   
   public Element need(Object needType) {
-    return needs[Visit.indexOf(needType, needTypes())];
+    final int index = Visit.indexOf(needType, needTypes());
+    return index == -1 ? null : needs[index];
   }
   
   
   public Element give(Object giveType) {
-    return gives[Visit.indexOf(giveType, giveTypes())];
+    final int index = Visit.indexOf(giveType, giveTypes());
+    return index == -1 ? null : gives[index];
   }
   
   
@@ -207,11 +209,12 @@ public class PlanStep implements Session.Saveable {
   }
   
   
-  void calcStepRatingFromParent(PlanStep parent) {
+  void calcRatingFromBase(float parentRating) {
     float chance = calcSuccessChance();
-    float urgency = parent.type.urgency(roleForParent(), parent);
+    float urgency = 0;
+    if (parent != null) urgency = parent.type.urgency(roleForParent(), parent);
     rating = 0;
-    rating += chance * (parent.rating * Nums.clamp(urgency, 0, 1));
+    rating += chance * (parentRating * Nums.clamp(urgency, 0, 1));
     rating += (chance * baseAppeal()) - ((1 - chance) * baseFailCost());
   }
   
@@ -267,9 +270,12 @@ public class PlanStep implements Session.Saveable {
     int time = world.totalMinutes() + (delayHours * World.MINUTES_PER_HOUR);
     int ends = time + (Task.TIME_SHORT * World.MINUTES_PER_HOUR);
     Place place = null;
-    for (Element e : needs) if (e != null && e.type == Kind.TYPE_PLACE) {
-      place = (Place) e;
-      break;
+    
+    if (place == null) for (Element e : needs) if (e != null) {
+      if ((place = e.place()) != null) break;
+    }
+    if (place == null) for (Element e : gives) if (e != null) {
+      if ((place = e.place()) != null) break;
     }
     
     event.assignParameters(this, place, time, ends);

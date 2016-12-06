@@ -33,6 +33,20 @@ public class TypeMake extends StepType {
   }
   
   
+  protected float urgency(Object needType, PlanStep step) {
+    final Item made = (Item) step.give(Gives.MADE);
+    if (made == null) return 0;
+    
+    if (needType == Needs.MAKES) {
+      return 1;
+    }
+    if (needType == Needs.MATERIALS) {
+      return made.kind().isCustom() ? 0 : 0.5f;
+    }
+    return 0;
+  }
+  
+  
   protected float calcFitness(
     Element used, Object needType, PlanStep step
   ) {
@@ -44,13 +58,6 @@ public class TypeMake extends StepType {
       return 0;
     }
     return 0;
-  }
-  
-  
-  protected float baseSuccessChance(PlanStep step) {
-    Person makes = (Person) step.need(Needs.MAKES);
-    Item   made  = (Item  ) step.give(Gives.MADE );
-    return makesChance(makes, made);
   }
   
   

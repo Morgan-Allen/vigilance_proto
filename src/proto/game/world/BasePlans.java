@@ -57,7 +57,6 @@ public class BasePlans {
       
       for (int n = numPlans; n-- > 0;) {
         final Plan plan = new Plan(base.leader, base.world, stepTypes);
-        plan.verbose = true;
         for (Element goon : base.roster()) plan.addObtained(goon);
         plan.selectInitialGoal();
         plan.advancePlan(maxDepth);
@@ -66,6 +65,7 @@ public class BasePlans {
       }
       
       currentPlan = picked;
+      if (picked != null) picked.printFullPlan();
     }
     
     if (currentPlan != null && (nextEvent == null || nextEvent.complete())) {
@@ -75,7 +75,8 @@ public class BasePlans {
       else next = steps.atIndex(steps.indexOf(nextEvent.planStep()) + 1);
       
       if (next != null) {
-        nextEvent = next.spawnEvent(base.world, 24);
+        nextEvent = next.spawnEvent(base.world, 20 + Rand.index(5));
+        I.say("Spawning next event for plan: "+nextEvent);
         base.world.events.scheduleEvent(nextEvent);
       }
     }

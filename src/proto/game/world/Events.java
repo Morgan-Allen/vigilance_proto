@@ -58,15 +58,16 @@ public class Events {
   void updateEvents() {
     
     for (Event event : coming) {
-      if (event.timeBegins() <= world.timeDays()) {
+      if (event.timeBegins() <= world.totalMinutes()) {
         coming.remove(event);
         active.add(event);
-        world.pauseMonitoring();
+        event.onEventBegun();
       }
     }
     
     for (Event event : active) {
-      if (event.timeEnds() <= world.timeDays() || event.complete()) {
+      if (event.timeEnds() <= world.totalMinutes() || event.complete()) {
+        event.onEventComplete();
         closeEvent(event);
       }
       else {
