@@ -22,14 +22,17 @@ public class ProgressOptionsView extends UINode {
     int across = 5, down = 0;
     
     monitorButton = new StringButton(
-      "Resume Monitoring",
-      new Box2D(across, down, viewBounds.xdim() - 10, 20), this
+      "", new Box2D(across, down, viewBounds.xdim() - 10, 20), this
     ) {
       protected void whenClicked() {
         final World world = mainView.world();
-        final boolean active = world.monitorActive();
-        if (active) world.pauseMonitoring();
-        else        world.beginMonitoring();
+        if (world.monitorActive()) world.pauseMonitoring();
+        else                       world.beginMonitoring();
+      }
+      protected void updateAndRender(Surface surface, Graphics2D g) {
+        final boolean active = mainView.world().monitorActive();
+        this.label = active ? "Pause Monitoring" : "Resume Monitoring";
+        super.updateAndRender(surface, g);
       }
     };
     addChildren(monitorButton);

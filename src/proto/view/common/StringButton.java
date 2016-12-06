@@ -11,7 +11,7 @@ import java.awt.Graphics2D;
 public abstract class StringButton extends UINode {
   
   
-  final String label;
+  public String label;
   public boolean toggled = false, valid = true;
   public Object refers = this;
   
