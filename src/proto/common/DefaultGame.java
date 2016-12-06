@@ -71,6 +71,19 @@ public class DefaultGame extends RunGame {
       base.setAttached(p, true);
     }
     
+    final PlaceType buildTechs[] = {
+      Facilities.BUSINESS_PARK,
+      Facilities.CHEMICAL_PLANT,
+      Facilities.STEEL_MILL,
+      Facilities.UNION_OFFICE,
+      Facilities.TECH_STARTUP,
+      Facilities.CITY_PARK,
+      Facilities.COMMUNITY_COLLEGE,
+      Facilities.ROBINS_CAMP,
+      Facilities.SOUP_KITCHEN
+    };
+    for (PlaceType t : buildTechs) base.addTech(t.tech);
+    
     base.addFacility(Gymnasium .BLUEPRINT, 0, 1f);
     base.addFacility(Library   .BLUEPRINT, 1, 1f);
     base.addFacility(Workshop  .BLUEPRINT, 2, 1f);

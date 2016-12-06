@@ -2,7 +2,6 @@
 
 package proto.game.world;
 import proto.common.*;
-import proto.content.places.Facilities;
 import proto.util.*;
 
 
@@ -185,20 +184,11 @@ public class Region extends Element {
   }
   
   
-  public Series <PlaceType> facilitiesAvailable() {
-    //  TODO:  MOVE THIS SELECTION TO THE OWNING BASE!
+  public Series <PlaceType> facilitiesAvailable(Base base) {
     final Batch <PlaceType> all = new Batch();
-    Visit.appendTo(all,
-      Facilities.BUSINESS_PARK,
-      Facilities.CHEMICAL_PLANT,
-      Facilities.STEEL_MILL,
-      Facilities.UNION_OFFICE,
-      Facilities.TECH_STARTUP,
-      Facilities.CITY_PARK,
-      Facilities.COMMUNITY_COLLEGE,
-      Facilities.ROBINS_CAMP,
-      Facilities.SOUP_KITCHEN
-    );
+    for (Tech tech : base.knownTech) for (Object g : tech.granted) {
+      if (g instanceof PlaceType) all.add((PlaceType) g);
+    }
     return all;
   }
   

@@ -19,6 +19,8 @@ public class PlaceType extends Kind {
   final Image icon;
   final SceneType sceneType;
   final public int buildCost, buildTime;
+  final public Tech tech;
+  
   
   
   
@@ -41,9 +43,11 @@ public class PlaceType extends Kind {
     
     this.buildCost = buildCost;
     this.buildTime = buildTime;
-    
     initStatsFor(this, initStats);
+    
     this.sceneType = sceneType;
+    
+    this.tech = new Tech(name, ID+"_tech", this);
   }
   
   

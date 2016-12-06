@@ -38,9 +38,9 @@ public class BuildOptionsView extends MessageView {
     
     //
     //  TODO:  Allow for purchase, salvage, or redevelopment!
+    final Base base = mainView.world().playerBase();
     
-    for (final PlaceType f : region.facilitiesAvailable()) {
-      
+    for (final PlaceType f : region.facilitiesAvailable(base)) {
       final int nextAcross = across + BS + 5;
       if (nextAcross >= maxWide) { across = minWide; down += BS + 5; }
       
