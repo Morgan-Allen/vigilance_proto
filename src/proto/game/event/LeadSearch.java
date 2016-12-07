@@ -4,6 +4,7 @@ package proto.game.event;
 import proto.common.*;
 import proto.game.world.*;
 import proto.game.person.*;
+import proto.util.*;
 import java.awt.Image;
 
 
@@ -12,7 +13,10 @@ import java.awt.Image;
 public class LeadSearch extends Lead {
   
   
+  /**  Data fields, construction and save/load methods-
+    */
   Place searched;
+  Batch <Clue> clues = new Batch();
   
   
   public LeadSearch(Base base, Lead prior, Place searched) {
@@ -24,12 +28,14 @@ public class LeadSearch extends Lead {
   public LeadSearch(Session s) throws Exception {
     super(s);
     searched = (Place) s.loadObject();
+    s.loadObjects(clues);
   }
   
   
   public void saveState(Session s) throws Exception {
     super.saveState(s);
     s.saveObject(searched);
+    s.saveObjects(clues);
   }
   
   
@@ -38,31 +44,14 @@ public class LeadSearch extends Lead {
   }
   
   
-  
-
-  public void updateAssignment() {
-    super.updateAssignment();
-    
-    //  TODO:  You need to alert the player if the person tailed visits a new
-    //  location or undertakes a new task that is related to an open case.
-    
-    /*
-    if (tailed.assignment() instanceof Event) {
-      
-    }
-    if (base.leads.hasOpenLead(tailed.location())) {
-      
-    }
-    //*/
-  }
-  
-
-  protected void onCompletion() {
-    resetTask();
-  }
-  
-  
   protected void onSuccess() {
+    
+    //  TODO:  Produce clues leading to the participants and/or to the hideout
+    //  and/or to items left at the scene.
+    
+    //  Participants can be interrogated, which might allow you to chase leads
+    //  further up the chain of command or get an indication of further steps
+    //  in a criminal plan.
   }
   
   
@@ -78,8 +67,8 @@ public class LeadSearch extends Lead {
   }
   
   
-  public String activeInfo() {
-    return null;
+  public String choiceInfo() {
+    return "Searched "+searched;
   }
   
   
@@ -88,15 +77,19 @@ public class LeadSearch extends Lead {
   }
   
   
-  public Image icon() {
-    return null;
+  public String activeInfo() {
+    return "Searching "+searched+" for clues";
   }
   
   
-  public String choiceInfo() {
-    return null;
+  public Image icon() {
+    return searched.icon();
   }
 }
+
+
+
+
 
 
 

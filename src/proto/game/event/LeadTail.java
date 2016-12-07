@@ -14,6 +14,7 @@ public class LeadTail extends Lead {
   
   
   Person tailed;
+  Event involved;
   
   
   public LeadTail(Base base, Lead prior, Person tailed) {
@@ -24,13 +25,15 @@ public class LeadTail extends Lead {
   
   public LeadTail(Session s) throws Exception {
     super(s);
-    tailed = (Person) s.loadObject();
+    tailed   = (Person) s.loadObject();
+    involved = (Event ) s.loadObject();
   }
   
   
   public void saveState(Session s) throws Exception {
     super.saveState(s);
-    s.saveObject(tailed);
+    s.saveObject(tailed  );
+    s.saveObject(involved);
   }
   
   
@@ -39,11 +42,8 @@ public class LeadTail extends Lead {
   }
   
   
-  
-
   public void updateAssignment() {
     super.updateAssignment();
-    
     //  TODO:  You need to alert the player if the person tailed visits a new
     //  location or undertakes a new task that is related to an open case.
   }
@@ -53,7 +53,7 @@ public class LeadTail extends Lead {
     I.say("Tailing succeeded!");
     //  TODO:  Present a message for either success or failure.
     
-    Event involved = base.world().events.nextEventInvolving(tailed);
+    involved = base.world().events.nextEventInvolving(tailed);
     if (involved != null) base.leads.leadOpened(this);
     base.leads.closeLead(tailed);
   }
@@ -61,7 +61,6 @@ public class LeadTail extends Lead {
   
   protected void onFailure() {
     I.say("Tailing failed!");
-    
     base.leads.closeLead(tailed);
   }
   
@@ -75,7 +74,14 @@ public class LeadTail extends Lead {
   
   
   public String choiceInfo() {
-    return "Tail "+tailed;
+    return "Tail Complete ";
+  }
+  
+  
+  public String helpInfo() {
+    return
+      "After tailing "+subject+", they appear to be involved in plans to "+
+      involved+".  This could be a chance to catch them red-handed.";
   }
   
   
@@ -84,15 +90,14 @@ public class LeadTail extends Lead {
   }
   
   
-  public String helpInfo() {
-    return "Follow "+tailed+" for any sign of criminal activity.";
-  }
-  
-  
   public Image icon() {
     return tailed.kind().sprite();
   }
 }
+
+
+
+
 
 
 

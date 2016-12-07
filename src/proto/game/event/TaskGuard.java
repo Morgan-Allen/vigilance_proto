@@ -85,12 +85,12 @@ public class TaskGuard extends Task {
   
   
   public String choiceInfo() {
-    return "Guard "+event.place()+" during event: "+event;
+    return "Guard "+event.place();
   }
   
   
   public String activeInfo() {
-    return "Guarding "+event.place();
+    return "Guarding "+event.place()+" during event: "+event;
   }
   
   

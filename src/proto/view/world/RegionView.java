@@ -18,7 +18,7 @@ public class RegionView extends UINode {
   
   
   final static Image
-    NOT_BUILT   = Kind.loadImage(
+    NOT_BUILT = Kind.loadImage(
       "media assets/tech icons/state_not_built.png"
     ),
     IN_PROGRESS = Kind.loadImage(
@@ -157,15 +157,18 @@ public class RegionView extends UINode {
       //  Firstly, draw an illustrative icon for the lead we've picked up and
       //  some basic info on how it was acquired.
       Image icon = lead.icon();
-      g.drawImage(icon, vx + 5, vy + 5, 40, 40, null);
-      
+      g.drawImage(icon, vx + 15, down + 5, 40, 40, null);
       int initDown = down;
+      
+      g.setColor(Color.WHITE);
       ViewUtils.drawWrappedString(
-        lead.choiceInfo(), g, vx + 60, down + 15, vw - 60, 20
+        lead.choiceInfo(), g, vx + 60, down + 5, vw - 80, 20
       );
       down += 20;
+      
+      g.setColor(Color.LIGHT_GRAY);
       ViewUtils.drawWrappedString(
-        lead.helpInfo(), g, vx + 20, down, vw - 40, 60
+        lead.helpInfo(), g, vx + 60, down, vw - 80, 60
       );
       down += 60;
       //

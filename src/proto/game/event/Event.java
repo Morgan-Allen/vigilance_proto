@@ -139,7 +139,7 @@ public class Event implements Session.Saveable {
   public void onEventComplete() {
     if (step != null && step.type.isDangerous(this)) {
       Base played = world().playerBase();
-      played.leads.leadOpened(new LeadTipoff(played, this));
+      played.leads.leadOpened(new LeadCrimeReport(played, this));
     }
   }
   

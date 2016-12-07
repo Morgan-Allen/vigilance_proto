@@ -3,19 +3,21 @@
 package proto.game.event;
 import proto.common.*;
 import proto.game.world.*;
+import proto.game.person.*;
 import java.awt.Image;
 
 
 
-public class LeadTipoff extends Lead {
+
+public class LeadCrimeReport extends Lead {
   
   
-  public LeadTipoff(Base base, Element about) {
+  public LeadCrimeReport(Base base, Event about) {
     super(base, Task.TIME_SHORT, null, about, new Object[0]);
   }
   
   
-  public LeadTipoff(Session s) throws Exception {
+  public LeadCrimeReport(Session s) throws Exception {
     super(s);
   }
   
@@ -26,7 +28,7 @@ public class LeadTipoff extends Lead {
   
   
   public Place targetLocation() {
-    return ((Element) subject).place();
+    return ((Event) subject).place();
   }
   
   
@@ -46,28 +48,30 @@ public class LeadTipoff extends Lead {
   
   
   public String choiceInfo() {
-    return "Anonymous Tip";
+    return "News Report";
   }
   
   
   public String helpInfo() {
-    return
-      "Street contacts claim that "+subject+" has been recruited for an "+
-      "upcoming criminal operation.";
+    return "Police have reported the following major crime: "+subject;
   }
   
   
   public String activeInfo() {
-    //  NOTE:  Tipoffs are handed off in complete form, so there's no need to
+    //  NOTE:  Reports are handed off in complete form, so there's no need to
     //  pursue them actively...
     return "";
   }
   
   
   public Image icon() {
-    return ((Element) subject).kind.sprite();
+    return ((Event) subject).place().icon();
   }
 }
+
+
+
+
 
 
 

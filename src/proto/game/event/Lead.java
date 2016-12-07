@@ -76,13 +76,13 @@ public abstract class Lead extends Task {
         Task guarding = new TaskGuard(base, event);
         followOptions.add(guarding);
       }
+      
+      /*
       if (dangerous && event.complete()) {
         Task searching = new LeadSearch(base, this, event.place());
         followOptions.add(searching);
       }
-      
       //  TODO:  Allow a search for *all* completed events?
-      
       if (event.planStep() != null && ! dangerous) {
         for (Element e : event.planStep().gives()) {
           Person carries = (Person) e.parentOfType(Kind.TYPE_PERSON);
@@ -92,6 +92,7 @@ public abstract class Lead extends Task {
         }
         //closeLead(event);
       }
+      //*/
     }
   }
   

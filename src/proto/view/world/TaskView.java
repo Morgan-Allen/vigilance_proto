@@ -28,11 +28,16 @@ public class TaskView extends UINode {
     //
     //  Draw the icon and description for this particular task-
     g.setColor(Color.WHITE);
-    final int iconSize = vh;
+    int iconSize = vh;
+    
     if (showIcon) {
       Image leadImg = task.icon();
       g.drawImage(leadImg, vx + 20, vy, iconSize, iconSize, null);
     }
+    else {
+      iconSize = 0;
+    }
+    
     ViewUtils.drawWrappedString(
       task.choiceInfo(), g,
       vx + 20 + iconSize + 5, vy, vw - (20 + iconSize + 20), vh - 15
