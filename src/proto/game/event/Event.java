@@ -1,6 +1,8 @@
 
 
 package proto.game.event;
+import java.awt.Image;
+
 import proto.common.*;
 import proto.game.world.*;
 import proto.game.scene.*;
@@ -9,7 +11,10 @@ import proto.util.*;
 
 
 
-public class Event implements Session.Saveable {
+//  TODO:  Events have to implement Assignment.  Yeah.
+
+
+public class Event implements Session.Saveable, Assignment {
   
   
   /**  Data fields, construction and save/load methods-
@@ -22,6 +27,8 @@ public class Event implements Session.Saveable {
   Place place;
   float timeBegins, timeEnds;
   boolean complete;
+  
+  List <Person> involved = new List();
   
   
   protected Event(EventType type) {
@@ -37,6 +44,7 @@ public class Event implements Session.Saveable {
     timeBegins = s.loadFloat();
     timeEnds   = s.loadFloat();
     complete   = s.loadBool ();
+    s.loadObjects(involved);
   }
   
   
@@ -47,6 +55,7 @@ public class Event implements Session.Saveable {
     s.saveFloat (timeBegins);
     s.saveFloat (timeEnds  );
     s.saveBool  (complete  );
+    s.saveObjects(involved);
   }
   
   
@@ -72,7 +81,7 @@ public class Event implements Session.Saveable {
   }
   
   
-  public Place place() {
+  public Place targetLocation() {
     return place;
   }
   
@@ -97,11 +106,22 @@ public class Event implements Session.Saveable {
   }
   
   
-  public boolean involves(Element element) {
+  
+  /**  Assigning perps-
+    */
+  public Series <Person> assigned() {
+    return involved;
+  }
+  
+  
+  public boolean allowsAssignment(Person p) {
     if (step == null) return false;
-    if (Visit.arrayIncludes(step.needs(), element)) return true;
-    if (Visit.arrayIncludes(step.gives(), element)) return true;
-    return false;
+    return Visit.arrayIncludes(step.needs(), p);
+  }
+  
+  
+  public void setAssigned(Person p, boolean is) {
+    involved.toggleMember(p, is);
   }
   
   
@@ -111,7 +131,7 @@ public class Event implements Session.Saveable {
   public void onEventBegun() {
     if (step != null) {
       Base played = world().playerBase();
-      Region region = place().region();
+      Region region = targetLocation().region();
       float tipoffChance = region.currentValue(Region.TRUST) / 100f;
       
       I.say("Event begun: "+this);
@@ -119,7 +139,10 @@ public class Event implements Session.Saveable {
       
       for (Element e : step.needs()) {
         if (e == null || e.type != Kind.TYPE_PERSON) continue;
+        
         final Person perp = (Person) e;
+        perp.setAssignment(this);
+        setAssigned(perp, true);
         
         if (Rand.num() < tipoffChance || freeTipoffs) {
           played.leads.leadOpened(new LeadTipoff(played, perp));
@@ -141,11 +164,14 @@ public class Event implements Session.Saveable {
       Base played = world().playerBase();
       played.leads.leadOpened(new LeadCrimeReport(played, this));
     }
+    
+    for (Person perp : involved) perp.setAssignment(null);
+    involved.clear();
   }
   
   
   
-  /**  Helping with scene configuration:
+  /**  Helping with scene configuration and after-effects:
     */
   public Series <Person> populateScene(Scene scene) {
     final List <Person> forces = new List();
@@ -190,6 +216,19 @@ public class Event implements Session.Saveable {
   }
   
   
+  public void handleSceneEffects(
+    boolean playerWon, float collateral, float getaways
+  ) {
+    if (step != null) step.type.applyRealStepEffects(
+      step, place, ! playerWon, collateral, getaways
+    );
+    
+    final Region region = place.region();
+    region.nudgeCurrentStat(Region.DETERRENCE, (getaways   - 0.5f) * -4);
+    region.nudgeCurrentStat(Region.TRUST     , (collateral - 0.5f) * -4);
+  }
+  
+  
   
   /**  Rendering, debug and interface methods-
     */
@@ -206,6 +245,24 @@ public class Event implements Session.Saveable {
   public String toString() {
     return name();
   }
+  
+  
+  public String activeInfo() {
+    return "On job: "+name();
+  }
+  
+  
+  public String helpInfo() {
+    return type.infoFor(this);
+  }
+  
+  
+  public Image icon() {
+    return type.iconFor(this);
+  }
+  
+  
+  
 }
 
 

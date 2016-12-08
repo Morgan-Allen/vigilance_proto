@@ -22,7 +22,7 @@ public class TypeCoerce extends StepType {
   };
   
   TypeCoerce() {
-    super("Coerce", "step_type_coerce", Needs.values(), Gives.values());
+    super("Coerce", "step_type_coerce", null, Needs.values(), Gives.values());
   }
   
   

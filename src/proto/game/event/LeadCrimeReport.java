@@ -28,7 +28,7 @@ public class LeadCrimeReport extends Lead {
   
   
   public Place targetLocation() {
-    return ((Event) subject).place();
+    return ((Event) subject).targetLocation();
   }
   
   
@@ -65,7 +65,7 @@ public class LeadCrimeReport extends Lead {
   
   
   public Image icon() {
-    return ((Event) subject).place().icon();
+    return ((Event) subject).targetLocation().icon();
   }
 }
 

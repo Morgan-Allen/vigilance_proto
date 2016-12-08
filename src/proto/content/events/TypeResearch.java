@@ -22,7 +22,7 @@ public class TypeResearch extends StepType {
   
   
   TypeResearch() {
-    super("Get Dirt", "step_type_get_dirt", Needs.values(), Gives.values());
+    super("Get Dirt", "step_type_get_dirt", null, Needs.values(), Gives.values());
   }
   
   

@@ -24,7 +24,7 @@ public abstract class TypeMajorCrime extends StepType {
   TypeMajorCrime(
     String name, String ID, Object needTypes[], Object giveTypes[]
   ) {
-    super(name, ID, needTypes, giveTypes);
+    super(name, ID, null, needTypes, giveTypes);
   }
   
   

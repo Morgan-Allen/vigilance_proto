@@ -27,6 +27,7 @@ public abstract class Task implements Assignment {
     TIME_SHORT  = 1,
     TIME_MEDIUM = World.HOURS_PER_SHIFT,
     TIME_LONG   = World.HOURS_PER_SHIFT * World.DAYS_PER_WEEK,
+    TIME_INDEF  = -1,
     
     TRIVIAL_DC = 1,
     LOW_DC     = 3,
@@ -154,6 +155,13 @@ public abstract class Task implements Assignment {
   }
   
   
+  public float hoursSoFar() {
+    if (initTime == -1) return 0;
+    float minutes = base.world().totalMinutes() - initTime;
+    return minutes / World.MINUTES_PER_HOUR;
+  }
+  
+  
   public boolean complete() {
     return complete;
   }
@@ -197,6 +205,14 @@ public abstract class Task implements Assignment {
     complete = true;
     onCompletion();
     return success;
+  }
+  
+  
+  public boolean setCompleted(boolean success) {
+    this.complete = true;
+    this.success = success;
+    onCompletion();
+    return true;
   }
   
   

@@ -21,7 +21,7 @@ public class TypePurchase extends StepType {
   };
   
   TypePurchase() {
-    super("Purchase", "step_type_purchase", Needs.values(), Gives.values());
+    super("Purchase", "step_type_purchase", null, Needs.values(), Gives.values());
   }
   
   

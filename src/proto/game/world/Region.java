@@ -123,11 +123,10 @@ public class Region extends Element {
   
   /**  General stat-queries and modifications-
     */
-  public void nudgeCurrentStat(Stat stat, int inc) {
+  public void nudgeCurrentStat(Stat stat, float inc) {
     Level l = this.statLevels[stat.ID];
     final float oldL = l.current;
     l.current = Nums.clamp(l.current + inc, 0, 100);
-    
     if (oldL != l.current) recordChange(stat, oldL, l.current);
   }
   

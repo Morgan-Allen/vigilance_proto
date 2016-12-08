@@ -71,8 +71,24 @@ public class TypeHeist extends TypeMajorCrime {
     }
     return super.calcFitness(used, needType, step);
   }
-
-
+  
+  
+  
+  /**  Scene effects-
+    */
+  public void applyRealStepEffects(
+    PlanStep step, Place happens,
+    boolean success, float collateral, float getaways
+  ) {
+    final Region region = happens.region();
+    region.nudgeCurrentStat(Region.DETERRENCE, success ? -1 : 1);
+    super.applyRealStepEffects(step, happens, success, collateral, getaways);
+  }
+  
+  
+  
+  /** Rendering, debug and interface methods-
+    */
   protected String langDescription(PlanStep step) {
     return "Steal "+step.give(Gives.LOOT)+" from "+step.need(Needs.VENUE);
   }

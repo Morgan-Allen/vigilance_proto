@@ -5,6 +5,9 @@ import proto.common.*;
 import proto.game.world.*;
 import proto.util.*;
 
+import java.awt.Image;
+
+
 
 public abstract class EventType extends Index.Entry implements
   Session.Saveable
@@ -13,11 +16,13 @@ public abstract class EventType extends Index.Entry implements
   
   final static Index <EventType> INDEX = new Index();
   final String name;
+  final Image icon;
   
   
-  protected EventType(String name, String ID) {
+  protected EventType(String name, String ID, String imgPath) {
     super(INDEX, ID);
     this.name = name;
+    this.icon = Kind.loadImage(imgPath);
   }
   
   
@@ -46,6 +51,7 @@ public abstract class EventType extends Index.Entry implements
   protected abstract String infoFor(Event event);
   
   public String toString() { return name; }
+  public Image iconFor(Event event) { return icon; }
 }
 
 

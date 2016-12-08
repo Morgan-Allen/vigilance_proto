@@ -70,11 +70,24 @@ public abstract class Lead extends Task {
     
     if (subject instanceof Event) {
       final Event event = (Event) subject;
+      final PlanStep step = event.planStep();
       final boolean dangerous = event.type.isDangerous(event);
       
       if (dangerous && ! event.complete()) {
         Task guarding = new TaskGuard(base, event);
         followOptions.add(guarding);
+      }
+      
+      else if (step != null) {
+        /*
+        PlanStep next = step.plan.agent.base().plans.stepAfter(step);
+        //*/
+        for (Element e : event.planStep().gives()) {
+          Person carries = (Person) e.parentOfType(Kind.TYPE_PERSON);
+          if (carries == null) continue;
+          Task tailing = new LeadTail(base, this, carries);
+          followOptions.add(tailing);
+        }
       }
       
       /*

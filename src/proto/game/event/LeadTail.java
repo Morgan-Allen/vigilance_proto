@@ -18,7 +18,7 @@ public class LeadTail extends Lead {
   
   
   public LeadTail(Base base, Lead prior, Person tailed) {
-    super(base, Task.TIME_SHORT, prior.subject, tailed, new Object[0]);
+    super(base, Task.TIME_INDEF, prior.subject, tailed, new Object[0]);
     this.tailed = tailed;
   }
   
@@ -44,23 +44,33 @@ public class LeadTail extends Lead {
   
   public void updateAssignment() {
     super.updateAssignment();
-    //  TODO:  You need to alert the player if the person tailed visits a new
-    //  location or undertakes a new task that is related to an open case.
+    
+    final Object task = tailed.assignment();
+    if (task instanceof Event) involved = (Event) task;
+    
+    if (involved != null) {
+      //  TODO:  You need to have a skill test here.
+      setCompleted(true);
+    }
+    if (hoursSoFar() > Task.TIME_LONG) {
+      setCompleted(false);
+    }
   }
   
   
   protected void onSuccess() {
     I.say("Tailing succeeded!");
-    //  TODO:  Present a message for either success or failure.
-    
-    involved = base.world().events.nextEventInvolving(tailed);
-    if (involved != null) base.leads.leadOpened(this);
+    //
+    //  TODO:  Present a message for success.
+    base.leads.leadOpened(this);
     base.leads.closeLead(tailed);
   }
   
   
   protected void onFailure() {
     I.say("Tailing failed!");
+    //
+    //  TODO:  Present a message for failure.
     base.leads.closeLead(tailed);
   }
   
@@ -74,7 +84,7 @@ public class LeadTail extends Lead {
   
   
   public String choiceInfo() {
-    return "Tail Complete ";
+    return "Tail "+subject;
   }
   
   

@@ -88,19 +88,6 @@ public class Events {
   }
   
   
-  public Event nextEventInvolving(Element e) {
-    Event next = null;
-    float earliestTime = Float.POSITIVE_INFINITY;
-    for (Event event : coming) {
-      if (! event.involves(e)) continue;
-      if (event.timeBegins() >= earliestTime) continue;
-      next = event;
-      earliestTime = event.timeBegins();
-    }
-    return next;
-  }
-  
-  
   
   /**  Logging background events-
     */

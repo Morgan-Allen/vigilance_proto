@@ -17,9 +17,10 @@ public abstract class StepType extends EventType {
   
   
   protected StepType(
-    String name, String ID, Object needTypes[], Object giveTypes[]
+    String name, String ID, String iconPath,
+    Object needTypes[], Object giveTypes[]
   ) {
-    super(name, ID);
+    super(name, ID, iconPath);
     this.needTypes = needTypes;
     this.giveTypes = giveTypes;
   }
@@ -111,6 +112,19 @@ public abstract class StepType extends EventType {
   
   public boolean onSpecialActionEnd(Action action) {
     return false;
+  }
+  
+  
+  
+  /**  And finally, handling the after-effects of a step:
+    */
+  public void applyRealStepEffects(
+    PlanStep step, Place happens,
+    boolean success, float collateral, float getaways
+  ) {
+    final Base base = step.plan.agent.base();
+    for (Element e : step.gives()) base.setAttached(e, true);
+    return;
   }
   
   

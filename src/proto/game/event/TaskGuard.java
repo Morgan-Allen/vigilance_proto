@@ -37,7 +37,7 @@ public class TaskGuard extends Task {
   
   
   public Place targetLocation() {
-    return event.place();
+    return event.targetLocation();
   }
   
   
@@ -47,7 +47,7 @@ public class TaskGuard extends Task {
     //  TODO:  This should only be triggered when the event itself is either
     //  going down or about to do so!
     
-    Place place = event.place();
+    Place place = event.targetLocation();
     SceneType sceneType = place.kind().sceneType();
     Scene mission = sceneType.generateScene(place, 32);
     
@@ -80,22 +80,22 @@ public class TaskGuard extends Task {
   
   
   public Image icon() {
-    return event.place().icon();
+    return event.targetLocation().icon();
   }
   
   
   public String choiceInfo() {
-    return "Guard "+event.place();
+    return "Guard "+event.targetLocation();
   }
   
   
   public String activeInfo() {
-    return "Guarding "+event.place()+" during event: "+event;
+    return "Guarding "+event.targetLocation()+" during event: "+event;
   }
   
   
   public String helpInfo() {
-    return "Guard "+event.place()+" to foil event: "+event;
+    return "Guard "+event.targetLocation()+" to foil event: "+event;
   }
   
   

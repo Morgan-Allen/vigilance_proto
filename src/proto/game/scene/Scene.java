@@ -437,9 +437,9 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     else moveToNextPersonsTurn();
     
     int nextState = checkCompletionStatus();
-    if (nextState != STATE_BEGUN && ! complete()) {
+    if (nextState > STATE_BEGUN && ! complete()) {
       this.state = nextState;
-      applySiteEffects();
+      onSceneCompletion();
     }
   }
   
@@ -613,19 +613,19 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   }
   
   
-  public void applySiteEffects() {
+  public void onSceneCompletion() {
     boolean success    = wasWon();
     float   collateral = assessCollateral();
-    float   getaways   = assessGetaways  ();
+    float   getaways   = assessGetaways();
     
-    //  TODO:  REINTRODUCE THIS!
-    //site.applyMissionEffects(this, success, dangerLevel, collateral, getaways);
-  }
-  
-  
-  public void resolveAsIgnored() {
-    this.state = STATE_LOST;
-    applySiteEffects();
+    world.exitFromScene(this);
+    
+    if (triggerEvent != null) {
+      triggerEvent.handleSceneEffects(success, collateral, getaways);
+    }
+    if (playerTask != null) {
+      playerTask.setCompleted(success);
+    }
   }
   
   

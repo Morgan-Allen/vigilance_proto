@@ -20,7 +20,7 @@ public class TypeBribe extends StepType {
   };
   
   TypeBribe() {
-    super("Bribe", "step_type_bribe", Needs.values(), Gives.values());
+    super("Bribe", "step_type_bribe", null, Needs.values(), Gives.values());
   }
   
   

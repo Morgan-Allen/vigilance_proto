@@ -20,7 +20,7 @@ public class TypeMake extends StepType {
   };
   
   TypeMake() {
-    super("Make", "step_type_make", Needs.values(), Gives.values());
+    super("Make", "step_type_make", null, Needs.values(), Gives.values());
   }
   
   
