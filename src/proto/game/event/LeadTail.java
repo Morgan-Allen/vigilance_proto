@@ -49,10 +49,9 @@ public class LeadTail extends Lead {
     if (task instanceof Event) involved = (Event) task;
     
     if (involved != null) {
-      //  TODO:  You need to have a skill test here.
-      setCompleted(true);
+      attemptTask();
     }
-    if (hoursSoFar() > Task.TIME_LONG) {
+    else if (hoursSoFar() > Task.TIME_LONG) {
       setCompleted(false);
     }
   }
@@ -62,8 +61,7 @@ public class LeadTail extends Lead {
     I.say("Tailing succeeded!");
     //
     //  TODO:  Present a message for success.
-    base.leads.leadOpened(this);
-    base.leads.closeLead(tailed);
+    base.leads.closeLead(this, true);
   }
   
   
@@ -71,7 +69,7 @@ public class LeadTail extends Lead {
     I.say("Tailing failed!");
     //
     //  TODO:  Present a message for failure.
-    base.leads.closeLead(tailed);
+    base.leads.closeLead(this, false);
   }
   
   

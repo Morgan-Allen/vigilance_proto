@@ -152,7 +152,7 @@ public class RegionView extends UINode {
     boolean noEvents = true;
     Base played = mainView.world().playerBase();
     
-    for (Lead lead : played.leads.openLeadsAround(d)) {
+    for (Lead lead : played.leads.confirmedLeadsAround(d)) {
       //
       //  Firstly, draw an illustrative icon for the lead we've picked up and
       //  some basic info on how it was acquired.
@@ -173,7 +173,7 @@ public class RegionView extends UINode {
       down += 60;
       //
       //  Then, render the options for pursuing the investigation further:
-      for (Task option : lead.investigationOptions()) {
+      for (Lead option : played.leads.openLeadsFrom(lead.subject)) {
         TaskView view = option.createView(parent);
         view.showIcon = false;
         view.relBounds.set(vx, down, vw, 45);

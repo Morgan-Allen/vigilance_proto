@@ -11,9 +11,8 @@ import proto.util.*;
 public abstract class Lead extends Task {
   
   
-  Object origin, subject;
-  List <Task> followOptions = new List();
-  boolean open;
+  final public Object origin, subject;
+  final Table.DoubleKey uniqueKey;
   
   
   Lead(
@@ -23,6 +22,7 @@ public abstract class Lead extends Task {
     super(base, timeHours, args);
     this.origin  = origin ;
     this.subject = subject;
+    this.uniqueKey = new Table.DoubleKey(getClass(), subject);
   }
   
   
@@ -30,8 +30,7 @@ public abstract class Lead extends Task {
     super(s);
     origin  = s.loadObject();
     subject = s.loadObject();
-    s.loadObjects(followOptions);
-    open = s.loadBool();
+    uniqueKey = new Table.DoubleKey(getClass(), subject);
   }
   
   
@@ -39,18 +38,17 @@ public abstract class Lead extends Task {
     super.saveState(s);
     s.saveObject(origin );
     s.saveObject(subject);
-    s.saveObjects(followOptions);
-    s.saveBool(open);
   }
   
   
   
-  void populateInvestigationOptions() {
+  Series <Lead> investigationOptions() {
     
     //  In addition, there may be multiple methods for investigating a single
     //  object (e.g, you could either tail, persuade or intimidate a suspect,
     //  stake out or guard a building, bug or sabotage a vehicle, swab or dust
     //  for clues, etc..)  And not all methods will yield immediate dividends.
+    final Batch <Lead> followOptions = new Batch();
     followOptions.clear();
     
     if (subject instanceof Item || subject instanceof Clue) {
@@ -60,7 +58,7 @@ public abstract class Lead extends Task {
     if (subject instanceof Person) {
       //  TODO:  Tailing, Guard, Dialog, Interrogate/Detain.
       final Person person = (Person) subject;
-      Task tailing = new LeadTail(base, this, person);
+      Lead tailing = new LeadTail(base, this, person);
       followOptions.add(tailing);
     }
     
@@ -74,7 +72,7 @@ public abstract class Lead extends Task {
       final boolean dangerous = event.type.isDangerous(event);
       
       if (dangerous && ! event.complete()) {
-        Task guarding = new TaskGuard(base, event);
+        Lead guarding = new LeadGuard(base, this, event);
         followOptions.add(guarding);
       }
       
@@ -85,14 +83,14 @@ public abstract class Lead extends Task {
         for (Element e : event.planStep().gives()) {
           Person carries = (Person) e.parentOfType(Kind.TYPE_PERSON);
           if (carries == null) continue;
-          Task tailing = new LeadTail(base, this, carries);
+          Lead tailing = new LeadTail(base, this, carries);
           followOptions.add(tailing);
         }
       }
       
       /*
       if (dangerous && event.complete()) {
-        Task searching = new LeadSearch(base, this, event.place());
+        Lead searching = new LeadSearch(base, this, event.place());
         followOptions.add(searching);
       }
       //  TODO:  Allow a search for *all* completed events?
@@ -100,17 +98,13 @@ public abstract class Lead extends Task {
         for (Element e : event.planStep().gives()) {
           Person carries = (Person) e.parentOfType(Kind.TYPE_PERSON);
           if (carries == null) continue;
-          Task tailing = new LeadTail(base, this, carries);
+          Lead tailing = new LeadTail(base, this, carries);
           followOptions.add(tailing);
         }
         //closeLead(event);
       }
       //*/
     }
-  }
-  
-  
-  public Series <Task> investigationOptions() {
     return followOptions;
   }
   

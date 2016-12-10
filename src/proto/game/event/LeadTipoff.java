@@ -60,7 +60,7 @@ public class LeadTipoff extends Lead {
   public String activeInfo() {
     //  NOTE:  Tipoffs are handed off in complete form, so there's no need to
     //  pursue them actively...
-    return "";
+    return "Tipoff on "+subject;
   }
   
   

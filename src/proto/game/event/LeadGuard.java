@@ -11,20 +11,19 @@ import java.awt.Image;
 
 
 
-public class TaskGuard extends Task {
+public class LeadGuard extends Lead {
   
   
   Event event;
   
   
-  
-  public TaskGuard(Base base, Event event) {
-    super(base, Task.TIME_SHORT, new Object[0]);
+  public LeadGuard(Base base, Lead prior, Event event) {
+    super(base, Task.TIME_SHORT, prior.subject, event, new Object[0]);
     this.event = event;
   }
   
   
-  public TaskGuard(Session s) throws Exception {
+  public LeadGuard(Session s) throws Exception {
     super(s);
     event = (Event) s.loadObject();
   }
@@ -42,7 +41,7 @@ public class TaskGuard extends Task {
   
   
   protected void onSuccess() {
-    base.leads.closeLead(event);
+    base.leads.closeLead(this, true);
     
     //  TODO:  This should only be triggered when the event itself is either
     //  going down or about to do so!
@@ -67,7 +66,7 @@ public class TaskGuard extends Task {
   
   
   protected void onFailure() {
-    base.leads.closeLead(event);
+    base.leads.closeLead(this, false);
   }
   
   

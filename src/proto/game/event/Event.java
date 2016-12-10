@@ -144,8 +144,11 @@ public class Event implements Session.Saveable, Assignment {
         perp.setAssignment(this);
         setAssigned(perp, true);
         
-        if (Rand.num() < tipoffChance || freeTipoffs) {
-          played.leads.leadOpened(new LeadTipoff(played, perp));
+        boolean tips = Rand.num() < tipoffChance || freeTipoffs;
+        if (! perp.isCriminal()) tips = false;
+        
+        if (tips) {
+          played.leads.closeLead(new LeadTipoff(played, perp), true);
           I.say("  Generating tipoff from: "+perp);
         }
         else I.say("No tipoff generated from "+perp);
@@ -162,7 +165,7 @@ public class Event implements Session.Saveable, Assignment {
   public void onEventComplete() {
     if (step != null && step.type.isDangerous(this)) {
       Base played = world().playerBase();
-      played.leads.leadOpened(new LeadCrimeReport(played, this));
+      played.leads.closeLead(new LeadCrimeReport(played, this), true);
     }
     
     for (Person perp : involved) perp.setAssignment(null);

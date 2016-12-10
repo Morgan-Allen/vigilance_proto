@@ -51,7 +51,7 @@ public abstract class Task implements Assignment {
   protected Task(
     Base base, int timeHours, Object... args
   ) {
-    this.timeTaken = timeHours * World.MINUTES_PER_HOUR;
+    this.timeTaken = timeHours <= 0 ? -1 : (timeHours * World.MINUTES_PER_HOUR);
     this.initTime  = -1;
     this.base      = base;
     
@@ -184,25 +184,27 @@ public abstract class Task implements Assignment {
   /**  Task performance and completion-
     */
   public void updateAssignment() {
-    if (assigned.empty() || complete) return;
+    if (assigned.empty() || complete()) return;
     
     base.world().events.logAssignment(this);
     
-    final int time = base.world().totalMinutes();
-    if (initTime == -1) initTime = time;
-    if ((time - initTime) > timeTaken) attemptTask();
+    if (timeTaken > TIME_INDEF) {
+      final int time = base.world().totalMinutes();
+      if (initTime == -1) initTime = time;
+      if ((time - initTime) > timeTaken) attemptTask();
+    }
   }
   
   
   public boolean attemptTask() {
     success = performTest();
+    complete = true;
     if (success) {
       onSuccess();
     }
     else {
       onFailure();
     }
-    complete = true;
     onCompletion();
     return success;
   }
