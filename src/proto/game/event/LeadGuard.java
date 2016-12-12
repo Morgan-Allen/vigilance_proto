@@ -14,34 +14,37 @@ import java.awt.Image;
 public class LeadGuard extends Lead {
   
   
+  Place guarded;
   Event event;
   
   
-  public LeadGuard(Base base, Lead prior, Event event) {
-    super(base, Task.TIME_SHORT, prior.subject, event, new Object[0]);
-    this.event = event;
+  public LeadGuard(Base base, Place guarded, Event event) {
+    super(base, Task.TIME_SHORT, guarded, new Object[0]);
+    this.guarded = guarded;
+    this.event   = event  ;
   }
   
   
   public LeadGuard(Session s) throws Exception {
     super(s);
-    event = (Event) s.loadObject();
+    guarded = (Place) s.loadObject();
+    event   = (Event) s.loadObject();
   }
   
   
   public void saveState(Session s) throws Exception {
     super.saveState(s);
-    s.saveObject(event);
+    s.saveObject(guarded);
+    s.saveObject(event  );
   }
   
   
   public Place targetLocation() {
-    return event.targetLocation();
+    return guarded;
   }
   
   
   protected void onSuccess() {
-    base.leads.closeLead(this, true);
     
     //  TODO:  This should only be triggered when the event itself is either
     //  going down or about to do so!
@@ -66,7 +69,6 @@ public class LeadGuard extends Lead {
   
   
   protected void onFailure() {
-    base.leads.closeLead(this, false);
   }
   
   
@@ -79,22 +81,22 @@ public class LeadGuard extends Lead {
   
   
   public Image icon() {
-    return event.targetLocation().icon();
+    return guarded.icon();
   }
   
   
   public String choiceInfo() {
-    return "Guard "+event.targetLocation();
+    return "Guard "+guarded;
   }
   
   
   public String activeInfo() {
-    return "Guarding "+event.targetLocation()+" during event: "+event;
+    return "Guarding "+guarded+" during event: "+event;
   }
   
   
   public String helpInfo() {
-    return "Guard "+event.targetLocation()+" to foil event: "+event;
+    return "Guard "+guarded+" to foil event: "+event;
   }
   
   

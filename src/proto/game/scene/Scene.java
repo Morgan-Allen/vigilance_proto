@@ -12,6 +12,8 @@ import proto.view.scene.SceneView;
 import java.awt.Image;
 
 
+//  TODO:  This doesn't need to implement Assignment.
+
 
 public class Scene implements Session.Saveable, Assignment, TileConstants {
   
@@ -621,7 +623,7 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     world.exitFromScene(this);
     
     if (triggerEvent != null) {
-      triggerEvent.handleSceneEffects(success, collateral, getaways);
+      triggerEvent.completeWithEffects(success, collateral, getaways);
     }
     if (playerTask != null) {
       playerTask.setCompleted(success);

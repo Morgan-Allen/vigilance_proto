@@ -152,28 +152,30 @@ public class RegionView extends UINode {
     boolean noEvents = true;
     Base played = mainView.world().playerBase();
     
-    for (Lead lead : played.leads.confirmedLeadsAround(d)) {
+    for (CaseFile file : played.leads.casesForRegion(d)) {
       //
       //  Firstly, draw an illustrative icon for the lead we've picked up and
       //  some basic info on how it was acquired.
-      Image icon = lead.icon();
+      Image icon = file.icon();
       g.drawImage(icon, vx + 15, down + 5, 40, 40, null);
       int initDown = down;
       
       g.setColor(Color.WHITE);
       ViewUtils.drawWrappedString(
-        lead.choiceInfo(), g, vx + 60, down + 5, vw - 80, 20
+        file.subject.toString(), g, vx + 60, down + 5, vw - 80, 20
       );
       down += 20;
       
       g.setColor(Color.LIGHT_GRAY);
+      StringBuffer desc = new StringBuffer();
+      file.shortDescription(desc);
       ViewUtils.drawWrappedString(
-        lead.helpInfo(), g, vx + 60, down, vw - 80, 60
+        desc.toString(), g, vx + 60, down, vw - 80, 60
       );
       down += 60;
       //
       //  Then, render the options for pursuing the investigation further:
-      for (Lead option : played.leads.openLeadsFrom(lead.subject)) {
+      for (Lead option : file.investigationOptions()) {
         TaskView view = option.createView(parent);
         view.showIcon = false;
         view.relBounds.set(vx, down, vw, 45);

@@ -61,13 +61,13 @@ public class Events {
       if (event.timeBegins() <= world.totalMinutes()) {
         coming.remove(event);
         active.add(event);
-        event.onEventBegun();
+        event.beginEvent();
       }
     }
     
     for (Event event : active) {
       if (event.timeEnds() <= world.totalMinutes() || event.complete()) {
-        event.onEventComplete();
+        event.completeEvent();
         closeEvent(event);
       }
       else {

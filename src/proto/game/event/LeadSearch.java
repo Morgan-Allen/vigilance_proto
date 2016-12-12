@@ -19,8 +19,8 @@ public class LeadSearch extends Lead {
   Batch <Clue> clues = new Batch();
   
   
-  public LeadSearch(Base base, Lead prior, Place searched) {
-    super(base, Task.TIME_SHORT, prior.subject, searched, new Object[0]);
+  public LeadSearch(Base base, Place searched) {
+    super(base, Task.TIME_SHORT, searched, new Object[0]);
     this.searched = searched;
   }
   

@@ -15,8 +15,8 @@ public class LeadInterrogate extends Lead {
   Person tailed;
   
   
-  public LeadInterrogate(Base base, Lead prior, Person tailed) {
-    super(base, Task.TIME_SHORT, prior.subject, tailed, new Object[0]);
+  public LeadInterrogate(Base base, Person tailed) {
+    super(base, Task.TIME_SHORT, tailed, new Object[0]);
   }
   
   

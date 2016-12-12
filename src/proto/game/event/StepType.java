@@ -97,6 +97,11 @@ public abstract class StepType extends EventType {
   }
   
   
+  public float harmLevel(PlanStep step, Element involved) {
+    return 0;
+  }
+  
+  
   
   /**  AI-control methods for within a particular scene:
     */
@@ -123,7 +128,10 @@ public abstract class StepType extends EventType {
     boolean success, float collateral, float getaways
   ) {
     final Base base = step.plan.agent.base();
-    for (Element e : step.gives()) base.setAttached(e, true);
+    for (Element e : step.gives()) {
+      base.world().setInside(e, true);
+      base.setAttached(e, true);
+    }
     return;
   }
   

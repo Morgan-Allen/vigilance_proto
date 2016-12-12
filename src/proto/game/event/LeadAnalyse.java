@@ -14,8 +14,8 @@ public class LeadAnalyse extends Lead {
   Item analysed;
   
   
-  public LeadAnalyse(Base base, Lead prior, Item analysed) {
-    super(base, Task.TIME_SHORT, prior.subject, analysed, new Object[0]);
+  public LeadAnalyse(Base base, Item analysed) {
+    super(base, Task.TIME_SHORT, analysed, new Object[0]);
     this.analysed = analysed;
   }
   

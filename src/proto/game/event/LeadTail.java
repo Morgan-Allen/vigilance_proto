@@ -17,8 +17,8 @@ public class LeadTail extends Lead {
   Event involved;
   
   
-  public LeadTail(Base base, Lead prior, Person tailed) {
-    super(base, Task.TIME_INDEF, prior.subject, tailed, new Object[0]);
+  public LeadTail(Base base, Person tailed) {
+    super(base, Task.TIME_INDEF, tailed, new Object[0]);
     this.tailed = tailed;
   }
   
@@ -59,9 +59,11 @@ public class LeadTail extends Lead {
   
   protected void onSuccess() {
     I.say("Tailing succeeded!");
+    final CaseFile file = base.leads.caseFor(tailed);
+    file.recordInvolvement(involved, CaseFile.LEVEL_EVIDENCE);
     //
     //  TODO:  Present a message for success.
-    base.leads.closeLead(this, true);
+    //base.leads.confirmLead(this, involved);
   }
   
   
@@ -69,7 +71,7 @@ public class LeadTail extends Lead {
     I.say("Tailing failed!");
     //
     //  TODO:  Present a message for failure.
-    base.leads.closeLead(this, false);
+    //base.leads.closeLead(this);
   }
   
   
@@ -87,6 +89,12 @@ public class LeadTail extends Lead {
   
   
   public String helpInfo() {
+    //  TODO:  You need to describe what brings you to the next lead.
+    
+    //  (e.g, A was seen talking to B.)
+    //  An acceptable hack might be providing the description as a direct
+    //  string.
+    
     return
       "After tailing "+subject+", they appear to be involved in plans to "+
       involved+".  This could be a chance to catch them red-handed.";
@@ -102,13 +110,5 @@ public class LeadTail extends Lead {
     return tailed.kind().sprite();
   }
 }
-
-
-
-
-
-
-
-
 
 

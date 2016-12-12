@@ -60,9 +60,10 @@ public class Element implements Session.Saveable {
   
   
   public void setAttached(Element other, boolean is) {
-    if (other.attachedTo != null) other.attachedTo.setAttached(other, false);
+    final Element oldP = other.attachedTo;
     attached.toggleMember(other, is);
     other.attachedTo = is ? this : null;
+    if (is && oldP != null && oldP != this) oldP.setAttached(other, false);
   }
   
   

@@ -128,7 +128,7 @@ public class Event implements Session.Saveable, Assignment {
   
   /**  Regular updates and life cycle:
     */
-  public void onEventBegun() {
+  public void beginEvent() {
     if (step != null) {
       Base played = world().playerBase();
       Region region = targetLocation().region();
@@ -145,10 +145,13 @@ public class Event implements Session.Saveable, Assignment {
         setAssigned(perp, true);
         
         boolean tips = Rand.num() < tipoffChance || freeTipoffs;
-        if (! perp.isCriminal()) tips = false;
+        //if (! perp.isCriminal()) tips = false;
         
         if (tips) {
-          played.leads.closeLead(new LeadTipoff(played, perp), true);
+          //  TODO:  You still need a tipoff to display!
+          final CaseFile file = played.leads.caseFor(perp);
+          file.recordInvolvement(this, CaseFile.LEVEL_TIPOFF);
+          //played.leads.confirmLead(new LeadTipoff(played, perp), perp);
           I.say("  Generating tipoff from: "+perp);
         }
         else I.say("No tipoff generated from "+perp);
@@ -162,14 +165,8 @@ public class Event implements Session.Saveable, Assignment {
   }
   
   
-  public void onEventComplete() {
-    if (step != null && step.type.isDangerous(this)) {
-      Base played = world().playerBase();
-      played.leads.closeLead(new LeadCrimeReport(played, this), true);
-    }
-    
-    for (Person perp : involved) perp.setAssignment(null);
-    involved.clear();
+  public void completeEvent() {
+    completeWithEffects(false, Rand.num(), 1.0f);
   }
   
   
@@ -219,16 +216,34 @@ public class Event implements Session.Saveable, Assignment {
   }
   
   
-  public void handleSceneEffects(
+  public void completeWithEffects(
     boolean playerWon, float collateral, float getaways
   ) {
+    for (Person perp : involved) perp.setAssignment(null);
+    involved.clear();
+    complete = true;
+    final boolean danger = step.type.isDangerous(this);
+    
+    if (step != null && danger) {
+      Base played = world().playerBase();
+      //  TODO:  You still need to generate a news-report for this!
+      final CaseFile file = played.leads.caseFor(this);
+      file.recordInvolvement(this, CaseFile.LEVEL_CONVICTED);
+    }
     if (step != null) step.type.applyRealStepEffects(
       step, place, ! playerWon, collateral, getaways
     );
-    
-    final Region region = place.region();
-    region.nudgeCurrentStat(Region.DETERRENCE, (getaways   - 0.5f) * -4);
-    region.nudgeCurrentStat(Region.TRUST     , (collateral - 0.5f) * -4);
+    if (danger) {
+      final Region region = place.region();
+      
+      float deterEffect = playerWon ? 2 : 0;
+      deterEffect -= getaways * 4;
+      float trustEffect = playerWon ? 2 : 0;
+      trustEffect -= collateral * 4;
+      
+      region.nudgeCurrentStat(Region.DETERRENCE, deterEffect);
+      region.nudgeCurrentStat(Region.TRUST     , trustEffect);
+    }
   }
   
   

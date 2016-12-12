@@ -49,7 +49,7 @@ public class BasePlans {
   public void updatePlanning() {
     if (Visit.empty(stepTypes)) return;
     
-    if (currentPlan == null || planComplete()) {
+    if (currentPlan == null || planComplete(currentPlan)) {
       
       final int maxDepth = 6, numPlans = 4;
       Plan picked = null;
@@ -82,11 +82,17 @@ public class BasePlans {
   }
   
   
-  public boolean planComplete() {
+  public boolean planComplete(Plan plan) {
+    if (plan != currentPlan) return true;
     if (currentPlan == null || nextEvent == null) return false;
     if (! nextEvent.complete()) return false;
     return nextEvent.planStep() == currentPlan.steps().last();
   }
   
 }
+
+
+
+
+
 

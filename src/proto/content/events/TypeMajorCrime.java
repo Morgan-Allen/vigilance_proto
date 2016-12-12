@@ -128,6 +128,21 @@ public abstract class TypeMajorCrime extends StepType {
   }
   
   
+  public float harmLevel(PlanStep step, Element involved) {
+    int index = Visit.indexOf(involved, step.needTypes());
+    if (index == -1) return 0;
+    
+    //  TODO:  Consider having a 'mark' or 'victim' role instead?
+    
+    Object role = step.needTypes()[index];
+    if (role == Needs.VENUE) return 0.5f;
+    
+    if (Visit.arrayIncludes(step.gives(), involved)) return 1;
+    
+    return 0;
+  }
+  
+  
   
   /**  Scene-specific AI directions-
     */

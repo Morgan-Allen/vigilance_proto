@@ -11,7 +11,7 @@ public class LeadTipoff extends Lead {
   
   
   public LeadTipoff(Base base, Element about) {
-    super(base, Task.TIME_SHORT, null, about, new Object[0]);
+    super(base, Task.TIME_SHORT, about, new Object[0]);
   }
   
   

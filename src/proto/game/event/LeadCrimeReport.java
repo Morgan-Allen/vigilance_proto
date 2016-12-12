@@ -13,7 +13,7 @@ public class LeadCrimeReport extends Lead {
   
   
   public LeadCrimeReport(Base base, Event about) {
-    super(base, Task.TIME_SHORT, null, about, new Object[0]);
+    super(base, Task.TIME_SHORT, about, new Object[0]);
   }
   
   
