@@ -10,6 +10,9 @@ import proto.util.*;
 public class PlanStep implements Session.Saveable {
   
   
+  
+  /**  Data fields, construction and save/load methods-
+    */
   final public StepType type;
   final public Plan plan;
   
@@ -66,6 +69,9 @@ public class PlanStep implements Session.Saveable {
   }
   
   
+  
+  /**  Supplementary query/iteration methods-
+    */
   public PlanStep setParent(PlanStep parent, Object needType) {
     this.parent       = parent;
     this.parentNeedID = Visit.indexOf(needType, parent.needTypes());
@@ -141,30 +147,13 @@ public class PlanStep implements Session.Saveable {
   }
   
   
-  public boolean doesGive(Element needs) {
-    return Visit.arrayIncludes(gives, needs);
+  public boolean doesGive(Element needed) {
+    return Visit.arrayIncludes(gives, needed);
   }
   
   
-  public boolean doesNeed(Element gives) {
-    return Visit.arrayIncludes(needs, gives);
-  }
-  
-  
-  public boolean satisfied(Object needType) {
-    return need(needType) != null;
-  }
-  
-  
-  public boolean satisfiedAny(Object... needTypes) {
-    for (Object type : needTypes) if (need(type) != null) return true;
-    return false;
-  }
-  
-  
-  public boolean satisfiedAll(Object... needTypes) {
-    for (Object type : needTypes) if (need(type) == null) return false;
-    return true;
+  public boolean doesNeed(Element given) {
+    return Visit.arrayIncludes(needs, given);
   }
   
   
@@ -254,9 +243,22 @@ public class PlanStep implements Session.Saveable {
   
   /**  Translating into concrete events:
     */
-  public Event associatedEvent(World world) {
+  public boolean currentlyPossible() {
+    final Base base = plan.agent.base();
+    for (Object typeN : needTypes()) {
+      final Element need = need(typeN);
+      if (type.urgency(typeN, this) < 1) continue;
+      if (need == null) return false;
+      if (plan.obtainedBefore(this, need)) continue;
+      if (need == null || need.attachedTo() != base) return false;
+    }
+    return true;
+  }
+  
+  
+  public Event matchedEvent() {
     if (event != null) return event;
-    event = new Event(type, world);
+    event = new Event(type, plan.world);
     
     Place place = null;
     if (place == null) for (Element e : needs) if (e != null) {

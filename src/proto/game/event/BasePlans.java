@@ -16,7 +16,7 @@ public class BasePlans {
   
   private StepType stepTypes[] = new StepType[0];
   private Plan currentPlan;
-  private Event nextEvent;
+  private PlanStep nextStep;
   
   
   public BasePlans(Base base) {
@@ -26,15 +26,15 @@ public class BasePlans {
   
   public void loadState(Session s) throws Exception {
     stepTypes   = (StepType[]) s.loadObjectArray(StepType.class);
-    currentPlan = (Plan ) s.loadObject();
-    nextEvent   = (Event) s.loadObject();
+    currentPlan = (Plan    ) s.loadObject();
+    nextStep    = (PlanStep) s.loadObject();
   }
   
   
   public void saveState(Session s) throws Exception {
     s.saveObjectArray(stepTypes);
     s.saveObject(currentPlan);
-    s.saveObject(nextEvent  );
+    s.saveObject(nextStep   );
   }
   
   
@@ -48,35 +48,35 @@ public class BasePlans {
   
   public void updatePlanning() {
     if (Visit.empty(stepTypes)) return;
+    final int maxDepth = 6, numPlans = 4;
     
     if (currentPlan == null || planComplete(currentPlan)) {
-      
-      final int maxDepth = 6, numPlans = 4;
       Plan picked = null;
       float bestRating = 0;
       
       for (int n = numPlans; n-- > 0;) {
         final Plan plan = new Plan(base.leader(), base.world(), stepTypes);
-        for (Element goon : base.roster()) plan.addObtained(goon);
-        plan.selectInitialGoal();
+        plan.selectInitialGoal(base);
         plan.advancePlan(maxDepth);
         float rating = plan.calcPlanRating();
         if (rating > bestRating) { picked = plan; bestRating = rating; }
       }
       
       currentPlan = picked;
+      nextStep = picked == null ? null : picked.steps().first();
+      
       if (picked != null) picked.printFullPlan();
     }
+    if (currentPlan == null) return;
     
-    if (currentPlan != null && (nextEvent == null || nextEvent.complete())) {
-      Series <PlanStep> steps = currentPlan.steps();
-      PlanStep next = null;
-      if (nextEvent == null) next = steps.first();
-      else next = steps.atIndex(steps.indexOf(nextEvent.planStep()) + 1);
-      
-      if (next != null) {
-        nextEvent = next.associatedEvent(base.world());
-        base.world().events.scheduleEvent(nextEvent, 20 + Rand.index(5));
+    PlanStep after = currentPlan.stepAfter(nextStep);
+    if (after != null && nextStep.matchedEvent().complete()) {
+      if (after.currentlyPossible()) {
+        int hoursDelay = 20 + Rand.index(5);
+        base.world().events.scheduleEvent(after.matchedEvent(), hoursDelay);
+      }
+      else {
+        currentPlan.reviseAfter(nextStep, maxDepth / 2, base);
       }
     }
   }
@@ -84,9 +84,9 @@ public class BasePlans {
   
   public boolean planComplete(Plan plan) {
     if (plan != currentPlan) return true;
-    if (currentPlan == null || nextEvent == null) return false;
-    if (! nextEvent.complete()) return false;
-    return nextEvent.planStep() == currentPlan.steps().last();
+    if (currentPlan == null || nextStep == null) return false;
+    if (! nextStep.matchedEvent().complete()) return false;
+    return nextStep == currentPlan.steps().last();
   }
   
   

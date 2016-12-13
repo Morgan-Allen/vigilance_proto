@@ -15,6 +15,7 @@ public class Plan implements Session.Saveable {
   
   StepType stepTypes[];
   List <Element> preObtained = new List();
+  List <PlanStep> goals = new List();
   List <PlanStep> steps = new List();
   
   public boolean verbose = false;
@@ -35,6 +36,7 @@ public class Plan implements Session.Saveable {
     
     stepTypes = (StepType[]) s.loadObjectArray(StepType.class);
     s.loadObjects(preObtained);
+    s.loadObjects(goals);
     s.loadObjects(steps);
   }
   
@@ -45,15 +47,26 @@ public class Plan implements Session.Saveable {
     
     s.saveObjectArray(stepTypes);
     s.saveObjects(preObtained);
+    s.saveObjects(goals);
     s.saveObjects(steps);
   }
   
   
   
-  /**  
+  /**  Iterating over the full sequence of steps-
     */
   public Series <PlanStep> steps() {
     return steps;
+  }
+  
+  
+  public PlanStep firstStep() {
+    return steps.first();
+  }
+  
+  
+  public PlanStep lastStep() {
+    return steps.last();
   }
   
   
@@ -69,7 +82,7 @@ public class Plan implements Session.Saveable {
   /**  Initial conditions and goal configuration-
     */
   public void addObtained(Element thing) {
-    preObtained.add(thing);
+    preObtained.include(thing);
   }
   
   
@@ -77,13 +90,15 @@ public class Plan implements Session.Saveable {
     goal.assignRating(priority);
     fillNeeds(goal);
     addStep(goal);
+    goals.add(goal);
   }
   
   
-  public void selectInitialGoal() {
+  public void selectInitialGoal(Base base) {
     if (verbose) I.say("\nSelecting goal-");
+    resetObtainedFrom(base);
     
-    final Batch <PlanStep> goals = new Batch();
+    final Batch <PlanStep> possible = new Batch();
     final Series <Element> targets = world.inside();
     
     for (StepType type : stepTypes) {
@@ -91,13 +106,36 @@ public class Plan implements Session.Saveable {
         PlanStep goal = type.asGoal(target, this);
         if (goal == null) continue;
         goal.assignRating(type.baseAppeal(goal));
-        goals.add(goal);
+        possible.add(goal);
       }
     }
     
-    PlanStep picked = pickStepFrom(goals);
+    PlanStep picked = pickStepFrom(possible);
     if (picked != null) addGoal(picked, picked.rating());
     else if (verbose) I.say("  No goal selected!");
+  }
+  
+  
+  public void reviseAfter(PlanStep step, int maxIterations, Base base) {
+    //
+    //  First, remove any steps that have already been taken, and reset the set
+    //  of pre-obtained objects.
+    resetObtainedFrom(base);
+    for (PlanStep s : steps) { steps.remove(s); if (s == step) break; }
+    //
+    //  Then eliminate any steps that have been rendered impossible (due to,
+    //  e.g, earlier steps failing to obtain needed materials.)
+    for (PlanStep s : steps) if (! s.currentlyPossible()) {
+      steps.remove(s);
+    }
+    advancePlan(maxIterations);
+  }
+  
+  
+  private void resetObtainedFrom(Base base) {
+    preObtained.clear();
+    for (Element goon : base.roster()) addObtained(goon);
+    for (Element e : base.attached()) addObtained(e);
   }
   
   
@@ -214,7 +252,7 @@ public class Plan implements Session.Saveable {
   
   /**  Determining pre-conditions and keeping track of resource-reservations.
     */
-  private boolean obtainedBefore(PlanStep step, Element need) {
+  protected boolean obtainedBefore(PlanStep step, Element need) {
     final Base base = agent.base();
     if (need.accessLevel(base) == Element.Access.GRANTED) return true;
     if (preObtained.includes(need)) return true;

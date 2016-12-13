@@ -83,7 +83,7 @@ public class LeadTail extends Lead {
     if (GameSettings.freeTipoffs) stepTip = baseTip = true;
     
     if (stepTip && after != null) {
-      Event afterEvent = after.associatedEvent(base.world());
+      Event afterEvent = after.matchedEvent();
       for (Element n : after.needs()) {
         if (Visit.arrayIncludes(step.gives(), n)) {
           final CaseFile fileN = base.leads.caseFor(n);
