@@ -75,8 +75,8 @@ public class BasePlans {
       else next = steps.atIndex(steps.indexOf(nextEvent.planStep()) + 1);
       
       if (next != null) {
-        nextEvent = next.spawnEvent(base.world(), 20 + Rand.index(5));
-        base.world().events.scheduleEvent(nextEvent);
+        nextEvent = next.associatedEvent(base.world());
+        base.world().events.scheduleEvent(nextEvent, 20 + Rand.index(5));
       }
     }
   }
@@ -89,7 +89,21 @@ public class BasePlans {
     return nextEvent.planStep() == currentPlan.steps().last();
   }
   
+  
+  public PlanStep stepAfter(PlanStep step) {
+    if (currentPlan == null || ! currentPlan.steps().includes(step)) {
+      return null;
+    }
+    Series <PlanStep> steps = currentPlan.steps();
+    int index = steps.indexOf(step) + 1;
+    if (index >= steps.size()) return null;
+    return steps.atIndex(index);
+  }
+  
 }
+
+
+
 
 
 

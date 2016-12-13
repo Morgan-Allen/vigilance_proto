@@ -123,7 +123,12 @@ public abstract class StepType extends EventType {
   
   /**  And finally, handling the after-effects of a step:
     */
-  public void applyRealStepEffects(
+  protected int duration(PlanStep step) {
+    return Task.TIME_MEDIUM;
+  }
+  
+  
+  protected void applyRealStepEffects(
     PlanStep step, Place happens,
     boolean success, float collateral, float getaways
   ) {

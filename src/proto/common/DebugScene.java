@@ -36,8 +36,7 @@ public class DebugScene extends RunGame {
     DefaultGame.initDefaultBase   (world);
     DefaultGame.initDefaultCrime  (world);
     
-    //  TODO:  Move this out to a general GameSettings class!
-    Event.freeTipoffs = true;
+    GameSettings.freeTipoffs = true;
     
     //  TODO:  Also, you need to avoid different bosses interfering with
     //  eachother (if reasonably possible.)

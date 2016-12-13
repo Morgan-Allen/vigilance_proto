@@ -19,41 +19,44 @@ public class Event implements Session.Saveable, Assignment {
   
   /**  Data fields, construction and save/load methods-
     */
-  public static boolean freeTipoffs = true;
-  
   final public EventType type;
   
-  PlanStep step;
-  Place place;
-  float timeBegins, timeEnds;
+  final World world;
+  PlanStep step  = null;
+  Place    place = null;
+  int timeBegins = -1;
+  int duration   = -1;
   boolean complete;
   
   List <Person> involved = new List();
   
   
-  protected Event(EventType type) {
+  protected Event(EventType type, World world) {
     this.type = type;
+    this.world = world;
   }
   
   
   public Event(Session s) throws Exception {
     s.cacheInstance(this);
     type       = (EventType) s.loadObject();
+    world      = (World    ) s.loadObject();
     step       = (PlanStep ) s.loadObject();
     place      = (Place    ) s.loadObject();
-    timeBegins = s.loadFloat();
-    timeEnds   = s.loadFloat();
-    complete   = s.loadBool ();
+    timeBegins = s.loadInt ();
+    duration   = s.loadInt ();
+    complete   = s.loadBool();
     s.loadObjects(involved);
   }
   
   
   public void saveState(Session s) throws Exception {
     s.saveObject(type      );
+    s.saveObject(world     );
     s.saveObject(step      );
     s.saveObject(place     );
-    s.saveFloat (timeBegins);
-    s.saveFloat (timeEnds  );
+    s.saveInt   (timeBegins);
+    s.saveInt   (duration  );
     s.saveBool  (complete  );
     s.saveObjects(involved);
   }
@@ -63,16 +66,15 @@ public class Event implements Session.Saveable, Assignment {
   /**  Supplemental setup/progression methods-
     */
   public void assignParameters(
-    PlanStep step, Place place, float begins, float ends
+    PlanStep step, Place place, int durationHours
   ) {
     if (step == null || place == null) {
       I.complain("Step/place were: "+step+"/"+place+", must be non-null!");
       return;
     }
-    this.step       = step  ;
-    this.place      = place ;
-    this.timeBegins = begins;
-    this.timeEnds   = ends  ;
+    this.step     = step;
+    this.place    = place;
+    this.duration = durationHours * World.MINUTES_PER_HOUR;
   }
   
   
@@ -88,21 +90,6 @@ public class Event implements Session.Saveable, Assignment {
   
   public PlanStep planStep() {
     return step;
-  }
-  
-  
-  public float timeBegins() {
-    return timeBegins;
-  }
-  
-  
-  public float timeEnds() {
-    return timeEnds;
-  }
-  
-  
-  public boolean complete() {
-    return complete;
   }
   
   
@@ -128,6 +115,33 @@ public class Event implements Session.Saveable, Assignment {
   
   /**  Regular updates and life cycle:
     */
+  public void setBeginTime(int time) {
+    this.timeBegins = time;
+  }
+  
+  
+  public float timeBegins() {
+    return timeBegins;
+  }
+  
+  
+  public float timeEnds() {
+    if (timeBegins == -1) return -1;
+    return timeBegins + duration;
+  }
+  
+  
+  public boolean hasBegun() {
+    if (timeBegins == -1) return false;
+    return world.totalMinutes() >= timeBegins;
+  }
+  
+  
+  public boolean complete() {
+    return complete;
+  }
+  
+  
   public void beginEvent() {
     if (step != null) {
       Base played = world().playerBase();
@@ -144,7 +158,7 @@ public class Event implements Session.Saveable, Assignment {
         perp.setAssignment(this);
         setAssigned(perp, true);
         
-        boolean tips = Rand.num() < tipoffChance || freeTipoffs;
+        boolean tips = Rand.num() < tipoffChance || GameSettings.freeTipoffs;
         //if (! perp.isCriminal()) tips = false;
         
         if (tips) {

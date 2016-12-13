@@ -26,12 +26,12 @@ public class CaseFile implements Session.Saveable {
   final public Object subject;
   
   Place knownLocation = null;
+  float evidenceAsHideout = 0;
   
   private static class Role {
     Event event;
     int roleID = -1;
     int sentence = -1;
-    
     //  TODO:  Record all the Leads pointing at involvement.
     float evidence = 0;
   }
@@ -52,9 +52,12 @@ public class CaseFile implements Session.Saveable {
   
   public CaseFile(Session s) throws Exception {
     s.cacheInstance(this);
-    base          = (Base   ) s.loadObject();
-    subject       = (Element) s.loadObject();
-    knownLocation = (Place  ) s.loadObject();
+    base    = (Base   ) s.loadObject();
+    subject = (Element) s.loadObject();
+    
+    knownLocation = (Place) s.loadObject();
+    evidenceAsHideout = s.loadFloat();
+    
     for (int n = s.loadInt(); n-- > 0;) {
       final Role r = new Role();
       r.event    = (Event) s.loadObject();
@@ -63,6 +66,7 @@ public class CaseFile implements Session.Saveable {
       r.evidence = s.loadFloat();
       roles.add(r);
     }
+    
     refreshOptions = s.loadBool();
     s.loadObjects(followOptions);
   }
@@ -71,7 +75,10 @@ public class CaseFile implements Session.Saveable {
   public void saveState(Session s) throws Exception {
     s.saveObject(base   );
     s.saveObject(subject);
+    
     s.saveObject(knownLocation);
+    s.saveFloat(evidenceAsHideout);
+    
     s.saveInt(roles.size());
     for (Role r : roles) {
       s.saveObject(r.event   );
@@ -104,6 +111,11 @@ public class CaseFile implements Session.Saveable {
     this.refreshOptions = true;
     
     base.world().pauseMonitoring();
+  }
+  
+  
+  void recordHideoutEvidence(float evidenceLevel) {
+    this.evidenceAsHideout += evidenceLevel;
   }
   
   
@@ -152,7 +164,7 @@ public class CaseFile implements Session.Saveable {
     Role active = null;
     for (Role role : roles) {
       if (defunct(role)) continue;
-      float date = role.event.timeEnds;
+      float date = role.event.timeEnds();
       if (date > lastDate) { active = role; lastDate = date; }
     }
     return active;

@@ -123,8 +123,13 @@ public abstract class TypeMajorCrime extends StepType {
   
   /**  Generating clues and tipoffs-
     */
-  public boolean isDangerous(PlanStep step) {
+  public boolean isDangerous(Event event) {
     return true;
+  }
+  
+  
+  protected int duration(PlanStep step) {
+    return Task.TIME_SHORT;
   }
   
   

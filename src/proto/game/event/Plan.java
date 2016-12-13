@@ -49,11 +49,25 @@ public class Plan implements Session.Saveable {
   }
   
   
+  
+  /**  
+    */
   public Series <PlanStep> steps() {
     return steps;
   }
   
   
+  public PlanStep stepAfter(PlanStep step) {
+    int index = steps.indexOf(step);
+    if (index == -1 || index + 1 >= steps.size()) return null;
+    return steps.atIndex(index + 1);
+  }
+  
+  
+  
+  
+  /**  Initial conditions and goal configuration-
+    */
   public void addObtained(Element thing) {
     preObtained.add(thing);
   }
@@ -87,6 +101,9 @@ public class Plan implements Session.Saveable {
   }
   
   
+  
+  /**  Plan advancement and step selection/addition-
+    */
   public void advancePlan(int maxIterations) {
     while (maxIterations-- > 0) {
       if (verbose) I.say("\nAdvancing plan- "+this.hashCode());
@@ -117,9 +134,6 @@ public class Plan implements Session.Saveable {
   }
   
   
-  
-  /**  TODO:  Move some of these out to the PlanStep class?
-    */
   private void addStep(PlanStep step) {
     step.uniqueID = steps.size();
     steps.addFirst(step);

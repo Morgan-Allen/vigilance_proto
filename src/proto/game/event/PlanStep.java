@@ -17,10 +17,10 @@ public class PlanStep implements Session.Saveable {
   int parentNeedID;
   private Element needs[], gives[];
   private PlanStep needSteps[];
-
+  
   int uniqueID = -1;
   private float rating;
-  private Session.Saveable extraData;
+  private Event event;
   
   
   public PlanStep(StepType type, Plan plan) {
@@ -46,7 +46,7 @@ public class PlanStep implements Session.Saveable {
     
     uniqueID  = s.loadInt();
     rating    = s.loadFloat();
-    extraData = s.loadObject();
+    event     = (Event) s.loadObject();
   }
   
   
@@ -62,7 +62,7 @@ public class PlanStep implements Session.Saveable {
     
     s.saveInt(uniqueID);
     s.saveFloat(rating);
-    s.saveObject(extraData);
+    s.saveObject(event);
   }
   
   
@@ -168,16 +168,6 @@ public class PlanStep implements Session.Saveable {
   }
   
   
-  public Session.Saveable extraData() {
-    return extraData;
-  }
-  
-  
-  public void setExtraData(Session.Saveable data) {
-    this.extraData = data;
-  }
-  
-  
   
   /**
     */
@@ -264,13 +254,11 @@ public class PlanStep implements Session.Saveable {
   
   /**  Translating into concrete events:
     */
-  public Event spawnEvent(World world, int delayHours) {
-    Event event = new Event(type);
+  public Event associatedEvent(World world) {
+    if (event != null) return event;
+    event = new Event(type, world);
     
-    int time = world.totalMinutes() + (delayHours * World.MINUTES_PER_HOUR);
-    int ends = time + (Task.TIME_SHORT * World.MINUTES_PER_HOUR);
     Place place = null;
-    
     if (place == null) for (Element e : needs) if (e != null) {
       if ((place = e.place()) != null) break;
     }
@@ -278,7 +266,7 @@ public class PlanStep implements Session.Saveable {
       if ((place = e.place()) != null) break;
     }
     
-    event.assignParameters(this, place, time, ends);
+    event.assignParameters(this, place, Task.TIME_SHORT);
     return event;
   }
   

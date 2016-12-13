@@ -56,9 +56,10 @@ public class Events {
   /**  Regular updates and event-generation-
     */
   void updateEvents() {
+    final int time = world.totalMinutes();
     
     for (Event event : coming) {
-      if (event.timeBegins() <= world.totalMinutes()) {
+      if (event.timeBegins() <= time) {
         coming.remove(event);
         active.add(event);
         event.beginEvent();
@@ -66,7 +67,7 @@ public class Events {
     }
     
     for (Event event : active) {
-      if (event.timeEnds() <= world.totalMinutes() || event.complete()) {
+      if (event.timeEnds() <= time || event.complete()) {
         event.completeEvent();
         closeEvent(event);
       }
@@ -77,7 +78,10 @@ public class Events {
   }
   
   
-  public void scheduleEvent(Event event) {
+  public void scheduleEvent(Event event, int delayHours) {
+    int startTime = world.totalMinutes();
+    startTime += delayHours * World.MINUTES_PER_HOUR;
+    event.setBeginTime(startTime);
     coming.include(event);
   }
   

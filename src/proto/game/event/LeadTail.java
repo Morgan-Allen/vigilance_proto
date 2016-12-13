@@ -48,7 +48,7 @@ public class LeadTail extends Lead {
     final Object task = tailed.assignment();
     if (task instanceof Event) involved = (Event) task;
     
-    if (involved != null) {
+    if (involved != null && involved.hasBegun()) {
       attemptTask();
     }
     else if (hoursSoFar() > Task.TIME_LONG) {
@@ -58,9 +58,45 @@ public class LeadTail extends Lead {
   
   
   protected void onSuccess() {
+    final PlanStep step = involved.planStep();
+    if (step == null) { onFailure(); return; }
     I.say("Tailing succeeded!");
+    //
+    //  First, give tipoffs on anyone directly involved in the crime underway:
     final CaseFile file = base.leads.caseFor(tailed);
     file.recordInvolvement(involved, CaseFile.LEVEL_EVIDENCE);
+    
+    for (Element e : step.needs()) {
+      if (e.type == Kind.TYPE_PERSON) {
+        final CaseFile fileE = base.leads.caseFor(e);
+        fileE.recordInvolvement(involved, CaseFile.LEVEL_EVIDENCE);
+      }
+    }
+    //
+    //  Then, see if you overhear anything about the next step in the plot, or
+    //  where the boss might be hiding.
+    PlanStep after = step.plan.stepAfter(step);
+    Place hideout = step.plan.agent.base();
+    float overhearChance = 0.5f;
+    boolean stepTip = Rand.num() < overhearChance;
+    boolean baseTip = Rand.num() < overhearChance;
+    if (GameSettings.freeTipoffs) stepTip = baseTip = true;
+    
+    if (stepTip && after != null) {
+      Event afterEvent = after.associatedEvent(base.world());
+      for (Element n : after.needs()) {
+        if (Visit.arrayIncludes(step.gives(), n)) {
+          final CaseFile fileN = base.leads.caseFor(n);
+          fileN.recordInvolvement(afterEvent, CaseFile.LEVEL_TIPOFF);
+        }
+      }
+    }
+    
+    if (baseTip && hideout != null) {
+      final CaseFile fileH = base.leads.caseFor(hideout);
+      fileH.recordHideoutEvidence(CaseFile.LEVEL_TIPOFF);
+    }
+    
     //
     //  TODO:  Present a message for success.
     //base.leads.confirmLead(this, involved);
