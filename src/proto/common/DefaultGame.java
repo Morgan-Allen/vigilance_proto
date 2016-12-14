@@ -109,7 +109,6 @@ public class DefaultGame extends RunGame {
     };
     
     final Batch <Base> hideouts = new Batch();
-    
     final Person falcone = new Person(Villains.FALCONE, world);
     final Base falconeBase = new Base(Facilities.HIDEOUT, world);
     world.regionFor(Regions.CAPE_FINGER).setAttached(falconeBase, true);
@@ -139,6 +138,7 @@ public class DefaultGame extends RunGame {
       for (Person p : base.roster()) {
         world.setInside(p, true);
         base.setAttached(p, true);
+        I.say("Location of "+p+" is "+p.place());
       }
     }
   }
@@ -153,11 +153,5 @@ public class DefaultGame extends RunGame {
     });
   }
 }
-
-
-
-
-
-
 
 

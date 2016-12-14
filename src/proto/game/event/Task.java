@@ -197,15 +197,7 @@ public abstract class Task implements Assignment {
   
   
   public boolean attemptTask() {
-    success = performTest();
-    complete = true;
-    if (success) {
-      onSuccess();
-    }
-    else {
-      onFailure();
-    }
-    onCompletion();
+    setCompleted(performTest());
     return success;
   }
   
@@ -213,6 +205,12 @@ public abstract class Task implements Assignment {
   public boolean setCompleted(boolean success) {
     this.complete = true;
     this.success = success;
+    if (success) {
+      onSuccess();
+    }
+    else {
+      onFailure();
+    }
     onCompletion();
     return true;
   }

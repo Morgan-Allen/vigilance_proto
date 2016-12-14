@@ -97,6 +97,14 @@ public class Element implements Session.Saveable {
   }
   
   
+  public boolean isPerson() { return type == Kind.TYPE_PERSON; }
+  public boolean isPlace () { return type == Kind.TYPE_PLACE ; }
+  public boolean isRegion() { return type == Kind.TYPE_REGION; }
+  public boolean isItem  () { return type == Kind.TYPE_ITEM  ; }
+  public boolean isProp  () { return type == Kind.TYPE_PROP  ; }
+  public boolean isClue  () { return type == Kind.TYPE_CLUE  ; }
+  
+  
   
   /**  AI-support methods-
     */

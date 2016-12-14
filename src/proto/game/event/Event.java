@@ -120,12 +120,12 @@ public class Event implements Session.Saveable, Assignment {
   }
   
   
-  public float timeBegins() {
+  public int timeBegins() {
     return timeBegins;
   }
   
   
-  public float timeEnds() {
+  public int timeEnds() {
     if (timeBegins == -1) return -1;
     return timeBegins + duration;
   }
@@ -237,18 +237,17 @@ public class Event implements Session.Saveable, Assignment {
     for (Person perp : involved) perp.setAssignment(null);
     involved.clear();
     complete = true;
-    final boolean danger = step.type.isDangerous(this);
     
-    if (step != null && danger) {
+    if (step != null && dangerous()) {
       Base played = world().playerBase();
       //  TODO:  You still need to generate a news-report for this!
       final CaseFile file = played.leads.caseFor(this);
-      file.recordCurrentRole(this, CaseFile.LEVEL_CONVICTED);
+      file.recordRole(this, CaseFile.ROLE_CRIME, CaseFile.LEVEL_CONVICTED);
     }
     if (step != null) step.type.applyRealStepEffects(
       step, place, ! playerWon, collateral, getaways
     );
-    if (danger) {
+    if (dangerous()) {
       final Region region = place.region();
       
       float deterEffect = playerWon ? 2 : 0;
@@ -259,6 +258,11 @@ public class Event implements Session.Saveable, Assignment {
       region.nudgeCurrentStat(Region.DETERRENCE, deterEffect);
       region.nudgeCurrentStat(Region.TRUST     , trustEffect);
     }
+  }
+  
+  
+  public boolean dangerous() {
+    return type.isDangerous(this);
   }
   
   

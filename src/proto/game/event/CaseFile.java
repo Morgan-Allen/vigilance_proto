@@ -31,9 +31,9 @@ public class CaseFile implements Session.Saveable {
   Place knownLocation = null;
   
   private static class Role {
-    Event event = null;
-    int roleID = -1;
-    int sentence = -1;
+    Event event;
+    int   roleID   = -1;
+    int   sentence = -1;
     //  TODO:  Record all the Leads pointing at involvement.
     float evidence = 0;
   }
@@ -95,25 +95,29 @@ public class CaseFile implements Session.Saveable {
   /**  Recording involvement in criminal actions and other information
     *  updates-
     */
-  void recordCurrentRole(Event event, float evidenceLevel) {
+  boolean recordCurrentRole(Event event, float evidenceLevel) {
     int roleID = Visit.indexOf(subject, event.planStep().needs());
-    if (roleID == -1) { I.complain("Subject not involved!"); return; }
-    recordRole(event, roleID, evidenceLevel);
+    if (roleID == -1) { I.complain("Subject not involved!"); return false; }
+    return recordRole(event, roleID, evidenceLevel);
   }
   
   
-  void recordRole(Event event, int roleID, float evidenceLevel) {
+  boolean recordRole(Event event, int roleID, float evidenceLevel) {
     Role role = null;
     for (Role r : roles) if (r.event == event && r.roleID == roleID) {
       role = r; break;
     }
     if (role == null) roles.add(role = new Role());
+    else if (role.evidence >= evidenceLevel) return false;
     
     role.event    = event;
     role.roleID   = roleID;
-    role.evidence = Nums.max(role.evidence, evidenceLevel);
+    role.evidence = evidenceLevel;
     
     this.refreshOptions = true;
+    this.base.world().pauseMonitoring();
+    
+    return true;
   }
   
   
@@ -145,8 +149,8 @@ public class CaseFile implements Session.Saveable {
   private boolean defunct(Role role) {
     final PlanStep step = role.event.planStep();
     if (step == null) return true;
-    if (step.plan.agent.base().plans.planComplete(step.plan)) return true;
     if (role.sentence > 0) return true;
+    if (step.plan.agent.base().plans.planComplete(step.plan)) return true;
     return false;
   }
   
@@ -160,15 +164,12 @@ public class CaseFile implements Session.Saveable {
   }
   
   
-  Role latestActiveRole() {
-    float lastDate = Float.NEGATIVE_INFINITY;
-    Role active = null;
+  Event eventWithRole(int roleID) {
     for (Role role : roles) {
       if (defunct(role)) continue;
-      float date = role.event.timeEnds();
-      if (date > lastDate) { active = role; lastDate = date; }
+      if (role.roleID == roleID) return role.event;
     }
-    return active;
+    return null;
   }
   
   
@@ -186,8 +187,13 @@ public class CaseFile implements Session.Saveable {
   /**  Generating subsequent investigation options-
     */
   public Series <Lead> investigationOptions() {
-    if (! refreshOptions) return followOptions;
     
+    for (Lead l : followOptions) if (l.complete()) {
+      followOptions.remove(l);
+      refreshOptions = true;
+    }
+    
+    if (! refreshOptions) return followOptions;
     followOptions.clear();
     refreshOptions = false;
     
@@ -196,8 +202,6 @@ public class CaseFile implements Session.Saveable {
     /*
     if (leadsTo instanceof Item || leadsTo instanceof Clue) {
     }
-    if (leadsTo instanceof Place) {
-    }
     //*/
     
     if (subject instanceof Person) {
@@ -205,7 +209,7 @@ public class CaseFile implements Session.Saveable {
       final Event threatens = base.leads.threateningEvent(person);
       
       if (isActiveSuspect()) {
-        Lead tailing = new LeadTail(base, person);
+        Lead tailing = new LeadSurveil(base, person);
         followOptions.add(tailing);
       }
       if (threatens != null) {
@@ -216,16 +220,16 @@ public class CaseFile implements Session.Saveable {
     
     if (subject instanceof Place) {
       final Place place = (Place) subject;
-      final Event threatens = base.leads.threateningEvent(place);
+      Event crime = eventWithRole(ROLE_SCENE);
       
-      if (threatens != null) {
-        Lead guarding = new LeadGuard(base, place, threatens);
+      if (crime != null && crime.dangerous()) {
+        Lead guarding = new LeadGuard(base, place, crime);
         followOptions.add(guarding);
       }
-    }
-    
-    if (subject instanceof Event) {
-      
+      else if (crime != null) {
+        Lead surveil = new LeadSurveil(base, place);
+        followOptions.add(surveil);
+      }
     }
     
     return followOptions;
@@ -259,14 +263,35 @@ public class CaseFile implements Session.Saveable {
   );
   
   
+  private Role pickMostProminentRole() {
+    int time = base.world().totalMinutes();
+    float bestRating = 0;
+    Role active = null;
+    
+    for (Role role : roles) {
+      if (defunct(role)) continue;
+      int daysAgo = (time - role.event.timeEnds()) / World.MINUTES_PER_DAY;
+      float rating = role.evidence;
+      if (role.roleID <= ROLE_NONE) rating /= 2;
+      rating *= 10f / (10 + daysAgo);
+      if (rating > bestRating) { active = role; bestRating = rating; }
+    }
+    return active;
+  }
+  
+  
   public void shortDescription(StringBuffer s) {
     
     //  TODO:  Ideally, the text description should incorporate both an
     //  explanation of the leads that brought you the info, the subject itself,
-    //  the level of evidence involved, and whether it's a past or future
-    //  event.
+    //  and the level of evidence involved.
     
-    final Role latest = latestActiveRole();
+    //  TODO:  Consider iterating over ALL active roles, and composing a
+    //  description for each?
+    
+    //  TODO:  You also have to allow for past vs. future tense.
+    
+    final Role latest = pickMostProminentRole();
     if (latest == null) {
       s.append("You have no current leads on "+subject);
       return;
@@ -286,7 +311,7 @@ public class CaseFile implements Session.Saveable {
         s.append("You have a tip that "+subject+" is acting suspiciously.");
       }
       else {
-        Object need = latest.event.planStep().needs()[latest.roleID];
+        Object need = latest.event.planStep().needTypes()[latest.roleID];
         s.append(subject+" is playing the role of "+need);
         s.append(" in the "+latest.event+".");
       }
@@ -303,11 +328,7 @@ public class CaseFile implements Session.Saveable {
     }
     return null;
   }
-  
-  
 }
-
-
 
 
 

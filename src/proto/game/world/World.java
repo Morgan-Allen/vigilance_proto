@@ -20,9 +20,9 @@ public class World implements Session.Saveable {
   /**  Data fields, construction and save/load methods-
     */
   final public static int
-    SECONDS_PER_MINUTE = 60,
     MINUTES_PER_HOUR   = 60,
     HOURS_PER_DAY      = 24,
+    MINUTES_PER_DAY    = 60 * 24,
     HOURS_PER_SHIFT    = 8,
     SHIFTS_PER_DAY     = 3,
     DAYS_PER_WEEK      = 7,

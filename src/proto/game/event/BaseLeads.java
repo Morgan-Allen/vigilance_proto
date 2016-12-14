@@ -47,7 +47,7 @@ public class BaseLeads {
     }
     final CaseFile file = new CaseFile(base, subject);
     files.add(file);
-    I.say("Creating case file for: "+subject);
+    I.say("Creating case file for: "+subject+", location: "+file.trueLocation());
     return file;
   }
   
