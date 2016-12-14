@@ -160,11 +160,13 @@ public class RegionView extends UINode {
       g.drawImage(icon, vx + 15, down + 5, 40, 40, null);
       int initDown = down;
       
+      /*
       g.setColor(Color.WHITE);
       ViewUtils.drawWrappedString(
         file.subject.toString(), g, vx + 60, down + 5, vw - 80, 20
       );
       down += 20;
+      //*/
       
       g.setColor(Color.LIGHT_GRAY);
       StringBuffer desc = new StringBuffer();

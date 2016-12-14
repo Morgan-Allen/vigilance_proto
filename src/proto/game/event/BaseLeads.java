@@ -47,6 +47,7 @@ public class BaseLeads {
     }
     final CaseFile file = new CaseFile(base, subject);
     files.add(file);
+    I.say("Creating case file for: "+subject);
     return file;
   }
   
@@ -63,12 +64,16 @@ public class BaseLeads {
   public Batch <CaseFile> casesForRegion(Region region) {
     final Batch <CaseFile> cases = new Batch();
     for (CaseFile file : files) if (file.isActiveSuspect()) {
-      if (file.currentSubjectLocation().region() == region) cases.add(file);
+      Place seen = file.trueLocation();
+      if (seen != null && seen.region() == region) cases.add(file);
     }
     return cases;
   }
   
 }
+
+
+
 
 
 

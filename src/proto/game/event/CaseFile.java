@@ -14,9 +14,12 @@ public class CaseFile implements Session.Saveable {
   
   
   final static int
-    ROLE_NONE = -1,
-    ROLE_GOON = -2,
-    ROLE_INFO = -3;
+    ROLE_NONE    = -1,
+    ROLE_CLUE    = -2,
+    ROLE_GOON    = -3,
+    ROLE_HIDEOUT = -4,
+    ROLE_CRIME   = -5,
+    ROLE_SCENE   = -6;
   final static float
     LEVEL_TIPOFF    = 0.5f,
     LEVEL_EVIDENCE  = 1.0f,
@@ -26,10 +29,9 @@ public class CaseFile implements Session.Saveable {
   final public Object subject;
   
   Place knownLocation = null;
-  float evidenceAsHideout = 0;
   
   private static class Role {
-    Event event;
+    Event event = null;
     int roleID = -1;
     int sentence = -1;
     //  TODO:  Record all the Leads pointing at involvement.
@@ -46,7 +48,7 @@ public class CaseFile implements Session.Saveable {
   CaseFile(Base base, Object subject) {
     this.base    = base   ;
     this.subject = subject;
-    knownLocation = currentSubjectLocation();
+    knownLocation = trueLocation();
   }
   
   
@@ -56,7 +58,6 @@ public class CaseFile implements Session.Saveable {
     subject = (Element) s.loadObject();
     
     knownLocation = (Place) s.loadObject();
-    evidenceAsHideout = s.loadFloat();
     
     for (int n = s.loadInt(); n-- > 0;) {
       final Role r = new Role();
@@ -77,7 +78,6 @@ public class CaseFile implements Session.Saveable {
     s.saveObject(subject);
     
     s.saveObject(knownLocation);
-    s.saveFloat(evidenceAsHideout);
     
     s.saveInt(roles.size());
     for (Role r : roles) {
@@ -92,30 +92,28 @@ public class CaseFile implements Session.Saveable {
   
   
   
-  /**  Utility methods for determine appropriate actions-
+  /**  Recording involvement in criminal actions and other information
+    *  updates-
     */
-  void recordInvolvement(Event event, float evidenceLevel) {
-    
-    Role role = null;
-    for (Role r : roles) if (r.event == event) { role = r; break; }
-    if (role == null) {role = new Role(); roles.add(role); }
-    
-    role.event  = event;
-    role.roleID = Visit.indexOf(subject, event.planStep().needs());
-    
-    final Series perps = event.assigned();
-    if (role.roleID == -1 && perps.includes(subject)) {
-      role.roleID = ROLE_GOON;
-    }
-    
-    this.refreshOptions = true;
-    
-    base.world().pauseMonitoring();
+  void recordCurrentRole(Event event, float evidenceLevel) {
+    int roleID = Visit.indexOf(subject, event.planStep().needs());
+    if (roleID == -1) { I.complain("Subject not involved!"); return; }
+    recordRole(event, roleID, evidenceLevel);
   }
   
   
-  void recordHideoutEvidence(float evidenceLevel) {
-    this.evidenceAsHideout += evidenceLevel;
+  void recordRole(Event event, int roleID, float evidenceLevel) {
+    Role role = null;
+    for (Role r : roles) if (r.event == event && r.roleID == roleID) {
+      role = r; break;
+    }
+    if (role == null) roles.add(role = new Role());
+    
+    role.event    = event;
+    role.roleID   = roleID;
+    role.evidence = Nums.max(role.evidence, evidenceLevel);
+    
+    this.refreshOptions = true;
   }
   
   
@@ -125,12 +123,15 @@ public class CaseFile implements Session.Saveable {
   }
   
   
+  
+  /**  Information queries relevant to investigation options-
+    */
   Place knownLocation() {
     return knownLocation;
   }
   
   
-  Place currentSubjectLocation() {
+  Place trueLocation() {
     if (subject instanceof Element) {
       return ((Element) subject).place();
     }
@@ -159,7 +160,7 @@ public class CaseFile implements Session.Saveable {
   }
   
   
-  private Role latestActiveRole() {
+  Role latestActiveRole() {
     float lastDate = Float.NEGATIVE_INFINITY;
     Role active = null;
     for (Role role : roles) {
@@ -234,28 +235,62 @@ public class CaseFile implements Session.Saveable {
   
   /**  Rendering, debug and interface methods-
     */
+  final static Table <Integer, String[]> ROLE_DESC = Table.make(
+    ROLE_GOON   , new String[] {
+      "",
+      "",
+      "<subject> was a low-level accomplice during the <event>."
+    },
+    ROLE_HIDEOUT, new String[] {
+      "You have a tipoff that <subject> is a criminal hideout.",
+      "Evidence confirms that <subject> is a criminal hideout.",
+      ""
+    },
+    ROLE_CRIME  , new String[] {
+      "You have a tipoff that the <event> is being planned.",
+      "You have direct evidence for the <event>.",
+      ""
+    },
+    ROLE_SCENE  , new String[] {
+      "You have a tipoff that <subject> will be the venue for the <event>.",
+      "Evidence confirms that <subject> will be the venue for the <event>.",
+      ""
+    }
+  );
+  
+  
   public void shortDescription(StringBuffer s) {
     
-    //  TODO:  Find the most serious/recent suspected role, and mention that
-    //  along with the degree of evidence.
-    
-    //  (The player can click elsewhere for a complete breakdown on their
-    //  prior record and any known associates.)
+    //  TODO:  Ideally, the text description should incorporate both an
+    //  explanation of the leads that brought you the info, the subject itself,
+    //  the level of evidence involved, and whether it's a past or future
+    //  event.
     
     final Role latest = latestActiveRole();
-    if (latest != null) {
-      if (latest.evidence <= LEVEL_TIPOFF) {
-        s.append(subject+" is suspected to have ");
-      }
-      else {
-        s.append(subject+" is playing the role of ");
-      }
+    if (latest == null) {
+      s.append("You have no current leads on "+subject);
+      return;
     }
     
-    //  TODO:  See if the subject is currently threatened- if so, mention that
-    //  you have the option to guard them.
-    //  TODO:  See if the subject is believed to be a hideout/kingpin- if so,
-    //  mention that you have the option to raid them.
+    String desc[] = ROLE_DESC.get((Integer) latest.roleID);
+    if (desc != null) {
+      String subDesc = desc[0];
+      if (latest.evidence >= LEVEL_EVIDENCE ) subDesc = desc[1];
+      if (latest.evidence >= LEVEL_CONVICTED) subDesc = desc[2];
+      subDesc = subDesc.replace("<subject>", subject     .toString());
+      subDesc = subDesc.replace("<event>"  , latest.event.toString());
+      s.append(subDesc);
+    }
+    else {
+      if (latest.evidence <= LEVEL_TIPOFF) {
+        s.append("You have a tip that "+subject+" is acting suspiciously.");
+      }
+      else {
+        Object need = latest.event.planStep().needs()[latest.roleID];
+        s.append(subject+" is playing the role of "+need);
+        s.append(" in the "+latest.event+".");
+      }
+    }
   }
   
   
@@ -268,7 +303,6 @@ public class CaseFile implements Session.Saveable {
     }
     return null;
   }
-  
   
   
 }

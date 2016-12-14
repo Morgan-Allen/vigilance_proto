@@ -64,17 +64,17 @@ public class LeadTail extends Lead {
     //
     //  First, give tipoffs on anyone directly involved in the crime underway:
     final CaseFile file = base.leads.caseFor(tailed);
-    file.recordInvolvement(involved, CaseFile.LEVEL_EVIDENCE);
+    file.recordCurrentRole(involved, CaseFile.LEVEL_EVIDENCE);
     
-    for (Element e : step.needs()) {
+    for (Element e : step.needs()) if (e != null) {
       if (e.type == Kind.TYPE_PERSON) {
         final CaseFile fileE = base.leads.caseFor(e);
-        fileE.recordInvolvement(involved, CaseFile.LEVEL_EVIDENCE);
+        fileE.recordCurrentRole(involved, CaseFile.LEVEL_EVIDENCE);
       }
     }
     //
-    //  Then, see if you overhear anything about the next step in the plot, or
-    //  where the boss might be hiding.
+    //  Then, see if you overhear anything about where the next crime is going
+    //  down, or where the boss might be hiding.
     PlanStep after = step.plan.stepAfter(step);
     Place hideout = step.plan.agent.base();
     float overhearChance = 0.5f;
@@ -84,17 +84,14 @@ public class LeadTail extends Lead {
     
     if (stepTip && after != null) {
       Event afterEvent = after.matchedEvent();
-      for (Element n : after.needs()) {
-        if (Visit.arrayIncludes(step.gives(), n)) {
-          final CaseFile fileN = base.leads.caseFor(n);
-          fileN.recordInvolvement(afterEvent, CaseFile.LEVEL_TIPOFF);
-        }
-      }
+      Place scene = afterEvent.targetLocation();
+      final CaseFile fileP = base.leads.caseFor(scene);
+      fileP.recordRole(afterEvent, CaseFile.ROLE_SCENE, CaseFile.LEVEL_TIPOFF);
     }
     
     if (baseTip && hideout != null) {
       final CaseFile fileH = base.leads.caseFor(hideout);
-      fileH.recordHideoutEvidence(CaseFile.LEVEL_TIPOFF);
+      fileH.recordRole(involved, CaseFile.ROLE_HIDEOUT, CaseFile.LEVEL_TIPOFF);
     }
     
     //

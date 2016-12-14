@@ -49,36 +49,55 @@ public class BasePlans {
   public void updatePlanning() {
     if (Visit.empty(stepTypes)) return;
     final int maxDepth = 6, numPlans = 4;
-    
+    //
+    //  If you currently lack a viable plan, and/or it's finished, generate a
+    //  new one from scratch-
     if (currentPlan == null || planComplete(currentPlan)) {
-      Plan picked = null;
-      float bestRating = 0;
-      
-      for (int n = numPlans; n-- > 0;) {
-        final Plan plan = new Plan(base.leader(), base.world(), stepTypes);
-        plan.selectInitialGoal(base);
-        plan.advancePlan(maxDepth);
-        float rating = plan.calcPlanRating();
-        if (rating > bestRating) { picked = plan; bestRating = rating; }
-      }
-      
-      currentPlan = picked;
-      nextStep = picked == null ? null : picked.steps().first();
-      
-      if (picked != null) picked.printFullPlan();
+      currentPlan = generateNextPlan(numPlans, maxDepth, null);
     }
     if (currentPlan == null) return;
-    
-    PlanStep after = currentPlan.stepAfter(nextStep);
-    if (after != null && nextStep.matchedEvent().complete()) {
-      if (after.currentlyPossible()) {
+    //
+    //  If you don't have a step scheduled, or the current step is complete,
+    //  move on to the next step in the plan.
+    if (nextStep == null || nextStep.matchedEvent().complete()) {
+      if (nextStep == null) nextStep = currentPlan.firstStep();
+      else nextStep = currentPlan.stepAfter(nextStep);
+      //
+      //  In the event that the next step is possible, schedule the
+      //  corresponding event.  Otherwise, considering revising the plan or
+      //  abandoning it entirely.
+      if (nextStep.currentlyPossible()) {
         int hoursDelay = 20 + Rand.index(5);
-        base.world().events.scheduleEvent(after.matchedEvent(), hoursDelay);
+        base.world().events.scheduleEvent(nextStep.matchedEvent(), hoursDelay);
       }
       else {
         currentPlan.reviseAfter(nextStep, maxDepth / 2, base);
+        currentPlan = generateNextPlan(1, maxDepth, currentPlan);
+        nextStep = null;
       }
     }
+  }
+  
+  
+  private Plan generateNextPlan(int numPlans, int maxDepth, Plan current) {
+    Plan picked = null;
+    float bestRating = 0;
+    
+    if (current != null) {
+      picked = current;
+      bestRating = current.calcPlanRating() * 2;
+    }
+    
+    for (int n = numPlans; n-- > 0;) {
+      final Plan plan = new Plan(base.leader(), base.world(), stepTypes);
+      plan.selectInitialGoal(base);
+      plan.advancePlan(maxDepth);
+      float rating = plan.calcPlanRating();
+      if (rating > bestRating) { picked = plan; bestRating = rating; }
+    }
+    
+    if (picked != null) picked.printFullPlan();
+    return picked;
   }
   
   
