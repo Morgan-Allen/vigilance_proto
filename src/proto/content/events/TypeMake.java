@@ -8,6 +8,8 @@ import proto.game.person.*;
 import proto.util.*;
 
 
+//  TODO:  Separate forgery as a different crime!
+
 
 public class TypeMake extends StepType {
   
@@ -73,7 +75,7 @@ public class TypeMake extends StepType {
   
   
   protected String langDescription(PlanStep step) {
-    return "Make "+step.give(Gives.MADE);
+    return "manufacturing "+step.give(Gives.MADE);
   }
 }
 

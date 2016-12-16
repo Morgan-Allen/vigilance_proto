@@ -34,8 +34,8 @@ public class CaseFile implements Session.Saveable {
     Event event;
     int   roleID   = -1;
     int   sentence = -1;
-    //  TODO:  Record all the Leads pointing at involvement.
-    float evidence = 0;
+    float maxEvidence = 0;
+    List <Lead> evidence = new List();
   }
   List <Role> roles = new List();
   
@@ -61,10 +61,11 @@ public class CaseFile implements Session.Saveable {
     
     for (int n = s.loadInt(); n-- > 0;) {
       final Role r = new Role();
-      r.event    = (Event) s.loadObject();
-      r.roleID   = s.loadInt();
-      r.sentence = s.loadInt();
-      r.evidence = s.loadFloat();
+      r.event       = (Event) s.loadObject();
+      r.roleID      = s.loadInt();
+      r.sentence    = s.loadInt();
+      r.maxEvidence = s.loadFloat();
+      s.loadObjects(r.evidence);
       roles.add(r);
     }
     
@@ -81,10 +82,11 @@ public class CaseFile implements Session.Saveable {
     
     s.saveInt(roles.size());
     for (Role r : roles) {
-      s.saveObject(r.event   );
-      s.saveInt   (r.roleID  );
-      s.saveInt   (r.sentence);
-      s.saveFloat (r.evidence);
+      s.saveObject(r.event      );
+      s.saveInt   (r.roleID     );
+      s.saveInt   (r.sentence   );
+      s.saveFloat (r.maxEvidence);
+      s.saveObjects(r.evidence);
     }
     s.saveBool(refreshOptions);
     s.saveObjects(followOptions);
@@ -95,30 +97,36 @@ public class CaseFile implements Session.Saveable {
   /**  Recording involvement in criminal actions and other information
     *  updates-
     */
-  boolean recordCurrentRole(Event event, float evidenceLevel) {
+  boolean recordCurrentRole(Event event, Lead lead) {
     int roleID = Visit.indexOf(subject, event.planStep().needs());
     if (roleID == -1) { I.complain("Subject not involved!"); return false; }
-    return recordRole(event, roleID, evidenceLevel);
+    return recordRole(event, roleID, lead);
   }
   
   
-  boolean recordRole(Event event, int roleID, float evidenceLevel) {
+  boolean recordRole(Event event, int roleID, Lead lead) {
+    //
+    //  Try to find a pre-existing role which matches this signature, or create
+    //  a new one otherwise.  Quit if the same lead has already been recorded.
+    //  TODO:  Leads might want to supply differing levels of evidence for
+    //  differing subjects!
     Role role = null;
     for (Role r : roles) if (r.event == event && r.roleID == roleID) {
       role = r; break;
     }
-    if (role == null) roles.add(role = new Role());
-    else if (role.evidence >= evidenceLevel) return false;
-    
-    role.event    = event;
-    role.roleID   = roleID;
-    role.evidence = evidenceLevel;
-    
+    if (role == null) {
+      roles.add(role = new Role());
+      role.event  = event ;
+      role.roleID = roleID;
+    }
+    else if (role.evidence.includes(lead)) return false;
+    //
+    //  Record the new evidence, refresh options and return-
+    I.say("RECORDING new role for "+subject+", event: "+event+": "+roleID);
+    role.maxEvidence = Nums.max(role.maxEvidence, lead.evidenceLevel());
+    role.evidence.include(lead);
     this.refreshOptions = true;
     this.base.world().pauseMonitoring();
-    
-    I.say("RECORDING new role for "+subject+", event: "+event+": "+roleID);
-    
     return true;
   }
   
@@ -146,15 +154,6 @@ public class CaseFile implements Session.Saveable {
     }
     return null;
   }
-  
-  
-  //  If the guy *was* involved in a crime, you have the option to arrest or
-  //  question them.
-  
-  //  If the guy *will be* involved in a crime, you have the option to tail
-  //  them.
-  
-  //  If they're the target of a crime, you have the option to guard them.
   
   
   private boolean defunct(Role role) {
@@ -303,7 +302,7 @@ public class CaseFile implements Session.Saveable {
     for (Role role : roles) {
       if (defunct(role)) continue;
       int daysAgo = (time - role.event.timeEnds()) / World.MINUTES_PER_DAY;
-      float rating = role.evidence;
+      float rating = role.maxEvidence;
       if (role.roleID <= ROLE_NONE) rating /= 2;
       rating *= 10f / (10 + daysAgo);
       if (rating > bestRating) { active = role; bestRating = rating; }
@@ -314,40 +313,41 @@ public class CaseFile implements Session.Saveable {
   
   public void shortDescription(StringBuffer s) {
     
-    //  TODO:  Ideally, the text description should incorporate both an
-    //  explanation of the leads that brought you the info, the subject itself,
-    //  and the level of evidence involved.
-    
-    //  TODO:  Consider iterating over ALL active roles, and composing a
-    //  description for each?
-    
-    //  TODO:  You also have to allow for past vs. future tense.
-    
-    final Role latest = pickMostProminentRole();
-    if (latest == null) {
+    final Role role = pickMostProminentRole();
+    if (role == null) {
       s.append("You have no current leads on "+subject);
       return;
     }
     
-    String desc[] = ROLE_DESC.get((Integer) latest.roleID);
-    if (desc != null) {
+    Lead lead = role.evidence.last();
+    String tenseDesc = "is", strengthDesc = "suggests";
+    
+    String fixedDesc[] = ROLE_DESC.get((Integer) role.roleID);
+    /*
       String subDesc = desc[0];
       if (latest.evidence >= LEVEL_EVIDENCE ) subDesc = desc[1];
       if (latest.evidence >= LEVEL_CONVICTED) subDesc = desc[2];
       subDesc = subDesc.replace("<subject>", subject     .toString());
       subDesc = subDesc.replace("<event>"  , latest.event.toString());
       s.append(subDesc);
-    }
-    else {
-      if (latest.evidence <= LEVEL_TIPOFF) {
-        s.append("You have a tip that "+subject+" is acting suspiciously.");
-      }
-      else {
-        Object need = latest.event.planStep().needTypes()[latest.roleID];
-        s.append(subject+" is playing the role of "+need);
-        s.append(" in the "+latest.event+".");
-      }
-    }
+    //*/
+    
+    //  TODO:  Move this out to the Leads themselves, so they can override as
+    //  needed.
+    
+    boolean pastTense = true, futureTense = true;
+    if (role.event.complete()) futureTense = false;
+    if (role.event.hasBegun()) pastTense   = false;
+    if (futureTense) tenseDesc = "will be";
+    if (pastTense  ) tenseDesc = "was";
+    
+    if (role.maxEvidence >= LEVEL_EVIDENCE) strengthDesc = "confirms";
+    
+    String desc = "";
+    desc += lead.activeInfo()+" "+strengthDesc;
+    desc += " that "+subject+" "+tenseDesc;
+    desc += " involved in "+role.event;
+    s.append(desc);
   }
   
   
@@ -361,6 +361,9 @@ public class CaseFile implements Session.Saveable {
     return null;
   }
 }
+
+
+
 
 
 

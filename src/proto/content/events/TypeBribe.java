@@ -70,7 +70,7 @@ public class TypeBribe extends StepType {
   /**  Rendering, debug and interface methods-
     */
   protected String langDescription(PlanStep step) {
-    return "Bribe "+step.give(Gives.BRIBED);
+    return "bribing "+step.give(Gives.BRIBED);
   }
 }
 

@@ -146,7 +146,7 @@ public class Event implements Session.Saveable, Assignment {
     if (step != null) {
       Base played = world().playerBase();
       Place place = targetLocation();
-      Region region = targetLocation().region();
+      Region region = place.region();
       float tipoffChance = region.currentValue(Region.TRUST) / 100f;
       
       I.say("Event begun: "+this);
@@ -164,9 +164,9 @@ public class Event implements Session.Saveable, Assignment {
         //if (! perp.isCriminal()) tips = false;
         
         if (tips) {
-          //  TODO:  You still need a tipoff to display!
+          final Lead tipoff = new LeadTipoff(played, perp);
           final CaseFile file = played.leads.caseFor(perp);
-          file.recordCurrentRole(this, CaseFile.LEVEL_TIPOFF);
+          file.recordCurrentRole(this, tipoff);
           I.say("  Generating tipoff from: "+perp);
         }
         else I.say("No tipoff generated from "+perp);
@@ -240,9 +240,9 @@ public class Event implements Session.Saveable, Assignment {
     
     if (step != null && dangerous()) {
       Base played = world().playerBase();
-      //  TODO:  You still need to generate a news-report for this!
+      final Lead report = new LeadCrimeReport(played, this);
       final CaseFile file = played.leads.caseFor(this);
-      file.recordRole(this, CaseFile.ROLE_CRIME, CaseFile.LEVEL_CONVICTED);
+      file.recordRole(this, CaseFile.ROLE_CRIME, report);
     }
     if (step != null) step.type.applyRealStepEffects(
       step, place, ! playerWon, collateral, getaways

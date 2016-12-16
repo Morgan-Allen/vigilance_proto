@@ -39,6 +39,11 @@ public class LeadCrimeReport extends Lead {
   protected void onFailure() {
   }
   
+
+  protected float evidenceLevel() {
+    return CaseFile.LEVEL_CONVICTED;
+  }
+  
   
   
   /**  Rendering, debug and interface methods-

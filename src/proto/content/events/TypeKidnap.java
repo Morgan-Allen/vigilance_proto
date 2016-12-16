@@ -10,14 +10,14 @@ import proto.util.*;
 
 
 
-public class TypeKidnapping extends TypeMajorCrime {
+public class TypeKidnap extends TypeMajorCrime {
   
   static enum Gives {
     VICTIM
   };
   
   
-  TypeKidnapping() {
+  TypeKidnap() {
     super("Kidnapping", "step_type_kidnap", Needs.values(), Gives.values());
   }
   
@@ -35,7 +35,7 @@ public class TypeKidnapping extends TypeMajorCrime {
   
   
   protected String langDescription(PlanStep step) {
-    return "Kidnap "+step.give(Gives.VICTIM);
+    return "kidnapping "+step.give(Gives.VICTIM);
   }
 }
 

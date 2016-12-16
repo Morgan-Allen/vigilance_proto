@@ -96,7 +96,7 @@ public class LeadSurveil extends Lead {
       
       if (e.type == Kind.TYPE_PERSON && e.place() == place) {
         final CaseFile fileE = base.leads.caseFor(e);
-        intel |= fileE.recordCurrentRole(involved, LEVEL_EVIDENCE);
+        intel |= fileE.recordCurrentRole(involved, this);
       }
     }
     //
@@ -113,12 +113,12 @@ public class LeadSurveil extends Lead {
       Event afterEvent = after.matchedEvent();
       Place scene = afterEvent.targetLocation();
       final CaseFile fileP = base.leads.caseFor(scene);
-      intel |= fileP.recordRole(afterEvent, ROLE_SCENE, LEVEL_TIPOFF);
+      intel |= fileP.recordRole(afterEvent, ROLE_SCENE, this);
     }
     
     if (baseTip && hideout != null) {
       final CaseFile fileH = base.leads.caseFor(hideout);
-      intel |= fileH.recordRole(involved, ROLE_HIDEOUT, LEVEL_TIPOFF);
+      intel |= fileH.recordRole(involved, ROLE_HIDEOUT, this);
     }
     
     return intel;

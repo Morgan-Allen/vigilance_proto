@@ -90,7 +90,7 @@ public class TypeHeist extends TypeMajorCrime {
   /** Rendering, debug and interface methods-
     */
   protected String langDescription(PlanStep step) {
-    return "Steal "+step.give(Gives.LOOT)+" from "+step.need(Needs.VENUE);
+    return "stealing "+step.give(Gives.LOOT)+" from "+step.need(Needs.VENUE);
   }
 }
 

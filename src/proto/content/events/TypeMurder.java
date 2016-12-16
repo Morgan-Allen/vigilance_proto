@@ -6,14 +6,14 @@ import proto.game.world.*;
 
 
 
-public class TypeAssassination extends TypeMajorCrime {
+public class TypeMurder extends TypeMajorCrime {
   
   static enum Gives {
     BODY
   };
   
   
-  TypeAssassination() {
+  TypeMurder() {
     super("Murder", "step_type_murder", Needs.values(), Gives.values());
   }
   
@@ -25,6 +25,6 @@ public class TypeAssassination extends TypeMajorCrime {
   
   
   protected String langDescription(PlanStep step) {
-    return "Assassinate "+step.give(Gives.BODY);
+    return "murdering "+step.give(Gives.BODY);
   }
 }

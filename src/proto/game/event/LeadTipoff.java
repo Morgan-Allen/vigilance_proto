@@ -37,6 +37,11 @@ public class LeadTipoff extends Lead {
   protected void onFailure() {
   }
   
+
+  protected float evidenceLevel() {
+    return CaseFile.LEVEL_TIPOFF;
+  }
+  
   
   
   /**  Rendering, debug and interface methods-
@@ -58,9 +63,7 @@ public class LeadTipoff extends Lead {
   
   
   public String activeInfo() {
-    //  NOTE:  Tipoffs are handed off in complete form, so there's no need to
-    //  pursue them actively...
-    return "Tipoff on "+subject;
+    return "An anonymous tip";
   }
   
   

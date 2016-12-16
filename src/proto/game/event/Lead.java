@@ -36,6 +36,15 @@ public abstract class Lead extends Task {
   
   
   
+  protected boolean matchType(Lead other) {
+    return other.subject == subject && other.getClass() == getClass();
+  }
+  
+  
+  protected float evidenceLevel() {
+    return CaseFile.LEVEL_EVIDENCE;
+  }
+  
 }
 
 

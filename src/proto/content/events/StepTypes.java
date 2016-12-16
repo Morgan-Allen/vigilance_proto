@@ -17,8 +17,8 @@ public class StepTypes {
   
   final public static StepType
     HEIST    = register(new TypeHeist()),
-    MURDER   = register(new TypeAssassination()),
-    KIDNAP   = register(new TypeKidnapping()),
+    MURDER   = register(new TypeMurder()),
+    KIDNAP   = register(new TypeKidnap()),
     COERCE   = register(new TypeCoerce()),
     BRIBE    = register(new TypeBribe()),
     MAKE     = register(new TypeMake()),

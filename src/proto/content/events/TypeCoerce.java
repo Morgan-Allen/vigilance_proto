@@ -68,7 +68,7 @@ public class TypeCoerce extends StepType {
   
   
   protected String langDescription(PlanStep step) {
-    return "Coerce "+step.give(Gives.COERCED);
+    return "coercing "+step.give(Gives.COERCED);
   }
 }
 
