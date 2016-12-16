@@ -56,7 +56,6 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   
   public Scene(Session s) throws Exception {
     s.cacheInstance(this);
-    view().loadState(s);
     
     world        = (World) s.loadObject();
     site         = (Place) s.loadObject();
@@ -82,12 +81,12 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     
     playerTurn = s.loadBool();
     nextActing = (Person) s.loadObject();
+    
+    view().loadState(s);
   }
   
   
   public void saveState(Session s) throws Exception {
-    view().saveState(s);
-    
     s.saveObject (world       );
     s.saveObject (site        );
     s.saveObject (playerTask  );
@@ -110,6 +109,8 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     
     s.saveBool(playerTurn);
     s.saveObject(nextActing);
+    
+    view().saveState(s);
   }
   
   

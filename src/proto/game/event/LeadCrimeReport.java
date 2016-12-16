@@ -63,9 +63,7 @@ public class LeadCrimeReport extends Lead {
   
   
   public String activeInfo() {
-    //  NOTE:  Reports are handed off in complete form, so there's no need to
-    //  pursue them actively...
-    return "";
+    return "A police report";
   }
   
   

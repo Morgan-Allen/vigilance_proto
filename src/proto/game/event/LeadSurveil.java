@@ -68,10 +68,6 @@ public class LeadSurveil extends Lead {
     //  Then we look out for any changes in behaviour on the subject's part and
     //  terminate the task either when new intel is uncovered or a long time
     //  passes without any leads.
-    if (doInit && (involved == null || involved.hasBegun())) {
-      prior = involved;
-      doInit = false;
-    }
     if (involved != prior && involved.hasBegun()) {
       if (performTest() && checkForNewIntel()) setCompleted(true);
       prior = involved;
@@ -109,6 +105,8 @@ public class LeadSurveil extends Lead {
     boolean baseTip = Rand.num() < overhearChance;
     if (GameSettings.freeTipoffs || true) stepTip = baseTip = true;
     
+    //  TODO:  You shouldn't neccesarily tip off the next step in the plan-
+    //  only the next step that this step contributes to!
     if (stepTip && after != null) {
       Event afterEvent = after.matchedEvent();
       Place scene = afterEvent.targetLocation();

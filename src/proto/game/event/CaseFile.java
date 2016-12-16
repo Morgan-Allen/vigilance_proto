@@ -251,7 +251,8 @@ public class CaseFile implements Session.Saveable {
     
     if (subject instanceof Place) {
       final Place place = (Place) subject;
-      Event crime = eventWithRole(ROLE_SCENE);
+      Event crime = eventWithRole(ROLE_SCENE  );
+      Event lair  = eventWithRole(ROLE_HIDEOUT);
       
       if (crime != null && crime.dangerous()) {
         Lead guarding = new LeadGuard(base, place, crime);
@@ -260,6 +261,9 @@ public class CaseFile implements Session.Saveable {
       if (crime != null) {
         Lead surveil = new LeadSurveil(base, place);
         followOptions.add(surveil);
+      }
+      if (lair != null) {
+        //  TODO:  Include the option to raid.
       }
     }
     
@@ -270,27 +274,11 @@ public class CaseFile implements Session.Saveable {
   
   /**  Rendering, debug and interface methods-
     */
-  final static Table <Integer, String[]> ROLE_DESC = Table.make(
-    ROLE_GOON   , new String[] {
-      "",
-      "",
-      "<subject> was a low-level accomplice during the <event>."
-    },
-    ROLE_HIDEOUT, new String[] {
-      "You have a tipoff that <subject> is a criminal hideout.",
-      "Evidence confirms that <subject> is a criminal hideout.",
-      ""
-    },
-    ROLE_CRIME  , new String[] {
-      "You have a tipoff that the <event> is being planned.",
-      "You have direct evidence for the <event>.",
-      ""
-    },
-    ROLE_SCENE  , new String[] {
-      "You have a tipoff that <subject> will be the venue for the <event>.",
-      "Evidence confirms that <subject> will be the venue for the <event>.",
-      ""
-    }
+  final static Table <Integer, String> ROLE_DESC = Table.make(
+    ROLE_GOON   , "<subject> <tense> an accomplice during the <event>.",
+    ROLE_HIDEOUT, "<subject> <tense> a criminal hideout.",
+    ROLE_CRIME  , "<event> <tense> planned.",
+    ROLE_SCENE  , "<subject> <tense> the venue for <event>."
   );
   
   
@@ -321,33 +309,26 @@ public class CaseFile implements Session.Saveable {
     
     Lead lead = role.evidence.last();
     String tenseDesc = "is", strengthDesc = "suggests";
-    
-    String fixedDesc[] = ROLE_DESC.get((Integer) role.roleID);
-    /*
-      String subDesc = desc[0];
-      if (latest.evidence >= LEVEL_EVIDENCE ) subDesc = desc[1];
-      if (latest.evidence >= LEVEL_CONVICTED) subDesc = desc[2];
-      subDesc = subDesc.replace("<subject>", subject     .toString());
-      subDesc = subDesc.replace("<event>"  , latest.event.toString());
-      s.append(subDesc);
-    //*/
-    
-    //  TODO:  Move this out to the Leads themselves, so they can override as
-    //  needed.
-    
-    boolean pastTense = true, futureTense = true;
-    if (role.event.complete()) futureTense = false;
-    if (role.event.hasBegun()) pastTense   = false;
-    if (futureTense) tenseDesc = "will be";
-    if (pastTense  ) tenseDesc = "was";
-    
+    if (! role.event.hasBegun()) tenseDesc = "will be";
+    else if (role.event.complete()) tenseDesc = "was";
     if (role.maxEvidence >= LEVEL_EVIDENCE) strengthDesc = "confirms";
     
-    String desc = "";
-    desc += lead.activeInfo()+" "+strengthDesc;
-    desc += " that "+subject+" "+tenseDesc;
-    desc += " involved in "+role.event;
-    s.append(desc);
+    String desc = ROLE_DESC.get((Integer) role.roleID);
+    if (desc != null) {
+      String subDesc = desc;
+      subDesc = subDesc.replace("<subject>", subject   .toString());
+      subDesc = subDesc.replace("<event>"  , role.event.toString());
+      subDesc = subDesc.replace("<tense>"  , tenseDesc            );
+      s.append(lead.activeInfo()+" "+strengthDesc+" ");
+      s.append(subDesc);
+    }
+    else {
+      //  TODO:  Move this out to the Leads themselves, so they can override as
+      //  needed?
+      s.append(lead.activeInfo()+" "+strengthDesc);
+      s.append(" that "+subject+" "+tenseDesc);
+      s.append(" involved in "+role.event);
+    }
   }
   
   

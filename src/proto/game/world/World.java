@@ -31,10 +31,10 @@ public class World implements Session.Saveable {
     GAME_HOURS_PER_REAL_SECOND = 8
   ;
   
+  MainView view = new MainView(this);
+  
   RunGame game;
   String savePath;
-  
-  MainView view = new MainView(this);
   
   Region regions[];
   Base played;

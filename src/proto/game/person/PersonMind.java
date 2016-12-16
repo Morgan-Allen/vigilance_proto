@@ -102,8 +102,8 @@ public class PersonMind {
       PlanStep planStep = scene.triggerEventPlanStep();
       if (planStep != null) {
         Action special = planStep.type.specialAction(person, planStep, scene);
-        float rating = special.used.rateUsage(special) * 0.5f;
-        pick.compare(special, rating);
+        float rating = special == null ? 0 : special.used.rateUsage(special);
+        pick.compare(special, rating * 0.5f);
       }
     }
     if (pick.empty()) {

@@ -169,15 +169,12 @@ public class ActionsView extends UINode {
         }
       }
     }
-    
     //
     //  General options-
-    /*
     s.append("\n");
     s.append("\n  Press S to save, R to reload.");
-    if (print.isPressed('s')) world.performSave();
-    if (print.isPressed('r')) world.reloadFromSave();
-    //*/
+    if (surface.isPressed('s')) world.performSave();
+    if (surface.isPressed('r')) world.reloadFromSave();
     
     return s.toString();
   }
