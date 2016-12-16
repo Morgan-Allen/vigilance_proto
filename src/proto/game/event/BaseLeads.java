@@ -63,7 +63,7 @@ public class BaseLeads {
   
   public Batch <CaseFile> casesForRegion(Region region) {
     final Batch <CaseFile> cases = new Batch();
-    for (CaseFile file : files) if (file.isActiveSuspect()) {
+    for (CaseFile file : files) if (file.lastSuspectEvent() != null) {
       Place seen = file.trueLocation();
       if (seen != null && seen.region() == region) cases.add(file);
     }
@@ -71,6 +71,10 @@ public class BaseLeads {
   }
   
 }
+
+
+
+
 
 
 

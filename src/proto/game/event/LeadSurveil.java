@@ -51,7 +51,9 @@ public class LeadSurveil extends Lead {
   
   public void updateAssignment() {
     super.updateAssignment();
-    
+    //
+    //  Firstly, we look out for any events that the subject might be involved
+    //  in (either as a participant or as a venue.)
     if (subject.isPerson()) {
       final Object task = ((Person) subject).assignment();
       if (task instanceof Event) involved = (Event) task;
@@ -62,8 +64,14 @@ public class LeadSurveil extends Lead {
         if (task instanceof Event) { involved = (Event) task; break; }
       }
     }
-    if (doInit) { prior = involved; doInit = false; }
-    
+    //
+    //  Then we look out for any changes in behaviour on the subject's part and
+    //  terminate the task either when new intel is uncovered or a long time
+    //  passes without any leads.
+    if (doInit && (involved == null || involved.hasBegun())) {
+      prior = involved;
+      doInit = false;
+    }
     if (involved != prior && involved.hasBegun()) {
       if (performTest() && checkForNewIntel()) setCompleted(true);
       prior = involved;
@@ -80,10 +88,12 @@ public class LeadSurveil extends Lead {
     final PlanStep step = involved.planStep();
     final Place place = subject.place();
     boolean intel = false;
-    I.say("Surveillance succeeded!");
+    I.say("\nSurveillance succeeded on "+subject+", event: "+involved);
     //
     //  First, give tipoffs on anyone directly involved in the crime underway:
     for (Element e : step.needs()) if (e != null) {
+      I.say("  Involved: "+e+" at "+e.place());
+      
       if (e.type == Kind.TYPE_PERSON && e.place() == place) {
         final CaseFile fileE = base.leads.caseFor(e);
         intel |= fileE.recordCurrentRole(involved, LEVEL_EVIDENCE);
@@ -123,7 +133,7 @@ public class LeadSurveil extends Lead {
   
   
   protected void onFailure() {
-    I.say("Surveillance failed!");
+    I.say("\nSurveillance failed on "+subject);
     //
     //  TODO:  Present a message for failure.
     //base.leads.closeLead(this);

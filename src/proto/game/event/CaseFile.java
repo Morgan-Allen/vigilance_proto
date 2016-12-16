@@ -117,6 +117,8 @@ public class CaseFile implements Session.Saveable {
     this.refreshOptions = true;
     this.base.world().pauseMonitoring();
     
+    I.say("RECORDING new role for "+subject+", event: "+event+": "+roleID);
+    
     return true;
   }
   
@@ -146,6 +148,15 @@ public class CaseFile implements Session.Saveable {
   }
   
   
+  //  If the guy *was* involved in a crime, you have the option to arrest or
+  //  question them.
+  
+  //  If the guy *will be* involved in a crime, you have the option to tail
+  //  them.
+  
+  //  If they're the target of a crime, you have the option to guard them.
+  
+  
   private boolean defunct(Role role) {
     final PlanStep step = role.event.planStep();
     if (step == null) return true;
@@ -155,12 +166,28 @@ public class CaseFile implements Session.Saveable {
   }
   
   
-  boolean isActiveSuspect() {
+  Event lastSuspectEvent() {
     for (Role role : roles) {
       if (defunct(role)) continue;
-      return true;
+      return role.event;
     }
-    return false;
+    return null;
+  }
+  
+  
+  Event nextEventInvolved() {
+    int worldTime = base.world().totalMinutes();
+    float minTime = Float.POSITIVE_INFINITY;
+    Event picked = null;
+    
+    for (Role role : roles) {
+      if (defunct(role)) continue;
+      if (role.event.timeEnds() <= worldTime) continue;
+      
+      int time = role.event.timeBegins();
+      if (time < minTime) { minTime = time; picked = role.event; }
+    }
+    return picked;
   }
   
   
@@ -206,11 +233,16 @@ public class CaseFile implements Session.Saveable {
     
     if (subject instanceof Person) {
       final Person person = (Person) subject;
+      final Event next      = nextEventInvolved();
+      final Event suspected = lastSuspectEvent();
       final Event threatens = base.leads.threateningEvent(person);
       
-      if (isActiveSuspect()) {
+      if (next != null) {
         Lead tailing = new LeadSurveil(base, person);
         followOptions.add(tailing);
+      }
+      if (suspected != null) {
+        //  TODO:  Include questioning and arrest options.
       }
       if (threatens != null) {
         Lead guarding = new LeadGuard(base, person.place(), threatens);
@@ -226,7 +258,7 @@ public class CaseFile implements Session.Saveable {
         Lead guarding = new LeadGuard(base, place, crime);
         followOptions.add(guarding);
       }
-      else if (crime != null) {
+      if (crime != null) {
         Lead surveil = new LeadSurveil(base, place);
         followOptions.add(surveil);
       }
