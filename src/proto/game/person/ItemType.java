@@ -49,14 +49,16 @@ public class ItemType extends Kind {
   
   public ItemType(
     String name, String ID, String description,
-    String iconImgPath,
+    String iconImgPath, Object media,
     int slotID, int buildCost, Object craftArgs[],
     int properties, int bonus,
     Ability... abilities
   ) {
     super(name, ID, description, Kind.TYPE_ITEM);
     this.icon  = Kind.loadImage(iconImgPath);
-    this.media = null;
+    
+    if (! (media instanceof String)) this.media = media;
+    else this.media = Kind.loadImage((String) media);
     
     this.slotID     = slotID;
     this.buildCost  = buildCost;
@@ -193,7 +195,9 @@ public class ItemType extends Kind {
         used.FX.renderBeam(a, s, beamColor(), Color.WHITE, 1, g);
       }
       else {
-        used.FX.renderMissile(a, s, missileSprite(), g);
+        Image missile = missileSprite();
+        
+        used.FX.renderMissile(a, s, missile, g);
       }
     }
   }

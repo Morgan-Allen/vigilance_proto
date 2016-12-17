@@ -119,7 +119,7 @@ public class SceneView extends UINode {
     }
     
     //
-    //  Render the persons themselves-
+    //  Render the persons themselves, and any action underway-
     for (Person p : scene.persons()) {
       if (scene.fogAt(p.currentTile(), Person.Side.HEROES) <= 0) continue;
       Vec3D pos = p.exactPosition();
@@ -160,7 +160,6 @@ public class SceneView extends UINode {
     if (scene.complete()) {
       return true;
     }
-    
     //
     //  Otherwise, determine what tile (and any objects above) are being
     //  selected-

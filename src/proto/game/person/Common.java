@@ -14,23 +14,27 @@ import java.awt.Graphics2D;
 
 
 public class Common {
-  
-  
-  final static String IMG_DIR = "media assets/character sprites/";
+
+  final static String
+    ICONS_DIR  = "media assets/item icons/",
+    SPRITE_DIR = "media assets/character sprites/"
+  ;
   
   
   final public static ItemType
     UNARMED = new ItemType(
       "Unarmed", "item_unarmed",
       "Bare fists and moxy.",
-      null,
+      ICONS_DIR+null,
+      SPRITE_DIR+"sprite_punch.png",
       SLOT_WEAPON, 0, new Object[0],
       IS_WEAPON | IS_MELEE | IS_KINETIC, 0
     ),
     UNARMOURED = new ItemType(
       "Unarmoured", "item_unarmoured",
       "Nothin' but the clothes on your back.",
-      null,
+      ICONS_DIR+null,
+      SPRITE_DIR+"sprite_deflect.png",
       SLOT_ARMOUR, 0, new Object[0],
       IS_ARMOUR, 0
     );
@@ -40,7 +44,7 @@ public class Common {
     
     MOVE = new Ability(
       "Move", "ability_move",
-      IMG_DIR+"move.png",
+      SPRITE_DIR+"move.png",
       "Move to the chosen point.",
       Ability.IS_BASIC | Ability.NO_NEED_LOS, 1,
       Ability.NO_HARM, Ability.MINOR_POWER
@@ -65,7 +69,7 @@ public class Common {
     
     STRIKE = new Ability(
       "Strike", "ability_strike",
-      IMG_DIR+"strike.png",
+      SPRITE_DIR+"strike.png",
       "Strike a melee target.  (Base damage scales with strength and weapon "+
       "bonus, 50% stun damage.)",
       Ability.IS_BASIC, 1, Ability.REAL_HARM, Ability.MINOR_POWER
@@ -87,15 +91,16 @@ public class Common {
         return volley;
       }
       
-      final Image missile = Kind.loadImage(IMG_DIR+"sprite_punch.png");
+      final Image missile = Kind.loadImage(SPRITE_DIR+"sprite_punch.png");
       public Image missileSprite() { return missile; }
     },
     
     THROW = new Ability(
       "Throw", "ability_throw",
-      IMG_DIR+"throw.png",
+      SPRITE_DIR+"throw.png",
       "Fire a shot using ranged weaponry.  Accuracy falls off with distance.",
-      Ability.IS_BASIC | IS_RANGED, 1, Ability.REAL_HARM, Ability.MINOR_POWER
+      Ability.IS_BASIC | Ability.IS_RANGED, 1,
+      Ability.REAL_HARM, Ability.MINOR_POWER
     ) {
       
       public boolean allowsTarget(Object target, Scene scene, Person acting) {

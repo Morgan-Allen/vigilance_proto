@@ -160,7 +160,7 @@ public class Volley implements Session.Saveable {
     
     selfDamageBase  = self.stats.levelFor(MIN_DAMAGE);
     selfDamageRange = self.stats.levelFor(RNG_DAMAGE);
-    hitsArmour      = hits.stats.levelFor(ARMOUR);
+    hitsArmour      = hits.stats.levelFor(ARMOUR    );
     
     if (weapon.melee() && ! ranged) {
       float brawnBonus = self.stats.levelFor(STAMINA) / 2f;
@@ -177,6 +177,8 @@ public class Volley implements Session.Saveable {
       hitsDefence = hits.stats.levelFor(GYMNASTICS);
     }
     
+    hitsDefence  = Nums.max(hitsDefence , 1);
+    selfAccuracy = Nums.max(selfAccuracy, 1);
     if (selfAccuracy > hitsDefence) {
       float hitChance = 0;
       hitChance = ((selfAccuracy - hitsDefence) / selfAccuracy);

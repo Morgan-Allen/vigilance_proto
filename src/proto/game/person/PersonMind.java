@@ -133,7 +133,7 @@ public class PersonMind {
       location.y + (Rand.index(range + 1) * (Rand.yes() ? 1 : -1))
     );
     
-    I.say(this+" picked random tile to approach: "+pick+" (at "+location+")");
+    I.say(person+" picked random tile to approach: "+pick+" (at "+location+")");
     
     return Common.MOVE.bestMotionToward(pick, person, scene);
   }

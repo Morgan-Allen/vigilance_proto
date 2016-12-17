@@ -10,12 +10,16 @@ import proto.game.person.*;
 public class Clues {
   
   
-  final static String ITEM_IMG_DIR = "media assets/item icons/";
+  final static String
+    ICONS_DIR = "media assets/item icons/",
+    SPRITE_DIR = "media assets/character sprites/"
+  ;
   
   final public static ItemType EVIDENCE = new ItemType(
     "Evidence", "item_evidence",
     "",
-    ITEM_IMG_DIR+"icon_evidence.png",
+    ICONS_DIR+"icon_evidence.png",
+    SPRITE_DIR+null,
     SLOT_ITEMS, 0, new Object[] {},
     IS_CUSTOM, 0
   ) {
@@ -24,7 +28,8 @@ public class Clues {
   final public static ItemType BLUEPRINT = new ItemType(
     "Blueprint", "item_blueprint",
     "",
-    ITEM_IMG_DIR+"icon_blueprint.png",
+    ICONS_DIR+"icon_blueprint.png",
+    SPRITE_DIR+null,
     SLOT_ITEMS, 0, new Object[] {},
     IS_CUSTOM, 0
   ) {
@@ -33,7 +38,8 @@ public class Clues {
   final public static ItemType BOMB = new ItemType(
     "Bomb", "item_bomb",
     "",
-    ITEM_IMG_DIR+"icon_bomb.png",
+    ICONS_DIR+"icon_bomb.png",
+    SPRITE_DIR+null,
     SLOT_ITEMS, 0, new Object[] {},
     IS_CONSUMED, 0
   ) {
@@ -42,7 +48,8 @@ public class Clues {
   final public static ItemType CASH = new ItemType(
     "Cash", "item_cash",
     "",
-    ITEM_IMG_DIR+"icon_cash.png",
+    ICONS_DIR+"icon_cash.png",
+    SPRITE_DIR+null,
     SLOT_ITEMS, 0, new Object[] {},
     IS_CONSUMED, 0
   ) {

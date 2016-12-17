@@ -20,7 +20,8 @@ public class PersonStats {
     ),
     RNG_DAMAGE = new Trait(
       "Damage max.", "stat_max_damage", null, ""
-    );
+    ),
+    GEAR_STATS[] = { ARMOUR, MIN_DAMAGE, RNG_DAMAGE };
   
   final public static Skill
     INTELLECT  = new Skill(
@@ -160,9 +161,10 @@ public class PersonStats {
       LANGUAGES , QUESTION    , DISGUISE    , SUASION ,
       STEALTH   , SURVEILLANCE, VEHICLES    , MARKSMAN,
       INTIMIDATE, GYMNASTICS  , CLOSE_COMBAT, STAMINA
-    },
-    ALL_STATS[] = (Skill[]) Visit.compose(
-      Skill.class, BASE_STATS, PHYS_STATS, ALL_SKILLS
+    };
+  final public static Trait
+    ALL_STATS[] = (Trait[]) Visit.compose(
+      Trait.class, GEAR_STATS, BASE_STATS, PHYS_STATS, ALL_SKILLS
     )
   ;
   
@@ -277,6 +279,10 @@ public class PersonStats {
   
   void updateStats() {
     
+    //I.say("Updating stats for: "+person);
+    for (Trait t : GEAR_STATS) {
+      updateStat(t, 0, false);
+    }
     for (Skill s : BASE_STATS) {
       updateStat(s, -1, true);
     }
@@ -304,13 +310,13 @@ public class PersonStats {
   }
   
   
-  protected boolean updateStat(Skill stat, float base, boolean mental) {
+  protected boolean updateStat(Trait stat, float base, boolean mental) {
     Level l = levels.get(stat);
     if (l == null) return false;
     
     float rootBonus = 0;
-    for (Skill root : stat.roots) {
-      rootBonus += levelFor(root) / (3f * stat.roots.length);
+    for (Skill root : stat.roots()) {
+      rootBonus += levelFor(root) / (3f * stat.roots().length);
     }
     
     l.bonus   = rootBonus;

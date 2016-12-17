@@ -152,12 +152,12 @@ public class PersonView extends UINode {
   
   void renderSkills(Surface surface, Graphics2D g, Person person) {
     
-    Skill hovered = null;
+    Trait hovered = null;
     
     g.setColor(Color.WHITE);
     int down = 160 + 60 + 10;
     
-    for (Skill t : ALL_STATS) {
+    for (Trait t : ALL_STATS) {
       int index = Visit.indexOf(t, STAT_DISPLAY_COORDS);
       if (index == -1) continue;
       
@@ -198,15 +198,15 @@ public class PersonView extends UINode {
       if (person.stats.levelFor(hovered) == 0) {
         desc += "\n  This skill is untrained.";
       }
-      else if (hovered.roots.length == 0) {
+      else if (hovered.roots().length == 0) {
         desc += "\n  Adds 1/3 value to derived skills";
         desc += ", XP: "+((int) (XP * 100))+"%";
       }
       else {
         desc += "\n  +"+bonus+" bonus from: ";
-        for (Skill r : hovered.roots) {
+        for (Skill r : hovered.roots()) {
           desc += r;
-          if (r != Visit.last(hovered.roots)) desc += " plus ";
+          if (r != Visit.last(hovered.roots())) desc += " plus ";
         }
         desc += ", XP: "+((int) (XP * 100))+"%";
       }
