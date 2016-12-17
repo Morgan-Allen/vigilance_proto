@@ -6,11 +6,15 @@ import proto.game.person.*;
 import proto.game.world.*;
 import proto.util.*;
 
+import proto.view.common.*;
+
 
 
 public abstract class Lead extends Task {
   
   
+  /**  Data fields, construction and save/load methods-
+    */
   final public Object subject;
   
   
@@ -36,6 +40,8 @@ public abstract class Lead extends Task {
   
   
   
+  /**  Supplemental methods for override-
+    */
   protected boolean matchType(Lead other) {
     return other.subject == subject && other.getClass() == getClass();
   }
@@ -45,13 +51,12 @@ public abstract class Lead extends Task {
     return CaseFile.LEVEL_EVIDENCE;
   }
   
-}
-
-
-/*
-  protected void presentMessage(final World world) {
-    
-    //  TODO:  Move this out to the View directory!
+  
+  
+  /**  Rendering, debug and interface methods-
+    */
+  protected void presentMessage() {
+    //  TODO:  Move this out to the .view directory?
     StringBuffer s = new StringBuffer();
     
     for (Person p : assigned) {
@@ -67,20 +72,8 @@ public abstract class Lead extends Task {
     if (success()) s.append("  They were successful.");
     else           s.append("  They had no luck."    );
     
-    boolean noLeads = true;
-    //  TODO:  You need to have a central fact-repository for the investigating
-    //  player instead.
-    /*
-    if (success) for (Lead l : parent.openLeadsFrom(this)) {
-      s.append("\n\nNew lead: ");
-      s.append(l.activeName);
-      noLeads = false;
-    }
-    //*/
-/*
-    if (noLeads) s.append("\nNo new leads were uncovered.");
-    
-    for (String action : world.events().extractLogInfo(this)) {
+    final World world = base.world();
+    for (String action : world.events.extractLogInfo(this)) {
       s.append("\n\n");
       s.append(action);
     }
@@ -96,7 +89,11 @@ public abstract class Lead extends Task {
       }
     });
   }
-//*/
+  
+}
+
+
+
 
 
 

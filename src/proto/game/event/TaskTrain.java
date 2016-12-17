@@ -81,7 +81,7 @@ public class TaskTrain extends Task {
       }
     }
     
-    presentMessage(base.world());
+    presentMessage();
     resetTask();
   }
   
@@ -135,7 +135,8 @@ public class TaskTrain extends Task {
   }
   
   
-  protected void presentMessage(final World world) {
+  protected void presentMessage() {
+    final World world = base.world();
     final Series <String> logs = world.events.extractLogInfo(this);
     if (logs.empty()) return;
     

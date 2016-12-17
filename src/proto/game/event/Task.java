@@ -217,7 +217,7 @@ public abstract class Task implements Assignment {
   
   
   protected void onCompletion() {
-    presentMessage(base.world());
+    presentMessage();
     for (Person p : assigned) setAssigned(p, false);
   }
   
@@ -286,7 +286,7 @@ public abstract class Task implements Assignment {
   
   /**  Rendering, debug and interface methods-
     */
-  protected abstract void presentMessage(World world);
+  protected abstract void presentMessage();
   public abstract String choiceInfo();
   
   

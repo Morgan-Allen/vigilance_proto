@@ -42,7 +42,7 @@ public class CaseFile implements Session.Saveable {
   //  NOTE:  This is intended for temporary storage and will get wiped whenever
   //  changes are made.
   private boolean refreshOptions = false;
-  final List <Lead> followOptions = new List();
+  private List <Lead> followOptions = new List();
   
   
   CaseFile(Base base, Object subject) {
@@ -125,15 +125,16 @@ public class CaseFile implements Session.Saveable {
     I.say("RECORDING new role for "+subject+", event: "+event+": "+roleID);
     role.maxEvidence = Nums.max(role.maxEvidence, lead.evidenceLevel());
     role.evidence.include(lead);
-    this.refreshOptions = true;
-    this.base.world().pauseMonitoring();
+    
+    refreshInvestigationOptions();
+    base.world().pauseMonitoring();
     return true;
   }
   
   
   void updateLocation(Place location) {
     this.knownLocation = location;
-    this.refreshOptions = true;
+    refreshInvestigationOptions();
   }
   
   
@@ -212,15 +213,44 @@ public class CaseFile implements Session.Saveable {
   
   /**  Generating subsequent investigation options-
     */
+  private void refreshInvestigationOptions() {
+    refreshOptions = true;
+    investigationOptions();
+  }
+  
+  
+  private void tryAddingOption(
+    Lead option, Series <Lead> options, Series <Lead> oldOptions
+  ) {
+    for (Lead l : oldOptions) if (l.matchType(option)) {
+      options.add(l);
+      return;
+    }
+    options.add(option);
+    base.world().events.log("New lead: "+option);
+  }
+  
+  
+  private void scrubOldOptions(
+    Series <Lead> options, Series <Lead> oldOptions
+  ) {
+    for (Lead l : oldOptions) if (! options.includes(l)) {
+      base.world().events.log("Lead closed: "+l);
+    }
+  }
+  
+  
   public Series <Lead> investigationOptions() {
     
+    //  TODO:  You also need to check whether the conditions for a given lead
+    //  (i.e, based on timing,) have expired.
     for (Lead l : followOptions) if (l.complete()) {
       followOptions.remove(l);
-      refreshOptions = true;
     }
     
     if (! refreshOptions) return followOptions;
-    followOptions.clear();
+    final Series <Lead> oldOptions = followOptions;
+    followOptions = new List();
     refreshOptions = false;
     
     //  TODO:  I'm going to return to these later, and gradually add more
@@ -238,14 +268,14 @@ public class CaseFile implements Session.Saveable {
       
       if (next != null) {
         Lead tailing = new LeadSurveil(base, person);
-        followOptions.add(tailing);
+        tryAddingOption(tailing, followOptions, oldOptions);
       }
       if (suspected != null) {
         //  TODO:  Include questioning and arrest options.
       }
       if (threatens != null) {
         Lead guarding = new LeadGuard(base, person.place(), threatens);
-        followOptions.add(guarding);
+        tryAddingOption(guarding, followOptions, oldOptions);
       }
     }
     
@@ -256,17 +286,18 @@ public class CaseFile implements Session.Saveable {
       
       if (crime != null && crime.dangerous()) {
         Lead guarding = new LeadGuard(base, place, crime);
-        followOptions.add(guarding);
+        tryAddingOption(guarding, followOptions, oldOptions);
       }
       if (crime != null) {
         Lead surveil = new LeadSurveil(base, place);
-        followOptions.add(surveil);
+        tryAddingOption(surveil, followOptions, oldOptions);
       }
       if (lair != null) {
         //  TODO:  Include the option to raid.
       }
     }
     
+    scrubOldOptions(followOptions, oldOptions);
     return followOptions;
   }
   

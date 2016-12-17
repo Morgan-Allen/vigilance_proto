@@ -89,12 +89,10 @@ public class ActionsView extends UINode {
     final Ability  a      = selectAbility;
     final Action   action = scene.currentAction();
     
-    /*
     if (scene.complete()) {
-      describeEndSummary(s);
+      describeEndSummary(surface, s);
       return s.toString();
     }
-    //*/
     
     if (p != null) {
       s.append("\nSelection: "+p.name()+" ("+p.side().name().toLowerCase()+")");
@@ -181,16 +179,14 @@ public class ActionsView extends UINode {
   
   
   
-  /*
-  void describeEndSummary(StringBuffer s) {
+  void describeEndSummary(Surface surface, StringBuffer s) {
     final Scene scene = mainView.world().activeScene();
     if (scene == null) return;
     
     boolean success = scene.wasWon();
     World   world   = scene.world();
-    Nation  site    = scene.site();
+    Place   site    = scene.site();
     
-    Printout print = world.game().print();
     s.append("\nMission ");
     if (success) s.append(" Successful: "+scene);
     else s.append(" Failed: "+scene);
@@ -201,10 +197,10 @@ public class ActionsView extends UINode {
       if (p.currentScene() != scene) {
         s.append(" (escaped)");
       }
-      else if (! p.alive()) {
+      else if (! p.health.alive()) {
         s.append(" (dead)");
       }
-      else if (! p.conscious()) {
+      else if (! p.health.conscious()) {
         s.append(success ? " (unconscious)" : " (captive)");
       }
       else s.append(" (okay)");
@@ -215,10 +211,10 @@ public class ActionsView extends UINode {
       if (p.currentScene() != scene) {
         s.append(" (escaped)");
       }
-      else if (! p.alive()) {
+      else if (! p.health.alive()) {
         s.append(" (dead)");
       }
-      else if (! p.conscious()) {
+      else if (! p.health.conscious()) {
         s.append(success ? " (captive)" : " (unconscious)");
       }
       else s.append(" (okay)");
@@ -234,18 +230,22 @@ public class ActionsView extends UINode {
     int getIndex = Nums.clamp(Nums.ceil(scene.assessGetaways  () * 5), 5);
     s.append("\nCollateral: "+DESC_C[colIndex]);
     s.append("\nGetaways: "  +DESC_G[getIndex]);
-    int trustPercent = (int) (site.trustLevel() * 100);
-    int crimePercent = (int) (site.crimeLevel() * 100);
+    
+    float trustLevel = site.region().currentValue(Region.TRUST   );
+    float crimeLevel = site.region().currentValue(Region.VIOLENCE);
+    int trustPercent = (int) (trustLevel * 100);
+    int crimePercent = (int) (crimeLevel * 100);
     s.append("\nRegional Trust: "+trustPercent+"%");
     s.append("\nRegional Crime: "+crimePercent+"%");
     
     s.append("\n\n  Press X to exit.");
-    if (print.isPressed('x')) {
+    if (surface.isPressed('x')) {
       scene.endScene();
     }
   }
-  //*/
-  
-  
   
 }
+
+
+
+

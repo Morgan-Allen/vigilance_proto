@@ -116,8 +116,9 @@ public class TaskCraft extends Task {
     return view;
   }
   
-
-  protected void presentMessage(final World world) {
+  
+  protected void presentMessage() {
+    final World world = base.world();
     final Series <String> logs = world.events.extractLogInfo(this);
     StringBuffer s = new StringBuffer();
     
