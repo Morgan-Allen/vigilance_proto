@@ -48,9 +48,7 @@ public class Facilities {
     Civilians.CIVILIAN, 2
   ) {
     public float speedBonus(Task task) {
-      if (! (task instanceof TaskCraft)) return 0;
-      final TaskCraft craft = (TaskCraft) task;
-      if (craft.room().kind() == Workshop.BLUEPRINT) return 0.1f;
+      if (TaskCraft.isCraftingAt(task, Workshop.BLUEPRINT)) return 0.1f;
       return 0;
     }
   };
@@ -67,9 +65,7 @@ public class Facilities {
     Civilians.CIVILIAN, 2
   ){
     public float speedBonus(Task task) {
-      if (! (task instanceof TaskCraft)) return 0;
-      final TaskCraft craft = (TaskCraft) task;
-      if (craft.room().kind() == Laboratory.BLUEPRINT) return 0.1f;
+      if (TaskCraft.isCraftingAt(task, Laboratory.BLUEPRINT)) return 0.1f;
       return 0;
     }
   };

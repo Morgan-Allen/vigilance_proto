@@ -4,6 +4,7 @@ package proto.game.event;
 import proto.common.*;
 import proto.game.person.*;
 import proto.game.world.*;
+
 import proto.view.common.*;
 import proto.view.world.*;
 import proto.util.*;
@@ -16,25 +17,25 @@ import java.awt.Image;
 //  completion-criteria.
 
 
-public class TaskCraft extends Task {
+public class TaskResearch extends Task {
   
   
   final Place room;
-  final ItemType made;
+  final Tech developed;
   float progress = 0;
   
   
-  public TaskCraft(ItemType made, Place room, Base base) {
-    super(base, TIME_LONG, made.craftArgs);
-    this.room = room;
-    this.made = made;
+  public TaskResearch(Tech developed, Place room, Base base) {
+    super(base, TIME_LONG, developed.researchArgs());
+    this.room      = room;
+    this.developed = developed;
   }
   
   
-  public TaskCraft(Session s) throws Exception {
+  public TaskResearch(Session s) throws Exception {
     super(s);
-    room = (Place   ) s.loadObject();
-    made = (ItemType) s.loadObject();
+    room      = (Place) s.loadObject();
+    developed = (Tech ) s.loadObject();
     progress = s.loadFloat();
   }
   
@@ -42,7 +43,7 @@ public class TaskCraft extends Task {
   public void saveState(Session s) throws Exception {
     super.saveState(s);
     s.saveObject(room);
-    s.saveObject(made);
+    s.saveObject(developed);
     s.saveFloat(progress);
   }
   
@@ -51,18 +52,11 @@ public class TaskCraft extends Task {
   /**  Task performance and completion-
     */
   protected void onFailure() {
-    room.owner().incFunding(0 - made.buildCost / 2);
   }
   
   
   protected void onSuccess() {
-    room.owner().incFunding(0 - made.buildCost);
-    room.owner().stocks.incStock(made, 1);
-  }
-  
-  
-  public ItemType made() {
-    return made;
+    base.addTech(developed);
   }
   
   
@@ -71,42 +65,32 @@ public class TaskCraft extends Task {
   }
   
   
-  public static boolean isCraftingAt(Task task, PlaceType type) {
-    if (! (task instanceof TaskCraft)) return false;
-    final TaskCraft craft = (TaskCraft) task;
-    return craft.targetLocation().kind() == type;
-  }
-  
-  
   
   /**  Rendering, debug and interface methods-
     */
   public Image icon() {
-    return made.icon();
+    return developed.icon();
   }
   
   
   public String choiceInfo() {
-    String info = "Crafting "+made;
-    int total = room.owner().stocks.numStored(made);
-    info += "  (In stock: "+total+")";
+    String info = "Researching "+developed;
     return info;
   }
   
   
   public String activeInfo() {
-    return "Crafting "+made+" in "+room;
+    return "Researching "+developed+" in "+room;
   }
   
   
   public String helpInfo() {
-    return made.defaultInfo()+"\n\n"+made.describeStats(null);
+    return developed.helpInfo();
   }
   
   
   public String testInfo() {
     String info = super.testInfo();
-    info += " Cost: "+made.buildCost;
     return info;
   }
   
@@ -119,6 +103,7 @@ public class TaskCraft extends Task {
   
   
   protected void presentMessage() {
+    /*
     final World world = base.world();
     final Series <String> logs = world.events.extractLogInfo(this);
     StringBuffer s = new StringBuffer();
@@ -151,6 +136,7 @@ public class TaskCraft extends Task {
         world.view().dismissMessage(this);
       }
     });
+    //*/
   }
   
 }

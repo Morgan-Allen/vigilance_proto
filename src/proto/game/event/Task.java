@@ -54,17 +54,7 @@ public abstract class Task implements Assignment {
     this.timeTaken = timeHours <= 0 ? -1 : (timeHours * World.MINUTES_PER_HOUR);
     this.initTime  = -1;
     this.base      = base;
-    
-    final int numT = args.length / 2;
-    tested  = new Trait  [numT];
-    testDCs = new int    [numT];
-    testMod = new int    [numT];
-    results = new boolean[numT];
-    
-    for (int n = 0; n < numT; n++) {
-      tested [n] = (Trait  ) args[ n * 2     ];
-      testDCs[n] = (Integer) args[(n * 2) + 1];
-    }
+    assignTestArgs(args);
   }
   
   
@@ -108,6 +98,20 @@ public abstract class Task implements Assignment {
     s.saveInt (initTime );
     s.saveBool(complete );
     s.saveBool(success  );
+  }
+  
+  
+  protected void assignTestArgs(Object... args) {
+    final int numT = args.length / 2;
+    tested  = new Trait  [numT];
+    testDCs = new int    [numT];
+    testMod = new int    [numT];
+    results = new boolean[numT];
+    
+    for (int n = 0; n < numT; n++) {
+      tested [n] = (Trait  ) args[ n * 2     ];
+      testDCs[n] = (Integer) args[(n * 2) + 1];
+    }
   }
   
   
