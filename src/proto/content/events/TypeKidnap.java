@@ -22,8 +22,20 @@ public class TypeKidnap extends TypeMajorCrime {
   }
   
   
+  public PlanStep asGoal(Element target, Plan plan) {
+    if (target.isPerson()) {
+      PlanStep step = new PlanStep(this, plan);
+      Person victim = (Person) target;
+      step.setGive(Gives.VICTIM, victim);
+      step.setNeed(Needs.VENUE, victim.resides(), step);
+      return step;
+    }
+    return null;
+  }
+  
+  
   public PlanStep toProvide(Element needed, PlanStep by) {
-    if (needed.type == Kind.TYPE_PERSON) {
+    if (needed.isPerson()) {
       PlanStep step = new PlanStep(this, by.plan);
       Person victim = (Person) needed;
       step.setGive(Gives.VICTIM, victim);
@@ -38,6 +50,10 @@ public class TypeKidnap extends TypeMajorCrime {
     return "kidnapping "+step.give(Gives.VICTIM);
   }
 }
+
+
+
+
 
 
 

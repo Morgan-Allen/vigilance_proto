@@ -164,6 +164,11 @@ public class World implements Session.Saveable {
   }
   
   
+  public Series <Base> bases() {
+    return bases;
+  }
+  
+  
   public boolean monitorActive() {
     return amWatching;
   }

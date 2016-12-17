@@ -3,6 +3,7 @@
 package proto.game.person;
 import proto.common.*;
 import proto.game.world.*;
+import proto.game.scene.*;
 import proto.util.*;
 import java.awt.*;
 
@@ -171,6 +172,32 @@ public class ItemType extends Kind {
   public Image icon() {
     return icon;
   }
+  
+  
+  public Image missileSprite() {
+    if (media instanceof Image) return (Image) media;
+    return null;
+  }
+  
+  
+  public Color beamColor() {
+    if (media instanceof Color) return (Color) media;
+    return null;
+  }
+  
+  
+  public void renderUsageFX(Action a, Scene s, Graphics2D g) {
+    if (isWeapon()) {
+      Ability used = a.used;
+      if (isBeam()) {
+        used.FX.renderBeam(a, s, beamColor(), Color.WHITE, 1, g);
+      }
+      else {
+        used.FX.renderMissile(a, s, missileSprite(), g);
+      }
+    }
+  }
+  
 }
 
 

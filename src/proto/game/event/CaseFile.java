@@ -13,14 +13,14 @@ import java.awt.Image;
 public class CaseFile implements Session.Saveable {
   
   
-  final static int
+  final public static int
     ROLE_NONE    = -1,
     ROLE_CLUE    = -2,
     ROLE_GOON    = -3,
     ROLE_HIDEOUT = -4,
     ROLE_CRIME   = -5,
     ROLE_SCENE   = -6;
-  final static float
+  final public static float
     LEVEL_TIPOFF    = 0.5f,
     LEVEL_EVIDENCE  = 1.0f,
     LEVEL_CONVICTED = 1.5f;
@@ -97,14 +97,14 @@ public class CaseFile implements Session.Saveable {
   /**  Recording involvement in criminal actions and other information
     *  updates-
     */
-  boolean recordCurrentRole(Event event, Lead lead) {
+  public boolean recordCurrentRole(Event event, Lead lead) {
     int roleID = Visit.indexOf(subject, event.planStep().needs());
     if (roleID == -1) { I.complain("Subject not involved!"); return false; }
     return recordRole(event, roleID, lead);
   }
   
   
-  boolean recordRole(Event event, int roleID, Lead lead) {
+  public boolean recordRole(Event event, int roleID, Lead lead) {
     //
     //  Try to find a pre-existing role which matches this signature, or create
     //  a new one otherwise.  Quit if the same lead has already been recorded.
@@ -159,9 +159,10 @@ public class CaseFile implements Session.Saveable {
   
   private boolean defunct(Role role) {
     final PlanStep step = role.event.planStep();
-    if (step == null) return true;
+    if (step == null     ) return true;
     if (role.sentence > 0) return true;
-    if (step.plan.agent.base().plans.planComplete(step.plan)) return true;
+    final Base agentBase = step.plan.agent.base();
+    if (agentBase.plans.planComplete(step.plan)) return true;
     return false;
   }
   
@@ -371,6 +372,11 @@ public class CaseFile implements Session.Saveable {
       return ((Event) subject).icon();
     }
     return null;
+  }
+  
+  
+  public String toString() {
+    return "Case File: "+subject;
   }
 }
 

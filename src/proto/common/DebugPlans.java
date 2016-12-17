@@ -19,6 +19,9 @@ public class DebugPlans {
     Assets.compileAssetList("proto");
     Assets.advanceAssetLoading(-1);
     
+    //  TODO:  Also, you need to avoid different bosses interfering with
+    //  eachother (if reasonably possible.)
+    
     I.say("Now running sketch!\n");
     
     World world = new World();

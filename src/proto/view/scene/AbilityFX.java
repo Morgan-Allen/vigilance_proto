@@ -70,7 +70,7 @@ public class AbilityFX {
   }
   
   
-  protected void renderMissile(
+  public void renderMissile(
     Action action, Scene s, Image sprite, Graphics2D g
   ) {
     if (sprite == null) return;
@@ -88,7 +88,7 @@ public class AbilityFX {
   }
   
   
-  protected void renderBeam(
+  public void renderBeam(
     Action action, Scene s,
     Color beamTone, Color coreTone, int beamWide, Graphics2D g
   ) {
@@ -109,7 +109,7 @@ public class AbilityFX {
   }
   
   
-  protected void dodgePosition(Person self, Object from, float scale) {
+  public void dodgePosition(Person self, Object from, float scale) {
     Scene s = self.currentScene();
     Tile atS = self.currentTile(), atH = s.tileUnder(from);
     Vec2D diff = new Vec2D(atS.x - atH.x, atS.y - atH.y);

@@ -5,11 +5,11 @@ import proto.common.*;
 import proto.game.event.*;
 import proto.game.scene.*;
 
-//import static proto.game.person.Ability.*;
 import static proto.game.person.ItemType.*;
 import static proto.game.person.PersonGear.*;
 
 import java.awt.Image;
+import java.awt.Graphics2D;
 
 
 
@@ -91,7 +91,34 @@ public class Common {
       public Image missileSprite() { return missile; }
     },
     
-    BASIC_ABILITIES[] = { MOVE, STRIKE };
+    THROW = new Ability(
+      "Throw", "ability_throw",
+      IMG_DIR+"throw.png",
+      "Fire a shot using ranged weaponry.  Accuracy falls off with distance.",
+      Ability.IS_BASIC | IS_RANGED, 1, Ability.REAL_HARM, Ability.MINOR_POWER
+    ) {
+      
+      public boolean allowsTarget(Object target, Scene scene, Person acting) {
+        if (! acting.gear.currentWeapon().ranged()) return false;
+        return target instanceof Person;
+      }
+      
+      protected Volley createVolley(Action use, Object target, Scene scene) {
+        Volley volley = new Volley();
+        volley.setupVolley(use.acting, (Person) target, true, scene);
+        volley.stunPercent = 0;
+        return volley;
+      }
+      
+      public void renderUsageFX(Action action, Scene scene, Graphics2D g) {
+        Person acting = action.acting;
+        ItemType weapon = acting.gear.equippedInSlot(SLOT_WEAPON);
+        if (weapon == null || ! weapon.ranged()) return;
+        weapon.renderUsageFX(action, scene, g);
+      }
+    },
+    
+    BASIC_ABILITIES[] = { MOVE, STRIKE, THROW };
   
   
   final public static Ability SPECIAL_ACTION = new Ability(
@@ -111,34 +138,12 @@ public class Common {
       if (step != null) step.type.onSpecialActionEnd(use);
     }
   };
+  
+  
+  //  TODO:  It's time to start assembling a 'tech tree' of techniques for
+  //  heroes to learn...
     
     /*
-    
-    SHOOT = new Ability(
-      "Shoot", "ability_shoot",
-      "Fire a shot using ranged weaponry.  Accuracy falls off with distance.",
-      IS_BASIC | IS_RANGED, 1, REAL_HARM, MINOR_POWER
-    ) {
-      
-      public boolean allowsTarget(Object target, Scene scene, Person acting) {
-        if (! acting.currentWeapon().ranged()) return false;
-        return target instanceof Person;
-      }
-      
-      protected Volley createVolley(Action use, Object target, Scene scene) {
-        Volley volley = new Volley();
-        volley.setupVolley(use.acting, (Person) target, true, scene);
-        volley.stunPercent = 0;
-        return volley;
-      }
-      
-      public void renderMissile(Action action, Scene s, Graphics2D g) {
-        Person acting = action.acting;
-        Equipped weapon = acting.equippedInSlot(SLOT_WEAPON);
-        if (weapon == null || ! weapon.ranged()) return;
-        weapon.renderUsage(action, s, g);
-      }
-    },
     
     DISARM = new Ability(
       "Disarm", "ability_disarm",
@@ -174,8 +179,6 @@ public class Common {
       final Image missile = Kind.loadImage(IMG_DIR+"sprite_punch.png");
       public Image missileSprite() { return missile; }
     },
-    
-    //  TODO:  Add Finish!
     
     EVASION = new Ability(
       "Evasion", "ability_evasion",

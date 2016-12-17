@@ -47,7 +47,7 @@ public class PlaceType extends Kind {
     
     this.sceneType = sceneType;
     
-    this.tech = new Tech(name, ID+"_tech", info, imgPath, this);
+    this.tech = new Tech(name, ID+"_tech", imgPath, info, this);
   }
   
   
