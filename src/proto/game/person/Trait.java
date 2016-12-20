@@ -13,18 +13,23 @@ public class Trait extends Index.Entry implements Session.Saveable {
   /**  Data fields, construction, and save/load methods-
     */
   final static Index <Trait> INDEX = new Index <Trait> ();
-  final static Skill NO_ROOTS[] = new Skill[0];
   
   final public String name;
   final public String description;
   final public Image icon;
   
+  final Trait roots[];
   
-  public Trait(String name, String ID, String imgPath, String description) {
+  
+  public Trait(
+    String name, String ID, String imgPath, String description,
+    Trait... roots
+  ) {
     super(INDEX, ID);
     this.name        = name;
     this.description = description;
     this.icon        = Kind.loadImage(imgPath);
+    this.roots       = roots;
   }
   
   
@@ -42,7 +47,7 @@ public class Trait extends Index.Entry implements Session.Saveable {
   /**  Typing and properties-
     */
   public Trait[] roots() {
-    return NO_ROOTS;
+    return roots;
   }
   
   

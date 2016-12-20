@@ -66,25 +66,25 @@ public class PersonStats {
       ACCURACY, DEFENCE, SIGHT_RANGE, STEALTH, MOVE_SPEED, ACT_SPEED
     },
     
-    ENGINEERING = new Skill(
+    ENGINEERING = new Trait(
       "Engineering", "skill_engineering", ICON_PATH+"icon_engineering.png",
       "Engineering skill allows an agent to construct and repair gadgets, "+
       "vehicles, and base facilities.",
       BRAINS
     ),
-    MEDICINE = new Skill(
+    MEDICINE = new Trait(
       "Medicine", "skill_medicine", ICON_PATH+"icon_pharmacy.png",
       "A knowledge of pharmacy allows a character to concoct vaccines and "+
       "medicines- or chemical weapons for their own use.",
       BRAINS
     ),
-    QUESTION      = new Skill(
+    QUESTION = new Trait(
       "Question", "skill_question", ICON_PATH+"icon_social.png",
       "Used to obtain information from friendly or neutral persons, and spot "+
       "inconsistencies or gaps in the account.",
       WILL
     ),
-    PERSUADE = new Skill(
+    PERSUADE = new Trait(
       "Persuade", "skill_persuade", ICON_PATH+"icon_social.png",
       "Allows an agent to beg favours, bargain or advocate convincingly, "+
       "without resorting to force.",

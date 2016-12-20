@@ -12,7 +12,7 @@ import static proto.game.person.PersonStats.*;
 
 public class Gymnasium extends Place {
   
-  final static Skill GYM_SKILLS[] = {
+  final static Trait GYM_SKILLS[] = {
     //MARKSMAN, GYMNASTICS, CLOSE_COMBAT, STAMINA
   };
   
@@ -23,6 +23,9 @@ public class Gymnasium extends Place {
   public Gymnasium(Base base, int slotIndex) {
     super(BLUEPRINT, slotIndex, base.world());
     setOwner(base);
+    
+    //  TODO:  You will need to refresh this list dynamically for each agent in
+    //  your roster.
     
     tasks = new Task[GYM_SKILLS.length];
     for (int i = 0; i < GYM_SKILLS.length; i++) {

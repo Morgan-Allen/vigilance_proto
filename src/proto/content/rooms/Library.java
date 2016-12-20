@@ -12,7 +12,7 @@ import proto.content.places.*;
 
 public class Library extends Place {
   
-  final static Skill LIB_SKILLS[] = {
+  final static Trait LIB_SKILLS[] = {
     /*
     ENGINEERING,
     INFORMATICS,

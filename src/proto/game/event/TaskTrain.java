@@ -13,15 +13,17 @@ import java.awt.Image;
 
 
 
+//  TODO:  Adapt this to learning abilities.
+
 public class TaskTrain extends Task {
   
   
   Place room;
-  Skill trained;
+  Trait trained;
   Trait talking;
   
   
-  public TaskTrain(Skill trained, Trait talking, Place room, Base base) {
+  public TaskTrain(Trait trained, Trait talking, Place room, Base base) {
     super(base, TIME_MEDIUM, trained, 0);
     this.room    = room   ;
     this.trained = trained;
@@ -32,7 +34,7 @@ public class TaskTrain extends Task {
   public TaskTrain(Session s) throws Exception {
     super(s);
     room    = (Place) s.loadObject();
-    trained = (Skill) s.loadObject();
+    trained = (Trait) s.loadObject();
     talking = (Trait) s.loadObject();
   }
   

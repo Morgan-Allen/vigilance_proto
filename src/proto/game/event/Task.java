@@ -250,12 +250,12 @@ public abstract class Task implements Assignment {
     xpRate = Nums.sqrt(xpRate);
     
     for (int n = tested.length; n-- > 0;) {
-      Trait stat = tested [n];
+      Trait stat = tested[n];
       float winChance = testChance(n);
       okay &= results[n] = (Rand.num() < winChance);
       
-      if (stat instanceof Skill) for (Person p : assigned) {
-        p.stats.gainXP((Skill) stat, (1 - winChance) * 2 * xpRate);
+      for (Person p : assigned) {
+        p.stats.gainXP(stat, (1 - winChance) * 2 * xpRate);
       }
     }
     
@@ -268,10 +268,7 @@ public abstract class Task implements Assignment {
     
     int checkLevel = p.stats.levelFor(stat);
     float winChance = Nums.clamp((checkLevel - (DC - 5)) / 10f, 0, 1);
-    
-    if (stat instanceof Skill) {
-      p.stats.gainXP((Skill) stat, (1 - winChance) * 2);
-    }
+    p.stats.gainXP(stat, (1 - winChance) * 2);
     
     return Rand.num() < winChance;
   }
