@@ -63,8 +63,8 @@ public class TypeResearch extends StepType {
     //  TODO:  Adapt this to a wider array of potential skills, and unify with
     //  similar methods in the Task or Crafting class.
     float skill = 0;
-    skill += makes.stats.levelFor(PersonStats.INFORMATICS);
-    skill -= made.kind().craftDC(PersonStats.INFORMATICS);
+    skill += makes.stats.levelFor(PersonStats.ENGINEERING);
+    skill -= made.kind().craftDC(PersonStats.ENGINEERING);
     return Nums.clamp(skill / 5f, 0, 1);
   }
   

@@ -41,7 +41,7 @@ public class Trait extends Index.Entry implements Session.Saveable {
   
   /**  Typing and properties-
     */
-  public Skill[] roots() {
+  public Trait[] roots() {
     return NO_ROOTS;
   }
   

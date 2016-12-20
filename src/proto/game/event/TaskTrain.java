@@ -18,10 +18,10 @@ public class TaskTrain extends Task {
   
   Place room;
   Skill trained;
-  Skill talking;
+  Trait talking;
   
   
-  public TaskTrain(Skill trained, Skill talking, Place room, Base base) {
+  public TaskTrain(Skill trained, Trait talking, Place room, Base base) {
     super(base, TIME_MEDIUM, trained, 0);
     this.room    = room   ;
     this.trained = trained;
@@ -31,9 +31,9 @@ public class TaskTrain extends Task {
   
   public TaskTrain(Session s) throws Exception {
     super(s);
-    room    = (Place ) s.loadObject();
+    room    = (Place) s.loadObject();
     trained = (Skill) s.loadObject();
-    talking = (Skill) s.loadObject();
+    talking = (Trait) s.loadObject();
   }
   
   
@@ -51,7 +51,7 @@ public class TaskTrain extends Task {
     //  TODO:  Allow for the possibility of more efficient solo training
     //         under particular circumstances?
     
-    final Skill chatWith = Rand.yes() ? talking : PersonStats.SUASION;
+    final Trait chatWith = Rand.yes() ? talking : PersonStats.PERSUADE;
     float maxLevel = 0, numPeers = assigned.size() - 1;
     
     for (Person p : assigned) {

@@ -17,32 +17,26 @@ import java.awt.Image;
 public class PersonView extends UINode {
   
   final static Object[] STAT_DISPLAY_COORDS = {
-    INTELLECT, 0, 0,
-    REFLEX   , 0, 1,
-    SOCIAL   , 0, 2,
-    STRENGTH , 0, 3,
+    BRAINS     , 0, 0 ,
+    REFLEXES   , 0, 1 ,
+    WILL       , 0, 2 ,
+    MUSCLE     , 0, 3 ,
     
-    ENGINEERING  , 0, 5 ,
-    INFORMATICS  , 0, 6 ,
-    PHARMACY     , 0, 7 ,
-    ANATOMY      , 0, 8 ,
-    LAW_N_FINANCE, 0, 9 ,
-    THE_OCCULT   , 0, 10,
+    ENGINEERING, 1, 0 ,
+    MEDICINE   , 1, 1 ,
+    QUESTION   , 1, 2 ,
+    PERSUADE   , 1, 3 ,
     
-    LANGUAGES    , 1, 0 ,
-    QUESTION     , 1, 1 ,
-    DISGUISE     , 1, 2 ,
-    SUASION      , 1, 3 ,
-    
-    STEALTH      , 1, 5 ,
-    SURVEILLANCE , 1, 6 ,
-    VEHICLES     , 1, 7 ,
-    MARKSMAN     , 1, 8 ,
-    
-    INTIMIDATE   , 1, 10,
-    GYMNASTICS   , 1, 11,
-    CLOSE_COMBAT , 1, 12,
-    STAMINA      , 1, 13,
+    ARMOUR     , 1, 5 ,
+    HEALTH     , 1, 6 ,
+    MIN_DAMAGE , 1, 7 ,
+    RNG_DAMAGE , 1, 8 ,
+    ACCURACY   , 1, 10,
+    DEFENCE    , 1, 11,
+    SIGHT_RANGE, 1, 12,
+    STEALTH    , 1, 13,
+    MOVE_SPEED , 1, 14,
+    ACT_SPEED  , 1, 15
   };
   final static int
     TAB_SKILLS = 1,
@@ -204,7 +198,7 @@ public class PersonView extends UINode {
       }
       else {
         desc += "\n  +"+bonus+" bonus from: ";
-        for (Skill r : hovered.roots()) {
+        for (Trait r : hovered.roots()) {
           desc += r;
           if (r != Visit.last(hovered.roots())) desc += " plus ";
         }
@@ -213,7 +207,7 @@ public class PersonView extends UINode {
       desc = hovered.description + desc;
       
       ViewUtils.drawWrappedString(
-        desc, g, vx + 20, vy + down + (15 * 20), 300, 100
+        desc, g, vx + 20, vy + down + (18 * 20), 300, 100
       );
     }
   }
@@ -232,13 +226,13 @@ public class PersonView extends UINode {
         vx + 5, vy + down, vw - 10, 40, "Slot_"+slotID
       );
       if (hovered) g.setColor(Color.YELLOW);
-      else g.setColor(Color.WHITE);
+      else         g.setColor(Color.WHITE );
       
       g.drawImage(icon, vx + 5, vy + down, 40, 40, null);
       g.drawString(slotName+": "+desc, vx + 5 + 40 + 5, vy + down + 15);
       
       if (hovered && surface.mouseClicked()) {
-        createItemMenu(person, slotID, vx + 5 + 40, vy + down + 20);
+        createItemMenu(person, slotID, vx + 5, vy + down + 20);
       }
       
       down += 40 + 10;
@@ -247,6 +241,7 @@ public class PersonView extends UINode {
   
   
   void createItemMenu(final Person person, final int slotID, int x, int y) {
+    final Base base = mainView.world().playerBase();
     final Batch <ItemType> types = new Batch();
     final BaseStocks stocks = mainView.world().playerBase().stocks;
     
@@ -267,7 +262,9 @@ public class PersonView extends UINode {
       }
       
       protected void whenPicked(ItemType option, int optionID) {
-        person.gear.equipItem(option, mainView.world().playerBase());
+        if (option == Common.UNARMED   ) option = null;
+        if (option == Common.UNARMOURED) option = null;
+        person.gear.equipItem(option, slotID, base);
       }
     });
   }

@@ -70,8 +70,8 @@ public class DebugScene extends RunGame {
     final Base HQ = world.playerBase();
     Task guarding = file.investigationOptions().first();
     for (Person p : HQ.roster()) {
-      p.gear.equipItem(Gadgets.BATARANGS  , HQ);
-      p.gear.equipItem(Gadgets.KEVLAR_VEST, HQ);
+      p.gear.equipItem(Gadgets.BATARANGS  , PersonGear.SLOT_WEAPON, HQ);
+      p.gear.equipItem(Gadgets.KEVLAR_VEST, PersonGear.SLOT_ARMOUR, HQ);
       guarding.setAssigned(p, true);
     }
     

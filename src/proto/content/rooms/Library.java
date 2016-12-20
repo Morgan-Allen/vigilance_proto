@@ -13,12 +13,14 @@ import proto.content.places.*;
 public class Library extends Place {
   
   final static Skill LIB_SKILLS[] = {
+    /*
     ENGINEERING,
     INFORMATICS,
     PHARMACY,
     ANATOMY,
     LAW_N_FINANCE,
     LANGUAGES
+    //*/
   };
   
   

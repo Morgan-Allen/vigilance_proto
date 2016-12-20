@@ -73,7 +73,7 @@ public abstract class ClickMenu <T> extends UINode {
       if (image == null) {
         hovered = surface.tryHover(x, y, maxWide, 20, option);
         if (hovered) g.setColor(Color.YELLOW);
-        g.drawString(label, x, y);
+        g.drawString(label, x + 5, y + 15);
         y += 20;
       }
       else {

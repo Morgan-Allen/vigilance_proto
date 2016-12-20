@@ -39,7 +39,7 @@ public class TypeBribe extends StepType {
       if (used.type != Kind.TYPE_PERSON) return 0;
       final Person briber = (Person) used;
       if (briber.base() != step.plan.agent.base()) return 0;
-      return briber.stats.levelFor(PersonStats.SUASION) / 10f;
+      return briber.stats.levelFor(PersonStats.PERSUADE) / 10f;
     }
     return 0;
   }
@@ -52,7 +52,7 @@ public class TypeBribe extends StepType {
     Person bribed = (Person) step.give(Gives.BRIBED);
     
     float skill = 0;
-    skill += briber.stats.levelFor(PersonStats.SUASION );
+    skill += briber.stats.levelFor(PersonStats.PERSUADE);
     skill -= bribed.stats.levelFor(PersonStats.QUESTION);
     return Nums.clamp(skill / 5f, 0, 1);
   }

@@ -43,7 +43,8 @@ public class Person extends Element {
     history.setSummary(kind.defaultInfo());
     
     for (int n = 0; n < kind.baseEquipped().length; n++) {
-      gear.equipItem(kind.baseEquipped()[n], null);
+      final ItemType type = kind.baseEquipped()[n];
+      gear.equipItem(type, type.slotID, null);
     }
     
     if      (kind.subtype() == Kind.SUBTYPE_HERO    ) side = Side.HEROES   ;

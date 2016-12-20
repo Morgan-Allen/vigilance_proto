@@ -37,6 +37,9 @@ public class BaseStocks {
       if (item.slotID != slotID || ! item.availableFor(person, base)) continue;
       available.add(item);
     }
+    
+    if (slotID == PersonGear.SLOT_ARMOUR) available.include(Common.UNARMOURED);
+    if (slotID == PersonGear.SLOT_WEAPON) available.include(Common.UNARMED   );
     return available;
   }
   

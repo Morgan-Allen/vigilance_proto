@@ -20,23 +20,19 @@ public class Crooks {
       "Goon", "person_kind_goon", IMG_DIR+"icon_goon.png",
       "", Civilians.COMMON_NAMES,
       Kind.SUBTYPE_MOOK,
-      INTELLECT , 4 ,
-      REFLEX    , 4 ,
-      SOCIAL    , 4 ,
-      STRENGTH  , 4 ,
-      HIT_POINTS, 10,
-      WILLPOWER , 8
+      BRAINS  , 2 ,
+      REFLEXES, 4 ,
+      WILL    , 4 ,
+      MUSCLE  , 8
     ),
     MOBSTER = Kind.ofPerson(
       "Mobster", "person_kind_mobster", IMG_DIR+"icon_mobster.png",
       "", Civilians.COMMON_NAMES,
       Kind.SUBTYPE_MOOK,
-      INTELLECT , 6 ,
-      REFLEX    , 6 ,
-      SOCIAL    , 6 ,
-      STRENGTH  , 6 ,
-      HIT_POINTS, 12,
-      WILLPOWER , 10
+      BRAINS  , 4 ,
+      REFLEXES, 6 ,
+      WILL    , 4 ,
+      MUSCLE  , 6
     ),
     HITMAN = null,
     PSYCHO = null

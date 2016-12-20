@@ -9,164 +9,92 @@ import proto.util.*;
 public class PersonStats {
   
   final static String
-    ICON_PATH = "media assets/stat icons/";
+    ICON_PATH = "media assets/stat icons/"
+  ;
   
   final public static Trait
+    MUSCLE = new Trait(
+      "Muscle", "stat_strength", ICON_PATH+"icon_strength.png",
+      "Brute force, stature and strength development."
+    ),
+    REFLEXES = new Trait(
+      "Reflexes", "stat_reflex", ICON_PATH+"icon_reflex.png",
+      "Agility, sensory acuity and motor coordination."
+    ),
+    WILL = new Trait(
+      "Will", "stat_will", ICON_PATH+"icon_social.png",
+      "Sheer bloody-minded persistence."
+    ),
+    BRAINS = new Trait(
+      "Brains", "stat_brains", ICON_PATH+"icon_intellect.png",
+      "Abstract logic, knowledge and planning ability."
+    ),
+    BASE_STATS[] = { MUSCLE, REFLEXES, WILL, BRAINS },
+    
     ARMOUR = new Trait(
       "Armour", "stat_armour", null, ""
     ),
+    HEALTH = new Trait(
+      "Health", "stat_health", null, ""
+    ),
     MIN_DAMAGE = new Trait(
-      "Damage min.", "stat_min_damage", null, ""
+      "Damage Base", "stat_min_damage", null, ""
     ),
     RNG_DAMAGE = new Trait(
-      "Damage max.", "stat_max_damage", null, ""
+      "Damage Range", "stat_rng_damage", null, ""
     ),
-    GEAR_STATS[] = { ARMOUR, MIN_DAMAGE, RNG_DAMAGE };
-  
-  final public static Skill
-    INTELLECT  = new Skill(
-      "Intellect", "stat_intellect", ICON_PATH+"icon_intellect.png",
-      "Abstract logic, knowledge and planning ability."
+    ACCURACY = new Trait(
+      "Accuracy", "stat_accuracy", null, ""
     ),
-    REFLEX     = new Skill(
-      "Reflex", "stat_reflex", ICON_PATH+"icon_reflex.png",
-      "Agility, sensory acuity and motor coordination."
+    DEFENCE = new Trait(
+      "Defence", "stat_defence", null, ""
     ),
-    SOCIAL     = new Skill(
-      "Social", "stat_social", ICON_PATH+"icon_social.png",
-      "Charm, presence, and emotional awareness."
+    SIGHT_RANGE = new Trait(
+      "Sight Range", "stat_sight_range", null, ""
     ),
-    STRENGTH   = new Skill(
-      "Strength", "stat_strength", ICON_PATH+"icon_strength.png",
-      "Brute force, stature and muscle development."
+    STEALTH = new Trait(
+      "Stealth", "stat_stealth", null, ""
     ),
-    BASE_STATS[] = { INTELLECT, REFLEX, SOCIAL, STRENGTH },
+    MOVE_SPEED = new Trait(
+      "Move Speed", "stat_move_speed", null, ""
+    ),
+    ACT_SPEED = new Trait(
+      "Act Speed", "stat_act_speed", null, ""
+    ),
+    COMBAT_STATS[] = {
+      ARMOUR, HEALTH, MIN_DAMAGE, RNG_DAMAGE,
+      ACCURACY, DEFENCE, SIGHT_RANGE, STEALTH, MOVE_SPEED, ACT_SPEED
+    },
     
-    HIT_POINTS = new Skill("Hit Points", "stat_hit_points", null, ""),
-    WILLPOWER  = new Skill("Willpower" , "stat_willpower" , null, ""),
-    PHYS_STATS[] = { HIT_POINTS, WILLPOWER },
-    
-    ENGINEERING   = new Skill(
-      "Engineering", "skill_eng", ICON_PATH+"icon_engineering.png",
+    ENGINEERING = new Skill(
+      "Engineering", "skill_engineering", ICON_PATH+"icon_engineering.png",
       "Engineering skill allows an agent to construct and repair gadgets, "+
       "vehicles, and base facilities.",
-      INTELLECT
+      BRAINS
     ),
-    INFORMATICS   = new Skill(
-      "Informatics", "skill_inf", ICON_PATH+"icon_informatics.png",
-      "Informatics covers software engineering, data mining and encryption- "+
-      "necessary for certain forms of research and advanced gadgetry.",
-      INTELLECT
-    ),
-    PHARMACY      = new Skill(
-      "Pharmacy", "skill_pha", ICON_PATH+"icon_pharmacy.png",
+    MEDICINE = new Skill(
+      "Medicine", "skill_medicine", ICON_PATH+"icon_pharmacy.png",
       "A knowledge of pharmacy allows a character to concoct vaccines and "+
       "medicines- or chemical weapons for their own use.",
-      INTELLECT
-    ),
-    ANATOMY       = new Skill(
-      "Anatomy", "skill_ant", ICON_PATH+"icon_anatomy.png",
-      "A knowledge of anatomy is essential to treatment of serious injury- "+
-      "and can let you inflict crushing blows.",
-      INTELLECT
-    ),
-    LAW_N_FINANCE = new Skill(
-      "Law & Finance", "skill_law", ICON_PATH+"icon_law_and_finance.png",
-      "A knowledge of loopholes, regulations and wheels to grease helps to "+
-      "navigate the corporate world and judicial process.",
-      INTELLECT
-    ),
-    THE_OCCULT    = new Skill(
-      "The Occult", "skill_occ", ICON_PATH+"icon_intellect.png",
-      "There are some things man was not meant to know.",
-      INTELLECT
-    ),
-    
-    LANGUAGES     = new Skill(
-      "Languages", "skill_lng", ICON_PATH+"icon_languages.png",
-      "A knowledge of spoken and written languages, both ancient and modern. "+
-      "Often useful for research, travel, questioning or impersonation.",
-      INTELLECT, SOCIAL
+      BRAINS
     ),
     QUESTION      = new Skill(
-      "Question", "skill_que", ICON_PATH+"icon_social.png",
+      "Question", "skill_question", ICON_PATH+"icon_social.png",
       "Used to obtain information from friendly or neutral persons, and spot "+
       "inconsistencies or gaps in the account.",
-      INTELLECT, SOCIAL
+      WILL
     ),
-    DISGUISE      = new Skill(
-      "Disguise" , "skill_dis", ICON_PATH+"icon_social.png",
-      "How to blend in or stand out through the use of wigs, props, costume "+
-      "and cosmetics.  Used working undercover or leading a double life.",
-      SOCIAL
-    ),
-    SUASION       = new Skill(
-      "Suasion"  , "skill_sua", ICON_PATH+"icon_social.png",
+    PERSUADE = new Skill(
+      "Persuade", "skill_persuade", ICON_PATH+"icon_social.png",
       "Allows an agent to beg favours, bargain or advocate convincingly, "+
       "without resorting to force.",
-      SOCIAL
+      WILL
     ),
+    SKILL_STATS[] = { ENGINEERING, MEDICINE, QUESTION, PERSUADE },
     
-    STEALTH       = new Skill(
-      "Stealth", "skill_ste", ICON_PATH+"icon_reflex.png",
-      "Allows an agent to slip past guards and surveillance systems unnoticed,"+
-      "particularly after dark or with some cover.",
-      REFLEX
-    ),
-    SURVEILLANCE  = new Skill(
-      "Surveillance", "skill_sur", ICON_PATH+"icon_reflex.png",
-      "Lets agents keep an eye out for suspicious activity, trail a suspect "+
-      "or see through a ruse.",
-      REFLEX
-    ),
-    VEHICLES      = new Skill(
-      "Vehicles", "skill_veh", ICON_PATH+"icon_reflex.png",
-      "Allows piloting of bikes, automobiles, or even jets & planes.",
-      REFLEX
-    ),
-    MARKSMAN      = new Skill(
-      "Marksman", "skill_mrk", ICON_PATH+"icon_marksman.png",
-      "Permits the accurate and forceful use of projectile weapons- bows, "+
-      "throwing stars, darts and guns.",
-      REFLEX
-    ),
-    
-    INTIMIDATE    = new Skill(
-      "Intimidate", "skill_int", ICON_PATH+"icon_strength.png",
-      "A combination of physical brutality and menacing implications might "+
-      "coax cooperation from stubborn suspects.",
-      STRENGTH, SOCIAL
-    ),
-    GYMNASTICS    = new Skill(
-      "Gymnastics", "skill_gym", ICON_PATH+"icon_gymnastics.png",
-      "They might not dodge bullets, but a good gymnast can vault obstacles "+
-      "to reach cover, escape injury, or reach inaccessible places.",
-      STRENGTH, REFLEX
-    ),
-    CLOSE_COMBAT  = new Skill(
-      "Close Combat", "skill_ccm", ICON_PATH+"icon_close_combat.png",
-      "An agent with close combat skills can deliver knockout blows, and "+
-      "stands a better chance of disarming or cuffing a perp.",
-      STRENGTH, REFLEX
-    ),
-    STAMINA       = new Skill(
-      "Stamina", "skill_sta", ICON_PATH+"icon_stamina.png",
-      "Sheer physical endurance may be the only way to weather certain "+
-      "trials, work through pain, or survive an injury.",
-      STRENGTH
-    ),
-    
-    ALL_SKILLS[] = {
-      ENGINEERING, INFORMATICS, PHARMACY, ANATOMY, LAW_N_FINANCE, THE_OCCULT,
-      LANGUAGES , QUESTION    , DISGUISE    , SUASION ,
-      STEALTH   , SURVEILLANCE, VEHICLES    , MARKSMAN,
-      INTIMIDATE, GYMNASTICS  , CLOSE_COMBAT, STAMINA
-    };
-  final public static Trait
     ALL_STATS[] = (Trait[]) Visit.compose(
-      Trait.class, GEAR_STATS, BASE_STATS, PHYS_STATS, ALL_SKILLS
-    )
-  ;
+      Trait.class, BASE_STATS, COMBAT_STATS, SKILL_STATS
+    );
   
   
   final Person person;
@@ -280,16 +208,13 @@ public class PersonStats {
   void updateStats() {
     
     //I.say("Updating stats for: "+person);
-    for (Trait t : GEAR_STATS) {
+    for (Trait t : COMBAT_STATS) {
       updateStat(t, 0, false);
     }
-    for (Skill s : BASE_STATS) {
+    for (Trait s : BASE_STATS) {
       updateStat(s, -1, true);
     }
-    for (Skill s : PHYS_STATS) {
-      updateStat(s, 0, false);
-    }
-    for (Skill s : ALL_SKILLS) {
+    for (Trait s : SKILL_STATS) {
       updateStat(s, -1, true);
     }
     
@@ -315,7 +240,7 @@ public class PersonStats {
     if (l == null) return false;
     
     float rootBonus = 0;
-    for (Skill root : stat.roots()) {
+    for (Trait root : stat.roots()) {
       rootBonus += levelFor(root) / (3f * stat.roots().length);
     }
     
@@ -361,7 +286,7 @@ public class PersonStats {
   }
   
   
-  public void gainXP(Skill stat, float XP) {
+  public void gainXP(Trait stat, float XP) {
     final Level l = getLevel(stat);
     l.practice += XP;
     
@@ -370,8 +295,8 @@ public class PersonStats {
       l.level++;
       person.world().events.log(person+" reached level "+l.level+" in "+stat);
     }
-    for (Skill root : stat.roots) {
-      gainXP(root, XP / (3f * stat.roots.length));
+    for (Trait root : stat.roots()) {
+      gainXP(root, XP / (3f * stat.roots().length));
     }
   }
   

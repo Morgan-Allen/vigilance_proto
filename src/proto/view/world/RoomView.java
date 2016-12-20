@@ -53,12 +53,8 @@ public class RoomView extends UINode {
     int portW = vw - 40, portH = (int) (portW / 2.5f);
     g.drawImage(portrait, vx + 20, vy + 40, portW, portH, null);
     //*/
-
-    g.setColor(Color.WHITE);
-    g.drawString(room.name(), vx + 20, vy + 20);
-    //
-    //  TODO:  Render information on the room type!
     
+    g.setColor(Color.WHITE);
     String info = room.kind().defaultInfo();
     ViewUtils.drawWrappedString(info,
       g, vx + 25, vy + 20, vw - 30, 80

@@ -59,8 +59,8 @@ public class TypeCoerce extends StepType {
   
   protected float calcSuccessChance(PlanStep step) {
     Person coerced = (Person) step.give(Gives.COERCED);
-    float talk = step.plan.agent.stats.levelFor(PersonStats.SOCIAL);
-    talk += 5 - coerced.stats.levelFor(PersonStats.SOCIAL);
+    float talk = step.plan.agent.stats.levelFor(PersonStats.PERSUADE);
+    talk += 5 - coerced.stats.levelFor(PersonStats.PERSUADE);
     
     //  TODO:  Factor in the value of leverage- either dirt or a hostage.
     return Nums.clamp(talk / 10f, 0, 1);

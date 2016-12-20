@@ -164,7 +164,7 @@ public class PersonActions {
   /**  Sight and stealth methods-
     */
   public float sightRange() {
-    return (person.stats.levelFor(SURVEILLANCE) / 2.5f) + 2;
+    return (person.stats.levelFor(SIGHT_RANGE) / 2.5f) + 2;
   }
   
   

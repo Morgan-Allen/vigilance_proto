@@ -10,19 +10,19 @@ package proto.game.person;
 
 public class Skill extends Trait {
   
-  final public Skill roots[];
+  final public Trait roots[];
   
   
   public Skill(
     String name, String ID, String imgPath, String description,
-    Skill... roots
+    Trait... roots
   ) {
     super(name, ID, imgPath, description);
     this.roots = roots;
   }
   
   
-  public Skill[] roots() {
+  public Trait[] roots() {
     return roots;
   }
 }

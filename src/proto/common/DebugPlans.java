@@ -67,10 +67,10 @@ public class DebugPlans {
     String name = pickFrom(FIRST_NAMES)+" "+pickFrom(LAST_NAMES);
     Person person = new Person(kind, world, name);
     
-    for (Trait stat : PersonStats.ALL_STATS) {
+    for (Trait stat : PersonStats.BASE_STATS) {
       person.stats.setLevel(stat, 5 + (int) (Math.random() * 10), true);
     }
-    for (Trait stat : PersonStats.ALL_SKILLS) {
+    for (Trait stat : PersonStats.SKILL_STATS) {
       person.stats.setLevel(stat, (int) (Math.random() * 10), true);
     }
     

@@ -26,55 +26,43 @@ public class Civilians {
       "Civilian", "person_kind_civilian", IMG_DIR+"icon_civilian_2.png",
       "", COMMON_NAMES,
       Kind.SUBTYPE_CIVILIAN,
-      INTELLECT , 2 ,
-      REFLEX    , 2 ,
-      SOCIAL    , 2 ,
-      STRENGTH  , 2 ,
-      HIT_POINTS, 6 ,
-      WILLPOWER , 4 
+      BRAINS  , 2 ,
+      REFLEXES, 2 ,
+      WILL    , 2 ,
+      MUSCLE  , 2
     ),
     DOCTOR = Kind.ofPerson(
       "Doctor", "person_kind_doctor", IMG_DIR+"icon_civilian_2.png",
       "", COMMON_NAMES,
       Kind.SUBTYPE_CIVILIAN,
-      INTELLECT , 7 ,
-      REFLEX    , 3 ,
-      SOCIAL    , 5 ,
-      STRENGTH  , 2 ,
-      HIT_POINTS, 6 ,
-      WILLPOWER , 5 ,
+      BRAINS  , 7 ,
+      REFLEXES, 3 ,
+      WILL    , 5 ,
+      MUSCLE  , 2 ,
       
-      PHARMACY   , 7,
-      ANATOMY    , 7
+      MEDICINE, 7
     ),
     INVENTOR = Kind.ofPerson(
       "Inventor", "person_kind_inventor", IMG_DIR+"icon_civilian_2.png",
       "", COMMON_NAMES,
       Kind.SUBTYPE_CIVILIAN,
-      INTELLECT , 7 ,
-      REFLEX    , 3 ,
-      SOCIAL    , 5 ,
-      STRENGTH  , 2 ,
-      HIT_POINTS, 6 ,
-      WILLPOWER , 5 ,
+      BRAINS  , 7 ,
+      REFLEXES, 3 ,
+      WILL    , 5 ,
+      MUSCLE  , 2 ,
       
-      ENGINEERING, 7,
-      INFORMATICS, 7
+      ENGINEERING, 7
     ),
     BROKER = Kind.ofPerson(
       "Broker", "person_kind_broker", IMG_DIR+"icon_broker.png",
       "", Civilians.COMMON_NAMES,
       Kind.SUBTYPE_CIVILIAN,
-      INTELLECT , 6 ,
-      REFLEX    , 3 ,
-      SOCIAL    , 5 ,
-      STRENGTH  , 2 ,
-      HIT_POINTS, 6 ,
-      WILLPOWER , 6 ,
+      BRAINS  , 6 ,
+      REFLEXES, 3 ,
+      WILL    , 5 ,
+      MUSCLE  , 2 ,
       
-      INFORMATICS  , 5,
-      LAW_N_FINANCE, 5,
-      SUASION      , 7
+      PERSUADE, 7
     ),
     POLITICIAN = null,
     POLICE     = null

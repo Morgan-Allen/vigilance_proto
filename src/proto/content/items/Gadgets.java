@@ -29,7 +29,7 @@ public class Gadgets {
     public float passiveModifierFor(Person person, Trait trait) {
       if (trait == MIN_DAMAGE) return 2;
       if (trait == RNG_DAMAGE) return 3;
-      if (trait == MARKSMAN  ) return 5;
+      if (trait == ACCURACY  ) return 5;
       return 0;
     }
   };
@@ -46,14 +46,14 @@ public class Gadgets {
     IS_WEAPON | IS_RANGED | IS_KINETIC, 0
   ) {
     public float passiveModifierFor(Person person, Trait trait) {
-      if (trait == GYMNASTICS) return 3;
+      //if (trait == GYMNASTICS) return 3;
       return 0;
     }
   };
   
   final public static ItemType BODY_ARMOUR = new ItemType(
     "Body Armour", "item_body_armour",
-    "Heavy ceramic body armour, virtually impervious to handgun fire.",
+    "Heavy ceramic body armour, almost impervious to handgun fire.",
     ICONS_DIR+"icon_body_armour.png",
     SPRITE_DIR+"sprite_deflect.png",
     SLOT_ARMOUR, 200, new Object[] {
@@ -62,8 +62,8 @@ public class Gadgets {
     IS_ARMOUR, 0
   ) {
     public float passiveModifierFor(Person person, Trait trait) {
-      if (trait == STAMINA   ) return  3;
-      if (trait == GYMNASTICS) return -1;
+      if (trait == ARMOUR ) return  3;
+      if (trait == STEALTH) return -2;
       return 0;
     }
   };
@@ -79,7 +79,7 @@ public class Gadgets {
     IS_ARMOUR, 0
   ) {
     public float passiveModifierFor(Person person, Trait trait) {
-      if (trait == STAMINA) return 2;
+      if (trait == ARMOUR) return 1;
       return 0;
     }
   };
@@ -91,15 +91,13 @@ public class Gadgets {
     ICONS_DIR+"icon_med_kit.png",
     SPRITE_DIR+"sprite_treatment.png",
     SLOT_ITEMS, 25, new Object[] {
-      PHARMACY, 4
+      MEDICINE, 4
     },
     IS_CONSUMED, 0
   ) {
-    
     //  TODO:  Provide an active 'stabilise/heal' ability instead
-    
     public float passiveModifierFor(Person person, Trait trait) {
-      if (trait == ANATOMY) return 2;
+      if (trait == MEDICINE) return 2;
       return 0;
     }
   };
@@ -111,13 +109,11 @@ public class Gadgets {
     ICONS_DIR+"icon_tear_gas.png",
     SPRITE_DIR+"sprite_smoke.png",
     SLOT_ITEMS, 35, new Object[] {
-      PHARMACY, 6
+      MEDICINE, 6
     },
     IS_CONSUMED, 0
   ) {
     public float passiveModifierFor(Person person, Trait trait) {
-      if (trait == CLOSE_COMBAT) return 1;
-      if (trait == MARKSMAN    ) return 2;
       return 0;
     }
   };

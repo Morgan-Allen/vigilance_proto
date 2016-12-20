@@ -15,23 +15,25 @@ public class Villains {
       "Falcone", "person_kind_falcone", IMG_DIR+"icon_falcone.png",
       "", null,
       Kind.SUBTYPE_BOSS,
-      INTELLECT , 6 ,
-      REFLEX    , 5 ,
-      SOCIAL    , 7 ,
-      STRENGTH  , 5 ,
-      HIT_POINTS, 14,
-      WILLPOWER , 15
+      BRAINS  , 6 ,
+      REFLEXES, 5 ,
+      WILL    , 7 ,
+      MUSCLE  , 5 ,
+      
+      QUESTION, 6 ,
+      PERSUADE, 7
     ),
     TWO_FACE = Kind.ofPerson(
       "Two-Face", "person_kind_two_face", IMG_DIR+"icon_two_face.png",
       "", null,
       Kind.SUBTYPE_BOSS,
-      INTELLECT , 8 ,
-      REFLEX    , 7 ,
-      SOCIAL    , 5 ,
-      STRENGTH  , 7 ,
-      HIT_POINTS, 16,
-      WILLPOWER , 15
+      BRAINS  , 8 ,
+      REFLEXES, 7 ,
+      WILL    , 5 ,
+      MUSCLE  , 7 ,
+      
+      QUESTION, 8 ,
+      PERSUADE, 6
     )
   ;
 }

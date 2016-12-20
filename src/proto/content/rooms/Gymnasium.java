@@ -13,7 +13,7 @@ import static proto.game.person.PersonStats.*;
 public class Gymnasium extends Place {
   
   final static Skill GYM_SKILLS[] = {
-    MARKSMAN, GYMNASTICS, CLOSE_COMBAT, STAMINA
+    //MARKSMAN, GYMNASTICS, CLOSE_COMBAT, STAMINA
   };
   
   
@@ -26,7 +26,7 @@ public class Gymnasium extends Place {
     
     tasks = new Task[GYM_SKILLS.length];
     for (int i = 0; i < GYM_SKILLS.length; i++) {
-      tasks[i] = new TaskTrain(GYM_SKILLS[i], INTIMIDATE, this, base);
+      tasks[i] = new TaskTrain(GYM_SKILLS[i], PERSUADE, this, base);
     }
   }
   

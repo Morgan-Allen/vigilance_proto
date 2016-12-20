@@ -179,8 +179,8 @@ public class PersonMind {
     //  TODO:  Refine these, and use constants to define the math.
     
     float courage = 0.2f, minAlert = (
-      person.stats.levelFor(REFLEX  ) +
-      person.stats.levelFor(STRENGTH)
+      person.stats.levelFor(REFLEXES) +
+      person.stats.levelFor(WILL    )
     ) / 100f;
     if (enemySight > 0) {
       wariness += enemySight / 4f;

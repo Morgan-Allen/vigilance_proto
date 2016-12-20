@@ -163,18 +163,18 @@ public class Volley implements Session.Saveable {
     hitsArmour      = hits.stats.levelFor(ARMOUR    );
     
     if (weapon.melee() && ! ranged) {
-      float brawnBonus = self.stats.levelFor(STAMINA) / 2f;
-      selfAccuracy = self.stats.levelFor(CLOSE_COMBAT);
+      float brawnBonus = self.stats.levelFor(MUSCLE) / 2f;
+      selfAccuracy = self.stats.levelFor(ACCURACY);
       selfDamageBase  += Nums.ceil (brawnBonus);
       selfDamageRange += Nums.floor(brawnBonus);
-      hitsDefence = hits.stats.levelFor(CLOSE_COMBAT);
+      hitsDefence = hits.stats.levelFor(DEFENCE);
     }
     if (ranged) {
-      selfAccuracy = self.stats.levelFor(MARKSMAN);
+      selfAccuracy = self.stats.levelFor(ACCURACY);
       float normRange = self.actions.sightRange() - 2;
       float distance  = scene.distance(self.currentTile(), hits.currentTile());
       selfAccuracy -= 5 * (distance - normRange);
-      hitsDefence = hits.stats.levelFor(GYMNASTICS);
+      hitsDefence = hits.stats.levelFor(DEFENCE);
     }
     
     hitsDefence  = Nums.max(hitsDefence , 1);

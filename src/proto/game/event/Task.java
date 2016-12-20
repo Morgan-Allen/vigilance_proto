@@ -139,16 +139,16 @@ public abstract class Task implements Assignment {
   
   
   public boolean physical() {
-    for (Trait t : tested) for (Skill s : t.roots()) {
-      if (s == REFLEX || s == STRENGTH) return true;
+    for (Trait t : tested) for (Trait s : t.roots()) {
+      if (s == REFLEXES || s == MUSCLE) return true;
     }
     return false;
   }
   
   
   public boolean mental() {
-    for (Trait t : tested) for (Skill s : t.roots()) {
-      if (s == INTELLECT || s == SOCIAL) return true;
+    for (Trait t : tested) for (Trait s : t.roots()) {
+      if (s == WILL || s == BRAINS) return true;
     }
     return false;
   }

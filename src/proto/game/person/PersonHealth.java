@@ -59,12 +59,12 @@ public class PersonHealth {
   
 
   public int maxHealth() {
-    return person.stats.levelFor(HIT_POINTS);
+    return person.stats.levelFor(HEALTH);
   }
   
   
   public int maxStress() {
-    return person.stats.levelFor(WILLPOWER);
+    return person.stats.levelFor(WILL);
   }
   
   

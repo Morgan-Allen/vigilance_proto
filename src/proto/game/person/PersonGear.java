@@ -47,9 +47,12 @@ public class PersonGear {
 
   /**  Assigning equipment loadout-
     */
-  public void equipItem(ItemType item, Base from) {
-    ItemType oldItem = equipSlots[item.slotID];
-    equipSlots[item.slotID] = item;
+  //  TODO:  Allow for multiple slots of the same type, and disallow passing of
+  //  null arguments.
+  
+  public void equipItem(ItemType item, int slotID, Base from) {
+    ItemType oldItem = equipSlots[slotID];
+    equipSlots[slotID] = item;
     person.stats.toggleItemAbilities(oldItem, false);
     person.stats.toggleItemAbilities(item   , true );
     
