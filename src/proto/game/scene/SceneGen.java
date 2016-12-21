@@ -7,6 +7,9 @@ import proto.util.*;
 
 public class SceneGen {
   
+  
+  /**  Constants, data fields and construction methods-
+    */
   final static byte
     MARK_NONE     = 0,
     MARK_CORRIDOR = 1,
@@ -15,12 +18,12 @@ public class SceneGen {
     MARK_FLOOR    = 4
   ;
   
-  Scene scene;
-  byte markup[][];
+  final Scene scene;
+  final byte markup[][];
   
-  int minRoomSize = 4;
-  float corWideFraction = 0.125f, maxSplitFrac = 0.5f;
-  
+  public int minRoomSize = 4;
+  public float corWideFraction = 0.125f;
+  public float maxSplitFrac = 0.5f;
   public boolean verbose = false;
   
   
@@ -48,109 +51,123 @@ public class SceneGen {
   
   /**
     */
-  public void subdivideAreas(SceneType parent, Box2D area) {
+  public void attemptPopulation(SceneType parent, Box2D area) {
     //
-    //  TODO:  First, check to see if an existing room will fit inside here?
-
+    //  Firstly, check if the area itself is fit to populate with one of the
+    //  scene's room-types:
+    AreaCheck check0 = attemptAreaCheck(parent, area);
+    if (check0.valid && check0.room != null) {
+      performRoomFill(area, check0.room);
+      return;
+    }
+    //
+    //  Failing that, try subdividing the area into two different areas along
+    //  the longer axis, and try to ensure that each can be filled with a room
+    //  that has access to a corridor- or failing that, that each has access to
+    //  a corrider along it's longer side (see below.)
     boolean longX = area.xdim() > area.ydim();
-    float maxSide = area.maxSide();
+    int maxSide = (int) area.maxSide();
     if (maxSide <= minRoomSize) return;
     
-    if (verbose) I.say("Attempting to subdivide: "+area);
-    Box2D a1 = new Box2D().setTo(area), a2 = new Box2D().setTo(area);
+    int corWide = Nums.max(1, (int) (maxSide * corWideFraction));
+    float splitFrac = maxSide - ((minRoomSize * 2) + corWide + 2);
+    splitFrac = Nums.clamp(splitFrac, 0, maxSide * maxSplitFrac);
+    int split = (int) (((maxSide - splitFrac) / 2) + (Rand.num() * splitFrac));
     
-    float splitFrac = maxSide - (minRoomSize * 2);
-    splitFrac = Nums.min(splitFrac, maxSide * maxSplitFrac);
-    int split = (int) (minRoomSize + (Rand.num() * splitFrac));
-    
-    if (longX) {
-      a1.xdim(split);
-      a2.incWide(0 - split);
-      a2.incX(split);
-    }
-    else {
-      a1.ydim(split);
-      a2.incHigh(0 - split);
-      a2.incY(split);
+    if (verbose) {
+      I.say("Attempting to subdivide: "+area);
+      I.say("  Split fraction: "+splitFrac+", split at: "+split);
     }
 
-    SplitCheck check1 = attemptSplitCheck(parent, a1);
-    SplitCheck check2 = attemptSplitCheck(parent, a2);
+    Box2D a1 = new Box2D().setTo(area), a2 = new Box2D().setTo(area);
+    int p1, p2, p3, p4;
+    p1 = 0;
+    p2 = split;
+    p3 = p2 + 1;
+    p4 = maxSide;
+    
+    if (longX) {
+      int x = (int) area.xpos();
+      a1.setX(x + p1, p2 - p1);
+      a2.setX(x + p3, p4 - p3);
+    }
+    else {
+      int y = (int) area.ypos();
+      a1.setY(y + p1, p2 - p1);
+      a2.setY(y + p3, p4 - p3);
+    }
+    
+    AreaCheck check1 = attemptAreaCheck(parent, a1);
+    AreaCheck check2 = attemptAreaCheck(parent, a2);
     
     if (check1.valid && check2.valid) {
       
       if (check1.room != null) performRoomFill(a1, check1.room);
-      else subdivideAreas(parent, a1);
+      else attemptPopulation(parent, a1);
       
       if (check2.room != null) performRoomFill(a2, check2.room);
-      else subdivideAreas(parent, a2);
+      else attemptPopulation(parent, a2);
       
       return;
     }
     //
-    //  If that fails, you'll need to insert a corridor between the two areas
-    //  and go again.
-    if (verbose) I.say("Initial split was not successful.  Adding corridor.");
+    //  If that's not possible, you'll need to insert a corridor between the
+    //  two areas (to ensure ease of access) and try again.
+    if (verbose) I.say("Initial split was not successful, adding corridor");
+    Box2D ac = new Box2D().setTo(area).expandBy(1);
+    int hCW = corWide / 2, p5, p6;
+    p1 = 0;
+    p2 = split - hCW;
+    p3 = p2 + 1;
+    p4 = p3 + corWide;
+    p5 = p4 + 1;
+    p6 = maxSide;
     
-    Box2D corridor = new Box2D().setTo(area);
-    int corWide = Nums.max(1, (int) (maxSide * corWideFraction));
-    int hCW = corWide / 2;
     if (longX) {
-      a1.incWide(-hCW);
-      a2.incX(corWide - hCW);
-      a2.incWide(hCW - corWide);
-      corridor.incX(a1.xdim());
-      corridor.xdim(corWide);
+      int x = (int) area.xpos();
+      a1.setX(x + p1, p2 - p1);
+      ac.setX(x + p3, p4 - p3);
+      a2.setX(x + p5, p6 - p5);
     }
     else {
-      a1.incHigh(-hCW);
-      a2.incY(corWide - hCW);
-      a2.incHigh(hCW - corWide);
-      corridor.incY(a1.ydim());
-      corridor.ydim(corWide);
+      int y = (int) area.ypos();
+      a1.setY(y + p1, p2 - p1);
+      ac.setY(y + p3, p4 - p3);
+      a2.setY(y + p5, p6 - p5);
     }
-    markArea(corridor, MARK_CORRIDOR);
-    //
-    //  Then, check once more to see if it's possible to fill the sub-areas.
-    //  And if that's still impossible, subdivide.
-    SplitCheck check3 = attemptSplitCheck(parent, a1);
-    SplitCheck check4 = attemptSplitCheck(parent, a2);
-    
-    if (check3.valid && check3.room != null) performRoomFill(a1, check3.room);
-    else subdivideAreas(parent, a1);
-    
-    if (check4.valid && check4.room != null) performRoomFill(a2, check4.room);
-    else subdivideAreas(parent, a2);
+    markArea(ac, MARK_CORRIDOR);
+    attemptPopulation(parent, a1);
+    attemptPopulation(parent, a2);
   }
   
   
   
   /**  
     */
-  static class SplitCheck { SceneType room; boolean valid; }
+  static class AreaCheck { SceneType room; boolean valid; }
   
-  SplitCheck attemptSplitCheck(SceneType parent, Box2D area) {
-    SplitCheck check = new SplitCheck();
+  AreaCheck attemptAreaCheck(SceneType parent, Box2D area) {
+    AreaCheck check = new AreaCheck();
     
-    if (canFillRoom(parent, area, check) && hasCorridorOnSide(area, false)) {
+    if (canFillRoom(parent, area, check) && hasCorridorAccess(area, false)) {
       check.valid = true;
     }
-    else if (hasCorridorOnSide(area, true)) {
+    else if (hasCorridorAccess(area, true)) {
       check.valid = true;
     }
     else check.valid = false;
     
     if (verbose) {
       Object room = check.room;
-      if (! check.valid)     I.say("  Cannot split:     "+area);
-      else if (room == null) I.say("  Should subdivide: "+area);
-      else                   I.say("  Will place room:  "+room+" in "+area);
+      if      (! check.valid) I.say("  Cannot split:     "+area);
+      else if (room == null ) I.say("  Should subdivide: "+area);
+      else                    I.say("  Will place room:  "+room+" in "+area);
     }
     return check;
   }
   
   
-  boolean canFillRoom(SceneType parent, Box2D area, SplitCheck check) {
+  boolean canFillRoom(SceneType parent, Box2D area, AreaCheck check) {
     if (area.maxSide() > 8) return false;
     
     //  TODO:  Elaborate on this...
@@ -159,14 +176,14 @@ public class SceneGen {
   }
   
   
-  boolean hasCorridorOnSide(Box2D area, boolean longSideOnly) {
+  boolean hasCorridorAccess(Box2D area, boolean longSideOnly) {
     int x = (int) area.xpos(), y = (int) area.ypos();
     int w = (int) area.xdim(), h = (int) area.ydim();
     boolean longX = area.xdim() > area.ydim();
     boolean screenX = longSideOnly &&   longX;
     boolean screenY = longSideOnly && ! longX;
     
-    for (Coord c : Visit.perimeter(x, y, w, h)) try {
+    for (Coord c : Visit.perimeter(x - 1, y - 1, w + 2, h + 2)) try {
       if (screenY && (c.y < y || c.y >= (y + h))) continue;
       if (screenX && (c.x < x || c.x >= (x + w))) continue;
       
@@ -190,7 +207,7 @@ public class SceneGen {
     for (Coord c : Visit.grid(x, y, w, h, 1)) {
       markup[c.x][c.y] = MARK_FLOOR;
     }
-    for (Coord c : Visit.perimeter(x + 1, y + 1, w - 2, h - 2)) {
+    for (Coord c : Visit.perimeter(x, y, w, h)) {
       markup[c.x][c.y] = MARK_WALLS;
     }
     if (verbose) {
