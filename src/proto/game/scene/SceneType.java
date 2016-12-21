@@ -30,8 +30,16 @@ public class SceneType extends Index.Entry implements
   Kind props[];
   float propWeights[];
   
+  //  NOTE:  the 'prop' for a layout may be either a child scene-type or a kind
+  //  of scene object.
+  static class PropLayout {
+    Object prop;
+    boolean dirs[] = new boolean[9];
+    float frequency;
+  }
+  
+  
   SceneType childPatterns[] = new SceneType[0];
-  Box2D childLayouts[];
   Table <Trait, Boolean> traitQueryCache = new Table();
   
   
@@ -130,16 +138,19 @@ public class SceneType extends Index.Entry implements
       }
     }
     
-    /*
     int totalPropArea = 0, totalArea = (int) area.area();
     for (Kind propType : props) {
       totalPropArea += propType.wide() * propType.high();
     }
-    //*/
   }
   
   
   
+  /**  Rendering, debug and interface methods-
+    */
+  public String toString() {
+    return name;
+  }
 }
 
 

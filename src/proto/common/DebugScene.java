@@ -74,6 +74,7 @@ public class DebugScene extends RunGame {
       p.gear.equipItem(Gadgets.KEVLAR_VEST, PersonGear.SLOT_ARMOUR, HQ);
       guarding.setAssigned(p, true);
     }
+    guarding.setCompleted(true);
     
     return world;
   }
