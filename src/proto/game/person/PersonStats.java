@@ -31,6 +31,7 @@ public class PersonStats {
     ),
     BASE_STATS[] = { MUSCLE, REFLEXES, WILL, BRAINS },
     
+    //  TODO:  Also add Regeneration and Energy?
     ARMOUR = new Trait(
       "Armour", "stat_armour", null, ""
     ),
@@ -206,17 +207,47 @@ public class PersonStats {
   
   
   void updateStats() {
+    updateStat(MUSCLE  , -1, false);
+    updateStat(REFLEXES, -1, false);
+    updateStat(BRAINS  , -1, true );
+    updateStat(WILL    , -1, true );
     
-    //I.say("Updating stats for: "+person);
-    for (Trait t : COMBAT_STATS) {
-      updateStat(t, 0, false);
-    }
-    for (Trait s : BASE_STATS) {
-      updateStat(s, -1, true);
-    }
-    for (Trait s : SKILL_STATS) {
-      updateStat(s, -1, true);
-    }
+    float    muscle   = levelFor(MUSCLE  );
+    float    reflexes = levelFor(REFLEXES);
+    float    brains   = levelFor(BRAINS  );
+    float    will     = levelFor(WILL    );
+    ItemType armour = person.gear.currentArmour();
+    ItemType weapon = person.gear.currentWeapon();
+    
+    float maxHP      = 10 + muscle;
+    float baseArmour = armour.bonus;
+    float baseDamage = weapon.bonus / 2f;
+    float rollDamage = weapon.bonus / 2f;
+    
+    //  TODO:  Incorporate these...
+    //float maxEnergy  = (muscle + will) / 2f;
+    //float baseRegen  = muscle / 100f;
+    
+    updateStat(HEALTH    , maxHP     , false);
+    updateStat(ARMOUR    , baseArmour, false);
+    updateStat(MIN_DAMAGE, baseDamage, false);
+    updateStat(RNG_DAMAGE, rollDamage, false);
+    
+    float lightLevel = (reflexes + 10) / 2;
+    updateStat(SIGHT_RANGE, lightLevel, true);
+    updateStat(STEALTH    , lightLevel, true);
+    updateStat(MOVE_SPEED , lightLevel, true);
+    updateStat(ACT_SPEED  , lightLevel, true);
+    updateStat(ACCURACY   , lightLevel, true);
+    updateStat(DEFENCE    , lightLevel, true);
+    
+    float levelQuestion = (will + brains       ) / 2;
+    float levelSuasion  = (10 + will + reflexes) / 2;
+    float levelTechs    = brains / 2;
+    updateStat(QUESTION   , levelQuestion, true);
+    updateStat(PERSUADE   , levelSuasion , true);
+    updateStat(ENGINEERING, levelTechs   , true);
+    updateStat(MEDICINE   , levelTechs   , true);
     
     Series <Ability> abilities = listAbilities();
     for (Ability a : abilities) if (a.passive()) {
@@ -236,8 +267,7 @@ public class PersonStats {
   
   
   protected boolean updateStat(Trait stat, float base, boolean mental) {
-    Level l = levels.get(stat);
-    if (l == null) return false;
+    Level l = getLevel(stat);
     
     float rootBonus = 0;
     for (Trait root : stat.roots()) {

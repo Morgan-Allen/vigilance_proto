@@ -21,40 +21,12 @@ public class Gadgets {
     "Lightweight, throwable projectiles, useful to disarm or startle foes.",
     ICONS_DIR+"icon_batarangs.png",
     SPRITE_DIR+"sprite_batarang.png",
-    SLOT_WEAPON, 10, new Object[] {
+    SLOT_WEAPON, 4, new Object[] {
       ENGINEERING, 2
     },
     IS_WEAPON | IS_RANGED | IS_KINETIC | IS_CONSUMED, 0
   ) {
-    public float passiveModifierFor(Person person, Trait trait) {
-      if (trait == MIN_DAMAGE) return 2;
-      if (trait == RNG_DAMAGE) return 3;
-      if (trait == ACCURACY  ) return 5;
-      return 0;
-    }
   };
-  
-  
-  //  TODO:  This won't be properly useful until you have 3-dimensional terrain
-  //  implemented.  Leave out for now.
-  /*
-  final public static ItemType CABLE_GUN = new ItemType(
-    "Cable Gun", "item_cable_gun",
-    "Launches a climbing cable over long distances, assisting infiltration "+
-    "and escape.",
-    ICONS_DIR+"icon_cable_gun.png",
-    SPRITE_DIR+"sprite_batarang.png",
-    SLOT_WEAPON, 80, new Object[] {
-      ENGINEERING, 5
-    },
-    IS_WEAPON | IS_RANGED | IS_KINETIC, 0
-  ) {
-    public float passiveModifierFor(Person person, Trait trait) {
-      //if (trait == GYMNASTICS) return 3;
-      return 0;
-    }
-  };
-  //*/
   
   final public static ItemType BODY_ARMOUR = new ItemType(
     "Body Armour", "item_body_armour",
@@ -124,6 +96,7 @@ public class Gadgets {
   };
   
   
+  //  TODO:  Create a 'sonic probe' item...
     
   
   
@@ -133,6 +106,28 @@ public class Gadgets {
 
 
 
+
+
+//  TODO:  This won't be properly useful until you have 3-dimensional terrain
+//  implemented.  Leave out for now.
+/*
+final public static ItemType CABLE_GUN = new ItemType(
+  "Cable Gun", "item_cable_gun",
+  "Launches a climbing cable over long distances, assisting infiltration "+
+  "and escape.",
+  ICONS_DIR+"icon_cable_gun.png",
+  SPRITE_DIR+"sprite_batarang.png",
+  SLOT_WEAPON, 80, new Object[] {
+    ENGINEERING, 5
+  },
+  IS_WEAPON | IS_RANGED | IS_KINETIC, 0
+) {
+  public float passiveModifierFor(Person person, Trait trait) {
+    //if (trait == GYMNASTICS) return 3;
+    return 0;
+  }
+};
+//*/
 
 
 

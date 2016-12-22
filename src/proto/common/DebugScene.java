@@ -73,6 +73,7 @@ public class DebugScene extends RunGame {
     for (Person p : HQ.roster()) {
       p.gear.equipItem(Gadgets.BATARANGS  , PersonGear.SLOT_WEAPON, HQ);
       p.gear.equipItem(Gadgets.KEVLAR_VEST, PersonGear.SLOT_ARMOUR, HQ);
+      p.updateOnBase(0);
       guarding.setAssigned(p, true);
     }
     guarding.setCompleted(true);
