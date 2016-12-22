@@ -34,6 +34,10 @@ public class Gadgets {
     }
   };
   
+  
+  //  TODO:  This won't be properly useful until you have 3-dimensional terrain
+  //  implemented.  Leave out for now.
+  /*
   final public static ItemType CABLE_GUN = new ItemType(
     "Cable Gun", "item_cable_gun",
     "Launches a climbing cable over long distances, assisting infiltration "+
@@ -50,6 +54,7 @@ public class Gadgets {
       return 0;
     }
   };
+  //*/
   
   final public static ItemType BODY_ARMOUR = new ItemType(
     "Body Armour", "item_body_armour",

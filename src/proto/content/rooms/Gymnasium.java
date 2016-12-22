@@ -5,16 +5,13 @@ import proto.common.*;
 import proto.game.event.*;
 import proto.game.person.*;
 import proto.game.world.*;
+import proto.content.agents.Techniques;
 import proto.content.places.*;
 import static proto.game.person.PersonStats.*;
 
 
 
 public class Gymnasium extends Place {
-  
-  final static Trait GYM_SKILLS[] = {
-    //MARKSMAN, GYMNASTICS, CLOSE_COMBAT, STAMINA
-  };
   
   
   final Task tasks[];
@@ -23,13 +20,13 @@ public class Gymnasium extends Place {
   public Gymnasium(Base base, int slotIndex) {
     super(BLUEPRINT, slotIndex, base.world());
     setOwner(base);
-    
+    //
     //  TODO:  You will need to refresh this list dynamically for each agent in
     //  your roster.
-    
-    tasks = new Task[GYM_SKILLS.length];
-    for (int i = 0; i < GYM_SKILLS.length; i++) {
-      tasks[i] = new TaskTrain(GYM_SKILLS[i], PERSUADE, this, base);
+    final Ability techs[] = Techniques.PHYS_TECHNIQUES;
+    tasks = new Task[techs.length];
+    for (int i = 0; i < techs.length; i++) {
+      tasks[i] = new TaskTrain(techs[i], PERSUADE, this, base);
     }
   }
   

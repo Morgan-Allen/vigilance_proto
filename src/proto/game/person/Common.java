@@ -185,33 +185,6 @@ public class Common {
       public Image missileSprite() { return missile; }
     },
     
-    EVASION = new Ability(
-      "Evasion", "ability_evasion",
-      "Reserve AP to increase chance to dodge enemy attacks by at least 20%. "+
-      "Ends turn.",
-      IS_BASIC | IS_DELAYED | TRIGGER_ON_DEFEND, 1, NO_HARM, MINOR_POWER
-    ) {
-      
-      public boolean allowsTarget(Object target, Scene scene, Person acting) {
-        return acting instanceof Person;
-      }
-      
-      public void applyOnDefendStart(Volley volley) {
-        Person self = volley.targAsPerson();
-        Person hits = volley.origAsPerson();
-        dodgePosition(self, hits, 0.33f);
-        volley.hitsDefence += self.stats.levelFor(DODGE) * 5;
-        volley.hitsDefence += 25 + (self.currentAP() * 5);
-      }
-      
-      public void applyOnDefendEnd(Volley volley) {
-        Person self = volley.targAsPerson();
-        Tile at = self.location();
-        self.setExactPosition(at.x, at.y, 0, at.scene);
-        self.modifyAP(-1);
-      }
-    },
-    
     GUARD = new Ability(
       "Guard", "ability_guard",
       "Reserve AP to reduce incoming damage and grant chance to counter-"+

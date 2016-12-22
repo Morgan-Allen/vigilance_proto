@@ -13,8 +13,6 @@ import java.awt.Image;
 
 
 
-//  TODO:  Adapt this to learning abilities.
-
 public class TaskTrain extends Task {
   
   
@@ -47,12 +45,19 @@ public class TaskTrain extends Task {
   }
   
   
+  public boolean allowsAssignment(Person p) {
+    for (Trait root : trained.roots()) {
+      if (p.stats.levelFor(root) <= 0) return false;
+    }
+    return true;
+  }
+
+
   protected void onCompletion() {
     //
     //  TODO:  Rates of XP and relations-gain need to be balanced.
     //  TODO:  Allow for the possibility of more efficient solo training
     //         under particular circumstances?
-    
     final Trait chatWith = Rand.yes() ? talking : PersonStats.PERSUADE;
     float maxLevel = 0, numPeers = assigned.size() - 1;
     
@@ -111,12 +116,12 @@ public class TaskTrain extends Task {
   
   
   public String choiceInfo() {
-    return "Training "+trained;
+    return "Learn "+trained;
   }
   
   
   public String activeInfo() {
-    return "Training "+trained+" in "+room;
+    return "Learning technique: "+trained+" in "+room;
   }
   
   

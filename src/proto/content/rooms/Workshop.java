@@ -16,7 +16,6 @@ public class Workshop extends Place {
   
   final static ItemType SHOP_ITEMS[] = {
     Gadgets.BATARANGS   ,
-    Gadgets.CABLE_GUN  ,
     Gadgets.BODY_ARMOUR,
     Gadgets.KEVLAR_VEST,
   };
