@@ -14,12 +14,12 @@ public class SceneGen implements TileConstants {
     MARK_NONE     = -1,
     MARK_INIT     =  0,
     MARK_OUTSIDE  =  1,
-    MARK_CORRIDOR =  2,
-    MARK_WINDOW   =  3,
-    MARK_WALLS    =  4,
-    MARK_LIMITS   =  5,
-    MARK_DOORS    =  6,
-    MARK_FLOOR    =  7
+    MARK_OUT_WALL =  2,
+    MARK_WALLS    =  3,
+    MARK_WINDOW   =  4,
+    MARK_DOORS    =  5,
+    MARK_FLOOR    =  6,
+    MARK_CORRIDOR =  7
   ;
   final static int
     VISIT_ALL        = 0,
@@ -304,7 +304,10 @@ public class SceneGen implements TileConstants {
     int w = (int) area.xdim(), h = (int) area.ydim();
     
     for (Coord c : Visit.perimeter(x, y, w, h)) {
-      markup[c.x][c.y] = MARK_LIMITS;
+      markup(c.x, c.y, MARK_OUT_WALL);
+    }
+    for (Coord c : Visit.perimeter(x - 1, y - 1, w + 2, h + 2)) {
+      markup(c.x, c.y, MARK_OUTSIDE);
     }
   }
   
@@ -324,7 +327,7 @@ public class SceneGen implements TileConstants {
     visitWalls(room, VISIT_NO_CORNERS, new WallVisit() {
       void visitWall(Coord[] wall, Coord at, int dir) {
         int atX = at.x - T_X[dir], atY = at.y - T_Y[dir];
-        if (sampleFacing(atX, atY, dir) == MARK_INIT) {
+        if (sampleFacing(atX, atY, dir) == MARK_OUTSIDE) {
           markup[atX][atY] = MARK_DOORS;
         }
       }
@@ -333,9 +336,9 @@ public class SceneGen implements TileConstants {
   
   
   void insertWindowsForRoom(Room room) {
-    visitWalls(room, VISIT_RANDOM, new WallVisit() {
+    visitWalls(room, VISIT_MIDDLE, new WallVisit() {
       void visitWall(Coord[] wall, Coord at, int dir) {
-        if (sampleFacing(at.x, at.y, dir) == MARK_INIT) {
+        if (sampleFacing(at.x, at.y, dir) == MARK_OUTSIDE) {
           markup[at.x][at.y] = MARK_WINDOW;
         }
       }
@@ -369,6 +372,12 @@ public class SceneGen implements TileConstants {
         visit.visitWall(wall, at, dir);
       }
     }
+  }
+  
+  
+  void markup(int x, int y, byte markVal) {
+    try { markup[x][y] = markVal; }
+    catch (ArrayIndexOutOfBoundsException e) {}
   }
   
   
