@@ -22,7 +22,7 @@ public class DebugSceneGen {
     
     SceneGen gen = new SceneGen(scene);
     gen.verbose = true;
-    gen.attemptPopulation(root, new Box2D(2, 2, 28, 28));
+    gen.populateAsRoot(root, new Box2D(2, 2, 28, 28));
     
     I.say("FINAL STATE...");
     gen.printMarkup();

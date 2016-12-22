@@ -5,17 +5,20 @@ import proto.util.*;
 
 
 
-public class SceneGen {
+public class SceneGen implements TileConstants {
   
   
   /**  Constants, data fields and construction methods-
     */
   final static byte
     MARK_NONE     = 0,
-    MARK_CORRIDOR = 1,
-    MARK_WALLS    = 2,
-    MARK_DOORS    = 3,
-    MARK_FLOOR    = 4
+    MARK_OUTSIDE  = 1,
+    MARK_CORRIDOR = 2,
+    MARK_WINDOW   = 3,
+    MARK_WALLS    = 4,
+    MARK_LIMITS   = 5,
+    MARK_DOORS    = 6,
+    MARK_FLOOR    = 7
   ;
   
   final Scene scene;
@@ -25,6 +28,16 @@ public class SceneGen {
   public float corWideFraction = 0.125f;
   public float maxSplitFrac = 0.5f;
   public boolean verbose = false;
+  
+  static class AreaCheck { SceneType room; boolean valid; }
+  
+  static class Room {
+    SceneType type;
+    Box2D area;
+    Coord walls[][];
+  }
+  
+  List <Room> rooms = new List(), corridors = new List();
   
   
   public SceneGen(Scene scene) {
@@ -49,9 +62,26 @@ public class SceneGen {
   
   
   
-  /**
+  /**  
     */
-  public void attemptPopulation(SceneType parent, Box2D area) {
+  public void populateAsRoot(SceneType root, Box2D area) {
+    //markArea(new Box2D(0, 0, scene.size, scene.size), MARK_OUTSIDE);
+    attemptPopulation(root, area);
+    
+//  TODO:  Next you need to install doors and windows, plus the curtain wall.
+//    Doors are placed whenever a corridor terminates on the curtain wall.
+//    Each room must have at least one door opening onto it's corridor.
+//    Rooms adjoining the curtain wall should have windows.
+    
+    placeCurtainWall(area);
+    
+    for (Room room : rooms) {
+      insertDoorsForRoom(room);
+    }
+  }
+  
+  
+  void attemptPopulation(SceneType parent, Box2D area) {
     //
     //  Firstly, check if the area itself is fit to populate with one of the
     //  scene's room-types:
@@ -135,17 +165,16 @@ public class SceneGen {
       ac.setY(y + p3, p4 - p3);
       a2.setY(y + p5, p6 - p5);
     }
-    markArea(ac, MARK_CORRIDOR);
+    
+    performRoomFill(ac, parent, MARK_CORRIDOR, true);
     attemptPopulation(parent, a1);
     attemptPopulation(parent, a2);
   }
   
   
   
-  /**  
+  /**  Utility methods for checking the validity of room placement-
     */
-  static class AreaCheck { SceneType room; boolean valid; }
-  
   AreaCheck attemptAreaCheck(SceneType parent, Box2D area) {
     AreaCheck check = new AreaCheck();
     
@@ -198,18 +227,45 @@ public class SceneGen {
   
   /**
     */
-  void performRoomFill(Box2D area, SceneType room) {
-    //  TODO:  Perform the task of actual population with walls, doors, floors,
-    //  et cetera...
+  void performRoomFill(Box2D area, SceneType type) {
+    performRoomFill(area, type, MARK_FLOOR, false);
+  }
+  
+  
+  void performRoomFill(
+    Box2D area, SceneType type, byte markVal, boolean corridor
+  ) {
+    final Room room = new Room();
+    room.type = type;
+    room.area = area;
+    room.walls = new Coord[4][];
+    
     int x = (int) area.xpos(), y = (int) area.ypos();
     int w = (int) area.xdim(), h = (int) area.ydim();
     
     for (Coord c : Visit.grid(x, y, w, h, 1)) {
-      markup[c.x][c.y] = MARK_FLOOR;
+      markup[c.x][c.y] = markVal;
     }
+    
+    int wallIndex = 0, tileIndex = 0;
+    room.walls[0] = new Coord[w + 1];
+    room.walls[1] = new Coord[h + 1];
+    room.walls[2] = new Coord[w + 1];
+    room.walls[3] = new Coord[h + 1];
+    
     for (Coord c : Visit.perimeter(x, y, w, h)) {
-      markup[c.x][c.y] = MARK_WALLS;
+      if (! corridor) markup[c.x][c.y] = MARK_WALLS;
+      room.walls[wallIndex][tileIndex] = new Coord(c);
+      
+      if (++tileIndex >= room.walls[wallIndex].length) {
+        tileIndex = 0;
+        wallIndex++;
+      }
     }
+    
+    if (corridor) corridors.add(room);
+    else rooms.add(room);
+    
     if (verbose) {
       I.say("Performed room fill!");
       printMarkup();
@@ -217,20 +273,43 @@ public class SceneGen {
   }
   
   
-  void markArea(Box2D area, byte markVal) {
-    int x = (int) area.xpos(), y = (int) area.ypos();
-    int w = (int) area.xdim(), h = (int) area.ydim();
-    for (Coord c : Visit.grid(x, y, w, h, 1)) {
-      markup[c.x][c.y] = markVal;
-    }
-    
-    if (verbose) {
-      I.say("Marked with value: "+markVal+", area: "+area);
-      printMarkup();
+  
+  /**  Utility methods for furniture placement-
+    */
+  void insertDoorsForRoom(Room room) {
+    //
+    //  Okay.  Firstly, find a wall facing onto a corridor.  Then, pick a tile
+    //  somewhere along it's face, and place the door.
+    for (int i = 4; i-- > 0;) {
+      Coord wall[] = room.walls[i];
+      Coord middle = wall[1 + Rand.index(wall.length - 1)];
+      final int dir = T_ADJACENT[(i + 3) % 4];
+      
+      int x = middle.x + T_X[dir], y = middle.y + T_Y[dir];
+      byte nearVal = markup[x][y];
+      
+      if (nearVal == MARK_CORRIDOR) {
+        markup[middle.x][middle.y] = MARK_DOORS;
+      }
     }
   }
   
+  
+  //  TODO:  In future, you might want to do a proper perimeter trace...
+  void placeCurtainWall(Box2D area) {
+    int x = (int) area.xpos(), y = (int) area.ypos();
+    int w = (int) area.xdim(), h = (int) area.ydim();
+    
+    for (Coord c : Visit.perimeter(x, y, w, h)) {
+      markup[c.x][c.y] = MARK_LIMITS;
+    }
+  }
+  
+  
 }
+
+
+
 
 
 
