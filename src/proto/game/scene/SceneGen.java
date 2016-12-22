@@ -11,14 +11,21 @@ public class SceneGen implements TileConstants {
   /**  Constants, data fields and construction methods-
     */
   final static byte
-    MARK_NONE     = 0,
-    MARK_OUTSIDE  = 1,
-    MARK_CORRIDOR = 2,
-    MARK_WINDOW   = 3,
-    MARK_WALLS    = 4,
-    MARK_LIMITS   = 5,
-    MARK_DOORS    = 6,
-    MARK_FLOOR    = 7
+    MARK_NONE     = -1,
+    MARK_INIT     =  0,
+    MARK_OUTSIDE  =  1,
+    MARK_CORRIDOR =  2,
+    MARK_WINDOW   =  3,
+    MARK_WALLS    =  4,
+    MARK_LIMITS   =  5,
+    MARK_DOORS    =  6,
+    MARK_FLOOR    =  7
+  ;
+  final static int
+    VISIT_ALL        = 0,
+    VISIT_NO_CORNERS = 1,
+    VISIT_MIDDLE     = 2,
+    VISIT_RANDOM     = 3
   ;
   
   final Scene scene;
@@ -35,6 +42,10 @@ public class SceneGen implements TileConstants {
     SceneType type;
     Box2D area;
     Coord walls[][];
+  }
+
+  static abstract class WallVisit {
+    abstract void visitWall(Coord wall[], Coord at, int dir);
   }
   
   List <Room> rooms = new List(), corridors = new List();
@@ -65,18 +76,16 @@ public class SceneGen implements TileConstants {
   /**  
     */
   public void populateAsRoot(SceneType root, Box2D area) {
-    //markArea(new Box2D(0, 0, scene.size, scene.size), MARK_OUTSIDE);
+    
     attemptPopulation(root, area);
-    
-//  TODO:  Next you need to install doors and windows, plus the curtain wall.
-//    Doors are placed whenever a corridor terminates on the curtain wall.
-//    Each room must have at least one door opening onto it's corridor.
-//    Rooms adjoining the curtain wall should have windows.
-    
     placeCurtainWall(area);
     
     for (Room room : rooms) {
       insertDoorsForRoom(room);
+      insertWindowsForRoom(room);
+    }
+    for (Room room : corridors) {
+      insertDoorsForCorridor(room);
     }
   }
   
@@ -94,7 +103,7 @@ public class SceneGen implements TileConstants {
     //  Failing that, try subdividing the area into two different areas along
     //  the longer axis, and try to ensure that each can be filled with a room
     //  that has access to a corridor- or failing that, that each has access to
-    //  a corrider along it's longer side (see below.)
+    //  a corridor along it's longer side (see below.)
     boolean longX = area.xdim() > area.ydim();
     int maxSide = (int) area.maxSide();
     if (maxSide <= minRoomSize) return;
@@ -166,7 +175,7 @@ public class SceneGen implements TileConstants {
       a2.setY(y + p5, p6 - p5);
     }
     
-    performRoomFill(ac, parent, MARK_CORRIDOR, true);
+    performCorridorFill(ac, parent);
     attemptPopulation(parent, a1);
     attemptPopulation(parent, a2);
   }
@@ -225,47 +234,60 @@ public class SceneGen implements TileConstants {
   
   
   
-  /**
+  /**  Utility methods for doing actual markup of the floorplan-
     */
   void performRoomFill(Box2D area, SceneType type) {
-    performRoomFill(area, type, MARK_FLOOR, false);
+    performFill(area, type, MARK_FLOOR, MARK_WALLS, rooms);
   }
   
   
-  void performRoomFill(
-    Box2D area, SceneType type, byte markVal, boolean corridor
+  void performCorridorFill(Box2D area, SceneType type) {
+    performFill(area, type, MARK_CORRIDOR, MARK_NONE, corridors);
+  }
+  
+  
+  void performFill(
+    Box2D area, SceneType type, byte floorVal, byte wallVal,
+    Series <Room> collection
   ) {
+    //
+    //  First we generate the room object, store it, and mark the entire floor.
     final Room room = new Room();
     room.type = type;
     room.area = area;
     room.walls = new Coord[4][];
+    collection.add(room);
     
     int x = (int) area.xpos(), y = (int) area.ypos();
     int w = (int) area.xdim(), h = (int) area.ydim();
     
     for (Coord c : Visit.grid(x, y, w, h, 1)) {
-      markup[c.x][c.y] = markVal;
+      if (floorVal != MARK_NONE) markup[c.x][c.y] = floorVal;
     }
-    
+    //
+    //  Then we iterate over the perimeter, mark as required, and store an
+    //  array of points visited as walls.  (Note some post-processing to ensure
+    //  corners appear in both adjoining walls.)
     int wallIndex = 0, tileIndex = 0;
-    room.walls[0] = new Coord[w + 1];
-    room.walls[1] = new Coord[h + 1];
-    room.walls[2] = new Coord[w + 1];
-    room.walls[3] = new Coord[h + 1];
-    
+    room.walls[0] = new Coord[w + 2];
+    room.walls[1] = new Coord[h + 2];
+    room.walls[2] = new Coord[w + 2];
+    room.walls[3] = new Coord[h + 2];
     for (Coord c : Visit.perimeter(x, y, w, h)) {
-      if (! corridor) markup[c.x][c.y] = MARK_WALLS;
+      if (wallVal != MARK_NONE) markup[c.x][c.y] = wallVal;
       room.walls[wallIndex][tileIndex] = new Coord(c);
       
-      if (++tileIndex >= room.walls[wallIndex].length) {
+      if (++tileIndex > room.walls[wallIndex].length - 2) {
         tileIndex = 0;
         wallIndex++;
       }
     }
-    
-    if (corridor) corridors.add(room);
-    else rooms.add(room);
-    
+    for (int i = 4; i-- > 0;) {
+      Coord wall[] = room.walls[i], nextWall[] = room.walls[(i + 1) % 4];
+      wall[wall.length - 1] = nextWall[0];
+    }
+    //
+    //  Report and return-
     if (verbose) {
       I.say("Performed room fill!");
       printMarkup();
@@ -276,25 +298,6 @@ public class SceneGen implements TileConstants {
   
   /**  Utility methods for furniture placement-
     */
-  void insertDoorsForRoom(Room room) {
-    //
-    //  Okay.  Firstly, find a wall facing onto a corridor.  Then, pick a tile
-    //  somewhere along it's face, and place the door.
-    for (int i = 4; i-- > 0;) {
-      Coord wall[] = room.walls[i];
-      Coord middle = wall[1 + Rand.index(wall.length - 1)];
-      final int dir = T_ADJACENT[(i + 3) % 4];
-      
-      int x = middle.x + T_X[dir], y = middle.y + T_Y[dir];
-      byte nearVal = markup[x][y];
-      
-      if (nearVal == MARK_CORRIDOR) {
-        markup[middle.x][middle.y] = MARK_DOORS;
-      }
-    }
-  }
-  
-  
   //  TODO:  In future, you might want to do a proper perimeter trace...
   void placeCurtainWall(Box2D area) {
     int x = (int) area.xpos(), y = (int) area.ypos();
@@ -306,15 +309,74 @@ public class SceneGen implements TileConstants {
   }
   
   
+  void insertDoorsForRoom(Room room) {
+    visitWalls(room, VISIT_RANDOM, new WallVisit() {
+      public void visitWall(Coord[] wall, Coord at, int dir) {
+        if (sampleFacing(at.x, at.y, dir) == MARK_CORRIDOR) {
+          markup[at.x][at.y] = MARK_DOORS;
+        }
+      }
+    });
+  }
+  
+  
+  void insertDoorsForCorridor(Room room) {
+    visitWalls(room, VISIT_NO_CORNERS, new WallVisit() {
+      void visitWall(Coord[] wall, Coord at, int dir) {
+        int atX = at.x - T_X[dir], atY = at.y - T_Y[dir];
+        if (sampleFacing(atX, atY, dir) == MARK_INIT) {
+          markup[atX][atY] = MARK_DOORS;
+        }
+      }
+    });
+  }
+  
+  
+  void insertWindowsForRoom(Room room) {
+    visitWalls(room, VISIT_RANDOM, new WallVisit() {
+      void visitWall(Coord[] wall, Coord at, int dir) {
+        if (sampleFacing(at.x, at.y, dir) == MARK_INIT) {
+          markup[at.x][at.y] = MARK_WINDOW;
+        }
+      }
+    });
+  }
+  
+  
+  
+  /**  Other utility methods for iteration over structural features:
+    */
+  void visitWalls(Room room, int visitMode, WallVisit visit) {
+    for (int i = 4; i-- > 0;) {
+      final Coord wall[] = room.walls[i];
+      final int dir = T_ADJACENT[(i + 3) % 4];
+      
+      if (visitMode == VISIT_ALL) {
+        for (Coord at : wall) visit.visitWall(wall, at, dir);
+      }
+      if (visitMode == VISIT_NO_CORNERS) {
+        for (Coord at : wall) {
+          if (at == wall[0] || at == Visit.last(wall)) continue;
+          visit.visitWall(wall, at, dir);
+        }
+      }
+      if (visitMode == VISIT_MIDDLE) {
+        Coord at = wall[wall.length / 2];
+        visit.visitWall(wall, at, dir);
+      }
+      if (visitMode == VISIT_RANDOM) {
+        Coord at = wall[1 + Rand.index(wall.length - 2)];
+        visit.visitWall(wall, at, dir);
+      }
+    }
+  }
+  
+  
+  byte sampleFacing(int atX, int atY, int dir) {
+    try { return markup[atX + T_X[dir]][atY + T_Y[dir]]; }
+    catch (ArrayIndexOutOfBoundsException e) { return MARK_NONE; }
+  }
+  
 }
-
-
-
-
-
-
-
-
-
 
 
