@@ -19,6 +19,7 @@ public class DebugSceneGen {
     Place park = new Place(Facilities.BUSINESS_PARK, 0, world);
     SceneType root = park.kind().sceneType();
     Scene scene = new Scene(park, 32);
+    scene.setupScene();
     
     SceneGen gen = new SceneGen(scene);
     gen.verbose = true;

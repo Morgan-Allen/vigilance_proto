@@ -1,8 +1,12 @@
 
 
 package proto.game.scene;
+import proto.common.*;
 import proto.util.*;
 
+
+
+//  TODO:  Include a sprinkling of random props within the various rooms...
 
 
 public class SceneGen implements TileConstants {
@@ -25,7 +29,9 @@ public class SceneGen implements TileConstants {
     VISIT_ALL        = 0,
     VISIT_NO_CORNERS = 1,
     VISIT_MIDDLE     = 2,
-    VISIT_RANDOM     = 3
+    VISIT_RANDOM     = 3,
+    VISIT_FLOORS     = 4,
+    VISIT_CEILING    = 5
   ;
   
   final Scene scene;
@@ -41,11 +47,11 @@ public class SceneGen implements TileConstants {
   static class Room {
     SceneType type;
     Box2D area;
-    Coord walls[][];
+    Coord walls[][], floor[], ceiling[];
   }
 
-  static abstract class WallVisit {
-    abstract void visitWall(Coord wall[], Coord at, int dir);
+  static abstract class Tiling {
+    abstract void tile(Coord wall[], Coord at, int dir);
   }
   
   List <Room> rooms = new List(), corridors = new List();
@@ -76,16 +82,14 @@ public class SceneGen implements TileConstants {
   /**  
     */
   public void populateAsRoot(SceneType root, Box2D area) {
-    
     attemptPopulation(root, area);
-    placeCurtainWall(area);
     
+    placeCurtainWall(root, area);
     for (Room room : rooms) {
-      insertDoorsForRoom(room);
-      insertWindowsForRoom(room);
+      insertPropsForRoom(room);
     }
     for (Room room : corridors) {
-      insertDoorsForCorridor(room);
+      insertPropsForCorridor(room);
     }
   }
   
@@ -252,27 +256,30 @@ public class SceneGen implements TileConstants {
   ) {
     //
     //  First we generate the room object, store it, and mark the entire floor.
+    int x = (int) area.xpos(), y = (int) area.ypos();
+    int w = (int) area.xdim(), h = (int) area.ydim();
     final Room room = new Room();
     room.type = type;
     room.area = area;
     room.walls = new Coord[4][];
+    room.walls[0] = new Coord[w + 2];
+    room.walls[1] = new Coord[h + 2];
+    room.walls[2] = new Coord[w + 2];
+    room.walls[3] = new Coord[h + 2];
+    room.floor    = new Coord[w * h];
+    room.ceiling  = new Coord[w * h];
     collection.add(room);
     
-    int x = (int) area.xpos(), y = (int) area.ypos();
-    int w = (int) area.xdim(), h = (int) area.ydim();
-    
+    int floorIndex = 0, wallIndex = 0, tileIndex = 0;
     for (Coord c : Visit.grid(x, y, w, h, 1)) {
       if (floorVal != MARK_NONE) markup[c.x][c.y] = floorVal;
+      room.floor  [floorIndex] = new Coord(c);
+      room.ceiling[floorIndex] = room.floor[floorIndex++];
     }
     //
     //  Then we iterate over the perimeter, mark as required, and store an
     //  array of points visited as walls.  (Note some post-processing to ensure
     //  corners appear in both adjoining walls.)
-    int wallIndex = 0, tileIndex = 0;
-    room.walls[0] = new Coord[w + 2];
-    room.walls[1] = new Coord[h + 2];
-    room.walls[2] = new Coord[w + 2];
-    room.walls[3] = new Coord[h + 2];
     for (Coord c : Visit.perimeter(x, y, w, h)) {
       if (wallVal != MARK_NONE) markup[c.x][c.y] = wallVal;
       room.walls[wallIndex][tileIndex] = new Coord(c);
@@ -299,12 +306,12 @@ public class SceneGen implements TileConstants {
   /**  Utility methods for furniture placement-
     */
   //  TODO:  In future, you might want to do a proper perimeter trace...
-  void placeCurtainWall(Box2D area) {
+  void placeCurtainWall(SceneType buildingType, Box2D area) {
     int x = (int) area.xpos(), y = (int) area.ypos();
     int w = (int) area.xdim(), h = (int) area.ydim();
     
     for (Coord c : Visit.perimeter(x, y, w, h)) {
-      markup(c.x, c.y, MARK_OUT_WALL);
+      insertProp(c.x, c.y, buildingType.borders, MARK_OUT_WALL, true);
     }
     for (Coord c : Visit.perimeter(x - 1, y - 1, w + 2, h + 2)) {
       markup(c.x, c.y, MARK_OUTSIDE);
@@ -312,72 +319,100 @@ public class SceneGen implements TileConstants {
   }
   
   
-  void insertDoorsForRoom(Room room) {
-    visitWalls(room, VISIT_RANDOM, new WallVisit() {
-      public void visitWall(Coord[] wall, Coord at, int dir) {
+  void insertPropsForRoom(final Room room) {
+    visitWalls(room, VISIT_FLOORS, new Tiling() {
+      void tile(Coord[] wall, Coord at, int dir) {
+        insertProp(at.x, at.y, room.type.floors, MARK_FLOOR, false);
+      }
+    });
+    visitWalls(room, VISIT_ALL, new Tiling() {
+      void tile(Coord[] wall, Coord at, int dir) {
+        insertProp(at.x, at.y, room.type.borders, MARK_WALLS, false);
+      }
+    });
+    visitWalls(room, VISIT_RANDOM, new Tiling() {
+      void tile(Coord[] wall, Coord at, int dir) {
         if (sampleFacing(at.x, at.y, dir) == MARK_CORRIDOR) {
-          markup[at.x][at.y] = MARK_DOORS;
+          insertProp(at.x, at.y, room.type.door, MARK_DOORS, true);
+        }
+      }
+    });
+    visitWalls(room, VISIT_MIDDLE, new Tiling() {
+      void tile(Coord[] wall, Coord at, int dir) {
+        if (sampleFacing(at.x, at.y, dir) == MARK_OUTSIDE) {
+          insertProp(at.x, at.y, room.type.window, MARK_WINDOW, true);
         }
       }
     });
   }
   
   
-  void insertDoorsForCorridor(Room room) {
-    visitWalls(room, VISIT_NO_CORNERS, new WallVisit() {
-      void visitWall(Coord[] wall, Coord at, int dir) {
+  void insertPropsForCorridor(final Room room) {
+    visitWalls(room, VISIT_FLOORS, new Tiling() {
+      void tile(Coord[] wall, Coord at, int dir) {
+        insertProp(at.x, at.y, room.type.floors, MARK_CORRIDOR, false);
+      }
+    });
+    visitWalls(room, VISIT_NO_CORNERS, new Tiling() {
+      void tile(Coord[] wall, Coord at, int dir) {
         int atX = at.x - T_X[dir], atY = at.y - T_Y[dir];
         if (sampleFacing(atX, atY, dir) == MARK_OUTSIDE) {
-          markup[atX][atY] = MARK_DOORS;
+          insertProp(atX, atY, room.type.door, MARK_DOORS, true);
         }
       }
     });
   }
   
   
-  void insertWindowsForRoom(Room room) {
-    visitWalls(room, VISIT_MIDDLE, new WallVisit() {
-      void visitWall(Coord[] wall, Coord at, int dir) {
-        if (sampleFacing(at.x, at.y, dir) == MARK_OUTSIDE) {
-          markup[at.x][at.y] = MARK_WINDOW;
-        }
-      }
-    });
+  void insertProp(int atX, int atY, Kind kind, byte markVal, boolean replace) {
+    if (kind == null || ! markup(atX, atY, markVal)) return;
+    if (scene.tileAt(atX, atY).prop() != null && ! replace) return;
+    scene.addProp(kind, atX, atY);
   }
   
   
   
   /**  Other utility methods for iteration over structural features:
     */
-  void visitWalls(Room room, int visitMode, WallVisit visit) {
-    for (int i = 4; i-- > 0;) {
+  void visitWalls(Room room, int visitMode, Tiling visit) {
+    
+    if (visitMode == VISIT_FLOORS || visitMode == VISIT_CEILING) {
+      final Box2D a = room.area;
+      int x = (int) a.xpos(), y = (int) a.ypos();
+      int w = (int) a.xdim(), h = (int) a.ydim();
+      
+      for (Coord c : Visit.grid(x, y, w, h, 1)) {
+        visit.tile(room.floor, c, CENTRE);
+      }
+    }
+    else for (int i = 4; i-- > 0;) {
       final Coord wall[] = room.walls[i];
       final int dir = T_ADJACENT[(i + 3) % 4];
       
       if (visitMode == VISIT_ALL) {
-        for (Coord at : wall) visit.visitWall(wall, at, dir);
+        for (Coord at : wall) visit.tile(wall, at, dir);
       }
       if (visitMode == VISIT_NO_CORNERS) {
         for (Coord at : wall) {
           if (at == wall[0] || at == Visit.last(wall)) continue;
-          visit.visitWall(wall, at, dir);
+          visit.tile(wall, at, dir);
         }
       }
       if (visitMode == VISIT_MIDDLE) {
         Coord at = wall[wall.length / 2];
-        visit.visitWall(wall, at, dir);
+        visit.tile(wall, at, dir);
       }
       if (visitMode == VISIT_RANDOM) {
         Coord at = wall[1 + Rand.index(wall.length - 2)];
-        visit.visitWall(wall, at, dir);
+        visit.tile(wall, at, dir);
       }
     }
   }
   
   
-  void markup(int x, int y, byte markVal) {
-    try { markup[x][y] = markVal; }
-    catch (ArrayIndexOutOfBoundsException e) {}
+  boolean markup(int x, int y, byte markVal) {
+    try { markup[x][y] = markVal; return true; }
+    catch (ArrayIndexOutOfBoundsException e) { return false; }
   }
   
   
