@@ -2,6 +2,7 @@
 
 package proto.common;
 import proto.game.world.*;
+import proto.view.scene.SceneView;
 import proto.game.person.*;
 import proto.game.event.*;
 import proto.content.agents.*;
@@ -75,6 +76,9 @@ public class DebugScene extends RunGame {
       guarding.setAssigned(p, true);
     }
     guarding.setCompleted(true);
+    
+    SceneView view = world.view().sceneView();
+    view.debugMode = true;
     
     return world;
   }

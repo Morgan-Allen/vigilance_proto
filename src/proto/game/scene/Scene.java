@@ -14,7 +14,6 @@ import java.awt.Image;
 
 //  TODO:  This doesn't need to implement Assignment.
 
-
 public class Scene implements Session.Saveable, Assignment, TileConstants {
   
   
@@ -304,6 +303,18 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     }
     prop.origin = tileAt(x, y);
     props.add(prop);
+    return true;
+  }
+  
+  
+  public boolean hasSpace(Kind type, int x, int y) {
+    for (Coord c : Visit.grid(x, y, type.wide(), type.high(), 1)) {
+      Tile under = tileAt(c.x, c.y);
+      if (under == null) return false;
+      if (under.prop() == null) continue;
+      final Kind uK = under.prop().kind();
+      if (uK.blockPath() || uK.blockSight()) return false;
+    }
     return true;
   }
   

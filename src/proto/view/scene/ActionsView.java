@@ -89,7 +89,7 @@ public class ActionsView extends UINode {
     final Ability  a      = selectAbility;
     final Action   action = scene.currentAction();
     
-    if (scene.complete()) {
+    if (scene.complete() && ! sceneView.debugMode) {
       describeEndSummary(surface, s);
       return s.toString();
     }

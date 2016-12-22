@@ -23,7 +23,8 @@ public class SceneGen implements TileConstants {
     MARK_WINDOW   =  4,
     MARK_DOORS    =  5,
     MARK_FLOOR    =  6,
-    MARK_CORRIDOR =  7
+    MARK_PROP     =  7,
+    MARK_CORRIDOR =  8
   ;
   final static int
     VISIT_ALL        = 0,
@@ -82,8 +83,7 @@ public class SceneGen implements TileConstants {
   /**  
     */
   public void populateAsRoot(SceneType root, Box2D area) {
-    attemptPopulation(root, area);
-    
+    attemptRoomDivision(root, area);
     placeCurtainWall(root, area);
     for (Room room : rooms) {
       insertPropsForRoom(room);
@@ -94,7 +94,7 @@ public class SceneGen implements TileConstants {
   }
   
   
-  void attemptPopulation(SceneType parent, Box2D area) {
+  void attemptRoomDivision(SceneType parent, Box2D area) {
     //
     //  Firstly, check if the area itself is fit to populate with one of the
     //  scene's room-types:
@@ -146,10 +146,10 @@ public class SceneGen implements TileConstants {
     if (check1.valid && check2.valid) {
       
       if (check1.room != null) performRoomFill(a1, check1.room);
-      else attemptPopulation(parent, a1);
+      else attemptRoomDivision(parent, a1);
       
       if (check2.room != null) performRoomFill(a2, check2.room);
-      else attemptPopulation(parent, a2);
+      else attemptRoomDivision(parent, a2);
       
       return;
     }
@@ -180,8 +180,8 @@ public class SceneGen implements TileConstants {
     }
     
     performCorridorFill(ac, parent);
-    attemptPopulation(parent, a1);
-    attemptPopulation(parent, a2);
+    attemptRoomDivision(parent, a1);
+    attemptRoomDivision(parent, a2);
   }
   
   
@@ -344,6 +344,28 @@ public class SceneGen implements TileConstants {
         }
       }
     });
+    //
+    //  TODO:  You'll want to use some more sophisticated options for placing
+    //  props- e.g, at regular spacing, with varying frequency, next to the
+    //  walls, surrounding other props, et cetera.
+    final Box2D a = room.area;
+    float roomArea = a.area();
+    
+    for (Kind propType : room.type.props) {
+      float areaUsed = 0, maxUsed = (roomArea * 0.5f) / room.type.props.length;
+      float propArea = propType.wide() * propType.high();
+      int numTries = 0, maxTries = (int) (roomArea * 4f / propArea);
+      
+      while (areaUsed < maxUsed && numTries++ < maxTries) {
+        int x = (int) Rand.range(a.xpos(), a.xmax());
+        int y = (int) Rand.range(a.ypos(), a.ymax());
+        
+        if (couldBlockPathing(propType, x, y)) continue;
+        insertProp(x, y, propType, MARK_PROP, false);
+        areaUsed += propArea;
+      }
+    }
+    
   }
   
   
@@ -365,9 +387,13 @@ public class SceneGen implements TileConstants {
   
   
   void insertProp(int atX, int atY, Kind kind, byte markVal, boolean replace) {
-    if (kind == null || ! markup(atX, atY, markVal)) return;
-    if (scene.tileAt(atX, atY).prop() != null && ! replace) return;
+    if (kind == null) return;
+    if ((! replace) && (! scene.hasSpace(kind, atX, atY))) return;
+    
     scene.addProp(kind, atX, atY);
+    
+    final int w = kind.wide(), h = kind.high();
+    for (Coord c : Visit.grid(atX, atY, w, h, 1)) markup(c.x, c.y, markVal);
   }
   
   
@@ -421,6 +447,47 @@ public class SceneGen implements TileConstants {
     catch (ArrayIndexOutOfBoundsException e) { return MARK_NONE; }
   }
   
+  
+  boolean couldBlockPathing(Kind propType, int atX, int atY) {
+    int w = propType.wide(), h = propType.high();
+    int isBlocked = -1, firstBlocked = -1, numBlockages = 0;
+    
+    for (Coord c : Visit.grid(atY, atY, w, h, 1)) {
+      final byte mark = sampleFacing(c.x, c.y, CENTRE);
+      if (mark != MARK_FLOOR && mark != MARK_CORRIDOR) return true;
+    }
+    
+    for (Coord c : Visit.perimeter(atY, atY, w, h)) {
+      final byte mark = sampleFacing(c.x, c.y, CENTRE);
+      if (mark == MARK_DOORS) return true;
+      final boolean blocked = mark != MARK_FLOOR && mark != MARK_CORRIDOR;
+      
+      if (firstBlocked == -1) {
+        firstBlocked = blocked ? 1 : 0;
+      }
+      if (blocked) {
+        if (isBlocked != 1) {
+          isBlocked = 1;
+          numBlockages++;
+        }
+      }
+      else {
+        if (isBlocked != 0) {
+          isBlocked = 0;
+        }
+      }
+    }
+    if (isBlocked != firstBlocked) numBlockages++;
+    
+    return numBlockages < 2;
+  }
+  
 }
+
+
+
+
+
+
 
 

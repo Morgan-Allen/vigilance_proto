@@ -45,14 +45,13 @@ public class LeadGuard extends Lead {
   
   
   protected void onSuccess() {
-    
+    //
     //  TODO:  This should only be triggered when the event itself is either
     //  going down or about to do so!
     
     Place place = event.targetLocation();
     SceneType sceneType = place.kind().sceneType();
     Scene mission = sceneType.generateScene(place, 32);
-    
     event.populateScene(mission);
     
     //

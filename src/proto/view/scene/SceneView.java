@@ -19,6 +19,7 @@ public class SceneView extends UINode {
   final static String IMG_DIR = "media assets/scene view/";
   
   final ActionsView actionsView;
+  public boolean debugMode = false;
   
   Tile zoomTile;
   int zoomX, zoomY;
@@ -121,7 +122,8 @@ public class SceneView extends UINode {
     //
     //  Render the persons themselves, and any action underway-
     for (Person p : scene.persons()) {
-      if (scene.fogAt(p.currentTile(), Person.Side.HEROES) <= 0) continue;
+      float fog = scene.fogAt(p.currentTile(), Person.Side.HEROES);
+      if (fog <= 0 && ! debugMode) continue;
       Vec3D pos = p.exactPosition();
       renderAt(pos.x, pos.y, p.kind(), g);
       visible.add(p);
@@ -152,12 +154,13 @@ public class SceneView extends UINode {
     for (Coord c : Visit.grid(0, 0, size, size, 1)) {
       Tile t = scene.tileAt(c.x, c.y);
       float fogAlpha = 1f - scene.fogAt(t, Person.Side.HEROES);
+      if (debugMode) fogAlpha /= 3;
       Color black = SCALE[Nums.clamp((int) (fogAlpha * 10), 10)];
       renderAt(c.x, c.y, 1, 1, null, black, g);
     }
     //
     //  If complete, display a summary of the results!
-    if (scene.complete()) {
+    if (scene.complete() && ! debugMode) {
       return true;
     }
     //

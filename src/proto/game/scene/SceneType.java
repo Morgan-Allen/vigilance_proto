@@ -101,48 +101,14 @@ public class SceneType extends Index.Entry implements
   public Scene generateScene(Place place, int size) {
     final Scene scene = new Scene(place, size);
     scene.setupScene();
-    final Box2D area = new Box2D().set(2, 2, size - 4, size - 4);
-    populateScene(scene, area);
+    
+    final Box2D area = new Box2D(2, 2, size - 4, size - 4);
+    final SceneGen gen = new SceneGen(scene);
+    gen.populateAsRoot(this, area);
+    
     return scene;
   }
   
-  
-  void populateScene(Scene scene, Box2D area) {
-    final int
-      minX = (int) area.xpos(),
-      minY = (int) area.ypos(),
-      dimX = (int) area.xdim(),
-      dimY = (int) area.ydim()
-    ;
-    
-    for (Coord c : Visit.grid(minX, minY, dimX, dimY, 1)) {
-      scene.addProp(floors, c.x, c.y);
-    }
-    
-    int x = minX, y = minY;
-    final int DIRS[] = { N, E, S, W };
-    for (int n = 0; n < 4; n++) {
-      final int dir = DIRS[n], side;
-      side = (dir == W || dir == E) ? dimX : dimY;
-      
-      int doorSpace = Nums.min(8, side / 2);
-      int windSpace = Nums.min(4, side / 4);
-      
-      for (int s = side; s-- > 0;) {
-        Kind prop = borders;
-        if (s % windSpace == 0) prop = window;
-        if (s % doorSpace == 0) prop = door;
-        scene.addProp(prop, x, y);
-        x += T_X[dir];
-        y += T_Y[dir];
-      }
-    }
-    
-    int totalPropArea = 0, totalArea = (int) area.area();
-    for (Kind propType : props) {
-      totalPropArea += propType.wide() * propType.high();
-    }
-  }
   
   
   
