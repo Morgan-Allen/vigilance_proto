@@ -107,18 +107,26 @@ public class SceneView extends UINode {
       Tile t = prop.origin();
       renderAt(t.x, t.y, prop.kind(), g);
     }
-    
     //
-    //  Render enemy-sight on top of objects but beneath persons-
-    for (Coord c : Visit.grid(0, 0, size, size, 1)) {
-      Tile t = scene.tileAt(c.x, c.y);
-      float seeAlpha = scene.fogAt(t, Person.Side.VILLAINS);
-      if (seeAlpha > 0) {
-        Color warns = ENEMY[Nums.clamp((int) (seeAlpha * 10), 10)];
+    //  Render enemy-sight on top of objects but beneath persons- but ONLY if
+    //  the enemy is visible themselves.
+    for (Person p : scene.othersTeam()) {
+      float fog = scene.fogAt(p.currentTile(), Person.Side.HEROES);
+      if (fog <= 0 && ! debugMode) continue;
+      
+      Vec3D exactPos = p.exactPosition();
+      float sightRange = p.actions.sightRange();
+      final Box2D area = new Box2D(exactPos.x, exactPos.y, 0, 0);
+      area.expandBy(Nums.ceil(sightRange));
+      
+      for (Coord c : Visit.grid(area)) {
+        float dist = exactPos.distance(c.x + 0.5f, c.y + 0.5f, 0) - 0.5f;
+        float glare = Nums.clamp(dist / sightRange, 0, 1);
+        if (glare <= 0) continue;
+        Color warns = ENEMY[Nums.clamp((int) (glare * 10), 10)];
         renderAt(c.x, c.y, 1, 1, null, warns, g);
       }
     }
-    
     //
     //  Render the persons themselves, and any action underway-
     for (Person p : scene.persons()) {

@@ -105,6 +105,7 @@ public class SceneType extends Index.Entry implements
     final Box2D area = new Box2D(2, 2, size - 4, size - 4);
     final SceneGen gen = new SceneGen(scene);
     gen.populateAsRoot(this, area);
+    gen.printMarkup();
     
     return scene;
   }
