@@ -1,6 +1,8 @@
 
 
 package proto.game.scene;
+import java.awt.Color;
+
 import proto.common.*;
 import proto.util.*;
 
@@ -24,7 +26,8 @@ public class SceneGen implements TileConstants {
     MARK_DOORS    =  5,
     MARK_FLOOR    =  6,
     MARK_PROP     =  7,
-    MARK_CORRIDOR =  8
+    MARK_CORRIDOR =  8,
+    MARKUP_TYPES  = 9
   ;
   final static int
     VISIT_ALL        = 0,
@@ -77,6 +80,27 @@ public class SceneGen implements TileConstants {
     I.say("\n");
   }
   
+  
+  public void printMarkupVisually() {
+    
+    int colorVals[][] = new int[scene.size][scene.size];
+    final int colorKeys[] = new int[MARKUP_TYPES];
+    
+    for (int i = MARKUP_TYPES; i-- > 0;) {
+      float hue = i * 1f / MARKUP_TYPES;
+      colorKeys[i] = Color.HSBtoRGB(hue, 1, 0.5f);
+    }
+    
+    for (int y = scene.size; y-- > 0;) {
+      for (int x = 0; x < scene.size; x++) {
+        byte b = markup[x][y];
+        colorVals[x][y] = colorKeys[Nums.clamp(b, MARKUP_TYPES)];
+      }
+    }
+    
+    int winSize = scene.size * 10;
+    I.present(colorVals, "Generated Scene", winSize, winSize);
+  }
   
   
   
