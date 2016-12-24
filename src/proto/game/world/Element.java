@@ -118,6 +118,19 @@ public class Element implements Session.Saveable {
   
   
   
+  /**  Scene support methods-
+    */
+  public boolean blockPath() {
+    return kind.blockPath();
+  }
+  
+  
+  public boolean blockSight() {
+    return kind.blockSight();
+  }
+  
+  
+  
   /**  Rendering, debug and interface methods-
     */
   public String name() {

@@ -99,7 +99,7 @@ public class PersonActions {
   }
   
   
-  public boolean onTurnStart() {
+  boolean onTurnStart() {
     actionPoints = (int) maxAP();
     nextAction   = null;
     turnDone     = false;
@@ -109,7 +109,7 @@ public class PersonActions {
   }
   
   
-  public boolean onTurnEnd() {
+  boolean onTurnEnd() {
     if (nextAction == null || ! nextAction.used.delayed()) {
       nextAction = null;
     }
@@ -120,7 +120,7 @@ public class PersonActions {
   }
   
   
-  public boolean updateDuringTurn() {
+  boolean updateDuringTurn() {
     Scene scene = person.currentScene();
     Action a = nextAction;
     if (scene == null || a == null) return false;

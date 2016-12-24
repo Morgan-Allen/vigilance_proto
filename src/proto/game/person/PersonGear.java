@@ -3,6 +3,7 @@
 package proto.game.person;
 import proto.common.*;
 import proto.game.world.*;
+import proto.game.scene.*;
 import proto.util.*;
 
 
@@ -61,6 +62,22 @@ public class PersonGear {
   }
   
   
+  public void dequipSlot(int slotID, Base from) {
+    equipItem(null, slotID, from);
+  }
+  
+  
+  public void dropItem(int slotID) {
+    if (person.currentTile() == null) I.complain("NOT IN SCENE: "+person);
+    
+    ItemType oldItem = equipSlots[slotID];
+    dequipSlot(slotID, null);
+    
+    Item dropped = new Item(oldItem, person.world());
+    person.currentTile().setInside(dropped, true);
+  }
+  
+  
   public int equipBonus(int slotID, int properties) {
     ItemType item = equipSlots[slotID];
     if (item == null || ! item.hasProperty(properties)) return 0;
@@ -92,6 +109,16 @@ public class PersonGear {
   }
   
   
+  public Series <ItemType> equipment() {
+    Batch <ItemType> all = new Batch();
+    for (ItemType e : equipSlots) if (e != null) all.add(e);
+    return all;
+  }
+  
+  
+  
+  /**  Specific queries related to weapons and armour-
+    */
   public ItemType currentWeapon() {
     ItemType weapon = equippedInSlot(SLOT_WEAPON);
     return weapon == null ? Common.UNARMED : weapon;
@@ -104,12 +131,18 @@ public class PersonGear {
   }
   
   
-  public Series <ItemType> equipment() {
-    Batch <ItemType> all = new Batch();
-    for (ItemType e : equipSlots) if (e != null) all.add(e);
-    return all;
+  public int baseWeaponBonus() {
+    return currentWeapon().bonus;
+  }
+  
+  
+  public int baseArmourBonus() {
+    return currentArmour().bonus;
   }
 }
+
+
+
 
 
 

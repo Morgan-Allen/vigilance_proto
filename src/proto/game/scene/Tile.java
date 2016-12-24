@@ -2,6 +2,7 @@
 
 package proto.game.scene;
 import proto.common.*;
+import proto.game.world.*;
 import proto.game.person.*;
 import proto.util.*;
 import static proto.util.TileConstants.*;
@@ -17,7 +18,7 @@ public class Tile implements Session.Saveable {
   final public int x, y;
   
   private Prop prop;
-  private Stack <Person> inside = new Stack();
+  private Stack <Element> inside = new Stack();
   private int blockState = -1;
   
   Object flag;
@@ -57,16 +58,23 @@ public class Tile implements Session.Saveable {
   }
   
   
-  public Series <Person> inside() {
+  public Series <Element> inside() {
     return inside;
   }
   
   
+  public boolean refreshPathing() {
+    if (blockState == -1) return false;
+    blockState = -1;
+    return true;
+  }
+  
+  
   public boolean blocked() {
-    if (blockState == -1 || true) {
+    if (blockState == -1) {
       blockState = 0;
-      if (prop != null && prop.kind.blockPath()) blockState = 1;
-      for (Person p : inside) if (p.health.conscious()) blockState = 1;
+      if (prop != null && prop.blockPath()) blockState = 1;
+      for (Element p : inside) if (p.blockPath()) blockState = 1;
     }
     return blockState == 1;
   }
@@ -84,7 +92,7 @@ public class Tile implements Session.Saveable {
   
   /**  Modifying state-
     */
-  public void setInside(Person p, boolean is) {
+  public void setInside(Element p, boolean is) {
     if (is) inside.include(p);
     else inside.remove(p);
     blockState = -1;

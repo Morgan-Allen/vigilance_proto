@@ -295,7 +295,7 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   /**  Supplementary population methods for use during initial setup-
     */
   public boolean addProp(Kind type, int x, int y) {
-    Prop prop = new Prop(type);
+    Prop prop = new Prop(type, world);
     for (Coord c : Visit.grid(x, y, type.wide(), type.high(), 1)) {
       Tile under = tileAt(c.x, c.y);
       if (under == null) return false;
@@ -425,16 +425,20 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     playerTurn = true;
     
     updateFog();
-    for (Person p : persons) p.actions.onTurnStart();
+    for (Person p : persons) p.onTurnStart();
   }
   
   
   public void updateScene() {
+
+    for (Person p : persons) if (p != nextActing) {
+      p.updateInScene(false);
+    }
     
     if (nextActing != null) {
       final PersonActions nextPA = nextActing.actions;
       Action last = nextPA.nextAction();
-      nextPA.updateDuringTurn();
+      nextActing.updateInScene(true);
       Action taken = nextPA.nextAction();
       
       if (taken != null) {
@@ -470,7 +474,7 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     PersonActions NA = nextActing == null ? null : nextActing.actions;
     if ((NA != null) && (! NA.turnDone()) && (! NA.canTakeAction())) {
       I.say("\n    Ending turn for "+nextActing);
-      NA.onTurnEnd();
+      nextActing.onTurnEnd();
     }
     nextActing = null;
     final int numTeams = 2;
@@ -511,7 +515,7 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
       if (nextActing == null) {
         I.say("    Will refresh AP and try other team...");
         for (Person p : nextTeam) if (p.currentScene() == this) {
-          p.actions.onTurnStart();
+          p.onTurnStart();
         }
         playerTurn = ! playerTurn;
       }

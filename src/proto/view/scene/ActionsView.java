@@ -139,7 +139,7 @@ public class ActionsView extends UINode {
         if (a == null) {
           s.append("\n  Pass Turn (X)");
           if (surface.isPressed('x')) {
-            p.actions.onTurnEnd();
+            p.onTurnEnd();
             scene.moveToNextPersonsTurn();
           }
         }

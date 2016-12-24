@@ -1,52 +1,36 @@
 
 
 package proto.game.scene;
-import proto.common.Kind;
-import proto.common.Session;
+import proto.common.*;
+import proto.game.world.*;
 import proto.util.*;
 
 
 
-public class Prop implements Session.Saveable {
+public class Prop extends Element {
   
   
-  final Kind kind;
   Tile origin;
   
   
-  Prop(Kind kind) {
-    this.kind = kind;
+  Prop(Kind kind, World world) {
+    super(kind, world);
   }
   
   
   public Prop(Session s) throws Exception {
-    s.cacheInstance(this);
-    kind   = (Kind) s.loadObject();
+    super(s);
     origin = (Tile) s.loadObject();
   }
   
   
   public void saveState(Session s) throws Exception {
-    s.saveObject(kind);
     s.saveObject(origin);
-  }
-  
-  
-  public Kind kind() {
-    return kind;
   }
   
   
   public Tile origin() {
     return origin;
-  }
-  
-  
-  
-  /**  Rendering, debug and interface methods-
-    */
-  public String toString() {
-    return kind.name();
   }
 }
 

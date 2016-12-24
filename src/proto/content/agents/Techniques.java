@@ -1,12 +1,16 @@
 
 
 package proto.content.agents;
+import proto.common.*;
 import proto.game.person.*;
 import proto.game.scene.*;
+import proto.util.*;
 
 import static proto.game.person.ItemType.*;
 import static proto.game.person.PersonGear.*;
 import static proto.game.person.PersonStats.*;
+
+import java.awt.Image;
 
 
 /*
@@ -74,6 +78,9 @@ public class Techniques {
         //  TODO:  Include actual stun effects!
         return volley;
       }
+      
+      final Image missile = Kind.loadImage(SPRITE_DIR+"sprite_punch.png");
+      public Image missileSprite() { return missile; }
     },
     
     DISARM = new Ability(
@@ -95,13 +102,26 @@ public class Techniques {
       protected Volley createVolley(Action use, Object target, Scene scene) {
         Volley volley = new Volley();
         volley.setupVolley(use.acting, (Person) target, false, scene);
-        volley.selfDamageBase *= 0.75f;
+        volley.selfDamageBase  *= 0.75f;
         volley.selfDamageRange *= 0.75f;
         volley.stunPercent = 100;
-        
-        //  TODO:  Include actual weapon removal!
         return volley;
       }
+      
+      
+      public void applyOnActionEnd(Action use) {
+        Person struck       = use.volley().targAsPerson();
+        int    damage       = use.volley().damageMargin;
+        float  disarmChance = damage * 2 / struck.health.maxHealth();
+        
+        if (Rand.num() < disarmChance && struck.gear.hasEquipped(SLOT_WEAPON)) {
+          I.say(struck+" dropped their weapon!");
+          struck.gear.dropItem(SLOT_WEAPON);
+        }
+      }
+      
+      final Image missile = Kind.loadImage(SPRITE_DIR+"sprite_punch.png");
+      public Image missileSprite() { return missile; }
     },
     
     EVASION = new Ability(

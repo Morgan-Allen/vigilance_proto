@@ -4,6 +4,7 @@ package proto.game.person;
 import proto.common.*;
 import proto.game.event.*;
 import proto.game.scene.*;
+import proto.util.*;
 
 import static proto.game.person.ItemType.*;
 import static proto.game.person.PersonGear.*;
@@ -123,7 +124,44 @@ public class Common {
       }
     },
     
-    BASIC_ABILITIES[] = { MOVE, STRIKE, THROW };
+    GUARD = new Ability(
+      "Guard", "ability_guard",
+      SPRITE_DIR+"guard.png",
+      "Reserve AP to reduce incoming damage and grant chance to counter-"+
+      "attack in melee.  Ends turn.",
+      Ability.IS_BASIC | Ability.IS_DELAYED | Ability.TRIGGER_ON_DEFEND,
+      1, Ability.NO_HARM, Ability.MINOR_POWER
+    ) {
+      
+      public boolean allowsTarget(Object target, Scene scene, Person acting) {
+        return acting instanceof Person;
+      }
+      
+      
+      public void applyOnDefendStart(Volley volley) {
+        Person self = volley.targAsPerson();
+        Person hits = volley.origAsPerson();
+        FX.dodgePosition(self, hits, 0.33f);
+        volley.hitsArmour  += 2 + (self.gear.baseArmourBonus() / 2f);
+        volley.hitsDefence += 5 + (self.actions.currentAP() * 5);
+      }
+      
+      
+      public void applyOnDefendEnd(Volley volley) {
+        Person self  = volley.targAsPerson();
+        Person hits  = volley.origAsPerson();
+        Scene  scene = self  .currentScene();
+        Tile at = self.currentTile();
+        self.setExactPosition(at.scene, at.x, at.y, 0);
+        float counterChance = 0.5f;
+        boolean opening = volley.melee() && ! volley.didConnect;
+        if (Rand.num() < counterChance && opening) {
+          STRIKE.takeFreeAction(self, hits.currentTile(), hits, scene);
+        }
+      }
+    },
+    
+    BASIC_ABILITIES[] = { MOVE, STRIKE, THROW, GUARD };
   
   
   final public static Ability SPECIAL_ACTION = new Ability(
@@ -144,85 +182,6 @@ public class Common {
     }
   };
   
-  
-  //  TODO:  It's time to start assembling a 'tech tree' of techniques for
-  //  heroes to learn...
-    
-    /*
-    
-    DISARM = new Ability(
-      "Disarm", "ability_disarm",
-      "Attempt to disarm a melee target.  (Deals base of 1-3 stun damage, "+
-      "scaling with strength.  Disarm chance is based on enemy health.)",
-      IS_BASIC, 2, MINOR_HARM, MINOR_POWER
-    ) {
-      
-      public boolean allowsTarget(Object target, Scene scene, Person acting) {
-        if (! acting.currentWeapon().melee()) return false;
-        return target instanceof Person;
-      }
-      
-      protected Volley createVolley(Action use, Object target, Scene scene) {
-        Volley volley = new Volley();
-        volley.setupVolley(use.acting, (Person) target, false, scene);
-        volley.stunPercent   = 100;
-        volley.damagePercent = 50 ;
-        return volley;
-      }
-      
-      public void applyOnActionEnd(Action use) {
-        Person struck       = use.volley().targAsPerson();
-        int    damage       = use.volley().damageMargin;
-        float  disarmChance = damage * 2 / struck.maxHealth();
-        
-        if (Rand.num() < disarmChance && struck.hasEquipped(SLOT_WEAPON)) {
-          I.say(struck+" dropped their weapon!");
-          struck.emptyEquipSlot(SLOT_WEAPON);
-        }
-      }
-      
-      final Image missile = Kind.loadImage(IMG_DIR+"sprite_punch.png");
-      public Image missileSprite() { return missile; }
-    },
-    
-    GUARD = new Ability(
-      "Guard", "ability_guard",
-      "Reserve AP to reduce incoming damage and grant chance to counter-"+
-      "attack in melee.  Ends turn.",
-      IS_BASIC | IS_DELAYED | TRIGGER_ON_DEFEND, 1, NO_HARM, MINOR_POWER
-    ) {
-      
-      public boolean allowsTarget(Object target, Scene scene, Person acting) {
-        return acting instanceof Person;
-      }
-      
-      
-      public void applyOnDefendStart(Volley volley) {
-        Person self = volley.targAsPerson();
-        Person hits = volley.origAsPerson();
-        dodgePosition(self, hits, 0.33f);
-        volley.hitsArmour  += 2 + (self.baseArmour() / 2f);
-        volley.hitsDefence += self.stats.levelFor(PARRY) * 5;
-        volley.hitsDefence += 5 + (self.currentAP() * 5);
-      }
-      
-      
-      public void applyOnDefendEnd(Volley volley) {
-        Person self  = volley.targAsPerson();
-        Person hits  = volley.origAsPerson();
-        Scene  scene = self  .currentScene();
-        Tile at = self.location();
-        self.setExactPosition(at.x, at.y, 0, at.scene);
-        float counterChance = 0.5f;
-        boolean opening = volley.melee() && ! volley.didConnect;
-        if (Rand.num() < counterChance && opening) {
-          STRIKE.takeFreeAction(self, hits.location(), hits, scene);
-        }
-      }
-    }
-    //*/
-    
-    //  TODO:  Add Overwatch!
 }
 
 

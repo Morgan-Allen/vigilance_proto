@@ -212,17 +212,17 @@ public class PersonStats {
     updateStat(BRAINS  , -1, true );
     updateStat(WILL    , -1, true );
     
-    float    muscle   = levelFor(MUSCLE  );
-    float    reflexes = levelFor(REFLEXES);
-    float    brains   = levelFor(BRAINS  );
-    float    will     = levelFor(WILL    );
-    ItemType armour = person.gear.currentArmour();
-    ItemType weapon = person.gear.currentWeapon();
+    float muscle   = levelFor(MUSCLE  );
+    float reflexes = levelFor(REFLEXES);
+    float brains   = levelFor(BRAINS  );
+    float will     = levelFor(WILL    );
+    float weapon = person.gear.baseWeaponBonus();
+    float armour = person.gear.baseArmourBonus();
     
     float maxHP      = 10 + muscle;
-    float baseArmour = armour.bonus;
-    float baseDamage = weapon.bonus / 2f;
-    float rollDamage = weapon.bonus / 2f;
+    float baseArmour = armour;
+    float baseDamage = weapon / 2f;
+    float rollDamage = weapon / 2f;
     
     //  TODO:  Incorporate these...
     //float maxEnergy  = (muscle + will) / 2f;

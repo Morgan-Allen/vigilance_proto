@@ -2,6 +2,7 @@
 
 package proto.view.scene;
 import proto.common.*;
+import proto.game.world.*;
 import proto.game.person.*;
 import proto.game.scene.*;
 
@@ -91,7 +92,6 @@ public class SceneView extends UINode {
       PALES[n] = new Color(1, 1, 1, n / 10f);
     }
     final Image hoverBox = mainView.selectCircle;
-    
     //
     //  Update camera information first-
     if (zoomTile != null) {
@@ -100,7 +100,6 @@ public class SceneView extends UINode {
     }
     zoomX -= vw / 2;
     zoomY -= vh / 2;
-    
     //
     //  Then, render any props, persons, or special FX-
     for (Prop prop : scene.props()) {
@@ -242,10 +241,9 @@ public class SceneView extends UINode {
   
   public Object topObjectAt(Tile at) {
     if (at == null) return null;
-    
-    //  TODO:  Move this to SceneView?  It's really about UI-selection...
     final Pick <Object> pick = new Pick();
-    for (Person p : at.inside()) {
+    for (Element e : at.inside()) if (e.isPerson()) {
+      final Person p = (Person) e;
       pick.compare(p, p.health.conscious() ? 1.5f : 1);
     }
     pick.compare(at.prop(), 0.5f);
