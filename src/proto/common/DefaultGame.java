@@ -54,12 +54,12 @@ public class DefaultGame extends RunGame {
   public static void initDefaultBase(World world) {
     final Base base = new Base(Facilities.WAYNE_MANOR, world);
     
-    Person leader = new Person(Heroes.HERO_BATMAN, world);
+    Person leader = new Person(Heroes.HERO_PHOBOS, world);
     base.setLeader(leader);
     base.addToRoster(leader);
-    base.addToRoster(new Person(Heroes.HERO_BATGIRL  , world));
-    base.addToRoster(new Person(Heroes.HERO_NIGHTWING, world));
-    base.addToRoster(new Person(Heroes.HERO_QUESTION , world));
+    base.addToRoster(new Person(Heroes.HERO_NIGHT_SWIFT, world));
+    base.addToRoster(new Person(Heroes.HERO_DEIMOS     , world));
+    base.addToRoster(new Person(Heroes.HERO_DR_YANG    , world));
     
     for (Person p : base.roster()) for (Person o : base.roster()) {
       if (p != o) p.history.incBond(o, 0.2f);
@@ -102,10 +102,10 @@ public class DefaultGame extends RunGame {
   public static void initDefaultCrime(World world) {
     
     final Kind goonTypes[] = {
-      Crooks.GOON, Crooks.GOON, Crooks.MOBSTER
+      Crooks.BRUISER, Crooks.BRUISER, Crooks.GANGSTER
     };
     final Kind seniorTypes[] = {
-      Crooks.MOBSTER, Civilians.DOCTOR, Civilians.INVENTOR, Civilians.BROKER
+      Crooks.GANGSTER, Civilians.DOCTOR, Civilians.INVENTOR, Civilians.BROKER
     };
     
     final Batch <Base> hideouts = new Batch();

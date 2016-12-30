@@ -13,72 +13,66 @@ import static proto.game.person.PersonStats.*;
 public class Heroes {
   
   
-  final static String IMG_DIR = "media assets/character icons/";
+  final static String IMG_DIR = "media assets/character icons/heroes/";
   
   final public static Kind
-    HERO_BATMAN = Kind.ofPerson(
-      "Batman", "hero_kind_batman", IMG_DIR+"icon_batman.png",
-      "The son of Thomas and Martha Wayne, wealthy socialites and "+
-      "philanthropists, Bruce Wayne swore to repay their deaths at the hands "+
-      "of a criminal by warring upon Gotham's underworld.",
+    HERO_PHOBOS = Kind.ofPerson(
+      "Phobos", "hero_kind_phobos", IMG_DIR+"icon_phobos.png",
+      "<phobos description>",
       null,
       Kind.SUBTYPE_HERO,
       BRAINS  , 8 ,
-      REFLEXES, 8 ,
+      REFLEXES, 6 ,
       WILL    , 8 ,
-      MUSCLE  , 8 ,
+      MUSCLE  , 6 ,
       
-      ENGINEERING  , 6,
-      MEDICINE     , 6,
+      ENGINEERING  , 8,
+      MEDICINE     , 8,
       QUESTION     , 7,
       PERSUADE     , 5
     )
   ;
   
   final public static Kind
-    HERO_NIGHTWING = Kind.ofPerson(
-      "Nightwing", "hero_kind_nightwing", IMG_DIR+"icon_nightwing.png",
-      "A former ward of Bruce Wayne, united in his dedication to fighting "+
-      "crime but separated by differences over methods and motivation.",
+    HERO_DEIMOS = Kind.ofPerson(
+      "Deimos", "hero_kind_deimos", IMG_DIR+"icon_deimos.png",
+      "<deimos description>",
       null,
       Kind.SUBTYPE_HERO,
-      BRAINS  , 5 ,
-      REFLEXES, 6 ,
-      WILL    , 7 ,
-      MUSCLE  , 6 ,
+      BRAINS  , 6 ,
+      REFLEXES, 8 ,
+      WILL    , 6 ,
+      MUSCLE  , 8 ,
       
-      ENGINEERING  , 3,
-      MEDICINE     , 3,
+      ENGINEERING  , 6,
+      MEDICINE     , 6,
       QUESTION     , 5,
       PERSUADE     , 7
     )
   ;
   
   final public static Kind
-    HERO_BATGIRL = Kind.ofPerson(
-      "Batgirl", "hero_kind_batgirl", IMG_DIR+"icon_batgirl.png",
-      "Indoctrinated from birth by her mother, Lady Shiva, to be the perfect "+
-      "assassin, Ms. Cain possesses uncanny reflexes and steely resolve but "+
-      "is functionally mute and easily manipulated.",
+    HERO_NIGHT_SWIFT = Kind.ofPerson(
+      "Night Swift", "hero_kind_night_swift", IMG_DIR+"icon_night_swift.png",
+      "<night swift description>",
       null,
       Kind.SUBTYPE_HERO,
       BRAINS  , 6 ,
-      REFLEXES, 8 ,
-      WILL    , 2 ,
-      MUSCLE  , 4 ,
+      REFLEXES, 6 ,
+      WILL    , 6 ,
+      MUSCLE  , 6 ,
       
-      ENGINEERING  , 0,
-      MEDICINE     , 0,
-      QUESTION     , 0,
-      PERSUADE     , 0
+      ENGINEERING  , 3,
+      MEDICINE     , 3,
+      QUESTION     , 7,
+      PERSUADE     , 8
     )
   ;
   
   final public static Kind
-    HERO_QUESTION = Kind.ofPerson(
-      "Question", "hero_kind_question", IMG_DIR+"icon_question.png",
-      "Paranoid conspiracist or the smartest guy left in the room?  That is "+
-      "the Question.",
+    HERO_DR_YANG = Kind.ofPerson(
+      "Dr. Yang", "hero_kind_dr_yang", IMG_DIR+"icon_dr_yang.png",
+      "<dr. yang description>",
       null,
       Kind.SUBTYPE_HERO,
       BRAINS  , 8 ,
@@ -86,12 +80,15 @@ public class Heroes {
       WILL    , 6 ,
       MUSCLE  , 5 ,
       
-      ENGINEERING  , 4,
-      MEDICINE     , 4,
+      ENGINEERING  , 6,
+      MEDICINE     , 6,
       QUESTION     , 8,
       PERSUADE     , 5
     )
   ;
+  
+  
+  
   
   
   

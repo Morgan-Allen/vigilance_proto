@@ -41,8 +41,8 @@ public class DebugScene extends RunGame {
     GameSettings.freeTipoffs = true;
     
     Base   crooks   = world.bases().atIndex(1);
-    Person boss     = new Person(Crooks.MOBSTER, world, "Crime Boss");
-    Person perp     = Person.randomOfKind(Crooks.GOON, world);
+    Person boss     = new Person(Crooks.GANGSTER, world, "Crime Boss");
+    Person perp     = Person.randomOfKind(Crooks.BRUISER, world);
     Person victim   = Person.randomOfKind(Civilians.CIVILIAN, world);
     Region port     = world.regionFor(Regions.PORT_ADAMS);
     Place  building = port.buildSlot(0);

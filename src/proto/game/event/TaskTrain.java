@@ -16,6 +16,10 @@ import java.awt.Image;
 public class TaskTrain extends Task {
   
   
+  final static int
+    ABILITY_BASE_LEARN_TIME = World.HOURS_PER_DAY * World.DAYS_PER_WEEK
+  ;
+  
   Place room;
   Trait trained;
   Trait talking;
@@ -172,11 +176,6 @@ public class TaskTrain extends Task {
     });
   }
 }
-
-
-
-
-
 
 
 

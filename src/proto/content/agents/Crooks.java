@@ -12,12 +12,12 @@ import static proto.game.person.PersonStats.*;
 public class Crooks {
   
   
-  final static String IMG_DIR = "media assets/character icons/";
+  final static String IMG_DIR = "media assets/character icons/common/";
   
   
   final public static Kind
-    GOON = Kind.ofPerson(
-      "Goon", "person_kind_goon", IMG_DIR+"icon_goon.png",
+    BRUISER = Kind.ofPerson(
+      "Goon", "person_kind_goon", IMG_DIR+"icon_bruiser.png",
       "", Civilians.COMMON_NAMES,
       Kind.SUBTYPE_MOOK,
       BRAINS  , 2 ,
@@ -25,8 +25,8 @@ public class Crooks {
       WILL    , 4 ,
       MUSCLE  , 8
     ),
-    MOBSTER = Kind.ofPerson(
-      "Mobster", "person_kind_mobster", IMG_DIR+"icon_mobster.png",
+    GANGSTER = Kind.ofPerson(
+      "Gangster", "person_kind_gangster", IMG_DIR+"icon_gangster.png",
       "", Civilians.COMMON_NAMES,
       Kind.SUBTYPE_MOOK,
       BRAINS  , 4 ,

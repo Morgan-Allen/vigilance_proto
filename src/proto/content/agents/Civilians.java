@@ -19,11 +19,11 @@ public class Civilians {
     COMMON_NAMES[][] = { COMMON_FIRST_NAMES, COMMON_LAST_NAMES };
   
   
-  final static String IMG_DIR = "media assets/character icons/";
+  final static String IMG_DIR = "media assets/character icons/common/";
   
   final public static Kind
     CIVILIAN = Kind.ofPerson(
-      "Civilian", "person_kind_civilian", IMG_DIR+"icon_civilian_2.png",
+      "Civilian", "person_kind_civilian", IMG_DIR+"icon_civilian.png",
       "", COMMON_NAMES,
       Kind.SUBTYPE_CIVILIAN,
       BRAINS  , 2 ,
@@ -32,7 +32,7 @@ public class Civilians {
       MUSCLE  , 2
     ),
     DOCTOR = Kind.ofPerson(
-      "Doctor", "person_kind_doctor", IMG_DIR+"icon_civilian_2.png",
+      "Doctor", "person_kind_doctor", IMG_DIR+"icon_doctor.png",
       "", COMMON_NAMES,
       Kind.SUBTYPE_CIVILIAN,
       BRAINS  , 7 ,
@@ -43,7 +43,7 @@ public class Civilians {
       MEDICINE, 7
     ),
     INVENTOR = Kind.ofPerson(
-      "Inventor", "person_kind_inventor", IMG_DIR+"icon_civilian_2.png",
+      "Inventor", "person_kind_inventor", IMG_DIR+"icon_inventor.png",
       "", COMMON_NAMES,
       Kind.SUBTYPE_CIVILIAN,
       BRAINS  , 7 ,

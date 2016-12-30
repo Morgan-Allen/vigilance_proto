@@ -25,6 +25,7 @@ public class Prop extends Element {
   
   
   public void saveState(Session s) throws Exception {
+    super.saveState(s);
     s.saveObject(origin);
   }
   

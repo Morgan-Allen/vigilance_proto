@@ -25,7 +25,7 @@ public class DebugPlans {
     I.say("Now running sketch!\n");
     
     World world = new World();
-    Person boss = new Person(Crooks.MOBSTER, world, "Crime Boss");
+    Person boss = new Person(Crooks.GANGSTER, world, "Crime Boss");
     Batch <Person> civvies = new Batch();
     Batch <Person> crooks  = new Batch();
     
@@ -33,7 +33,7 @@ public class DebugPlans {
       Person civvy = genRandomPerson(Civilians.CIVILIAN, world);
       world.setInside(civvy, true);
       civvies.add(civvy);
-      Person crook = genRandomPerson(Crooks.GOON, world);
+      Person crook = genRandomPerson(Crooks.BRUISER, world);
       world.setInside(crook, true);
       crooks.add(crook);
     }
