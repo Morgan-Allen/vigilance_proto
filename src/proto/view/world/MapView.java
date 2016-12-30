@@ -127,7 +127,7 @@ public class MapView extends UINode {
       pixVal = ((BufferedImage) keyImage).getRGB(mX, mY);
     }
     
-    ///if (I.used60Frames) I.say("Pixel value is: "+pixVal);
+    if (I.used60Frames) I.say("Pixel value is: "+pixVal);
     
     Region selectedArea = mainView.selectedNation();
     for (Region n : districts) if (n.kind().view.colourKey == pixVal) {

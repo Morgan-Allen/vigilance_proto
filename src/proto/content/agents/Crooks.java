@@ -17,7 +17,7 @@ public class Crooks {
   
   final public static Kind
     BRUISER = Kind.ofPerson(
-      "Goon", "person_kind_goon", IMG_DIR+"icon_bruiser.png",
+      "Bruiser", "person_kind_bruiser", IMG_DIR+"icon_bruiser.png",
       "", Civilians.COMMON_NAMES,
       Kind.SUBTYPE_MOOK,
       BRAINS  , 2 ,
@@ -38,11 +38,4 @@ public class Crooks {
     PSYCHO = null
   ;
 }
-
-
-
-
-
-
-
 

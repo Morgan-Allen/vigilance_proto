@@ -118,18 +118,6 @@ public class Facilities {
     ENTERTAINMENT, 1
   );
   
-  final public static PlaceType ROBINS_CAMP = new PlaceType(
-    "Neighbourhood Robins Camp", "facility_robins_camp",
-    "media assets/tech icons/icon_robins_camp.png",
-    "Helping to give the city's troubled youth a sense of purpose and "+
-    "direction, the Neighbourhood Robins teach wilderness survival, a code "+
-    "of ethics and various martial arts.  Any rumours of collusion with "+
-    "masked vigilantes are... greatly exxaggerated.",
-    50, BUILD_TIME_LONG, URBAN_SCENE,
-    TRUST, 1,
-    DETERRENCE, 1
-  );
-  
   final public static PlaceType SOUP_KITCHEN = new PlaceType(
     "Soup Kitchen", "facility_soup_kitchen",
     "media assets/tech icons/icon_soup_kitchen.png",

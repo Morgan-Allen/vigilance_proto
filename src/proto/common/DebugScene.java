@@ -44,12 +44,12 @@ public class DebugScene extends RunGame {
     Person boss     = new Person(Crooks.GANGSTER, world, "Crime Boss");
     Person perp     = Person.randomOfKind(Crooks.BRUISER, world);
     Person victim   = Person.randomOfKind(Civilians.CIVILIAN, world);
-    Region port     = world.regionFor(Regions.PORT_ADAMS);
+    Region port     = world.regionFor(Regions.SECTOR01);
     Place  building = port.buildSlot(0);
     
     Place home = new Place(Facilities.COMMUNITY_COLLEGE, 0, world);
     world.setInside(home, true);
-    world.regionFor(Regions.BLACKGATE).setAttached(home, true);
+    world.regionFor(Regions.SECTOR02).setAttached(home, true);
     victim.setResidence(home);
     building.setAttached(perp, true);
     boss.setBase(crooks);

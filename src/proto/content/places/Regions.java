@@ -11,6 +11,17 @@ public class Regions {
   
   
   final public static RegionType
+    
+    SECTOR01 = new RegionType("Sector 01", "region_01"),
+    SECTOR02 = new RegionType("Sector 02", "region_02"),
+    SECTOR03 = new RegionType("Sector 03", "region_03"),
+    SECTOR04 = new RegionType("Sector 04", "region_04"),
+    SECTOR05 = new RegionType("Sector 05", "region_05"),
+    SECTOR06 = new RegionType("Sector 06", "region_06"),
+    SECTOR07 = new RegionType("Sector 07", "region_07"),
+    SECTOR08 = new RegionType("Sector 08", "region_08"),
+    SECTOR09 = new RegionType("Sector 09", "region_09"),
+    /*
     PORT_ADAMS     = new RegionType("Port Adams"    , "region_pa"),
     BLACKGATE      = new RegionType("Blackgate"     , "region_bg"),
     GOTHAM_CENTRAL = new RegionType("Gotham Central", "region_gc"),
@@ -28,88 +39,67 @@ public class Regions {
     CAPE_FINGER    = new RegionType("Cape Finger"   , "region_cf"),
     AMUSEMENT_MILE = new RegionType("Amusement Mile", "region_am"),
     NEW_GOTHAM     = new RegionType("New Gotham"    , "region_ng"),
+    //*/
     
     ALL_REGIONS[] = {
-      PORT_ADAMS, BLACKGATE  , GOTHAM_CENTRAL, OLD_GOTHAM    , THE_TRICORNE,
-      DINISBURG , MILLER_BAY , BUSINESS_DIST , NOLAN_HOOK    , THE_LEESIDE ,
-      ARKHAM    , CRIME_ALLEY, CAPE_FINGER   , AMUSEMENT_MILE, NEW_GOTHAM  ,
+      SECTOR01, SECTOR02, SECTOR03,
+      SECTOR04, SECTOR05, SECTOR06,
+      SECTOR07, SECTOR08, SECTOR09
     };
     
   
   static {
     final String IMG_DIR = "media assets/scene backgrounds/";
     
-    //  Downtown-
-    final RegionType PA = PORT_ADAMS;
-    PA.view.attachColourKey(-14894156, "PA");
-    PA.view.attachPortrait(IMG_DIR+"district_industrial.png");
-    PA.attachDefaultFacilities(STEEL_MILL, UNION_OFFICE);
+    final RegionType r1 = SECTOR01;
+    r1.view.attachColourKey(-16734721, "01");
+    r1.view.attachPortrait(IMG_DIR+"district_industrial.png");
+    r1.attachDefaultFacilities(STEEL_MILL);
+
+    final RegionType r2 = SECTOR02;
+    r2.view.attachColourKey(-3584, "02");
+    r2.view.attachPortrait(IMG_DIR+"district_industrial.png");
+    r2.attachDefaultFacilities(UNION_OFFICE);
+
+    final RegionType r3 = SECTOR03;
+    r3.view.attachColourKey(-65354, "03");
+    r3.view.attachPortrait(IMG_DIR+"district_industrial.png");
+    r3.attachDefaultFacilities(SOUP_KITCHEN);
+
     
-    final RegionType BG = BLACKGATE;
-    BG.view.attachPortrait(IMG_DIR+"district_industrial.png");
-    BG.view.attachColourKey(-12284725, "BG");
+    final RegionType r4 = SECTOR04;
+    r4.view.attachColourKey(-14812949, "04");
+    r4.view.attachPortrait(IMG_DIR+"district_industrial.png");
+    r4.attachDefaultFacilities(COMMUNITY_COLLEGE);
+
+    final RegionType r5 = SECTOR05;
+    r5.view.attachColourKey(-486371, "05");
+    r5.view.attachPortrait(IMG_DIR+"district_industrial.png");
+    r5.attachDefaultFacilities(CITY_PARK);
+
+    final RegionType r6 = SECTOR06;
+    r6.view.attachColourKey(-2286088, "06");
+    r6.view.attachPortrait(IMG_DIR+"district_industrial.png");
+    r6.attachDefaultFacilities(BUSINESS_PARK);
+
     
-    final RegionType GC = GOTHAM_CENTRAL;
-    GC.view.attachPortrait(IMG_DIR+"district_business.png");
-    GC.view.attachColourKey(-2712    , "GC");
-    GC.attachDefaultFacilities(SOUP_KITCHEN);
+    final RegionType r7 = SECTOR07;
+    r7.view.attachColourKey(-4628394, "07");
+    r7.view.attachPortrait(IMG_DIR+"district_industrial.png");
+    r7.attachDefaultFacilities();
     
-    final RegionType OG = OLD_GOTHAM;
-    OG.view.attachPortrait(IMG_DIR+"district_business.png");
-    OG.view.attachColourKey(-553386  , "WH");
-    GC.attachDefaultFacilities(COMMUNITY_COLLEGE);
+    final RegionType r8 = SECTOR08;
+    r8.view.attachColourKey(-11111239, "08");
+    r8.view.attachPortrait(IMG_DIR+"district_industrial.png");
+    r8.attachDefaultFacilities();
+
+    final RegionType r9 = SECTOR09;
+    r9.view.attachColourKey(-11093671, "09");
+    r9.view.attachPortrait(IMG_DIR+"district_industrial.png");
+    r9.attachDefaultFacilities(TECH_STARTUP, CHEMICAL_PLANT);
     
-    final RegionType TT = THE_TRICORNE;
-    TT.view.attachPortrait(IMG_DIR+"district_business.png");
-    TT.view.attachColourKey(-3874917 , "TT");
-    
-    //  Midtown-
-    final RegionType DB = DINISBURG;
-    DB.view.attachPortrait(IMG_DIR+"district_park.png");
-    DB.view.attachColourKey(-8205668 , "DB");
-    DB.attachDefaultFacilities(CITY_PARK, ROBINS_CAMP);
-    
-    final RegionType MB = MILLER_BAY;
-    MB.view.attachPortrait(IMG_DIR+"district_amusement.png");
-    MB.view.attachColourKey(-8600202 , "MB");
-    
-    final RegionType BD = BUSINESS_DIST;
-    BD.view.attachPortrait(IMG_DIR+"district_business.png");
-    BD.view.attachColourKey(-746814  , "BD");
-    BD.attachDefaultFacilities(BUSINESS_PARK);
-    
-    final RegionType NH = NOLAN_HOOK;
-    NH.view.attachPortrait(IMG_DIR+"district_industrial.png");
-    NH.view.attachColourKey(-9580297 , "NH");
-    NH.attachDefaultFacilities(STEEL_MILL);
-    
-    final RegionType TL = THE_LEESIDE;
-    TL.view.attachPortrait(IMG_DIR+"district_park.png");
-    TL.view.attachColourKey(-8154166 , "TL");
-    TL.attachDefaultFacilities(CITY_PARK);
-    
-    //  Uptown-
-    final RegionType AK = ARKHAM;
-    AK.view.attachPortrait(IMG_DIR+"district_industrial.png");
-    AK.view.attachColourKey(-11111239, "AK");
-    AK.attachDefaultFacilities(CHEMICAL_PLANT);
-    
-    final RegionType CA = CRIME_ALLEY;
-    CA.view.attachPortrait(IMG_DIR+"district_industrial.png");
-    CA.view.attachColourKey(-486371  , "CA");
-    
-    final RegionType CF = CAPE_FINGER;
-    CF.view.attachPortrait(IMG_DIR+"district_park.png");
-    CF.view.attachColourKey(-1172444 , "CF");
-    CF.attachDefaultFacilities(SOUP_KITCHEN);
-    
-    final RegionType AM = AMUSEMENT_MILE;
-    AM.view.attachPortrait(IMG_DIR+"district_amusement.png");
-    AM.view.attachColourKey(-12995254, "AM");
-    
-    final RegionType NG = NEW_GOTHAM;
-    NG.view.attachPortrait(IMG_DIR+"district_business.png");
-    NG.view.attachColourKey(-3584    , "NG");
-    NG.attachDefaultFacilities(TECH_STARTUP, CHEMICAL_PLANT);
   }
 }
+
+
+

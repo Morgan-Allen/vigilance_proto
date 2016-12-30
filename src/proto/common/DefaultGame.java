@@ -64,7 +64,7 @@ public class DefaultGame extends RunGame {
     for (Person p : base.roster()) for (Person o : base.roster()) {
       if (p != o) p.history.incBond(o, 0.2f);
     }
-    world.regionFor(Regions.OLD_GOTHAM).setAttached(base, true);
+    world.regionFor(Regions.SECTOR03).setAttached(base, true);
     
     for (Person p : base.roster()) {
       world.setInside(p, true);
@@ -79,7 +79,6 @@ public class DefaultGame extends RunGame {
       Facilities.TECH_STARTUP,
       Facilities.CITY_PARK,
       Facilities.COMMUNITY_COLLEGE,
-      Facilities.ROBINS_CAMP,
       Facilities.SOUP_KITCHEN
     };
     for (PlaceType t : buildTechs) base.addTech(t.tech);
@@ -111,7 +110,7 @@ public class DefaultGame extends RunGame {
     final Batch <Base> hideouts = new Batch();
     final Person falcone = new Person(Villains.FALCONE, world);
     final Base falconeBase = new Base(Facilities.HIDEOUT, world);
-    world.regionFor(Regions.CAPE_FINGER).setAttached(falconeBase, true);
+    world.regionFor(Regions.SECTOR04).setAttached(falconeBase, true);
     falconeBase.setLeader(falcone);
     falconeBase.incFunding(100);
     hideouts.add(falconeBase);
