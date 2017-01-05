@@ -6,15 +6,15 @@ import java.awt.Graphics2D;
 
 
 
-public abstract class UINode {
+public class UINode {
   
   
   final protected MainView mainView;
-  final protected UINode parent;
   
   final public Box2D relBounds = new Box2D();
   public boolean visible = true;
   
+  protected UINode parent;
   final List <UINode> kids = new List();
   protected int vx, vy, vw, vh;
   protected boolean clipContent = false;
@@ -41,6 +41,7 @@ public abstract class UINode {
   protected void setChild(UINode kid, boolean is) {
     if (kid.parent != this) kid.parent.setChild(kid, false);
     kids.toggleMember(kid, is);
+    kid.parent = this;
   }
   
   
@@ -81,7 +82,9 @@ public abstract class UINode {
   }
   
   
-  protected abstract boolean renderTo(Surface surface, Graphics2D g);
+  protected boolean renderTo(Surface surface, Graphics2D g) {
+    return true;
+  }
 }
 
 

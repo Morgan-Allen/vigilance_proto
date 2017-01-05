@@ -6,7 +6,7 @@ import proto.game.event.*;
 import proto.game.scene.*;
 import proto.util.*;
 import proto.view.*;
-import proto.view.world.RegionAssets;
+import proto.view.base.RegionAssets;
 
 
 

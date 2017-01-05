@@ -1,6 +1,6 @@
 
 
-package proto.view.world;
+package proto.view.base;
 import java.awt.Color;
 import java.awt.Graphics2D;
 

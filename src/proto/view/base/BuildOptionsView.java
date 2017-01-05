@@ -1,6 +1,6 @@
 
 
-package proto.view.world;
+package proto.view.base;
 import proto.game.person.*;
 import proto.game.world.*;
 import proto.util.*;

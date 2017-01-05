@@ -6,8 +6,8 @@ import proto.common.*;
 import proto.game.person.*;
 import proto.util.*;
 import proto.view.*;
+import proto.view.common.TaskView;
 import proto.view.common.UINode;
-import proto.view.world.TaskView;
 
 import static proto.game.person.PersonStats.*;
 

@@ -1,6 +1,6 @@
 
 
-package proto.view.world;
+package proto.view.base;
 import proto.game.event.*;
 import proto.game.world.*;
 
@@ -43,8 +43,8 @@ public class RoomView extends UINode {
     }
     //*/
     
-    Place room = mainView.selectedRoom();
-    if (room == null) return false;
+    //Place room = mainView.selectedRoom();
+    //if (room == null) return false;
     
     //Image portrait = nation.region.view.portrait;
     /*
@@ -53,6 +53,7 @@ public class RoomView extends UINode {
     int portW = vw - 40, portH = (int) (portW / 2.5f);
     g.drawImage(portrait, vx + 20, vy + 40, portW, portH, null);
     //*/
+    /*
     
     g.setColor(Color.WHITE);
     String info = room.kind().defaultInfo();
@@ -80,6 +81,7 @@ public class RoomView extends UINode {
     }
     g.setColor(Color.LIGHT_GRAY);
     ViewUtils.drawWrappedString(help, g, vx + 25, down + 20, vw - 30, 150);
+    //*/
     
     return true;
   }

@@ -1,6 +1,6 @@
 
 
-package proto.view.world;
+package proto.view.base;
 import proto.common.*;
 import proto.game.world.*;
 import proto.game.person.*;
@@ -29,34 +29,42 @@ public class RosterView extends UINode {
       "media assets/action view/select_illegal.png"
     );
   
+  final static Color statColors[] = new Color[] {
+    new Color(0.0f, 0.0f, 1.0f),
+    new Color(0.0f, 1.0f, 0.0f),
+    new Color(1.0f, 1.0f, 0.5f),
+    new Color(1.0f, 0.5f, 1.0f)
+  };
   
-  final Color statColors[] = new Color[4];
+  
+  private Person selectedPerson = null;
   
   
   public RosterView(UINode parent, Box2D viewBounds) {
     super(parent, viewBounds);
-    statColors[0] = new Color(0.0f, 0.0f, 1.0f);
-    statColors[1] = new Color(0.0f, 1.0f, 0.0f);
-    statColors[2] = new Color(1.0f, 1.0f, 0.5f);
-    statColors[3] = new Color(1.0f, 0.5f, 1.0f);
+  }
+  
+  
+  public void setSelectedPerson(Person person) {
+    this.selectedPerson = person;
+  }
+  
+  
+  public Person selectedPerson() {
+    return selectedPerson;
   }
   
   
   protected boolean renderTo(Surface surface, Graphics2D g) {
     Base base = mainView.world().playerBase();
-    Assignment assignTo = mainView.selectedTask();
-    Person selectedPerson = mainView.selectedPerson();
     
     Image selectCircle = mainView.selectCircle;
     int across = 0, down = 15, size = 75, sizeA = 25, pad = 25, x, y;
     
     Person personHovered = null;
-    Person assignHovered = null;
+    if (selectedPerson == null) setSelectedPerson(base.roster().first());
     
     for (Person p : base.roster()) {
-      final int personID = base.rosterIndex(p);
-      final boolean canAssign = assignTo != null && p.canAssignTo(assignTo);
-      
       int nextAcross = across + size + pad;
       if (nextAcross >= vw) {
         across = 0;
@@ -82,20 +90,7 @@ public class RosterView extends UINode {
       
       final Assignment a = p.assignment();
       Image forA = a == null ? null : a.icon();
-      
-      final boolean hoverA = surface.tryHover(
-        x, y + size - sizeA, sizeA, sizeA, "Roster_"+personID
-      );
       g.drawImage(forA, x, y + size - sizeA, sizeA, sizeA, null);
-      if (assignTo != null) {
-        if (a == assignTo) forA = ASSIGN_OKAY;
-        else if (! canAssign) forA = ASSIGN_FORBID;
-        g.drawImage(forA, x, y + size - sizeA, sizeA, sizeA, null);
-      }
-      if (hoverA && canAssign) {
-        g.drawImage(selectCircle, x, y + size - sizeA, sizeA, sizeA, null);
-        assignHovered = p;
-      }
       
       int MH = p.health.maxHealth(), MS = p.health.maxStress();
       int inj = (int) p.health.injury();
@@ -112,15 +107,8 @@ public class RosterView extends UINode {
       );
     }
     
-    if (assignHovered != null && surface.mouseClicked() && assignTo != null) {
-      final Person p = assignHovered;
-      final Assignment o = p.assignment();
-      if (o != null    ) o       .setAssigned(p, false);
-      if (o != assignTo) assignTo.setAssigned(p, true );
-    }
     if (personHovered != null && surface.mouseClicked()) {
-      if (selectedPerson == personHovered) personHovered = null;
-      mainView.setSelection(personHovered);
+      setSelectedPerson(personHovered);
     }
     
     g.setColor(Color.DARK_GRAY);
@@ -129,6 +117,9 @@ public class RosterView extends UINode {
     return true;
   }
 }
+
+
+
 
 
 

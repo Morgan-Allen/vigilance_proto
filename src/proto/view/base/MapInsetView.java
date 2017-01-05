@@ -1,11 +1,10 @@
 
 
-package proto.view.world;
+package proto.view.base;
 import proto.common.*;
 import proto.game.world.*;
 import proto.game.event.*;
 import proto.game.person.*;
-
 import proto.util.*;
 import proto.view.common.*;
 
@@ -15,7 +14,7 @@ import java.awt.image.BufferedImage;
 
 
 
-public class MapView extends UINode {
+public class MapInsetView extends UINode {
   
   
   /**  Data fields, construction, setup and attachment-
@@ -24,8 +23,10 @@ public class MapView extends UINode {
   BufferedImage keyImage;
   RegionAssets attached[];
   
+  private Region selectedRegion;
   
-  MapView(UINode parent, Box2D viewBounds) {
+  
+  public MapInsetView(UINode parent, Box2D viewBounds) {
     super(parent, viewBounds);
   }
   
@@ -45,7 +46,6 @@ public class MapView extends UINode {
       relW  = mapW / selfW,
       relH  = mapH / selfH
     ;
-    //*
     
     if (relW < relH) {
       float shrink = selfW * ((relH / relW) - 1);
@@ -57,7 +57,6 @@ public class MapView extends UINode {
       relBounds.incHigh(0 - shrink);
       relBounds.incY   (shrink / 2);
     }
-    //*/
   }
   
   
@@ -110,7 +109,7 @@ public class MapView extends UINode {
     //
     //  Draw the background image first-
     g.drawImage(mapImage, vx, vy, vw, vh, null);
-    Region nationHovered = null;
+    Region regionHovered = null;
     //
     //  Then draw the nations of the world on the overhead map.
     int imgWide = mapImage.getWidth(), imgHigh = mapImage.getHeight();
@@ -127,18 +126,17 @@ public class MapView extends UINode {
       pixVal = ((BufferedImage) keyImage).getRGB(mX, mY);
     }
     
-    if (I.used60Frames) I.say("Pixel value is: "+pixVal);
+    ///if (I.used60Frames) I.say("Pixel value is: "+pixVal);
     
-    Region selectedArea = mainView.selectedNation();
     for (Region n : districts) if (n.kind().view.colourKey == pixVal) {
-      nationHovered = n;
+      regionHovered = n;
     }
-    if (nationHovered != null && surface.mouseClicked()) {
-      mainView.setSelection(nationHovered);
+    if (regionHovered != null && surface.mouseClicked()) {
+      this.setSelectedRegion(regionHovered);
     }
     
-    renderOutline(selectedArea , surface, g, mapWRatio, mapHRatio);
-    renderOutline(nationHovered, surface, g, mapWRatio, mapHRatio);
+    renderOutline(selectedRegion, surface, g, mapWRatio, mapHRatio);
+    renderOutline(regionHovered , surface, g, mapWRatio, mapHRatio);
     
     for (Region n : districts) {
       int x = (int) ((n.kind().view.centerX / mapWRatio) + vx);
@@ -187,11 +185,18 @@ public class MapView extends UINode {
       h = (int) (r.outline.getHeight(null) / mapHRatio);
     g.drawImage(r.outline, x, y, w, h, null);
   }
+  
+  
+  
+  public void setSelectedRegion(Region region) {
+    this.selectedRegion = region;
+  }
+  
+  
+  public Region selectedRegion() {
+    return selectedRegion;
+  }
 }
-
-
-
-
 
 
 

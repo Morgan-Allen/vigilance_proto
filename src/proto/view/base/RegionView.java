@@ -1,6 +1,6 @@
 
 
-package proto.view.world;
+package proto.view.base;
 import proto.common.*;
 import proto.game.event.*;
 import proto.game.world.*;
@@ -26,8 +26,12 @@ public class RegionView extends UINode {
     );
   
   
-  public RegionView(UINode parent, Box2D viewBounds) {
+  final ActivityView parent;
+  
+  
+  public RegionView(ActivityView parent, Box2D viewBounds) {
     super(parent, viewBounds);
+    this.parent = parent;
   }
   
   
@@ -36,19 +40,21 @@ public class RegionView extends UINode {
     */
   protected boolean renderTo(Surface surface, Graphics2D g) {
     
-    Region nation = mainView.selectedNation();
-    if (nation == null) return false;
+    final Region region = parent.mapView.selectedRegion();
+    if (region == null) {
+      //  TODO:  Render some help-text instead!
+      return false;
+    }
     
-    //Image portrait = nation.region.view.portrait;
     final Base base = mainView.world().playerBase();
     g.setColor(Color.WHITE);
-    g.drawString(nation.kind().name(), vx + 20, vy + 20);
+    g.drawString(region.kind().name(), vx + 20, vy + 20);
     
     int down = 50;
     for (Region.Stat stat : Region.CIVIC_STATS) {
       g.drawString(stat+": ", vx + 30, vy + down);
-      int max = nation.longTermValue(stat);
-      int current = (int) nation.currentValue(stat);
+      int max = region.longTermValue(stat);
+      int current = (int) region.currentValue(stat);
       g.drawString(""+current+"/"+max, vx + 180, vy + down);
       down += 20;
     }
@@ -56,17 +62,17 @@ public class RegionView extends UINode {
     down += 5;
     for (Region.Stat stat : Region.SOCIAL_STATS) {
       g.drawString(stat+": ", vx + 80, vy + down);
-      int current = (int) nation.currentValue(stat);
+      int current = (int) region.currentValue(stat);
       g.drawString(""+current, vx + 180, vy + down);
       down += 20;
     }
     
-    int income = nation.incomeFor(base), expense = nation.expensesFor(base);
+    int income = region.incomeFor(base), expense = region.expensesFor(base);
     g.drawString("Income: " +income , vx + 30 , vy + down);
     g.drawString("Expense: "+expense, vx + 130, vy + down);
     
-    renderFacilities(nation, surface, g);
-    renderLeads(nation, surface, g);
+    renderFacilities(region, surface, g);
+    ///renderLeads(region, surface, g);
     
     g.setColor(Color.DARK_GRAY);
     g.drawRect(vx, vy, vw, vh);
@@ -143,62 +149,6 @@ public class RegionView extends UINode {
   ) {
     final BuildOptionsView options = new BuildOptionsView(mainView, d, slotID);
     mainView.queueMessage(options);
-  }
-  
-  
-  void renderLeads(Region d, Surface surface, Graphics2D g) {
-    g.setColor(Color.LIGHT_GRAY);
-    int down = vy + 240;
-    boolean noEvents = true;
-    Base played = mainView.world().playerBase();
-    
-    for (CaseFile file : played.leads.casesForRegion(d)) {
-      //
-      //  Firstly, draw an illustrative icon for the lead we've picked up and
-      //  some basic info on how it was acquired.
-      Image icon = file.icon();
-      g.drawImage(icon, vx + 15, down + 5, 40, 40, null);
-      int initDown = down;
-      
-      g.setColor(Color.LIGHT_GRAY);
-      StringBuffer desc = new StringBuffer();
-      file.shortDescription(desc);
-      
-      ViewUtils.drawWrappedString(
-        desc.toString(), g, vx + 60, down, vw - 80, 60
-      );
-      down += 60;
-      //
-      //  Then, render the options for pursuing the investigation further:
-      for (Lead option : file.investigationOptions()) {
-        TaskView view = option.createView(parent);
-        view.showIcon = false;
-        view.relBounds.set(vx, down, vw, 45);
-        view.renderNow(surface, g);
-        down += view.relBounds.ydim() + 10;
-        noEvents = false;
-      }
-      //
-      //  Finally, box it all in with a nice border-
-      g.setColor(Color.DARK_GRAY);
-      g.drawRect(vx + 10, initDown, vw - 20, down - initDown);
-    }
-    
-    if (noEvents) {
-      g.setColor(Color.LIGHT_GRAY);
-      ViewUtils.drawWrappedString(
-        "You have no leads on serious criminal activity in this district.",
-        g, vx + 25, down + 20, vw - 30, 150
-      );
-    }
-    else if (true) {
-      g.setColor(Color.LIGHT_GRAY);
-      ViewUtils.drawWrappedString(
-        "Select a task, then click in the bottom-left of roster portraits to "+
-        "assign agents to the task.",
-        g, vx + 25, down + 20, vw - 30, 150
-      );
-    }
   }
   
   

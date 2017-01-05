@@ -1,13 +1,11 @@
 
 package proto.view.common;
-
 import proto.common.*;
 import proto.game.world.*;
 import proto.game.person.*;
-
 import proto.util.*;
 import proto.view.scene.*;
-import proto.view.world.*;
+import proto.view.base.*;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -28,15 +26,19 @@ public class MainView extends UINode {
   
   SceneView  sceneView ;
   UINode     mainUI    ;
+  final public RosterView rosterView;
+  PersonInsetView personView;
   
-  RosterView rosterView;
-  AreasView  areaView  ;
-  StatsReadoutView    readoutView ;
-  ProgressOptionsView progressView;
   
-  PersonView personView;
-  RoomView   roomView  ;
-  RegionView regionView;
+  UINode tabsNode;
+  UINode tabButtons[], tabContent[];
+  UINode currentTab = null;
+  
+  EquipmentView equipView;
+  TrainingView  trainView;
+  ActivityView  activView;
+  FacilityView  facilView;
+  HistoryView   histoView;
   
   final public Image alertMarker, selectCircle, selectSquare;
   
@@ -44,8 +46,6 @@ public class MainView extends UINode {
   List <UINode> messageQueue = new List();
   ClickMenu clickMenu = null;
   
-  private Object selectedObject;
-  private Assignment selectedTask;
   
   
   
@@ -61,20 +61,57 @@ public class MainView extends UINode {
     ));
     mainUI = new UINode(this, new Box2D(
       0, 0, fullWide, fullHigh
-    )) {
-      protected boolean renderTo(Surface surface, Graphics2D g) {
-        return true;
-      }
-    };
+    ));
     addChildren(sceneView, mainUI);
     
     rosterView = new RosterView(mainUI, new Box2D(
       320, 0, fullWide - 320, 120
     ));
+    personView = new PersonInsetView(mainUI, new Box2D(
+      0, 0, 320, 145
+    ));
+    mainUI.addChildren(personView, rosterView);
+    
+    //  Add views for each tab:
+    final Box2D tabSubBounds = new Box2D(0, 145, fullWide, fullHigh - 145);
+    activView = new ActivityView (mainUI, tabSubBounds);
+    equipView = new EquipmentView(mainUI, tabSubBounds);
+    trainView = new TrainingView (mainUI, tabSubBounds);
+    facilView = new FacilityView (mainUI, tabSubBounds);
+    histoView = new HistoryView  (mainUI, tabSubBounds);
+    tabContent = new UINode[] {
+      activView, equipView, trainView, facilView, histoView
+    };
+    
+    tabsNode = new UINode(mainUI, new Box2D(320, 120, fullWide - 320, 25));
+    Box2D blank = new Box2D();
+    final String tabNames[] = {
+      "Activity", "Armory", "Training Room", "Facilities", "History"
+    };
+    tabButtons = new UINode[tabContent.length];
+    int butW = (int) (tabsNode.relBounds.xdim() / tabButtons.length);
+    
+    for (int i = tabContent.length; i-- > 0;) {
+      final UINode content = tabContent[i], button;
+      button = tabButtons[i] = new StringButton(tabNames[i], blank, tabsNode) {
+        protected void whenClicked() {
+          switchToTab(content);
+        }
+      };
+      button.relBounds.set(butW * i, 0, butW, 25);
+      content.visible = false;
+    }
+    mainUI  .addChildren(tabsNode  );
+    tabsNode.addChildren(tabButtons);
+    mainUI  .addChildren(tabContent);
+    
+    switchToTab(activView);
+    
+    /*
     readoutView = new StatsReadoutView(mainUI, new Box2D(
       320, 120, fullWide - 320, 20
     ));
-    areaView = new AreasView(mainUI, new Box2D(
+    areaView = new MapInsetView(mainUI, new Box2D(
       320, 140, fullWide - 320, fullHigh - (140 + 50)
     ));
     progressView = new ProgressOptionsView(mainUI, new Box2D(
@@ -88,6 +125,7 @@ public class MainView extends UINode {
     roomView   = new RoomView  (mainUI, panesBound);
     regionView = new RegionView(mainUI, panesBound);
     mainUI.addChildren(personView, roomView, regionView);
+    //*/
     
     alertMarker   = Kind.loadImage(MAPS_DIR+"alert_symbol.png" );
     selectCircle  = Kind.loadImage(ACTS_DIR+"select_circle.png");
@@ -106,8 +144,22 @@ public class MainView extends UINode {
   
   
   
+  /**  Switching tabs:
+    */
+  void switchToTab(UINode content) {
+    int index = Visit.indexOf(content, tabContent);
+    for (int i = tabButtons.length; i-- > 0;) {
+      ((StringButton) tabButtons[i]).toggled = i == index;
+    }
+    for (UINode c : tabContent) {
+      c.visible = c == content;
+    }
+  }
+  
+  
   /**  Selection handling-
     */
+  /*
   public void setSelection(Object selected) {
     I.say("Setting selection: "+selected);
     
@@ -123,7 +175,7 @@ public class MainView extends UINode {
   }
   
   
-  public Region selectedNation() {
+  public Region selectedRegion() {
     if (selectedObject instanceof Region) return (Region) selectedObject;
     return null;
   }
@@ -148,6 +200,7 @@ public class MainView extends UINode {
   public Assignment selectedTask() {
     return selectedTask;
   }
+  //*/
   
   
   

@@ -1,6 +1,6 @@
 
 
-package proto.view.world;
+package proto.view.base;
 import proto.game.world.*;
 import proto.game.person.*;
 
@@ -12,26 +12,39 @@ import java.awt.Graphics2D;
 
 
 
-public class AreasView extends UINode {
+public class ActivityView extends UINode {
   
   
-  final public MapView mapView;
+  MapInsetView mapView;
+  RegionView regionView;
+  LeadsListView leadsView;
   
   
   
-  public AreasView(final UINode parent, Box2D viewBounds) {
+  
+  public ActivityView(final UINode parent, Box2D viewBounds) {
     super(parent, viewBounds);
     
-    mapView = new MapView(this, new Box2D(
-      80, 10,
-      viewBounds.xdim() - 90, viewBounds.ydim() - 20
+    int fullWide = (int) viewBounds.xdim(), fullHigh = (int) viewBounds.ydim();
+    
+    leadsView = new LeadsListView(this, new Box2D(
+      0, 5, 320, fullHigh - 10
+    ));
+    
+    mapView = new MapInsetView(this, new Box2D(
+      320, 5, fullWide - 640, fullHigh - 10
     ));
     mapView.loadMapImages(
       MainView.MAPS_DIR+"city_map.png",
       MainView.MAPS_DIR+"city_districts_key.png"
     );
     mapView.resizeToFitAspectRatio();
-    addChildren(mapView);
+    
+    regionView = new RegionView(this, new Box2D(
+      fullWide - 320, 5, 320, fullHigh - 10
+    ));
+    
+    addChildren(leadsView, mapView, regionView);
   }
   
   
@@ -39,10 +52,10 @@ public class AreasView extends UINode {
     
     final World world = mainView.world();
     final Base  base  = world.playerBase();
-    Object selection = mainView.selectedObject();
     
+    /*
+    //Object selection = mainView.selectedObject();
     int down = 10;
-    
     for (Place room : base.rooms()) if (room != null) {
       g.drawImage(room.icon(), vx + 10, vy + down, 60, 60, null);
       boolean hover = surface.tryHover(vx + 10, vy + down, 60, 60, room);
@@ -60,6 +73,7 @@ public class AreasView extends UINode {
       );
       down += 60 + 10;
     }
+    //*/
     
     return true;
   }

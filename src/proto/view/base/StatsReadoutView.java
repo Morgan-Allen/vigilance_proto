@@ -1,5 +1,5 @@
 
-package proto.view.world;
+package proto.view.base;
 import proto.game.world.*;
 import proto.view.common.*;
 import proto.util.*;

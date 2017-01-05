@@ -8,7 +8,8 @@ import proto.util.*;
 import proto.view.*;
 import proto.view.common.MainView;
 import proto.view.common.MessageView;
-import proto.view.world.TaskView;
+import proto.view.common.TaskView;
+
 import java.awt.Image;
 
 

@@ -70,6 +70,15 @@ public class BaseLeads {
     return cases;
   }
   
+  
+  public Batch <CaseFile> allOpenCases() {
+    final Batch <CaseFile> cases = new Batch();
+    for (CaseFile file : files) if (file.lastSuspectEvent() != null) {
+      cases.add(file);
+    }
+    return cases;
+  }
+  
 }
 
 

@@ -1,8 +1,8 @@
 
 
-package proto.view.world;
+package proto.view.common;
 import proto.game.event.*;
-import proto.util.I;
+import proto.game.person.*;
 import proto.view.common.*;
 
 import java.awt.Color;
@@ -27,6 +27,7 @@ public class TaskView extends UINode {
   protected boolean renderTo(Surface surface, Graphics2D g) {
     //
     //  Draw the icon and description for this particular task-
+    //*
     g.setColor(Color.WHITE);
     int iconSize = vh;
     
@@ -52,17 +53,16 @@ public class TaskView extends UINode {
     final boolean hovered = surface.tryHover(
       vx + 20 - 5, vy + 0, vw + 10 - 40, vh - 0, task
     );
-    final boolean selected = mainView.selectedTask() == task;
     
-    Color              boxColor = Color.DARK_GRAY;
-    if      (selected) boxColor = Color.YELLOW;
-    else if (hovered ) boxColor = Color.YELLOW;
+    Color        boxColor = Color.DARK_GRAY;
+    if (hovered) boxColor = Color.YELLOW;
     
     g.setColor(boxColor);
     g.drawRect(vx + 20 -5, vy - 5, vw + 10 - 41, vh + 9);
     
-    if (surface.mouseClicked() && hovered) {
-      mainView.setSelectedTask(selected ? null : task);
+    final Person person = mainView.rosterView.selectedPerson();
+    if (surface.mouseClicked() && hovered && person != null) {
+      person.setAssignment(task);
     }
     //
     //  Finally, draw any persons assigned to this task...
@@ -70,20 +70,10 @@ public class TaskView extends UINode {
     ViewUtils.renderAssigned(
       task.assigned(), across - 20, vy + vh, surface, g
     );
-    
     return true;
   }
   
 }
-
-
-
-
-
-
-
-
-
 
 
 

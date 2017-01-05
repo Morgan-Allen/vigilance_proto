@@ -1,0 +1,102 @@
+
+
+package proto.view.base;
+import proto.game.person.*;
+import proto.game.world.*;
+import proto.util.*;
+import proto.view.common.*;
+
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Color;
+
+
+
+public class EquipmentView extends UINode {
+  
+  
+  public EquipmentView(UINode parent, Box2D bounds) {
+    super(parent, bounds);
+  }
+  
+  
+  
+  protected boolean renderTo(Surface surface, Graphics2D g) {
+    if (! super.renderTo(surface, g)) return false;
+    
+    Person person = this.mainView.rosterView.selectedPerson();
+    if (person == null) return false;
+    
+    int down = 10;
+    
+    for (int slotID : PersonGear.ALL_SLOTS) {
+      ItemType inSlot = person.gear.equippedInSlot(slotID);
+      Image  icon = inSlot == null ? null   : inSlot.icon();
+      String desc = inSlot == null ? "None" : inSlot.name();
+      String slotName = PersonGear.SLOT_NAMES[slotID];
+      
+      final boolean hovered = surface.tryHover(
+        vx + 5, vy + down, vw - 10, 40, "Slot_"+slotID
+      );
+      if (hovered) g.setColor(Color.YELLOW);
+      else         g.setColor(Color.WHITE );
+      
+      g.drawImage(icon, vx + 5, vy + down, 40, 40, null);
+      g.drawString(slotName+": "+desc, vx + 5 + 40 + 5, vy + down + 15);
+      
+      if (hovered && surface.mouseClicked()) {
+        createItemMenu(person, slotID, vx + 5, vy + down + 20);
+      }
+      
+      down += 40 + 10;
+    }
+    
+    return true;
+  }
+  
+  
+  void createItemMenu(final Person person, final int slotID, int x, int y) {
+    final Base base = mainView.world().playerBase();
+    final Batch <ItemType> types = new Batch();
+    final BaseStocks stocks = mainView.world().playerBase().stocks;
+    
+    for (ItemType type : stocks.availableItems(person, slotID)) {
+      types.add(type);
+    }
+    if (types.empty()) return;
+    
+    mainView.showClickMenu(new ClickMenu <ItemType> (
+      types, x, y, mainView
+    ) {
+      protected Image imageFor(ItemType option) {
+        return option.icon();
+      }
+      
+      protected String labelFor(ItemType option) {
+        return option.name()+" ("+option.describeStats(person)+")";
+      }
+      
+      protected void whenPicked(ItemType option, int optionID) {
+        if (option == Common.UNARMED   ) option = null;
+        if (option == Common.UNARMOURED) option = null;
+        person.gear.equipItem(option, slotID, base);
+      }
+    });
+  }
+  
+  
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

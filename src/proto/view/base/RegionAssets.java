@@ -1,6 +1,6 @@
 
 
-package proto.view.world;
+package proto.view.base;
 import proto.common.*;
 import proto.util.*;
 import java.awt.*;
