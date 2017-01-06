@@ -19,10 +19,10 @@ public class ProgressOptionsView extends UINode {
   public ProgressOptionsView(UINode parent, Box2D viewBounds) {
     super(parent, viewBounds);
     
-    int across = 5, down = 0;
+    int across = 0, down = 0;
     
     monitorButton = new StringButton(
-      "", new Box2D(across, down, viewBounds.xdim() - 10, 20), this
+      "", new Box2D(across + 5, down, 200 - 10, 20), this
     ) {
       protected void whenClicked() {
         final World world = mainView.world();
@@ -37,7 +37,8 @@ public class ProgressOptionsView extends UINode {
     };
     addChildren(monitorButton);
     
-    down = (int) viewBounds.ydim() - 20;
+    down += 25;
+    across += 25;
     
     saveButton = new StringButton(
       "Save", new Box2D(across + 0, down, 50, 20), this

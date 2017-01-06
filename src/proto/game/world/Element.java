@@ -1,6 +1,8 @@
 
 
 package proto.game.world;
+import java.awt.Image;
+
 import proto.common.*;
 import proto.game.event.*;
 import proto.util.*;
@@ -141,7 +143,15 @@ public class Element implements Session.Saveable {
   public String toString() {
     return name();
   }
+  
+  
+  public Image icon() {
+    //  TODO:  Make this more general!
+    return kind().sprite();
+  }
 }
+
+
 
 
 

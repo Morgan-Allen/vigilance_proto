@@ -12,6 +12,9 @@ import java.awt.Image;
 
 
 
+//  TODO:  This needs to allow scrolling over longer lists.
+
+
 public class LeadsListView extends UINode {
   
   
@@ -33,7 +36,19 @@ public class LeadsListView extends UINode {
     boolean noEvents = true;
     Base played = mainView.world().playerBase();
     
-    for (CaseFile file : played.leads.allOpenCases()) {
+    Region region = parent.mapView.selectedRegion();
+    
+    if (region == null) {
+      g.setColor(Color.LIGHT_GRAY);
+      ViewUtils.drawWrappedString(
+        "Select a district to view information on ongoing crimes and "+
+        "possible leads.",
+        g, vx + 25, vy + down + 20, vw - 30, 150
+      );
+      return true;
+    }
+    
+    for (CaseFile file : played.leads.casesForRegion(region)) {
       //
       //  Firstly, draw an illustrative icon for the lead we've picked up and
       //  some basic info on how it was acquired.
@@ -68,7 +83,7 @@ public class LeadsListView extends UINode {
     if (noEvents) {
       g.setColor(Color.LIGHT_GRAY);
       ViewUtils.drawWrappedString(
-        "You have no active leads on criminal activity.",
+        "You have no active leads on criminal activity in this district.",
         g, vx + 25, vy + down + 20, vw - 30, 150
       );
     }

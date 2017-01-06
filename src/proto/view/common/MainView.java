@@ -40,6 +40,9 @@ public class MainView extends UINode {
   FacilityView  facilView;
   HistoryView   histoView;
   
+  ProgressOptionsView progOptions;
+  StatsReadoutView mainReadout;
+  
   final public Image alertMarker, selectCircle, selectSquare;
   
   UINode messageShown = null;
@@ -107,25 +110,13 @@ public class MainView extends UINode {
     
     switchToTab(activView);
     
-    /*
-    readoutView = new StatsReadoutView(mainUI, new Box2D(
-      320, 120, fullWide - 320, 20
-    ));
-    areaView = new MapInsetView(mainUI, new Box2D(
-      320, 140, fullWide - 320, fullHigh - (140 + 50)
-    ));
-    progressView = new ProgressOptionsView(mainUI, new Box2D(
+    progOptions = new ProgressOptionsView(mainUI, new Box2D(
       (fullWide / 2) - 100, fullHigh - 50, 200, 50
     ));
-    mainUI.addChildren(rosterView, readoutView, areaView, progressView);
-    
-    final Box2D panesBound = new Box2D(0, 0, 320, fullHigh);
-    
-    personView = new PersonView(mainUI, panesBound);
-    roomView   = new RoomView  (mainUI, panesBound);
-    regionView = new RegionView(mainUI, panesBound);
-    mainUI.addChildren(personView, roomView, regionView);
-    //*/
+    mainReadout = new StatsReadoutView(mainUI, new Box2D(
+      0, fullHigh - 50, (fullWide / 2) - 100, 50
+    ));
+    mainUI.addChildren(progOptions, mainReadout);
     
     alertMarker   = Kind.loadImage(MAPS_DIR+"alert_symbol.png" );
     selectCircle  = Kind.loadImage(ACTS_DIR+"select_circle.png");

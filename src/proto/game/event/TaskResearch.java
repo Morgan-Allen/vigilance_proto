@@ -4,9 +4,7 @@ package proto.game.event;
 import proto.common.*;
 import proto.game.person.*;
 import proto.game.world.*;
-
 import proto.view.common.*;
-import proto.view.world.*;
 import proto.util.*;
 
 import java.awt.Image;

@@ -161,7 +161,7 @@ public class LeadSurveil extends Lead {
   
   
   public Image icon() {
-    return subject.kind().sprite();
+    return subject.icon();
   }
 }
 

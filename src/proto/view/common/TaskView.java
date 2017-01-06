@@ -4,6 +4,7 @@ package proto.view.common;
 import proto.game.event.*;
 import proto.game.person.*;
 import proto.view.common.*;
+import proto.game.world.*;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -62,20 +63,20 @@ public class TaskView extends UINode {
     
     final Person person = mainView.rosterView.selectedPerson();
     if (surface.mouseClicked() && hovered && person != null) {
-      person.setAssignment(task);
+      final Assignment oldA = person.assignment();
+      if (oldA != null) oldA.setAssigned(person, false);
+      
+      if (oldA == task) task.setAssigned(person, false);
+      else              task.setAssigned(person, true );
     }
     //
     //  Finally, draw any persons assigned to this task...
-    int across = vx + vw;
     ViewUtils.renderAssigned(
-      task.assigned(), across - 20, vy + vh, surface, g
+      task.assigned(), vx + vw - 20, vy + vh, surface, g
     );
     return true;
   }
   
 }
-
-
-
 
 

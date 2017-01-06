@@ -166,8 +166,15 @@ public class MapInsetView extends UINode {
   private Series <Person> visitors(Region located) {
     final Batch <Person> visitors = new Batch();
     final Series <Person> roster = mainView.world().playerBase().roster();
-    for (Person p : roster) if (p.region() == located) {
-      visitors.include(p);
+    for (Person p : roster) {
+      if (p.assignment() != null) {
+        if (p.assignment().targetLocation().region() == located) {
+          visitors.include(p);
+        }
+      }
+      else if (p.region() == located) {
+        visitors.include(p);
+      }
     }
     return visitors;
   }
