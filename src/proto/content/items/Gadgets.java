@@ -23,7 +23,7 @@ public class Gadgets {
     "Lightweight, throwable projectiles, useful to disarm or startle foes.",
     ICONS_DIR+"icon_wing_blades.png",
     SPRITE_DIR+"sprite_wing_blade.png",
-    SLOT_WEAPON, 4, new Object[] {
+    SLOT_TYPE_WEAPON, 4, new Object[] {
       ENGINEERING, 2
     },
     IS_WEAPON | IS_RANGED | IS_KINETIC | IS_CONSUMED, 0
@@ -36,7 +36,7 @@ public class Gadgets {
     "stealth.",
     ICONS_DIR+"icon_body_armour.png",
     SPRITE_DIR+"sprite_deflect.png",
-    SLOT_ARMOUR, 200, new Object[] {
+    SLOT_TYPE_ARMOUR, 200, new Object[] {
       ENGINEERING, 3
     },
     IS_ARMOUR, 0
@@ -53,7 +53,7 @@ public class Gadgets {
     "Lightweight kevlar provides reasonable protection and good mobility.",
     ICONS_DIR+"icon_kevlar_vest.png",
     SPRITE_DIR+"sprite_deflect.png",
-    SLOT_ARMOUR, 140, new Object[] {
+    SLOT_TYPE_ARMOUR, 140, new Object[] {
       ENGINEERING, 4
     },
     IS_ARMOUR, 0
@@ -94,7 +94,7 @@ public class Gadgets {
     "subjects.",
     ICONS_DIR+"icon_med_kit.png",
     SPRITE_DIR+"sprite_treatment.png",
-    SLOT_ITEMS, 25, new Object[] {
+    SLOT_TYPE_ITEM, 25, new Object[] {
       MEDICINE, 4
     },
     IS_CONSUMED, 0, MED_KIT_HEAL
@@ -107,7 +107,7 @@ public class Gadgets {
     "with relative impunity.",
     ICONS_DIR+"icon_tear_gas.png",
     SPRITE_DIR+"sprite_smoke.png",
-    SLOT_ITEMS, 35, new Object[] {
+    SLOT_TYPE_ITEM, 35, new Object[] {
       MEDICINE, 6
     },
     IS_CONSUMED, 0

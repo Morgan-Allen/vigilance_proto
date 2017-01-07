@@ -155,7 +155,7 @@ public class Volley implements Session.Saveable {
     this.targ   = hits  ;
     this.ranged = ranged;
     
-    ItemType weapon = self.gear.currentWeapon();
+    ItemType weapon = self.gear.weaponType();
     damageType = weapon.properties;
     
     selfDamageBase  = self.stats.levelFor(MIN_DAMAGE);

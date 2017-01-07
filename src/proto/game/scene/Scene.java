@@ -338,6 +338,10 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   public boolean enterScene(Person p, int x, int y) {
     Tile location = tileAt(x, y);
     if (location == null) return false;
+    
+    p.gear.refreshCharges();
+    p.stats.refreshCooldowns();
+    
     p.setExactPosition(this, x, y, 0);
     persons.add(p);
     liftFogInSight(p);

@@ -36,12 +36,16 @@ public class EquipmentView extends UINode {
   
   void renderEquipment(Surface surface, Graphics2D g, Person person) {
     int down = 10;
+    int maxSlots = person.gear.maxSlots();
     
-    for (int slotID : PersonGear.ALL_SLOTS) {
-      ItemType inSlot = person.gear.equippedInSlot(slotID);
+    for (int slotID : PersonGear.SLOT_IDS) {
+      if (slotID >= maxSlots) break;
+      
+      Item inSlot = person.gear.itemInSlot(slotID);
+      int slotType = PersonGear.SLOT_TYPES[slotID];
       Image  icon = inSlot == null ? null   : inSlot.icon();
       String desc = inSlot == null ? "None" : inSlot.name();
-      String slotName = PersonGear.SLOT_NAMES[slotID];
+      String slotName = PersonGear.SLOT_TYPE_NAMES[slotType];
       
       final boolean hovered = surface.tryHover(
         vx + 5, vy + down, vw - 10, 40, "Slot_"+slotID
@@ -65,8 +69,9 @@ public class EquipmentView extends UINode {
     final Base base = mainView.world().playerBase();
     final Batch <ItemType> types = new Batch();
     final BaseStocks stocks = mainView.world().playerBase().stocks;
+    final int slotType = PersonGear.SLOT_TYPES[slotID];
     
-    for (ItemType type : stocks.availableItems(person, slotID)) {
+    for (ItemType type : stocks.availableItemTypes(person, slotType)) {
       types.add(type);
     }
     if (types.empty()) return;
@@ -83,9 +88,8 @@ public class EquipmentView extends UINode {
       }
       
       protected void whenPicked(ItemType option, int optionID) {
-        if (option == Common.UNARMED   ) option = null;
-        if (option == Common.UNARMOURED) option = null;
-        person.gear.equipItem(option, slotID, base);
+        Item item = base.stocks.nextOfType(option);
+        person.gear.equipItem(item, slotID, base);
       }
     });
   }

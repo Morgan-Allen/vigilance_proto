@@ -35,7 +35,7 @@ public class ItemType extends Kind {
   final Image icon;
   final Object media;
   
-  final public int slotID;
+  final public int slotType;
   final public int buildCost;
   final public Object craftArgs[];
   final public int bonus;
@@ -50,7 +50,7 @@ public class ItemType extends Kind {
   public ItemType(
     String name, String ID, String description,
     String iconImgPath, Object media,
-    int slotID, int buildCost, Object craftArgs[],
+    int slotType, int buildCost, Object craftArgs[],
     int properties, int bonus,
     Ability... abilities
   ) {
@@ -60,7 +60,7 @@ public class ItemType extends Kind {
     if (! (media instanceof String)) this.media = media;
     else this.media = Kind.loadImage((String) media);
     
-    this.slotID     = slotID;
+    this.slotType   = slotType;
     this.buildCost  = buildCost;
     this.craftArgs  = craftArgs;
     this.properties = properties;

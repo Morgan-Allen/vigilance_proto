@@ -77,7 +77,7 @@ public class Common {
     ) {
       
       public boolean allowsTarget(Object target, Scene scene, Person acting) {
-        if (! acting.gear.currentWeapon().melee()) return false;
+        if (! acting.gear.weaponType().melee()) return false;
         if (target instanceof Person) {
           final Person other = (Person) target;
           return other.isEnemy(acting);
@@ -105,7 +105,7 @@ public class Common {
     ) {
       
       public boolean allowsTarget(Object target, Scene scene, Person acting) {
-        if (! acting.gear.currentWeapon().ranged()) return false;
+        if (! acting.gear.weaponType().ranged()) return false;
         return target instanceof Person;
       }
       
@@ -118,7 +118,7 @@ public class Common {
       
       public void renderUsageFX(Action action, Scene scene, Graphics2D g) {
         Person acting = action.acting;
-        ItemType weapon = acting.gear.equippedInSlot(SLOT_WEAPON);
+        ItemType weapon = acting.gear.weaponType();
         if (weapon == null || ! weapon.ranged()) return;
         weapon.renderUsageFX(action, scene, g);
       }

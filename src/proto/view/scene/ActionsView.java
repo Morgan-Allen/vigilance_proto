@@ -112,10 +112,12 @@ public class ActionsView extends UINode {
         s.append("\n  Last action: "+PA.nextAction().used);
       }
       
-      Series <ItemType> equipped = p.gear.equipment();
+      Series <Item> equipped = p.gear.equipped();
       if (equipped.size() > 0) {
         s.append("\n  Equipment:");
-        for (ItemType e : equipped) s.append(" "+e.name()+" ("+e.bonus+")");
+        for (Item e : equipped) {
+          s.append(" "+e.name()+" ("+e.kind().bonus+")");
+        }
       }
       
       boolean canCommand =

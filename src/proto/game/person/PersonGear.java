@@ -9,18 +9,32 @@ import proto.util.*;
 
 
 public class PersonGear {
-
+  
+  
   final public static int
-    SLOT_WEAPON     = 0,
-    SLOT_ARMOUR     = 1,
-    SLOT_ITEMS      = 2,
-    NUM_EQUIP_SLOTS = 3,
-    ALL_SLOTS[] = { 0, 1, 2 };
+    SLOT_TYPE_WEAPON = 0,
+    SLOT_TYPE_ARMOUR = 1,
+    SLOT_TYPE_ITEM   = 2,
+    
+    SLOT_WEAPON = 0,
+    SLOT_ARMOUR = 1,
+    SLOT_ITEM_1 = 2,
+    SLOT_ITEM_2 = 3,
+    SLOT_ITEM_3 = 4,
+    SLOT_ITEM_4 = 5,
+    
+    SLOT_IDS[] = {
+      0, 1, 2, 3, 4, 5
+    },
+    SLOT_TYPES[] = {
+      0, 1, 2, 2, 2, 2
+    },
+    DEFAULT_MAX_SLOTS = 4;
   final public static String
-    SLOT_NAMES[] = { "Weapon", "Armour", "Items" };
+    SLOT_TYPE_NAMES[] = { "Weapon", "Armour", "Item" };
   
   final Person person;
-  ItemType equipSlots[] = new ItemType[NUM_EQUIP_SLOTS];
+  List <Item> equipped = new List();
   Element carried = null;
   
   
@@ -31,34 +45,88 @@ public class PersonGear {
   
   
   void loadState(Session s) throws Exception {
-    for (int i = 0 ; i < NUM_EQUIP_SLOTS; i++) {
-      equipSlots[i] = (ItemType) s.loadObject();
-    }
+    s.loadObjects(equipped);
     carried = (Element) s.loadObject();
   }
   
   
   void saveState(Session s) throws Exception {
-    for (int i = 0 ; i < NUM_EQUIP_SLOTS; i++) {
-      s.saveObject(equipSlots[i]);
-    }
+    s.saveObjects(equipped);
     s.saveObject(carried);
   }
   
-
+  
+  
   /**  Assigning equipment loadout-
     */
-  //  TODO:  Allow for multiple slots of the same type, and disallow passing of
-  //  null arguments.
+  public Item itemInSlot(int slotID) {
+    for (Item i : equipped) if (i.slotID == slotID) return i;
+    return null;
+  }
   
-  public void equipItem(ItemType item, int slotID, Base from) {
-    ItemType oldItem = equipSlots[slotID];
-    equipSlots[slotID] = item;
-    person.stats.toggleItemAbilities(oldItem, false);
-    person.stats.toggleItemAbilities(item   , true );
+  
+  public int slotForItem(Item item) {
+    if (! equipped.includes(item)) return -1;
+    return item.slotID;
+  }
+  
+  
+  public int maxSlots() {
+    //  TODO:  Allow certain abilities to modify this.
+    return DEFAULT_MAX_SLOTS;
+  }
+  
+  
+  public int nextFreeSlotID(int slotType) {
+    int maxSlots = maxSlots();
+    for (int ID : SLOT_IDS) if (SLOT_TYPES[ID] == slotType) {
+      if (ID >= maxSlots) break;
+      if (itemInSlot(ID) == null) return ID;
+    }
+    return -1;
+  }
+  
+  
+  public boolean hasEquipped(int slotID) {
+    return itemInSlot(slotID) != null;
+  }
+  
+
+  public void equipItem(Item item, int slotID) {
+    equipItem(item, slotID, null);
+  }
+  
+  
+  public void equipItem(Item item, int slotID, Base from) {
+    int maxSlots = maxSlots();
+    if (slotID >= maxSlots) {
+      I.complain("Cannot add item to slot: "+slotID);
+      return;
+    }
     
-    if (oldItem != null && from != null) from.stocks.incStock(oldItem,  1);
-    if (item    != null && from != null) from.stocks.incStock(item   , -1);
+    final Item oldItem = itemInSlot(slotID);
+    if (oldItem != null) {
+      equipped.remove(oldItem);
+      item.setCarries(null, -1);
+      if (from != null) from.stocks.addItem(oldItem);
+    }
+    if (item != null) {
+      if (from != null) from.stocks.removeItem(item);
+      item.setCarries(person, slotID);
+      equipped.add(item);
+    }
+  }
+  
+  
+  public void dropItem(int slotID) {
+    if (person.currentTile() == null) {
+      I.complain("NOT IN SCENE: "+person);
+      return;
+    }
+    
+    Item item = itemInSlot(slotID);
+    dequipSlot(slotID, null);
+    person.currentTile().setInside(item, true);
   }
   
   
@@ -67,82 +135,62 @@ public class PersonGear {
   }
   
   
-  public void dropItem(int slotID) {
-    if (person.currentTile() == null) I.complain("NOT IN SCENE: "+person);
-    
-    ItemType oldItem = equipSlots[slotID];
-    dequipSlot(slotID, null);
-    
-    Item dropped = new Item(oldItem, person.world());
-    person.currentTile().setInside(dropped, true);
-  }
-  
-  
-  public void useCharge(ItemType item, float amount) {
-    
-  }
-  
-  
   public int equipBonus(int slotID, int properties) {
-    ItemType item = equipSlots[slotID];
-    if (item == null || ! item.hasProperty(properties)) return 0;
-    return item.bonus;
-  }
-  
-  
-  public ItemType equippedInSlot(int slotID) {
-    return equipSlots[slotID];
-  }
-  
-  
-  public boolean hasEquipped(int slotID) {
-    return equipSlots[slotID] != null;
+    Item item = itemInSlot(slotID);
+    if (item == null || ! item.kind().hasProperty(properties)) return 0;
+    return item.kind().bonus;
   }
   
   
   public boolean hasEquipped(ItemType item) {
-    for (ItemType i : equipSlots) if (i == item) return true;
+    for (Item i : equipped) if (i.kind() == item) return true;
     return false;
   }
   
   
-  public boolean canEquip(ItemType item) {
-    for (int slotID : ALL_SLOTS) {
-      if (item.slotID == slotID && equipSlots[slotID] == null) return true;
+  public Series <Item> equipped() {
+    return equipped;
+  }
+  
+  
+  public boolean useCharge(ItemType type, float amount) {
+    for (Item i : equipped) if (i.kind() == type && i.charges > 0) {
+      i.charges -= amount;
+      return true;
     }
     return false;
   }
   
   
-  public Series <ItemType> equipment() {
-    Batch <ItemType> all = new Batch();
-    for (ItemType e : equipSlots) if (e != null) all.add(e);
-    return all;
+  public void refreshCharges() {
+    for (Item i : equipped) {
+      i.charges = Nums.max(i.charges, 1);
+    }
   }
   
   
   
   /**  Specific queries related to weapons and armour-
     */
-  public ItemType currentWeapon() {
-    ItemType weapon = equippedInSlot(SLOT_WEAPON);
-    return weapon == null ? Common.UNARMED : weapon;
+  public ItemType weaponType() {
+    Item weapon = itemInSlot(SLOT_WEAPON);
+    return weapon == null ? Common.UNARMED : weapon.kind();
   }
   
   
-  public ItemType currentArmour() {
-    ItemType armour = equippedInSlot(SLOT_ARMOUR);
-    return armour == null ? Common.UNARMOURED : armour;
+  public ItemType armourType() {
+    Item armour = itemInSlot(SLOT_ARMOUR);
+    return armour == null ? Common.UNARMOURED : armour.kind();
   }
   
   
   public int baseWeaponBonus() {
-    return currentWeapon().bonus;
+    return weaponType().bonus;
   }
   
   
   public int baseArmourBonus() {
-    return currentArmour().bonus;
+    return armourType().bonus;
   }
 }
 

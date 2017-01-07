@@ -20,7 +20,7 @@ public class Clues {
     "",
     ICONS_DIR+"icon_evidence.png",
     SPRITE_DIR+null,
-    SLOT_ITEMS, 0, new Object[] {},
+    SLOT_TYPE_ITEM, 0, new Object[] {},
     IS_CUSTOM, 0
   ) {
   };
@@ -30,7 +30,7 @@ public class Clues {
     "",
     ICONS_DIR+"icon_blueprint.png",
     SPRITE_DIR+null,
-    SLOT_ITEMS, 0, new Object[] {},
+    SLOT_TYPE_ITEM, 0, new Object[] {},
     IS_CUSTOM, 0
   ) {
   };
@@ -40,7 +40,7 @@ public class Clues {
     "",
     ICONS_DIR+"icon_bomb.png",
     SPRITE_DIR+null,
-    SLOT_ITEMS, 0, new Object[] {},
+    SLOT_TYPE_ITEM, 0, new Object[] {},
     IS_CONSUMED, 0
   ) {
   };
@@ -50,7 +50,7 @@ public class Clues {
     "",
     ICONS_DIR+"icon_cash.png",
     SPRITE_DIR+null,
-    SLOT_ITEMS, 0, new Object[] {},
+    SLOT_TYPE_ITEM, 0, new Object[] {},
     IS_CONSUMED, 0
   ) {
   };

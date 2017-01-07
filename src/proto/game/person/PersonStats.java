@@ -176,8 +176,8 @@ public class PersonStats {
     
     Batch <Ability> all = new Batch();
     for (Ability a : abilities) all.add(a);
-    for (ItemType e : person.gear.equipSlots) if (e != null) {
-      for (Ability a : e.abilities) all.add(a);
+    for (Item i : person.gear.equipped()) {
+      for (Ability a : i.kind().abilities) all.include(a);
     }
     return all;
   }
@@ -253,8 +253,8 @@ public class PersonStats {
     for (Ability a : abilities) if (a.passive()) {
       a.applyPassiveStatsBonus(person);
     }
-    for (ItemType i : person.gear.equipment()) {
-      i.applyPassiveStatsBonus(person);
+    for (Item i : person.gear.equipped()) {
+      i.kind().applyPassiveStatsBonus(person);
     }
   }
   
@@ -296,6 +296,11 @@ public class PersonStats {
   }
   
   
+  public void refreshCooldowns() {
+    //  TODO:  Implement this once cooldowns are available...
+  }
+  
+  
   
   /**  Assigning experience and abilities-
     */
@@ -327,15 +332,6 @@ public class PersonStats {
     }
     for (Trait root : stat.roots()) {
       gainXP(root, XP / (3f * stat.roots().length));
-    }
-  }
-  
-  
-  public void toggleItemAbilities(ItemType item, boolean active) {
-    if (item == null) return;
-    for (Ability a : item.abilities) {
-      if (! a.equipped()) continue;
-      setLevel(a, active ? 1 : 0, false);
     }
   }
 }

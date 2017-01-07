@@ -14,7 +14,7 @@ public class BaseStocks {
   /**  Data fields, constructors and save/load methods-
     */
   final Base base;
-  Tally <ItemType> stocks = new Tally();
+  List <Item> stocks = new List();
   List <TaskCraft> tasks = new List();
   
   
@@ -24,13 +24,13 @@ public class BaseStocks {
   
   
   void saveState(Session s) throws Exception {
-    s.saveTally(stocks);
+    s.saveObjects(stocks);
     s.saveObjects(tasks);
   }
   
   
   void loadState(Session s) throws Exception {
-    s.loadTally(stocks);
+    s.loadObjects(stocks);
     s.loadObjects(tasks);
   }
   
@@ -38,34 +38,55 @@ public class BaseStocks {
   
   /**  Adding, removing and listing items:
     */
-  public Series <ItemType> availableItems(Person person, int slotID) {
+  public Series <ItemType> availableItemTypes(Person person, int slotType) {
     Batch <ItemType> available = new Batch();
     
-    for (ItemType item : stocks.keys()) {
-      if (item.slotID != slotID || ! item.availableFor(person, base)) continue;
-      available.add(item);
+    for (Item item : stocks) {
+      final ItemType type = item.kind();
+      if (  type.slotType != slotType      ) continue;
+      if (! type.availableFor(person, base)) continue;
+      available.include(type);
     }
-    
-    if (slotID == PersonGear.SLOT_ARMOUR) available.include(Common.UNARMOURED);
-    if (slotID == PersonGear.SLOT_WEAPON) available.include(Common.UNARMED   );
+    if (slotType == PersonGear.SLOT_ARMOUR) {
+      available.add(Common.UNARMOURED);
+    }
+    if (slotType == PersonGear.SLOT_WEAPON) {
+      available.add(Common.UNARMED);
+    }
     return available;
   }
   
   
-  public boolean incStock(ItemType item, int amount) {
-    if (item == null) return false;
-    stocks.add(amount, item);
+  public boolean incStock(ItemType type, int amount) {
+    while (amount-- > 0) {
+      stocks.add(new Item(type, base.world));
+    }
     return true;
   }
   
   
-  public void removeFromStore(ItemType item) {
-    incStock(item, -1);
+  public void addItem(Item item) {
+    stocks.add(item);
   }
   
   
-  public int numStored(ItemType item) {
-    return (int) stocks.valueFor(item);
+  public void removeItem(Item item) {
+    stocks.remove(item);
+  }
+  
+  
+  public int numStored(ItemType type) {
+    int total = 0;
+    for (Item i : stocks) if (i.kind() == type) total++;
+    return total;
+  }
+  
+  
+  public Item nextOfType(ItemType type) {
+    if (type == Common.UNARMED   ) return null;
+    if (type == Common.UNARMOURED) return null;
+    for (Item i : stocks) if (i.kind() == type) return i;
+    return null;
   }
   
   
