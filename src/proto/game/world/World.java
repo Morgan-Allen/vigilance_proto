@@ -11,7 +11,6 @@ import proto.content.agents.*;
 import proto.content.events.*;
 import proto.content.items.*;
 import proto.content.places.*;
-import proto.content.rooms.*;
 
 
 

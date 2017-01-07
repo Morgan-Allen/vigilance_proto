@@ -12,14 +12,14 @@ import java.awt.Graphics2D;
 
 
 
-public class ActivityView extends UINode {
+public class MissionsView extends UINode {
   
   
   MapInsetView mapView;
   LeadsListView leadsView;
   
   
-  public ActivityView(final UINode parent, Box2D viewBounds) {
+  public MissionsView(final UINode parent, Box2D viewBounds) {
     super(parent, viewBounds);
     
     int fullWide = (int) viewBounds.xdim(), fullHigh = (int) viewBounds.ydim();
@@ -65,28 +65,6 @@ public class ActivityView extends UINode {
         vx + 15, vy + 5, 320, 45
       );
     }
-    
-    /*
-    //Object selection = mainView.selectedObject();
-    int down = 10;
-    for (Place room : base.rooms()) if (room != null) {
-      g.drawImage(room.icon(), vx + 10, vy + down, 60, 60, null);
-      boolean hover = surface.tryHover(vx + 10, vy + down, 60, 60, room);
-      
-      if (hover || selection == room) {
-        g.drawImage(mainView.selectSquare, vx + 10, vy + down, 60, 60, null);
-      }
-      
-      if (hover && surface.mouseClicked()) {
-        mainView.setSelection(room);
-      }
-      
-      ViewUtils.renderAssigned(
-        room.visitors(), vx + 60 + 10, vy + down + 60, surface, g
-      );
-      down += 60 + 10;
-    }
-    //*/
     
     return true;
   }

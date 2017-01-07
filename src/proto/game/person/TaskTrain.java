@@ -1,6 +1,6 @@
 
 
-package proto.game.event;
+package proto.game.person;
 import proto.common.*;
 import proto.game.person.*;
 import proto.game.world.*;

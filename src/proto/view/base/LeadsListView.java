@@ -18,10 +18,10 @@ import java.awt.Image;
 public class LeadsListView extends UINode {
   
   
-  final ActivityView parent;
+  final MissionsView parent;
   
   
-  public LeadsListView(ActivityView parent, Box2D viewBounds) {
+  public LeadsListView(MissionsView parent, Box2D viewBounds) {
     super(parent, viewBounds);
     this.parent = parent;
   }
@@ -99,3 +99,5 @@ public class LeadsListView extends UINode {
     return true;
   }
 }
+
+

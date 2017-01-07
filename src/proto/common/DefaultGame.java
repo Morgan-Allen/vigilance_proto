@@ -4,7 +4,6 @@ package proto.common;
 import proto.content.agents.*;
 import proto.content.items.*;
 import proto.content.places.*;
-import proto.content.rooms.*;
 import proto.content.events.*;
 import proto.game.person.*;
 import proto.game.world.*;
@@ -52,7 +51,7 @@ public class DefaultGame extends RunGame {
   
   
   public static void initDefaultBase(World world) {
-    final Base base = new Base(Facilities.WAYNE_MANOR, world);
+    final Base base = new Base(Facilities.MANOR, world);
     
     Person leader = new Person(Heroes.HERO_PHOBOS, world);
     base.setLeader(leader);

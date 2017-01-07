@@ -2,6 +2,7 @@
 
 package proto.game.event;
 import proto.common.*;
+import proto.game.person.*;
 import proto.game.world.*;
 import java.awt.Image;
 

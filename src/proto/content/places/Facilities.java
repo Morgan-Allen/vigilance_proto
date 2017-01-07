@@ -4,8 +4,7 @@ package proto.content.places;
 import proto.game.person.*;
 import proto.game.event.*;
 import proto.game.world.*;
-import proto.content.agents.Civilians;
-import proto.content.rooms.*;
+import proto.content.agents.*;
 import static proto.game.world.Region.*;
 import static proto.content.places.UrbanScenes.*;
 
@@ -22,8 +21,8 @@ public class Facilities {
   );
   
   
-  final public static PlaceType WAYNE_MANOR = new PlaceType(
-    "Wayne Manor", "base_type_manor",
+  final public static PlaceType MANOR = new PlaceType(
+    "Manor", "base_type_manor",
     null, "",
     0, BUILD_TIME_NONE, MANSION_SCENE
   );

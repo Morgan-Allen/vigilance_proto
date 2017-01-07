@@ -52,6 +52,17 @@ public abstract class Lead extends Task {
   }
   
   
+  public boolean allowsAssignment(Person p) {
+    final CaseFile parentFile = base.leads.caseFor(subject);
+    
+    for (Lead option : parentFile.investigationOptions()) {
+      if (option != this && ! option.assigned().empty()) return false;
+    }
+    
+    return super.allowsAssignment(p);
+  }
+
+
   public int assignmentPriority() {
     return PRIORITY_LEAD;
   }
@@ -70,9 +81,9 @@ public abstract class Lead extends Task {
       if (p != active.last()) s.append(" and ");
     }
     s.append(" tested their ");
-    for (Trait t : tested) {
+    for (Trait t : tested()) {
       s.append(t);
-      if (t != Visit.last(tested)) s.append(" and ");
+      if (t != Visit.last(tested())) s.append(" and ");
     }
     s.append(".");
     if (success()) s.append("  They were successful.");

@@ -36,7 +36,6 @@ public class BaseStocks {
   
   
   
-  
   /**  Adding, removing and listing items:
     */
   public Series <ItemType> availableItems(Person person, int slotID) {

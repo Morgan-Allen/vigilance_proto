@@ -1,6 +1,6 @@
 
 
-package proto.game.event;
+package proto.game.person;
 import proto.game.world.*;
 import proto.common.*;
 import proto.game.person.*;
@@ -36,7 +36,7 @@ public abstract class Task implements Assignment {
     EPIC_DC    = 9
   ;
   
-  final Base base;
+  final public Base base;
   Trait   tested [];
   int     testDCs[];
   int     testMod[];
@@ -116,18 +116,10 @@ public abstract class Task implements Assignment {
   
   
   
-  /**  Roster assignments-
+  /**  Roster assignments and progress reporting-
     */
   public void setAssigned(Person p, boolean is) {
     assigned.toggleMember(p, is);
-  }
-  
-  
-  public boolean setModifier(Trait skill, int mod) {
-    int index = Visit.indexOf(skill, tested);
-    if (index == -1) return false;
-    testMod[index] = mod;
-    return true;
   }
   
   
@@ -138,6 +130,47 @@ public abstract class Task implements Assignment {
   
   public int assignmentPriority() {
     return PRIORITY_CASUAL;
+  }
+  
+  
+  public Series <Person> assigned() {
+    return assigned;
+  }
+  
+  
+  public boolean complete() {
+    return complete;
+  }
+  
+  
+  public boolean success() {
+    return success;
+  }
+  
+  
+  public boolean failed() {
+    return complete && ! success;
+  }
+  
+  
+  public float hoursSoFar() {
+    if (initTime == -1) return 0;
+    float minutes = base.world().totalMinutes() - initTime;
+    return minutes / World.MINUTES_PER_HOUR;
+  }
+  
+  
+  public abstract Place targetLocation();
+  
+  
+  
+  /**  Skill and type requirements-
+    */
+  public boolean setModifier(Trait skill, int mod) {
+    int index = Visit.indexOf(skill, tested);
+    if (index == -1) return false;
+    testMod[index] = mod;
+    return true;
   }
   
   
@@ -157,39 +190,14 @@ public abstract class Task implements Assignment {
   }
   
   
+  public Trait[] tested() {
+    return tested;
+  }
+  
+  
   public boolean needsSkill(Trait s) {
     return Visit.arrayIncludes(tested, s);
   }
-  
-  
-  public Series <Person> assigned() {
-    return assigned;
-  }
-  
-  
-  public float hoursSoFar() {
-    if (initTime == -1) return 0;
-    float minutes = base.world().totalMinutes() - initTime;
-    return minutes / World.MINUTES_PER_HOUR;
-  }
-  
-  
-  public boolean complete() {
-    return complete;
-  }
-  
-  
-  public boolean success() {
-    return success;
-  }
-  
-  
-  public boolean failed() {
-    return complete && ! success;
-  }
-  
-  
-  public abstract Place targetLocation();
   
   
   

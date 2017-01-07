@@ -34,11 +34,11 @@ public class MainView extends UINode {
   UINode tabButtons[], tabContent[];
   UINode currentTab = null;
   
-  EquipmentView equipView;
-  TrainingView  trainView;
-  ActivityView  activView;
-  InvestingView invstView;
-  HistoryView   histoView;
+  EquipmentView equipView  ;
+  TrainingView  trainView  ;
+  MissionsView  missionView;
+  InvestingView investView ;
+  HistoryView   historyView;
   
   ProgressOptionsView progOptions;
   StatsReadoutView mainReadout;
@@ -77,13 +77,13 @@ public class MainView extends UINode {
     
     //  Add views for each tab:
     final Box2D tabSubBounds = new Box2D(0, 145, fullWide, fullHigh - 145);
-    activView = new ActivityView (mainUI, tabSubBounds);
-    invstView = new InvestingView(mainUI, tabSubBounds);
-    equipView = new EquipmentView(mainUI, tabSubBounds);
-    trainView = new TrainingView (mainUI, tabSubBounds);
-    histoView = new HistoryView  (mainUI, tabSubBounds);
+    missionView = new MissionsView (mainUI, tabSubBounds);
+    investView  = new InvestingView(mainUI, tabSubBounds);
+    equipView   = new EquipmentView(mainUI, tabSubBounds);
+    trainView   = new TrainingView (mainUI, tabSubBounds);
+    historyView = new HistoryView  (mainUI, tabSubBounds);
     tabContent = new UINode[] {
-      activView, invstView, equipView, trainView
+      missionView, investView, equipView, trainView
     };
     
     tabsNode = new UINode(mainUI, new Box2D(320, 120, fullWide - 320, 25));
@@ -108,7 +108,7 @@ public class MainView extends UINode {
     tabsNode.addChildren(tabButtons);
     mainUI  .addChildren(tabContent);
     
-    switchToTab(activView);
+    switchToTab(missionView);
     
     progOptions = new ProgressOptionsView(mainUI, new Box2D(
       (fullWide / 2) - 100, fullHigh - 50, 200, 50
