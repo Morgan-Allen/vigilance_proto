@@ -141,7 +141,7 @@ public class SceneView extends UINode {
       if (p.isCriminal()) teamColor = Color.RED;
       Vec3D pos         = p.exactPosition();
       float healthLevel = p.health.healthLevel();
-      float stunLevel   = 1 - p.health.bleedRisk();
+      float stunLevel   = 1 - p.health.harmToStunRatio();
       Color pale = PALES[(int) (stunLevel * 9.9f)];
       
       renderAt(pos.x, pos.y + 0.9f, 1, 0.1f, null, Color.BLACK, g);

@@ -2,6 +2,8 @@
 
 package proto.content.items;
 import proto.game.person.*;
+import proto.game.scene.*;
+
 import static proto.game.person.PersonStats.*;
 import static proto.game.person.ItemType.*;
 import static proto.game.person.PersonGear.*;
@@ -62,6 +64,30 @@ public class Gadgets {
     }
   };
   
+  
+  final static Ability MED_KIT_HEAL = new Ability(
+    "Med Kit Heal", "ability_med_kit_heal",
+    SPRITE_DIR+"icon_med_kit.png",
+    "Patches up injury sustained in combat (up to 6 health), halts bleeding "+
+    "and reduces recovery time.",
+    Ability.IS_ACTIVE | Ability.IS_EQUIPPED | Ability.IS_MELEE, 3,
+    Ability.REAL_HELP, Ability.MEDIUM_POWER
+  ) {
+    
+    public boolean allowsTarget(Object target, Scene scene, Person acting) {
+      if (! (target instanceof Person)) return false;
+      return ((Person) target).health.injury() > 0;
+    }
+
+    public void applyOnActionEnd(Action use) {
+      Person healed = (Person) use.target;
+      healed.health.liftInjury(6);
+      healed.health.liftTotalHarm(2);
+      healed.health.toggleBleeding(false);
+      healed.gear.useCharge(Gadgets.MED_KIT, 0.5f);
+    }
+  };
+  
   final public static ItemType MED_KIT = new ItemType(
     "Med Kit", "item_med_kit",
     "Med Kits can provide vital first aid to bleeding or incapacitated "+
@@ -71,13 +97,8 @@ public class Gadgets {
     SLOT_ITEMS, 25, new Object[] {
       MEDICINE, 4
     },
-    IS_CONSUMED, 0
+    IS_CONSUMED, 0, MED_KIT_HEAL
   ) {
-    //  TODO:  Provide an active 'stabilise/heal' ability instead
-    public float passiveModifierFor(Person person, Trait trait) {
-      if (trait == MEDICINE) return 2;
-      return 0;
-    }
   };
 
   final public static ItemType TEAR_GAS = new ItemType(

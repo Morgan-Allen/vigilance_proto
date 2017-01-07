@@ -27,8 +27,8 @@ public class PersonHealth {
   final Person person;
   
   int luck = INIT_LUCK, stress = INIT_STRESS;
-  float injury, stun;
-  boolean alive = true, conscious = true;
+  float injury, stun, totalHarm;
+  boolean bleed = false, alive = true, conscious = true;
   
   
   
@@ -42,6 +42,8 @@ public class PersonHealth {
     stress    = s.loadInt();
     injury    = s.loadFloat();
     stun      = s.loadFloat();
+    totalHarm = s.loadFloat();
+    bleed     = s.loadBool();
     alive     = s.loadBool();
     conscious = s.loadBool();
   }
@@ -52,6 +54,8 @@ public class PersonHealth {
     s.saveInt  (stress   );
     s.saveFloat(injury   );
     s.saveFloat(stun     );
+    s.saveFloat(totalHarm);
+    s.saveBool (bleed    );
     s.saveBool (alive    );
     s.saveBool (conscious);
   }
@@ -88,7 +92,7 @@ public class PersonHealth {
   }
   
   
-  public float bleedRisk() {
+  public float harmToStunRatio() {
     if (injury <= 0) return 0;
     if (stun   <= 0) return 1;
     return injury / (stun + injury);
@@ -121,7 +125,8 @@ public class PersonHealth {
   
   
   public void receiveInjury(float injury) {
-    this.injury += injury;
+    this.injury    += injury;
+    this.totalHarm += injury;
     checkState();
     person.world().events.log(person+" suffered "+injury+" injury.");
   }
@@ -132,7 +137,11 @@ public class PersonHealth {
       receiveInjury(attack.injureDamage);
       receiveStun  (attack.stunDamage  );
     }
-    checkState();
+    float bleedRisk = totalHarm / maxHealth();
+    if (Rand.num() < bleedRisk) {
+      bleed = true;
+      person.world().events.log(person+" began bleeding.");
+    }
   }
   
   
@@ -148,6 +157,16 @@ public class PersonHealth {
   
   public void liftStress(int lift) {
     stress = Nums.max(0, stress - lift);
+  }
+  
+  
+  public void liftTotalHarm(float lift) {
+    totalHarm = Nums.max(0, totalHarm - lift);
+  }
+  
+  
+  public void toggleBleeding(boolean bleed) {
+    this.bleed = bleed;
   }
   
   

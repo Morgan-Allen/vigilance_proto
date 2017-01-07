@@ -78,6 +78,11 @@ public class PersonGear {
   }
   
   
+  public void useCharge(ItemType item, float amount) {
+    
+  }
+  
+  
   public int equipBonus(int slotID, int properties) {
     ItemType item = equipSlots[slotID];
     if (item == null || ! item.hasProperty(properties)) return 0;
