@@ -22,12 +22,13 @@ public class Base extends Place {
   List <Person> roster = new List();
   List <Kind> goonTypes = new List();
   
-  final public BaseStocks stocks = new BaseStocks(this);
-  final public BaseLeads  leads  = new BaseLeads (this);
-  final public BasePlans  plans  = new BasePlans (this);
+  final public BaseStocks   stocks   = new BaseStocks  (this);
+  final public BaseTraining training = new BaseTraining(this);
+  final public BaseLeads    leads    = new BaseLeads   (this);
+  final public BasePlans    plans    = new BasePlans   (this);
   
   Place rooms[] = new Place[MAX_FACILITIES];
-  List <Tech> knownTech = new List();
+  List <Object> knownTech = new List();
   int currentFunds, incomeFloor, income, maintenance;
   
   
@@ -43,9 +44,10 @@ public class Base extends Place {
     s.loadObjects(roster);
     s.loadObjects(goonTypes);
     
-    stocks.loadState(s);
-    leads .loadState(s);
-    plans .loadState(s);
+    stocks  .loadState(s);
+    training.loadState(s);
+    leads   .loadState(s);
+    plans   .loadState(s);
     
     for (int n = 0 ; n < MAX_FACILITIES; n++) {
       rooms[n] = (Place) s.loadObject();
@@ -66,9 +68,10 @@ public class Base extends Place {
     s.saveObjects(roster);
     s.saveObjects(goonTypes);
     
-    stocks.saveState(s);
-    leads .saveState(s);
-    plans .saveState(s);
+    stocks  .saveState(s);
+    training.saveState(s);
+    leads   .saveState(s);
+    plans   .saveState(s);
     
     for (int n = 0 ; n < MAX_FACILITIES; n++) {
       s.saveObject(rooms[n]);
@@ -116,6 +119,8 @@ public class Base extends Place {
     this.income += incomeFloor;
     this.currentFunds += (income - maintenance) * numWeeks;
     
+    stocks.updateCrafting();
+    training.updateTraining();
     leads.updateInvestigations();
     plans.updatePlanning();
   }
@@ -175,12 +180,12 @@ public class Base extends Place {
   
   /**  Tech levels and funding-
     */
-  public boolean hasTech(Tech tech) {
+  public boolean hasTech(Object tech) {
     return knownTech.includes(tech);
   }
   
   
-  public boolean addTech(Tech tech) {
+  public boolean addTech(Object tech) {
     if (tech == null || knownTech.includes(tech)) return false;
     knownTech.add(tech);
     return true;

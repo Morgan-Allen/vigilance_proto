@@ -23,7 +23,7 @@ public class MapInsetView extends UINode {
   BufferedImage keyImage;
   RegionAssets attached[];
   
-  private Region selectedRegion;
+  private static RegionType lastRegionType;
   
   
   public MapInsetView(UINode parent, Box2D viewBounds) {
@@ -135,8 +135,8 @@ public class MapInsetView extends UINode {
       this.setSelectedRegion(regionHovered);
     }
     
-    renderOutline(selectedRegion, surface, g, mapWRatio, mapHRatio);
-    renderOutline(regionHovered , surface, g, mapWRatio, mapHRatio);
+    renderOutline(selectedRegion(), surface, g, mapWRatio, mapHRatio);
+    renderOutline(regionHovered   , surface, g, mapWRatio, mapHRatio);
     
     for (Region n : districts) {
       int x = (int) ((n.kind().view.centerX / mapWRatio) + vx);
@@ -196,12 +196,12 @@ public class MapInsetView extends UINode {
   
   
   public void setSelectedRegion(Region region) {
-    this.selectedRegion = region;
+    lastRegionType = region.kind();
   }
   
   
   public Region selectedRegion() {
-    return selectedRegion;
+    return mainView.world().regionFor(lastRegionType);
   }
 }
 

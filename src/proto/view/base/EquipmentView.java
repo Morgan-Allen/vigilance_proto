@@ -1,6 +1,7 @@
 
 
 package proto.view.base;
+import proto.game.event.*;
 import proto.game.person.*;
 import proto.game.world.*;
 import proto.util.*;
@@ -20,13 +21,20 @@ public class EquipmentView extends UINode {
   }
   
   
-  
   protected boolean renderTo(Surface surface, Graphics2D g) {
     if (! super.renderTo(surface, g)) return false;
     
     Person person = this.mainView.rosterView.selectedPerson();
     if (person == null) return false;
     
+    renderEquipment(surface, g, person);
+    renderCraftOptions(surface, g, person);
+    
+    return true;
+  }
+  
+  
+  void renderEquipment(Surface surface, Graphics2D g, Person person) {
     int down = 10;
     
     for (int slotID : PersonGear.ALL_SLOTS) {
@@ -50,8 +58,6 @@ public class EquipmentView extends UINode {
       
       down += 40 + 10;
     }
-    
-    return true;
   }
   
   
@@ -85,11 +91,23 @@ public class EquipmentView extends UINode {
   }
   
   
+  void renderCraftOptions(Surface surface, Graphics2D g, Person person) {
+    final Base base = mainView.world().playerBase();
+    
+    int down = 10, across = vw - 320;
+    
+    for (TaskCraft option : base.stocks.craftingTasksFor(person)) {
+      TaskView view = option.createView(mainView);
+      view.showIcon = false;
+      view.relBounds.set(vx + across, vy + down, 320, 45);
+      view.renderNow(surface, g);
+      down += view.relBounds.ydim() + 10;
+    }
+    
+  }
+  
+  
 }
-
-
-
-
 
 
 

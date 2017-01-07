@@ -126,6 +126,13 @@ public abstract class Ability extends Trait {
   }
   
   
+  public boolean canLearn(Person learns) {
+    for (Trait t : roots()) {
+      if (learns.stats.levelFor(t) < 1) return false;
+    }
+    return true;
+  }
+  
   
   
   /**  Configuring actions-

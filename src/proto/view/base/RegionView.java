@@ -26,12 +26,13 @@ public class RegionView extends UINode {
     );
   
   
-  final ActivityView parent;
+  //final ActivityView parent;
+  final MapInsetView mapRefers;
   
   
-  public RegionView(ActivityView parent, Box2D viewBounds) {
+  public RegionView(UINode parent, MapInsetView map, Box2D viewBounds) {
     super(parent, viewBounds);
-    this.parent = parent;
+    this.mapRefers = map;
   }
   
   
@@ -40,7 +41,7 @@ public class RegionView extends UINode {
     */
   protected boolean renderTo(Surface surface, Graphics2D g) {
     
-    final Region region = parent.mapView.selectedRegion();
+    final Region region = mapRefers.selectedRegion();
     if (region == null) {
       //  TODO:  Render some help-text instead!
       return false;

@@ -185,8 +185,8 @@ public class Region extends Element {
   
   public Series <PlaceType> facilitiesAvailable(Base base) {
     final Batch <PlaceType> all = new Batch();
-    for (Tech tech : base.knownTech) for (Object g : tech.granted) {
-      if (g instanceof PlaceType) all.add((PlaceType) g);
+    for (Object tech : base.knownTech) {
+      if (tech instanceof PlaceType) all.add((PlaceType) tech);
     }
     return all;
   }

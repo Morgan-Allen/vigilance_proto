@@ -40,7 +40,7 @@ public class Facilities {
     "Steel Mill", "facility_steel_mill",
     "media assets/tech icons/icon_steel_mill.png",
     "A Steel Mill provides income and steady blue-collar employment, along "+
-    "with industrial pollution.\n\n10% bonus to Workshop projects",
+    "with industrial pollution.\n\n10% bonus to Engineering projects",
     100, BUILD_TIME_MEDIUM, URBAN_SCENE,
     EMPLOYMENT, 3,
     HEALTH_AND_ENVIRONMENT, -2,
@@ -48,7 +48,7 @@ public class Facilities {
     Civilians.CIVILIAN, 2
   ) {
     public float speedBonus(Task task) {
-      if (TaskCraft.isCraftingAt(task, Workshop.BLUEPRINT)) return 0.1f;
+      if (task.needsSkill(PersonStats.ENGINEERING)) return 0.1f;
       return 0;
     }
   };
@@ -57,7 +57,7 @@ public class Facilities {
     "Chemical Plant", "facility_chemical_plant",
     "media assets/tech icons/icon_chemical_plant.png",
     "Chemical plants provide basic laborers with a steady job, but won't "+
-    "do their health any favours.\n\n10% bonus to Laboratory projects",
+    "do their health any favours.\n\n10% bonus to Medical projects",
     100, BUILD_TIME_MEDIUM, URBAN_SCENE,
     EMPLOYMENT, 3,
     HEALTH_AND_ENVIRONMENT, -2,
@@ -65,7 +65,7 @@ public class Facilities {
     Civilians.CIVILIAN, 2
   ){
     public float speedBonus(Task task) {
-      if (TaskCraft.isCraftingAt(task, Laboratory.BLUEPRINT)) return 0.1f;
+      if (task.needsSkill(PersonStats.MEDICINE)) return 0.1f;
       return 0;
     }
   };

@@ -16,10 +16,7 @@ public class ActivityView extends UINode {
   
   
   MapInsetView mapView;
-  RegionView regionView;
   LeadsListView leadsView;
-  
-  
   
   
   public ActivityView(final UINode parent, Box2D viewBounds) {
@@ -40,11 +37,7 @@ public class ActivityView extends UINode {
     );
     mapView.resizeToFitAspectRatio();
     
-    regionView = new RegionView(this, new Box2D(
-      fullWide - 320, 5, 320, fullHigh - 10
-    ));
-    
-    addChildren(leadsView, mapView, regionView);
+    addChildren(leadsView, mapView);
   }
   
   

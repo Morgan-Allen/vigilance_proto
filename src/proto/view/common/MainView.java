@@ -37,7 +37,7 @@ public class MainView extends UINode {
   EquipmentView equipView;
   TrainingView  trainView;
   ActivityView  activView;
-  FacilityView  facilView;
+  InvestingView invstView;
   HistoryView   histoView;
   
   ProgressOptionsView progOptions;
@@ -78,18 +78,18 @@ public class MainView extends UINode {
     //  Add views for each tab:
     final Box2D tabSubBounds = new Box2D(0, 145, fullWide, fullHigh - 145);
     activView = new ActivityView (mainUI, tabSubBounds);
+    invstView = new InvestingView(mainUI, tabSubBounds);
     equipView = new EquipmentView(mainUI, tabSubBounds);
     trainView = new TrainingView (mainUI, tabSubBounds);
-    facilView = new FacilityView (mainUI, tabSubBounds);
     histoView = new HistoryView  (mainUI, tabSubBounds);
     tabContent = new UINode[] {
-      activView, equipView, trainView, facilView, histoView
+      activView, invstView, equipView, trainView
     };
     
     tabsNode = new UINode(mainUI, new Box2D(320, 120, fullWide - 320, 25));
     Box2D blank = new Box2D();
     final String tabNames[] = {
-      "Activity", "Armory", "Training Room", "Facilities", "History"
+      "Mission Control", "Investments", "Armory", "Training Room"
     };
     tabButtons = new UINode[tabContent.length];
     int butW = (int) (tabsNode.relBounds.xdim() / tabButtons.length);
@@ -146,52 +146,6 @@ public class MainView extends UINode {
       c.visible = c == content;
     }
   }
-  
-  
-  /**  Selection handling-
-    */
-  /*
-  public void setSelection(Object selected) {
-    I.say("Setting selection: "+selected);
-    
-    final Object old = selectedObject;
-    this.selectedObject = selected;
-    if (old != selected && ! (selected instanceof Person)) selectedTask = null;
-  }
-  
-  
-  public Place selectedRoom() {
-    if (selectedObject instanceof Place) return (Place) selectedObject;
-    return null;
-  }
-  
-  
-  public Region selectedRegion() {
-    if (selectedObject instanceof Region) return (Region) selectedObject;
-    return null;
-  }
-  
-  
-  public Person selectedPerson() {
-    if (selectedObject instanceof Person) return (Person) selectedObject;
-    return null;
-  }
-  
-  
-  public Object selectedObject() {
-    return selectedObject;
-  }
-  
-  
-  public void setSelectedTask(Assignment task) {
-    this.selectedTask = task;
-  }
-  
-  
-  public Assignment selectedTask() {
-    return selectedTask;
-  }
-  //*/
   
   
   

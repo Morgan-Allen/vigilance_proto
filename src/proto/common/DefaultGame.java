@@ -81,16 +81,21 @@ public class DefaultGame extends RunGame {
       Facilities.COMMUNITY_COLLEGE,
       Facilities.SOUP_KITCHEN
     };
-    for (PlaceType t : buildTechs) base.addTech(t.tech);
+    for (Object t : buildTechs) base.addTech(t);
     
-    base.addFacility(Gymnasium .BLUEPRINT, 0, 1f);
-    base.addFacility(Library   .BLUEPRINT, 1, 1f);
-    base.addFacility(Workshop  .BLUEPRINT, 2, 1f);
-    base.addFacility(Laboratory.BLUEPRINT, 3, 1f);
+    final Ability learnTechs[] = Techniques.PHYS_TECHNIQUES;
+    for (Object t : learnTechs) base.addTech(t);
     
-    base.stocks.incStock(Gadgets.BATARANGS  , 4);
-    base.stocks.incStock(Gadgets.BODY_ARMOUR, 2);
-    base.stocks.incStock(Gadgets.MED_KIT    , 2);
+    final ItemType craftTechs[] = {
+      Gadgets.WING_BLADES,
+      Gadgets.BODY_ARMOUR,
+      Gadgets.KEVLAR_VEST,
+      Gadgets.MED_KIT
+    };
+    for (Object t : craftTechs) {
+      base.addTech(t);
+      base.stocks.incStock((ItemType) t, 4);
+    }
     
     base.setIncomeFloor(20);
     base.incFunding(500);

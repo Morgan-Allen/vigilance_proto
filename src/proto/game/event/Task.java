@@ -154,6 +154,11 @@ public abstract class Task implements Assignment {
   }
   
   
+  public boolean needsSkill(Trait s) {
+    return Visit.arrayIncludes(tested, s);
+  }
+  
+  
   public Series <Person> assigned() {
     return assigned;
   }

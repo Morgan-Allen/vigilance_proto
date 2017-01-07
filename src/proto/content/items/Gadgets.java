@@ -16,11 +16,11 @@ public class Gadgets {
     SPRITE_DIR = "media assets/character sprites/"
   ;
   
-  final public static ItemType BATARANGS = new ItemType(
-    "Batarang Set", "item_batarangs",
+  final public static ItemType WING_BLADES = new ItemType(
+    "Wing Blades", "item_wing_blades",
     "Lightweight, throwable projectiles, useful to disarm or startle foes.",
-    ICONS_DIR+"icon_batarangs.png",
-    SPRITE_DIR+"sprite_batarang.png",
+    ICONS_DIR+"icon_wing_blades.png",
+    SPRITE_DIR+"sprite_wing_blade.png",
     SLOT_WEAPON, 4, new Object[] {
       ENGINEERING, 2
     },
@@ -30,7 +30,8 @@ public class Gadgets {
   
   final public static ItemType BODY_ARMOUR = new ItemType(
     "Body Armour", "item_body_armour",
-    "Heavy ceramic body armour, almost impervious to handgun fire.",
+    "Heavy ceramic body armour.  Grants excellent protection but impedes "+
+    "stealth.",
     ICONS_DIR+"icon_body_armour.png",
     SPRITE_DIR+"sprite_deflect.png",
     SLOT_ARMOUR, 200, new Object[] {

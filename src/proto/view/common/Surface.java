@@ -64,6 +64,14 @@ public class Surface extends JPanel implements
   }
   
   
+  public boolean tryHover(Box2D b, Object hovered) {
+    return tryHover(
+      (int) b.xpos(), (int) b.ypos(), (int) b.xdim(), (int) b.ydim(),
+      hovered
+    );
+  }
+  
+  
   public boolean tryHover(int x, int y, int w, int h, Object hovered) {
     if (! recordHover(x, y, w, h, hovered)) return false;
     return wasHovered(hovered);

@@ -90,7 +90,7 @@ public class LeadGuard extends Lead {
   
   
   public String activeInfo() {
-    return "Guarding "+guarded+" during event: "+event;
+    return "Guarding "+guarded;//+" during event: "+event;
   }
   
   

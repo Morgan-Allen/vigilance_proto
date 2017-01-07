@@ -21,14 +21,12 @@ public class TaskTrain extends Task {
     ABILITY_BASE_LEARN_TIME = World.HOURS_PER_DAY * World.DAYS_PER_WEEK
   ;
   
-  Place room;
   Trait trained;
   Trait talking;
   
   
-  public TaskTrain(Trait trained, Trait talking, Place room, Base base) {
+  public TaskTrain(Trait trained, Trait talking, Base base) {
     super(base, TIME_MEDIUM, trained, 0);
-    this.room    = room   ;
     this.trained = trained;
     this.talking = talking;
   }
@@ -36,7 +34,6 @@ public class TaskTrain extends Task {
   
   public TaskTrain(Session s) throws Exception {
     super(s);
-    room    = (Place) s.loadObject();
     trained = (Trait) s.loadObject();
     talking = (Trait) s.loadObject();
   }
@@ -44,7 +41,6 @@ public class TaskTrain extends Task {
   
   public void saveState(Session s) throws Exception {
     super.saveState(s);
-    s.saveObject(room   );
     s.saveObject(trained);
     s.saveObject(talking);
   }
@@ -107,7 +103,12 @@ public class TaskTrain extends Task {
   
   
   public Place targetLocation() {
-    return room;
+    return base;
+  }
+  
+  
+  public Trait trained() {
+    return trained;
   }
   
   
@@ -126,7 +127,7 @@ public class TaskTrain extends Task {
   
   
   public String activeInfo() {
-    return "Learning technique: "+trained+" in "+room;
+    return "Learning technique: "+trained;
   }
   
   
