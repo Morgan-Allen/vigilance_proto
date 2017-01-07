@@ -64,48 +64,27 @@ public class TrainingView extends UINode {
     final Base base = mainView.world().playerBase();
     int down = 10, across = vw - 320;
     
+    TaskTrain hovered = null;
+    
     for (TaskTrain option : base.training.trainingTasksFor(person)) {
       TaskView view = option.createView(mainView);
       view.showIcon = false;
       view.relBounds.set(vx + across, vy + down, 320, 45);
       view.renderNow(surface, g);
       down += view.relBounds.ydim() + 10;
+      if (surface.wasHovered(option)) hovered = option;
+    }
+    
+    if (hovered != null) {
+      down += 10;
+      String desc = hovered.trained().description;
+      g.setColor(Color.LIGHT_GRAY);
+      ViewUtils.drawWrappedString(desc, g, vx + across, vy + down, 320, 200);
     }
     
     //  TODO:  You'll want a different presentation-method for this, given
     //  time- show the actual structure of the skill-tree so you can prioritise
     //  accordingly.
-    
-    /*
-    //  TODO:  Use the gymnasium tasks for this instead?  Or create tasks from
-    //  scratch?  Hmm.
-    
-    //  The problem with associating tasks with the person is that multiple
-    //  agents might be involved, so who gets to update isn't clear.
-    
-    //  So... I would suggest associating them with the place instead.
-    
-    for (final Ability a : toLearn(person)) {
-      String desc = "Train: "+a.name;
-      Box2D bounds = new Box2D(vx + 10, vy + down, 200, 50);
-      boolean hovered = surface.tryHover(bounds, a);
-      
-      StringButton button = new StringButton(desc, bounds, this) {
-        protected void whenClicked() {
-          person.setAssignment(a);
-        }
-      };
-      down += 50;
-      button.renderNow(surface, g);
-      if (hovered) hoverA = a;
-    }
-    //*/
-    /*
-    if (hoverA != null) {
-      String desc = hoverA.description;
-      ViewUtils.drawWrappedString(desc, g, vx + 5, vh - 200, 190, 200);
-    }
-    //*/
   }
   
   

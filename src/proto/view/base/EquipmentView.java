@@ -95,6 +95,7 @@ public class EquipmentView extends UINode {
     final Base base = mainView.world().playerBase();
     
     int down = 10, across = vw - 320;
+    TaskCraft hovered = null;
     
     for (TaskCraft option : base.stocks.craftingTasksFor(person)) {
       TaskView view = option.createView(mainView);
@@ -102,8 +103,15 @@ public class EquipmentView extends UINode {
       view.relBounds.set(vx + across, vy + down, 320, 45);
       view.renderNow(surface, g);
       down += view.relBounds.ydim() + 10;
+      if (surface.wasHovered(option)) hovered = option;
     }
     
+    if (hovered != null) {
+      down += 10;
+      String desc = hovered.made().defaultInfo();
+      g.setColor(Color.LIGHT_GRAY);
+      ViewUtils.drawWrappedString(desc, g, vx + across, vy + down, 320, 200);
+    }
   }
   
   

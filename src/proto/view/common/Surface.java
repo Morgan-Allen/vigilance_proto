@@ -60,15 +60,12 @@ public class Surface extends JPanel implements
   
   
   public boolean tryHover(UINode node) {
-    return tryHover(node.vx, node.vy, node.vw, node.vh, node);
+    return tryHover(node, node);
   }
   
   
-  public boolean tryHover(Box2D b, Object hovered) {
-    return tryHover(
-      (int) b.xpos(), (int) b.ypos(), (int) b.xdim(), (int) b.ydim(),
-      hovered
-    );
+  public boolean tryHover(UINode node, Object hovered) {
+    return tryHover(node.vx, node.vy, node.vw, node.vh, hovered);
   }
   
   
