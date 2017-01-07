@@ -49,18 +49,18 @@ public class LeadSurveil extends Lead {
   }
   
   
-  public void updateAssignment() {
-    super.updateAssignment();
+  public boolean updateAssignment() {
+    if (! super.updateAssignment()) return false;
     //
     //  Firstly, we look out for any events that the subject might be involved
     //  in (either as a participant or as a venue.)
     if (subject.isPerson()) {
-      final Object task = ((Person) subject).assignment();
+      final Object task = ((Person) subject).topAssignment();
       if (task instanceof Event) involved = (Event) task;
     }
     if (subject.isPlace()) {
       for (Element e : subject.attached()) if (e.isPerson()) {
-        final Object task = ((Person) e).assignment();
+        final Object task = ((Person) e).topAssignment();
         if (task instanceof Event) { involved = (Event) task; break; }
       }
     }
@@ -69,12 +69,13 @@ public class LeadSurveil extends Lead {
     //  terminate the task either when new intel is uncovered or a long time
     //  passes without any leads.
     if (involved != prior && involved.hasBegun()) {
-      if (performTest() && checkForNewIntel()) setCompleted(true);
+      if (performTest(active()) && checkForNewIntel()) setCompleted(true);
       prior = involved;
     }
     else if (hoursSoFar() > Task.TIME_LONG) {
       setCompleted(false);
     }
+    return true;
   }
   
   

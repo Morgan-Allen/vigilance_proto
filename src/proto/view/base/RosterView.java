@@ -88,9 +88,11 @@ public class RosterView extends UINode {
         g.drawImage(selectCircle, x, y, size, size, null);
       }
       
-      final Assignment a = p.assignment();
-      Image forA = a == null ? null : a.icon();
-      g.drawImage(forA, x, y + size - sizeA, sizeA, sizeA, null);
+      int acrossP = x;
+      for (Assignment a : p.assignments()) {
+        g.drawImage(a.icon(), acrossP, y + size - sizeA, sizeA, sizeA, null);
+        acrossP += sizeA;
+      }
       
       int MH = p.health.maxHealth(), MS = p.health.maxStress();
       int inj = (int) p.health.injury();

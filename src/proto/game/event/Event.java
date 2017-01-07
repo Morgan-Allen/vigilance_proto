@@ -83,13 +83,18 @@ public class Event implements Session.Saveable, Assignment {
   }
   
   
+  public PlanStep planStep() {
+    return step;
+  }
+  
+  
   public Place targetLocation() {
     return place;
   }
   
   
-  public PlanStep planStep() {
-    return step;
+  public int assignmentPriority() {
+    return PRIORITY_PLAN_STEP;
   }
   
   
@@ -157,7 +162,7 @@ public class Event implements Session.Saveable, Assignment {
         
         final Person perp = (Person) e;
         place.setAttached(perp, true);
-        perp.setAssignment(this);
+        perp.addAssignment(this);
         setAssigned(perp, true);
         
         boolean tips = Rand.num() < tipoffChance || GameSettings.freeTipoffs;
@@ -224,7 +229,7 @@ public class Event implements Session.Saveable, Assignment {
       nY += 5 - Rand.index(10);
       Tile entry = scene.findEntryPoint(nX, nY, p);
       if (entry == null) { forces.remove(p); continue; }
-      scene.addToTeam(p);
+      p.addAssignment(scene);
       scene.enterScene(p, entry.x, entry.y);
     }
     return forces;
@@ -234,7 +239,7 @@ public class Event implements Session.Saveable, Assignment {
   public void completeWithEffects(
     boolean playerWon, float collateral, float getaways
   ) {
-    for (Person perp : involved) perp.setAssignment(null);
+    for (Person perp : involved) perp.removeAssignment(this);
     involved.clear();
     complete = true;
     

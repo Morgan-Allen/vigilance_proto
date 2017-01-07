@@ -39,8 +39,8 @@ public class LeadAnalyse extends Lead {
   
   
 
-  public void updateAssignment() {
-    super.updateAssignment();
+  public boolean updateAssignment() {
+    if (! super.updateAssignment()) return false;
     
     //  TODO:  You need to alert the player if the person tailed visits a new
     //  location or undertakes a new task that is related to an open case.
@@ -53,6 +53,7 @@ public class LeadAnalyse extends Lead {
       
     }
     //*/
+    return true;
   }
   
 

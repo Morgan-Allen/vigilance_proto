@@ -120,8 +120,6 @@ public abstract class Task implements Assignment {
     */
   public void setAssigned(Person p, boolean is) {
     assigned.toggleMember(p, is);
-    if (is) p.setAssignment(this);
-    else if (p.assignment() == this) p.setAssignment(null);
   }
   
   
@@ -135,6 +133,11 @@ public abstract class Task implements Assignment {
   
   public boolean allowsAssignment(Person p) {
     return true;
+  }
+  
+  
+  public int assignmentPriority() {
+    return PRIORITY_CASUAL;
   }
   
   
@@ -192,8 +195,10 @@ public abstract class Task implements Assignment {
   
   /**  Task performance and completion-
     */
-  public void updateAssignment() {
-    if (assigned.empty() || complete()) return;
+  public boolean updateAssignment() {
+    //  TODO:  You need some way to screen out agents who are currently busy
+    //  with other tasks!
+    if (active().empty() || complete()) return false;
     
     base.world().events.logAssignment(this);
     
@@ -202,11 +207,19 @@ public abstract class Task implements Assignment {
       if (initTime == -1) initTime = time;
       if ((time - initTime) > timeTaken) attemptTask();
     }
+    return true;
+  }
+  
+  
+  public Series <Person> active() {
+    final Batch <Person> active = new Batch();
+    for (Person p : assigned) if (p.topAssignment() == this) active.add(p);
+    return active;
   }
   
   
   public boolean attemptTask() {
-    setCompleted(performTest());
+    setCompleted(performTest(active()));
     return success;
   }
   
@@ -237,7 +250,7 @@ public abstract class Task implements Assignment {
     int   DC   = testDCs[testIndex] + Nums.max(0, -mod);
     
     float maxLevel = 0, sumLevels = 0;
-    for (Person p : assigned) {
+    for (Person p : active()) {
       float level = p.stats.levelFor(stat) + Nums.max(0, mod);
       maxLevel  = Nums.max(level, maxLevel);
       sumLevels += level;
@@ -249,7 +262,7 @@ public abstract class Task implements Assignment {
   }
   
   
-  protected boolean performTest() {
+  protected boolean performTest(Series <Person> active) {
     boolean okay = true;
     float xpRate = timeTaken * 1f / World.MINUTES_PER_HOUR;
     xpRate = Nums.sqrt(xpRate);
@@ -259,7 +272,7 @@ public abstract class Task implements Assignment {
       float winChance = testChance(n);
       okay &= results[n] = (Rand.num() < winChance);
       
-      for (Person p : assigned) {
+      for (Person p : active) {
         p.stats.gainXP(stat, (1 - winChance) * 2 * xpRate);
       }
     }

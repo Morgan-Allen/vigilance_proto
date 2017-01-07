@@ -60,9 +60,10 @@ public class TaskTrain extends Task {
     //  TODO:  Allow for the possibility of more efficient solo training
     //         under particular circumstances?
     final Trait chatWith = Rand.yes() ? talking : PersonStats.PERSUADE;
-    float maxLevel = 0, numPeers = assigned.size() - 1;
+    final Series <Person> active = active();
+    float maxLevel = 0, numPeers = active.size() - 1;
     
-    for (Person p : assigned) {
+    for (Person p : active) {
       maxLevel = Nums.max(maxLevel, p.stats.levelFor(trained));
     }
     
@@ -112,6 +113,11 @@ public class TaskTrain extends Task {
   }
   
   
+  public int assignmentPriority() {
+    return PRIORITY_TRAINING;
+  }
+  
+  
   
   /**  Rendering, debug and interface methods-
     */
@@ -154,10 +160,11 @@ public class TaskTrain extends Task {
     if (logs.empty()) return;
     
     StringBuffer s = new StringBuffer();
-
-    for (Person p : assigned) {
+    
+    final Series <Person> active = active();
+    for (Person p : active) {
       s.append(p.name());
-      if (p != assigned.last()) s.append(" and ");
+      if (p != active.last()) s.append(" and ");
     }
     s.append(" trained their "+trained);
     

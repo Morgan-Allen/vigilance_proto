@@ -63,11 +63,9 @@ public class TaskView extends UINode {
     
     final Person person = mainView.rosterView.selectedPerson();
     if (surface.mouseClicked() && hovered && person != null) {
-      final Assignment oldA = person.assignment();
-      if (oldA != null) oldA.setAssigned(person, false);
-      
-      if (oldA == task) task.setAssigned(person, false);
-      else              task.setAssigned(person, true );
+      final boolean wasAssigned = person.assignments().includes(task);
+      if (wasAssigned) person.removeAssignment(task);
+      else             person.addAssignment   (task);
     }
     //
     //  Finally, draw any persons assigned to this task...

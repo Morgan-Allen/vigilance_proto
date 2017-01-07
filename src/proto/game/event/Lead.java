@@ -52,6 +52,11 @@ public abstract class Lead extends Task {
   }
   
   
+  public int assignmentPriority() {
+    return PRIORITY_LEAD;
+  }
+  
+  
   
   /**  Rendering, debug and interface methods-
     */
@@ -59,9 +64,10 @@ public abstract class Lead extends Task {
     //  TODO:  Move this out to the .view directory?
     StringBuffer s = new StringBuffer();
     
-    for (Person p : assigned) {
+    final Series <Person> active = active();
+    for (Person p : active) {
       s.append(p.name());
-      if (p != assigned.last()) s.append(" and ");
+      if (p != active.last()) s.append(" and ");
     }
     s.append(" tested their ");
     for (Trait t : tested) {

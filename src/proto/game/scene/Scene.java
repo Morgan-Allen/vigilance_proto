@@ -12,7 +12,6 @@ import proto.view.scene.SceneView;
 import java.awt.Image;
 
 
-//  TODO:  This doesn't need to implement Assignment.
 
 public class Scene implements Session.Saveable, Assignment, TileConstants {
   
@@ -117,8 +116,8 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   /**  Assignment methods-
     */
   public void setAssigned(Person p, boolean is) {
-    if (is) addToTeam(p);
-    else removePerson(p);
+    if (p.isPlayerOwned()) playerTeam.toggleMember(p, is);
+    else                   othersTeam.toggleMember(p, is);
   }
   
   
@@ -139,6 +138,11 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   
   public boolean allowsAssignment(Person p) {
     return true;
+  }
+  
+  
+  public int assignmentPriority() {
+    return PRIORITY_ON_SCENE;
   }
   
   
@@ -331,17 +335,9 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   }
   
   
-  public void addToTeam(Person p) {
-    if (p.isPlayerOwned()) playerTeam.include(p);
-    else                   othersTeam.include(p);
-    p.setAssignment(this);
-  }
-  
-  
   public boolean enterScene(Person p, int x, int y) {
     Tile location = tileAt(x, y);
     if (location == null) return false;
-    p.setAssignment(this);
     p.setExactPosition(this, x, y, 0);
     persons.add(p);
     liftFogInSight(p);
@@ -354,9 +350,9 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     
     playerTeam.remove(p);
     othersTeam.remove(p);
+    p.removeAssignment(this);
     
     p.setExactPosition(null, 0, 0, 0);
-    p.setAssignment(null);
     persons.remove(p);
     return true;
   }

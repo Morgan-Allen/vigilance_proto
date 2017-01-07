@@ -29,8 +29,14 @@ public class Person extends Element {
   final public PersonGear    gear    = new PersonGear   (this);
   
   Base base;
-  Assignment assignment;
   Place resides;
+  Scene scene;
+  
+  List <Assignment> assignments = new List <Assignment> () {
+    protected float queuePriority(Assignment r) {
+      return r.assignmentPriority();
+    }
+  };
   
   Tile location;
   Vec3D exactPos = new Vec3D();
@@ -74,9 +80,10 @@ public class Person extends Element {
     health .loadState(s);
     gear   .loadState(s);
     
-    base       = (Base      ) s.loadObject();
-    assignment = (Assignment) s.loadObject();
-    resides    = (Place     ) s.loadObject();
+    base    = (Base ) s.loadObject();
+    resides = (Place) s.loadObject();
+    scene   = (Scene) s.loadObject();
+    s.loadObjects(assignments);
     
     location = (Tile) s.loadObject();
     exactPos.loadFrom(s.input());
@@ -97,9 +104,10 @@ public class Person extends Element {
     health .saveState(s);
     gear   .saveState(s);
     
-    s.saveObject(base      );
-    s.saveObject(assignment);
-    s.saveObject(resides   );
+    s.saveObject(base   );
+    s.saveObject(resides);
+    s.saveObject(scene  );
+    s.saveObjects(assignments);
     
     s.saveObject(location);
     exactPos.saveTo(s.output());
@@ -124,43 +132,21 @@ public class Person extends Element {
   }
   
   
-  public Base base() {
-    return base;
-  }
-  
-  
   public Side side() {
     return side;
   }
   
   
-  public Assignment assignment() {
-    return assignment;
-  }
   
-  
-  public Place resides() {
-    return resides;
-  }
-  
-  
-  
-  
-  /**  Assigning jobs & missions-
+  /**  Assigning jobs-
     */
-  public boolean freeForAssignment() {
-    if (! health.conscious()) return false;
-    return assignment == null;
+  public Assignment topAssignment() {
+    return assignments.first();
   }
   
   
-  public void setBase(Base base) {
-    this.base = base;
-  }
-  
-  
-  public void setResidence(Place resides) {
-    this.resides = resides;
+  public Series <Assignment> assignments() {
+    return assignments;
   }
   
   
@@ -172,15 +158,61 @@ public class Person extends Element {
   }
   
   
-  public void setAssignment(Assignment assigned) {
-    this.assignment = assigned;
+  public boolean addAssignment(Assignment assigned) {
+    if (assignments.includes(assigned)) return false;
+    
+    final int priority = assigned.assignmentPriority();
+    for (Assignment a : assignments) if (a.assignmentPriority() == priority) {
+      removeAssignment(a);
+    }
+    
+    assignments.queueAdd(assigned);
+    assigned.setAssigned(this, true);
+    if (assigned instanceof Scene) scene = (Scene) assigned;
+    
     I.say(this+" assigned to "+assigned);
+    return true;
+  }
+  
+  
+  public boolean removeAssignment(Assignment assigned) {
+    if (! assignments.includes(assigned)) return false;
+    
+    assignments.remove(assigned);
+    assigned.setAssigned(this, false);
+    if (scene == assigned) scene = null;
+    
+    I.say(this+" removed from assignment "+assigned);
+    return true;
   }
   
   
   public Scene currentScene() {
-    if (assignment instanceof Scene) return (Scene) assignment;
-    return null;
+    return scene;
+  }
+  
+  
+  
+  
+  /**  Setting base and residence:
+    */
+  public void setBase(Base base) {
+    this.base = base;
+  }
+  
+  
+  public void setResidence(Place resides) {
+    this.resides = resides;
+  }
+  
+  
+  public Base base() {
+    return base;
+  }
+  
+  
+  public Place resides() {
+    return resides;
   }
   
   
@@ -246,8 +278,8 @@ public class Person extends Element {
   /**  Regular updates and life-cycle-
     */
   public void updateOnBase(float numWeeks) {
-    if (assignment != null && assignment.complete()) {
-      assignment = null;
+    for (Assignment a : assignments) {
+      if (a.complete()) { removeAssignment(a); continue; }
     }
     
     health.updateHealth(numWeeks);

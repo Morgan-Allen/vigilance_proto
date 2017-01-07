@@ -58,7 +58,7 @@ public class LeadGuard extends Lead {
     //  Finally, introduce the agents themselves-
     int across = (32 - (assigned().size())) / 2;
     for (Person p : assigned()) {
-      mission.addToTeam(p);
+      p.addAssignment(mission);
       mission.enterScene(p, across++, 0);
     }
     

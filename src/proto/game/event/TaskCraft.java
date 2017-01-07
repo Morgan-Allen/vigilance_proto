@@ -66,6 +66,11 @@ public class TaskCraft extends Task {
   }
   
   
+  public int assignmentPriority() {
+    return PRIORITY_TRAINING;
+  }
+  
+  
 
   /**  Rendering, debug and interface methods-
     */
@@ -110,10 +115,11 @@ public class TaskCraft extends Task {
     final World world = base.world();
     final Series <String> logs = world.events.extractLogInfo(this);
     StringBuffer s = new StringBuffer();
-    
-    for (Person p : assigned) {
+
+    final Series <Person> active = active();
+    for (Person p : active) {
       s.append(p.name());
-      if (p != assigned.last()) s.append(" and ");
+      if (p != active.last()) s.append(" and ");
     }
     s.append(" attempted to make "+made+".");
     

@@ -49,7 +49,7 @@ public class ActivityView extends UINode {
     Person person = mainView.rosterView.selectedPerson();
     if (person != null) {
       g.setColor(Color.WHITE);
-      final Assignment task = person.assignment();
+      final Assignment task = person.topAssignment();
       String assignDesc = "None", locDesc = "";
       if (task != null) {
         assignDesc = task.activeInfo();
