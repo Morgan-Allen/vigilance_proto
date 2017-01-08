@@ -173,10 +173,11 @@ public class SceneView extends UINode {
     //
     //  Otherwise, determine what tile (and any objects above) are being
     //  selected-
+    boolean hasFocus = surface.tryHover(this);
     int HT = TILE_SIZE / 2;
     int hoverX = (surface.mouseX() + zoomX + HT - vx) / TILE_SIZE;
     int hoverY = (surface.mouseY() + zoomY + HT - vy) / TILE_SIZE;
-    Tile hoverT = scene.tileAt(hoverX, hoverY);
+    Tile hoverT = hasFocus ? scene.tileAt(hoverX, hoverY) : null;
     
     if (hoverT != null) {
       renderAt(hoverT.x, hoverT.y, 1, 1, hoverBox, null, g);

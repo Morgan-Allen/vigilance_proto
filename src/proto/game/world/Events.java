@@ -96,6 +96,8 @@ public class Events {
   /**  Logging background events-
     */
   public void logAssignment(Assignment action) {
+    //  TODO:  It's possible the assignment associated should be passed to the
+    //  log method directly...
     this.currentAction = action;
   }
   
@@ -107,6 +109,9 @@ public class Events {
     entry.info     = info;
     entry.priority = priority;
     actionLog.add(entry);
+    
+    I.say("\nRECORDING IN LOG: "+info);
+    I.say("  Current action: "+currentAction);
   }
   
   
@@ -132,8 +137,5 @@ public class Events {
     return extractLogInfo(action, EVENT_NORMAL);
   }
 }
-
-
-
 
 

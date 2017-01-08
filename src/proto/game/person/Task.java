@@ -221,7 +221,9 @@ public abstract class Task implements Assignment {
   
   public Series <Person> active() {
     final Batch <Person> active = new Batch();
-    for (Person p : assigned) if (p.topAssignment() == this) active.add(p);
+    for (Person p : assigned) {
+      if (p.topAssignment() == this) active.add(p);
+    }
     return active;
   }
   

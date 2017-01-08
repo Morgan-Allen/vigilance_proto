@@ -108,7 +108,6 @@ public class Techniques {
         return volley;
       }
       
-      
       public void applyOnActionEnd(Action use) {
         Person struck       = use.volley().targAsPerson();
         int    damage       = use.volley().damageMargin;

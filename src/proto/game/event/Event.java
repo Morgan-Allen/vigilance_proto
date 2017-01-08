@@ -148,6 +148,7 @@ public class Event implements Session.Saveable, Assignment {
   
   
   public void beginEvent() {
+    world().events.logAssignment(this);
     if (step != null) {
       Base played = world().playerBase();
       Place place = targetLocation();
@@ -181,11 +182,12 @@ public class Event implements Session.Saveable, Assignment {
   
   
   public void updateEvent() {
-    
+    world().events.logAssignment(this);
   }
   
   
   public void completeEvent() {
+    world().events.logAssignment(this);
     completeWithEffects(false, Rand.num(), 1.0f);
   }
   

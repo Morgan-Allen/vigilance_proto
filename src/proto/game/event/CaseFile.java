@@ -122,7 +122,7 @@ public class CaseFile implements Session.Saveable {
     else if (role.evidence.includes(lead)) return false;
     //
     //  Record the new evidence, refresh options and return-
-    I.say("RECORDING new role for "+subject+", event: "+event+": "+roleID);
+    I.say("RECORDING role for "+subject+", event: "+event+": Role: "+roleID);
     role.maxEvidence = Nums.max(role.maxEvidence, lead.evidenceLevel());
     role.evidence.include(lead);
     

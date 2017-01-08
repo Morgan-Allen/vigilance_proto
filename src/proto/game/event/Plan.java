@@ -303,6 +303,7 @@ public class Plan implements Session.Saveable {
     I.say("\n\nFinal plan: "+this.hashCode());
     for (PlanStep step : steps()) {
       I.say("  "+step.langDescription()+": "+step.rating());
+      I.say("  Begun? "+step.matchedEvent().hasBegun());
     }
   }
 }

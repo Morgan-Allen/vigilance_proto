@@ -19,7 +19,7 @@ public class LeadGuard extends Lead {
   
   
   public LeadGuard(Base base, Place guarded, Event event) {
-    super(base, Task.TIME_SHORT, guarded, new Object[0]);
+    super(base, Task.TIME_LONG, guarded, new Object[0]);
     this.guarded = guarded;
     this.event   = event  ;
   }
@@ -42,28 +42,42 @@ public class LeadGuard extends Lead {
   public Place targetLocation() {
     return guarded;
   }
+
+  
+  
+  public boolean updateAssignment() {
+    if (! super.updateAssignment()) return false;
+    
+    if (event.complete()) {
+      setCompleted(false);
+    }
+    else if (event.hasBegun()) {
+      final Series <Person> active = active();
+      setCompleted(true);
+      
+      Place place = event.targetLocation();
+      SceneType sceneType = place.kind().sceneType();
+      Scene mission = sceneType.generateScene(place, 32);
+      event.populateScene(mission);
+      
+      //
+      //  Finally, introduce the agents themselves-
+      int across = (32 - (active.size())) / 2;
+      for (Person p : active) {
+        p.addAssignment(mission);
+        mission.enterScene(p, across++, 0);
+      }
+      
+      mission.assignMissionParameters(place, this, event);
+      base.world().enterScene(mission);
+    }
+    else resetTask();
+    
+    return true;
+  }
   
   
   protected void onSuccess() {
-    //
-    //  TODO:  This should only be triggered when the event itself is either
-    //  going down or about to do so!
-    
-    Place place = event.targetLocation();
-    SceneType sceneType = place.kind().sceneType();
-    Scene mission = sceneType.generateScene(place, 32);
-    event.populateScene(mission);
-    
-    //
-    //  Finally, introduce the agents themselves-
-    int across = (32 - (assigned().size())) / 2;
-    for (Person p : assigned()) {
-      p.addAssignment(mission);
-      mission.enterScene(p, across++, 0);
-    }
-    
-    mission.assignMissionParameters(place, this, event);
-    base.world().enterScene(mission);
   }
   
   

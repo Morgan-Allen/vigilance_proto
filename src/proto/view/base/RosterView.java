@@ -59,12 +59,14 @@ public class RosterView extends UINode {
     Base base = mainView.world().playerBase();
     
     Image selectCircle = mainView.selectCircle;
-    int across = 0, down = 15, size = 75, sizeA = 25, pad = 25, x, y;
+    int across = 0, down = 15, size = 75, sizeA = 25, pad = 5, x, y;
     
     Person personHovered = null;
     if (selectedPerson == null) setSelectedPerson(base.roster().first());
     
     for (Person p : base.roster()) {
+      ///if (p == selectedPerson) continue;
+      
       int nextAcross = across + size + pad;
       if (nextAcross >= vw) {
         across = 0;
