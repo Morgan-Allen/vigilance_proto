@@ -143,6 +143,7 @@ public class SceneGen implements TileConstants {
     
     if (verbose) {
       I.say("Attempting to subdivide: "+area);
+      I.say("  Max. Side: "+maxSide);
       I.say("  Split fraction: "+splitFrac+", split at: "+split);
     }
 
@@ -184,7 +185,7 @@ public class SceneGen implements TileConstants {
     Box2D ac = new Box2D().setTo(area).expandBy(1);
     int hCW = corWide / 2, p5, p6;
     p1 = 0;
-    p2 = split - hCW;
+    p2 = split - (hCW + 1);
     p3 = p2 + 1;
     p4 = p3 + corWide;
     p5 = p4 + 1;
@@ -385,7 +386,9 @@ public class SceneGen implements TileConstants {
         int y = (int) Rand.range(a.ypos(), a.ymax());
         
         if (couldBlockPathing(propType, x, y)) continue;
-        insertProp(x, y, propType, MARK_PROP, false);
+        if (! insertProp(x, y, propType, MARK_PROP, false)) {
+          continue;
+        }
         areaUsed += propArea;
       }
     }
@@ -410,14 +413,17 @@ public class SceneGen implements TileConstants {
   }
   
   
-  void insertProp(int atX, int atY, Kind kind, byte markVal, boolean replace) {
-    if (kind == null) return;
-    if ((! replace) && (! scene.hasSpace(kind, atX, atY))) return;
+  boolean insertProp(
+    int atX, int atY, Kind kind, byte markVal, boolean replace
+  ) {
+    if (kind == null) return false;
+    if ((! replace) && (! scene.hasSpace(kind, atX, atY))) return false;
     
     scene.addProp(kind, atX, atY);
     
     final int w = kind.wide(), h = kind.high();
     for (Coord c : Visit.grid(atX, atY, w, h, 1)) markup(c.x, c.y, markVal);
+    return true;
   }
   
   
@@ -475,16 +481,24 @@ public class SceneGen implements TileConstants {
   boolean couldBlockPathing(Kind propType, int atX, int atY) {
     int w = propType.wide(), h = propType.high();
     int isBlocked = -1, firstBlocked = -1, numBlockages = 0;
+    boolean blocksPath = false;
     
-    for (Coord c : Visit.grid(atY, atY, w, h, 1)) {
+    for (Coord c : Visit.grid(atX, atY, w, h, 1)) {
       final byte mark = sampleFacing(c.x, c.y, CENTRE);
       if (mark != MARK_FLOOR && mark != MARK_CORRIDOR) return true;
     }
     
-    for (Coord c : Visit.perimeter(atY, atY, w, h)) {
+    ///StringBuffer b = new StringBuffer();
+    ///Coord initC = null;
+    
+    for (Coord c : Visit.perimeter(atX, atY, w, h)) {
       final byte mark = sampleFacing(c.x, c.y, CENTRE);
-      if (mark == MARK_DOORS) return true;
       final boolean blocked = mark != MARK_FLOOR && mark != MARK_CORRIDOR;
+      
+      ///if (initC == null) initC = new Coord(c);
+      ///b.append(mark+" ");
+      
+      if (mark == MARK_DOORS) blocksPath = true;
       
       if (firstBlocked == -1) {
         firstBlocked = blocked ? 1 : 0;
@@ -503,15 +517,16 @@ public class SceneGen implements TileConstants {
     }
     if (isBlocked != firstBlocked) numBlockages++;
     
-    return numBlockages < 2;
+    if (numBlockages >= 2 || blocksPath) {
+      return true;
+    }
+    else {
+      ///I.say("Perimeter okay for "+propType+" at "+atX+"/"+atY);
+      ///I.say("  Blockages: "+numBlockages+", init coord: "+initC);
+      ///I.say("  "+b);
+      return false;
+    }
   }
   
 }
-
-
-
-
-
-
-
 
