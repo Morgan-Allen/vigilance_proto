@@ -54,8 +54,8 @@ public class CaseFile implements Session.Saveable {
   
   public CaseFile(Session s) throws Exception {
     s.cacheInstance(this);
-    base    = (Base   ) s.loadObject();
-    subject = (Element) s.loadObject();
+    base    = (Base) s.loadObject();
+    subject =        s.loadObject();
     
     knownLocation = (Place) s.loadObject();
     
@@ -122,9 +122,12 @@ public class CaseFile implements Session.Saveable {
     else if (role.evidence.includes(lead)) return false;
     //
     //  Record the new evidence, refresh options and return-
-    I.say("RECORDING role for "+subject+", event: "+event+": Role: "+roleID);
     role.maxEvidence = Nums.max(role.maxEvidence, lead.evidenceLevel());
     role.evidence.include(lead);
+    
+    StringBuffer roleDesc = new StringBuffer();
+    shortDescription(role, roleDesc);
+    base.world().events.log(roleDesc.toString());
     
     refreshInvestigationOptions();
     base.world().pauseMonitoring();
@@ -332,18 +335,22 @@ public class CaseFile implements Session.Saveable {
   
   
   public void shortDescription(StringBuffer s) {
-    
     final Role role = pickMostProminentRole();
     if (role == null) {
       s.append("You have no current leads on "+subject);
       return;
     }
+    shortDescription(role, s);
+  }
+  
+  
+  public void shortDescription(Role role, StringBuffer s) {
     
     Lead lead = role.evidence.last();
     String tenseDesc = "is", strengthDesc = "suggests";
     if (! role.event.hasBegun()) tenseDesc = "will be";
     else if (role.event.complete()) tenseDesc = "was";
-    if (role.maxEvidence >= LEVEL_EVIDENCE) strengthDesc = "confirms";
+    if (role.maxEvidence >= LEVEL_EVIDENCE) strengthDesc = "confirmed";
     
     String desc = ROLE_DESC.get((Integer) role.roleID);
     if (desc != null) {

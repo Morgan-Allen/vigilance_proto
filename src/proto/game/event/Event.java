@@ -8,6 +8,7 @@ import proto.game.world.*;
 import proto.game.scene.*;
 import proto.game.person.*;
 import proto.util.*;
+import proto.view.common.MessageView;
 
 
 
@@ -149,6 +150,7 @@ public class Event implements Session.Saveable, Assignment {
   
   public void beginEvent() {
     world().events.logAssignment(this);
+    
     if (step != null) {
       Base played = world().playerBase();
       Place place = targetLocation();
@@ -178,6 +180,7 @@ public class Event implements Session.Saveable, Assignment {
         else I.say("No tipoff generated from "+perp);
       }
     }
+    checkForTipoffMessage();
   }
   
   
@@ -187,7 +190,6 @@ public class Event implements Session.Saveable, Assignment {
   
   
   public void completeEvent() {
-    world().events.logAssignment(this);
     completeWithEffects(false, Rand.num(), 1.0f);
   }
   
@@ -241,10 +243,11 @@ public class Event implements Session.Saveable, Assignment {
   public void completeWithEffects(
     boolean playerWon, float collateral, float getaways
   ) {
+    world().events.logAssignment(this);
     for (Person perp : involved) perp.removeAssignment(this);
     involved.clear();
     complete = true;
-    
+
     if (step != null && dangerous()) {
       Base played = world().playerBase();
       final Lead report = new LeadCrimeReport(played, this);
@@ -265,6 +268,7 @@ public class Event implements Session.Saveable, Assignment {
       region.nudgeCurrentStat(Region.DETERRENCE, deterEffect);
       region.nudgeCurrentStat(Region.TRUST     , trustEffect);
     }
+    checkForTipoffMessage();
   }
   
   
@@ -306,8 +310,32 @@ public class Event implements Session.Saveable, Assignment {
   }
   
   
-  
+  protected void checkForTipoffMessage() {
+    //  TODO:  Move this out to the .view directory?
+    StringBuffer s = new StringBuffer();
+    
+    for (String action : world.events.extractLogInfo(this)) {
+      s.append("\n\n");
+      s.append(action);
+    }
+    if (s.length() == 0) return;
+    
+    world.view().queueMessage(new MessageView(
+      world.view(),
+      icon(), "New Tipoffs!",
+      s.toString(),
+      "Dismiss"
+    ) {
+      protected void whenClicked(String option, int optionID) {
+        world.view().dismissMessage(this);
+      }
+    });
+  }
 }
+
+
+
+
 
 
 

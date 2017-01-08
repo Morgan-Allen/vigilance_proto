@@ -90,8 +90,8 @@ public class LeadsListView extends UINode {
     else if (true) {
       g.setColor(Color.LIGHT_GRAY);
       ViewUtils.drawWrappedString(
-        "Select a task, then click in the bottom-left of roster portraits to "+
-        "assign agents to the task.",
+        "Select agents from the roster, then click on a lead to assign them "+
+        "to the task.  Click again to unassign.",
         g, vx + 25, vy + down + 20, vw - 30, 150
       );
     }

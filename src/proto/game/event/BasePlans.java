@@ -66,7 +66,7 @@ public class BasePlans {
       //  In the event that the next step is possible, schedule the
       //  corresponding event.  Otherwise, considering revising the plan or
       //  abandoning it entirely.
-      if (nextStep.currentlyPossible()) {
+      if (nextStep != null && nextStep.currentlyPossible()) {
         int hoursDelay = 20 + Rand.index(5);
         base.world().events.scheduleEvent(nextStep.matchedEvent(), hoursDelay);
       }
