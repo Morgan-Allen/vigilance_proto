@@ -44,12 +44,13 @@ public class ActionsView extends UINode {
     Object hovered, Tile at, Surface surface, Graphics2D g
   ) {
     final Scene scene = mainView.world().activeScene();
-    if (selectAbility == null || sceneView.selected == null) return false;
+    if (selectAbility == null || sceneView.activePerson == null) return false;
     
+    StringBuffer failLog = new StringBuffer();
     selectAction = null;
     if (! selectAbility.delayed()) {
       selectAction = selectAbility.configAction(
-        sceneView.selected, at, hovered, scene, null
+        sceneView.activePerson, at, hovered, scene, null, failLog
       );
     }
     if (selectAction != null) {
@@ -59,7 +60,7 @@ public class ActionsView extends UINode {
       return true;
     }
     else {
-      sceneView.renderString(at.x, at.y - 0.5f, "X", Color.RED, g);
+      sceneView.renderString(at.x, at.y - 0.5f, ""+failLog, Color.RED, g);
       return false;
     }
   }
@@ -85,7 +86,7 @@ public class ActionsView extends UINode {
     if (scene == null) return null;
     final StringBuffer s = new StringBuffer();
     
-    final Person   p      = sceneView.selected;
+    final Person   p      = sceneView.activePerson;
     final Ability  a      = selectAbility;
     final Action   action = scene.currentAction();
     
@@ -99,6 +100,7 @@ public class ActionsView extends UINode {
       
       final PersonHealth  PH = p.health ;
       final PersonActions PA = p.actions;
+      final PersonStats   PS = p.stats  ;
       
       int HP = (int) (PH.maxHealth() - (PH.injury() + PH.stun()));
       int armour = p.stats.levelFor(PersonStats.ARMOUR);
@@ -106,7 +108,7 @@ public class ActionsView extends UINode {
       if (PH.stun() > 0) s.append(" (Stun "+(int) PH.stun()+")");
       if (armour > 0) s.append("\n  Armour: "+armour);
       s.append("\n  Status: "+p.confidenceDescription());
-      s.append("\n  AP: "+PA.currentAP()+"/"+PA.maxAP());
+      s.append("\n  AP: "+PA.currentAP()+"/"+PS.maxActionPoints());
       
       if (PH.conscious() && PA.nextAction() != null) {
         s.append("\n  Last action: "+PA.nextAction().used);
@@ -116,7 +118,7 @@ public class ActionsView extends UINode {
       if (equipped.size() > 0) {
         s.append("\n  Equipment:");
         for (Item e : equipped) {
-          s.append(" "+e.name()+" ("+e.kind().bonus+")");
+          s.append("\n    "+e.name());
         }
       }
       
@@ -150,7 +152,9 @@ public class ActionsView extends UINode {
         //  needed, only confirmation.
         else {
           if (a.delayed()) {
-            selectAction = a.configAction(p, p.currentTile(), p, scene, null);
+            selectAction = a.configAction(
+              p, p.currentTile(), p, scene, null, null
+            );
             s.append("\n\n"+a.FX.describeAction(selectAction, scene));
             s.append("\n  Confirm (Y)");
             if (surface.isPressed('y')) {

@@ -34,9 +34,9 @@ public class TrainingView extends UINode {
     ACCURACY   , 1, 10,
     DEFENCE    , 1, 11,
     SIGHT_RANGE, 1, 12,
-    STEALTH    , 1, 13,
+    HIDE_RANGE , 1, 13,
     MOVE_SPEED , 1, 14,
-    ACT_SPEED  , 1, 15
+    ACT_POINTS , 1, 15
   };
   
   

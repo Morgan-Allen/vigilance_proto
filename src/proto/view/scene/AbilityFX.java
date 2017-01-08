@@ -38,7 +38,7 @@ public class AbilityFX {
       int maxDamage = Nums.ceil (v.maxDamage());
       
       s.append("\n  "+minDamage+"-"+maxDamage+" damage");
-      int hitPercent = Nums.clamp(v.accuracyPercent, 101);
+      int hitPercent = Nums.clamp(v.accuracyMargin, 101);
       s.append("\n  "+hitPercent+"% to hit (armour "+v.hitsArmour+")");
     }
     return s.toString();

@@ -256,6 +256,10 @@ public class Person extends Element {
   public void updateInScene(boolean duringOwnTurn) {
     if (duringOwnTurn) {
       actions.updateDuringTurn();
+      stats.updateStats();
+    }
+    else {
+      stats.updateStats();
     }
     
     if (blockPath() != oldBlock) {

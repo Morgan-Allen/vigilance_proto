@@ -53,18 +53,18 @@ public class PersonStats {
     SIGHT_RANGE = new Trait(
       "Sight Range", "stat_sight_range", null, ""
     ),
-    STEALTH = new Trait(
-      "Stealth", "stat_stealth", null, ""
+    HIDE_RANGE = new Trait(
+      "Hide Range", "stat_stealth", null, ""
     ),
     MOVE_SPEED = new Trait(
       "Move Speed", "stat_move_speed", null, ""
     ),
-    ACT_SPEED = new Trait(
-      "Act Speed", "stat_act_speed", null, ""
+    ACT_POINTS = new Trait(
+      "Action Points", "stat_act_speed", null, ""
     ),
     COMBAT_STATS[] = {
       ARMOUR, HEALTH, MIN_DAMAGE, RNG_DAMAGE,
-      ACCURACY, DEFENCE, SIGHT_RANGE, STEALTH, MOVE_SPEED, ACT_SPEED
+      ACCURACY, DEFENCE, SIGHT_RANGE, HIDE_RANGE, MOVE_SPEED, ACT_POINTS
     },
     
     ENGINEERING = new Trait(
@@ -183,11 +183,34 @@ public class PersonStats {
   }
   
   
+  
+  /**  Specific numeric calculations:
+    */
   public float powerLevel() {
     //  TODO:  Refine this!
     if (person.isHero    ()) return 4;
     if (person.isCriminal()) return 1;
     return 0;
+  }
+  
+  
+  public float sightRange() {
+    return levelFor(SIGHT_RANGE);
+  }
+  
+  
+  public float hidingRange() {
+    return levelFor(HIDE_RANGE);
+  }
+  
+  
+  public int maxActionPoints() {
+    return (int) levelFor(ACT_POINTS);
+  }
+  
+  
+  public float tilesMotionPerAP() {
+    return levelFor(MOVE_SPEED) * 1f / maxActionPoints();
   }
   
   
@@ -207,39 +230,44 @@ public class PersonStats {
   
   
   void updateStats() {
+    
+    //  These are all assumed to have averages of 5, ranging from 0 to 10.
     updateStat(MUSCLE  , -1, false);
     updateStat(REFLEXES, -1, false);
     updateStat(BRAINS  , -1, true );
     updateStat(WILL    , -1, true );
-    
     float muscle   = levelFor(MUSCLE  );
     float reflexes = levelFor(REFLEXES);
     float brains   = levelFor(BRAINS  );
     float will     = levelFor(WILL    );
-    float weapon = person.gear.baseWeaponBonus();
-    float armour = person.gear.baseArmourBonus();
     
-    float maxHP      = 10 + muscle;
-    float baseArmour = armour;
-    float baseDamage = weapon / 2f;
-    float rollDamage = weapon / 2f;
-    
-    //  TODO:  Incorporate these...
+    //  Average hit point total is 15.  Damage and armour start at 0.
+    float maxHP = 10 + muscle;
+    updateStat(HEALTH    , maxHP, false);
+    //  TODO:  Incorporate these.
     //float maxEnergy  = (muscle + will) / 2f;
     //float baseRegen  = muscle / 100f;
+    updateStat(ARMOUR    , 0, false);
+    updateStat(MIN_DAMAGE, 0, false);
+    updateStat(RNG_DAMAGE, 0, false);
     
-    updateStat(HEALTH    , maxHP     , false);
-    updateStat(ARMOUR    , baseArmour, false);
-    updateStat(MIN_DAMAGE, baseDamage, false);
-    updateStat(RNG_DAMAGE, rollDamage, false);
+    //  Average sight range is 5.  Average hide range is 2.5.
+    float sightRange = (reflexes + 5) / 2;
+    float hideRange  = sightRange / 2;
+    updateStat(SIGHT_RANGE, sightRange, true);
+    updateStat(HIDE_RANGE , hideRange , true);
     
-    float lightLevel = (reflexes + 10) / 2;
-    updateStat(SIGHT_RANGE, lightLevel, true);
-    updateStat(STEALTH    , lightLevel, true);
-    updateStat(MOVE_SPEED , lightLevel, true);
-    updateStat(ACT_SPEED  , lightLevel, true);
-    updateStat(ACCURACY   , lightLevel, true);
-    updateStat(DEFENCE    , lightLevel, true);
+    //  Average action points is 4.  Average move speed is 11.
+    float actPoints = 2 + (reflexes / 3);
+    float moveSpeed = 6 + (reflexes / 1);
+    updateStat(ACT_POINTS , actPoints, true);
+    updateStat(MOVE_SPEED , moveSpeed, true);
+    
+    //  Average accuracy is 50%.  Average defence is 20%.
+    float accLevel = (5 + reflexes) * 5;
+    float defLevel = (accLevel / 2) - 5;
+    updateStat(ACCURACY   , accLevel, true);
+    updateStat(DEFENCE    , defLevel, true);
     
     float levelQuestion = (will + brains       ) / 2;
     float levelSuasion  = (10 + will + reflexes) / 2;
@@ -276,7 +304,7 @@ public class PersonStats {
     
     l.bonus   = rootBonus;
     l.learned = mental   ;
-    if (base > 0) l.level = base;
+    if (base >= 0) l.level = base;
     return true;
   }
   

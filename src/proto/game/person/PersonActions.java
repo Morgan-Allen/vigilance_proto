@@ -45,11 +45,6 @@ public class PersonActions {
   
   /**  Overall status queries-
     */
-  public int maxAP() {
-    return 4;
-  }
-  
-  
   public int currentAP() {
     return actionPoints;
   }
@@ -100,7 +95,7 @@ public class PersonActions {
   
   
   boolean onTurnStart() {
-    actionPoints = (int) maxAP();
+    actionPoints = person.stats.maxActionPoints();
     nextAction   = null;
     turnDone     = false;
     person.stats.updateStats();
@@ -163,16 +158,6 @@ public class PersonActions {
   
   /**  Sight and stealth methods-
     */
-  public float sightRange() {
-    return (person.stats.levelFor(SIGHT_RANGE) / 2.5f) + 2;
-  }
-  
-  
-  public float hidingRange() {
-    return 0 + (person.stats.levelFor(STEALTH) / 4f);
-  }
-  
-  
   public boolean hasSight(Tile point) {
     Scene scene = person.currentScene();
     if (scene == null) return false;
@@ -192,8 +177,8 @@ public class PersonActions {
       Person other = (Person) point;
       if (other.isAlly(person)) return true;
       
-      float   sighting = Nums.max(1, sightRange());
-      float   stealth  = other.actions.hidingRange();
+      float   sighting = Nums.max(1, person.stats.sightRange());
+      float   stealth  = other.stats.hidingRange();
       Action  action   = other.actions.nextAction();
       boolean focused  = lastTarget == other;
       

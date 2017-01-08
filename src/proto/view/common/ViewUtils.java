@@ -36,11 +36,9 @@ public class ViewUtils {
       
       while (! tokens.empty()) {
         final String token = tokens.first();
+        if (token.equals("\n")) { tokens.removeFirst(); break; }
         
-        if (token.equals(" " )) { tokens.removeFirst(); continue; }
-        if (token.equals("\n")) { tokens.removeFirst(); break   ; }
-        
-        lineMore = line + token + " ";
+        lineMore = line + token;
         int lineWide = metrics.stringWidth(lineMore);
         if (lineWide >= w) break;
         

@@ -24,7 +24,7 @@ public class SceneView extends UINode {
   
   Tile zoomTile;
   int zoomX, zoomY;
-  Person selected;
+  Person activePerson;
   
   
   
@@ -40,7 +40,7 @@ public class SceneView extends UINode {
     zoomTile = (Tile) s.loadObject();
     zoomX    = s.loadInt();
     zoomY    = s.loadInt();
-    selected = (Person) s.loadObject();
+    activePerson = (Person) s.loadObject();
     actionsView.selectAbility = (Ability) s.loadObject();
     actionsView.selectAction  = (Action ) s.loadObject();
   }
@@ -50,7 +50,7 @@ public class SceneView extends UINode {
     s.saveObject(zoomTile);
     s.saveInt   (zoomX   );
     s.saveInt   (zoomY   );
-    s.saveObject(selected);
+    s.saveObject(activePerson);
     s.saveObject(actionsView.selectAbility);
     s.saveObject(actionsView.selectAction );
   }
@@ -62,8 +62,8 @@ public class SceneView extends UINode {
   
   
   public void setSelection(Person acting, boolean keepActiveAbility) {
-    final Person old = selected;
-    this.selected = acting;
+    final Person old = activePerson;
+    this.activePerson = acting;
     if (acting != old || ! keepActiveAbility) actionsView.clearSelection();
   }
   
@@ -114,7 +114,7 @@ public class SceneView extends UINode {
       if (fog <= 0 && ! debugMode) continue;
       
       Vec3D exactPos = p.exactPosition();
-      float sightRange = p.actions.sightRange();
+      float sightRange = p.stats.sightRange();
       final Box2D area = new Box2D(exactPos.x, exactPos.y, 0, 0);
       area.expandBy(Nums.ceil(sightRange));
       
@@ -149,7 +149,7 @@ public class SceneView extends UINode {
       renderAt(pos.x, pos.y + 0.9f, healthLevel, 0.1f, null, teamColor, g);
       renderString(pos.x, pos.y + 0.5f, p.name(), Color.WHITE, g);
       
-      if (p == selected) {
+      if (p == activePerson) {
         renderAt(pos.x, pos.y, 1, 1, hoverBox, null, g);
       }
     }
@@ -190,8 +190,8 @@ public class SceneView extends UINode {
       
       if (surface.mouseClicked()) {
         if (done == null && canDoAction) {
-          scene.setNextActing(selected);
-          selected.actions.assignAction(actionsView.selectAction);
+          scene.setNextActing(activePerson);
+          activePerson.actions.assignAction(actionsView.selectAction);
         }
         else {
           Person pickP = null;

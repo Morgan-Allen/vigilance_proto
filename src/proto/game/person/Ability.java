@@ -169,19 +169,20 @@ public abstract class Ability extends Trait {
   }
   
   
-  public int motionCostAP(int pathLength) {
-    if (pathLength <= 0) return 0;
-    return (pathLength - 1) / 2;
+  public int maxRange() {
+    return -1;
+  }
+  
+  
+  public int motionCostAP(int pathLength, Person person) {
+    if (pathLength <= 1) return 0;
+    float tilesPerAP = person.stats.tilesMotionPerAP();
+    return Nums.max(1, (int) (pathLength / tilesPerAP));
   }
   
   
   public int costAP(Action use) {
-    return minCostAP() + motionCostAP(use.path().length);
-  }
-  
-  
-  public int maxRange() {
-    return -1;
+    return minCostAP() + motionCostAP(use.path().length, use.acting);
   }
   
   
@@ -192,17 +193,27 @@ public abstract class Ability extends Trait {
   
   public Action configAction(
     Person acting, Tile dest, Object target,
-    Scene scene, Tile pathToTake[]
+    Scene scene, Tile pathToTake[], StringBuffer failLog
   ) {
-    if (acting == null || ! allowsTarget(target, scene, acting)) return null;
-    if (requiresFog() && ! acting.actions.hasSight(dest)) return null;
+    if (acting == null || ! allowsTarget(target, scene, acting)) {
+      return failResult("", failLog);
+    }
+    if (requiresFog() && ! acting.actions.hasSight(dest)) {
+      return failResult("Hidden In Fog", failLog);
+    }
     
     final float range = scene.distance(acting.location, dest);
     final int maxRange = maxRange();
-    if (maxRange > 0 && range > maxRange) return null;
+    if (maxRange > 0 && range > maxRange) {
+      return failResult("Outside Max. Range", failLog);
+    }
     if (requiresSight()) {
-      if (range > (acting.actions.sightRange() + 1)) return null;
-      if (scene.degreeOfSight(acting.location, dest, acting) <= 0) return null;
+      if (range > (acting.stats.sightRange() + 1)) {
+        return failResult("Outside Sight Range", failLog);
+      }
+      if (scene.degreeOfSight(acting.location, dest, acting) <= 0) {
+        return failResult("No Sight Line", failLog);
+      }
     }
     
     Tile path[] = null;
@@ -215,8 +226,12 @@ public abstract class Ability extends Trait {
     else {
       MoveSearch search = new MoveSearch(acting, acting.location, dest);
       search.doSearch();
-      if (! search.success()) return null;
-      else path = search.fullPath(Tile.class);
+      if (! search.success()) {
+        return failResult("No Path", failLog);
+      }
+      else {
+        path = search.fullPath(Tile.class);
+      }
     }
     
     Action newAction = new Action(this, acting, target);
@@ -224,8 +239,16 @@ public abstract class Ability extends Trait {
     newAction.attachVolley(createVolley(newAction, target, scene));
     final int costAP = costAP(newAction);
     
-    if (costAP > acting.actions.currentAP()) return null;
+    if (costAP > acting.actions.currentAP()) {
+      return failResult("Not enough AP", failLog);
+    }
     return newAction;
+  }
+  
+  
+  private Action failResult(String s, StringBuffer log) {
+    if (log != null) log.append(s);
+    return null;
   }
   
   
@@ -347,7 +370,7 @@ public abstract class Ability extends Trait {
     for (int n = path.length; n-- > 0;) {
       Tile shortPath[] = new Tile[n + 1], t = path[n];
       System.arraycopy(path, 0, shortPath, 0, n + 1);
-      Action use = configAction(acting, t, t, scene, shortPath);
+      Action use = configAction(acting, t, t, scene, shortPath, null);
       if (use != null) return use;
     }
     return null;

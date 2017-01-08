@@ -38,7 +38,6 @@ public class ItemType extends Kind {
   final public int slotType;
   final public int buildCost;
   final public Object craftArgs[];
-  final public int bonus;
   
   final public int properties;
   final Ability abilities[];
@@ -51,8 +50,7 @@ public class ItemType extends Kind {
     String name, String ID, String description,
     String iconImgPath, Object media,
     int slotType, int buildCost, Object craftArgs[],
-    int properties, int bonus,
-    Ability... abilities
+    int properties, Ability... abilities
   ) {
     super(name, ID, description, Kind.TYPE_ITEM);
     this.icon  = Kind.loadImage(iconImgPath);
@@ -64,7 +62,6 @@ public class ItemType extends Kind {
     this.buildCost  = buildCost;
     this.craftArgs  = craftArgs;
     this.properties = properties;
-    this.bonus      = bonus;
     this.abilities  = abilities;
   }
   

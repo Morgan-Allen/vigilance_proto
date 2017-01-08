@@ -558,7 +558,7 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   
   
   public void liftFogInSight(Person p) {
-    final float radius = p.actions.sightRange();
+    final float radius = p.stats.sightRange();
     liftFogAround(p.currentTile(), radius, p, true);
   }
   

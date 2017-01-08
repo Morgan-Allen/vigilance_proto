@@ -29,7 +29,7 @@ public class Common {
       ICONS_DIR+null,
       SPRITE_DIR+"sprite_punch.png",
       SLOT_WEAPON, 0, new Object[0],
-      IS_WEAPON | IS_MELEE | IS_KINETIC, 0
+      IS_WEAPON | IS_MELEE | IS_KINETIC
     ),
     UNARMOURED = new ItemType(
       "Unarmoured", "item_unarmoured",
@@ -37,7 +37,7 @@ public class Common {
       ICONS_DIR+null,
       SPRITE_DIR+"sprite_deflect.png",
       SLOT_ARMOUR, 0, new Object[0],
-      IS_ARMOUR, 0
+      IS_ARMOUR
     );
   
   
@@ -142,7 +142,8 @@ public class Common {
         Person self = volley.targAsPerson();
         Person hits = volley.origAsPerson();
         FX.dodgePosition(self, hits, 0.33f);
-        volley.hitsArmour  += 2 + (self.gear.baseArmourBonus() / 2f);
+        float baseArmour = self.stats.levelFor(PersonStats.ARMOUR);
+        volley.hitsArmour  += 2 + (baseArmour / 2f);
         volley.hitsDefence += 5 + (self.actions.currentAP() * 5);
       }
       

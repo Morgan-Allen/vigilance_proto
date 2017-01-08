@@ -135,13 +135,6 @@ public class PersonGear {
   }
   
   
-  public int equipBonus(int slotID, int properties) {
-    Item item = itemInSlot(slotID);
-    if (item == null || ! item.kind().hasProperty(properties)) return 0;
-    return item.kind().bonus;
-  }
-  
-  
   public boolean hasEquipped(ItemType item) {
     for (Item i : equipped) if (i.kind() == item) return true;
     return false;
@@ -181,16 +174,6 @@ public class PersonGear {
   public ItemType armourType() {
     Item armour = itemInSlot(SLOT_ARMOUR);
     return armour == null ? Common.UNARMOURED : armour.kind();
-  }
-  
-  
-  public int baseWeaponBonus() {
-    return weaponType().bonus;
-  }
-  
-  
-  public int baseArmourBonus() {
-    return armourType().bonus;
   }
 }
 

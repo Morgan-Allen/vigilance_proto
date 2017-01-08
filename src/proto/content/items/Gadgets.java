@@ -26,8 +26,13 @@ public class Gadgets {
     SLOT_TYPE_WEAPON, 4, new Object[] {
       ENGINEERING, 2
     },
-    IS_WEAPON | IS_RANGED | IS_KINETIC | IS_CONSUMED, 0
+    IS_WEAPON | IS_RANGED | IS_KINETIC | IS_CONSUMED
   ) {
+    public float passiveModifierFor(Person person, Trait trait) {
+      if (trait == MIN_DAMAGE) return 2;
+      if (trait == RNG_DAMAGE) return 3;
+      return 0;
+    }
   };
   
   final public static ItemType BODY_ARMOUR = new ItemType(
@@ -39,11 +44,11 @@ public class Gadgets {
     SLOT_TYPE_ARMOUR, 200, new Object[] {
       ENGINEERING, 3
     },
-    IS_ARMOUR, 0
+    IS_ARMOUR
   ) {
     public float passiveModifierFor(Person person, Trait trait) {
       if (trait == ARMOUR ) return  3;
-      if (trait == STEALTH) return -2;
+      if (trait == HIDE_RANGE) return -2;
       return 0;
     }
   };
@@ -56,7 +61,7 @@ public class Gadgets {
     SLOT_TYPE_ARMOUR, 140, new Object[] {
       ENGINEERING, 4
     },
-    IS_ARMOUR, 0
+    IS_ARMOUR
   ) {
     public float passiveModifierFor(Person person, Trait trait) {
       if (trait == ARMOUR) return 1;
@@ -97,7 +102,7 @@ public class Gadgets {
     SLOT_TYPE_ITEM, 25, new Object[] {
       MEDICINE, 4
     },
-    IS_CONSUMED, 0, MED_KIT_HEAL
+    IS_CONSUMED, MED_KIT_HEAL
   ) {
   };
 
@@ -110,7 +115,7 @@ public class Gadgets {
     SLOT_TYPE_ITEM, 35, new Object[] {
       MEDICINE, 6
     },
-    IS_CONSUMED, 0
+    IS_CONSUMED
   ) {
     public float passiveModifierFor(Person person, Trait trait) {
       return 0;

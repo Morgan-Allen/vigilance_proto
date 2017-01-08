@@ -91,7 +91,7 @@ public class PersonMind {
           continue;
         }
         for (Ability a : abilities) {
-          Action use = a.configAction(person, p.location, p, scene, null);
+          Action use = a.configAction(person, p.location, p, scene, null, null);
           if (use == null) continue;
           float rating = a.rateUsage(use) * Rand.avgNums(2);
           if (report) I.say("  Rating for "+a+" is "+rating);
@@ -126,7 +126,7 @@ public class PersonMind {
       if (motion != null) return motion;
     }
     
-    int range = Nums.ceil(person.actions.sightRange() / 2);
+    int range = Nums.ceil(person.stats.sightRange() / 2);
     final Tile location = person.currentTile();
     Tile pick = scene.tileAt(
       location.x + (Rand.index(range + 1) * (Rand.yes() ? 1 : -1)),

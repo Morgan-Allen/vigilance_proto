@@ -33,7 +33,8 @@ public class Volley implements Session.Saveable {
   public int hitsDefence;
   public int hitsArmour;
   
-  public int accuracyPercent;
+  public int accuracyRoll;
+  public int accuracyMargin;
   public int damageRoll;
   public int damageMargin;
   public int injureDamage;
@@ -70,7 +71,8 @@ public class Volley implements Session.Saveable {
     hitsDefence     = s.loadInt();
     hitsArmour      = s.loadInt();
     
-    accuracyPercent = s.loadInt();
+    accuracyRoll    = s.loadInt();
+    accuracyMargin  = s.loadInt();
     damageRoll      = s.loadInt();
     damageMargin    = s.loadInt();
     injureDamage    = s.loadInt();
@@ -102,7 +104,8 @@ public class Volley implements Session.Saveable {
     s.saveInt(hitsDefence    );
     s.saveInt(hitsArmour     );
     
-    s.saveInt(accuracyPercent);
+    s.saveInt(accuracyRoll   );
+    s.saveInt(accuracyMargin );
     s.saveInt(damageRoll     );
     s.saveInt(damageMargin   );
     s.saveInt(injureDamage   );
@@ -171,9 +174,9 @@ public class Volley implements Session.Saveable {
     }
     if (ranged) {
       selfAccuracy = self.stats.levelFor(ACCURACY);
-      float normRange = self.actions.sightRange() - 2;
+      float normRange = self.stats.sightRange();
       float distance  = scene.distance(self.currentTile(), hits.currentTile());
-      selfAccuracy -= 5 * (distance - normRange);
+      selfAccuracy -= 25 * (distance - normRange);
       hitsDefence = hits.stats.levelFor(DEFENCE);
     }
     
@@ -181,17 +184,17 @@ public class Volley implements Session.Saveable {
     selfAccuracy = Nums.max(selfAccuracy, 1);
     if (selfAccuracy > hitsDefence) {
       float hitChance = 0;
-      hitChance = ((selfAccuracy - hitsDefence) / selfAccuracy);
+      hitChance = ((selfAccuracy - hitsDefence) * 1f / selfAccuracy);
       hitChance += 0.5f * (1 - hitChance);
-      accuracyPercent = (int) (hitChance * 100);
+      accuracyMargin = (int) (hitChance * 100);
     }
     else {
       float defChance = 0;
-      defChance = ((hitsDefence - selfAccuracy) / hitsDefence);
+      defChance = ((hitsDefence - selfAccuracy) * 1f / hitsDefence);
       defChance += 0.5f * (1 - defChance);
-      accuracyPercent = 100 - (int) (defChance * 100);
+      accuracyMargin = 100 - (int) (defChance * 100);
     }
-    critPercent = ((20 + selfAccuracy) * accuracyPercent) / 100;
+    critPercent = ((25 + selfAccuracy) * accuracyMargin) / (5 * 50);
   }
   
   
@@ -210,9 +213,10 @@ public class Volley implements Session.Saveable {
   
   
   void resolveConnection() {
-    I.say("  Resolving connection (hit chance "+accuracyPercent+"%)");
+    I.say("  Resolving connection (hit chance "+accuracyMargin+"%)");
     
-    if (Rand.index(100) < accuracyPercent) {
+    accuracyRoll = Rand.index(100);
+    if (accuracyRoll < accuracyMargin) {
       didConnect = true;
       I.say("  Volley connected!");
     }
@@ -226,27 +230,29 @@ public class Volley implements Session.Saveable {
   void resolveDamage() {
     damageRoll = selfDamageBase + Rand.index(selfDamageRange + 1);
     damageRoll *= damagePercent / 100f;
+    
+    int rollMargin = accuracyMargin - accuracyRoll;
     int armourSoak = (int) (hitsArmour * (armourPercent / 100f));
     damageMargin = damageRoll - armourSoak;
     
     if (damageMargin > 0) {
       didDamage = true;
       
-      if (accuracyPercent > 60) {
-        I.say("  Dead centre!");
-        damageMargin *= 1.2f;
-      }
-      else if (accuracyPercent <= 10) {
+      if (rollMargin <= 10) {
         I.say("  Glancing blow!");
         damageMargin *= 0.2f;
       }
-      else if (accuracyPercent <= 30) {
+      else if (rollMargin <= 30) {
         I.say("  Flesh wound!");
         damageMargin *= 0.8f;
       }
-      else if (accuracyPercent <= 60) {
+      else if (rollMargin <= 60) {
         I.say("  Palpable hit!");
         damageMargin *= 1.0f;
+      }
+      else {
+        I.say("  Dead centre!");
+        damageMargin *= 1.2f;
       }
       I.say("  Full damage roll:  "+damageRoll);
       I.say("  Armour absorbed:   "+armourSoak);
@@ -261,9 +267,9 @@ public class Volley implements Session.Saveable {
   
   void resolveCrit() {
     I.say("  Resolving critical (crit chance "+critPercent+")");
-    if (Rand.index(100) < (critPercent * accuracyPercent) / 100f) {
+    if (Rand.index(100) < critPercent) {
       didCrit = true;
-      damageMargin *= 1 + (critPercent / 10);
+      damageMargin *= 1 + (critPercent / 50f);
       I.say("  Volley did critical damage: "+damageMargin);
     }
     else {
