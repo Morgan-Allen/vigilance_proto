@@ -55,14 +55,16 @@ public class LeadGuard extends Lead {
       final Series <Person> active = active();
       setCompleted(true);
       
+      //  TODO:  Vary the size of the map properly, based on the scene-type...
+      
       Place place = event.targetLocation();
       SceneType sceneType = place.kind().sceneType();
-      Scene mission = sceneType.generateScene(place, 32);
+      Scene mission = sceneType.generateScene(place.world(), 32, false);
       event.populateScene(mission);
       
       //
       //  Finally, introduce the agents themselves-
-      int across = (32 - (active.size())) / 2;
+      int across = (mission.size() - (active.size())) / 2;
       for (Person p : active) {
         p.addAssignment(mission);
         mission.enterScene(p, across++, 0);

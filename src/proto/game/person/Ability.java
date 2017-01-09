@@ -177,7 +177,7 @@ public abstract class Ability extends Trait {
   public int motionCostAP(int pathLength, Person person) {
     if (pathLength <= 1) return 0;
     float tilesPerAP = person.stats.tilesMotionPerAP();
-    return Nums.max(1, (int) (pathLength / tilesPerAP));
+    return (int) ((pathLength - 1) / tilesPerAP);
   }
   
   

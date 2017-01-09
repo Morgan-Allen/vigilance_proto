@@ -1,11 +1,10 @@
 
 
 package proto.view.scene;
+import proto.common.*;
 import proto.game.world.*;
 import proto.game.person.*;
 import proto.game.scene.*;
-import proto.view.*;
-
 import proto.view.common.*;
 import proto.util.*;
 
@@ -90,7 +89,7 @@ public class ActionsView extends UINode {
     final Ability  a      = selectAbility;
     final Action   action = scene.currentAction();
     
-    if (scene.complete() && ! sceneView.debugMode) {
+    if (scene.complete() && ! GameSettings.debugScene) {
       describeEndSummary(surface, s);
       return s.toString();
     }

@@ -5,7 +5,6 @@ import proto.common.*;
 import proto.game.world.*;
 import proto.game.person.*;
 import proto.game.scene.*;
-
 import proto.util.*;
 import proto.view.common.*;
 
@@ -20,7 +19,6 @@ public class SceneView extends UINode {
   final static String IMG_DIR = "media assets/scene view/";
   
   final ActionsView actionsView;
-  public boolean debugMode = false;
   
   Tile zoomTile;
   int zoomX, zoomY;
@@ -111,7 +109,7 @@ public class SceneView extends UINode {
     //  the enemy is visible themselves.
     for (Person p : scene.othersTeam()) {
       float fog = scene.fogAt(p.currentTile(), Person.Side.HEROES);
-      if (fog <= 0 && ! debugMode) continue;
+      if (fog <= 0 && ! GameSettings.debugScene) continue;
       
       Vec3D exactPos = p.exactPosition();
       float sightRange = p.stats.sightRange();
@@ -130,7 +128,7 @@ public class SceneView extends UINode {
     //  Render the persons themselves, and any action underway-
     for (Person p : scene.persons()) {
       float fog = scene.fogAt(p.currentTile(), Person.Side.HEROES);
-      if (fog <= 0 && ! debugMode) continue;
+      if (fog <= 0 && ! GameSettings.debugScene) continue;
       Vec3D pos = p.exactPosition();
       renderAt(pos.x, pos.y, p.kind(), g);
       visible.add(p);
@@ -161,13 +159,13 @@ public class SceneView extends UINode {
     for (Coord c : Visit.grid(0, 0, size, size, 1)) {
       Tile t = scene.tileAt(c.x, c.y);
       float fogAlpha = 1f - scene.fogAt(t, Person.Side.HEROES);
-      if (debugMode) fogAlpha /= 3;
+      if (GameSettings.debugScene) fogAlpha /= 3;
       Color black = SCALE[Nums.clamp((int) (fogAlpha * 10), 10)];
       renderAt(c.x, c.y, 1, 1, null, black, g);
     }
     //
     //  If complete, display a summary of the results!
-    if (scene.complete() && ! debugMode) {
+    if (scene.complete() && ! GameSettings.debugScene) {
       return true;
     }
     //
@@ -248,6 +246,7 @@ public class SceneView extends UINode {
       pick.compare(p, p.health.conscious() ? 1.5f : 1);
     }
     pick.compare(at.prop(), 0.5f);
+    pick.compare(at, 0.1f);
     return pick.result();
   }
   

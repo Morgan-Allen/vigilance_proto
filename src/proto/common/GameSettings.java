@@ -9,7 +9,8 @@ public class GameSettings {
   
   public static boolean
     freeTipoffs = false,
-    freeLeads   = false
+    freeLeads   = false,
+    debugScene  = false
   ;
   
 }

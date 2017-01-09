@@ -241,12 +241,14 @@ public class World implements Session.Saveable {
   
   
   public void enterScene(Scene mission) {
+    I.say("ENTERING SCENE: "+mission);
     this.activeScene = mission;
   }
   
   
   public void exitFromScene(Scene mission) {
     if (this.activeScene != mission) I.complain(mission+" is not active!");
+    I.say("EXITING SCENE: "+activeScene);
     this.activeScene = null;
   }
   

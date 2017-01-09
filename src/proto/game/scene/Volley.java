@@ -240,11 +240,11 @@ public class Volley implements Session.Saveable {
       
       if (rollMargin <= 10) {
         I.say("  Glancing blow!");
-        damageMargin *= 0.2f;
+        damageMargin *= 0.5f;
       }
       else if (rollMargin <= 30) {
         I.say("  Flesh wound!");
-        damageMargin *= 0.8f;
+        damageMargin *= 0.75f;
       }
       else if (rollMargin <= 60) {
         I.say("  Palpable hit!");
@@ -252,7 +252,7 @@ public class Volley implements Session.Saveable {
       }
       else {
         I.say("  Dead centre!");
-        damageMargin *= 1.2f;
+        damageMargin *= 1.25f;
       }
       I.say("  Full damage roll:  "+damageRoll);
       I.say("  Armour absorbed:   "+armourSoak);

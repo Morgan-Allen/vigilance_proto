@@ -30,6 +30,10 @@ public class SceneType extends Index.Entry implements
   Kind props[];
   float propWeights[];
   
+  boolean fixedLayout;
+  Kind fixedPropTypes[];
+  byte fixedLayoutGrid[][];
+  
   //  NOTE:  the 'prop' for a layout may be either a child scene-type or a kind
   //  of scene object.
   static class PropLayout {
@@ -38,17 +42,29 @@ public class SceneType extends Index.Entry implements
     float frequency;
   }
   
-  
   SceneType childPatterns[] = new SceneType[0];
-  Table <Trait, Boolean> traitQueryCache = new Table();
   
   
+  public static SceneType loadConstant(Session s) throws Exception {
+    return INDEX.loadEntry(s.input());
+  }
+  
+  
+  public void saveState(Session s) throws Exception {
+    INDEX.saveEntry(this, s.output());
+  }
+  
+  
+  
+  /**  Constructor definition for procedural generation...
+    */
   public SceneType(
     String name, String ID, Object... args
   ) {
     super(INDEX, ID);
     this.name = name;
     
+    this.fixedLayout = false;
     Batch <Kind> propB = new Batch();
     
     for (int i = 0; i < args.length; i += 2) {
@@ -63,15 +79,26 @@ public class SceneType extends Index.Entry implements
   }
   
   
-  public static SceneType loadConstant(Session s) throws Exception {
-    return INDEX.loadEntry(s.input());
+  /**  ...and constructor definition for fixed scene layouts.
+    */
+  public SceneType(
+    String name, String ID,
+    Kind propTypes[], byte typeGrid[][]
+  ) {
+    super(INDEX, ID);
+    this.name = name;
+    
+    this.fixedLayout = true;
+    fixedPropTypes = propTypes;
+    fixedLayoutGrid = typeGrid;
   }
   
   
-  public void saveState(Session s) throws Exception {
-    INDEX.saveEntry(this, s.output());
-  }
   
+  
+  /**  Property queries-
+    */
+  Table <Trait, Boolean> traitQueryCache = new Table();
   
   public boolean hasFurnitureOfType(Trait trait) {
     Boolean cached = traitQueryCache.get(trait);
@@ -98,17 +125,39 @@ public class SceneType extends Index.Entry implements
   
   /**  Actual scene generation-
     */
-  public Scene generateScene(Place place, int size) {
-    final Scene scene = new Scene(place, size);
-    scene.setupScene();
+  public Scene generateScene(World world, int size, boolean forTesting) {
     
-    final Box2D area = new Box2D(2, 2, size - 4, size - 4);
-    final SceneGen gen = new SceneGen(scene);
-    gen.populateAsRoot(this, area);
-    gen.printMarkup();
+    if (fixedLayout) {
+      int wide = fixedLayoutGrid[0].length, high = fixedLayoutGrid.length;
+      size = Nums.max(wide, high) + 2;
+      
+      final Scene scene = new Scene(world, size);
+      scene.setupScene(forTesting);
+      
+      for (Coord c : Visit.grid(0, 0, wide, high, 1)) {
+        byte index = fixedLayoutGrid[c.y][c.x];
+        Kind type = index >= 0 ? fixedPropTypes[index] : null;
+        if (type == null) continue;
+        if (! scene.hasSpace(type, c.x + 1, c.y + 1)) continue;
+        scene.addProp(type, c.x + 1, c.y + 1);
+      }
+      return scene;
+    }
     
-    return scene;
+    else {
+      final Scene scene = new Scene(world, size);
+      scene.setupScene(forTesting);
+      
+      final Box2D area = new Box2D(2, 2, size - 4, size - 4);
+      final SceneGen gen = new SceneGen(scene);
+      gen.populateAsRoot(this, area);
+      gen.printMarkup();
+      return scene;
+    }
   }
+  
+  
+  
   
   
   
@@ -119,6 +168,11 @@ public class SceneType extends Index.Entry implements
     return name;
   }
 }
+
+
+
+
+
 
 
 

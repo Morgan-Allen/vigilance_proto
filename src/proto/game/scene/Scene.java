@@ -19,6 +19,7 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   /**  Data fields, constructors and save/load methods-
     */
   final static int
+    STATE_TEST  = -2,
     STATE_INIT  = -1,
     STATE_SETUP =  0,
     STATE_BEGUN =  1,
@@ -26,9 +27,7 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     STATE_LOST  =  3;
   
   World world;
-  Place site;
-  Task playerTask;
-  Event triggerEvent;
+  
   List <Person> playerTeam = new List();
   List <Person> othersTeam = new List();
   int state = STATE_INIT;
@@ -44,10 +43,13 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   boolean playerTurn;
   Person nextActing;
   
+  Place site;
+  Task playerTask;
+  Event triggerEvent;
   
-  public Scene(Place place, int size) {
-    this.world = place.world();
-    this.site  = place;
+  
+  public Scene(World world, int size) {
+    this.world = world;
     this.size  = size;
   }
   
@@ -220,6 +222,10 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   
   
   public float fogAt(Tile at, Person.Side side) {
+    if (at == null) {
+      I.say("?");
+    }
+    
     if (side == Person.Side.HEROES  ) return fogP[at.x][at.y] / 100f;
     if (side == Person.Side.VILLAINS) return fogO[at.x][at.y] / 100f;
     return 1;
@@ -384,11 +390,8 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   }
   
   
-  
-  /**  Regular updates and activity cycle:
-    */
-  public void setupScene() {
-    this.state = STATE_SETUP;
+  public void setupScene(boolean forTesting) {
+    this.state = forTesting ? STATE_TEST : STATE_SETUP;
     
     tiles = new Tile[size][size];
     fogP  = new byte[size][size];
@@ -409,6 +412,9 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   }
   
   
+  
+  /**  Regular updates and life cycle:
+    */
   public void beginScene() {
     this.state = STATE_BEGUN;
     
@@ -590,6 +596,7 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   /**  End-mission resolution-FX on the larger world:
     */
   int checkCompletionStatus() {
+    if (state == STATE_TEST) return state;
     
     boolean heroUp = false, criminalUp = false;
     for (Person p : playerTeam) if (p.isHero()) {
@@ -656,25 +663,25 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   
   
   public String toString() {
-    if (playerTask == null) return site.name();
+    if (playerTask == null) return "Scene";
     return playerTask.toString();
   }
   
   
   public String activeInfo() {
-    if (playerTask == null) return site.name();
+    if (playerTask == null) return "On Scene";
     return "On mission: "+playerTask.activeInfo();
   }
   
   
   public String helpInfo() {
-    if (playerTask == null) return site.name();
+    if (playerTask == null) return "On Scene";
     return playerTask.helpInfo();
   }
   
   
   public Image icon() {
-    if (playerTask == null) return site.kind().icon();
+    if (playerTask == null) return null;
     return playerTask.icon();
   }
   
