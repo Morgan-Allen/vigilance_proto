@@ -1,11 +1,11 @@
 
 
 package proto.game.world;
-import java.awt.Image;
-
 import proto.common.*;
 import proto.game.event.*;
 import proto.util.*;
+
+import java.awt.Image;
 
 
 

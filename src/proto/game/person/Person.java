@@ -271,11 +271,13 @@ public class Person extends Element {
   
   public void onTurnStart() {
     actions.onTurnStart();
+    stats  .onTurnStart();
   }
   
   
   public void onTurnEnd() {
     actions.onTurnEnd();
+    stats  .onTurnEnd();
   }
   
   

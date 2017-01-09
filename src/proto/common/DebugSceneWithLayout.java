@@ -3,15 +3,8 @@
 package proto.common;
 import proto.game.world.*;
 import proto.game.person.*;
-import proto.game.event.*;
 import proto.game.scene.*;
 import proto.util.*;
-import proto.view.scene.*;
-
-import proto.content.agents.*;
-import proto.content.events.*;
-import proto.content.places.Facilities;
-
 import static proto.content.places.UrbanScenes.*;
 
 import java.awt.EventQueue;

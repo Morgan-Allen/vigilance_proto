@@ -3,6 +3,7 @@
 package proto.content.items;
 import proto.game.person.*;
 import proto.game.scene.*;
+import proto.game.world.*;
 
 import static proto.game.person.PersonStats.*;
 import static proto.game.person.ItemType.*;
@@ -71,7 +72,7 @@ public class Gadgets {
   
   
   final static Ability MED_KIT_HEAL = new Ability(
-    "Med Kit Heal", "ability_med_kit_heal",
+    "First Aid (Medkit)", "ability_med_kit_heal",
     SPRITE_DIR+"icon_med_kit.png",
     "Patches up injury sustained in combat (up to 6 health), halts bleeding "+
     "and reduces recovery time.",
@@ -89,7 +90,7 @@ public class Gadgets {
       healed.health.liftInjury(6);
       healed.health.liftTotalHarm(2);
       healed.health.toggleBleeding(false);
-      healed.gear.useCharge(Gadgets.MED_KIT, 0.5f);
+      use.acting.gear.useCharge(Gadgets.MED_KIT, 0.5f);
     }
   };
   
@@ -105,7 +106,37 @@ public class Gadgets {
     IS_CONSUMED, MED_KIT_HEAL
   ) {
   };
-
+  
+  
+  final static Ability TEAR_GAS_ABILITY = new Ability(
+    "Tear Gass", "tear_gas_condition",
+    SPRITE_DIR+"icon_tear_gas.png",
+    "Reduces accuracy and limits action.  Lasts three turns.",
+    Ability.IS_CONDITION | Ability.IS_AREA_EFFECT | Ability.IS_RANGED, 2,
+    Ability.MINOR_HARM, Ability.MEDIUM_POWER
+  ) {
+    
+    public void applyOnActionEnd(Action use) {
+      use.acting.gear.useCharge(Gadgets.TEAR_GAS, 1);
+    }
+    
+    public int maxRange() {
+      //  TODO:  Base this off the thrower's strength (as with other
+      //  projectiles.)
+      return 8;
+    }
+    
+    public int maxEffectRange() {
+      return 3;
+    }
+    
+    protected boolean affectsTargetInRange(
+      Element affects, Scene scene, Person acting
+    ) {
+      return affects.isPerson();
+    }
+  };
+  
   final public static ItemType TEAR_GAS = new ItemType(
     "Tear Gas", "item_tear_gas",
     "Tear Gas can blind and suffocate opponents long enough to finish them "+
@@ -115,18 +146,12 @@ public class Gadgets {
     SLOT_TYPE_ITEM, 35, new Object[] {
       MEDICINE, 6
     },
-    IS_CONSUMED
+    IS_CONSUMED, TEAR_GAS_ABILITY
   ) {
-    public float passiveModifierFor(Person person, Trait trait) {
-      return 0;
-    }
+    
   };
   
-  
   //  TODO:  Create a 'sonic probe' item...
-    
-  
-  
   
   
 }

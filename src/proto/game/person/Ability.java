@@ -3,14 +3,11 @@
 package proto.game.person;
 import proto.game.world.*;
 import proto.game.scene.*;
-import proto.view.*;
-import proto.view.scene.AbilityFX;
 import proto.util.*;
+import proto.view.scene.AbilityFX;
 
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.Color;
-import java.awt.BasicStroke;
 
 
 
@@ -28,10 +25,13 @@ public abstract class Ability extends Trait {
     IS_DELAYED        = 1 << 4 ,
     NO_NEED_FOG       = 1 << 5 ,
     NO_NEED_LOS       = 1 << 6 ,
-    IS_BASIC          = 1 << 7 ,
-    IS_EQUIPPED       = 1 << 8 ,
-    TRIGGER_ON_ATTACK = 1 << 9 ,
-    TRIGGER_ON_DEFEND = 1 << 10;
+    IS_CONDITION      = 1 << 7 ,
+    IS_AREA_EFFECT    = 1 << 8 ,
+    IS_STUNNING       = 1 << 8 ,
+    IS_BASIC          = 1 << 10,
+    IS_EQUIPPED       = 1 << 11,
+    TRIGGER_ON_ATTACK = 1 << 12,
+    TRIGGER_ON_DEFEND = 1 << 13;
   final public static float
     MAJOR_HELP = -2.0f,
     REAL_HELP  = -1.0f,
@@ -135,10 +135,10 @@ public abstract class Ability extends Trait {
   
   
   
-  /**  Configuring actions-
+  /**  Passive effects on stats and allowing actions, etc.-
     */
   protected void applyPassiveStatsBonus(Person person) {
-    for (Trait trait : passiveTraitsModified()) {
+    for (Trait trait : PersonStats.ALL_STATS) {
       final float mod = passiveModifierFor(person, trait);
       if (mod != 0) person.stats.incBonus(trait, mod);
     }
@@ -146,13 +146,26 @@ public abstract class Ability extends Trait {
   }
   
   
-  public Trait[] passiveTraitsModified() {
-    return NO_TRAITS;
+  public float passiveModifierFor(Person person, Trait trait) {
+    return 0;
   }
   
   
-  public float passiveModifierFor(Person person, Trait trait) {
+  protected void applyConditionStatsBonus(Person person) {
+    for (Trait trait : PersonStats.ALL_STATS) {
+      final float mod = conditionModifierFor(person, trait);
+      if (mod != 0) person.stats.incBonus(trait, mod);
+    }
+  }
+  
+  
+  public float conditionModifierFor(Person person, Trait trait) {
     return 0;
+  }
+  
+  
+  public void applyConditionOnTurn(Person person) {
+    return;
   }
   
   
@@ -353,6 +366,49 @@ public abstract class Ability extends Trait {
   }
   
   
+  
+  /**  Dealing with AoE effects-
+    */
+  public int maxEffectRange() {
+    return -1;
+  }
+  
+  
+  protected boolean affectsTargetInRange(
+    Element affects, Scene scene, Person acting
+  ) {
+    return true;
+  }
+  
+  
+  protected Series <Element> elementsInRange(Action use, Tile centre) {
+    final Batch <Element> all = new Batch();
+    int range = maxEffectRange();
+    if (range <= 0) return all;
+    
+    Scene scene = use.scene();
+    int minX = centre.x - range, minY = centre.y - range;
+    
+    for (Coord c : Visit.grid(minX, minY, range * 2, range * 2, 1)) {
+      Tile t = scene.tileAt(c.x, c.y);
+      
+      if (t != null) for (Element e : t.inside()) {
+        float dist = scene.distance(t, scene.tileUnder(e));
+        if (dist > range) continue;
+        
+        if (affectsTargetInRange(e, scene, use.acting)) {
+          all.include(e);
+        }
+      }
+    }
+    return all;
+  }
+  
+  
+  
+  
+  /**  Supplementary methods for AI decision-making.
+    */
   //  TODO:  Move these to an AI class.
   
   public Action bestMotionToward(Object point, Person acting, Scene scene) {

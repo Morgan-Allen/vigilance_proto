@@ -101,11 +101,19 @@ public class PersonStats {
   final Person person;
   
   List <Ability> abilities = new List();
-  class Level {
+  
+  static class Level {
     float level, practice, bonus;
     boolean learned;
   }
   Table <Trait, Level> levels = new Table();
+  
+  static class Condition {
+    Ability basis;
+    Person casts;
+    int countdown;
+  }
+  List <Condition> conditions = new List();
   
   
   PersonStats(Person p) {
@@ -124,6 +132,13 @@ public class PersonStats {
       l.learned  = s.loadBool ();
       levels.put(key, l);
     }
+    for (int n = s.loadInt(); n-- > 0;) {
+      Condition c = new Condition();
+      c.basis = (Ability) s.loadObject();
+      c.casts = (Person ) s.loadObject();
+      c.countdown = s.loadInt();
+      conditions.add(c);
+    }
   }
   
   
@@ -137,6 +152,12 @@ public class PersonStats {
       s.saveFloat(l.practice);
       s.saveFloat(l.bonus   );
       s.saveBool (l.learned );
+    }
+    s.saveInt(conditions.size());
+    for (Condition c : conditions) {
+      s.saveObject(c.basis);
+      s.saveObject(c.casts);
+      s.saveInt(c.countdown);
     }
   }
   
@@ -173,10 +194,11 @@ public class PersonStats {
   public Series <Ability> listAbilities() {
     //  TODO:  I'm not certain, at the moment, if this shouldn't be considered
     //  a UI method.  Check.
-    
     Batch <Ability> all = new Batch();
-    for (Ability a : abilities) all.add(a);
-    for (Item i : person.gear.equipped()) {
+    for (Ability a : abilities) {
+      all.add(a);
+    }
+    for (Item i : person.gear.equipped()) if (i.charges > 0) {
       for (Ability a : i.kind().abilities) all.include(a);
     }
     return all;
@@ -284,6 +306,9 @@ public class PersonStats {
     for (Item i : person.gear.equipped()) {
       i.kind().applyPassiveStatsBonus(person);
     }
+    for (Condition c : conditions) {
+      c.basis.applyConditionStatsBonus(person);
+    }
   }
   
   
@@ -315,17 +340,51 @@ public class PersonStats {
   }
   
   
-  protected void applyStatEffects() {
+  public void refreshCooldowns() {
+    //  TODO:  Implement this once cooldowns are available...
+  }
+  
+  
+  boolean onTurnStart() {
+    for (Condition c : conditions) {
+      c.basis.applyConditionOnTurn(person);
+    }
+    //  TODO:  Restore these.
     /*
     final float regen = levelFor(REGEN);
     if      (person.stun  () > 0) person.liftStun  (regen * 2);
     else if (person.injury() > 0) person.liftInjury(regen * 1);
     //*/
+    return true;
   }
   
   
-  public void refreshCooldowns() {
-    //  TODO:  Implement this once cooldowns are available...
+  boolean onTurnEnd() {
+    for (Condition c : conditions) {
+      c.countdown--;
+      if (c.countdown <= 0) conditions.remove(c);
+    }
+    return true;
+  }
+  
+  
+  
+  /**  Assigning conditions-
+    */
+  public void applyCondition(Ability basis, Person casts, int duration) {
+    Condition match = null;
+    for (Condition c : conditions) {
+      if (c.basis == basis && c.casts == casts) {
+        match = c;
+        break;
+      }
+    }
+    if (match == null) {
+      conditions.add(match = new Condition());
+    }
+    match.basis = basis;
+    match.casts = casts;
+    match.countdown = Nums.max(duration, match.countdown);
   }
   
   
