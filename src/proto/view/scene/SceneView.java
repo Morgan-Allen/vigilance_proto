@@ -8,21 +8,36 @@ import proto.game.scene.*;
 import proto.util.*;
 import proto.view.common.*;
 
-import java.awt.*;
+import java.awt.Image;
+import java.awt.Graphics2D;
+import java.awt.AlphaComposite;
+import java.awt.Color;
 
 
 
 public class SceneView extends UINode {
   
+  
+  /**  Data fields, construction and save/load methods-
+    */
   final static int
     TILE_SIZE = 64;
-  final static String IMG_DIR = "media assets/scene view/";
+  final static String
+    IMG_DIR = "media assets/scene view/";
   
   final ActionsView actionsView;
   
   Tile zoomTile;
   int zoomX, zoomY;
   Person activePerson;
+  
+  static class TempFX {
+    Image sprite;
+    float size;
+    Vec3D pos = new Vec3D();
+    int duration, framesLeft;
+  }
+  List <TempFX> tempFX = new List();
   
   
   
@@ -54,6 +69,9 @@ public class SceneView extends UINode {
   }
   
   
+  
+  /**  Public utility methods-
+    */
   public void setZoomPoint(Tile t) {
     this.zoomTile = t;
   }
@@ -66,6 +84,23 @@ public class SceneView extends UINode {
   }
   
   
+  public void addTempFX(
+    Image sprite, float size,
+    float posX, float posY, float posZ, float numSeconds
+  ) {
+    final TempFX fx = new TempFX();
+    fx.sprite = sprite;
+    fx.size = size;
+    fx.pos.set(posX, posY, posZ);
+    fx.duration = (int) (numSeconds * RunGame.FRAME_RATE);
+    fx.framesLeft = fx.duration;
+    tempFX.add(fx);
+  }
+  
+  
+  
+  /**  Overrides for ancestor methods-
+    */
   protected void updateAndRender(Surface surface, Graphics2D g) {
     final Box2D b = this.relBounds;
     actionsView.relBounds.set(0, 0, b.xdim() / 4f, b.ydim());
@@ -125,7 +160,7 @@ public class SceneView extends UINode {
       }
     }
     //
-    //  Render the persons themselves, and any action underway-
+    //  Render the persons themselves-
     for (Person p : scene.persons()) {
       float fog = scene.fogAt(p.currentTile(), Person.Side.HEROES);
       if (fog <= 0 && ! GameSettings.debugScene) continue;
@@ -151,8 +186,16 @@ public class SceneView extends UINode {
         renderAt(pos.x, pos.y, 1, 1, hoverBox, null, g);
       }
     }
+    //
+    //  Then render any action underway, and any temporary FX-
     if (done != null && done.progress() >= 0) {
       done.used.renderUsageFX(done, scene, g);
+    }
+    for (TempFX fx : tempFX) {
+      float px = fx.pos.x - fx.size, py = fx.pos.y - fx.size, s2 = fx.size * 2;
+      renderAt(px, py, s2, s2, fx.sprite, null, g);
+      fx.framesLeft--;
+      if (fx.framesLeft <= 0) tempFX.remove(fx);
     }
     //
     //  Then render our own fog on top of all objects-

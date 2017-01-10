@@ -1,13 +1,16 @@
 
 
 package proto.content.items;
+import proto.common.*;
 import proto.game.person.*;
 import proto.game.scene.*;
 import proto.game.world.*;
-
 import static proto.game.person.PersonStats.*;
 import static proto.game.person.ItemType.*;
 import static proto.game.person.PersonGear.*;
+
+import java.awt.Graphics2D;
+import java.awt.Image;
 
 
 
@@ -73,7 +76,7 @@ public class Gadgets {
   
   final static Ability MED_KIT_HEAL = new Ability(
     "First Aid (Medkit)", "ability_med_kit_heal",
-    SPRITE_DIR+"icon_med_kit.png",
+    ICONS_DIR+"icon_med_kit.png",
     "Patches up injury sustained in combat (up to 6 health), halts bleeding "+
     "and reduces recovery time.",
     Ability.IS_ACTIVE | Ability.IS_EQUIPPED | Ability.IS_MELEE, 3,
@@ -109,16 +112,14 @@ public class Gadgets {
   
   
   final static Ability TEAR_GAS_ABILITY = new Ability(
-    "Tear Gass", "tear_gas_condition",
-    SPRITE_DIR+"icon_tear_gas.png",
+    "Tear Gas", "tear_gas_condition",
+    ICONS_DIR+"sprite_grenade.png",
     "Reduces accuracy and limits action.  Lasts three turns.",
     Ability.IS_CONDITION | Ability.IS_AREA_EFFECT | Ability.IS_RANGED, 2,
     Ability.MINOR_HARM, Ability.MEDIUM_POWER
   ) {
-    
-    public void applyOnActionEnd(Action use) {
-      use.acting.gear.useCharge(Gadgets.TEAR_GAS, 1);
-    }
+    final Image GRENADE_IMG = Kind.loadImage(SPRITE_DIR+"sprite_grenade.png");
+    final Image BURST_IMG = Kind.loadImage(SPRITE_DIR+"sprite_smoke.png");
     
     public int maxRange() {
       //  TODO:  Base this off the thrower's strength (as with other
@@ -130,10 +131,28 @@ public class Gadgets {
       return 3;
     }
     
+    public boolean allowsTarget(Object target, Scene scene, Person acting) {
+      return true;
+    }
+    
     protected boolean affectsTargetInRange(
       Element affects, Scene scene, Person acting
     ) {
       return affects.isPerson();
+    }
+    
+    public void applyOnActionEnd(Action use) {
+      use.acting.gear.useCharge(Gadgets.TEAR_GAS, 1);
+      final Tile at = use.scene().tileUnder(use.target);
+      use.scene().view().addTempFX(BURST_IMG, 3, at.x, at.y, 0, 1);
+    }
+    
+    public Image missileSprite() {
+      return GRENADE_IMG;
+    }
+    
+    public void renderUsageFX(Action use, Scene scene, Graphics2D g) {
+      FX.renderMissile(use, scene, g);
     }
   };
   
@@ -142,7 +161,7 @@ public class Gadgets {
     "Tear Gas can blind and suffocate opponents long enough to finish them "+
     "with relative impunity.",
     ICONS_DIR+"icon_tear_gas.png",
-    SPRITE_DIR+"sprite_smoke.png",
+    SPRITE_DIR+"sprite_grenade.png",
     SLOT_TYPE_ITEM, 35, new Object[] {
       MEDICINE, 6
     },

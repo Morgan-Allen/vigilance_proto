@@ -2,6 +2,7 @@
 
 package proto.common;
 import proto.game.world.*;
+import proto.content.items.Gadgets;
 import proto.game.person.*;
 import proto.game.scene.*;
 import proto.util.*;
@@ -66,6 +67,8 @@ public class DebugSceneWithLayout extends RunGame {
     Series <Person> active = base.roster();
     int across = (mission.size() - (active.size())) / 2;
     for (Person p : active) {
+      Item tearGas = new Item(Gadgets.TEAR_GAS, world);
+      p.gear.equipItem(tearGas, PersonGear.SLOT_ITEM_1);
       p.addAssignment(mission);
       mission.enterScene(p, across++, 0);
     }

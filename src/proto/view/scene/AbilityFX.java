@@ -23,11 +23,6 @@ public class AbilityFX {
   }
   
   
-  public Image missileSprite() {
-    return null;
-  }
-  
-  
   public String describeAction(Action action, Scene scene) {
     StringBuffer s = new StringBuffer();
     s.append(basis.description);
@@ -66,7 +61,7 @@ public class AbilityFX {
   
   
   public void renderMissile(Action action, Scene s, Graphics2D g) {
-    renderMissile(action, s, missileSprite(), g);
+    renderMissile(action, s, basis.missileSprite(), g);
   }
   
   
@@ -106,6 +101,15 @@ public class AbilityFX {
     g.setColor(coreTone);
     g.setStroke(new BasicStroke(beamWide * 2));
     g.drawLine(orig.x, orig.y, dest.x, dest.y);
+  }
+  
+  
+  public void renderBurst(
+    Object at, Scene s, float radius, Image sprite, Graphics2D g
+  ) {
+    Tile under = s.tileUnder(at);
+    float px = under.x - radius, py = under.y - radius, r2 = radius * 2;
+    s.view().renderAt(px, py, r2, r2, sprite, null, g);
   }
   
   
