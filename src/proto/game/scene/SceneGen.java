@@ -1,14 +1,10 @@
 
 
 package proto.game.scene;
-import java.awt.Color;
-
 import proto.common.*;
 import proto.util.*;
 
 
-
-//  TODO:  Include a sprinkling of random props within the various rooms...
 
 
 public class SceneGen implements TileConstants {
@@ -27,7 +23,7 @@ public class SceneGen implements TileConstants {
     MARK_FLOOR    =  6,
     MARK_PROP     =  7,
     MARK_CORRIDOR =  8,
-    MARKUP_TYPES  = 9
+    MARKUP_TYPES  =  9
   ;
   final static int
     VISIT_ALL        = 0,
@@ -40,13 +36,17 @@ public class SceneGen implements TileConstants {
   
   final Scene scene;
   final byte markup[][];
+  Tally <SceneType> frequencies = new Tally();
   
   public int minRoomSize = 4;
   public float corWideFraction = 0.125f;
   public float maxSplitFrac = 0.5f;
   public boolean verbose = false;
   
-  static class AreaCheck { SceneType room; boolean valid; }
+  static class AreaCheck {
+    SceneType room;
+    boolean valid;
+  }
   
   static class Room {
     SceneType type;
@@ -88,7 +88,7 @@ public class SceneGen implements TileConstants {
     
     for (int i = MARKUP_TYPES; i-- > 0;) {
       float hue = i * 1f / MARKUP_TYPES;
-      colorKeys[i] = Color.HSBtoRGB(hue, 1, 0.5f);
+      colorKeys[i] = java.awt.Color.HSBtoRGB(hue, 1, 0.5f);
     }
     
     for (int y = scene.size; y-- > 0;) {
@@ -235,10 +235,24 @@ public class SceneGen implements TileConstants {
   
   
   boolean canFillRoom(SceneType parent, Box2D area, AreaCheck check) {
-    if (area.maxSide() > 8) return false;
+    final int size = (int) area.maxSide();
     
-    //  TODO:  Elaborate on this...
-    check.room = parent;
+    Pick <SceneType> pick = new Pick <SceneType> () {
+      public void compare(SceneType k, float rating) {
+        if (k.maxSize > 0 && size > k.maxSize) return;
+        if (k.minSize > 0 && size < k.minSize) return;
+        
+        float freq = frequencies.valueFor(k);
+        rating /= 1 + freq;
+        super.compare(k, rating);
+      }
+    };
+    
+    pick.compare(parent, 1);
+    for (SceneType kidType : parent.kidTypes) pick.compare(kidType, 1);
+    
+    if (pick.result() == null) return false;
+    check.room = pick.result();
     return true;
   }
   
@@ -319,7 +333,11 @@ public class SceneGen implements TileConstants {
       wall[wall.length - 1] = nextWall[0];
     }
     //
-    //  Report and return-
+    //  Finally, we update the frequencies for this room-type:
+    float freqInc = room.area.area() / (scene.size * scene.size);
+    frequencies.add(freqInc, room.type);
+    //
+    //  And report and return-
     if (verbose) {
       I.say("Performed room fill!");
       printMarkup();

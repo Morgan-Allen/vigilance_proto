@@ -2,7 +2,7 @@
 
 package proto.common;
 import proto.game.world.*;
-import proto.content.items.Gadgets;
+import proto.content.items.*;
 import proto.game.person.*;
 import proto.game.scene.*;
 import proto.util.*;
@@ -24,7 +24,7 @@ public class DebugSceneWithLayout extends RunGame {
     });
   }
   
-  final public static SceneType FIXED_TEST_SCENE = new SceneType(
+  final public static SceneType FIXED_TEST_SCENE = new SceneTypeFixed(
     "fixed test scene", "type_urban_scene_fixed",
     new Kind[] {
       KIND_FLOOR     ,
@@ -32,16 +32,19 @@ public class DebugSceneWithLayout extends RunGame {
       KIND_DOOR      ,
       KIND_WINDOW    ,
       KIND_POOL_TABLE,
+      KIND_BAR_TABLE ,
+      KIND_BAR_STOOL ,
+      KIND_JUKEBOX   ,
     },
     new byte[][] {
-      { 0, 0, 0, 1, 0, 0, 1, 0 },
-      { 1, 0, 0, 0, 0, 1, 0, 1 },
-      { 0, 0, 4, 4, 4, 0, 0, 0 },
-      { 0, 0, 4, 4, 4, 0, 1, 0 },
-      { 0, 0, 0, 0, 0, 0, 0, 0 },
-      { 0, 1, 0, 0, 1, 0, 1, 0 },
-      { 0, 0, 0, 0, 0, 0, 0, 0 },
-      { 0, 1, 0, 0, 0, 0, 0, 0 },
+      { 0, 0, 0, 0, 0, 0, 7, 0 },
+      { 0, 0, 0, 0, 0, 0, 0, 6 },
+      { 0, 0, 4, 4, 4, 0, 5, 5 },
+      { 0, 0, 4, 4, 4, 0, 6, 0 },
+      { 0, 0, 0, 0, 0, 0, 6, 0 },
+      { 7, 0, 6, 6, 0, 5, 5, 0 },
+      { 0, 0, 5, 5, 0, 6, 6, 0 },
+      { 0, 0, 6, 6, 0, 0, 0, 0 },
     }
   );
   
