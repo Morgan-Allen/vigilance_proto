@@ -81,8 +81,6 @@ public class SceneTypeFixed extends SceneType {
       Kind type = propType(c.x, c.y);
       if (type == null) continue;
       if (! scene.hasSpace(type, c.x + offX, c.y + offY)) continue;
-      
-      I.say("  Adding prop: "+type+" at "+c);
       scene.addProp(type, c.x + offX, c.y + offY);
     }
   }

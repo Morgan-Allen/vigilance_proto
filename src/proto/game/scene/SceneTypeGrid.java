@@ -78,13 +78,17 @@ public class SceneTypeGrid extends SceneType {
     I.say("GENERATING GRID SCENE "+this);
     
     final int gridSize = size / resolution;
-    size = (gridSize * resolution) + (gridSize - 1);
+    size = (gridSize * resolution) + ((gridSize + 1) * wallPad) + 2;
     
     Scene scene = new Scene(world, size);
     scene.setupScene(forTesting);
     int counts[] = new int[units.length];
+    int off = wallPad + 1;
     
-    for (Coord c : Visit.grid(0, 0, size, size, resolution + 1)) {
+    for (Coord c : Visit.grid(0, 0, gridSize, gridSize, 1)) {
+      
+      int atX = off + (c.x * (resolution + wallPad));
+      int atY = off + (c.y * (resolution + wallPad));
       
       Pick <GridUnit> pick = new Pick();
       for (GridUnit unit : units) {
@@ -93,7 +97,7 @@ public class SceneTypeGrid extends SceneType {
         
         if (unit.maxCount > 0 && count   >= unit.maxCount) continue;
         if (unit.percent  > 0 && percent >= unit.percent ) continue;
-        if (! unit.type.checkBordering(scene, c.x, c.y, resolution)) continue;
+        if (! unit.type.checkBordering(scene, atX, atY, resolution)) continue;
         
         float rating = unit.priority * 1f / PRIORITY_MEDIUM;
         rating += Nums.max(0, unit.minCount - count);
@@ -103,9 +107,9 @@ public class SceneTypeGrid extends SceneType {
       GridUnit picked = pick.result();
       
       if (picked == null) continue;
-      I.say("PICKED GRID UNIT "+picked.type+" AT "+c);
+      I.say("PICKED GRID UNIT "+picked.type+" AT "+atX+" "+atY);
       
-      picked.type.applyToScene(scene, c.x, c.y, resolution);
+      picked.type.applyToScene(scene, atX, atY, resolution);
       counts[picked.ID]++;
     }
     return scene;

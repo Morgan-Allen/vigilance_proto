@@ -10,8 +10,8 @@ import proto.view.common.*;
 
 import java.awt.Image;
 import java.awt.Graphics2D;
-import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.geom.AffineTransform;
 
 
 
@@ -137,7 +137,7 @@ public class SceneView extends UINode {
     //  Then, render any props, persons, or special FX-
     for (Prop prop : scene.props()) {
       Tile t = prop.origin();
-      renderAt(t.x, t.y, prop.kind(), g);
+      renderAt(t.x, t.y, prop.kind(), prop.facing() * 90f, g);
     }
     //
     //  Render enemy-sight on top of objects but beneath persons- but ONLY if
@@ -156,7 +156,7 @@ public class SceneView extends UINode {
         float glare = Nums.clamp(dist / sightRange, 0, 1);
         if (glare <= 0) continue;
         Color warns = ENEMY[Nums.clamp((int) (glare * 10), 10)];
-        renderAt(c.x, c.y, 1, 1, null, warns, g);
+        renderAt(c.x, c.y, 1, 1, null, 0, warns, g);
       }
     }
     //
@@ -165,7 +165,7 @@ public class SceneView extends UINode {
       float fog = scene.fogAt(p.currentTile(), Person.Side.HEROES);
       if (fog <= 0 && ! GameSettings.debugScene) continue;
       Vec3D pos = p.exactPosition();
-      renderAt(pos.x, pos.y, p.kind(), g);
+      renderAt(pos.x, pos.y, p.kind(), 0, g);
       visible.add(p);
     }
     for (Person p : visible) {
@@ -177,13 +177,13 @@ public class SceneView extends UINode {
       float stunLevel   = 1 - p.health.harmToStunRatio();
       Color pale = PALES[(int) (stunLevel * 9.9f)];
       
-      renderAt(pos.x, pos.y + 0.9f, 1, 0.1f, null, Color.BLACK, g);
-      renderAt(pos.x, pos.y + 0.9f, 1, 0.1f, null, pale, g);
-      renderAt(pos.x, pos.y + 0.9f, healthLevel, 0.1f, null, teamColor, g);
+      renderAt(pos.x, pos.y + 0.9f, 1, 0.1f, null, 0, Color.BLACK, g);
+      renderAt(pos.x, pos.y + 0.9f, 1, 0.1f, null, 0, pale, g);
+      renderAt(pos.x, pos.y + 0.9f, healthLevel, 0.1f, null, 0, teamColor, g);
       renderString(pos.x, pos.y + 0.5f, p.name(), Color.WHITE, g);
       
       if (p == activePerson) {
-        renderAt(pos.x, pos.y, 1, 1, hoverBox, null, g);
+        renderAt(pos.x, pos.y, 1, 1, hoverBox, 0, null, g);
       }
     }
     //
@@ -193,7 +193,7 @@ public class SceneView extends UINode {
     }
     for (TempFX fx : tempFX) {
       float px = fx.pos.x - fx.size, py = fx.pos.y - fx.size, s2 = fx.size * 2;
-      renderAt(px, py, s2, s2, fx.sprite, null, g);
+      renderAt(px, py, s2, s2, fx.sprite, 0, null, g);
       fx.framesLeft--;
       if (fx.framesLeft <= 0) tempFX.remove(fx);
     }
@@ -204,7 +204,7 @@ public class SceneView extends UINode {
       float fogAlpha = 1f - scene.fogAt(t, Person.Side.HEROES);
       if (GameSettings.debugScene) fogAlpha /= 3;
       Color black = SCALE[Nums.clamp((int) (fogAlpha * 10), 10)];
-      renderAt(c.x, c.y, 1, 1, null, black, g);
+      renderAt(c.x, c.y, 1, 1, null, 0, black, g);
     }
     //
     //  If complete, display a summary of the results!
@@ -221,7 +221,7 @@ public class SceneView extends UINode {
     Tile hoverT = hasFocus ? scene.tileAt(hoverX, hoverY) : null;
     
     if (hoverT != null) {
-      renderAt(hoverT.x, hoverT.y, 1, 1, hoverBox, null, g);
+      renderAt(hoverT.x, hoverT.y, 1, 1, hoverBox, 0, null, g);
       Object hovered = topObjectAt(hoverT);
       boolean canDoAction = false;
       
@@ -256,14 +256,14 @@ public class SceneView extends UINode {
   }
   
 
-  void renderAt(float px, float py, Kind kind, Graphics2D g) {
-    renderAt(px, py, kind.wide(), kind.high(), kind.sprite(), null, g);
+  void renderAt(float px, float py, Kind kind, float rotation, Graphics2D g) {
+    renderAt(px, py, kind.wide(), kind.high(), kind.sprite(), rotation, null, g);
   }
   
   
   public void renderAt(
     float px, float py, float w, float h,
-    Image sprite, Color fill, Graphics2D g
+    Image sprite, float angle, Color fill, Graphics2D g
   ) {
     int x, y;
     x = vx + (int) ((px - 0.5f) * TILE_SIZE);
@@ -272,7 +272,15 @@ public class SceneView extends UINode {
     h *= TILE_SIZE;
     
     if (sprite != null) {
-      g.drawImage(sprite, x - zoomX, y - zoomY, (int) w, (int) h, null);
+      angle = Nums.toRadians(angle);
+      w /= sprite.getWidth (null);
+      h /= sprite.getHeight(null);
+      AffineTransform t = AffineTransform.getTranslateInstance(
+        x - zoomX, y - zoomY
+      );
+      t.scale(w, h);
+      t.rotate(angle);
+      g.drawImage(sprite, t, null);
     }
     if (fill != null) {
       g.setColor(fill);
