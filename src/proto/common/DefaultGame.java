@@ -145,16 +145,6 @@ public class DefaultGame extends RunGame {
       }
     }
   }
-  
-  
-  public static void main(String[] args) {
-    EventQueue.invokeLater(new Runnable() {
-      public void run() {
-        RunGame ex = new DefaultGame();
-        ex.setVisible(true);
-      }
-    });
-  }
 }
 
 

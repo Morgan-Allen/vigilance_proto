@@ -36,34 +36,13 @@ public abstract class RunGame extends JFrame implements ActionListener {
   }
   
   
+  
+  /**  Support methods for saving and loading-
+    */
   private void setupAssets() {
     //  TODO:  Throw up a loading screen?
     Assets.compileAssetList("proto");
     Assets.advanceAssetLoading(-1);
-  }
-  
-  
-  protected abstract World setupWorld();
-  
-  
-  private void initUI() {
-    this.setLayout(new BorderLayout());
-    add(this.surface = new Surface(this), BorderLayout.CENTER);
-    
-    pack();
-    setTitle("Run Game");
-    setLocationRelativeTo(null);
-    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-    this   .addKeyListener        (surface);
-    surface.addMouseListener      (surface);
-    surface.addMouseMotionListener(surface);
-  }
-  
-  
-  public void actionPerformed(ActionEvent e) {
-    if (world   != null) world.updateWorld();
-    if (surface != null) surface.repaint();
   }
   
   
@@ -74,6 +53,25 @@ public abstract class RunGame extends JFrame implements ActionListener {
     this.world = (World) s.loaded()[0];
     if (world != null) world.attachToGame(this, savePath);
     return true;
+  }
+  
+  
+  
+  /**  Some utility methods for thread-execution:
+    */
+  public static void main(String args[]) {
+    EventQueue.invokeLater(new Runnable() {
+      public void run() {
+        DebugSceneWithLayout ex = new DebugSceneWithLayout();
+        ex.setVisible(true);
+      }
+    });
+  }
+  
+  
+  public void actionPerformed(ActionEvent e) {
+    if (world   != null) world.updateWorld();
+    if (surface != null) surface.repaint();
   }
   
   
@@ -90,26 +88,39 @@ public abstract class RunGame extends JFrame implements ActionListener {
   
   
   
-  /**  Public access methods-
+  /**  Actual world setup for the first run (not when saving/loading)-
     */
-  final public static int
-    FRAME_RATE = 25;
-  
+  protected abstract World setupWorld();
   
   public World world() {
     return world;
   }
   
   
-  /*
-  public Scene scene() {
-    return world == null ? null : world.enteredScene();
-  }
-  //*/
+  
+  /**  Support methods for the UI-
+    */
+  final public static int
+    FRAME_RATE = 25;
   
   
   public Surface surface() {
     return surface;
+  }
+  
+  
+  private void initUI() {
+    this.setLayout(new BorderLayout());
+    add(this.surface = new Surface(this), BorderLayout.CENTER);
+    
+    pack();
+    setTitle("Run Game");
+    setLocationRelativeTo(null);
+    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+    this   .addKeyListener        (surface);
+    surface.addMouseListener      (surface);
+    surface.addMouseMotionListener(surface);
   }
 }
 

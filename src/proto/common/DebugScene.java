@@ -17,16 +17,6 @@ import java.awt.EventQueue;
 public class DebugScene extends RunGame {
   
   
-  public static void main(String args[]) {
-    EventQueue.invokeLater(new Runnable() {
-      public void run() {
-        DebugScene ex = new DebugScene();
-        ex.setVisible(true);
-      }
-    });
-  }
-  
-  
   DebugScene() {
     super("saves/debug_scene");
   }
@@ -68,6 +58,7 @@ public class DebugScene extends RunGame {
     final CaseFile file = base.leads.caseFor(home);
     file.recordRole(kidnapEvent, CaseFile.ROLE_SCENE, tipoff);
     
+    /*
     final Base HQ = world.playerBase();
     Task guarding = file.investigationOptions().first();
     for (Person p : HQ.roster()) {
@@ -80,6 +71,7 @@ public class DebugScene extends RunGame {
     
     SceneView view = world.view().sceneView();
     view.debugMode = true;
+    //*/
     
     return world;
   }

@@ -15,15 +15,6 @@ import java.awt.EventQueue;
 public class DebugSceneWithLayout extends RunGame {
   
   
-  public static void main(String args[]) {
-    EventQueue.invokeLater(new Runnable() {
-      public void run() {
-        DebugSceneWithLayout ex = new DebugSceneWithLayout();
-        ex.setVisible(true);
-      }
-    });
-  }
-  
   final public static SceneType FIXED_TEST_SCENE = new SceneTypeFixed(
     "fixed test scene", "type_urban_scene_fixed",
     new Kind[] {
