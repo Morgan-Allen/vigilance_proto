@@ -130,9 +130,9 @@ public class SceneView extends UINode {
     if (zoomTile != null) {
       zoomX = zoomTile.x * TILE_SIZE;
       zoomY = zoomTile.y * TILE_SIZE;
+      zoomX -= vw / 2;
+      zoomY -= vh / 2;
     }
-    zoomX -= vw / 2;
-    zoomY -= vh / 2;
     //
     //  Then, render any props, persons, or special FX-
     for (Prop prop : scene.props()) {

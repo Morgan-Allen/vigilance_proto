@@ -14,23 +14,24 @@ public class SceneTypeGrid extends SceneType {
   
   /**  Data fields, construction and save/load methods-
     */
-  static class GridUnit {
+  public static class GridUnit {
     SceneTypeFixed type;
     int ID;
     int priority, percent, minCount, maxCount;
   }
   
-  final int resolution;
+  final int resolution, wallPad;
   final GridUnit units[];
   
   
   public SceneTypeGrid(
     String name, String ID,
-    int resolution,
+    int resolution, int wallPad,
     GridUnit... units
   ) {
     super(name, ID);
     this.resolution = resolution;
+    this.wallPad    = wallPad;
     this.units      = units;
     int unitID = 0;
     for (GridUnit unit : units) unit.ID = unitID++;
@@ -74,23 +75,24 @@ public class SceneTypeGrid extends SceneType {
   /**  Actual scene generation-
     */
   public Scene generateScene(World world, int size, boolean forTesting) {
+    I.say("GENERATING GRID SCENE "+this);
     
     final int gridSize = size / resolution;
-    size = gridSize * resolution;
+    size = (gridSize * resolution) + (gridSize - 1);
     
-    Scene scene = new Scene(world, gridSize);
+    Scene scene = new Scene(world, size);
     scene.setupScene(forTesting);
-    
     int counts[] = new int[units.length];
     
-    for (Coord c : Visit.grid(0, 0, size, size, resolution)) {
+    for (Coord c : Visit.grid(0, 0, size, size, resolution + 1)) {
       
       Pick <GridUnit> pick = new Pick();
       for (GridUnit unit : units) {
         int count = counts[unit.ID];
         int percent = (count * 100) / (gridSize * gridSize);
-        if (count   > unit.maxCount) continue;
-        if (percent > unit.percent ) continue;
+        
+        if (unit.maxCount > 0 && count   >= unit.maxCount) continue;
+        if (unit.percent  > 0 && percent >= unit.percent ) continue;
         if (! unit.type.checkBordering(scene, c.x, c.y, resolution)) continue;
         
         float rating = unit.priority * 1f / PRIORITY_MEDIUM;
@@ -99,16 +101,15 @@ public class SceneTypeGrid extends SceneType {
         pick.compare(unit, rating);
       }
       GridUnit picked = pick.result();
-      if (picked == null) continue;
       
-      picked.type.applyToScene(scene, c.x, c.y);
+      if (picked == null) continue;
+      I.say("PICKED GRID UNIT "+picked.type+" AT "+c);
+      
+      picked.type.applyToScene(scene, c.x, c.y, resolution);
       counts[picked.ID]++;
     }
     return scene;
   }
-  
-  
 }
-
 
 

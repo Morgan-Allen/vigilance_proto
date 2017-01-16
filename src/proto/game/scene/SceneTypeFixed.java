@@ -34,7 +34,10 @@ public class SceneTypeFixed extends SceneType {
   boolean checkBordering(
     Scene scene, int offX, int offY, int resolution
   ) {
-    for (Coord c : Visit.perimeter(0, 0, resolution, resolution)) {
+    int offGX = (wide - resolution) / 2;
+    int offGY = (high - resolution) / 2;
+    
+    for (Coord c : Visit.perimeter(offGX, offGY, resolution, resolution)) {
       int tx = c.x + offX, ty = c.y + offY, gx = c.x, gy = c.y;
       if (c.x < 0) gx--; if (c.x >= resolution) gx++;
       if (c.y < 0) gy--; if (c.y >= resolution) gy++;
@@ -54,7 +57,10 @@ public class SceneTypeFixed extends SceneType {
     Tile at = scene.tileAt(tx, ty);
     boolean blockG = type == null ? false : type.blockPath();
     boolean blockT = at   == null ? true  : at.blocked();
-    return blockG == blockT;
+    
+    //  TODO:  FIX THIS!
+    return true;
+    //return blockG == blockT;
   }
   
   
@@ -67,12 +73,17 @@ public class SceneTypeFixed extends SceneType {
   }
   
   
-  void applyToScene(Scene scene, int offX, int offY) {
+  void applyToScene(Scene scene, int offX, int offY, int resolution) {
+    offX -= (wide - resolution) / 2;
+    offY -= (high - resolution) / 2;
+    
     for (Coord c : Visit.grid(0, 0, wide, high, 1)) {
       Kind type = propType(c.x, c.y);
       if (type == null) continue;
       if (! scene.hasSpace(type, c.x + offX, c.y + offY)) continue;
-      scene.addProp(type, c.x + offY, c.y + offY);
+      
+      I.say("  Adding prop: "+type+" at "+c);
+      scene.addProp(type, c.x + offX, c.y + offY);
     }
   }
   
@@ -84,12 +95,10 @@ public class SceneTypeFixed extends SceneType {
     size = Nums.max(wide, high) + 2;
     final Scene scene = new Scene(world, size);
     scene.setupScene(forTesting);
-    applyToScene(scene, 1, 1);
+    applyToScene(scene, 0, 0, size);
     return scene;
   }
 }
-
-
 
 
 

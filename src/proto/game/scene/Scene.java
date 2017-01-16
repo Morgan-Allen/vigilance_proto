@@ -436,6 +436,7 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   
   
   public void updateScene() {
+    if (GameSettings.pauseScene) return;
 
     for (Person p : persons) if (p != nextActing) {
       p.updateInScene(false);

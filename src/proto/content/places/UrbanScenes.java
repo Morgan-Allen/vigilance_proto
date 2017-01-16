@@ -4,6 +4,7 @@ package proto.content.places;
 import proto.common.*;
 import proto.game.scene.*;
 import static proto.game.scene.SceneType.*;
+import static proto.game.scene.SceneTypeGrid.*;
 
 
 
@@ -70,7 +71,60 @@ public class UrbanScenes {
       IMG_DIR+"sprite_pinball_machine.png",
       1, 1, true, true
     ),
-    
+    BAR_ROOM_PROP_TYPES[] = {
+      KIND_FLOOR,
+      KIND_WALL,
+      KIND_DOOR,
+      KIND_WINDOW,
+      KIND_POOL_TABLE,
+      KIND_BAR_TABLE,
+      KIND_BAR_STOOL,
+      KIND_BAR_STOOLS,
+      KIND_BAR_TAPS,
+      KIND_JUKEBOX,
+      KIND_PINBALL_MACHINE,
+    }
+  ;
+  
+  final public static SceneTypeFixed ROOM_MAIN_BAR = new SceneTypeFixed(
+    "main bar", "type_main_bar_urban",
+    BAR_ROOM_PROP_TYPES,
+    new byte[][] {
+      { 0, 0, 0, 0, 0, 0 },
+      { 0, 0, 0, 0, 0, 0 },
+      { 0, 7, 6, 7, 7, 0 },
+      { 0, 8, 8, 8, 1, 0 },
+      { 0, 8, 8, 8, 1, 0 },
+      { 1, 1, 1, 1, 1, 1 },
+    }
+  );
+  final public static SceneTypeFixed ROOM_POOL_AREA = new SceneTypeFixed(
+    "pool area", "type_pool_area_urban",
+    BAR_ROOM_PROP_TYPES,
+    new byte[][] {
+      { 0, 0, 0, 0, 0, 0 },
+      { 0, 0, 0, 0, 0, 0 },
+      { 0, 4, 4, 4, 0, 0 },
+      { 0, 4, 4, 4, 0, 0 },
+      { 0, 0, 0, 0, 0, 0 },
+      { 0, 0, 0, 0, 0, 0 },
+    }
+  );
+  final public static SceneTypeFixed ROOM_SEATING = new SceneTypeFixed(
+    "seating", "type_seating_urban",
+    BAR_ROOM_PROP_TYPES,
+    new byte[][] {
+      { 0, 0, 0, 0, 0, 0 },
+      { 0, 6, 6, 0, 9, 0 },
+      { 0, 5, 5, 0, 0, 0 },
+      { 0, 7, 6, 0, 1, 0 },
+      { 0, 0, 0, 0, 10, 0 },
+      { 0, 0, 0, 0, 0, 0 },
+    }
+  );
+  
+  
+  final public static Kind
     KIND_BATHROOM_FLOOR = Kind.ofProp(
       "Bathroom Floor", "prop_bathroom_floor_urban",
       IMG_DIR+"sprite_bathroom_floor.png",
@@ -85,17 +139,37 @@ public class UrbanScenes {
       "Basin", "prop_basin_urban",
       IMG_DIR+"sprite_basin.png",
       1, 1, false, false
-    )
-    ;
+    ),
+    BATHROOM_PROP_TYPES[] = {
+      KIND_BATHROOM_FLOOR,
+      KIND_WALL,
+      KIND_DOOR,
+      KIND_WINDOW,
+      KIND_BATHROOM_STALL,
+      KIND_BASIN
+    }
+  ;
   
+  final public static SceneTypeFixed ROOM_BATHROOM = new SceneTypeFixed(
+    "bathroom", "type_bathroom_urban",
+    BATHROOM_PROP_TYPES,
+    new byte[][] {
+      { 1, 1, 1, 1, 1, 1 },
+      { 1, 5, 0, 0, 0, 1 },
+      { 1, 0, 0, 4, 4, 1 },
+      { 1, 1, 0, 4, 4, 1 },
+      { 1, 5, 0, 4, 4, 1 },
+      { 1, 1, 1, 1, 1, 1 },
+    }
+  );
   
-  final public static SceneType URBAN_SCENE = new SceneTypeCorridors(
+  final public static SceneType URBAN_SCENE = new SceneTypeGrid(
     "urban scene", "type_urban_scene",
-    BORDERS, KIND_WALL      ,
-    DOOR   , KIND_DOOR      ,
-    WINDOW , KIND_WINDOW    ,
-    FLOORS , KIND_FLOOR     ,
-    PROP   , KIND_POOL_TABLE
+    4, 1,
+    numberUnit (ROOM_BATHROOM , 1 ),
+    numberUnit (ROOM_MAIN_BAR , 1 ),
+    percentUnit(ROOM_POOL_AREA, 33),
+    percentUnit(ROOM_SEATING  , 67)
   );
   
   final public static SceneType MANSION_SCENE = new SceneTypeCorridors(
