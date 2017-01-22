@@ -25,7 +25,7 @@ public class DebugSceneGen {
     Scene scene = new Scene(world, size);
     scene.setupScene(true);
     
-    SceneGen gen = new SceneGen(scene);
+    SceneGenCorridors gen = new SceneGenCorridors(scene);
     gen.verbose = true;
     gen.populateAsRoot(root, new Box2D(2, 2, size - 4, size - 4));
     gen.printMarkupVisually();

@@ -304,6 +304,8 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   
   /**  Supplementary population methods for use during initial setup-
     */
+  //  TODO:  Consider moving these out to the Prop class.
+  
   public boolean addProp(Kind type, int x, int y, int facing) {
     Prop prop = new Prop(type, world);
     Tile first = null;
@@ -311,6 +313,8 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     for (Coord c : coordsUnder(type, x, y, facing)) {
       Tile under = tileAt(c.x, c.y);
       if (under == null) continue;
+      final Prop oldProp = under.prop();
+      if (oldProp != null) removeProp(oldProp);
       under.setProp(prop);
       if (first == null) first = under;
     }
@@ -321,7 +325,17 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     return true;
   }
   
-  //  TODO:  Consider moving these out to the Prop class.
+  
+  public boolean removeProp(Prop prop) {
+    Tile at = prop.origin();
+    for (Coord c : coordsUnder(prop.kind(), at.x, at.y, prop.facing())) {
+      Tile under = tileAt(c.x, c.y);
+      if (under.prop() == prop) under.setProp(null);
+    }
+    props.remove(prop);
+    return true;
+  }
+  
   
   public boolean hasSpace(Kind type, int x, int y, int facing) {
     for (Coord c : coordsUnder(type, x, y, facing)) {
@@ -345,13 +359,6 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     if (facing == E) y -= h - 1;
     if (facing == S) { y -= h - 1; x -= w - 1; }
     return Visit.grid(x, y, w, h, 1);
-  }
-  
-  
-  public boolean removeProp(Prop prop) {
-    prop.origin.setProp(null);
-    props.remove(prop);
-    return true;
   }
   
   

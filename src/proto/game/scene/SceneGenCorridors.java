@@ -7,7 +7,7 @@ import proto.util.*;
 
 
 
-public class SceneGen implements TileConstants {
+public class SceneGenCorridors implements TileConstants {
   
   
   /**  Constants, data fields and construction methods-
@@ -53,7 +53,7 @@ public class SceneGen implements TileConstants {
     Box2D area;
     Coord walls[][], floor[], ceiling[];
   }
-
+  
   static abstract class Tiling {
     abstract void tile(Coord wall[], Coord at, int dir);
   }
@@ -61,7 +61,7 @@ public class SceneGen implements TileConstants {
   List <Room> rooms = new List(), corridors = new List();
   
   
-  public SceneGen(Scene scene) {
+  public SceneGenCorridors(Scene scene) {
     this.scene = scene;
     this.markup = new byte[scene.size][scene.size];
   }
@@ -506,15 +506,9 @@ public class SceneGen implements TileConstants {
       if (mark != MARK_FLOOR && mark != MARK_CORRIDOR) return true;
     }
     
-    ///StringBuffer b = new StringBuffer();
-    ///Coord initC = null;
-    
     for (Coord c : Visit.perimeter(atX, atY, w, h)) {
       final byte mark = sampleFacing(c.x, c.y, CENTRE);
       final boolean blocked = mark != MARK_FLOOR && mark != MARK_CORRIDOR;
-      
-      ///if (initC == null) initC = new Coord(c);
-      ///b.append(mark+" ");
       
       if (mark == MARK_DOORS) blocksPath = true;
       
@@ -539,9 +533,6 @@ public class SceneGen implements TileConstants {
       return true;
     }
     else {
-      ///I.say("Perimeter okay for "+propType+" at "+atX+"/"+atY);
-      ///I.say("  Blockages: "+numBlockages+", init coord: "+initC);
-      ///I.say("  "+b);
       return false;
     }
   }

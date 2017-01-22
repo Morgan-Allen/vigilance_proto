@@ -3,6 +3,7 @@
 package proto.common;
 import proto.game.world.*;
 import proto.content.items.*;
+import proto.content.places.UrbanScenes;
 import proto.game.person.*;
 import proto.game.scene.*;
 import proto.util.*;
@@ -53,10 +54,13 @@ public class DebugSceneWithLayout extends RunGame {
     DefaultGame.initDefaultCrime  (world);
     //
     //  Generate the scene-
-    SceneType sceneType = FIXED_TEST_SCENE;
-    Scene mission = sceneType.generateScene(world, 32, true);
+    SceneType sceneType = UrbanScenes.URBAN_SCENE;
+    Scene mission = sceneType.generateScene(world, 8, true);
+    GameSettings.debugScene = true;
+    GameSettings.pauseScene = true;
     //
     //  Then introduce the agents themselves-
+    /*
     final Base base = world.playerBase();
     Series <Person> active = base.roster();
     int across = (mission.size() - (active.size())) / 2;
@@ -66,6 +70,7 @@ public class DebugSceneWithLayout extends RunGame {
       p.addAssignment(mission);
       mission.enterScene(p, across++, 0);
     }
+    //*/
     //
     //  Then enter and return-
     world.enterScene(mission);

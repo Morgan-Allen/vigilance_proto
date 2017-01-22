@@ -22,7 +22,7 @@ public class SceneTypeCorridors extends SceneType {
     scene.setupScene(forTesting);
     
     final Box2D area = new Box2D(2, 2, size - 4, size - 4);
-    final SceneGen gen = new SceneGen(scene);
+    final SceneGenCorridors gen = new SceneGenCorridors(scene);
     gen.populateAsRoot(this, area);
     gen.printMarkup();
     return scene;
