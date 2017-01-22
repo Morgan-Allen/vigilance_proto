@@ -304,21 +304,27 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   
   /**  Supplementary population methods for use during initial setup-
     */
-  public boolean addProp(Kind type, int x, int y) {
+  public boolean addProp(Kind type, int x, int y, int facing) {
     Prop prop = new Prop(type, world);
-    for (Coord c : Visit.grid(x, y, type.wide(), type.high(), 1)) {
+    Tile first = null;
+    
+    for (Coord c : coordsUnder(type, x, y, facing)) {
       Tile under = tileAt(c.x, c.y);
-      if (under == null) return false;
-      else under.setProp(prop);
+      if (under == null) continue;
+      under.setProp(prop);
+      if (first == null) first = under;
     }
-    prop.origin = tileAt(x, y);
+    
+    prop.origin = first;
+    prop.facing = facing;
     props.add(prop);
     return true;
   }
   
+  //  TODO:  Consider moving these out to the Prop class.
   
-  public boolean hasSpace(Kind type, int x, int y) {
-    for (Coord c : Visit.grid(x, y, type.wide(), type.high(), 1)) {
+  public boolean hasSpace(Kind type, int x, int y, int facing) {
+    for (Coord c : coordsUnder(type, x, y, facing)) {
       Tile under = tileAt(c.x, c.y);
       if (under == null) return false;
       if (under.prop() == null) continue;
@@ -326,6 +332,19 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
       if (uK.blockPath() || uK.blockSight()) return false;
     }
     return true;
+  }
+  
+  
+  public Visit <Coord> coordsUnder(Kind type, int x, int y, int facing) {
+    int w = type.wide(), h = type.high();
+    if (facing == W || facing == E) {
+      w = type.high();
+      h = type.wide();
+    }
+    if (facing == W) x -= w - 1;
+    if (facing == E) y -= h - 1;
+    if (facing == S) { y -= h - 1; x -= w - 1; }
+    return Visit.grid(x, y, w, h, 1);
   }
   
   

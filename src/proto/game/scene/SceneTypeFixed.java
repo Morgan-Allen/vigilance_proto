@@ -6,10 +6,11 @@ import proto.game.world.*;
 import proto.util.*;
 
 
+
 public class SceneTypeFixed extends SceneType {
   
   
-  /**  ...and constructor definition for fixed scene layouts.
+  /**  Data fields and construction-
     */
   final Kind fixedPropTypes[];
   final int wide, high;
@@ -27,6 +28,7 @@ public class SceneTypeFixed extends SceneType {
     wide = fixedLayoutGrid[0].length;
     high = fixedLayoutGrid.length;
   }
+  
   
   
   /**  Utility methods for either scene-generation or scene-insertion.
@@ -56,7 +58,7 @@ public class SceneTypeFixed extends SceneType {
     Kind type = propType(gx, gy);
     Tile at = scene.tileAt(tx, ty);
     boolean blockG = type == null ? false : type.blockPath();
-    boolean blockT = at   == null ? true  : at.blocked();
+    boolean blockT = at   == null ? true  : at  .blocked  ();
     
     //  TODO:  FIX THIS!
     return true;
@@ -73,15 +75,26 @@ public class SceneTypeFixed extends SceneType {
   }
   
   
-  void applyToScene(Scene scene, int offX, int offY, int resolution) {
+  void applyToScene(
+    Scene scene, int offX, int offY, int facing, int resolution
+  ) {
     offX -= (wide - resolution) / 2;
     offY -= (high - resolution) / 2;
+    
+    Mat2D rot = new Mat2D().setIdentity().rotateAndRound(facing * 45);
+    if (facing == E) { offY += high - 1; }
+    if (facing == W) { offX += wide - 1; }
+    if (facing == S) { offX += wide - 1; offY += high - 1; }
+    Vec2D temp = new Vec2D();
     
     for (Coord c : Visit.grid(0, 0, wide, high, 1)) {
       Kind type = propType(c.x, c.y);
       if (type == null) continue;
-      if (! scene.hasSpace(type, c.x + offX, c.y + offY)) continue;
-      scene.addProp(type, c.x + offX, c.y + offY);
+      
+      rot.transform(temp.set(c.x, c.y));
+      int sx = (int) (temp.x + offX), sy = (int) (temp.y + offY);
+      if (! scene.hasSpace(type, sx, sy, facing)) continue;
+      scene.addProp(type, sx, sy, facing);
     }
   }
   
@@ -93,10 +106,9 @@ public class SceneTypeFixed extends SceneType {
     size = Nums.max(wide, high) + 2;
     final Scene scene = new Scene(world, size);
     scene.setupScene(forTesting);
-    applyToScene(scene, 0, 0, size);
+    applyToScene(scene, 0, 0, N, size);
     return scene;
   }
 }
-
 
 

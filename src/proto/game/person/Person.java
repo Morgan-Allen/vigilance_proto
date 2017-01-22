@@ -1,10 +1,14 @@
 
 
 package proto.game.person;
+import java.awt.Graphics2D;
+
 import proto.common.*;
 import proto.game.world.*;
 import proto.game.scene.*;
 import proto.util.*;
+import proto.view.common.Surface;
+import proto.view.scene.SceneView;
 
 
 
@@ -366,7 +370,15 @@ public class Person extends Element {
     if (wariness   < 0.33f) alertDesc  = "Unwary"  ;
     return moraleDesc+", "+alertDesc;
   }
+  
+  
+  public void renderTo(Scene scene, SceneView view, Surface s, Graphics2D g) {
+    Vec3D pos = exactPosition();
+    view.renderAt(pos.x, pos.y, 1, 1, kind().sprite(), 0, null, g);
+  }
 }
+
+
 
 
 

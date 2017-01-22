@@ -143,6 +143,12 @@ public final class Nums {
   }
   
   
+  public static int roundUnsigned(float value, int unit) {
+    if (value < 0) return 0 - round(0 - value, unit, false);
+    else return round(value, unit, false);
+  }
+  
+  
   
   /**  Sampling methods for within 2D arrays of data-
     */

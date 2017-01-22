@@ -9,12 +9,12 @@ import java.io.*;
 
 
 public class Mat2D {
-	
-	public float
-	  r0c0, r0c1,
-	  r1c0, r1c1;
-	private static Mat2D tempM = new Mat2D();
-
+  
+  public float
+    r0c0, r0c1,
+    r1c0, r1c1;
+  private static Mat2D tempM = new Mat2D();
+  
   
   public Mat2D() {}
   
@@ -37,10 +37,7 @@ public class Mat2D {
 
   /**  Sets the matrix to the specif ied values, row first, column second.
     */
-  public Mat2D set(
-      float m00, float m01,
-      float m10, float m11)
-  {
+  public Mat2D set(float m00, float m01, float m10, float m11) {
     r0c0 = m00;
     r0c1 = m01;
     r1c0 = m10;
@@ -83,15 +80,14 @@ public class Mat2D {
   /**  Sets the matrix to all zeroes.  Returns itself.
     */
   public Mat2D setZero() {
-    r0c0 = r0c1 =
-      r1c0 = r1c1 = 0;
+    r0c0 = r0c1 = r1c0 = r1c1 = 0;
     return this;
   }
   
   
   /**  Rotates this matrix anticlockwise by the given value.
     */
-  public Mat2D rotate(float radians) {
+  public Mat2D rotateBy(float radians) {
     final float cr = Nums.cos(radians), sr = Nums.sin(radians);
     tempM.setIdentity();
     tempM.r0c0 = cr;
@@ -101,6 +97,17 @@ public class Mat2D {
     trans(tempM, tempM);
     return setTo(tempM);
   }
+  
+  
+  public Mat2D rotateAndRound(int degrees) {
+    rotateBy(Nums.toRadians(degrees));
+    r0c0 = Nums.roundUnsigned(r0c0, 1);
+    r0c1 = Nums.roundUnsigned(r0c1, 1);
+    r1c0 = Nums.roundUnsigned(r1c0, 1);
+    r1c1 = Nums.roundUnsigned(r1c1, 1);
+    return this;
+  }
+  
   
 
   /**  Multiplies the vector given in-place and return the same vector.

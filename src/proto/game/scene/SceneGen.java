@@ -435,9 +435,9 @@ public class SceneGen implements TileConstants {
     int atX, int atY, Kind kind, byte markVal, boolean replace
   ) {
     if (kind == null) return false;
-    if ((! replace) && (! scene.hasSpace(kind, atX, atY))) return false;
+    if ((! replace) && (! scene.hasSpace(kind, atX, atY, N))) return false;
     
-    scene.addProp(kind, atX, atY);
+    scene.addProp(kind, atX, atY, N);
     
     final int w = kind.wide(), h = kind.high();
     for (Coord c : Visit.grid(atX, atY, w, h, 1)) markup(c.x, c.y, markVal);

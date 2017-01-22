@@ -14,9 +14,19 @@ public class SceneTypeGrid extends SceneType {
   
   /**  Data fields, construction and save/load methods-
     */
+  public static enum WallType {
+    NONE, EXTERIOR, SAME_TYPE
+  };
+  final public static int
+    PRIORITY_HIGH   = 4,
+    PRIORITY_MEDIUM = 2,
+    PRIORITY_LOW    = 0
+  ;
+  
   public static class GridUnit {
-    SceneTypeFixed type;
     int ID;
+    SceneTypeFixed type;
+    WallType wallType;
     int priority, percent, minCount, maxCount;
   }
   
@@ -41,15 +51,9 @@ public class SceneTypeGrid extends SceneType {
   
   /**  Specifying sub-units for placement within the grid-
     */
-  final public static int
-    PRIORITY_HIGH   = 4,
-    PRIORITY_MEDIUM = 2,
-    PRIORITY_LOW    = 0
-  ;
-  
   public static GridUnit unit(
-    SceneTypeFixed type, int priority,
-    int percent, int minCount, int maxCount
+    SceneTypeFixed type, WallType wallType,
+    int priority, int percent, int minCount, int maxCount
   ) {
     GridUnit unit = new GridUnit();
     unit.type     = type;
@@ -62,12 +66,12 @@ public class SceneTypeGrid extends SceneType {
   
   
   public static GridUnit percentUnit(SceneTypeFixed type, int percent) {
-    return unit(type, PRIORITY_MEDIUM, percent, -1, -1);
+    return unit(type, WallType.SAME_TYPE, PRIORITY_MEDIUM, percent, -1, -1);
   }
   
   
   public static GridUnit numberUnit(SceneTypeFixed type, int number) {
-    return unit(type, PRIORITY_HIGH, -1, number, number);
+    return unit(type, WallType.SAME_TYPE, PRIORITY_HIGH, -1, number, number);
   }
   
   
@@ -86,7 +90,6 @@ public class SceneTypeGrid extends SceneType {
     int off = wallPad + 1;
     
     for (Coord c : Visit.grid(0, 0, gridSize, gridSize, 1)) {
-      
       int atX = off + (c.x * (resolution + wallPad));
       int atY = off + (c.y * (resolution + wallPad));
       
@@ -109,7 +112,7 @@ public class SceneTypeGrid extends SceneType {
       if (picked == null) continue;
       I.say("PICKED GRID UNIT "+picked.type+" AT "+atX+" "+atY);
       
-      picked.type.applyToScene(scene, atX, atY, resolution);
+      picked.type.applyToScene(scene, atX, atY, N, resolution);
       counts[picked.ID]++;
     }
     return scene;

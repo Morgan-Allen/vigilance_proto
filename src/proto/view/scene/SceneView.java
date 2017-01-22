@@ -136,8 +136,7 @@ public class SceneView extends UINode {
     //
     //  Then, render any props, persons, or special FX-
     for (Prop prop : scene.props()) {
-      Tile t = prop.origin();
-      renderAt(t.x, t.y, prop.kind(), prop.facing() * 90f, g);
+      prop.renderTo(scene, this, surface, g);
     }
     //
     //  Render enemy-sight on top of objects but beneath persons- but ONLY if
@@ -164,8 +163,7 @@ public class SceneView extends UINode {
     for (Person p : scene.persons()) {
       float fog = scene.fogAt(p.currentTile(), Person.Side.HEROES);
       if (fog <= 0 && ! GameSettings.debugScene) continue;
-      Vec3D pos = p.exactPosition();
-      renderAt(pos.x, pos.y, p.kind(), 0, g);
+      p.renderTo(scene, this, surface, g);
       visible.add(p);
     }
     for (Person p : visible) {
@@ -221,7 +219,9 @@ public class SceneView extends UINode {
     Tile hoverT = hasFocus ? scene.tileAt(hoverX, hoverY) : null;
     
     if (hoverT != null) {
-      renderAt(hoverT.x, hoverT.y, 1, 1, hoverBox, 0, null, g);
+      if (! hoverT.blocked()) {
+        renderAt(hoverT.x, hoverT.y, 1, 1, hoverBox, 0, null, g);
+      }
       Object hovered = topObjectAt(hoverT);
       boolean canDoAction = false;
       
@@ -247,17 +247,14 @@ public class SceneView extends UINode {
   }
   
   
-  void renderString(float px, float py, String s, Color c, Graphics2D g) {
+  public void renderString(
+    float px, float py, String s, Color c, Graphics2D g
+  ) {
     int x, y;
     x = vx + (int) ((px - 0.50f) * TILE_SIZE);
     y = vy + (int) ((py + 0.15f) * TILE_SIZE);
     g.setColor(c);
     g.drawString(s, x - zoomX, y - zoomY);
-  }
-  
-
-  void renderAt(float px, float py, Kind kind, float rotation, Graphics2D g) {
-    renderAt(px, py, kind.wide(), kind.high(), kind.sprite(), rotation, null, g);
   }
   
   
