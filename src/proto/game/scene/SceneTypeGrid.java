@@ -12,19 +12,19 @@ public class SceneTypeGrid extends SceneType {
   
   /**  Data fields, construction and save/load methods-
     */
-  public static enum WallType {
-    NONE, EXTERIOR, INCLUDED
-  };
   final public static int
     PRIORITY_HIGH   = 4,
     PRIORITY_MEDIUM = 2,
-    PRIORITY_LOW    = 0
+    PRIORITY_LOW    = 0,
+    WALL_NONE     = 0,
+    WALL_EXTERIOR = 1,
+    WALL_INTERIOR = 2
   ;
   
   public static class GridUnit {
     int ID;
     SceneTypeFixed type;
-    WallType wallType = WallType.EXTERIOR;
+    int wallType = WALL_EXTERIOR;
     int priority, percent, minCount, maxCount;
   }
   
@@ -54,26 +54,31 @@ public class SceneTypeGrid extends SceneType {
   /**  Specifying sub-units for placement within the grid-
     */
   public static GridUnit unit(
-    SceneTypeFixed type,
+    SceneTypeFixed type, int wallType,
     int priority, int percent, int minCount, int maxCount
   ) {
     GridUnit unit = new GridUnit();
-    unit.type     = type;
+    unit.type     = type    ;
+    unit.wallType = wallType;
     unit.priority = priority;
-    unit.percent  = percent;
+    unit.percent  = percent ;
     unit.minCount = minCount;
     unit.maxCount = maxCount;
     return unit;
   }
   
   
-  public static GridUnit percentUnit(SceneTypeFixed type, int percent) {
-    return unit(type, PRIORITY_MEDIUM, percent, -1, -1);
+  public static GridUnit percentUnit(
+    SceneTypeFixed type, int wallType, int percent
+  ) {
+    return unit(type, wallType, PRIORITY_MEDIUM, percent, -1, -1);
   }
   
   
-  public static GridUnit numberUnit(SceneTypeFixed type, int number) {
-    return unit(type, PRIORITY_HIGH, -1, number, number);
+  public static GridUnit numberUnit(
+    SceneTypeFixed type, int wallType, int number
+  ) {
+    return unit(type, wallType, PRIORITY_HIGH, -1, number, number);
   }
   
   
@@ -115,6 +120,7 @@ public class SceneTypeGrid extends SceneType {
   static class AreaWall {
     boolean indoor;
     GridArea side1, side2;
+    int wallTypeDiff;
     Batch <Coord> points = new Batch();
   }
   
@@ -200,7 +206,7 @@ public class SceneTypeGrid extends SceneType {
     }
     //
     //  Once all wall-points have been recorded, we populate the area with
-    //  actuall wall-objects accordingly, and punctuate with doors and windows.
+    //  actual wall-objects accordingly, and punctuate with doors and windows.
     for (AreaWall wall : g.walls) {
       for (Coord c : wall.points) {
         scene.addProp(borders, c.x, c.y, N);
@@ -215,7 +221,9 @@ public class SceneTypeGrid extends SceneType {
       if (! canDoor.empty()) {
         Coord d = (Coord) Rand.pickFrom(canDoor);
         Coord w = (Coord) Rand.pickFrom(canDoor);
-        scene.addProp(door, d.x, d.y, N);
+        if (wall.wallTypeDiff < 2) {
+          scene.addProp(door, d.x, d.y, N);
+        }
         if (w != d && ! wall.indoor) {
           scene.addProp(window, w.x, w.y, N);
         }
@@ -231,17 +239,18 @@ public class SceneTypeGrid extends SceneType {
   
   
   boolean tryRecordingWall(Coord p, GridArea from, GridArea other, SceneGen g) {
-    WallType forO = other == null ? WallType.NONE : other.unit.wallType;
-    WallType forF = from  == null ? WallType.NONE : from .unit.wallType;
+    int forO = other == null ? WALL_NONE : other.unit.wallType;
+    int forF = from  == null ? WALL_NONE : from .unit.wallType;
     
     boolean shouldWall = false;
     if (forO != forF) shouldWall = true;
-    else if (forO == WallType.INCLUDED) shouldWall = from.unit != other.unit;
+    else if (forO == WALL_INTERIOR) shouldWall = true;
     if (! shouldWall) return false;
     
     AreaWall wall = wallBetween(from, other, g);
     for (Coord c : wall.points) if (c.matches(p)) return false;
     wall.points.add(new Coord(p));
+    wall.wallTypeDiff = Nums.abs(forO - forF);
     return true;
   }
   
@@ -274,7 +283,7 @@ public class SceneTypeGrid extends SceneType {
   boolean sceneBlocked(int x, int y, Scene s) {
     Tile at = s.tileAt(x, y);
     if (at == null) return true;
-    return at.blocked();
+    return at.blocked() || at.opaque();
   }
   
 }

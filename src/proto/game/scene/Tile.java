@@ -80,6 +80,11 @@ public class Tile implements Session.Saveable {
   }
   
   
+  public boolean opaque() {
+    return prop != null && prop.blockSight();
+  }
+  
+  
   public Tile[] tilesAdjacent() {
     final Tile t[] = new Tile[T_INDEX.length];
     for (int n : T_INDEX) {

@@ -167,10 +167,10 @@ public class UrbanScenes {
     "urban scene", "type_urban_scene",
     4, 1,
     KIND_WALL, KIND_DOOR, KIND_WINDOW,
-    numberUnit (ROOM_BATHROOM , 1 ),
-    numberUnit (ROOM_MAIN_BAR , 1 ),
-    percentUnit(ROOM_POOL_AREA, 33),
-    percentUnit(ROOM_SEATING  , 67)
+    numberUnit (ROOM_BATHROOM , WALL_INTERIOR, 1 ),
+    numberUnit (ROOM_MAIN_BAR , WALL_EXTERIOR, 1 ),
+    percentUnit(ROOM_POOL_AREA, WALL_EXTERIOR, 33),
+    percentUnit(ROOM_SEATING  , WALL_EXTERIOR, 67)
   );
   
   final public static SceneType MANSION_SCENE = new SceneTypeCorridors(
@@ -182,11 +182,6 @@ public class UrbanScenes {
   );
   
 }
-
-
-
-
-
 
 
 
