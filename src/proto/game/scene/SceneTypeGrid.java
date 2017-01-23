@@ -35,7 +35,7 @@ public class SceneTypeGrid extends SceneType {
   public SceneTypeGrid(
     String name, String ID,
     int resolution, int wallPad,
-    Kind wallType, Kind doorType, Kind windowType,
+    Kind wallType, Kind doorType, Kind windowType, Kind floorType,
     GridUnit... units
   ) {
     super(name, ID);
@@ -45,6 +45,7 @@ public class SceneTypeGrid extends SceneType {
     this.borders = wallType;
     this.door    = doorType;
     this.window  = windowType;
+    this.floors  = floorType;
     int unitID = 0;
     for (GridUnit unit : units) unit.ID = unitID++;
   }
@@ -138,6 +139,9 @@ public class SceneTypeGrid extends SceneType {
     int off = wallPad + 1;
     int counts[] = new int[units.length];
     
+    //  TODO:  You need to select optimal facings as well- and iterate over
+    //  types before you iterate over locations.
+    
     for (Coord c : Visit.grid(0, 0, g.gridSize, g.gridSize, 1)) {
       int atX = off + (c.x * (resolution + wallPad));
       int atY = off + (c.y * (resolution + wallPad));
@@ -160,7 +164,8 @@ public class SceneTypeGrid extends SceneType {
       
       if (picked == null) continue;
       I.say("PICKED GRID UNIT "+picked.type+" AT "+atX+" "+atY);
-      picked.type.applyToScene(scene, atX, atY, N, resolution);
+      int pickFace = T_ADJACENT[Rand.index(4)];
+      picked.type.applyToScene(scene, atX, atY, pickFace, resolution);
       //
       //  
       GridArea area = new GridArea();
@@ -186,9 +191,9 @@ public class SceneTypeGrid extends SceneType {
     for (Coord p : Visit.grid(0, 0, scene.size, scene.size, 1)) {
       GridArea under = areaUnder(p.x, p.y, g);
       if (under != null) continue;
-      
       Batch <GridArea> nearB = new Batch(8);
       int numOutside = 0;
+      boolean walled = false;
       
       for (int dir : T_INDEX) {
         GridArea next = areaUnder(p.x + T_X[dir], p.y + T_Y[dir], g);
@@ -196,12 +201,15 @@ public class SceneTypeGrid extends SceneType {
         else numOutside++;
       }
       for (GridArea a : nearB) {
-        for (GridArea b : nearB) {
-          if (a != b) tryRecordingWall(p, a, b, g);
+        for (GridArea b : nearB) if (a != b) {
+          walled |= tryRecordingWall(p, a, b, g);
         }
         if (numOutside > 4) {
-          tryRecordingWall(p, a, null, g);
+          walled |= tryRecordingWall(p, a, null, g);
         }
+      }
+      if ((! walled) && (! nearB.empty())) {
+        scene.addProp(floors, p.x, p.y, N);
       }
     }
     //

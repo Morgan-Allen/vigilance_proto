@@ -56,12 +56,12 @@ public class DebugSceneWithLayout extends RunGame {
     //
     //  Generate the scene-
     SceneType sceneType = UrbanScenes.URBAN_SCENE;
-    Scene mission = sceneType.generateScene(world, 8, true);
+    Scene mission = sceneType.generateScene(world, 12, true);
     GameSettings.debugScene = true;
-    GameSettings.pauseScene = true;
+    //GameSettings.pauseScene = true;
     //
     //  Then introduce the agents themselves-
-    /*
+    //*
     final Base base = world.playerBase();
     Series <Person> active = base.roster();
     int across = (mission.size() - (active.size())) / 2;

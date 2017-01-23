@@ -284,8 +284,8 @@ public class SceneView extends UINode {
       AffineTransform t = AffineTransform.getTranslateInstance(
         x - zoomX, y - zoomY
       );
-      t.scale(w, h);
       t.rotate(angle);
+      t.scale(w, h);
       g.drawImage(sprite, t, null);
     }
     if (fill != null) {

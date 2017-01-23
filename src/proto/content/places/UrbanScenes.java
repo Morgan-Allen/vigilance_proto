@@ -158,7 +158,7 @@ public class UrbanScenes {
   final public static SceneType URBAN_SCENE = new SceneTypeGrid(
     "urban scene", "type_urban_scene",
     4, 1,
-    KIND_WALL, KIND_DOOR, KIND_WINDOW,
+    KIND_WALL, KIND_DOOR, KIND_WINDOW, KIND_FLOOR,
     numberUnit (ROOM_BATHROOM , WALL_INTERIOR, 1 ),
     numberUnit (ROOM_MAIN_BAR , WALL_EXTERIOR, 1 ),
     percentUnit(ROOM_POOL_AREA, WALL_EXTERIOR, 33),
