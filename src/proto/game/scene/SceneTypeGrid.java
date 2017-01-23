@@ -7,9 +7,6 @@ import proto.util.*;
 
 
 
-//  TODO:  You'll also need to ensure contiguous pathing between all the
-//  various sub-units (even if door-hacks are needed.)
-
 public class SceneTypeGrid extends SceneType {
   
   
@@ -175,12 +172,35 @@ public class SceneTypeGrid extends SceneType {
   
   
   void insertWallsAndDoors(Scene scene, SceneGen g) {
+    //
+    //  We visit every point in the grid, then visit all adjacent points and
+    //  keep a tally of nearby outdoor points and areas.  Points that border
+    //  on an area (including outside) that demand a partition will have that
+    //  point recorded as a wall.
     for (Coord p : Visit.grid(0, 0, scene.size, scene.size, 1)) {
-      checkForWall(p,  1,  0, g);
-      checkForWall(p,  0,  1, g);
-      checkForWall(p,  1,  1, g);
-      checkForWall(p, -1,  1, g);
+      GridArea under = areaUnder(p.x, p.y, g);
+      if (under != null) continue;
+      
+      Batch <GridArea> nearB = new Batch(8);
+      int numOutside = 0;
+      
+      for (int dir : T_INDEX) {
+        GridArea next = areaUnder(p.x + T_X[dir], p.y + T_Y[dir], g);
+        if (next != null) nearB.include(next);
+        else numOutside++;
+      }
+      for (GridArea a : nearB) {
+        for (GridArea b : nearB) {
+          if (a != b) tryRecordingWall(p, a, b, g);
+        }
+        if (numOutside > 4) {
+          tryRecordingWall(p, a, null, g);
+        }
+      }
     }
+    //
+    //  Once all wall-points have been recorded, we populate the area with
+    //  actuall wall-objects accordingly, and punctuate with doors and windows.
     for (AreaWall wall : g.walls) {
       for (Coord c : wall.points) {
         scene.addProp(borders, c.x, c.y, N);
@@ -192,25 +212,15 @@ public class SceneTypeGrid extends SceneType {
         if (canInsertDoor(c.x, c.y, 1, 0, scene)) canDoor.add(c);
         if (canInsertDoor(c.x, c.y, 0, 1, scene)) canDoor.add(c);
       }
-      //  TODO:  You also need to insert windows.
       if (! canDoor.empty()) {
         Coord d = (Coord) Rand.pickFrom(canDoor);
+        Coord w = (Coord) Rand.pickFrom(canDoor);
         scene.addProp(door, d.x, d.y, N);
+        if (w != d && ! wall.indoor) {
+          scene.addProp(window, w.x, w.y, N);
+        }
       }
     }
-  }
-  
-  
-  void checkForWall(
-    Coord p, int dx, int dy, SceneGen g
-  ) {
-    if (areaUnder(p.x, p.y, g) != null) return;
-    GridArea from  = areaUnder(p.x - dx, p.y - dy, g);
-    GridArea other = areaUnder(p.x + dx, p.y + dy, g);
-    if (! shouldWallBetween(from, other)) return;
-    AreaWall wall = wallBetween(from, other, g);
-    for (Coord c : wall.points) if (c.matches(p)) return;
-    wall.points.add(new Coord(p));
   }
   
   
@@ -220,12 +230,19 @@ public class SceneTypeGrid extends SceneType {
   }
   
   
-  boolean shouldWallBetween(GridArea from, GridArea other) {
+  boolean tryRecordingWall(Coord p, GridArea from, GridArea other, SceneGen g) {
     WallType forO = other == null ? WallType.NONE : other.unit.wallType;
     WallType forF = from  == null ? WallType.NONE : from .unit.wallType;
-    if (forO != forF) return true;
-    if (forO == WallType.INCLUDED) return from.unit != other.unit;
-    return false;
+    
+    boolean shouldWall = false;
+    if (forO != forF) shouldWall = true;
+    else if (forO == WallType.INCLUDED) shouldWall = from.unit != other.unit;
+    if (! shouldWall) return false;
+    
+    AreaWall wall = wallBetween(from, other, g);
+    for (Coord c : wall.points) if (c.matches(p)) return false;
+    wall.points.add(new Coord(p));
+    return true;
   }
   
   
@@ -237,23 +254,13 @@ public class SceneTypeGrid extends SceneType {
       if (w.side1 == b && w.side2 == a) return w;
     }
     AreaWall w = new AreaWall();
-    w.indoor = a == null || b == null;
+    w.indoor = a != null && b != null;
     w.side1 = a;
     w.side2 = b;
     if (a != null) a.walls.add(w);
     if (b != null) b.walls.add(w);
     g.walls.add(w);
     return w;
-  }
-  
-  
-  boolean checkOutside(int x, int y, Batch <GridArea> toWall) {
-    for (GridArea a : toWall) {
-      if ((x < a.minX - 1) || (x > a.minX + resolution)) continue;
-      if ((y < a.minY - 1) || (y > a.minY + resolution)) continue;
-      return false;
-    }
-    return true;
   }
   
   
@@ -271,7 +278,6 @@ public class SceneTypeGrid extends SceneType {
   }
   
 }
-
 
 
 
