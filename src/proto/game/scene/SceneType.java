@@ -108,6 +108,9 @@ public abstract class SceneType extends Index.Entry implements
     World world, int size, boolean forTesting
   );
   
+  public abstract void applyToScene(
+    Scene scene, int offX, int offY, int facing, int resolution
+  );
   
   
   /**  Rendering, debug and interface methods-

@@ -94,20 +94,12 @@ public class SceneTypeGrid extends SceneType {
     
     Scene scene = new Scene(world, size);
     scene.setupScene(forTesting);
-    
-    SceneGen gen = new SceneGen();
-    gen.scene = scene;
-    gen.gridSize = gridSize;
-    gen.areaMarkup = new GridArea[size][size];
-    
-    populateWithAreas(scene, gen);
-    insertWallsAndDoors(scene, gen);
+    applyToScene(scene, 1, 1, N, size);
     
     return scene;
   }
   
   
-
   static class GridArea {
     GridUnit unit;
     int ID;
@@ -128,23 +120,39 @@ public class SceneTypeGrid extends SceneType {
   
   static class SceneGen {
     Scene scene;
-    int gridSize;
+    int gridSize, offX, offY, limit;
     List <GridArea> areas = new List();
     List <AreaWall> walls = new List();
     GridArea areaMarkup[][];
   }
   
   
+  public void applyToScene(
+    Scene scene, int offX, int offY, int facing, int size
+  ) {
+    int gridSize = (size - wallPad) / (resolution + wallPad);
+    SceneGen gen = new SceneGen();
+    gen.scene      = scene;
+    gen.gridSize   = gridSize;
+    gen.offX       = offX;
+    gen.offY       = offY;
+    gen.limit      = size;
+    gen.areaMarkup = new GridArea[size][size];
+    
+    populateWithAreas(scene, gen);
+    insertWallsAndDoors(scene, gen);
+  }
+  
+  
   void populateWithAreas(Scene scene, SceneGen g) {
-    int off = wallPad + 1;
     int counts[] = new int[units.length];
     
     //  TODO:  You need to select optimal facings as well- and iterate over
     //  types before you iterate over locations.
     
     for (Coord c : Visit.grid(0, 0, g.gridSize, g.gridSize, 1)) {
-      int atX = off + (c.x * (resolution + wallPad));
-      int atY = off + (c.y * (resolution + wallPad));
+      int atX = g.offX + wallPad + (c.x * (resolution + wallPad));
+      int atY = g.offY + wallPad + (c.y * (resolution + wallPad));
       
       Pick <GridUnit> pick = new Pick();
       for (GridUnit unit : units) {
@@ -170,12 +178,12 @@ public class SceneTypeGrid extends SceneType {
       //  
       GridArea area = new GridArea();
       area.unit = picked;
-      area.ID = g.areas.size();
+      area.ID   = g.areas.size();
       area.minX = atX;
       area.minY = atY;
       g.areas.add(area);
       for (Coord m : Visit.grid(atX, atY, resolution, resolution, 1)) {
-        g.areaMarkup[m.x][m.y] = area;
+        g.areaMarkup[m.x - g.offX][m.y - g.offY] = area;
       }
       counts[picked.ID]++;
     }
@@ -188,7 +196,7 @@ public class SceneTypeGrid extends SceneType {
     //  keep a tally of nearby outdoor points and areas.  Points that border
     //  on an area (including outside) that demand a partition will have that
     //  point recorded as a wall.
-    for (Coord p : Visit.grid(0, 0, scene.size, scene.size, 1)) {
+    for (Coord p : Visit.grid(g.offX, g.offY, g.limit, g.limit, 1)) {
       GridArea under = areaUnder(p.x, p.y, g);
       if (under != null) continue;
       Batch <GridArea> nearB = new Batch(8);
@@ -241,7 +249,7 @@ public class SceneTypeGrid extends SceneType {
   
   
   GridArea areaUnder(int x, int y, SceneGen g) {
-    try { return g.areaMarkup[x][y]; }
+    try { return g.areaMarkup[x - g.offX][y - g.offY]; }
     catch (ArrayIndexOutOfBoundsException e) { return null; }
   }
   

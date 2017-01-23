@@ -20,13 +20,26 @@ public class SceneTypeCorridors extends SceneType {
   public Scene generateScene(World world, int size, boolean forTesting) {
     final Scene scene = new Scene(world, size);
     scene.setupScene(forTesting);
-    
-    final Box2D area = new Box2D(2, 2, size - 4, size - 4);
-    final SceneGenCorridors gen = new SceneGenCorridors(scene);
-    gen.populateAsRoot(this, area);
-    gen.printMarkup();
+    applyToScene(scene, 2, 2, N, size - 4);
     return scene;
   }
   
   
+  public void applyToScene(
+    Scene scene, int offX, int offY, int facing, int limit
+  ) {
+    final SceneGenCorridors gen = new SceneGenCorridors(scene);
+    final Box2D area = new Box2D(offX, offY, limit, limit);
+    gen.populateAsRoot(this, area);
+    gen.printMarkup();
+  }
+  
+  
+  
+  
+  
+  
 }
+
+
+

@@ -59,7 +59,7 @@ public class SceneTypeFixed extends SceneType {
     Kind type = propType(gx, gy);
     Tile at = scene.tileAt(tx, ty);
     boolean blockG = type == null ? false : type.blockLevel() > 0;
-    boolean blockT = at   == null ? true  : at  .blocked  ();
+    boolean blockT = at   == null ? true  : at.blocked();
     
     //  TODO:  FIX THIS!
     return true;
@@ -76,7 +76,7 @@ public class SceneTypeFixed extends SceneType {
   }
   
   
-  void applyToScene(
+  public void applyToScene(
     Scene scene, int offX, int offY, int facing, int resolution
   ) {
     offX -= (wide - resolution) / 2;
