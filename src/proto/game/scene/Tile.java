@@ -17,9 +17,8 @@ public class Tile implements Session.Saveable {
   final public Scene scene;
   final public int x, y;
   
-  private Prop prop;
   private Stack <Element> inside = new Stack();
-  private int blockState = -1;
+  private int blockState = -1, opacity = -1;
   
   Object flag;
   
@@ -36,7 +35,6 @@ public class Tile implements Session.Saveable {
     scene    = (Scene) s.loadObject();
     x        = s.loadInt();
     y        = s.loadInt();
-    prop     = (Prop) s.loadObject();
     s.loadObjects(inside);
   }
   
@@ -45,7 +43,6 @@ public class Tile implements Session.Saveable {
     s.saveObject(scene);
     s.saveInt(x);
     s.saveInt(y);
-    s.saveObject(prop);
     s.saveObjects(inside);
   }
   
@@ -53,13 +50,13 @@ public class Tile implements Session.Saveable {
   
   /**  Public query methods-
     */
-  public Prop prop() {
-    return prop;
+  public Series <Element> inside() {
+    return inside;
   }
   
   
-  public Series <Element> inside() {
-    return inside;
+  public Element topInside() {
+    return inside.last();
   }
   
   
@@ -73,15 +70,19 @@ public class Tile implements Session.Saveable {
   public boolean blocked() {
     if (blockState == -1) {
       blockState = 0;
-      if (prop != null && prop.blockPath()) blockState = 1;
-      for (Element p : inside) if (p.blockPath()) blockState = 1;
+      opacity = 0;
+      for (Element p : inside) {
+        if (p.blockLevel() == Kind.BLOCK_FULL) blockState = 1;
+        if (p.blockSight()) opacity = 1;
+      }
     }
     return blockState == 1;
   }
   
   
   public boolean opaque() {
-    return prop != null && prop.blockSight();
+    if (blockState == -1) blocked();
+    return opacity == 1;
   }
   
   
@@ -104,12 +105,6 @@ public class Tile implements Session.Saveable {
   }
   
   
-  public void setProp(Prop prop) {
-    this.prop = prop;
-    blockState = -1;
-  }
-  
-  
   
   /**  Rendering, debug and interface methods-
     */
@@ -117,8 +112,6 @@ public class Tile implements Session.Saveable {
     return "Tile at "+x+"|"+y;
   }
 }
-
-
 
 
 

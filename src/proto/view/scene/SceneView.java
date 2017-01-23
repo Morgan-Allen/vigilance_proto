@@ -135,7 +135,16 @@ public class SceneView extends UINode {
     }
     //
     //  Then, render any props, persons, or special FX-
+    final List <Prop> propsShown = new List <Prop> () {
+      protected float queuePriority(Prop r) {
+        return r.renderPriority();
+      }
+    };
     for (Prop prop : scene.props()) {
+      propsShown.add(prop);
+    }
+    propsShown.queueSort();
+    for (Prop prop : propsShown) {
       prop.renderTo(scene, this, surface, g);
     }
     //
@@ -293,7 +302,7 @@ public class SceneView extends UINode {
       final Person p = (Person) e;
       pick.compare(p, p.health.conscious() ? 1.5f : 1);
     }
-    pick.compare(at.prop(), 0.5f);
+    pick.compare(at.topInside(), 0.5f);
     pick.compare(at, 0.1f);
     return pick.result();
   }

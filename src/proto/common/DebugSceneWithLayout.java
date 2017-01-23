@@ -18,6 +18,7 @@ public class DebugSceneWithLayout extends RunGame {
   
   final public static SceneType FIXED_TEST_SCENE = new SceneTypeFixed(
     "fixed test scene", "type_urban_scene_fixed",
+    KIND_FLOOR,
     new Kind[] {
       KIND_FLOOR     ,
       KIND_WALL      ,

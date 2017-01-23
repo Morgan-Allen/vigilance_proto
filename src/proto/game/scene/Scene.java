@@ -246,7 +246,7 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
       
       Tile t = tiles[x][y];
       if (t == dest) break;
-      if (t != orig && t.prop() != null && t.prop().kind.blockSight()) {
+      if (t.opaque()) {
         sight *= 0;
       }
       if (sight == 0) break;
@@ -310,12 +310,14 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     Prop prop = new Prop(type, world);
     Tile first = null;
     
-    for (Coord c : coordsUnder(type, x, y, facing)) {
+    for (Coord c : Prop.coordsUnder(type, x, y, facing)) {
       Tile under = tileAt(c.x, c.y);
       if (under == null) continue;
-      final Prop oldProp = under.prop();
-      if (oldProp != null) removeProp(oldProp);
-      under.setProp(prop);
+      
+      for (Element e : under.inside()) if (e.wouldBlock(type)) {
+        removeProp((Prop) e);
+      }
+      under.setInside(prop, true);
       if (first == null) first = under;
     }
     
@@ -328,9 +330,9 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   
   public boolean removeProp(Prop prop) {
     Tile at = prop.origin();
-    for (Coord c : coordsUnder(prop.kind(), at.x, at.y, prop.facing())) {
+    for (Coord c : Prop.coordsUnder(prop.kind(), at.x, at.y, prop.facing())) {
       Tile under = tileAt(c.x, c.y);
-      if (under.prop() == prop) under.setProp(null);
+      if (under != null) under.setInside(prop, false);
     }
     props.remove(prop);
     return true;
@@ -338,27 +340,12 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   
   
   public boolean hasSpace(Kind type, int x, int y, int facing) {
-    for (Coord c : coordsUnder(type, x, y, facing)) {
+    for (Coord c : Prop.coordsUnder(type, x, y, facing)) {
       Tile under = tileAt(c.x, c.y);
       if (under == null) return false;
-      if (under.prop() == null) continue;
-      final Kind uK = under.prop().kind();
-      if (uK.blockPath() || uK.blockSight()) return false;
+      for (Element e : under.inside()) if (e.wouldBlock(type)) return false;
     }
     return true;
-  }
-  
-  
-  public Visit <Coord> coordsUnder(Kind type, int x, int y, int facing) {
-    int w = type.wide(), h = type.high();
-    if (facing == W || facing == E) {
-      w = type.high();
-      h = type.wide();
-    }
-    if (facing == W) x -= w - 1;
-    if (facing == E) y -= h - 1;
-    if (facing == S) { y -= h - 1; x -= w - 1; }
-    return Visit.grid(x, y, w, h, 1);
   }
   
   

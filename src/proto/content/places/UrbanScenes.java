@@ -16,60 +16,60 @@ public class UrbanScenes {
     KIND_WALL = Kind.ofProp(
       "Wall", "prop_wall_urban",
       IMG_DIR+"sprite_wall.png",
-      1, 1, true, true
+      1, 1, Kind.BLOCK_FULL, true
     ),
     KIND_FLOOR = Kind.ofProp(
       "Floor", "prop_floor_urban",
       IMG_DIR+"sprite_floor.png",
-      1, 1, false, false
+      1, 1, Kind.BLOCK_NONE, false
     ),
     KIND_DOOR = Kind.ofProp(
       "Door", "prop_door_urban",
       IMG_DIR+"sprite_door.png",
-      1, 1, false, true,
+      1, 1, Kind.BLOCK_PARTIAL, true,
       Facilities.ALARMED, 1
     ),
     KIND_WINDOW = Kind.ofProp(
       "Window", "prop_window_urban",
       IMG_DIR+"sprite_window.png",
-      1, 1, true, false,
+      1, 1, Kind.BLOCK_FULL, false,
       Facilities.ALARMED, 1
     ),
     
     KIND_POOL_TABLE = Kind.ofProp(
       "Pool Table", "prop_pool_table_urban",
       IMG_DIR+"sprite_pool_table.png",
-      3, 2, true, false
+      3, 2, Kind.BLOCK_FULL, false
     ),
     KIND_BAR_TABLE = Kind.ofProp(
       "Bar Table", "prop_bar_table_urban",
       IMG_DIR+"sprite_bar_table.png",
-      2, 1, true, false
+      2, 1, Kind.BLOCK_FULL, false
     ),
     KIND_BAR_STOOL = Kind.ofProp(
       "Bar Stool", "prop_bar_stool_urban",
       IMG_DIR+"sprite_bar_stool.png",
-      1, 1, false, false
+      1, 1, Kind.BLOCK_PARTIAL, false
     ),
     KIND_BAR_STOOLS = Kind.ofProp(
       "Bar Stools", "prop_bar_stools_urban",
       IMG_DIR+"sprite_bar_stools.png",
-      1, 1, false, false
+      1, 1, Kind.BLOCK_PARTIAL, false
     ),
     KIND_BAR_TAPS = Kind.ofProp(
       "Bar Taps", "prop_bar_taps_urban",
       IMG_DIR+"sprite_bar_taps.png",
-      3, 2, true, false
+      3, 2, Kind.BLOCK_FULL, false
     ),
     KIND_JUKEBOX = Kind.ofProp(
       "Jukebox", "prop_jukebox_urban",
       IMG_DIR+"sprite_jukebox.png",
-      1, 1, true, true
+      1, 1, Kind.BLOCK_FULL, true
     ),
     KIND_PINBALL_MACHINE = Kind.ofProp(
       "Pinball Machine", "prop_pinball_machine_urban",
       IMG_DIR+"sprite_pinball_machine.png",
-      1, 1, true, true
+      1, 1, Kind.BLOCK_FULL, true
     ),
     BAR_ROOM_PROP_TYPES[] = {
       KIND_FLOOR,
@@ -88,38 +88,32 @@ public class UrbanScenes {
   
   final public static SceneTypeFixed ROOM_MAIN_BAR = new SceneTypeFixed(
     "main bar", "type_main_bar_urban",
-    BAR_ROOM_PROP_TYPES,
+    KIND_FLOOR, BAR_ROOM_PROP_TYPES,
     new byte[][] {
-      { 0, 0, 0, 0, 0, 0 },
-      { 0, 0, 0, 0, 0, 0 },
-      { 0, 7, 6, 7, 7, 0 },
-      { 0, 8, 8, 8, 1, 0 },
-      { 0, 8, 8, 8, 1, 0 },
-      { 1, 1, 1, 1, 1, 1 },
+      { 0, 0, 0, 0 },
+      { 7, 6, 7, 7 },
+      { 8, 8, 8, 1 },
+      { 8, 8, 8, 1 },
     }
   );
   final public static SceneTypeFixed ROOM_POOL_AREA = new SceneTypeFixed(
     "pool area", "type_pool_area_urban",
-    BAR_ROOM_PROP_TYPES,
+    KIND_FLOOR, BAR_ROOM_PROP_TYPES,
     new byte[][] {
-      { 0, 0, 0, 0, 0, 0 },
-      { 0, 0, 0, 0, 0, 0 },
-      { 0, 4, 4, 4, 0, 0 },
-      { 0, 4, 4, 4, 0, 0 },
-      { 0, 0, 0, 0, 0, 0 },
-      { 0, 0, 0, 0, 0, 0 },
+      { 0, 0, 0, 0 },
+      { 4, 4, 4, 0 },
+      { 4, 4, 4, 0 },
+      { 0, 0, 0, 0 },
     }
   );
   final public static SceneTypeFixed ROOM_SEATING = new SceneTypeFixed(
     "seating", "type_seating_urban",
-    BAR_ROOM_PROP_TYPES,
+    KIND_FLOOR, BAR_ROOM_PROP_TYPES,
     new byte[][] {
-      { 0, 0, 0, 0, 0, 0 },
-      { 0, 6, 6, 0, 9, 0 },
-      { 0, 5, 5, 0, 0, 0 },
-      { 0, 7, 6, 0, 1, 0 },
-      { 0, 0, 0, 0, 10, 0 },
-      { 0, 0, 0, 0, 0, 0 },
+      { 6, 6, 0, 9 },
+      { 5, 5, 0, 0 },
+      { 7, 6, 0, 1 },
+      { 0, 0, 0, 10 },
     }
   );
   
@@ -128,17 +122,17 @@ public class UrbanScenes {
     KIND_BATHROOM_FLOOR = Kind.ofProp(
       "Bathroom Floor", "prop_bathroom_floor_urban",
       IMG_DIR+"sprite_bathroom_floor.png",
-      1, 1, false, false
+      1, 1, Kind.BLOCK_NONE, false
     ),
     KIND_BATHROOM_STALL = Kind.ofProp(
       "Bathroom Stall", "prop_bathroom_stall_urban",
       IMG_DIR+"sprite_bathroom_stall.png",
-      2, 1, true, true
+      2, 1, Kind.BLOCK_FULL, true
     ),
     KIND_BASIN = Kind.ofProp(
       "Basin", "prop_basin_urban",
       IMG_DIR+"sprite_basin.png",
-      1, 1, false, false
+      1, 1, Kind.BLOCK_PARTIAL, false
     ),
     BATHROOM_PROP_TYPES[] = {
       KIND_BATHROOM_FLOOR,
@@ -152,14 +146,12 @@ public class UrbanScenes {
   
   final public static SceneTypeFixed ROOM_BATHROOM = new SceneTypeFixed(
     "bathroom", "type_bathroom_urban",
-    BATHROOM_PROP_TYPES,
+    KIND_BATHROOM_FLOOR, BATHROOM_PROP_TYPES,
     new byte[][] {
-      { 1, 1, 1, 1, 1, 1 },
-      { 1, 5, 0, 0, 0, 1 },
-      { 1, 0, 0, 4, 4, 1 },
-      { 1, 1, 0, 4, 4, 1 },
-      { 1, 5, 0, 4, 4, 1 },
-      { 1, 1, 1, 1, 1, 1 },
+      { 5, 0, 0, 0},
+      { 0, 0, 4, 4},
+      { 1, 0, 4, 4},
+      { 5, 0, 4, 4},
     }
   );
   

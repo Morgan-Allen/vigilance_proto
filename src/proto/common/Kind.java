@@ -30,6 +30,10 @@ public class Kind extends Index.Entry implements Session.Saveable {
     SUBTYPE_HERO     = 3,
     SUBTYPE_BOSS     = 4
   ;
+  final public static int
+    BLOCK_NONE    = 0,
+    BLOCK_PARTIAL = 1,
+    BLOCK_FULL    = 2;
   
   String name;
   String defaultInfo;
@@ -39,7 +43,7 @@ public class Kind extends Index.Entry implements Session.Saveable {
   int type, subtype;
   int wide, high;
   boolean blockSight;
-  boolean blockPath;
+  int blockLevel;
   
   Table <Object, Integer> traitLevels = new Table();
   Trait    baseTraits  [] = new Trait   [0];
@@ -74,7 +78,8 @@ public class Kind extends Index.Entry implements Session.Saveable {
     Kind k = new Kind(name, ID, defaultInfo, TYPE_PERSON);
     k.subtype = subtype;
     k.wide = k.high = 1;
-    k.blockPath = k.blockSight = false;
+    k.blockSight = false;
+    k.blockLevel = BLOCK_PARTIAL;
     initStatsFor(k, initStats);
     
     k.sprite = loadImage(spritePath);
@@ -88,13 +93,13 @@ public class Kind extends Index.Entry implements Session.Saveable {
   
   public static Kind ofProp(
     String name, String ID, String spritePath,
-    int wide, int high, boolean blockPath, boolean blockSight,
+    int wide, int high, int blockLevel, boolean blockSight,
     Object... initStats
   ) {
     Kind k = new Kind(name, ID, "", TYPE_PROP);
     k.wide = wide;
     k.high = high;
-    k.blockPath  = blockPath ;
+    k.blockLevel = blockLevel;
     k.blockSight = blockSight;
     initStatsFor(k, initStats);
     
@@ -167,7 +172,7 @@ public class Kind extends Index.Entry implements Session.Saveable {
   public int high() { return high; }
   public int subtype() { return subtype; }
   public boolean blockSight() { return blockSight; }
-  public boolean blockPath () { return blockPath ; }
+  public int blockLevel() { return blockLevel; }
   
   public String name  () { return name  ; }
   public Image  sprite() { return sprite; }

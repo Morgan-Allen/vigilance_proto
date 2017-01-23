@@ -3,6 +3,7 @@
 package proto.game.world;
 import proto.common.*;
 import proto.game.event.*;
+import proto.game.scene.Prop;
 import proto.util.*;
 
 import java.awt.Image;
@@ -122,13 +123,24 @@ public class Element implements Session.Saveable {
   
   /**  Scene support methods-
     */
-  public boolean blockPath() {
-    return kind.blockPath();
+  public int blockLevel() {
+    return kind.blockLevel();
+  }
+  
+  
+  public boolean blocksFull() {
+    return blockLevel() == Kind.BLOCK_FULL;
   }
   
   
   public boolean blockSight() {
     return kind.blockSight();
+  }
+  
+  
+  public boolean wouldBlock(Kind other) {
+    if (kind().type() != other.type()) return false;
+    return kind().blockLevel() > 0 == other.blockLevel() > 0;
   }
   
   

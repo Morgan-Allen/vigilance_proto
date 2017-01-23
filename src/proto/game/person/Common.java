@@ -53,7 +53,7 @@ public class Common {
       
       public boolean allowsTarget(Object target, Scene scene, Person acting) {
         if (target instanceof Prop) {
-          return ! ((Prop) target).kind().blockPath();
+          return ! ((Prop) target).blocksFull();
         }
         return target instanceof Tile;
       }

@@ -50,6 +50,23 @@ public class Prop extends Element implements TileConstants {
   
   
   
+  /**  Placement, removal and occupation methods-
+    */
+  public static Visit <Coord> coordsUnder(Kind type, int x, int y, int facing) {
+    int w = type.wide(), h = type.high();
+    if (facing == W || facing == E) {
+      w = type.high();
+      h = type.wide();
+    }
+    if (facing == W) x -= w - 1;
+    if (facing == E) y -= h - 1;
+    if (facing == S) { y -= h - 1; x -= w - 1; }
+    return Visit.grid(x, y, w, h, 1);
+  }
+  
+  
+  
+  
   /**  Rendering, debug and interface methods-
     */
   public void renderTo(Scene scene, SceneView view, Surface s, Graphics2D g) {
@@ -62,20 +79,12 @@ public class Prop extends Element implements TileConstants {
     
     view.renderAt(midX, midY, w, h, kind().sprite(), facing * -45, null, g);
   }
+  
+  
+  public int renderPriority() {
+    return blockLevel();
+  }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
