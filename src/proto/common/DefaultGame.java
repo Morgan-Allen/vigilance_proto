@@ -20,8 +20,8 @@ public class DefaultGame extends RunGame {
     DEFAULT_SAVE_PATH = "saves/main_save.vgl";
   
   
-  DefaultGame() {
-    super(DEFAULT_SAVE_PATH);
+  public static void main(String args[]) {
+    runGame(new DebugScene(), DEFAULT_SAVE_PATH);
   }
   
   

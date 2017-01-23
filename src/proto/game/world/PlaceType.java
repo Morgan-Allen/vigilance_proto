@@ -41,7 +41,6 @@ public class PlaceType extends Kind {
     this.buildCost = buildCost;
     this.buildTime = buildTime;
     initStatsFor(this, initStats);
-    
     this.sceneType = sceneType;
   }
   

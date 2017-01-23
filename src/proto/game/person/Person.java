@@ -56,7 +56,7 @@ public class Person extends Element {
     for (int n = 0; n < kind.baseEquipped().length; n++) {
       final ItemType type = kind.baseEquipped()[n];
       final int freeSlotID = gear.nextFreeSlotID(type.slotType);
-      gear.equipItem(new Item(type, world), freeSlotID);
+      gear.equipItem(type, freeSlotID);
     }
     
     if      (kind.subtype() == Kind.SUBTYPE_HERO    ) side = Side.HEROES   ;

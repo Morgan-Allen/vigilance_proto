@@ -13,14 +13,6 @@ import static proto.content.places.UrbanScenes.*;
 public class Facilities {
   
   
-  final public static Trait REINFORCED = new Trait(
-    "Reinforced", "trait_reinforced", null, ""
-  );
-  final public static Trait ALARMED = new Trait(
-    "Alarmed", "trait_alarmed", null, ""
-  );
-  
-  
   final public static PlaceType MANOR = new PlaceType(
     "Manor", "base_type_manor",
     null, "",

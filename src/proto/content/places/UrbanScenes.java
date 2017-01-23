@@ -27,13 +27,13 @@ public class UrbanScenes {
       "Door", "prop_door_urban",
       IMG_DIR+"sprite_door.png",
       1, 1, Kind.BLOCK_PARTIAL, true,
-      Facilities.ALARMED, 1
+      PlacesCommon.ALARMED, 1
     ),
     KIND_WINDOW = Kind.ofProp(
       "Window", "prop_window_urban",
       IMG_DIR+"sprite_window.png",
       1, 1, Kind.BLOCK_FULL, false,
-      Facilities.ALARMED, 1
+      PlacesCommon.ALARMED, 1
     ),
     
     KIND_POOL_TABLE = Kind.ofProp(

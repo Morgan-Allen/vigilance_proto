@@ -21,24 +21,25 @@ public abstract class RunGame extends JFrame implements ActionListener {
   World world;
   
   
-  public RunGame(String savePath) {
-    this.savePath = savePath;
-    
-    setupAssets();
-    initUI();
+  protected static void runGame(final RunGame game, final String savePath) {
+    EventQueue.invokeLater(new Runnable() {
+      public void run() {
+        game.savePath = savePath;
+        game.setupAssets();
+        game.initUI();
 
-    if (! attemptReload(savePath)) {
-      this.world = setupWorld();
-    }
-    
-    Timer timer = new Timer(1000 / FRAME_RATE, this);
-    timer.start();
+        if (! game.attemptReload(game.savePath)) {
+          game.world = game.setupWorld();
+        }
+        
+        Timer timer = new Timer(1000 / FRAME_RATE, game);
+        timer.start();
+        game.setVisible(true);
+      }
+    });
   }
   
   
-  
-  /**  Support methods for saving and loading-
-    */
   private void setupAssets() {
     //  TODO:  Throw up a loading screen?
     Assets.compileAssetList("proto");
@@ -53,19 +54,6 @@ public abstract class RunGame extends JFrame implements ActionListener {
     this.world = (World) s.loaded()[0];
     if (world != null) world.attachToGame(this, savePath);
     return true;
-  }
-  
-  
-  
-  /**  Some utility methods for thread-execution:
-    */
-  public static void main(String args[]) {
-    EventQueue.invokeLater(new Runnable() {
-      public void run() {
-        DebugSceneWithLayout ex = new DebugSceneWithLayout();
-        ex.setVisible(true);
-      }
-    });
   }
   
   

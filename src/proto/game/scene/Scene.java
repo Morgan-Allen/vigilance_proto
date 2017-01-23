@@ -246,7 +246,7 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
       
       Tile t = tiles[x][y];
       if (t == dest) break;
-      if (t.opaque()) {
+      if (t.opaque() && t != p.currentTile()) {
         sight *= 0;
       }
       if (sight == 0) break;

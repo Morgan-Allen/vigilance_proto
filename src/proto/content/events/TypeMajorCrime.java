@@ -46,9 +46,8 @@ public abstract class TypeMajorCrime extends StepType {
     
     Place venue = (Place) step.need(Needs.VENUE);
     if (venue == null) return 0;
-    
-    boolean reinforced = venue.kind().hasFurnitureType(Facilities.REINFORCED);
-    boolean alarmed    = venue.kind().hasFurnitureType(Facilities.ALARMED   );
+    boolean reinforced = venue.kind().hasFurnitureType(PlacesCommon.REINFORCED);
+    boolean alarmed    = venue.kind().hasFurnitureType(PlacesCommon.ALARMED   );
     
     //  TODO:  Don't bother with the mutual exclusion- just have the needs-set
     //  tweaked by the rigors of individual sub-classes and/or the properties

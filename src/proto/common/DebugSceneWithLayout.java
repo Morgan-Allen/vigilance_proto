@@ -43,8 +43,8 @@ public class DebugSceneWithLayout extends RunGame {
   
   
   
-  DebugSceneWithLayout() {
-    super("saves/debug_fixed_scene");
+  public static void main(String args[]) {
+    runGame(new DebugSceneWithLayout(), "saves/debug_fixed_scene");
   }
   
   
@@ -55,13 +55,12 @@ public class DebugSceneWithLayout extends RunGame {
     DefaultGame.initDefaultCrime  (world);
     //
     //  Generate the scene-
-    SceneType sceneType = UrbanScenes.URBAN_SCENE;
-    Scene mission = sceneType.generateScene(world, 12, true);
+    SceneType sceneType = FIXED_TEST_SCENE;
+    Scene mission = sceneType.generateScene(world, 8, true);
     GameSettings.debugScene = true;
     //GameSettings.pauseScene = true;
     //
     //  Then introduce the agents themselves-
-    //*
     final Base base = world.playerBase();
     Series <Person> active = base.roster();
     int across = (mission.size() - (active.size())) / 2;
@@ -71,13 +70,22 @@ public class DebugSceneWithLayout extends RunGame {
       p.addAssignment(mission);
       mission.enterScene(p, across++, 0);
     }
-    //*/
+    
+    //
+    //  TODO:  Then introduce some random goons?
+    
     //
     //  Then enter and return-
     world.enterScene(mission);
     return world;
   }
 }
+
+
+
+
+
+
 
 
 

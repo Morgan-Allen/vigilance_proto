@@ -10,15 +10,13 @@ import proto.content.events.*;
 import proto.content.items.*;
 import proto.content.places.*;
 
-import java.awt.EventQueue;
-
 
 
 public class DebugScene extends RunGame {
   
   
-  DebugScene() {
-    super("saves/debug_scene");
+  public static void main(String args[]) {
+    runGame(new DebugScene(), "saves/debug_scene");
   }
   
   
@@ -62,25 +60,18 @@ public class DebugScene extends RunGame {
     final Base HQ = world.playerBase();
     Task guarding = file.investigationOptions().first();
     for (Person p : HQ.roster()) {
-      p.gear.equipItem(Gadgets.BATARANGS  , PersonGear.SLOT_WEAPON, HQ);
-      p.gear.equipItem(Gadgets.KEVLAR_VEST, PersonGear.SLOT_ARMOUR, HQ);
+      p.gear.equipItem(Gadgets.WING_BLADES, PersonGear.SLOT_WEAPON);
+      p.gear.equipItem(Gadgets.KEVLAR_VEST, PersonGear.SLOT_ARMOUR);
       p.updateOnBase(0);
       guarding.setAssigned(p, true);
     }
     guarding.setCompleted(true);
-    
-    SceneView view = world.view().sceneView();
-    view.debugMode = true;
+    GameSettings.debugScene = true;
     //*/
     
     return world;
   }
 }
-
-
-
-
-
 
 
 

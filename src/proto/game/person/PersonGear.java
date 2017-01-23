@@ -91,6 +91,11 @@ public class PersonGear {
     return itemInSlot(slotID) != null;
   }
   
+  
+  public void equipItem(ItemType kind, int slotID) {
+    equipItem(new Item(kind, person.world()), slotID);
+  }
+  
 
   public void equipItem(Item item, int slotID) {
     equipItem(item, slotID, null);
