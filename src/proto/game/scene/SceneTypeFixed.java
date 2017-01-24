@@ -20,14 +20,20 @@ public class SceneTypeFixed extends SceneType {
   
   public SceneTypeFixed(
     String name, String ID,
-    Kind floor, Kind propTypes[], byte typeGrid[][]
+    Kind floor, Kind propTypes[], int wide, int high, byte typeGrid[][]
   ) {
-    super(name, ID);
-    fixedPropTypes = propTypes;
+    super(
+      name, ID,
+      MIN_SIZE, Nums.max(wide, high),
+      MAX_SIZE, Nums.max(wide, high)
+    );
+    fixedPropTypes  = propTypes;
     fixedLayoutGrid = typeGrid;
-    this.floors = floor;
-    wide = fixedLayoutGrid[0].length;
-    high = fixedLayoutGrid.length;
+    this.floors     = floor;
+    this.wide       = wide;
+    this.high       = high;
+    if (wide != typeGrid[0].length) I.complain("WRONG WIDTH" );
+    if (high != typeGrid   .length) I.complain("WRONG HEIGHT");
   }
   
   

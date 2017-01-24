@@ -89,7 +89,7 @@ public class UrbanScenes {
   final public static SceneTypeFixed ROOM_MAIN_BAR = new SceneTypeFixed(
     "main bar", "type_main_bar_urban",
     KIND_FLOOR, BAR_ROOM_PROP_TYPES,
-    new byte[][] {
+    4, 4, new byte[][] {
       { 0, 0, 0, 0 },
       { 7, 6, 7, 7 },
       { 8, 8, 8, 1 },
@@ -99,7 +99,7 @@ public class UrbanScenes {
   final public static SceneTypeFixed ROOM_POOL_AREA = new SceneTypeFixed(
     "pool area", "type_pool_area_urban",
     KIND_FLOOR, BAR_ROOM_PROP_TYPES,
-    new byte[][] {
+    4, 4, new byte[][] {
       { 0, 0, 0, 0 },
       { 4, 4, 4, 0 },
       { 4, 4, 4, 0 },
@@ -109,7 +109,7 @@ public class UrbanScenes {
   final public static SceneTypeFixed ROOM_SEATING = new SceneTypeFixed(
     "seating", "type_seating_urban",
     KIND_FLOOR, BAR_ROOM_PROP_TYPES,
-    new byte[][] {
+    4, 4, new byte[][] {
       { 6, 6, 0, 9 },
       { 5, 5, 0, 0 },
       { 7, 6, 0, 1 },
@@ -147,7 +147,7 @@ public class UrbanScenes {
   final public static SceneTypeFixed ROOM_BATHROOM = new SceneTypeFixed(
     "bathroom", "type_bathroom_urban",
     KIND_BATHROOM_FLOOR, BATHROOM_PROP_TYPES,
-    new byte[][] {
+    4, 4, new byte[][] {
       { 5, 0, 0, 0},
       { 0, 0, 4, 4},
       { 1, 0, 4, 4},
@@ -157,7 +157,7 @@ public class UrbanScenes {
   
   final public static SceneType URBAN_SCENE = new SceneTypeGrid(
     "urban scene", "type_urban_scene",
-    4, 1,
+    4, 4, true,
     KIND_WALL, KIND_DOOR, KIND_WINDOW, KIND_FLOOR,
     numberUnit (ROOM_BATHROOM , WALL_INTERIOR, 1 ),
     numberUnit (ROOM_MAIN_BAR , WALL_EXTERIOR, 1 ),

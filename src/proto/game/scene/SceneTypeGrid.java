@@ -28,19 +28,24 @@ public class SceneTypeGrid extends SceneType {
     int priority, percent, minCount, maxCount;
   }
   
-  final int resolution, wallPad;
+  final int resolution;
+  final boolean thickWalls;
   final GridUnit units[];
   
   
   public SceneTypeGrid(
     String name, String ID,
-    int resolution, int wallPad,
+    int resolution, int maxUnitSize, boolean thickWalls,
     Kind wallType, Kind doorType, Kind windowType, Kind floorType,
     GridUnit... units
   ) {
-    super(name, ID);
+    super(
+      name, ID,
+      MIN_SIZE, resolution * 2,
+      MAX_SIZE, (maxUnitSize > 1 ? (resolution * maxUnitSize) : -1)
+    );
     this.resolution = resolution;
-    this.wallPad    = wallPad;
+    this.thickWalls = thickWalls;
     this.units      = units;
     this.borders = wallType;
     this.door    = doorType;
@@ -89,7 +94,7 @@ public class SceneTypeGrid extends SceneType {
   public Scene generateScene(World world, int size, boolean forTesting) {
     I.say("GENERATING GRID SCENE "+this);
     
-    final int gridSize = size / resolution;
+    final int gridSize = size / resolution, wallPad = thickWalls ? 1 : 0;
     size = (gridSize * resolution) + ((gridSize + 1) * wallPad) + 2;
     
     Scene scene = new Scene(world, size);
@@ -130,6 +135,7 @@ public class SceneTypeGrid extends SceneType {
   public void applyToScene(
     Scene scene, int offX, int offY, int facing, int size
   ) {
+    int wallPad = thickWalls ? 1 : 0;
     int gridSize = (size - wallPad) / (resolution + wallPad);
     SceneGen gen = new SceneGen();
     gen.scene      = scene;
@@ -145,6 +151,7 @@ public class SceneTypeGrid extends SceneType {
   
   
   void populateWithAreas(Scene scene, SceneGen g) {
+    int wallPad = thickWalls ? 1 : 0;
     int counts[] = new int[units.length];
     
     //  TODO:  You need to select optimal facings as well- and iterate over

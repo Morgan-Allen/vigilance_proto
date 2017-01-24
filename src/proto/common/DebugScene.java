@@ -66,7 +66,7 @@ public class DebugScene extends RunGame {
       guarding.setAssigned(p, true);
     }
     guarding.setCompleted(true);
-    GameSettings.debugScene = true;
+    //GameSettings.debugScene = true;
     //*/
     
     return world;

@@ -29,7 +29,7 @@ public class DebugSceneWithLayout extends RunGame {
       KIND_BAR_STOOL ,
       KIND_JUKEBOX   ,
     },
-    new byte[][] {
+    8, 8, new byte[][] {
       { 0, 0, 0, 0, 0, 0, 7, 0 },
       { 0, 0, 0, 0, 0, 0, 0, 6 },
       { 0, 0, 4, 4, 4, 0, 5, 5 },
@@ -56,7 +56,7 @@ public class DebugSceneWithLayout extends RunGame {
     //
     //  Generate the scene-
     SceneType sceneType = FIXED_TEST_SCENE;
-    Scene mission = sceneType.generateScene(world, 8, true);
+    Scene mission = sceneType.generateScene(world, 12, true);
     GameSettings.debugScene = true;
     //GameSettings.pauseScene = true;
     //
@@ -65,8 +65,7 @@ public class DebugSceneWithLayout extends RunGame {
     Series <Person> active = base.roster();
     int across = (mission.size() - (active.size())) / 2;
     for (Person p : active) {
-      Item tearGas = new Item(Gadgets.TEAR_GAS, world);
-      p.gear.equipItem(tearGas, PersonGear.SLOT_ITEM_1);
+      p.gear.equipItem(Gadgets.TEAR_GAS, PersonGear.SLOT_ITEM_1);
       p.addAssignment(mission);
       mission.enterScene(p, across++, 0);
     }
