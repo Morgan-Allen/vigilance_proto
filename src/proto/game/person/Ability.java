@@ -473,11 +473,6 @@ public abstract class Ability extends Trait {
   }
   
   
-  public Image missileSprite() {
-    return null;
-  }
-  
-  
   public void renderUsageFX(Action action, Scene scene, Graphics2D g) {
     return;
   }

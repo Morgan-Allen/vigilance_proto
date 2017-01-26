@@ -247,8 +247,8 @@ public class Person extends Element {
   }
   
   
-  public boolean blockPath() {
-    return health.conscious() ? true : false;
+  public int blockLevel() {
+    return health.conscious() ? Kind.BLOCK_FULL : Kind.BLOCK_PARTIAL;
   }
   
   
@@ -266,9 +266,9 @@ public class Person extends Element {
       stats.updateStats();
     }
     
-    if (blockPath() != oldBlock) {
+    if (blocksFull() != oldBlock) {
       location.refreshPathing();
-      oldBlock = blockPath();
+      oldBlock = blocksFull();
     }
   }
   

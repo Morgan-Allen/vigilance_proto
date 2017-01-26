@@ -60,11 +60,6 @@ public class AbilityFX {
   }
   
   
-  public void renderMissile(Action action, Scene s, Graphics2D g) {
-    renderMissile(action, s, basis.missileSprite(), g);
-  }
-  
-  
   public void renderMissile(
     Action action, Scene s, Image sprite, Graphics2D g
   ) {

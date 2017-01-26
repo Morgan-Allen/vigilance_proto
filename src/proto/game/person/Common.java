@@ -93,7 +93,10 @@ public class Common {
       }
       
       final Image missile = Kind.loadImage(SPRITE_DIR+"sprite_punch.png");
-      public Image missileSprite() { return missile; }
+      
+      public void renderUsageFX(Action action, Scene scene, Graphics2D g) {
+        FX.renderMissile(action, scene, missile, g);
+      }
     },
     
     THROW = new Ability(

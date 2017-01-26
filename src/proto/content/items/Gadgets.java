@@ -147,12 +147,8 @@ public class Gadgets {
       use.scene().view().addTempFX(BURST_IMG, 3, at.x, at.y, 0, 1);
     }
     
-    public Image missileSprite() {
-      return GRENADE_IMG;
-    }
-    
     public void renderUsageFX(Action use, Scene scene, Graphics2D g) {
-      FX.renderMissile(use, scene, g);
+      FX.renderMissile(use, scene, GRENADE_IMG, g);
     }
   };
   
