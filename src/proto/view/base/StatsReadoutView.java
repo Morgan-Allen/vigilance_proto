@@ -20,7 +20,6 @@ public class StatsReadoutView extends UINode {
   
   
   protected boolean renderTo(Surface surface, Graphics2D g) {
-    
     final World world = mainView.world();
     final Base  base  = world.playerBase();
     
@@ -28,13 +27,10 @@ public class StatsReadoutView extends UINode {
     String timeString = "Time: "+ViewUtils.getTimeString(world);
     g.drawString(timeString, vx + 10, vy + vh - 5);
     
-    //  TODO:  You will need to incorporate a more complete report on base
-    //  finances here, include secret vs. public funding.
-    
     String cashString = "";
-    cashString +=  "Funds: "  +base.finance.publicFunds  ()+"";
-    cashString += " Income: " +base.finance.publicIncome ()+"";
-    cashString += " Expense: "+base.finance.publicExpense()+"";
+    cashString +=  "Funds: "  +base.finance.secretFunds  ()+"";
+    cashString += " Income: " +base.finance.secretIncome ()+"";
+    cashString += " Expense: "+base.finance.secretExpense()+"";
     g.drawString(cashString, vx + 260, vy + vh - 5);
     
     g.setColor(Color.DARK_GRAY);
@@ -43,9 +39,6 @@ public class StatsReadoutView extends UINode {
     return true;
   }
 }
-
-
-
 
 
 

@@ -86,6 +86,8 @@ public class Base extends Place {
     */
   public World world() { return world; }
   
+  public boolean criminal() { return criminal; }
+  
   
   
   /**  Regular updates and life-cycle methods:

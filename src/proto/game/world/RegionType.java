@@ -19,7 +19,8 @@ public class RegionType extends Kind {
   
   int     maxFacilities  = 3    ;
   float   defaultTrust   = 0.00f;
-  boolean defaultMember  = false;
+  int     baseFunding    = 500  ;
+  boolean defaultMember  = true ;
   PlaceType defaultFacilities[];
   
   
@@ -35,6 +36,8 @@ public class RegionType extends Kind {
     this.defaultFacilities = facilities;
   }
 }
+
+
 
 
 

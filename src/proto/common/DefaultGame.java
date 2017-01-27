@@ -102,6 +102,7 @@ public class DefaultGame extends RunGame {
       base.stocks.incStock((ItemType) t, 4);
     }
     
+    base.finance.setSecretPercent(2);
     base.finance.incPublicFunds(500);
     world.addBase(base, true);
   }
@@ -121,6 +122,7 @@ public class DefaultGame extends RunGame {
     final Base falconeBase = new Base(Facilities.HIDEOUT, world, true);
     world.regionFor(Regions.SECTOR04).setAttached(falconeBase, true);
     falconeBase.setLeader(falcone);
+    falconeBase.finance.setSecretPercent(0);
     falconeBase.finance.incPublicFunds(100);
     hideouts.add(falconeBase);
     
@@ -151,5 +153,7 @@ public class DefaultGame extends RunGame {
     }
   }
 }
+
+
 
 

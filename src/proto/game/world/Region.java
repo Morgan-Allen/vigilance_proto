@@ -153,6 +153,11 @@ public class Region extends Element {
   private int incomeFor(Base base, boolean positive) {
     int total = 0;
     
+    if (positive && ! base.criminal()) {
+      float crime = currentValue(VIOLENCE) / 100f;
+      total += kind().baseFunding * (1.5f - crime);
+    }
+    
     for (Place slot : buildSlots) {
       if (slot == null || slot.owner() != base) continue;
       if (slot.buildProgress() < 1) continue;
@@ -238,19 +243,17 @@ public class Region extends Element {
       if (DF == null || i >= DF.length) break;
       setupFacility(DF[i], i, owns, true);
     }
-    updateRegion();
+    updateStats();
     
     for (Stat stat : CIVIC_STATS) {
       final Level l = statLevels[stat.ID];
       l.current = l.level + l.bonus;
     }
-    updateRegion();
+    updateStats();
   }
   
   
-  public void updateRegion() {
-    if (! world.timing.dayIsUp()) return;
-    
+  void updateStats() {
     //
     //  Reset the bonus for all stats to zero, then iterate across all built
     //  facilities and collect their bonuses (including for income.)
@@ -319,6 +322,12 @@ public class Region extends Element {
     
     //  TODO:  Rate social stats out of a hundred, so you can see improvement
     //  (or decay) within a week or two.
+  }
+  
+  
+  public void updateRegion() {
+    if (! world.timing.dayIsUp()) return;
+    updateStats();
   }
   
   

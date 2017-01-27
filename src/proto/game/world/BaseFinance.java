@@ -54,6 +54,7 @@ public class BaseFinance {
   
   
   void updateFinance() {
+    
     publicIncome  = 0;
     publicExpense = 0;
     secretExpense = 0;
@@ -68,15 +69,13 @@ public class BaseFinance {
     }
     
     if (base.world.timing.monthIsUp()) {
-      int publicMargin = publicIncome - publicExpense;
-      int secretShare = publicMargin * secretPercent / 100;
-      
+      int secretShare = secretIncome();
       if (secretShare > 0) {
-        secretFunds  += secretShare;
-        publicMargin -= secretShare;
+        secretFunds += secretShare;
+        publicFunds -= secretShare;
       }
-      
-      publicFunds += publicMargin;
+      publicFunds += publicIncome ;
+      publicFunds -= publicExpense;
       secretFunds -= secretExpense;
       
       if (publicFunds < 0) {
@@ -88,6 +87,17 @@ public class BaseFinance {
         //  TODO:  Render secret facilities defunct!
       }
     }
+  }
+  
+  
+  public void setSecretPercent(int percent) {
+    secretPercent = percent;
+  }
+  
+  
+  public int secretIncome() {
+    int publicMargin = publicIncome - publicExpense;
+    return (publicMargin * secretPercent) / 100;
   }
   
   
