@@ -59,7 +59,8 @@ public class TypeBribe extends StepType {
   
   
   protected float baseAppeal(PlanStep step) {
-    float cashCost = 10f, reserves = step.plan.agent.base().currentFunds();
+    Base base = step.plan.agent.base();
+    float cashCost = 10f, reserves = base.finance.publicFunds();
     if (cashCost > reserves) return -100;
     return -10 * cashCost / reserves;
   }

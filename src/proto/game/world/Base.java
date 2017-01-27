@@ -21,7 +21,9 @@ public class Base extends Place {
   Person leader = null;
   List <Person> roster = new List();
   List <Kind> goonTypes = new List();
+  boolean criminal;
   
+  final public BaseFinance  finance  = new BaseFinance (this);
   final public BaseStocks   stocks   = new BaseStocks  (this);
   final public BaseTraining training = new BaseTraining(this);
   final public BaseLeads    leads    = new BaseLeads   (this);
@@ -29,11 +31,11 @@ public class Base extends Place {
   
   Place rooms[] = new Place[MAX_FACILITIES];
   List <Object> knownTech = new List();
-  int currentFunds, incomeFloor, income, maintenance;
   
   
-  public Base(PlaceType kind, World world) {
+  public Base(PlaceType kind, World world, boolean criminal) {
     super(kind, 0, world);
+    this.criminal = criminal;
   }
   
   
@@ -43,7 +45,9 @@ public class Base extends Place {
     leader = (Person) s.loadObject();
     s.loadObjects(roster);
     s.loadObjects(goonTypes);
+    criminal = s.loadBool();
     
+    finance .loadState(s);
     stocks  .loadState(s);
     training.loadState(s);
     leads   .loadState(s);
@@ -53,11 +57,6 @@ public class Base extends Place {
       rooms[n] = (Place) s.loadObject();
     }
     s.loadObjects(knownTech);
-    
-    currentFunds = s.loadInt();
-    incomeFloor  = s.loadInt();
-    income       = s.loadInt();
-    maintenance  = s.loadInt();
   }
   
   
@@ -67,7 +66,9 @@ public class Base extends Place {
     s.saveObject(leader);
     s.saveObjects(roster);
     s.saveObjects(goonTypes);
+    s.saveBool(criminal);
     
+    finance .saveState(s);
     stocks  .saveState(s);
     training.saveState(s);
     leads   .saveState(s);
@@ -77,57 +78,30 @@ public class Base extends Place {
       s.saveObject(rooms[n]);
     }
     s.saveObjects(knownTech);
-    
-    s.saveInt(currentFunds);
-    s.saveInt(incomeFloor );
-    s.saveInt(income      );
-    s.saveInt(maintenance );
   }
   
   
   
   /**  General stat queries-
     */
-  public int currentFunds() { return currentFunds; }
-  public int incomeFloor () { return incomeFloor ; }
-  public int income      () { return income      ; }
-  public int maintenance () { return maintenance ; }
-  
   public World world() { return world; }
   
   
   
   /**  Regular updates and life-cycle methods:
     */
-  void updateBase(float numWeeks) {
-    this.income      = 0;
-    this.maintenance = 0;
-    
+  void updateBase() {
     for (Person p : roster) {
-      p.updateOnBase(numWeeks);
+      p.updateOnBase();
     }
-    
     for (Place r : rooms) if (r != null) {
       r.updatePlace();
     }
-    
-    for (Region dist : world.regions) {
-      this.income      += dist.incomeFor  (this);
-      this.maintenance += dist.expensesFor(this);
-    }
-    
-    this.income += incomeFloor;
-    this.currentFunds += (income - maintenance) * numWeeks;
-    
+    finance.updateFinance();
     stocks.updateCrafting();
     training.updateTraining();
-    leads.updateInvestigations();
+    leads.updateLeads();
     plans.updatePlanning();
-  }
-  
-  
-  void updateBaseDaily() {
-    
   }
   
   
@@ -192,24 +166,12 @@ public class Base extends Place {
   }
   
   
-  public boolean incFunding(int funds) {
-    this.currentFunds += funds;
-    return true;
-  }
-  
-  
-  public boolean setIncomeFloor(int floor) {
-    this.incomeFloor = floor;
-    return true;
-  }
-  
-  
   
   /**  Construction and salvage-
     */
   public boolean canConstruct(PlaceType print, int slot) {
     if (rooms[slot] != null) return false;
-    if (print.buildCost > currentFunds) return false;
+    if (print.buildCost > finance.publicFunds()) return false;
     return true;
   }
   
@@ -238,7 +200,7 @@ public class Base extends Place {
   
   
   public void beginConstruction(PlaceType print, int slot) {
-    currentFunds -= print.buildCost;
+    finance.incPublicFunds(0 - print.buildCost);
     addFacility(print, slot, 0);
   }
   
@@ -246,7 +208,7 @@ public class Base extends Place {
   public void beginSalvage(int slot) {
     Place room = rooms[slot];
     if (room == null) return;
-    currentFunds += room.kind().buildCost / 2f;
+    finance.incPublicFunds(room.kind().buildCost / 2);
     addFacility(null, slot, 1);
   }
   

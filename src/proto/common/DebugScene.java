@@ -2,7 +2,6 @@
 
 package proto.common;
 import proto.game.world.*;
-import proto.view.scene.SceneView;
 import proto.game.person.*;
 import proto.game.event.*;
 import proto.content.agents.*;
@@ -22,6 +21,7 @@ public class DebugScene extends RunGame {
   
   protected World setupWorld() {
     this.world = new World(this, savePath);
+    DefaultGame.initDefaultTime   (world);
     DefaultGame.initDefaultRegions(world);
     DefaultGame.initDefaultBase   (world);
     DefaultGame.initDefaultCrime  (world);
@@ -56,22 +56,25 @@ public class DebugScene extends RunGame {
     final CaseFile file = base.leads.caseFor(home);
     file.recordRole(kidnapEvent, CaseFile.ROLE_SCENE, tipoff);
     
-    /*
+    //*
     final Base HQ = world.playerBase();
     Task guarding = file.investigationOptions().first();
     for (Person p : HQ.roster()) {
       p.gear.equipItem(Gadgets.WING_BLADES, PersonGear.SLOT_WEAPON);
       p.gear.equipItem(Gadgets.KEVLAR_VEST, PersonGear.SLOT_ARMOUR);
-      p.updateOnBase(0);
+      p.gear.equipItem(Gadgets.MED_KIT    , PersonGear.SLOT_ITEM_1);
+      p.gear.equipItem(Gadgets.TEAR_GAS   , PersonGear.SLOT_ITEM_2);
+      p.updateOnBase();
       guarding.setAssigned(p, true);
     }
     guarding.setCompleted(true);
-    //GameSettings.debugScene = true;
     //*/
     
     return world;
   }
 }
+
+
 
 
 

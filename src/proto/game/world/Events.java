@@ -56,7 +56,7 @@ public class Events {
   /**  Regular updates and event-generation-
     */
   void updateEvents() {
-    final int time = world.totalMinutes();
+    final int time = world.timing.totalMinutes();
     
     for (Event event : coming) {
       if (event.timeBegins() <= time) {
@@ -79,7 +79,7 @@ public class Events {
   
   
   public void scheduleEvent(Event event, int delayHours) {
-    int startTime = world.totalMinutes();
+    int startTime = world.timing.totalMinutes();
     startTime += delayHours * World.MINUTES_PER_HOUR;
     event.setBeginTime(startTime);
     coming.include(event);

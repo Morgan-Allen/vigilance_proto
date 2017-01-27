@@ -29,13 +29,18 @@ public abstract class MessageView extends UINode {
     this.title     = title    ;
     this.mainText  = mainText ;
     this.options   = options  ;
-    
+  }
+  
+  
+  protected void updateAndRender(Surface surface, Graphics2D g) {
     final int w = mainView.vw, h = mainView.vh;
     this.relBounds.set(w / 4, h / 4, w / 2, h / 2);
+    super.updateAndRender(surface, g);
   }
   
   
   protected boolean renderTo(Surface surface, Graphics2D g) {
+    
     surface.tryHover(0, 0, surface.getWidth(), surface.getWidth(), this);
     
     g.setColor(background);

@@ -40,11 +40,10 @@ public class World implements Session.Saveable {
   List <Base> bases = new List();
   List <Element> elements = new List();
   
+  final public Timing timing = new Timing(this);
   final public Events events = new Events(this);
-  int timeDays = 0;
-  float timeHours = 0;
-  boolean amWatching = false;
   
+  boolean amWatching = false;
   Scene activeScene = null;
   
   
@@ -69,12 +68,11 @@ public class World implements Session.Saveable {
     regions = (Region[]) s.loadObjectArray(Region.class);
     played    = (Base) s.loadObject();
     s.loadObjects(bases);
+    
     events.loadState(s);
+    timing.loadState(s);
     
-    timeDays   = s.loadInt  ();
-    timeHours  = s.loadFloat();
     amWatching = s.loadBool ();
-    
     activeScene = (Scene) s.loadObject();
   }
   
@@ -84,12 +82,11 @@ public class World implements Session.Saveable {
     
     s.saveObject(played);
     s.saveObjects(bases);
+    
     events.saveState(s);
+    timing.saveState(s);
     
-    s.saveInt  (timeDays  );
-    s.saveFloat(timeHours );
     s.saveBool (amWatching);
-    
     s.saveObject(activeScene);
   }
   
@@ -173,27 +170,7 @@ public class World implements Session.Saveable {
   }
   
   
-  public int timeDays() {
-    return timeDays;
-  }
   
-  
-  public int timeHours() {
-    return (int) timeHours;
-  }
-  
-  
-  public int timeMinutes() {
-    return (int) ((timeHours % 1) * MINUTES_PER_HOUR);
-  }
-  
-  
-  public int totalMinutes() {
-    return (timeDays * 24 * 60) + (int) (timeHours * 60);
-  }
-  
-  
-
   /**  Regular updates and activity cycle:
     */
   public void updateWorld() {
@@ -201,25 +178,16 @@ public class World implements Session.Saveable {
     if (activeScene != null) {
       activeScene.updateScene();
     }
+    
     else if (amWatching) {
-      final float realGap = 1f / RunGame.FRAME_RATE;
-      final float timeGap = realGap * GAME_HOURS_PER_REAL_SECOND;
-      timeHours += timeGap;
-      
-      while (timeHours > HOURS_PER_DAY) {
-        timeDays++;
-        timeHours -= HOURS_PER_DAY;
-        for (Region d : regions) {
-          d.updateRegion();
-        }
-        for (Base base : bases) {
-          base.updateBaseDaily();
-        }
-      }
-      
+      timing.updateTiming();
       events.updateEvents();
+      
+      for (Region d : regions) {
+        d.updateRegion();
+      }
       for (Base base : bases) {
-        base.updateBase(timeGap / (HOURS_PER_DAY * DAYS_PER_WEEK));
+        base.updateBase();
       }
     }
   }

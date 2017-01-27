@@ -153,7 +153,7 @@ public abstract class Task implements Assignment {
   
   public float hoursSoFar() {
     if (initTime == -1) return 0;
-    float minutes = base.world().totalMinutes() - initTime;
+    float minutes = base.world().timing.totalMinutes() - initTime;
     return minutes / World.MINUTES_PER_HOUR;
   }
   
@@ -209,7 +209,7 @@ public abstract class Task implements Assignment {
     base.world().events.logAssignment(this);
     
     if (timeTaken > TIME_INDEF) {
-      final int time = base.world().totalMinutes();
+      final int time = base.world().timing.totalMinutes();
       if (initTime == -1) initTime = time;
       if ((time - initTime) > timeTaken) attemptTask();
     }

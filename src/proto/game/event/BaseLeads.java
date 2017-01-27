@@ -30,7 +30,7 @@ public class BaseLeads {
   }
   
   
-  public void updateInvestigations() {
+  public void updateLeads() {
     for (CaseFile file : files) for (Lead lead : file.investigationOptions()) {
       if (lead.assigned().empty()) continue;
       lead.updateAssignment();

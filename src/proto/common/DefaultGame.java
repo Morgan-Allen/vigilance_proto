@@ -27,10 +27,16 @@ public class DefaultGame extends RunGame {
   
   protected World setupWorld() {
     this.world = new World(this, savePath);
+    initDefaultTime   (world);
     initDefaultRegions(world);
-    initDefaultBase(world);
-    initDefaultCrime(world);
+    initDefaultBase   (world);
+    initDefaultCrime  (world);
     return world;
+  }
+  
+  
+  public static void initDefaultTime(World world) {
+    world.timing.setStartDate(9, 7, 1984);
   }
   
   
@@ -51,7 +57,7 @@ public class DefaultGame extends RunGame {
   
   
   public static void initDefaultBase(World world) {
-    final Base base = new Base(Facilities.MANOR, world);
+    final Base base = new Base(Facilities.MANOR, world, false);
     
     Person leader = new Person(Heroes.HERO_PHOBOS, world);
     base.setLeader(leader);
@@ -96,8 +102,7 @@ public class DefaultGame extends RunGame {
       base.stocks.incStock((ItemType) t, 4);
     }
     
-    base.setIncomeFloor(20);
-    base.incFunding(500);
+    base.finance.incPublicFunds(500);
     world.addBase(base, true);
   }
   
@@ -113,10 +118,10 @@ public class DefaultGame extends RunGame {
     
     final Batch <Base> hideouts = new Batch();
     final Person falcone = new Person(Villains.FALCONE, world);
-    final Base falconeBase = new Base(Facilities.HIDEOUT, world);
+    final Base falconeBase = new Base(Facilities.HIDEOUT, world, true);
     world.regionFor(Regions.SECTOR04).setAttached(falconeBase, true);
     falconeBase.setLeader(falcone);
-    falconeBase.incFunding(100);
+    falconeBase.finance.incPublicFunds(100);
     hideouts.add(falconeBase);
     
     /*

@@ -288,12 +288,12 @@ public class Person extends Element {
   
   /**  Regular updates and life-cycle-
     */
-  public void updateOnBase(float numWeeks) {
+  public void updateOnBase() {
     for (Assignment a : assignments) {
       if (a.complete()) { removeAssignment(a); continue; }
     }
     
-    health.updateHealth(numWeeks);
+    health.updateHealth();
     if (health.alive()) {
       stats.updateStats();
     }

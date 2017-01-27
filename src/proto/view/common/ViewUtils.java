@@ -110,30 +110,16 @@ public class ViewUtils {
   
   /**  Time and date utilities-
     */
-  final static DateFormat
-    DISPLAY_FORMAT = new SimpleDateFormat("HH:mm EEE, MMM d, yyyy");
-  static Date
-    DEFAULT_INIT_DATE = new Date();
-  static {
-    try { DEFAULT_INIT_DATE = DISPLAY_FORMAT.parse("00:00 Mon, Jul 9, 1984"); }
-    catch (Exception e) {}
-  }
-  
   public static String getTimeString(World world) {
-    
-    long timeMS = 0;
-    timeMS += world.timeDays();
-    timeMS *= 24;
-    timeMS += world.timeHours();
-    timeMS *= 60;
-    timeMS += world.timeMinutes();
-    timeMS *= 60 * 1000;
-    timeMS += DEFAULT_INIT_DATE.getTime();
-    
-    final Date date = new Date();
-    date.setTime(timeMS);
-    
-    return DISPLAY_FORMAT.format(date);
+    int minutes = world.timing.timeMinutes();
+    int hours   = world.timing.timeHours  ();
+    int day     = world.timing.dayInMonth ();
+    int month   = world.timing.monthInYear();
+    int year    = world.timing.timeYears  ();
+    String hourString = ""+I.lengthen(hours  , 2, true);
+    String minsString = ""+I.lengthen(minutes, 2, true);
+    String monthName = Timing.MONTH_NAMES[month];
+    return hourString+":"+minsString+", "+monthName+" "+day+", "+year;
   }
 }
 

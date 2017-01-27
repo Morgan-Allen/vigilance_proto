@@ -217,7 +217,7 @@ public class Region extends Element {
     }
     else {
       place.setOwner(owns);
-      owns.incFunding(0 - place.kind().buildCost);
+      owns.finance.incPublicFunds(0 - place.kind().buildCost);
       place.setBuildProgress(0);
     }
     
@@ -249,6 +249,8 @@ public class Region extends Element {
   
   
   public void updateRegion() {
+    if (! world.timing.dayIsUp()) return;
+    
     //
     //  Reset the bonus for all stats to zero, then iterate across all built
     //  facilities and collect their bonuses (including for income.)
@@ -256,7 +258,6 @@ public class Region extends Element {
       l.bonus = 0;
     }
     int baseIncome = 0, mobIncome = 0, totalIncome = 0;
-    
     
     for (Place slot : buildSlots) if (slot != null) {
       final PlaceType built = slot.kind();

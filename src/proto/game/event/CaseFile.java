@@ -180,7 +180,7 @@ public class CaseFile implements Session.Saveable {
   
   
   Event nextEventInvolved() {
-    int worldTime = base.world().totalMinutes();
+    int worldTime = base.world().timing.totalMinutes();
     float minTime = Float.POSITIVE_INFINITY;
     Event picked = null;
     
@@ -318,7 +318,7 @@ public class CaseFile implements Session.Saveable {
   
   
   private Role pickMostProminentRole() {
-    int time = base.world().totalMinutes();
+    int time = base.world().timing.totalMinutes();
     float bestRating = 0;
     Role active = null;
     

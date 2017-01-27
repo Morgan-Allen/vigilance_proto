@@ -46,12 +46,12 @@ public class TaskCraft extends Task {
   /**  Task performance and completion-
     */
   protected void onFailure() {
-    base.incFunding(0 - made.buildCost / 2);
+    base.finance.incSecretFunds(0 - made.buildCost / 2);
   }
   
   
   protected void onSuccess() {
-    base.incFunding(0 - made.buildCost);
+    base.finance.incSecretFunds(0 - made.buildCost);
     base.stocks.incStock(made, 1);
   }
   

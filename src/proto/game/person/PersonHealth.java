@@ -3,6 +3,7 @@
 package proto.game.person;
 import proto.common.*;
 import proto.game.scene.Volley;
+import proto.game.world.World;
 
 import static proto.game.person.PersonStats.*;
 import proto.util.*;
@@ -173,9 +174,12 @@ public class PersonHealth {
   
   /**  Regular updates-
     */
-  void updateHealth(float numWeeks) {
+  void updateHealth() {
     if (! alive()) return;
     if (conscious()) stun = 0;
+    
+    float numWeeks = person.world().timing.hoursInTick();
+    numWeeks /= World.DAYS_PER_WEEK * World.HOURS_PER_DAY;
     
     int maxHealth = maxHealth();
     float regen = maxHealth * numWeeks / FULL_HEAL_WEEKS;

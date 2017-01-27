@@ -86,7 +86,7 @@ public class PlaceType extends Kind {
   /**  Construction and prereqs-
     */
   public boolean canBuild(Base owner, Region district) {
-    return owner.currentFunds() >= buildCost;
+    return owner.finance.publicFunds() >= buildCost;
   }
   
   
