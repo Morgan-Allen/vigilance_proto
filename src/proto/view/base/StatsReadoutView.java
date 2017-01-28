@@ -28,9 +28,9 @@ public class StatsReadoutView extends UINode {
     g.drawString(timeString, vx + 10, vy + vh - 5);
     
     String cashString = "";
-    cashString +=  "Funds: "  +base.finance.secretFunds  ()+"";
-    cashString += " Income: " +base.finance.secretIncome ()+"";
-    cashString += " Expense: "+base.finance.secretExpense()+"";
+    cashString += "Public/Private Funds: ";
+    cashString += base.finance.publicFunds()+"/";
+    cashString += base.finance.secretFunds()+"";
     g.drawString(cashString, vx + 260, vy + vh - 5);
     
     g.setColor(Color.DARK_GRAY);
@@ -39,6 +39,9 @@ public class StatsReadoutView extends UINode {
     return true;
   }
 }
+
+
+
 
 
 

@@ -88,6 +88,12 @@ public class DefaultGame extends RunGame {
     };
     for (Object t : buildTechs) base.addTech(t);
     
+    for (Region r : world.regions()) {
+      for (Place built : r.buildSlots()) if (built != null) {
+        built.setOwner(base);
+      }
+    }
+    
     final Ability learnTechs[] = Techniques.PHYS_TECHNIQUES;
     for (Object t : learnTechs) base.addTech(t);
     
@@ -103,7 +109,9 @@ public class DefaultGame extends RunGame {
     }
     
     base.finance.setSecretPercent(2);
-    base.finance.incPublicFunds(500);
+    base.finance.incPublicFunds(2000);
+    base.finance.incSecretFunds(200);
+    base.finance.updateFinance();
     world.addBase(base, true);
   }
   

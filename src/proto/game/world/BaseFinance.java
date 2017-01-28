@@ -53,7 +53,7 @@ public class BaseFinance {
   public int secretFunds  () { return secretFunds  ; }
   
   
-  void updateFinance() {
+  public void updateFinance() {
     
     publicIncome  = 0;
     publicExpense = 0;

@@ -26,7 +26,6 @@ public class RegionView extends UINode {
     );
   
   
-  //final ActivityView parent;
   final MapInsetView mapRefers;
   
   
@@ -54,26 +53,20 @@ public class RegionView extends UINode {
     int down = 50;
     for (Region.Stat stat : Region.CIVIC_STATS) {
       g.drawString(stat+": ", vx + 30, vy + down);
-      int max = region.longTermValue(stat);
-      int current = (int) region.currentValue(stat);
-      g.drawString(""+current+"/"+max, vx + 180, vy + down);
+      int current = (int) region.longTermValue(stat);
+      g.drawString(""+current+"/10", vx + 120, vy + down);
       down += 20;
     }
     
-    down += 5;
+    down = 50;
     for (Region.Stat stat : Region.SOCIAL_STATS) {
-      g.drawString(stat+": ", vx + 80, vy + down);
+      g.drawString(stat+": ", vx + 160, vy + down);
       int current = (int) region.currentValue(stat);
-      g.drawString(""+current, vx + 180, vy + down);
+      g.drawString(""+current, vx + 250, vy + down);
       down += 20;
     }
-    
-    int income = region.incomeFor(base), expense = region.expensesFor(base);
-    g.drawString("Income: " +income , vx + 30 , vy + down);
-    g.drawString("Expense: "+expense, vx + 130, vy + down);
     
     renderFacilities(region, surface, g);
-    ///renderLeads(region, surface, g);
     
     g.setColor(Color.DARK_GRAY);
     g.drawRect(vx, vy, vw, vh);
@@ -86,8 +79,9 @@ public class RegionView extends UINode {
     final Region d, final Surface surface, final Graphics2D g
   ) {
     final int maxF = d.maxFacilities();
-    int across = 240, down = 10;
-    final Vars.Int hoverSlot = new Vars.Int(-1);
+    int across = 25, down = 125;
+    //final Vars.Int hoverSlot = new Vars.Int(-1);
+    int hoverSlotID = -1;
     
     for (int n = 0; n < maxF; n++) {
       final Place     slot  = d.buildSlot(n);
@@ -109,37 +103,37 @@ public class RegionView extends UINode {
         protected void whenClicked() {
           presentBuildOptions(d, slotID, surface, g);
         }
-        protected void whenHovered() {
-          if (built != null) hoverSlot.val = slotID;
-        }
       };
       button.refers = built+"_slot_"+slotID;
       if (prog < 1 && built != null) button.attachOverlay(IN_PROGRESS);
       button.renderNow(surface, g);
+      if (surface.wasHovered(button.refers)) hoverSlotID = n;
       
-      down += 60 + 10;
+      across += 60 + 10;
     }
     
-    if (hoverSlot.val != -1) {
+    if (hoverSlotID != -1 && d.buildSlot(hoverSlotID) == null) {
+      g.setColor(Color.LIGHT_GRAY);
+      String desc = "Vacant Site\n  (Click to begin construction)";
+      ViewUtils.drawWrappedString(
+        desc, g, vx + 25, vy + 190, 275, 500
+      );
+    }
+    else if (hoverSlotID != -1) {
       g.setColor(Color.LIGHT_GRAY);
       
-      final Place     slot  = d.buildSlot(hoverSlot.val);
+      final Place     slot  = d.buildSlot(hoverSlotID);
       final PlaceType built = slot.kind();
       final Base      owns  = slot.owner();
       final float     prog  = slot.buildProgress();
       
       String desc = "";
-      desc += built.name();
+      desc += "\n\n"+built.defaultInfo();
+      desc += "\nOwned by: "+owns;
       if (prog < 1) desc += " ("+((int) (prog * 100))+"% complete)";
       
-      desc += "\nOwned by: "+owns;
-      desc += "\n\n";
-      desc += built.statInfo();
-      
       ViewUtils.drawWrappedString(
-        desc, g,
-        vx + 240, vy + 10 + 60 + 10,
-        vw - 240, 200 - 70
+        desc, g, vx + 25, vy + 190, 275, 500
       );
     }
   }

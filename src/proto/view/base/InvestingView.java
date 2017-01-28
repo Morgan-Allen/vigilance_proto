@@ -47,6 +47,12 @@ public class InvestingView extends UINode {
     
     Person person = mainView.rosterView.selectedPerson();
     int across = 10, down = 10;
+
+    /*
+    int income = region.incomeFor(base), expense = region.expensesFor(base);
+    g.drawString("Income: " +income , vx + 30 , vy + down);
+    g.drawString("Expense: "+expense, vx + 130, vy + down);
+    //*/
     
     //  TODO:  Turn investments into a kind of Task?
     /*
@@ -61,10 +67,47 @@ public class InvestingView extends UINode {
     );
     //*/
     
+    renderFinanceReport(surface, g, mainView.world().playerBase());
     return true;
   }
   
   
+  protected void renderFinanceReport(Surface surface, Graphics2D g, Base base) {
+    int down = 10, across = vw - 320;
+    StringBuffer s = new StringBuffer();
+    
+    Region region = mapView.selectedRegion();
+    if (region != null) {
+      float violence   = region.currentValue(Region.VIOLENCE  ) / 100f;
+      float corruption = region.currentValue(Region.CORRUPTION) / 100f;
+      int baseIncome   = region.kind().baseFunding();
+      int regionIncome = region.incomeFor(base);
+      int violenceLoss = (int) (baseIncome * violence  );
+      int corruptLoss  = (int) (baseIncome * corruption);
+      
+      s.append("\n\nFinances For "+region);
+      s.append("\n  Basic Income: "+baseIncome);
+      s.append("\n  Losses from violence: "+violenceLoss);
+      s.append("\n  Losses from corruption: "+corruptLoss);
+      s.append("\n  Total with facilities: "+regionIncome);
+    }
+    
+    final BaseFinance BF = base.finance;
+    s.append("\n\nPublic Finances");
+    s.append("\n  Total Income: " +BF.publicIncome ());
+    s.append("\n  Total Expense: "+BF.publicExpense());
+    s.append("\n  Public Funds: " +BF.publicFunds  ());
+    
+    s.append("\n\nJANUS Project:");
+    s.append("\n  Total Income: " +BF.secretIncome ());
+    s.append(" ("+BF.secretPercent()+"% of revenue)");
+    s.append("\n  Total Expense: "+BF.secretExpense());
+    s.append("\n  Secret Funds: " +BF.secretFunds  ());
+    
+    g.setColor(Color.WHITE);
+    ViewUtils.drawWrappedString(
+      s.toString(), g, vx + across, vy + down, 320, vh - 20
+    );
+  }
 }
-
 

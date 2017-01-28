@@ -139,7 +139,7 @@ public class World implements Session.Saveable {
   
   /**  General query methods-
     */
-  public Region[] districts() {
+  public Region[] regions() {
     return regions;
   }
   

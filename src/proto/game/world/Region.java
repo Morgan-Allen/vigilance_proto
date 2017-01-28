@@ -44,16 +44,11 @@ public class Region extends Element {
   ;
   
   final public static Stat
-    EMPLOYMENT             = new Stat("Employment"          , "Poverty", 0),
-    EDUCATION_AND_CULTURE  = new Stat("Education & Culture" , "Vice"   , 1),
-    HEALTH_AND_ENVIRONMENT = new Stat("Health & Environment", "Squalor", 2),
-    ENTERTAINMENT          = new Stat("Entertainment"       , "Despair", 3),
-    
-    //  TODO:  Rename as something shorter?
-    CIVIC_STATS[] = {
-      EMPLOYMENT            , EDUCATION_AND_CULTURE,
-      HEALTH_AND_ENVIRONMENT, ENTERTAINMENT        ,
-    },
+    EMPLOYMENT = new Stat("Employment", "Poverty", 0),
+    EDUCATION  = new Stat("Education" , "Vice"   , 1),
+    HEALTH     = new Stat("Health"    , "Squalor", 2),
+    DIVERSION  = new Stat("Diversion" , "Despair", 3),
+    CIVIC_STATS[] = { EMPLOYMENT, EDUCATION, HEALTH, DIVERSION },
     
     DETERRENCE = new Stat("Deterrence", 4),
     TRUST      = new Stat("Trust"     , 5),
@@ -155,7 +150,8 @@ public class Region extends Element {
     
     if (positive && ! base.criminal()) {
       float crime = currentValue(VIOLENCE) / 100f;
-      total += kind().baseFunding * (1.5f - crime);
+      crime += currentValue(CORRUPTION) / 100f;
+      total += kind().baseFunding * (1 - Nums.clamp(crime, 0, 1));
     }
     
     for (Place slot : buildSlots) {
@@ -194,6 +190,11 @@ public class Region extends Element {
       if (tech instanceof PlaceType) all.add((PlaceType) tech);
     }
     return all;
+  }
+  
+  
+  public Place[] buildSlots() {
+    return buildSlots;
   }
   
   

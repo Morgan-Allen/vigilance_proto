@@ -19,13 +19,18 @@ public class RegionType extends Kind {
   
   int     maxFacilities  = 3    ;
   float   defaultTrust   = 0.00f;
-  int     baseFunding    = 500  ;
+  int     baseFunding    = 250  ;
   boolean defaultMember  = true ;
   PlaceType defaultFacilities[];
   
   
   public RegionType(String name, String ID) {
     super(name, ID, "", Kind.TYPE_REGION);
+  }
+  
+  
+  public int baseFunding() {
+    return baseFunding;
   }
   
   
@@ -36,12 +41,6 @@ public class RegionType extends Kind {
     this.defaultFacilities = facilities;
   }
 }
-
-
-
-
-
-
 
 
 

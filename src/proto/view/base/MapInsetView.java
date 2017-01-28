@@ -103,7 +103,7 @@ public class MapInsetView extends UINode {
   /**  Actual rendering methods-
     */
   protected boolean renderTo(Surface surface, Graphics2D g) {
-    Region districts[] = mainView.world().districts();
+    Region districts[] = mainView.world().regions();
     Base played = mainView.world().playerBase();
     attachOutlinesFor(districts);
     //
