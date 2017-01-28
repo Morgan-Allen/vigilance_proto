@@ -35,9 +35,15 @@ public class EquipmentView extends UINode {
   
   
   void renderEquipment(Surface surface, Graphics2D g, Person person) {
-    int down = 10;
-    int maxSlots = person.gear.maxSlots();
+    int down = 10, across = vw - 320;
     
+    g.setColor(Color.WHITE);
+    ViewUtils.drawWrappedString(
+      "Equipment", g, vx + across, vy + down, 320, 30
+    );
+    down += 30;
+    
+    int maxSlots = person.gear.maxSlots();
     for (int slotID : PersonGear.SLOT_IDS) {
       if (slotID >= maxSlots) break;
       
@@ -48,16 +54,16 @@ public class EquipmentView extends UINode {
       String slotName = PersonGear.SLOT_TYPE_NAMES[slotType];
       
       final boolean hovered = surface.tryHover(
-        vx + 5, vy + down, vw - 10, 40, "Slot_"+slotID
+        vx + 5 + across, vy + down, vw - 10, 40, "Slot_"+slotID
       );
       if (hovered) g.setColor(Color.YELLOW);
       else         g.setColor(Color.WHITE );
       
-      g.drawImage(icon, vx + 5, vy + down, 40, 40, null);
-      g.drawString(slotName+": "+desc, vx + 5 + 40 + 5, vy + down + 15);
+      g.drawImage(icon, vx + across + 5, vy + down, 40, 40, null);
+      g.drawString(slotName+": "+desc, vx + across + 50, vy + down + 15);
       
       if (hovered && surface.mouseClicked()) {
-        createItemMenu(person, slotID, vx + 5, vy + down + 20);
+        createItemMenu(person, slotID, vx + across + 5, vy + down + 20);
       }
       
       down += 40 + 10;
@@ -98,13 +104,25 @@ public class EquipmentView extends UINode {
   void renderCraftOptions(Surface surface, Graphics2D g, Person person) {
     final Base base = mainView.world().playerBase();
     
-    int down = 10, across = vw - 320;
-    TaskCraft hovered = null;
+    int down = 10, across = 10;
+
+    TaskCraft current = null;
+    for (Assignment a : person.assignments()) if (a instanceof TaskCraft) {
+      current = (TaskCraft) a;
+    }
+    g.setColor(Color.WHITE);
+    ViewUtils.drawWrappedString(
+      "Crafting: "+(current == null ? "None" : current.made()), g,
+      vx + across, vy + down, 320, 30
+    );
+    
+    down += 30;
+    TaskCraft hovered = current;
     
     for (TaskCraft option : base.stocks.craftingTasksFor(person)) {
       TaskView view = option.createView(mainView);
       view.showIcon = false;
-      view.relBounds.set(vx + across, vy + down, 320, 45);
+      view.relBounds.set(vx + across, vy + down, 320, 20);
       view.renderNow(surface, g);
       down += view.relBounds.ydim() + 10;
       if (surface.wasHovered(option)) hovered = option;
@@ -112,7 +130,13 @@ public class EquipmentView extends UINode {
     
     if (hovered != null) {
       down += 10;
+      
+      int craftTime = hovered.craftingTime() / World.HOURS_PER_DAY;
       String desc = hovered.made().defaultInfo();
+      
+      desc += "\n  "+hovered.testInfo();
+      desc += "\n  Crafting time: "+craftTime+" days";
+      
       g.setColor(Color.LIGHT_GRAY);
       ViewUtils.drawWrappedString(desc, g, vx + across, vy + down, 320, 200);
     }
@@ -120,6 +144,8 @@ public class EquipmentView extends UINode {
   
   
 }
+
+
 
 
 

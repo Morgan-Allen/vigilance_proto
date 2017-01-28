@@ -36,3 +36,8 @@ public interface Assignment extends Session.Saveable {
   
   Place targetLocation();
 }
+
+
+
+
+

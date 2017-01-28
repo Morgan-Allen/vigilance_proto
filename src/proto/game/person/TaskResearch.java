@@ -71,7 +71,7 @@ public class TaskResearch extends Task {
   }
   
   
-  public String choiceInfo() {
+  public String choiceInfo(Person p) {
     String info = "Researching "+developed;
     return info;
   }

@@ -112,7 +112,7 @@ public class PersonGear {
     final Item oldItem = itemInSlot(slotID);
     if (oldItem != null) {
       equipped.remove(oldItem);
-      item.setCarries(null, -1);
+      oldItem.setCarries(null, -1);
       if (from != null) from.stocks.addItem(oldItem);
     }
     if (item != null) {
@@ -120,6 +120,7 @@ public class PersonGear {
       item.setCarries(person, slotID);
       equipped.add(item);
     }
+    person.stats.updateStats();
   }
   
   

@@ -146,7 +146,7 @@ public class LeadSurveil extends Lead {
   }
   
   
-  public String choiceInfo() {
+  public String choiceInfo(Person p) {
     return "Surveil "+subject;
   }
   

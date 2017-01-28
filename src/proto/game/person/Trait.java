@@ -51,9 +51,24 @@ public class Trait extends Index.Entry implements Session.Saveable {
   }
   
   
+  public float xpRequired(int oldLevel) {
+    return oldLevel + 1;
+  }
+  
+  
   
   /**  Rendering, debug and interface methods-
     */
+  final public static String LEVEL_DESC[] = {
+    "None", "Novice", "Practiced", "Mastered"
+  };
+  
+  
+  public String levelDesc(int level) {
+    return LEVEL_DESC[Nums.clamp(level, 4)];
+  }
+  
+  
   public String toString() {
     return name;
   }

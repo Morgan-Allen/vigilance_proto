@@ -178,7 +178,7 @@ public abstract class Ability extends Trait {
   /**  Methods specific to scenes and actions-
     */
   public int minCostAP() {
-    return 1;
+    return costAP;
   }
   
   

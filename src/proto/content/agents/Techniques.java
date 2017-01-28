@@ -86,9 +86,8 @@ public class Techniques {
     DISARM = new Ability(
       "Disarm", "ability_disarm",
       SPRITE_DIR+"sprite_punch.png",
-      "Deals slightly reduced, but entirely nonlethal damage, with a chance "+
-      "to remove the target's weapon.",
-      Ability.IS_MELEE, 1, Ability.REAL_HARM, Ability.MINOR_POWER
+      "Deals nonlethal damage with a chance to remove the target's weapon.",
+      Ability.IS_MELEE, 2, Ability.REAL_HARM, Ability.MINOR_POWER
     ) {
       
       public boolean allowsTarget(Object target, Scene scene, Person acting) {
@@ -102,8 +101,6 @@ public class Techniques {
       protected Volley createVolley(Action use, Object target, Scene scene) {
         Volley volley = new Volley();
         volley.setupVolley(use.acting, (Person) target, false, scene);
-        volley.selfDamageBase  *= 0.75f;
-        volley.selfDamageRange *= 0.75f;
         volley.stunPercent = 100;
         return volley;
       }
@@ -157,7 +154,7 @@ public class Techniques {
     ENDURANCE = new Ability(
       "Endurance", "ability_endurance",
       SPRITE_DIR+"move.png",
-      "Increases health reserves.",
+      "Grants 2 bonus health per experience grade.",
       Ability.IS_PASSIVE, 1,
       Ability.NO_HARM, Ability.MINOR_POWER
     ) {

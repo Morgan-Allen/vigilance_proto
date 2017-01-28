@@ -44,24 +44,27 @@ public class InvestingView extends UINode {
   
   
   protected boolean renderTo(Surface surface, Graphics2D g) {
-    if (! super.renderTo(surface, g)) return false;
+    
+    Person person = mainView.rosterView.selectedPerson();
+    int across = 10, down = 10;
+    
+    //  TODO:  Turn investments into a kind of Task?
+    /*
+    TaskCraft current = null;
+    for (Assignment a : person.assignments()) if (a instanceof TaskCraft) {
+      current = (TaskCraft) a;
+    }
+    g.setColor(Color.WHITE);
+    ViewUtils.drawWrappedString(
+      "Current Crafting: "+(current == null ? "None" : current.made()), g,
+      vx + across, vy + down, 320, 30
+    );
+    //*/
     
     return true;
   }
   
   
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 

@@ -51,7 +51,7 @@ public class LeadTipoff extends Lead {
   }
   
   
-  public String choiceInfo() {
+  public String choiceInfo(Person p) {
     return "Anonymous Tip";
   }
   

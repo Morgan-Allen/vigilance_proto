@@ -48,6 +48,8 @@ public class LeadsListView extends UINode {
       return true;
     }
     
+    Lead hovered = null;
+    
     for (CaseFile file : played.leads.casesForRegion(region)) {
       //
       //  Firstly, draw an illustrative icon for the lead we've picked up and
@@ -69,10 +71,11 @@ public class LeadsListView extends UINode {
       for (Lead option : file.investigationOptions()) {
         TaskView view = option.createView(mainView);
         view.showIcon = false;
-        view.relBounds.set(vx, vy + down, vw, 45);
+        view.relBounds.set(vx, vy + down, vw, 20);
         view.renderNow(surface, g);
         down += view.relBounds.ydim() + 10;
         noEvents = false;
+        if (surface.wasHovered(option)) hovered = option;
       }
       //
       //  Finally, box it all in with a nice border-
@@ -80,7 +83,14 @@ public class LeadsListView extends UINode {
       g.drawRect(vx + 10, vy + initDown, vw - 20, down - initDown);
     }
     
-    if (noEvents) {
+    if (hovered != null) {
+      g.setColor(Color.LIGHT_GRAY);
+      ViewUtils.drawWrappedString(
+        hovered.testInfo(),
+        g, vx + 25, vy + down + 20, vw - 30, 150
+      );
+    }
+    else if (noEvents) {
       g.setColor(Color.LIGHT_GRAY);
       ViewUtils.drawWrappedString(
         "You have no active leads on criminal activity in this district.",

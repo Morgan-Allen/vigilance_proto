@@ -52,24 +52,7 @@ public class LeadGuard extends Lead {
       setCompleted(false);
     }
     else if (event.hasBegun()) {
-      final Series <Person> active = active();
       setCompleted(true);
-      
-      Place place = event.targetLocation();
-      SceneType sceneType = place.kind().sceneType();
-      Scene mission = sceneType.generateScene(place.world());
-      event.populateScene(mission);
-      
-      //
-      //  Finally, introduce the agents themselves-
-      int across = (mission.size() - (active.size())) / 2;
-      for (Person p : active) {
-        p.addAssignment(mission);
-        mission.enterScene(p, across++, 0);
-      }
-      
-      mission.assignMissionParameters(place, this, event);
-      base.world().enterScene(mission);
     }
     else resetTask();
     
@@ -78,15 +61,27 @@ public class LeadGuard extends Lead {
   
   
   protected void onSuccess() {
+    //
+    //  Firstly, generate the scene and populate with minions-
+    Place place = event.targetLocation();
+    SceneType sceneType = place.kind().sceneType();
+    Scene mission = sceneType.generateScene(place.world());
+    event.populateScene(mission);
+    //
+    //  Then, introduce the agents themselves-
+    final Series <Person> active = active();
+    int across = (mission.size() - (active.size())) / 2;
+    for (Person p : active) {
+      p.addAssignment(mission);
+      mission.enterScene(p, across++, 0);
+    }
+    //
+    //  Then, set the scene as active within the world-
+    mission.assignMissionParameters(place, this, event);
+    base.world().enterScene(mission);
   }
-  
-  
-  protected void onFailure() {
-  }
-  
-  
-  
-  
+
+
   /**  Rendering, debug and interface methods-
     */
   protected void presentMessage(World world) {
@@ -98,7 +93,7 @@ public class LeadGuard extends Lead {
   }
   
   
-  public String choiceInfo() {
+  public String choiceInfo(Person p) {
     return "Guard "+guarded;
   }
   

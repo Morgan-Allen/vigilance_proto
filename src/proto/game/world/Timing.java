@@ -138,8 +138,8 @@ public class Timing {
   }
   
   
-  public int totalMinutes() {
-    return (timeDays * 24 * 60) + (int) (timeHours * 60);
+  public int totalHours() {
+    return (timeDays * 24 * 60) + (int) (timeHours);
   }
   
   

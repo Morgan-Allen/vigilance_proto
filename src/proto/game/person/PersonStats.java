@@ -103,7 +103,7 @@ public class PersonStats {
   List <Ability> abilities = new List();
   
   static class Level {
-    float level, practice, bonus;
+    float level, xpGained, bonus;
     boolean learned;
   }
   Table <Trait, Level> levels = new Table();
@@ -127,7 +127,7 @@ public class PersonStats {
       Trait key = (Trait) s.loadObject();
       Level l = new Level();
       l.level    = s.loadFloat();
-      l.practice = s.loadFloat();
+      l.xpGained = s.loadFloat();
       l.bonus    = s.loadFloat();
       l.learned  = s.loadBool ();
       levels.put(key, l);
@@ -149,7 +149,7 @@ public class PersonStats {
       Level l = levels.get(a);
       s.saveObject(a);
       s.saveFloat(l.level   );
-      s.saveFloat(l.practice);
+      s.saveFloat(l.xpGained);
       s.saveFloat(l.bonus   );
       s.saveBool (l.learned );
     }
@@ -180,7 +180,7 @@ public class PersonStats {
   public float xpLevelFor(Trait trait) {
     Level l = levels.get(trait);
     if (l == null) return 0;
-    return l.practice / (l.level + 1f);
+    return l.xpGained / trait.xpRequired((int) l.level);
   }
   
   
@@ -397,7 +397,7 @@ public class PersonStats {
     if (level > 0) {
       final Level l = getLevel(a);
       l.level    = level;
-      l.practice = 0;
+      l.xpGained = 0;
       l.learned  = learned;
       if (keep) abilities.include((Ability) a);
     }
@@ -410,10 +410,10 @@ public class PersonStats {
   
   public void gainXP(Trait stat, float XP) {
     final Level l = getLevel(stat);
-    l.practice += XP;
+    l.xpGained += XP;
     
-    while (l.practice >= l.level + 1) {
-      l.practice -= l.level + 1;
+    while (l.xpGained >= l.level + 1) {
+      l.xpGained -= l.level + 1;
       l.level++;
       person.world().events.log(person+" reached level "+l.level+" in "+stat);
     }

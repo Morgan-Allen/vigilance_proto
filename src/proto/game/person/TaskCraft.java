@@ -23,7 +23,7 @@ public class TaskCraft extends Task {
   
   
   public TaskCraft(ItemType made, Base base) {
-    super(base, TIME_LONG, made.craftArgs);
+    super(base, made.craftTime, made.craftArgs);
     this.made = made;
   }
   
@@ -56,11 +56,6 @@ public class TaskCraft extends Task {
   }
   
   
-  public ItemType made() {
-    return made;
-  }
-  
-  
   public Place targetLocation() {
     return base;
   }
@@ -68,6 +63,16 @@ public class TaskCraft extends Task {
   
   public int assignmentPriority() {
     return PRIORITY_TRAINING;
+  }
+  
+  
+  public ItemType made() {
+    return made;
+  }
+  
+  
+  public int craftingTime() {
+    return super.timeTaken;
   }
   
   
@@ -79,7 +84,7 @@ public class TaskCraft extends Task {
   }
   
   
-  public String choiceInfo() {
+  public String choiceInfo(Person p) {
     String info = "Craft "+made;
     int total = base.stocks.numStored(made);
     info += "  (In stock: "+total+")";

@@ -37,7 +37,7 @@ public class ProgressOptionsView extends UINode {
     };
     addChildren(monitorButton);
     
-    down += 25;
+    down   += 25;
     across += 25;
     
     saveButton = new StringButton(

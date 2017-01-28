@@ -24,7 +24,7 @@ public abstract class Task implements Assignment {
     
     TIME_SHORT  = 1,
     TIME_MEDIUM = World.HOURS_PER_SHIFT,
-    TIME_LONG   = World.HOURS_PER_SHIFT * World.DAYS_PER_WEEK,
+    TIME_LONG   = World.HOURS_PER_DAY * 2,
     TIME_INDEF  = -1,
     
     TRIVIAL_DC = 1,
@@ -49,7 +49,7 @@ public abstract class Task implements Assignment {
   protected Task(
     Base base, int timeHours, Object... args
   ) {
-    this.timeTaken = timeHours <= 0 ? -1 : (timeHours * World.MINUTES_PER_HOUR);
+    this.timeTaken = timeHours <= 0 ? -1 : timeHours;
     this.initTime  = -1;
     this.base      = base;
     assignTestArgs(args);
@@ -153,8 +153,12 @@ public abstract class Task implements Assignment {
   
   public float hoursSoFar() {
     if (initTime == -1) return 0;
-    float minutes = base.world().timing.totalMinutes() - initTime;
-    return minutes / World.MINUTES_PER_HOUR;
+    return base.world().timing.totalHours() - initTime;
+  }
+  
+  
+  public float hoursLeft() {
+    return timeTaken - Nums.max(0, initTime);
   }
   
   
@@ -202,14 +206,12 @@ public abstract class Task implements Assignment {
   /**  Task performance and completion-
     */
   public boolean updateAssignment() {
-    //  TODO:  You need some way to screen out agents who are currently busy
-    //  with other tasks!
     if (active().empty() || complete()) return false;
     
     base.world().events.logAssignment(this);
     
     if (timeTaken > TIME_INDEF) {
-      final int time = base.world().timing.totalMinutes();
+      final int time = base.world().timing.totalHours();
       if (initTime == -1) initTime = time;
       if ((time - initTime) > timeTaken) attemptTask();
     }
@@ -306,15 +308,21 @@ public abstract class Task implements Assignment {
   }
   
   
-  protected abstract void onSuccess();
-  protected abstract void onFailure();
+  protected void onSuccess() {
+    return;
+  }
+  
+  
+  protected void onFailure() {
+    return;
+  }
   
   
   
   /**  Rendering, debug and interface methods-
     */
   protected abstract void presentMessage();
-  public abstract String choiceInfo();
+  public abstract String choiceInfo(Person p);
   
   
   public String testInfo() {

@@ -91,7 +91,7 @@ public class LeadInterrogate extends Lead {
   }
   
   
-  public String choiceInfo() {
+  public String choiceInfo(Person p) {
     return null;
   }
 }

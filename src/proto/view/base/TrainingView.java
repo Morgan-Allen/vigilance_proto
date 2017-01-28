@@ -17,26 +17,27 @@ import java.awt.Color;
 public class TrainingView extends UINode {
 
   final static Object[] STAT_DISPLAY_COORDS = {
-    BRAINS     , 0, 0 ,
-    REFLEXES   , 0, 1 ,
-    WILL       , 0, 2 ,
-    MUSCLE     , 0, 3 ,
+    BRAINS     , 0, 0 , 10,
+    REFLEXES   , 0, 1 , 10,
+    WILL       , 0, 2 , 10,
+    MUSCLE     , 0, 3 , 10,
     
-    ENGINEERING, 1, 0 ,
-    MEDICINE   , 1, 1 ,
-    QUESTION   , 1, 2 ,
-    PERSUADE   , 1, 3 ,
+    ENGINEERING, 0, 5 , 20,
+    MEDICINE   , 0, 6 , 20,
+    QUESTION   , 0, 7 , 20,
+    PERSUADE   , 0, 8 , 20,
     
-    ARMOUR     , 1, 5 ,
-    HEALTH     , 1, 6 ,
-    MIN_DAMAGE , 1, 7 ,
-    RNG_DAMAGE , 1, 8 ,
-    ACCURACY   , 1, 10,
-    DEFENCE    , 1, 11,
-    SIGHT_RANGE, 1, 12,
-    HIDE_RANGE , 1, 13,
-    MOVE_SPEED , 1, 14,
-    ACT_POINTS , 1, 15
+    ARMOUR     , 1, 0 , 20,
+    HEALTH     , 1, 1 , 20,
+    MIN_DAMAGE , 1, 2 , 20,
+    RNG_DAMAGE , 1, 3 , 20,
+    
+    ACCURACY   , 1, 5 , 100,
+    DEFENCE    , 1, 6 , 100,
+    SIGHT_RANGE, 1, 7 , 10,
+    HIDE_RANGE , 1, 8 , 10,
+    MOVE_SPEED , 1, 9 , 40,
+    ACT_POINTS , 1, 10, 10,
   };
   
   
@@ -62,14 +63,25 @@ public class TrainingView extends UINode {
     Surface surface, Graphics2D g, final Person person
   ) {
     final Base base = mainView.world().playerBase();
-    int down = 10, across = vw - 320;
+    int down = 10, across = 10;
     
-    TaskTrain hovered = null;
+    TaskTrain current = null;
+    for (Assignment a : person.assignments()) if (a instanceof TaskTrain) {
+      current = (TaskTrain) a;
+    }
+    g.setColor(Color.WHITE);
+    ViewUtils.drawWrappedString(
+      "Training: "+(current == null ? "None" : current.trained()), g,
+      vx + across, vy + down, 320, 30
+    );
+    
+    down += 30;
+    TaskTrain hovered = current;
     
     for (TaskTrain option : base.training.trainingTasksFor(person)) {
       TaskView view = option.createView(mainView);
       view.showIcon = false;
-      view.relBounds.set(vx + across, vy + down, 320, 45);
+      view.relBounds.set(vx + across, vy + down, 320, 20);
       view.renderNow(surface, g);
       down += view.relBounds.ydim() + 10;
       if (surface.wasHovered(option)) hovered = option;
@@ -77,7 +89,18 @@ public class TrainingView extends UINode {
     
     if (hovered != null) {
       down += 10;
+      
+      Ability trained = hovered.trained();
+      float xp = person.stats.xpLevelFor(trained);
+      int trainTime = hovered.trainingTime(person) / World.HOURS_PER_DAY;
+      int costAP = trained.minCostAP();
       String desc = hovered.trained().description;
+      
+      if (trainTime <= 0) desc += "\n  Cannot train when badly wounded.";
+      else desc += "\n  Training time: "+trainTime+" days";
+      desc += " ("+(int) (xp * 100)+"% complete).";
+      if (costAP > 0) desc += "\n  Base AP cost: "+costAP;
+      
       g.setColor(Color.LIGHT_GRAY);
       ViewUtils.drawWrappedString(desc, g, vx + across, vy + down, 320, 200);
     }
@@ -92,38 +115,38 @@ public class TrainingView extends UINode {
     Trait hovered = null;
     
     g.setColor(Color.WHITE);
-    int down = 10;
-    
+    int down = 10, across = vw - 360;
     for (Trait t : ALL_STATS) {
       int index = Visit.indexOf(t, STAT_DISPLAY_COORDS);
       if (index == -1) continue;
       
       int   level = person.stats.levelFor  (t);
       float XP    = person.stats.xpLevelFor(t);
-      int x = (Integer) STAT_DISPLAY_COORDS[index + 1];
-      int y = (Integer) STAT_DISPLAY_COORDS[index + 2];
+      int x   = (Integer) STAT_DISPLAY_COORDS[index + 1];
+      int y   = (Integer) STAT_DISPLAY_COORDS[index + 2];
+      int max = (Integer) STAT_DISPLAY_COORDS[index + 3];
       x = (x * 150) + 10;
       y *= 20;
       Color forT = Color.LIGHT_GRAY;
       
-      if (surface.tryHover(vx + x, vy + y + down, 150, 20, t)) {
+      if (surface.tryHover(vx + x + across, vy + y + down, 150, 20, t)) {
         hovered = t;
         forT = Color.YELLOW;
       }
       
       ViewUtils.renderStatBar(
-        vx + x + 100, vy + y + down, 50, 15,
-        Color.DARK_GRAY, null, level / 10f, false, g
+        vx + x + 100 + across, vy + y + down, 50, 15,
+        Color.DARK_GRAY, null, level * 1f / max, false, g
       );
       ViewUtils.renderStatBar(
-        vx + x + 100, vy + y + down + 15, 50, 5,
+        vx + x + 100 + across, vy + y + down + 15, 50, 5,
         Color.GRAY, null, XP, false, g
       );
       
       g.setColor(forT);
-      g.drawString(t.name  , vx + x      , vy + y + down + 15);
+      g.drawString(t.name  , vx + x + across, vy + y + down + 15);
       g.setColor(Color.WHITE);
-      g.drawString(""+level, vx + x + 100, vy + y + down + 15);
+      g.drawString(""+level, vx + x + 100 + across, vy + y + down + 15);
     }
     
     if (hovered != null) {
@@ -150,7 +173,7 @@ public class TrainingView extends UINode {
       desc = hovered.description + desc;
       
       ViewUtils.drawWrappedString(
-        desc, g, vx + 20, vy + down + (18 * 20), 300, 100
+        desc, g, vx + 20 + across, vy + down + (12 * 20), 300, 100
       );
     }
   }

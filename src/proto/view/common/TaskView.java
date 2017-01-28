@@ -43,13 +43,15 @@ public class TaskView extends UINode {
       iconSize = 0;
     }
     ViewUtils.drawWrappedString(
-      task.choiceInfo(), g,
-      vx + 20 + iconSize + 5, vy, vw - (20 + iconSize + 20), vh - 15
+      task.choiceInfo(person), g,
+      vx + 20 + iconSize + 5, vy, vw - (20 + iconSize + 20), vh - 0
     );
+    /*
     ViewUtils.drawWrappedString(
       task.testInfo(), g,
       vx + 20 + iconSize + 5, vy + vh - 20, vw - (20 + iconSize + 20), 20
     );
+    //*/
     //
     //  Draw the highlight/selection rectangle, and toggle selection if
     //  clicked-

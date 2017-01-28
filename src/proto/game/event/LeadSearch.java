@@ -67,7 +67,7 @@ public class LeadSearch extends Lead {
   }
   
   
-  public String choiceInfo() {
+  public String choiceInfo(Person p) {
     return "Searched "+searched;
   }
   

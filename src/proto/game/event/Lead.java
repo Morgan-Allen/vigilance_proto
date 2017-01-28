@@ -97,7 +97,7 @@ public abstract class Lead extends Task {
     
     world.view().queueMessage(new MessageView(
       world.view(),
-      icon(), "Task complete: "+choiceInfo(),
+      icon(), "Task complete: "+activeInfo(),
       s.toString(),
       "Dismiss"
     ) {

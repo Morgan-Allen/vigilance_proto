@@ -139,7 +139,7 @@ public class Event implements Session.Saveable, Assignment {
   
   public boolean hasBegun() {
     if (timeBegins == -1) return false;
-    return world.timing.totalMinutes() >= timeBegins;
+    return world.timing.totalHours() >= timeBegins;
   }
   
   

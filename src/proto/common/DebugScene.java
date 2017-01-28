@@ -56,7 +56,6 @@ public class DebugScene extends RunGame {
     final CaseFile file = base.leads.caseFor(home);
     file.recordRole(kidnapEvent, CaseFile.ROLE_SCENE, tipoff);
     
-    //*
     final Base HQ = world.playerBase();
     Task guarding = file.investigationOptions().first();
     for (Person p : HQ.roster()) {
@@ -65,10 +64,9 @@ public class DebugScene extends RunGame {
       p.gear.equipItem(Gadgets.MED_KIT    , PersonGear.SLOT_ITEM_1);
       p.gear.equipItem(Gadgets.TEAR_GAS   , PersonGear.SLOT_ITEM_2);
       p.updateOnBase();
-      guarding.setAssigned(p, true);
+      p.addAssignment(guarding);
     }
     guarding.setCompleted(true);
-    //*/
     
     return world;
   }

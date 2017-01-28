@@ -2,14 +2,10 @@
 
 package proto.game.person;
 import proto.common.*;
-import proto.game.person.*;
 import proto.game.world.*;
 import proto.util.*;
 import proto.view.*;
-import proto.view.common.MainView;
-import proto.view.common.MessageView;
-import proto.view.common.TaskView;
-
+import proto.view.common.*;
 import java.awt.Image;
 
 
@@ -17,16 +13,19 @@ import java.awt.Image;
 public class TaskTrain extends Task {
   
   
+  
+  /**  Data fields, construction and save/load methods-
+    */
   final static int
     ABILITY_BASE_LEARN_TIME = World.HOURS_PER_DAY * World.DAYS_PER_WEEK
   ;
   
-  Trait trained;
+  Ability trained;
   Trait talking;
   
   
-  public TaskTrain(Trait trained, Trait talking, Base base) {
-    super(base, TIME_MEDIUM, trained, 0);
+  public TaskTrain(Ability trained, Trait talking, Base base) {
+    super(base, TIME_INDEF, trained, 0);
     this.trained = trained;
     this.talking = talking;
   }
@@ -34,8 +33,8 @@ public class TaskTrain extends Task {
   
   public TaskTrain(Session s) throws Exception {
     super(s);
-    trained = (Trait) s.loadObject();
-    talking = (Trait) s.loadObject();
+    trained = (Ability) s.loadObject();
+    talking = (Trait  ) s.loadObject();
   }
   
   
@@ -46,60 +45,14 @@ public class TaskTrain extends Task {
   }
   
   
+  
+  /**  Filler methods for task completion-
+    */
   public boolean allowsAssignment(Person p) {
     for (Trait root : trained.roots()) {
       if (p.stats.levelFor(root) <= 0) return false;
     }
     return true;
-  }
-
-
-  protected void onCompletion() {
-    //
-    //  TODO:  Rates of XP and relations-gain need to be balanced.
-    //  TODO:  Allow for the possibility of more efficient solo training
-    //         under particular circumstances?
-    final Trait chatWith = Rand.yes() ? talking : PersonStats.PERSUADE;
-    final Series <Person> active = active();
-    float maxLevel = 0, numPeers = active.size() - 1;
-    
-    for (Person p : active) {
-      maxLevel = Nums.max(maxLevel, p.stats.levelFor(trained));
-    }
-    
-    for (Person p : assigned()) {
-      float trainBonus = 0;
-      //
-      //  If you're training in a group, then you gain a bonus for whoever has
-      //  the highest skill-rating, and for successfully performing a needed
-      //  conversation skill.
-      if (numPeers > 0) {
-        float ownLevel = p.stats.levelFor(trained);
-        if (performTest(chatWith, p, MEDIUM_DC)) trainBonus += 0.5f;
-        trainBonus += (maxLevel + MEDIUM_DC) * 0.5f / (ownLevel + MEDIUM_DC);
-      }
-      //
-      //  Otherwise you gain XP at a fixed rate-
-      float gainedXP = 1;
-      gainedXP *= (1 + trainBonus) / 10f;
-      p.stats.gainXP(trained, gainedXP);
-      //
-      //  Then you boost any related relationships.
-      for (Person o : assigned()) if (o != p) {
-        p.history.incBond(o, (1f + trainBonus) / 100);
-      }
-    }
-    
-    presentMessage();
-    resetTask();
-  }
-  
-  
-  protected void onFailure() {
-  }
-  
-  
-  protected void onSuccess() {
   }
   
   
@@ -108,13 +61,76 @@ public class TaskTrain extends Task {
   }
   
   
-  public Trait trained() {
-    return trained;
+  public int assignmentPriority() {
+    return PRIORITY_TRAINING;
   }
   
   
-  public int assignmentPriority() {
-    return PRIORITY_TRAINING;
+  public boolean updateAssignment() {
+    if (! super.updateAssignment()) return false;
+    
+    float timeHours = base.world().timing.hoursInTick();
+    for (Person p : active()) {
+      final int oldLevel = p.stats.levelFor(trained);
+      advanceTraining(p, timeHours);
+      final int newLevel = p.stats.levelFor(trained);
+      if (newLevel > oldLevel) presentMessage();
+    }
+    
+    return true;
+  }
+  
+  
+  /**  Training-specific methods-
+    */
+  void advanceTraining(Person person, float timeHours) {
+    int level = person.stats.levelFor(trained);
+    float xpGain = trained.xpRequired(level);
+    xpGain *= timeHours / trainingTime(person);
+    person.stats.gainXP(trained, xpGain);
+  }
+  
+  
+  float trainBonus(Person person) {
+    float trainBonus = 0;
+    //
+    //  If you're training in a group, then you gain a bonus for whoever has
+    //  the highest skill-rating, and for having a needed conversation skill.
+    int numPeers = 0, maxLevel = 0;
+    for (Person p : active()) if (p != person) {
+      maxLevel = Nums.max(maxLevel, p.stats.levelFor(trained));
+      numPeers++;
+    }
+    if (numPeers > 0) {
+      int ownLevel = person.stats.levelFor(trained);
+      float chatChance = person.stats.levelFor(PersonStats.PERSUADE);
+      chatChance = Nums.clamp(chatChance / MEDIUM_DC, 0, 1);
+      maxLevel *= chatChance;
+      trainBonus += (maxLevel + MEDIUM_DC) * 0.5f / (ownLevel + MEDIUM_DC);
+    }
+    //
+    //  If you're wounded, increase the time taken-
+    float woundLevel = (1 - person.health.healthLevel()) * 2;
+    return trainBonus - Nums.clamp(woundLevel, 0, 1);
+  }
+  
+  
+  public int trainingTime(Person person) {
+    float trainBonus = trainBonus(person);
+    if (trainBonus <= -1) return -1;
+    int level = person.stats.levelFor(trained);
+    return (int) (ABILITY_BASE_LEARN_TIME * (1 + level) / (1 + trainBonus));
+  }
+  
+  
+  public int trainingTimeLeft(Person person) {
+    float xp = person.stats.xpLevelFor(trained);
+    return (int) (trainingTime(person) * (1 - xp));
+  }
+  
+  
+  public Ability trained() {
+    return trained;
   }
   
   
@@ -127,8 +143,9 @@ public class TaskTrain extends Task {
   }
   
   
-  public String choiceInfo() {
-    return "Learn "+trained;
+  public String choiceInfo(Person p) {
+    int level = p.stats.levelFor(trained) + 1;
+    return "Train "+trained+" ("+trained.levelDesc(level)+")";
   }
   
   
