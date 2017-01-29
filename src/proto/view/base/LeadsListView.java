@@ -32,10 +32,9 @@ public class LeadsListView extends UINode {
     
     g.setColor(Color.LIGHT_GRAY);
     
-    int down = 10;
+    int across = 10, down = 10;
     boolean noEvents = true;
     Base played = mainView.world().playerBase();
-    
     Region region = parent.mapView.selectedRegion();
     
     if (region == null) {
@@ -47,6 +46,10 @@ public class LeadsListView extends UINode {
       );
       return true;
     }
+    
+    g.setColor(Color.WHITE);
+    g.drawString(region.kind().name(), vx + across, vy + down);
+    down += 20;
     
     Lead hovered = null;
     

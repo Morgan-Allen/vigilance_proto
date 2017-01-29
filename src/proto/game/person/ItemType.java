@@ -157,6 +157,36 @@ public class ItemType extends Kind {
   }
   
   
+  protected boolean triggerOnAttack(Volley volley) {
+    return volley.weaponType() == this;
+  }
+  
+  
+  protected boolean triggerOnDefend(Volley volley) {
+    return volley.armourType() == this;
+  }
+  
+  
+  public void applyOnAttackStart(Volley volley) {
+    return;
+  }
+  
+  
+  public void applyOnAttackEnd(Volley volley) {
+    return;
+  }
+  
+  
+  public void applyOnDefendStart(Volley volley) {
+    return;
+  }
+  
+  
+  public void applyOnDefendEnd(Volley volley) {
+    return;
+  }
+  
+  
   
   /**  Rendering, debug and interface methods-
     */

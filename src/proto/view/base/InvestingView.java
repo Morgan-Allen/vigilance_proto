@@ -93,12 +93,14 @@ public class InvestingView extends UINode {
     }
     
     final BaseFinance BF = base.finance;
-    s.append("\n\nPublic Finances");
+    int margin = BF.publicIncome() - BF.publicExpense();
+    s.append("\n\nJanus Industries");
     s.append("\n  Total Income: " +BF.publicIncome ());
     s.append("\n  Total Expense: "+BF.publicExpense());
     s.append("\n  Public Funds: " +BF.publicFunds  ());
+    s.append(" ("+I.signNum(margin)+" per month)");
     
-    s.append("\n\nJANUS Project:");
+    s.append("\n\nProject Vigil");
     s.append("\n  Total Income: " +BF.secretIncome ());
     s.append(" ("+BF.secretPercent()+"% of revenue)");
     s.append("\n  Total Expense: "+BF.secretExpense());
@@ -110,4 +112,5 @@ public class InvestingView extends UINode {
     );
   }
 }
+
 

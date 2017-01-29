@@ -11,29 +11,38 @@ public class Villains {
   final static String IMG_DIR = "media assets/character icons/";
   
   final public static Kind
-    FALCONE  = Kind.ofPerson(
-      "Falcone", "person_kind_falcone", IMG_DIR+"icon_falcone.png",
-      "", null,
-      Kind.SUBTYPE_BOSS,
-      BRAINS  , 6 ,
-      REFLEXES, 5 ,
-      WILL    , 7 ,
-      MUSCLE  , 5 ,
-      
-      QUESTION, 6 ,
-      PERSUADE, 7
-    ),
-    TWO_FACE = Kind.ofPerson(
-      "Two-Face", "person_kind_two_face", IMG_DIR+"icon_two_face.png",
-      "", null,
+    MORETTI  = Kind.ofPerson(
+      "Moretti", "villain_kind_moretti", IMG_DIR+"icon_moretti.png",
+      "<moretti description>", null,
       Kind.SUBTYPE_BOSS,
       BRAINS  , 8 ,
+      REFLEXES, 5 ,
+      WILL    , 7 ,
+      MUSCLE  , 3 ,
+      
+      QUESTION, 5 ,
+      PERSUADE, 8
+    ),
+    SNAKE_EYES = Kind.ofPerson(
+      "Snake Eyes", "villain_kind_snake_eyes", IMG_DIR+"icon_snake_eyes.png",
+      "<snake-eyes description>", null,
+      Kind.SUBTYPE_BOSS,
+      BRAINS  , 7 ,
       REFLEXES, 7 ,
       WILL    , 5 ,
-      MUSCLE  , 7 ,
+      MUSCLE  , 6 ,
       
       QUESTION, 8 ,
-      PERSUADE, 6
+      PERSUADE, 4
     )
   ;
 }
+
+
+
+
+
+
+
+
+

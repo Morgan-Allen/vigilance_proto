@@ -299,6 +299,12 @@ public abstract class Ability extends Trait {
       if (start) volley.beginVolley   ();
       if (end  ) volley.completeVolley();
       
+      if (self != null) for (Item item : self.gear.equipped()) {
+        if (! item.kind().triggerOnAttack(volley)) continue;
+        if (start) item.kind().applyOnAttackStart(volley);
+        if (end  ) item.kind().applyOnAttackEnd  (volley);
+      }
+      
       if (self != null && self.actions.nextAction() != null) {
         Ability a = self.actions.nextAction().used;
         if (a.triggerOnAttack() && a.allowsTarget(self, scene, self)) {
@@ -313,6 +319,12 @@ public abstract class Ability extends Trait {
           if (start) a.applyOnAttackStart(volley);
           if (end  ) a.applyOnAttackEnd  (volley);
         }
+      }
+      
+      if (hits != null) for (Item item : hits.gear.equipped()) {
+        if (! item.kind().triggerOnDefend(volley)) continue;
+        if (start) item.kind().applyOnDefendStart(volley);
+        if (end  ) item.kind().applyOnDefendEnd  (volley);
       }
       
       if (hits != null && hits.actions.nextAction() != null) {

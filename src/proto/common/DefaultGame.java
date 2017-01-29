@@ -21,7 +21,7 @@ public class DefaultGame extends RunGame {
   
   
   public static void main(String args[]) {
-    runGame(new DebugScene(), DEFAULT_SAVE_PATH);
+    runGame(new DefaultGame(), DEFAULT_SAVE_PATH);
   }
   
   
@@ -99,13 +99,14 @@ public class DefaultGame extends RunGame {
     
     final ItemType craftTechs[] = {
       Gadgets.WING_BLADES,
+      Gadgets.REVOLVER,
       Gadgets.BODY_ARMOUR,
       Gadgets.KEVLAR_VEST,
-      Gadgets.MED_KIT
+      Gadgets.MED_KIT,
+      Gadgets.SONIC_PROBE
     };
     for (Object t : craftTechs) {
       base.addTech(t);
-      base.stocks.incStock((ItemType) t, 4);
     }
     
     base.finance.setSecretPercent(2);
@@ -126,20 +127,20 @@ public class DefaultGame extends RunGame {
     };
     
     final Batch <Base> hideouts = new Batch();
-    final Person falcone = new Person(Villains.FALCONE, world);
-    final Base falconeBase = new Base(Facilities.HIDEOUT, world, true);
-    world.regionFor(Regions.SECTOR04).setAttached(falconeBase, true);
-    falconeBase.setLeader(falcone);
-    falconeBase.finance.setSecretPercent(0);
-    falconeBase.finance.incPublicFunds(100);
-    hideouts.add(falconeBase);
+    final Person boss1 = new Person(Villains.MORETTI, world);
+    final Base base1 = new Base(Facilities.HIDEOUT, world, true);
+    world.regionFor(Regions.SECTOR04).setAttached(base1, true);
+    base1.setLeader(boss1);
+    base1.finance.setSecretPercent(0);
+    base1.finance.incPublicFunds(100);
+    hideouts.add(base1);
     
     /*
-    final Person twoFace = new Person(Villains.TWO_FACE, world);
-    final Base twoFaceBase = new Base(Facilities.HIDEOUT, world);
-    world.regionFor(Regions.MILLER_BAY).setAttached(twoFaceBase, true);
-    twoFaceBase.setLeader(twoFace);
-    hideouts.add(twoFaceBase);
+    final Person boss2 = new Person(Villains.SNAKE_EYES, world);
+    final Base base2 = new Base(Facilities.HIDEOUT, world, true);
+    world.regionFor(Regions.SECTOR07).setAttached(base2, true);
+    base2.setLeader(boss2);
+    hideouts.add(base2);
     //*/
     
     for (Base base : hideouts) {

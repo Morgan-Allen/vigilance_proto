@@ -58,21 +58,19 @@ public class DebugScene extends RunGame {
     
     final Base HQ = world.playerBase();
     Task guarding = file.investigationOptions().first();
+    int ID = 0;
     for (Person p : HQ.roster()) {
-      p.gear.equipItem(Gadgets.WING_BLADES, PersonGear.SLOT_WEAPON);
-      p.gear.equipItem(Gadgets.KEVLAR_VEST, PersonGear.SLOT_ARMOUR);
-      p.gear.equipItem(Gadgets.MED_KIT    , PersonGear.SLOT_ITEM_1);
-      p.gear.equipItem(Gadgets.TEAR_GAS   , PersonGear.SLOT_ITEM_2);
+      ItemType gadget1 = ID % 2 == 0 ? Gadgets.MED_KIT     : Gadgets.MED_KIT ;
+      ItemType gadget2 = ID % 2 == 0 ? Gadgets.SONIC_PROBE : Gadgets.TEAR_GAS;
+      p.gear.equipItem(gadget1, PersonGear.SLOT_ITEM_1);
+      p.gear.equipItem(gadget2, PersonGear.SLOT_ITEM_2);
       p.updateOnBase();
       p.addAssignment(guarding);
+      ID++;
     }
     guarding.setCompleted(true);
     
     return world;
   }
 }
-
-
-
-
 

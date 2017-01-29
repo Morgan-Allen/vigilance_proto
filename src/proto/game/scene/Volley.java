@@ -131,6 +131,8 @@ public class Volley implements Session.Saveable {
   
   public boolean ranged() { return   ranged; }
   public boolean melee () { return ! ranged; }
+  public ItemType weaponType() { return weaponType; }
+  public ItemType armourType() { return armourType; }
   
   
   public boolean hasDamageType(int properties) {
@@ -158,14 +160,15 @@ public class Volley implements Session.Saveable {
     this.targ   = hits  ;
     this.ranged = ranged;
     
-    ItemType weapon = self.gear.weaponType();
-    damageType = weapon.properties;
+    weaponType = self.gear.weaponType();
+    armourType = hits.gear.armourType();
+    damageType = weaponType.properties;
     
     selfDamageBase  = self.stats.levelFor(MIN_DAMAGE);
     selfDamageRange = self.stats.levelFor(RNG_DAMAGE);
     hitsArmour      = hits.stats.levelFor(ARMOUR    );
     
-    if (weapon.melee() && ! ranged) {
+    if (weaponType.melee() && ! ranged) {
       float brawnBonus = self.stats.levelFor(MUSCLE) / 2f;
       selfAccuracy = self.stats.levelFor(ACCURACY);
       selfDamageBase  += Nums.ceil (brawnBonus);

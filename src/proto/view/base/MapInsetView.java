@@ -103,9 +103,10 @@ public class MapInsetView extends UINode {
   /**  Actual rendering methods-
     */
   protected boolean renderTo(Surface surface, Graphics2D g) {
-    Region districts[] = mainView.world().regions();
+    Region regions[] = mainView.world().regions();
     Base played = mainView.world().playerBase();
-    attachOutlinesFor(districts);
+    attachOutlinesFor(regions);
+    if (selectedRegion() == null) setSelectedRegion(regions[0]);
     //
     //  Draw the background image first-
     g.drawImage(mapImage, vx, vy, vw, vh, null);
@@ -128,7 +129,7 @@ public class MapInsetView extends UINode {
     
     ///if (I.used60Frames) I.say("Pixel value is: "+pixVal);
     
-    for (Region n : districts) if (n.kind().view.colourKey == pixVal) {
+    for (Region n : regions) if (n.kind().view.colourKey == pixVal) {
       regionHovered = n;
     }
     if (regionHovered != null && surface.mouseClicked()) {
@@ -138,7 +139,7 @@ public class MapInsetView extends UINode {
     renderOutline(selectedRegion(), surface, g, mapWRatio, mapHRatio);
     renderOutline(regionHovered   , surface, g, mapWRatio, mapHRatio);
     
-    for (Region n : districts) {
+    for (Region n : regions) {
       int x = (int) ((n.kind().view.centerX / mapWRatio) + vx);
       int y = (int) ((n.kind().view.centerY / mapHRatio) + vy);
       

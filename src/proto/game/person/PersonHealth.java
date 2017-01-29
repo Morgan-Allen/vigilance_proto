@@ -133,6 +133,13 @@ public class PersonHealth {
   }
   
   
+  public void receiveTrauma(float trauma) {
+    this.totalHarm += injury;
+    checkState();
+    person.world().events.log(person+" suffered "+trauma+" trauma.");
+  }
+  
+  
   public void receiveAttack(Volley attack) {
     if (attack.didConnect) {
       receiveInjury(attack.injureDamage);

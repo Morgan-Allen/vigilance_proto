@@ -46,7 +46,6 @@ public class RegionView extends UINode {
       return false;
     }
     
-    final Base base = mainView.world().playerBase();
     g.setColor(Color.WHITE);
     g.drawString(region.kind().name(), vx + 20, vy + 20);
     
@@ -80,7 +79,6 @@ public class RegionView extends UINode {
   ) {
     final int maxF = d.maxFacilities();
     int across = 25, down = 125;
-    //final Vars.Int hoverSlot = new Vars.Int(-1);
     int hoverSlotID = -1;
     
     for (int n = 0; n < maxF; n++) {
@@ -128,7 +126,7 @@ public class RegionView extends UINode {
       final float     prog  = slot.buildProgress();
       
       String desc = "";
-      desc += "\n\n"+built.defaultInfo();
+      desc += built.defaultInfo();
       desc += "\nOwned by: "+owns;
       if (prog < 1) desc += " ("+((int) (prog * 100))+"% complete)";
       

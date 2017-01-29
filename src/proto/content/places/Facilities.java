@@ -70,7 +70,7 @@ public class Facilities {
     400, BUILD_TIME_MEDIUM, URBAN_SCENE,
     EMPLOYMENT, 2,
     EDUCATION, -1,
-    DETERRENCE, 1,
+    DETERRENCE, 10,
     INCOME, -100,
     Civilians.CIVILIAN, 1
   );
@@ -115,8 +115,8 @@ public class Facilities {
     "A place of refuge for the city's most desperate, Soup Kitchens afford "+
     "shelter from bad weather, gnawing hunger and cruel intentions.",
     600, BUILD_TIME_SHORT, URBAN_SCENE,
-    TRUST, 1,
-    VIOLENCE, -1,
+    TRUST, 10,
+    VIOLENCE, -10,
     INCOME, -100
   );
   
@@ -128,7 +128,7 @@ public class Facilities {
     "tenure.",
     1200, BUILD_TIME_LONG, URBAN_SCENE,
     EDUCATION, 2,
-    TRUST, 1,
+    TRUST, 10,
     INCOME, -100,
     Civilians.DOCTOR, 1
   );

@@ -43,9 +43,6 @@ public class MissionsView extends UINode {
   
   protected boolean renderTo(Surface surface, Graphics2D g) {
     
-    final World world = mainView.world();
-    final Base  base  = world.playerBase();
-    
     Person person = mainView.rosterView.selectedPerson();
     if (person != null) {
       g.setColor(Color.WHITE);

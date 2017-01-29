@@ -8,7 +8,6 @@ import proto.util.*;
 
 
 
-
 public class Clue extends Element {
   
   
@@ -42,9 +41,6 @@ public class Clue extends Element {
   public ClueType kind() {
     return (ClueType) kind;
   }
-  
-  
 }
-
 
 

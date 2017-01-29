@@ -110,28 +110,17 @@ public class Kind extends Index.Entry implements Session.Saveable {
   
   protected static void initStatsFor(Kind k, Object... initStats) {
     Batch <Object> allKeys = new Batch();
-    Object  readK = null;
-    Integer readL = null;
     
-    for (Object o : initStats) {
-      if (o instanceof Integer) {
-        readL = (Integer) o;
+    for (int i = 0; i < initStats.length; i++) {
+      Object arg = initStats[i];
+      Integer pref = numberAt(i, initStats), post = numberAt(i + 1, initStats);
+      if (pref == null && post != null) {
+        allKeys.add(arg);
+        k.traitLevels.put(arg, post);
       }
-      else if (o instanceof Float) {
-        readL = (int) (float) (Float) o;
-      }
-      else {
-        if (readL == null && readK != null) {
-          allKeys.add(readK);
-          k.traitLevels.put(readK, 1);
-        }
-        readK = o;
-      }
-      if (readL != null && readL != null) {
-        allKeys.add(readK);
-        k.traitLevels.put(readK, readL);
-        readK = null;
-        readL = null;
+      else if (pref == null) {
+        allKeys.add(arg);
+        k.traitLevels.put(arg, 1);
       }
     }
 
@@ -149,10 +138,20 @@ public class Kind extends Index.Entry implements Session.Saveable {
         if (e.isCustom()) allC.add(e);
       }
     }
+    
     k.baseTraits   = allT.toArray(Trait   .class);
     k.baseEquipped = allE.toArray(ItemType.class);
     k.customItems  = allC.toArray(ItemType.class);
     k.childTypes   = allK.toArray(Kind    .class);
+  }
+  
+  
+  protected static Integer numberAt(int index, Object args[]) {
+    if (index < 0 || index >= args.length) return null;
+    Object arg = args[index];
+    if (arg instanceof Integer) return (Integer) arg;
+    if (arg instanceof Float) return (int) (float) (Float) arg;
+    return null;
   }
   
   

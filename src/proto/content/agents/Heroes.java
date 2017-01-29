@@ -2,6 +2,7 @@
 
 package proto.content.agents;
 import proto.common.*;
+import proto.content.items.Gadgets;
 import proto.game.world.*;
 import proto.game.event.*;
 import proto.game.person.*;
@@ -29,7 +30,10 @@ public class Heroes {
       ENGINEERING  , 8,
       MEDICINE     , 8,
       QUESTION     , 7,
-      PERSUADE     , 5
+      PERSUADE     , 5,
+      
+      Gadgets.WING_BLADES,
+      Gadgets.KEVLAR_VEST
     )
   ;
   
@@ -47,7 +51,10 @@ public class Heroes {
       ENGINEERING  , 6,
       MEDICINE     , 6,
       QUESTION     , 5,
-      PERSUADE     , 7
+      PERSUADE     , 7,
+      
+      Gadgets.REVOLVER,
+      Gadgets.BODY_ARMOUR
     )
   ;
   
@@ -65,7 +72,10 @@ public class Heroes {
       ENGINEERING  , 3,
       MEDICINE     , 3,
       QUESTION     , 7,
-      PERSUADE     , 8
+      PERSUADE     , 8,
+      
+      Gadgets.WING_BLADES,
+      Gadgets.BODY_ARMOUR
     )
   ;
   
@@ -83,7 +93,10 @@ public class Heroes {
       ENGINEERING  , 6,
       MEDICINE     , 6,
       QUESTION     , 8,
-      PERSUADE     , 5
+      PERSUADE     , 5,
+      
+      Gadgets.REVOLVER,
+      Gadgets.KEVLAR_VEST
     )
   ;
   

@@ -5,6 +5,8 @@ import proto.common.*;
 import proto.game.person.*;
 import proto.game.scene.*;
 import proto.game.world.*;
+import proto.util.Rand;
+
 import static proto.game.person.PersonStats.*;
 import static proto.game.person.ItemType.*;
 import static proto.game.person.PersonGear.*;
@@ -27,7 +29,7 @@ public class Gadgets {
     "Lightweight, throwable projectiles, useful to disarm or startle foes.",
     ICONS_DIR+"icon_wing_blades.png",
     SPRITE_DIR+"sprite_wing_blade.png",
-    SLOT_TYPE_WEAPON, 4, new Object[] {
+    SLOT_TYPE_WEAPON, 20, new Object[] {
       ENGINEERING, 2
     },
     IS_WEAPON | IS_RANGED | IS_KINETIC | IS_CONSUMED
@@ -36,6 +38,31 @@ public class Gadgets {
       if (trait == MIN_DAMAGE) return 2;
       if (trait == RNG_DAMAGE) return 3;
       return 0;
+    }
+  };
+  
+  final public static ItemType REVOLVER = new ItemType(
+    "Revolver", "item_revolver",
+    "A light, portable sidearm.  Deals significant damage, but with a higher "+
+    "risk of death or lasting injury.",
+    ICONS_DIR+"icon_revolver.png",
+    SPRITE_DIR+"sprite_revolver.png",
+    SLOT_TYPE_WEAPON, 40, new Object[] {
+      ENGINEERING, 4
+    },
+    IS_WEAPON | IS_RANGED | IS_KINETIC 
+  ) {
+    public float passiveModifierFor(Person person, Trait trait) {
+      if (trait == MIN_DAMAGE) return 4;
+      if (trait == RNG_DAMAGE) return 5;
+      return 0;
+    }
+    
+    public void applyOnAttackEnd(Volley volley) {
+      Person mark = volley.targAsPerson();
+      mark.health.receiveTrauma(2 + Rand.index(4));
+      mark.health.toggleBleeding(true);
+      return;
     }
   };
   
@@ -114,12 +141,12 @@ public class Gadgets {
   final static Ability TEAR_GAS_ABILITY = new Ability(
     "Tear Gas", "tear_gas_condition",
     ICONS_DIR+"sprite_grenade.png",
-    "Reduces accuracy and limits action.  Lasts three turns.",
+    "Reduces accuracy, sight range and action-points.  Lasts three turns.",
     Ability.IS_CONDITION | Ability.IS_AREA_EFFECT | Ability.IS_RANGED, 2,
     Ability.MINOR_HARM, Ability.MEDIUM_POWER
   ) {
     final Image GRENADE_IMG = Kind.loadImage(SPRITE_DIR+"sprite_grenade.png");
-    final Image BURST_IMG = Kind.loadImage(SPRITE_DIR+"sprite_smoke.png");
+    final Image BURST_IMG   = Kind.loadImage(SPRITE_DIR+"sprite_smoke.png"  );
     
     public int maxRange() {
       //  TODO:  Base this off the thrower's strength (as with other
@@ -147,6 +174,13 @@ public class Gadgets {
       use.scene().view().addTempFX(BURST_IMG, 3, at.x, at.y, 0, 1);
     }
     
+    public float conditionModifierFor(Person person, Trait trait) {
+      if (trait == ACT_POINTS ) return -1;
+      if (trait == SIGHT_RANGE) return -2;
+      if (trait == ACCURACY   ) return -30;
+      return 0;
+    }
+    
     public void renderUsageFX(Action use, Scene scene, Graphics2D g) {
       FX.renderMissile(use, scene, GRENADE_IMG, g);
     }
@@ -166,7 +200,41 @@ public class Gadgets {
     
   };
   
-  //  TODO:  Create a 'sonic probe' item...
+  
+  //  TODO:  The area revealed should last until the end of the next turn.
+  final static Ability SONIC_PROBE_ABILITY = new Ability(
+    "Sonic Probe", "sonic_probe_ability",
+    ICONS_DIR+"sprite_sonic_probe.png",
+    "Reveals an area hidden in the fog of war.",
+    Ability.IS_RANGED, 1,
+    Ability.NO_HARM, Ability.MINOR_POWER
+  ) {
+    final Image GRENADE_IMG = Kind.loadImage(SPRITE_DIR+"sprite_grenade.png");
+    final Image BURST_IMG   = Kind.loadImage(SPRITE_DIR+"sprite_sonic.png"  );
+    
+    public void renderUsageFX(Action use, Scene scene, Graphics2D g) {
+      FX.renderMissile(use, scene, GRENADE_IMG, g);
+    }
+    
+    public void applyOnActionEnd(Action use) {
+      final Tile at = use.scene().tileUnder(use.target);
+      use.scene().liftFogAround(at, 4, use.acting, true);
+      use.scene().view().addTempFX(BURST_IMG, 3, at.x, at.y, 0, 1);
+    }
+  };
+  
+  final public static ItemType SONIC_PROBE = new ItemType(
+    "Sonic Probe", "item_sonic_probe",
+    "Can be thrown to reveal areas of hidden terrain.",
+    ICONS_DIR+"icon_sonic_probe.png",
+    SPRITE_DIR+"sprite_sonic_probe.png",
+    SLOT_TYPE_ITEM, 65, new Object[] {
+      ENGINEERING, 7
+    },
+    IS_CONSUMED, SONIC_PROBE_ABILITY
+  ) {
+    
+  };
   
   
 }
