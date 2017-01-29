@@ -83,7 +83,7 @@ public class SceneTypeFixed extends SceneType {
   
   
   public void applyToScene(
-    Scene scene, int offX, int offY, int facing, int resolution
+    Scene scene, int offX, int offY, int facing, int resolution, boolean forTesting
   ) {
     offX -= (wide - resolution) / 2;
     offY -= (high - resolution) / 2;
@@ -113,7 +113,7 @@ public class SceneTypeFixed extends SceneType {
     size = Nums.max(wide, high) + 2;
     final Scene scene = new Scene(world, size);
     scene.setupScene(forTesting);
-    applyToScene(scene, 0, 0, N, size);
+    applyToScene(scene, 0, 0, N, size, forTesting);
     return scene;
   }
 }

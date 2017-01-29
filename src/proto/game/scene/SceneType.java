@@ -77,6 +77,7 @@ public abstract class SceneType extends Index.Entry implements
   
   /**  Property queries-
     */
+  //  TODO:  Check whether this is needed...
   Table <Trait, Boolean> traitQueryCache = new Table();
   
   public boolean hasFurnitureOfType(Trait trait) {
@@ -120,7 +121,7 @@ public abstract class SceneType extends Index.Entry implements
   );
   
   public abstract void applyToScene(
-    Scene scene, int offX, int offY, int facing, int resolution
+    Scene scene, int offX, int offY, int facing, int limit, boolean forTesting
   );
   
   

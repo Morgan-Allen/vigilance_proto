@@ -4,6 +4,7 @@ package proto.game.scene;
 import proto.common.*;
 import proto.game.world.*;
 import proto.util.*;
+import static proto.game.scene.SceneGen.*;
 
 
 
@@ -20,6 +21,10 @@ public class SceneTypeGrid extends SceneType {
     WALL_EXTERIOR = 1,
     WALL_INTERIOR = 2
   ;
+  
+  static class SceneGenGrid extends SceneGen {
+    Room areaMarkup[][];
+  }
   
   public static class GridUnit {
     int ID;
@@ -99,58 +104,31 @@ public class SceneTypeGrid extends SceneType {
     
     Scene scene = new Scene(world, size);
     scene.setupScene(forTesting);
-    applyToScene(scene, 1, 1, N, size);
+    applyToScene(scene, 1, 1, N, size, forTesting);
     
     return scene;
   }
   
   
-  static class GridArea {
-    GridUnit unit;
-    int ID;
-    int minX, minY;
-    Batch <AreaWall> walls = new Batch();
-    
-    public String toString() { return ""+ID; }
-  }
-  
-  
-  static class AreaWall {
-    boolean indoor;
-    GridArea side1, side2;
-    int wallTypeDiff;
-    Batch <Coord> points = new Batch();
-  }
-  
-  
-  static class SceneGen {
-    Scene scene;
-    int gridSize, offX, offY, limit;
-    List <GridArea> areas = new List();
-    List <AreaWall> walls = new List();
-    GridArea areaMarkup[][];
-  }
-  
-  
   public void applyToScene(
-    Scene scene, int offX, int offY, int facing, int size
+    Scene scene, int offX, int offY, int facing, int size, boolean forTesting
   ) {
     int wallPad = thickWalls ? 1 : 0;
     int gridSize = (size - wallPad) / (resolution + wallPad);
-    SceneGen gen = new SceneGen();
+    SceneGenGrid gen = new SceneGenGrid();
     gen.scene      = scene;
     gen.gridSize   = gridSize;
     gen.offX       = offX;
     gen.offY       = offY;
     gen.limit      = size;
-    gen.areaMarkup = new GridArea[size][size];
+    gen.areaMarkup = new Room[size][size];
     
     populateWithAreas(scene, gen);
     insertWallsAndDoors(scene, gen);
   }
   
   
-  void populateWithAreas(Scene scene, SceneGen g) {
+  void populateWithAreas(Scene scene, SceneGenGrid g) {
     int wallPad = thickWalls ? 1 : 0;
     int counts[] = new int[units.length];
     
@@ -180,15 +158,16 @@ public class SceneTypeGrid extends SceneType {
       if (picked == null) continue;
       I.say("PICKED GRID UNIT "+picked.type+" AT "+atX+" "+atY);
       int pickFace = T_ADJACENT[Rand.index(4)];
-      picked.type.applyToScene(scene, atX, atY, pickFace, resolution);
+      picked.type.applyToScene(scene, atX, atY, pickFace, resolution, g.verbose);
       //
       //  
-      GridArea area = new GridArea();
+      Room area = new Room();
       area.unit = picked;
-      area.ID   = g.areas.size();
+      area.ID   = g.rooms.size();
       area.minX = atX;
       area.minY = atY;
-      g.areas.add(area);
+      area.wide = area.high = resolution;
+      g.rooms.add(area);
       for (Coord m : Visit.grid(atX, atY, resolution, resolution, 1)) {
         g.areaMarkup[m.x - g.offX][m.y - g.offY] = area;
       }
@@ -197,26 +176,26 @@ public class SceneTypeGrid extends SceneType {
   }
   
   
-  void insertWallsAndDoors(Scene scene, SceneGen g) {
+  void insertWallsAndDoors(Scene scene, SceneGenGrid g) {
     //
     //  We visit every point in the grid, then visit all adjacent points and
     //  keep a tally of nearby outdoor points and areas.  Points that border
     //  on an area (including outside) that demand a partition will have that
     //  point recorded as a wall.
     for (Coord p : Visit.grid(g.offX, g.offY, g.limit, g.limit, 1)) {
-      GridArea under = areaUnder(p.x, p.y, g);
+      Room under = areaUnder(p.x, p.y, g);
       if (under != null) continue;
-      Batch <GridArea> nearB = new Batch(8);
+      Batch <Room> nearB = new Batch(8);
       int numOutside = 0;
       boolean walled = false;
       
       for (int dir : T_INDEX) {
-        GridArea next = areaUnder(p.x + T_X[dir], p.y + T_Y[dir], g);
+        Room next = areaUnder(p.x + T_X[dir], p.y + T_Y[dir], g);
         if (next != null) nearB.include(next);
         else numOutside++;
       }
-      for (GridArea a : nearB) {
-        for (GridArea b : nearB) if (a != b) {
+      for (Room a : nearB) {
+        for (Room b : nearB) if (a != b) {
           walled |= tryRecordingWall(p, a, b, g);
         }
         if (numOutside > 4) {
@@ -230,12 +209,12 @@ public class SceneTypeGrid extends SceneType {
     //
     //  Once all wall-points have been recorded, we populate the area with
     //  actual wall-objects accordingly, and punctuate with doors and windows.
-    for (AreaWall wall : g.walls) {
+    for (Wall wall : g.walls) {
       for (Coord c : wall.points) {
         scene.addProp(borders, c.x, c.y, N);
       }
     }
-    for (AreaWall wall : g.walls) {
+    for (Wall wall : g.walls) {
       Batch <Coord> canDoor = new Batch();
       for (Coord c : wall.points) {
         if (canInsertDoor(c.x, c.y, 1, 0, scene)) canDoor.add(c);
@@ -255,22 +234,22 @@ public class SceneTypeGrid extends SceneType {
   }
   
   
-  GridArea areaUnder(int x, int y, SceneGen g) {
+  Room areaUnder(int x, int y, SceneGenGrid g) {
     try { return g.areaMarkup[x - g.offX][y - g.offY]; }
     catch (ArrayIndexOutOfBoundsException e) { return null; }
   }
   
   
-  boolean tryRecordingWall(Coord p, GridArea from, GridArea other, SceneGen g) {
-    int forO = other == null ? WALL_NONE : other.unit.wallType;
-    int forF = from  == null ? WALL_NONE : from .unit.wallType;
+  boolean tryRecordingWall(Coord p, Room from, Room other, SceneGenGrid g) {
+    int forO = other == null ? WALL_NONE : ((GridUnit) other.unit).wallType;
+    int forF = from  == null ? WALL_NONE : ((GridUnit) from .unit).wallType;
     
     boolean shouldWall = false;
     if (forO != forF) shouldWall = true;
     else if (forO == WALL_INTERIOR) shouldWall = true;
     if (! shouldWall) return false;
     
-    AreaWall wall = wallBetween(from, other, g);
+    Wall wall = wallBetween(from, other, g);
     for (Coord c : wall.points) if (c.matches(p)) return false;
     wall.points.add(new Coord(p));
     wall.wallTypeDiff = Nums.abs(forO - forF);
@@ -278,14 +257,14 @@ public class SceneTypeGrid extends SceneType {
   }
   
   
-  AreaWall wallBetween(GridArea a, GridArea b, SceneGen g) {
-    GridArea source = a == null ? b : a;
+  Wall wallBetween(Room a, Room b, SceneGenGrid g) {
+    Room source = a == null ? b : a;
     if (source == null) I.complain("No wall source!");
-    for (AreaWall w : source.walls) {
+    for (Wall w : source.walls) {
       if (w.side1 == a && w.side2 == b) return w;
       if (w.side1 == b && w.side2 == a) return w;
     }
-    AreaWall w = new AreaWall();
+    Wall w = new Wall();
     w.indoor = a != null && b != null;
     w.side1 = a;
     w.side2 = b;

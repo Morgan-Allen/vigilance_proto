@@ -210,9 +210,7 @@ public class Event implements Session.Saveable, Assignment {
     //  can also be equipped?
     
     //  TODO:  You also need to populate with civilian passerbys and/or
-    //  hostages!  Also, the types of goon/civilian should be specified under
-    //  types in the content package- or perhaps associated with a given base/
-    //  faction.  Yeah.
+    //  hostages!
     
     final float dangerLevel = 0.5f;
     final Base faction = step.plan.agent.base();
