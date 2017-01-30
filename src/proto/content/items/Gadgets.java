@@ -46,7 +46,7 @@ public class Gadgets {
     "A light, portable sidearm.  Deals significant damage, but with a higher "+
     "risk of death or lasting injury.",
     ICONS_DIR+"icon_revolver.png",
-    SPRITE_DIR+"sprite_revolver.png",
+    SPRITE_DIR+"sprite_bullets.png",
     SLOT_TYPE_WEAPON, 40, new Object[] {
       ENGINEERING, 4
     },
@@ -114,7 +114,7 @@ public class Gadgets {
       if (! (target instanceof Person)) return false;
       return ((Person) target).health.injury() > 0;
     }
-
+    
     public void applyOnActionEnd(Action use) {
       Person healed = (Person) use.target;
       healed.health.liftInjury(6);

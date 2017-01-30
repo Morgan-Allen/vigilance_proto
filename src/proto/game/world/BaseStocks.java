@@ -66,6 +66,8 @@ public class BaseStocks {
   
   
   public void addItem(Item item) {
+    if (item.kind() == Common.UNARMED   ) return;
+    if (item.kind() == Common.UNARMOURED) return;
     stocks.add(item);
   }
   

@@ -14,19 +14,19 @@ public class PersonStats {
   
   final public static Trait
     MUSCLE = new Trait(
-      "Muscle", "stat_strength", ICON_PATH+"icon_strength.png",
+      "Muscle", "stat_strength", null,
       "Brute force, stature and strength development."
     ),
     REFLEXES = new Trait(
-      "Reflexes", "stat_reflex", ICON_PATH+"icon_reflex.png",
+      "Reflexes", "stat_reflex", null,
       "Agility, sensory acuity and motor coordination."
     ),
     WILL = new Trait(
-      "Will", "stat_will", ICON_PATH+"icon_social.png",
+      "Will", "stat_will", null,
       "Sheer bloody-minded persistence."
     ),
     BRAINS = new Trait(
-      "Brains", "stat_brains", ICON_PATH+"icon_intellect.png",
+      "Brains", "stat_brains", null,
       "Abstract logic, knowledge and planning ability."
     ),
     BASE_STATS[] = { MUSCLE, REFLEXES, WILL, BRAINS },

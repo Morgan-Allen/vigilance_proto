@@ -156,32 +156,36 @@ public class Volley implements Session.Saveable {
   public void setupVolley(
     Person self, Person hits, boolean ranged, Scene scene
   ) {
-    weaponType = self.gear.weaponType();
-    armourType = hits.gear.armourType();
-    setupVolley(self, weaponType, hits, armourType, ranged, scene);
+    Item weapon = self.gear.weapon(), armour = hits.gear.armour();
+    setupVolley(self, weapon, hits, armour, ranged, scene);
   }
   
   
   public void setupMeleeVolley(Person self, Person hits, Scene scene) {
-    weaponType = self.gear.weaponType();
-    armourType = hits.gear.armourType();
-    if (! weaponType.melee()) weaponType = Common.UNARMED;
-    setupVolley(self, weaponType, hits, armourType, ranged, scene);
+    Item weapon = self.gear.weapon(), armour = hits.gear.armour();
+    if (weapon != null && ! weapon.kind().melee()) {
+      weapon = new Item(Common.UNARMED, self.world());
+    }
+    setupVolley(self, weapon, hits, armour, ranged, scene);
   }
   
   
   public void setupVolley(
-    Person self, ItemType weaponType,
-    Person hits, ItemType armourType,
+    Person self, Item weapon,
+    Person hits, Item armour,
     boolean ranged, Scene scene
   ) {
-    //  TODO:  Stat bonuses from a given weapon/armour piece should ONLY apply
-    //  while said weapon is being used.
+    final Item nativeWeapon = self.gear.weapon();
     this.orig       = self  ;
     this.targ       = hits  ;
     this.ranged     = ranged;
-    this.weaponType = weaponType;
-    this.armourType = armourType;
+    this.weaponType = weapon == null ? Common.UNARMED    : weapon.kind();
+    this.armourType = armour == null ? Common.UNARMOURED : armour.kind();
+    
+    if (weapon != nativeWeapon) {
+      self.gear.equipItem(weapon, PersonGear.SLOT_WEAPON);
+    }
+    
     damageType      = weaponType.properties;
     selfDamageBase  = self.stats.levelFor(MIN_DAMAGE);
     selfDamageRange = self.stats.levelFor(RNG_DAMAGE);
@@ -217,6 +221,10 @@ public class Volley implements Session.Saveable {
       accuracyMargin = 100 - (int) (defChance * 100);
     }
     critPercent = ((25 + selfAccuracy) * accuracyMargin) / (5 * 50);
+
+    if (weapon != nativeWeapon) {
+      self.gear.equipItem(nativeWeapon, PersonGear.SLOT_WEAPON);
+    }
   }
   
   

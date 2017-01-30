@@ -100,8 +100,8 @@ public class Common {
       }
     },
     
-    THROW = new Ability(
-      "Throw", "ability_throw",
+    FIRE = new Ability(
+      "Fire", "ability_throw",
       SPRITE_DIR+"throw.png",
       "Fire a shot using ranged weaponry.  Accuracy falls off with distance.",
       Ability.IS_BASIC | Ability.IS_RANGED, 1,
@@ -166,7 +166,7 @@ public class Common {
       }
     },
     
-    BASIC_ABILITIES[] = { MOVE, STRIKE, THROW, GUARD };
+    BASIC_ABILITIES[] = { MOVE, STRIKE, FIRE, GUARD };
   
   
   final public static Ability SPECIAL_ACTION = new Ability(

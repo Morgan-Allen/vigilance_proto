@@ -181,6 +181,16 @@ public class PersonGear {
     Item armour = itemInSlot(SLOT_ARMOUR);
     return armour == null ? Common.UNARMOURED : armour.kind();
   }
+  
+  
+  public Item weapon() {
+    return itemInSlot(SLOT_WEAPON);
+  }
+  
+  
+  public Item armour() {
+    return itemInSlot(SLOT_ARMOUR);
+  }
 }
 
 
