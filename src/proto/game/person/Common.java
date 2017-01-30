@@ -74,11 +74,11 @@ public class Common {
       SPRITE_DIR+"strike.png",
       "Strike a melee target.  (Base damage scales with strength and weapon "+
       "bonus, 50% stun damage.)",
-      Ability.IS_BASIC, 1, Ability.REAL_HARM, Ability.MINOR_POWER
+      Ability.IS_BASIC | Ability.IS_MELEE,
+      1, Ability.REAL_HARM, Ability.MINOR_POWER
     ) {
       
       public boolean allowsTarget(Object target, Scene scene, Person acting) {
-        if (! acting.gear.weaponType().melee()) return false;
         if (target instanceof Person) {
           final Person other = (Person) target;
           return other.isEnemy(acting);
@@ -88,7 +88,7 @@ public class Common {
       
       protected Volley createVolley(Action use, Object target, Scene scene) {
         Volley volley = new Volley();
-        volley.setupVolley(use.acting, (Person) target, false, scene);
+        volley.setupMeleeVolley(use.acting, (Person) target, scene);
         volley.stunPercent = 50;
         return volley;
       }

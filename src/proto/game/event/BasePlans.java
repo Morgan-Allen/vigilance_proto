@@ -51,9 +51,23 @@ public class BasePlans {
     final int maxDepth = 6, numPlans = 4;
     //
     //  If you currently lack a viable plan, and/or it's finished, generate a
-    //  new one from scratch-
+    //  new one from scratch, and assign a suitable time interval before the
+    //  execution of each step-
     if (currentPlan == null || planComplete(currentPlan)) {
       currentPlan = generateNextPlan(numPlans, maxDepth, null);
+      if (currentPlan != null) {
+        int stepTime = base.world().timing.totalHours() + (int) Rand.range(
+          GameSettings.MIN_PLOT_THINKING_TIME,
+          GameSettings.MAX_PLOT_THINKING_TIME
+        );
+        for (PlanStep step : currentPlan.steps()) {
+          step.matchedEvent().setBeginTime(stepTime);
+          stepTime += (int) Rand.range(
+            GameSettings.MIN_PLOT_STEP_DELAY,
+            GameSettings.MAX_PLOT_STEP_DELAY
+          );
+        }
+      }
     }
     if (currentPlan == null) return;
     //
@@ -67,8 +81,7 @@ public class BasePlans {
       //  corresponding event.  Otherwise, considering revising the plan or
       //  abandoning it entirely.
       if (nextStep != null && nextStep.currentlyPossible()) {
-        int hoursDelay = 20 + Rand.index(5);
-        base.world().events.scheduleEvent(nextStep.matchedEvent(), hoursDelay);
+        base.world().events.scheduleEvent(nextStep.matchedEvent());
       }
       else {
         currentPlan.reviseAfter(nextStep, maxDepth / 2, base);

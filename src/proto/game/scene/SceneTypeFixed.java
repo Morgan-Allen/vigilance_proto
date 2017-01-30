@@ -76,7 +76,7 @@ public class SceneTypeFixed extends SceneType {
   Kind propType(int gx, int gy) {
     try {
       byte index = fixedLayoutGrid[gy][gx];
-      return index > 0 ? fixedPropTypes[index] : null;
+      return index > 0 ? fixedPropTypes[index - 1] : null;
     }
     catch(ArrayIndexOutOfBoundsException e) { return null; }
   }

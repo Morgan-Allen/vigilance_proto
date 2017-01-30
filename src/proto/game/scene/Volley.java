@@ -156,14 +156,33 @@ public class Volley implements Session.Saveable {
   public void setupVolley(
     Person self, Person hits, boolean ranged, Scene scene
   ) {
-    this.orig   = self  ;
-    this.targ   = hits  ;
-    this.ranged = ranged;
-    
     weaponType = self.gear.weaponType();
     armourType = hits.gear.armourType();
-    damageType = weaponType.properties;
-    
+    setupVolley(self, weaponType, hits, armourType, ranged, scene);
+  }
+  
+  
+  public void setupMeleeVolley(Person self, Person hits, Scene scene) {
+    weaponType = self.gear.weaponType();
+    armourType = hits.gear.armourType();
+    if (! weaponType.melee()) weaponType = Common.UNARMED;
+    setupVolley(self, weaponType, hits, armourType, ranged, scene);
+  }
+  
+  
+  public void setupVolley(
+    Person self, ItemType weaponType,
+    Person hits, ItemType armourType,
+    boolean ranged, Scene scene
+  ) {
+    //  TODO:  Stat bonuses from a given weapon/armour piece should ONLY apply
+    //  while said weapon is being used.
+    this.orig       = self  ;
+    this.targ       = hits  ;
+    this.ranged     = ranged;
+    this.weaponType = weaponType;
+    this.armourType = armourType;
+    damageType      = weaponType.properties;
     selfDamageBase  = self.stats.levelFor(MIN_DAMAGE);
     selfDamageRange = self.stats.levelFor(RNG_DAMAGE);
     hitsArmour      = hits.stats.levelFor(ARMOUR    );

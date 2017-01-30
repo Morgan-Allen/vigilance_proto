@@ -16,10 +16,6 @@ public class TaskTrain extends Task {
   
   /**  Data fields, construction and save/load methods-
     */
-  final static int
-    ABILITY_BASE_LEARN_TIME = World.HOURS_PER_DAY * World.DAYS_PER_WEEK
-  ;
-  
   Ability trained;
   Trait talking;
   
@@ -118,8 +114,9 @@ public class TaskTrain extends Task {
   public int trainingTime(Person person) {
     float trainBonus = trainBonus(person);
     if (trainBonus <= -1) return -1;
+    int defaultTime = GameSettings.DEF_ABILITY_TRAIN_TIME;
     int level = person.stats.levelFor(trained);
-    return (int) (ABILITY_BASE_LEARN_TIME * (1 + level) / (1 + trainBonus));
+    return (int) (defaultTime * (1 + level) / (1 + trainBonus));
   }
   
   

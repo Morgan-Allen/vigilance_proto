@@ -93,6 +93,13 @@ public class SceneTypeGrid extends SceneType {
   }
   
   
+  public static GridUnit numberOrPercentUnit(
+    SceneTypeFixed type, int wallType, int percent, int number
+  ) {
+    return unit(type, wallType, PRIORITY_HIGH, percent, number, -1);
+  }
+  
+  
   
   /**  Actual scene generation-
     */

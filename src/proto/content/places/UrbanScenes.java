@@ -72,10 +72,6 @@ public class UrbanScenes {
       1, 1, Kind.BLOCK_FULL, true
     ),
     BAR_ROOM_PROP_TYPES[] = {
-      KIND_FLOOR,
-      KIND_WALL,
-      KIND_DOOR,
-      KIND_WINDOW,
       KIND_POOL_TABLE,
       KIND_BAR_TABLE,
       KIND_BAR_STOOL,
@@ -83,37 +79,50 @@ public class UrbanScenes {
       KIND_BAR_TAPS,
       KIND_JUKEBOX,
       KIND_PINBALL_MACHINE,
+      KIND_WALL
     }
   ;
   
   final public static SceneTypeFixed ROOM_MAIN_BAR = new SceneTypeFixed(
     "main bar", "type_main_bar_urban",
     KIND_FLOOR, BAR_ROOM_PROP_TYPES,
-    4, 4, new byte[][] {
-      { 0, 0, 0, 0 },
-      { 7, 6, 7, 7 },
-      { 8, 8, 8, 1 },
-      { 8, 8, 8, 1 },
+    8, 8, new byte[][] {
+      { 0, 0, 0, 0, 0, 0, 0, 0 },
+      { 0, 0, 0, 0, 0, 0, 0, 0 },
+      { 4, 3, 4, 0, 4, 4, 3, 0 },
+      { 5, 5, 5, 0, 5, 5, 5, 0 },
+      { 5, 5, 5, 0, 5, 5, 5, 0 },
+      { 8, 8, 8, 0, 8, 8, 8, 0 },
+      { 4, 3, 0, 0, 0, 0, 3, 0 },
+      { 2, 2, 0, 2, 2, 0, 2, 2 },
     }
   );
   final public static SceneTypeFixed ROOM_POOL_AREA = new SceneTypeFixed(
     "pool area", "type_pool_area_urban",
     KIND_FLOOR, BAR_ROOM_PROP_TYPES,
-    4, 4, new byte[][] {
-      { 0, 0, 0, 0 },
-      { 4, 4, 4, 0 },
-      { 4, 4, 4, 0 },
-      { 0, 0, 0, 0 },
+    8, 8, new byte[][] {
+      { 0, 0, 0, 0, 0, 4, 3, 0 },
+      { 0, 1, 1, 1, 0, 2, 2, 0 },
+      { 0, 1, 1, 1, 0, 4, 4, 0 },
+      { 0, 0, 0, 0, 0, 3, 4, 0 },
+      { 0, 0, 0, 0, 0, 2, 2, 0 },
+      { 0, 1, 1, 1, 0, 3, 3, 0 },
+      { 0, 1, 1, 1, 0, 0, 8, 0 },
+      { 0, 0, 0, 0, 0, 0, 7, 0 },
     }
   );
   final public static SceneTypeFixed ROOM_SEATING = new SceneTypeFixed(
     "seating", "type_seating_urban",
     KIND_FLOOR, BAR_ROOM_PROP_TYPES,
-    4, 4, new byte[][] {
-      { 6, 6, 0, 9 },
-      { 5, 5, 0, 0 },
-      { 7, 6, 0, 1 },
-      { 0, 0, 0, 10 },
+    8, 8, new byte[][] {
+      { 0, 0, 0, 0, 0, 0, 3, 3 },
+      { 3, 4, 0, 0, 0, 0, 2, 2 },
+      { 2, 2, 3, 0, 8, 0, 4, 4 },
+      { 3, 0, 0, 0, 6, 0, 4, 0 },
+      { 4, 3, 0, 0, 0, 0, 2, 2 },
+      { 2, 2, 0, 0, 8, 0, 4, 3 },
+      { 3, 0, 0, 0, 7, 0, 0, 0 },
+      { 0, 0, 0, 0, 0, 0, 0, 0 },
     }
   );
   
@@ -135,45 +144,46 @@ public class UrbanScenes {
       1, 1, Kind.BLOCK_PARTIAL, false
     ),
     BATHROOM_PROP_TYPES[] = {
-      KIND_BATHROOM_FLOOR,
-      KIND_WALL,
-      KIND_DOOR,
-      KIND_WINDOW,
       KIND_BATHROOM_STALL,
-      KIND_BASIN
+      KIND_BASIN,
+      KIND_WALL,
+      KIND_DOOR
     }
   ;
   
   final public static SceneTypeFixed ROOM_BATHROOM = new SceneTypeFixed(
     "bathroom", "type_bathroom_urban",
     KIND_BATHROOM_FLOOR, BATHROOM_PROP_TYPES,
-    4, 4, new byte[][] {
-      { 5, 0, 0, 0},
-      { 0, 0, 4, 4},
-      { 1, 0, 4, 4},
-      { 5, 0, 4, 4},
+    8, 8, new byte[][] {
+      { 2, 0, 1, 1, 3, 0, 0, 0 },
+      { 0, 0, 1, 1, 3, 0, 0, 0 },
+      { 3, 0, 1, 1, 3, 0, 0, 0 },
+      { 2, 0, 0, 0, 4, 0, 0, 0 },
+      { 0, 0, 1, 1, 3, 3, 4, 3 },
+      { 3, 0, 1, 1, 3, 0, 2, 2 },
+      { 2, 0, 1, 1, 3, 0, 0, 0 },
+      { 0, 0, 0, 0, 3, 0, 0, 0 },
     }
   );
   
   final public static SceneType URBAN_SCENE = new SceneTypeGrid(
     "urban scene", "type_urban_scene",
-    4, 4, true,
+    8, 3, true,
     KIND_WALL, KIND_DOOR, KIND_WINDOW, KIND_FLOOR,
-    numberUnit (ROOM_BATHROOM , WALL_INTERIOR, 1 ),
-    numberUnit (ROOM_MAIN_BAR , WALL_EXTERIOR, 1 ),
-    percentUnit(ROOM_POOL_AREA, WALL_EXTERIOR, 33),
-    percentUnit(ROOM_SEATING  , WALL_EXTERIOR, 67)
+    numberUnit         (ROOM_MAIN_BAR , WALL_EXTERIOR, 1    ),
+    numberOrPercentUnit(ROOM_BATHROOM , WALL_INTERIOR, 20, 1),
+    percentUnit        (ROOM_POOL_AREA, WALL_EXTERIOR, 33   ),
+    percentUnit        (ROOM_SEATING  , WALL_EXTERIOR, 67   )
   );
   
   final public static SceneType MANSION_SCENE = new SceneTypeCorridors(
     "mansion scene", "type_mansion_scene",
-    BORDERS, KIND_WALL      ,
-    DOOR   , KIND_DOOR      ,
-    WINDOW , KIND_WINDOW    ,
-    FLOORS , KIND_FLOOR     
+    BORDERS, KIND_WALL  ,
+    DOOR   , KIND_DOOR  ,
+    WINDOW , KIND_WINDOW,
+    FLOORS , KIND_FLOOR 
   );
   
 }
-
 
 

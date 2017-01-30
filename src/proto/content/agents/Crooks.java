@@ -2,6 +2,7 @@
 
 package proto.content.agents;
 import proto.common.*;
+import proto.content.items.Gadgets;
 import proto.game.world.*;
 import proto.game.person.*;
 import proto.util.*;
@@ -32,10 +33,14 @@ public class Crooks {
       BRAINS  , 4 ,
       REFLEXES, 6 ,
       WILL    , 4 ,
-      MUSCLE  , 6
+      MUSCLE  , 6 ,
+      Gadgets.REVOLVER
     ),
     HITMAN = null,
     PSYCHO = null
   ;
 }
+
+
+
 

@@ -78,10 +78,18 @@ public class Events {
   }
   
   
-  public void scheduleEvent(Event event, int delayHours) {
-    int startTime = world.timing.totalHours() + delayHours;
-    event.setBeginTime(startTime);
+  public void scheduleEvent(Event event) {
+    int time = world.timing.totalHours();
+    if (event.timeBegins() == -1 || event.timeBegins() < time) {
+      event.setBeginTime(time);
+    }
     coming.include(event);
+  }
+  
+  
+  public void scheduleEvent(Event event, int delayHours) {
+    event.setBeginTime(world.timing.totalHours() + delayHours);
+    scheduleEvent(event);
   }
   
   

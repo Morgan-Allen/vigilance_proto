@@ -217,10 +217,11 @@ public abstract class Ability extends Trait {
     
     final float range = scene.distance(acting.location, dest);
     final int maxRange = maxRange();
+    
     if (maxRange > 0 && range > maxRange) {
       return failResult("Outside Max. Range", failLog);
     }
-    if (requiresSight()) {
+    if (maxRange > 0 && requiresSight()) {
       if (range > (acting.stats.sightRange() + 1)) {
         return failResult("Outside Sight Range", failLog);
       }

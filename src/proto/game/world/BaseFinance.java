@@ -25,22 +25,22 @@ public class BaseFinance {
   
   
   void saveState(Session s) throws Exception {
-    publicIncome  = s.loadInt();
-    publicExpense = s.loadInt();
-    publicFunds   = s.loadInt();
-    secretPercent = s.loadInt();
-    secretExpense = s.loadInt();
-    secretFunds   = s.loadInt();
-  }
-  
-  
-  void loadState(Session s) throws Exception {
     s.saveInt(publicIncome );
     s.saveInt(publicExpense);
     s.saveInt(publicFunds  );
     s.saveInt(secretPercent);
     s.saveInt(secretExpense);
     s.saveInt(secretFunds  );
+  }
+  
+  
+  void loadState(Session s) throws Exception {
+    publicIncome  = s.loadInt();
+    publicExpense = s.loadInt();
+    publicFunds   = s.loadInt();
+    secretPercent = s.loadInt();
+    secretExpense = s.loadInt();
+    secretFunds   = s.loadInt();
   }
   
   

@@ -55,8 +55,8 @@ public class Techniques {
     PUNISHMENT = new Ability(
       "Punishment", "ability_punishment",
       SPRITE_DIR+"sprite_punch.png",
-      "Deals additional damage with increased risk of lethality and chance to "+
-      "stun.",
+      "Deals additional melee damage with increased risk of lethality and "+
+      "chance to stun.",
       Ability.IS_MELEE, 1, Ability.REAL_HARM, Ability.MINOR_POWER
     ) {
       
@@ -71,10 +71,9 @@ public class Techniques {
       protected Volley createVolley(Action use, Object target, Scene scene) {
         int level = use.acting.stats.levelFor(this);
         Volley volley = new Volley();
-        volley.setupVolley(use.acting, (Person) target, false, scene);
+        volley.setupMeleeVolley(use.acting, (Person) target, scene);
         volley.selfDamageRange += 1 + level;
         volley.stunPercent = 20;
-        
         //  TODO:  Include actual stun effects!
         return volley;
       }
@@ -100,7 +99,7 @@ public class Techniques {
       
       protected Volley createVolley(Action use, Object target, Scene scene) {
         Volley volley = new Volley();
-        volley.setupVolley(use.acting, (Person) target, false, scene);
+        volley.setupMeleeVolley(use.acting, (Person) target, scene);
         volley.stunPercent = 100;
         return volley;
       }

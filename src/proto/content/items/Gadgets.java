@@ -209,6 +209,10 @@ public class Gadgets {
     Ability.IS_RANGED, 1,
     Ability.NO_HARM, Ability.MINOR_POWER
   ) {
+    public boolean allowsTarget(Object target, Scene scene, Person acting) {
+      return true;
+    }
+    
     final Image GRENADE_IMG = Kind.loadImage(SPRITE_DIR+"sprite_grenade.png");
     final Image BURST_IMG   = Kind.loadImage(SPRITE_DIR+"sprite_sonic.png"  );
     
