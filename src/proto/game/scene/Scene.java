@@ -6,8 +6,7 @@ import proto.game.person.*;
 import proto.game.world.*;
 import proto.game.event.*;
 import proto.util.*;
-import proto.view.*;
-import proto.view.scene.SceneView;
+import proto.view.scene.*;
 
 import java.awt.Image;
 
@@ -26,7 +25,8 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     STATE_WON   =  2,
     STATE_LOST  =  3;
   
-  World world;
+  final World world;
+  final public SceneEntry entry = new SceneEntry(this);
   
   List <Person> playerTeam = new List();
   List <Person> othersTeam = new List();
@@ -266,32 +266,6 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
       }
     }
     return sight;
-  }
-  
-  
-  public boolean isExitPoint(Object point, Person exits) {
-    Tile under = tileUnder(point);
-    if (under == null || exits == null || ! exits.mind.retreating()) {
-      return false;
-    }
-    if (under.x == 0 || under.x == size - 1) return true;
-    if (under.y == 0 || under.y == size - 1) return true;
-    return false;
-  }
-  
-  
-  public Tile findEntryPoint(int x, int y, Person enters) {
-    Tile under = tileAt(x, y);
-    int dir = T_INDEX[Rand.index(T_INDEX.length)], size = size();
-    
-    while (under != null) {
-      if (x != Nums.clamp(x, size) || y != Nums.clamp(y, size)) break;
-      if (! under.blocked()) return under;
-      x += T_X[dir];
-      y += T_Y[dir];
-      under = tileAt(x, y);
-    }
-    return under;
   }
   
   

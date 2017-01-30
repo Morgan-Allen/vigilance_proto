@@ -59,8 +59,9 @@ public class Common {
       }
       
       public void applyOnActionEnd(Action use) {
-        Scene s = use.scene();
-        if (s.isExitPoint(use.target, use.acting)) s.removePerson(use.acting);
+        if (use.scene().entry.isExitPoint(use.target, use.acting)) {
+          use.scene().removePerson(use.acting);
+        }
       }
       
       public float animDuration() {

@@ -61,22 +61,11 @@ public class LeadGuard extends Lead {
   
   
   protected void onSuccess() {
-    //
-    //  Firstly, generate the scene and populate with minions-
     Place place = event.targetLocation();
     SceneType sceneType = place.kind().sceneType();
     Scene mission = sceneType.generateScene(place.world());
     event.populateScene(mission);
-    //
-    //  Then, introduce the agents themselves-
-    final Series <Person> active = active();
-    int across = (mission.size() - (active.size())) / 2;
-    for (Person p : active) {
-      p.addAssignment(mission);
-      mission.enterScene(p, across++, 0);
-    }
-    //
-    //  Then, set the scene as active within the world-
+    mission.entry.provideBorderEntry(active());
     mission.assignMissionParameters(place, this, event);
     base.world().enterScene(mission);
   }

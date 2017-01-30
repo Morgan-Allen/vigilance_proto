@@ -3,6 +3,7 @@
 package proto.game.event;
 import proto.common.*;
 import proto.game.person.*;
+import proto.game.scene.Scene;
 import proto.game.world.*;
 import proto.util.*;
 
@@ -271,6 +272,31 @@ public class PlanStep implements Session.Saveable {
     
     event.assignParameters(this, place, Task.TIME_SHORT);
     return event;
+  }
+  
+  
+  public Series <Person> generateGroundForces(Event event) {
+    final List <Person> forces = new List();
+    
+    for (Element e : needs()) {
+      if (e == null || e.type != Kind.TYPE_PERSON) continue;
+      forces.add((Person) e);
+    }
+    
+    final float dangerLevel = 0.5f;
+    final Base faction = plan.agent.base();
+    final Kind GOONS[] = faction.goonTypes().toArray(Kind.class);
+    float forceLimit = dangerLevel * 10;
+    float forceSum   = 0;
+    
+    while (forceSum < forceLimit) {
+      Kind ofGoon = (Kind) Rand.pickFrom(GOONS);
+      Person goon = Person.randomOfKind(ofGoon, event.world());
+      forceSum += goon.stats.powerLevel();
+      forces.add(goon);
+    }
+    
+    return forces;
   }
   
   

@@ -198,42 +198,9 @@ public class Event implements Session.Saveable, Assignment {
   /**  Helping with scene configuration and after-effects:
     */
   public Series <Person> populateScene(Scene scene) {
-    final List <Person> forces = new List();
-    if (step == null) return forces;
-    
-    for (Element e : step.needs()) {
-      if (e == null || e.type != Kind.TYPE_PERSON) continue;
-      forces.add((Person) e);
-    }
-    
-    //  TODO:  Move this out to the StepType class, so that any special items
-    //  can also be equipped?
-    
-    //  TODO:  You also need to populate with civilian passerbys and/or
-    //  hostages!
-    
-    final float dangerLevel = 0.5f;
-    final Base faction = step.plan.agent.base();
-    final Kind GOONS[] = faction.goonTypes().toArray(Kind.class);
-    float forceLimit = dangerLevel * 10;
-    float forceSum   = 0;
-    
-    while (forceSum < forceLimit) {
-      Kind ofGoon = (Kind) Rand.pickFrom(GOONS);
-      Person goon = Person.randomOfKind(ofGoon, scene.world());
-      forceSum += goon.stats.powerLevel();
-      forces.add(goon);
-    }
-    
-    for (Person p : forces) {
-      int nX = scene.size() / 2, nY = scene.size() / 2;
-      nX += 5 - Rand.index(10);
-      nY += 5 - Rand.index(10);
-      Tile entry = scene.findEntryPoint(nX, nY, p);
-      if (entry == null) { forces.remove(p); continue; }
-      p.addAssignment(scene);
-      scene.enterScene(p, entry.x, entry.y);
-    }
+    if (step == null) return new Batch();
+    final Series <Person> forces = step.generateGroundForces(this);
+    scene.entry.provideInProgressEntry(forces);
     return forces;
   }
   
