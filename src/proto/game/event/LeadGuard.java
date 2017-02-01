@@ -69,8 +69,14 @@ public class LeadGuard extends Lead {
     mission.assignMissionParameters(place, this, event);
     base.world().enterScene(mission);
   }
-
-
+  
+  
+  public void onSceneExit(Scene scene, EventReport report) {
+    CaseFile file = base.leads.caseFor(guarded);
+    file.refreshInvestigationOptions();
+  }
+  
+  
   /**  Rendering, debug and interface methods-
     */
   protected void presentMessage(World world) {

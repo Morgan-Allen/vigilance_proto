@@ -115,8 +115,8 @@ public class BasePlans {
   
   
   public boolean planComplete(Plan plan) {
-    if (plan != currentPlan) return false;
-    if (currentPlan == null || nextStep == null) return false;
+    if (plan != currentPlan) return true;
+    if (currentPlan == null || nextStep == null) return true;
     if (! nextStep.matchedEvent().complete()) return false;
     return nextStep == currentPlan.steps().last();
   }

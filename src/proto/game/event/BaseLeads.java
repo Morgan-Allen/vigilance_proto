@@ -31,9 +31,8 @@ public class BaseLeads {
   
   
   public void updateLeads() {
-    for (CaseFile file : files) for (Lead lead : file.investigationOptions()) {
-      if (lead.assigned().empty()) continue;
-      lead.updateAssignment();
+    for (CaseFile file : files) {
+      file.updateLeads();
     }
   }
   

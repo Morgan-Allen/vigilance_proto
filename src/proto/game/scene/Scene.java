@@ -608,16 +608,9 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   
   
   public void onSceneCompletion() {
-    world.exitFromScene(this);
     
     final EventReport report = new EventReport();
     report.composeFromScene(this);
-    report.presentMessageForScene(this);
-    
-    //  TODO:  Decide whether personnel are injured, hospitalised or dead.
-    for (Person p : didEnter) {
-      removePerson(p);
-    }
     
     if (triggerEvent != null) {
       triggerEvent.completeAfterScene(this, report);
@@ -625,6 +618,15 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     if (playerTask != null) {
       playerTask.onSceneExit(this, report);
     }
+    
+    report.applyOutcomeEffects(site);
+    report.presentMessageForScene(this);
+    
+    //  TODO:  Decide whether personnel are left injured, hospitalised or dead.
+    for (Person p : didEnter) {
+      removePerson(p);
+    }
+    world.exitFromScene(this);
   }
   
   

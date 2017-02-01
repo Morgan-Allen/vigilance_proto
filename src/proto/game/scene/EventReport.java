@@ -87,7 +87,7 @@ public class EventReport implements Session.Saveable {
     forceRating      = sumForce / Nums.max(1, numCrooks   );
     collateralRating = sumHurt  / Nums.max(1, numCivilians);
     getawaysRating   = sumAway  / Nums.max(1, numCrooks   );
-
+    
     final boolean playerWon  = outcomeState == Scene.STATE_WON;
     deterEffect += playerWon ? 10 : 0;
     deterEffect += (forceRating * 5) - (getawaysRating * 20);
@@ -174,8 +174,8 @@ public class EventReport implements Session.Saveable {
     s.append("\nCollateral: "  +descFrom(collateralRating, COLLATERAL_DESC));
     s.append("\nGetaways: "    +descFrom(getawaysRating  , GETAWAYS_DESC  ));
     Region region = scene.targetLocation().region();
-    s.append("\n"+region+" trust      "+I.signNum((int) trustEffect)+"%");
-    s.append("\n"+region+" deterrence "+I.signNum((int) deterEffect)+"%");
+    s.append("\n"+region+" Trust "     +I.signNum((int) trustEffect)+"%");
+    s.append("\n"+region+" Deterrence "+I.signNum((int) deterEffect)+"%");
     
     final MainView view = scene.world().view();
     view.queueMessage(new MessageView(

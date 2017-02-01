@@ -35,6 +35,7 @@ public class CaseFile implements Session.Saveable {
     int   roleID   = -1;
     int   sentence = -1;
     float maxEvidence = 0;
+    boolean isPast = false;
     List <Lead> evidence = new List();
   }
   List <Role> roles = new List();
@@ -65,6 +66,7 @@ public class CaseFile implements Session.Saveable {
       r.roleID      = s.loadInt();
       r.sentence    = s.loadInt();
       r.maxEvidence = s.loadFloat();
+      r.isPast      = s.loadBool();
       s.loadObjects(r.evidence);
       roles.add(r);
     }
@@ -86,6 +88,7 @@ public class CaseFile implements Session.Saveable {
       s.saveInt   (r.roleID     );
       s.saveInt   (r.sentence   );
       s.saveFloat (r.maxEvidence);
+      s.saveBool  (r.isPast     );
       s.saveObjects(r.evidence);
     }
     s.saveBool(refreshOptions);
@@ -138,6 +141,21 @@ public class CaseFile implements Session.Saveable {
   void updateLocation(Place location) {
     this.knownLocation = location;
     refreshInvestigationOptions();
+  }
+  
+  
+  void updateLeads() {
+    boolean refresh = false;
+    for (Role r : roles) if (r.event.complete() != r.isPast) {
+      r.isPast = true;
+      refresh = true;
+    }
+    if (refresh) refreshInvestigationOptions();
+    
+    for (Lead lead : investigationOptions()) {
+      if (lead.assigned().empty()) continue;
+      lead.updateAssignment();
+    }
   }
   
   
@@ -217,7 +235,7 @@ public class CaseFile implements Session.Saveable {
   
   /**  Generating subsequent investigation options-
     */
-  private void refreshInvestigationOptions() {
+  public void refreshInvestigationOptions() {
     refreshOptions = true;
     investigationOptions();
   }
@@ -270,16 +288,16 @@ public class CaseFile implements Session.Saveable {
       final Event suspected = lastSuspectEvent();
       final Event threatens = base.leads.threateningEvent(person);
       
-      if (next != null) {
+      if (next != null && ! next.complete()) {
         Lead tailing = new LeadSurveil(base, person);
         tryAddingOption(tailing, followOptions, oldOptions);
       }
-      if (suspected != null) {
-        //  TODO:  Include questioning and arrest options.
-      }
-      if (threatens != null) {
+      if (threatens != null && ! threatens.complete()) {
         Lead guarding = new LeadGuard(base, person.place(), threatens);
         tryAddingOption(guarding, followOptions, oldOptions);
+      }
+      if (suspected != null) {
+        //  TODO:  Include questioning and arrest options.
       }
     }
     
@@ -288,11 +306,11 @@ public class CaseFile implements Session.Saveable {
       Event crime = eventWithRole(ROLE_SCENE  );
       Event lair  = eventWithRole(ROLE_HIDEOUT);
       
-      if (crime != null && crime.dangerous()) {
+      if (crime != null && crime.dangerous() && ! crime.complete()) {
         Lead guarding = new LeadGuard(base, place, crime);
         tryAddingOption(guarding, followOptions, oldOptions);
       }
-      if (crime != null) {
+      if (crime != null && ! crime.complete()) {
         Lead surveil = new LeadSurveil(base, place);
         tryAddingOption(surveil, followOptions, oldOptions);
       }
