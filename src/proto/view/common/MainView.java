@@ -178,7 +178,6 @@ public class MainView extends UINode {
   /**  Rendering methods-
     */
   protected void updateAndRender(Surface surface, Graphics2D g) {
-    
     final UINode topMessage = messageQueue.first();
     
     if (world.activeScene() != null) {

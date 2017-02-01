@@ -86,7 +86,7 @@ public class PersonMind {
     else {
       AIstate = STATE_ACTIVE;
       
-      for (Person p : scene.persons()) {
+      for (Person p : scene.allPersons()) {
         if (! person.actions.canNotice(p)) {
           continue;
         }
@@ -107,6 +107,7 @@ public class PersonMind {
       }
     }
     if (pick.empty()) {
+      //  TODO:  Select from either enemies or allies here!
       Series <Person> foes = scene.playerTeam();
       Action motion = retreating() ?
         pickRetreatAction(foes) :
@@ -165,7 +166,7 @@ public class PersonMind {
     
     I.say("Assessing confidence for "+person);
     
-    for (Person p : scene.persons()) {
+    for (Person p : scene.allPersons()) {
       if (p.isAlly(person)) {
         teamPower  += p.stats.powerLevel();
         teamHealth += p.stats.powerLevel() * p.health.healthLevel();

@@ -17,19 +17,21 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   
   /**  Data fields, constructors and save/load methods-
     */
-  final static int
-    STATE_TEST  = -2,
-    STATE_INIT  = -1,
-    STATE_SETUP =  0,
-    STATE_BEGUN =  1,
-    STATE_WON   =  2,
-    STATE_LOST  =  3;
+  final public static int
+    STATE_TEST   = -2,
+    STATE_INIT   = -1,
+    STATE_SETUP  =  0,
+    STATE_BEGUN  =  1,
+    STATE_WON    =  2,
+    STATE_LOST   =  3,
+    STATE_ABSENT =  4;
   
   final World world;
   final public SceneEntry entry = new SceneEntry(this);
   
   List <Person> playerTeam = new List();
   List <Person> othersTeam = new List();
+  List <Person> allPersons = new List();
   int state = STATE_INIT;
   
   int size;
@@ -38,7 +40,6 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   byte fogP [][] = new byte[0][0];
   byte fogO [][] = new byte[0][0];
   List <Prop> props = new List();
-  List <Person> persons = new List();
   
   boolean playerTurn;
   Person nextActing;
@@ -46,6 +47,7 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   Place site;
   Task playerTask;
   Event triggerEvent;
+  List <Person> didEnter = new List();
   
   
   public Scene(World world, int size) {
@@ -61,8 +63,11 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     site         = (Place) s.loadObject();
     playerTask   = (Task ) s.loadObject();
     triggerEvent = (Event) s.loadObject();
+    
     s.loadObjects(playerTeam);
     s.loadObjects(othersTeam);
+    s.loadObjects(allPersons);
+    s.loadObjects(didEnter  );
     state = s.loadInt();
     
     size   = s.loadInt();
@@ -77,7 +82,6 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     s.loadByteArray(fogP);
     s.loadByteArray(fogO);
     s.loadObjects(props);
-    s.loadObjects(persons);
     
     playerTurn = s.loadBool();
     nextActing = (Person) s.loadObject();
@@ -93,6 +97,8 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     s.saveObject (triggerEvent);
     s.saveObjects(playerTeam  );
     s.saveObjects(othersTeam  );
+    s.saveObjects(allPersons  );
+    s.saveObjects(didEnter    );
     s.saveInt    (state       );
     
     s.saveInt(size);
@@ -105,7 +111,6 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     s.saveByteArray(fogP);
     s.saveByteArray(fogO);
     s.saveObjects(props);
-    s.saveObjects(persons);
     
     s.saveBool(playerTurn);
     s.saveObject(nextActing);
@@ -336,7 +341,8 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     p.stats.refreshCooldowns();
     
     p.setExactPosition(this, x, y, 0);
-    persons.add(p);
+    allPersons.include(p);
+    didEnter.include(p);
     liftFogInSight(p);
     return true;
   }
@@ -344,19 +350,10 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   
   public boolean removePerson(Person p) {
     if (p.currentScene() != this) return false;
-    
-    playerTeam.remove(p);
-    othersTeam.remove(p);
-    p.removeAssignment(this);
-    
     p.setExactPosition(null, 0, 0, 0);
-    persons.remove(p);
+    allPersons.remove(p);
+    p.removeAssignment(this);
     return true;
-  }
-  
-  
-  public Series <Person> persons() {
-    return persons;
   }
   
   
@@ -367,6 +364,16 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   
   public Series <Person> othersTeam() {
     return othersTeam;
+  }
+  
+  
+  public Series <Person> allPersons() {
+    return allPersons;
+  }
+  
+  
+  public Series <Person> didEnter() {
+    return didEnter;
   }
   
   
@@ -418,17 +425,20 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     playerTurn = true;
     
     updateFog();
-    for (Person p : persons) p.onTurnStart();
+    for (Person p : playerTeam) p.onTurnStart();
+    for (Person p : othersTeam) p.onTurnStart();
   }
   
   
   public void updateScene() {
     if (GameSettings.pauseScene) return;
 
-    for (Person p : persons) if (p != nextActing) {
+    for (Person p : playerTeam) if (p != nextActing) {
       p.updateInScene(false);
     }
-    
+    for (Person p : othersTeam) if (p != nextActing) {
+      p.updateInScene(false);
+    }
     if (nextActing != null) {
       final PersonActions nextPA = nextActing.actions;
       Action last = nextPA.nextAction();
@@ -527,12 +537,6 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     I.say("\nWARNING- COULD NOT FIND NEXT ACTIVE PERSON!");
   }
   
-  
-  public void endScene() {
-    for (Person p : persons) removePerson(p);
-    world.exitFromScene(this);
-  }
-  
 
   
   /**  Fog and visibility updates-
@@ -603,41 +607,23 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   }
   
   
-  public float assessCollateral() {
-    float sum = 0;
-    for (Person p : othersTeam) {
-      float damage = p.health.injury() / p.health.maxHealth();
-      if (! p.health.alive()) damage += 3;
-      if (! p.isCriminal()  ) damage *= 2;
-      sum += Nums.max(0, damage - 0.5f) * 2;
-    }
-    return sum * 0.5f / othersTeam.size();
-  }
-  
-  
-  public float assessGetaways() {
-    float sum = 0, numC = 0;
-    for (Person p : othersTeam) if (p.isCriminal()) {
-      numC++;
-      if (p.health.conscious() || p.currentScene() != this) sum++;
-    }
-    if (numC == 0) return 0;
-    return sum / numC;
-  }
-  
-  
   public void onSceneCompletion() {
-    boolean success    = wasWon();
-    float   collateral = assessCollateral();
-    float   getaways   = assessGetaways();
-    
     world.exitFromScene(this);
     
+    final EventReport report = new EventReport();
+    report.composeFromScene(this);
+    report.presentMessageForScene(this);
+    
+    //  TODO:  Decide whether personnel are injured, hospitalised or dead.
+    for (Person p : didEnter) {
+      removePerson(p);
+    }
+    
     if (triggerEvent != null) {
-      triggerEvent.completeWithEffects(success, collateral, getaways);
+      triggerEvent.completeAfterScene(this, report);
     }
     if (playerTask != null) {
-      playerTask.setCompleted(success);
+      playerTask.onSceneExit(this, report);
     }
   }
   

@@ -3,7 +3,7 @@
 package proto.game.person;
 import proto.game.world.*;
 import proto.common.*;
-import proto.game.person.*;
+import proto.game.scene.*;
 import proto.util.*;
 import proto.view.*;
 import proto.view.common.*;
@@ -208,8 +208,6 @@ public abstract class Task implements Assignment {
   public boolean updateAssignment() {
     if (active().empty() || complete()) return false;
     
-    base.world().events.logAssignment(this);
-    
     if (timeTaken > TIME_INDEF) {
       final int time = base.world().timing.totalHours();
       if (initTime == -1) initTime = time;
@@ -250,7 +248,7 @@ public abstract class Task implements Assignment {
   
   protected void onCompletion() {
     presentMessage();
-    for (Person p : assigned) setAssigned(p, false);
+    for (Person p : assigned) p.removeAssignment(this);
   }
   
   
@@ -314,6 +312,11 @@ public abstract class Task implements Assignment {
   
   
   protected void onFailure() {
+    return;
+  }
+  
+  
+  public void onSceneExit(Scene scene, EventReport report) {
     return;
   }
   

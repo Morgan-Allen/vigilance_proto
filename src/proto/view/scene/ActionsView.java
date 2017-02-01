@@ -83,16 +83,12 @@ public class ActionsView extends UINode {
     final Scene scene = world.activeScene();
     
     if (scene == null) return null;
-    final StringBuffer s = new StringBuffer();
+    if (scene.complete() && ! GameSettings.debugScene) return "";
     
+    final StringBuffer s = new StringBuffer();
     final Person   p      = sceneView.activePerson;
     final Ability  a      = selectAbility;
     final Action   action = scene.currentAction();
-    
-    if (scene.complete() && ! GameSettings.debugScene) {
-      describeEndSummary(surface, s);
-      return s.toString();
-    }
     
     if (p != null) {
       s.append("\nSelection: "+p.name()+" ("+p.side().name().toLowerCase()+")");
@@ -180,73 +176,6 @@ public class ActionsView extends UINode {
     if (surface.isPressed('r')) world.reloadFromSave();
     
     return s.toString();
-  }
-  
-  
-  
-  void describeEndSummary(Surface surface, StringBuffer s) {
-    final Scene scene = mainView.world().activeScene();
-    if (scene == null) return;
-    
-    boolean success = scene.wasWon();
-    World   world   = scene.world();
-    Place   site    = scene.site();
-    
-    s.append("\nMission ");
-    if (success) s.append(" Successful: "+scene);
-    else s.append(" Failed: "+scene);
-    
-    s.append("\nTeam Status:");
-    for (Person p : scene.playerTeam()) {
-      s.append("\n  "+p.name());
-      if (p.currentScene() != scene) {
-        s.append(" (escaped)");
-      }
-      else if (! p.health.alive()) {
-        s.append(" (dead)");
-      }
-      else if (! p.health.conscious()) {
-        s.append(success ? " (unconscious)" : " (captive)");
-      }
-      else s.append(" (okay)");
-    }
-    s.append("\nOther Forces:");
-    for (Person p : scene.othersTeam()) {
-      s.append("\n  "+p.name());
-      if (p.currentScene() != scene) {
-        s.append(" (escaped)");
-      }
-      else if (! p.health.alive()) {
-        s.append(" (dead)");
-      }
-      else if (! p.health.conscious()) {
-        s.append(success ? " (captive)" : " (unconscious)");
-      }
-      else s.append(" (okay)");
-    }
-    
-    final String DESC_C[] = {
-      "None", "Minimal", "Medium", "Heavy", "Total"
-    };
-    final String DESC_G[] = {
-      "None", "Few", "Some", "Many", "All"
-    };
-    int colIndex = Nums.clamp(Nums.ceil(scene.assessCollateral() * 5), 5);
-    int getIndex = Nums.clamp(Nums.ceil(scene.assessGetaways  () * 5), 5);
-    s.append("\nCollateral: "+DESC_C[colIndex]);
-    s.append("\nGetaways: "  +DESC_G[getIndex]);
-    
-    float trustLevel = site.region().currentValue(Region.TRUST   );
-    float crimeLevel = site.region().currentValue(Region.VIOLENCE);
-    int trustPercent = (int) (trustLevel * 100);
-    int crimePercent = (int) (crimeLevel * 100);
-    s.append("\nRegional Trust: "+trustPercent+"%");
-    s.append("\nRegional Crime: "+crimePercent+"%");
-    
-    s.append("\n\n  Press X to exit.");
-    if (surface.isPressed('x')) {
-      scene.endScene();
-    }
   }
   
 }

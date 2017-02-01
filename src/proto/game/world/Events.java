@@ -102,11 +102,13 @@ public class Events {
   
   /**  Logging background events-
     */
+  /*
   public void logAssignment(Assignment action) {
     //  TODO:  It's possible the assignment associated should be passed to the
     //  log method directly...
     this.currentAction = action;
   }
+  //*/
   
   
   public void log(String info, int priority) {
@@ -127,6 +129,8 @@ public class Events {
   }
   
   
+  //  TODO:  Get rid of these.
+  //*
   public Series <String> extractLogInfo(Assignment action, int minPriority) {
     final Batch <String> extracts = new Batch();
     
@@ -143,6 +147,7 @@ public class Events {
   public Series <String> extractLogInfo(Assignment action) {
     return extractLogInfo(action, EVENT_NORMAL);
   }
+  //*/
 }
 
 

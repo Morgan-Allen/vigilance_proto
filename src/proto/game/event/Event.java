@@ -1,14 +1,14 @@
 
 
 package proto.game.event;
-import java.awt.Image;
-
 import proto.common.*;
 import proto.game.world.*;
 import proto.game.scene.*;
 import proto.game.person.*;
 import proto.util.*;
-import proto.view.common.MessageView;
+import proto.view.common.*;
+
+import java.awt.Image;
 
 
 
@@ -149,8 +149,6 @@ public class Event implements Session.Saveable, Assignment {
   
   
   public void beginEvent() {
-    world().events.logAssignment(this);
-    
     if (step != null) {
       Base played = world().playerBase();
       Place place = targetLocation();
@@ -175,22 +173,15 @@ public class Event implements Session.Saveable, Assignment {
           final Lead tipoff = new LeadTipoff(played, perp);
           final CaseFile file = played.leads.caseFor(perp);
           file.recordCurrentRole(this, tipoff);
-          I.say("  Generating tipoff from: "+perp);
+          presentTipoffMessage(TIPOFF_HEADER, "", tipoff);
         }
-        else I.say("No tipoff generated from "+perp);
       }
     }
-    checkForTipoffMessage();
   }
   
   
   public void updateEvent() {
-    world().events.logAssignment(this);
-  }
-  
-  
-  public void completeEvent() {
-    completeWithEffects(false, Rand.num(), 1.0f);
+    return;
   }
   
   
@@ -199,41 +190,42 @@ public class Event implements Session.Saveable, Assignment {
     */
   public Series <Person> populateScene(Scene scene) {
     if (step == null) return new Batch();
-    final Series <Person> forces = step.generateGroundForces(this);
+    final Series <Person> forces = step.type.generateGroundForces(this);
     scene.entry.provideInProgressEntry(forces);
     return forces;
   }
   
   
-  public void completeWithEffects(
-    boolean playerWon, float collateral, float getaways
-  ) {
-    world().events.logAssignment(this);
+  public void completeEvent() {
     for (Person perp : involved) perp.removeAssignment(this);
     involved.clear();
     complete = true;
-
-    if (step != null && dangerous()) {
-      Base played = world().playerBase();
-      final Lead report = new LeadCrimeReport(played, this);
-      final CaseFile file = played.leads.caseFor(this);
-      file.recordRole(this, CaseFile.ROLE_CRIME, report);
-    }
-    if (step != null) step.type.applyRealStepEffects(
-      step, place, ! playerWon, collateral, getaways
-    );
+    
+    if (step == null) return;
+    EventReport report = new EventReport();
+    step.type.updateReport(this, report);
+    step.type.applyEffectsAfter(this);
+    report.applyOutcomeEffects(targetLocation());
+    
     if (dangerous()) {
-      final Region region = place.region();
-      
-      float deterEffect = playerWon ? 2 : 0;
-      deterEffect -= getaways * 4;
-      float trustEffect = playerWon ? 2 : 0;
-      trustEffect -= collateral * 4;
-      
-      region.nudgeCurrentStat(Region.DETERRENCE, deterEffect);
-      region.nudgeCurrentStat(Region.TRUST     , trustEffect);
+      Base played = world().playerBase();
+      final Lead crimeReport = new LeadCrimeReport(played, this);
+      final CaseFile file = played.leads.caseFor(this);
+      file.recordRole(this, CaseFile.ROLE_CRIME, crimeReport);
+      presentTipoffMessage(REPORT_HEADER, "", crimeReport);
     }
-    checkForTipoffMessage();
+  }
+  
+  
+  public void completeAfterScene(Scene scene, EventReport report) {
+    for (Person perp : involved) perp.removeAssignment(this);
+    involved.clear();
+    complete = true;
+    world.events.closeEvent(this);
+    
+    if (step == null) return;
+    step.type.updateReport(this, report);
+    if (! report.playerWon()) step.type.applyEffectsAfter(this);
   }
   
   
@@ -275,32 +267,29 @@ public class Event implements Session.Saveable, Assignment {
   }
   
   
-  protected void checkForTipoffMessage() {
-    //  TODO:  Move this out to the .view directory?
-    StringBuffer s = new StringBuffer();
-    
-    for (String action : world.events.extractLogInfo(this)) {
-      s.append("\n\n");
-      s.append(action);
+  final static String
+    TIPOFF_HEADER = "New Tipoff",
+    REPORT_HEADER = "News Report";
+  
+  protected void presentTipoffMessage(
+    String header, String mainText, Lead... leads
+  ) {
+    StringBuffer s = new StringBuffer(mainText);
+    for (Lead lead : leads) {
+      s.append("\n  ");
+      s.append(lead.toString());
     }
-    if (s.length() == 0) return;
     
-    world.view().queueMessage(new MessageView(
-      world.view(),
-      icon(), "New Tipoffs!",
-      s.toString(),
-      "Dismiss"
+    final MainView view = world.view();
+    view.queueMessage(new MessageView(
+      view, icon(), header, s.toString(), "Dismiss"
     ) {
       protected void whenClicked(String option, int optionID) {
-        world.view().dismissMessage(this);
+        view.dismissMessage(this);
       }
     });
   }
 }
-
-
-
-
 
 
 

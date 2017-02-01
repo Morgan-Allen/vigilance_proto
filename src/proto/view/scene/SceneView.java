@@ -169,7 +169,7 @@ public class SceneView extends UINode {
     }
     //
     //  Render the persons themselves-
-    for (Person p : scene.persons()) {
+    for (Person p : scene.allPersons()) {
       float fog = scene.fogAt(p.currentTile(), Person.Side.HEROES);
       if (fog <= 0 && ! GameSettings.debugScene) continue;
       p.renderTo(scene, this, surface, g);

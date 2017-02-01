@@ -5,6 +5,7 @@ import proto.common.*;
 import proto.game.event.*;
 import proto.game.world.*;
 import proto.game.person.*;
+import proto.game.scene.EventReport;
 import proto.content.items.*;
 import proto.util.*;
 
@@ -76,13 +77,14 @@ public class TypeHeist extends TypeMajorCrime {
   
   /**  Scene effects-
     */
-  public void applyRealStepEffects(
-    PlanStep step, Place happens,
-    boolean success, float collateral, float getaways
-  ) {
-    final Region region = happens.region();
-    region.nudgeCurrentStat(Region.DETERRENCE, success ? -1 : 1);
-    super.applyRealStepEffects(step, happens, success, collateral, getaways);
+  public void updateReport(Event event, EventReport report) {
+    super.updateReport(event, report);
+    report.deterEffect += report.playerWon() ? 2 : -2;
+  }
+  
+  
+  public void applyEffectsAfter(Event event) {
+    return;
   }
   
   
@@ -93,12 +95,6 @@ public class TypeHeist extends TypeMajorCrime {
     return "stealing "+step.give(Gives.LOOT)+" from "+step.need(Needs.VENUE);
   }
 }
-
-
-
-
-
-
 
 
 

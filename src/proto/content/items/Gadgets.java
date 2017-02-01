@@ -206,7 +206,7 @@ public class Gadgets {
     "Sonic Probe", "sonic_probe_ability",
     ICONS_DIR+"sprite_sonic_probe.png",
     "Reveals an area hidden in the fog of war.",
-    Ability.IS_RANGED, 1,
+    Ability.IS_RANGED | Ability.NO_NEED_FOG, 1,
     Ability.NO_HARM, Ability.MINOR_POWER
   ) {
     public boolean allowsTarget(Object target, Scene scene, Person acting) {

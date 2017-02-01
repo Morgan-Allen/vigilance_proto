@@ -2,6 +2,7 @@
 
 package proto.game.event;
 import proto.game.world.*;
+import proto.common.Kind;
 import proto.game.person.*;
 import proto.game.scene.*;
 import proto.util.*;
@@ -128,10 +129,41 @@ public abstract class StepType extends EventType {
   }
   
   
-  protected void applyRealStepEffects(
-    PlanStep step, Place happens,
-    boolean success, float collateral, float getaways
-  ) {
+  public Series <Person> generateGroundForces(Event event) {
+    final PlanStep step = event.planStep();
+    final List <Person> forces = new List();
+    
+    for (Element e : step.needs()) {
+      if (e == null || e.type != Kind.TYPE_PERSON) continue;
+      forces.add((Person) e);
+    }
+    
+    final float dangerLevel = 0.5f;
+    final Base faction = step.plan.agent.base();
+    final Kind GOONS[] = faction.goonTypes().toArray(Kind.class);
+    float forceLimit = dangerLevel * 10;
+    float forceSum   = 0;
+    
+    while (forceSum < forceLimit) {
+      Kind ofGoon = (Kind) Rand.pickFrom(GOONS);
+      Person goon = Person.randomOfKind(ofGoon, event.world());
+      forceSum += goon.stats.powerLevel();
+      forces.add(goon);
+    }
+    
+    return forces;
+  }
+  
+  
+  public void updateReport(Event event, EventReport report) {
+    if (isDangerous(event) && report.outcomeState == Scene.STATE_INIT) {
+      report.composeFromEvent(event, Rand.num(), 1);
+    }
+  }
+  
+  
+  protected void applyEffectsAfter(Event event) {
+    final PlanStep step = event.planStep();
     final Base base = step.plan.agent.base();
     for (Element e : step.gives()) {
       base.world().setInside(e, true);
