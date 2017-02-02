@@ -63,17 +63,13 @@ public class PlaceType extends Kind {
   
   /**  Active effects-
     */
-  protected void applyStatEffects(Region district) {
-    for (Region.Stat stat : Region.ALL_STATS) {
-      int level = baseLevel(stat);
-      if (level == 0) continue;
-      district.statLevels[stat.ID].bonus += level;
-    }
+  public int incomeFrom(Region district) {
+    return baseLevel(Region.INCOME);
   }
   
   
-  public int incomeFrom(Region district) {
-    return baseLevel(Region.INCOME);
+  public int bonusFor(Region.Stat stat) {
+    return baseLevel(stat);
   }
   
   

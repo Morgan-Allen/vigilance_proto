@@ -46,11 +46,17 @@ public class RegionView extends UINode {
       return false;
     }
     
-    g.setColor(Color.WHITE);
     g.drawString(region.kind().name(), vx + 20, vy + 20);
+    
+    Region.Stat hovered = null;
     
     int down = 50;
     for (Region.Stat stat : Region.CIVIC_STATS) {
+      if (surface.tryHover(vx, vy + down - 10, 120, 20, stat)) {
+        hovered = stat;
+        g.setColor(Color.YELLOW);
+      }
+      else g.setColor(Color.WHITE);
       g.drawString(stat+": ", vx + 30, vy + down);
       int current = (int) region.longTermValue(stat);
       g.drawString(""+current+"/10", vx + 120, vy + down);
@@ -59,6 +65,11 @@ public class RegionView extends UINode {
     
     down = 50;
     for (Region.Stat stat : Region.SOCIAL_STATS) {
+      if (surface.tryHover(vx + 160, vy + down - 10, 120, 20, stat)) {
+        hovered = stat;
+        g.setColor(Color.YELLOW);
+      }
+      else g.setColor(Color.WHITE);
       g.drawString(stat+": ", vx + 160, vy + down);
       int current = (int) region.currentValue(stat);
       g.drawString(""+current, vx + 250, vy + down);
@@ -66,6 +77,14 @@ public class RegionView extends UINode {
     }
     
     renderFacilities(region, surface, g);
+    
+    if (hovered != null) {
+      g.setColor(Color.LIGHT_GRAY);
+      String desc = hovered.description;
+      ViewUtils.drawWrappedString(
+        desc, g, vx + 25, vy + 190, 275, 500
+      );
+    }
     
     g.setColor(Color.DARK_GRAY);
     g.drawRect(vx, vy, vw, vh);

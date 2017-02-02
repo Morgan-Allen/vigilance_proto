@@ -14,16 +14,18 @@ public class Region extends Element {
   public static class Stat {
     
     final int ID;
-    final String name, oppName;
+    final public String name, oppName, description;
     
-    Stat(String name, int ID) {
-      this(name, null, ID);
+    
+    Stat(String name, int ID, String description) {
+      this(name, null, ID, description);
     }
     
-    Stat(String name, String oppName, int ID) {
-      this.ID      = ID;
-      this.name    = name;
-      this.oppName = oppName;
+    Stat(String name, String oppName, int ID, String description) {
+      this.ID          = ID;
+      this.name        = name;
+      this.oppName     = oppName;
+      this.description = description;
     }
     
     public String toString() {
@@ -32,10 +34,12 @@ public class Region extends Element {
   }
   
   final public static int
-    BASE_CIVIC_STAT  = 5,
-    MAX_CIVIC_STAT   = 10,
-    STAT_DRIFT_TIME  = World.DAYS_PER_WEEK * World.WEEKS_PER_YEAR * 10,
-    REPUTATION_DECAY = 1,
+    BASE_CIVIC_STAT   = 5,
+    MAX_CIVIC_STAT    = 10,
+    STAT_DRIFT_TIME   = World.DAYS_PER_WEEK * World.WEEKS_PER_YEAR * 10,
+    REPUTATION_DECAY  = 1,
+    DEFAULT_TRUST     = 25,
+    REPUTE_DRIFT_TIME = World.DAYS_PER_WEEK * 2,
     
     BUILD_TIME_SHORT  = 6  * World.DAYS_PER_WEEK * 4,
     BUILD_TIME_MEDIUM = 12 * World.DAYS_PER_WEEK * 4,
@@ -44,19 +48,59 @@ public class Region extends Element {
   ;
   
   final public static Stat
-    EMPLOYMENT = new Stat("Employment", "Poverty", 0),
-    EDUCATION  = new Stat("Education" , "Vice"   , 1),
-    HEALTH     = new Stat("Health"    , "Squalor", 2),
-    DIVERSION  = new Stat("Diversion" , "Despair", 3),
+    EMPLOYMENT = new Stat(
+      "Employment", "Poverty", 0,
+      "Employment puts money in the pockets of the everyday citizen, while "+
+      "reducing the incidence of petty theft and crimes of desperation."
+    ),
+    EDUCATION = new Stat(
+      "Education", "Vice", 1,
+      "Education improves citizens' long-term career prospects and improves "+
+      "the quality of expertise among your doctors and inventors."
+    ),
+    HEALTH = new Stat(
+      "Health", "Squalor", 2,
+      "Hospital facilities, sanitation and green space help to maintain "+
+      "a city's physical and psychological well-being."
+    ),
+    DIVERSION = new Stat(
+      "Diversion", "Despair", 3,
+      "Theatres, museums, stadia and other entertainment venues keep spirits "+
+      "high and ideas fresh."
+    ),
     CIVIC_STATS[] = { EMPLOYMENT, EDUCATION, HEALTH, DIVERSION },
     
-    DETERRENCE = new Stat("Deterrence", 4),
-    TRUST      = new Stat("Trust"     , 5),
-    CORRUPTION = new Stat("Corruption", 6),
-    VIOLENCE   = new Stat("Violence"  , 7),
+    DETERRENCE = new Stat(
+      "Deterrence", 4,
+      "Deterrence suppresses violence and corruption in a given sector, but "+
+      "decays over time.  Boost it by preventing criminals' escape, ensuring "+
+      "conviction, and paying for police and security firms."
+    ),
+    TRUST = new Stat(
+      "Trust", 5,
+      "Trust improves the likelihood of tipoffs from local sources, which "+
+      "are vital to most investigations.  Boost it by protecting civilians, "+
+      "minimising use of force, and building public amenities."
+    ),
+    CORRUPTION = new Stat(
+      "Corruption", 6,
+      "Corruption reduces your chance for convictions after arrest, and "+
+      "siphons money away from legitimate investors.  Reduce it by lowering "+
+      "violence, shutting down criminals' business fronts and neutralising "+
+      "masterminds."
+    ),
+    VIOLENCE = new Stat(
+      "Violence", 7,
+      "Violence keeps common citizens in fear of the mob and takes a "+
+      "constant toll on lives and property.  Reduce it by tackling "+
+      "corruption, and providing jobs, healthcare, education and diversions."
+    ),
     SOCIAL_STATS[] = { DETERRENCE, TRUST, CORRUPTION, VIOLENCE },
     
-    INCOME = new Stat("Income", "Expense", 8),
+    INCOME = new Stat(
+      "Income", "Expense", 8,
+      "Income and expenses are derived from regional facilities you own."
+    ),
     FINANCE_STATS[] = { INCOME },
     
     ALL_STATS[] = (Stat[]) Visit.compose(
@@ -64,7 +108,10 @@ public class Region extends Element {
     )
   ;
   
-  static class Level { Stat stat; int level, bonus; float current; }
+  static class Level {
+    Stat stat;
+    float level, bonus, current;
+  }
   Level statLevels[];
   Place buildSlots[];
   
@@ -91,8 +138,8 @@ public class Region extends Element {
     initStats();
     
     for (Level l : statLevels) {
-      l.bonus   = s.loadInt  ();
-      l.level   = s.loadInt  ();
+      l.bonus   = s.loadFloat();
+      l.level   = s.loadFloat();
       l.current = s.loadFloat();
     }
     buildSlots = (Place[]) s.loadObjectArray(Place.class);
@@ -102,8 +149,8 @@ public class Region extends Element {
   public void saveState(Session s) throws Exception {
     super.saveState(s);
     for (Level l : statLevels) {
-      s.saveInt(l.bonus);
-      s.saveInt(l.level);
+      s.saveFloat(l.bonus  );
+      s.saveFloat(l.level  );
       s.saveFloat(l.current);
     }
     s.saveObjectArray(buildSlots);
@@ -126,14 +173,14 @@ public class Region extends Element {
   }
   
   
-  public void setLevel(Stat stat, int level, boolean asCurrent) {
+  public void setLevel(Stat stat, float level, boolean asCurrent) {
     Level l = this.statLevels[stat.ID];
-    l.level = Nums.clamp(level, 1000);
+    l.level = Nums.clamp(level, 0, 100);
     if (asCurrent) l.current = l.level + l.bonus;
   }
   
   
-  public int longTermValue(Stat stat) {
+  public float longTermValue(Stat stat) {
     Level l = this.statLevels[stat.ID];
     return l.bonus + l.level;
   }
@@ -149,7 +196,8 @@ public class Region extends Element {
     int total = 0;
     
     if (positive && ! base.criminal()) {
-      float crime = currentValue(VIOLENCE) / 100f;
+      float crime = 0;
+      crime += currentValue(VIOLENCE  ) / 100f;
       crime += currentValue(CORRUPTION) / 100f;
       total += kind().baseFunding * (1 - Nums.clamp(crime, 0, 1));
     }
@@ -244,17 +292,17 @@ public class Region extends Element {
       if (DF == null || i >= DF.length) break;
       setupFacility(DF[i], i, owns, true);
     }
-    updateStats();
+    updateStats(0);
     
     for (Stat stat : CIVIC_STATS) {
       final Level l = statLevels[stat.ID];
       l.current = l.level + l.bonus;
     }
-    updateStats();
+    updateStats(0);
   }
   
   
-  void updateStats() {
+  void updateStats(float numDays) {
     //
     //  Reset the bonus for all stats to zero, then iterate across all built
     //  facilities and collect their bonuses (including for income.)
@@ -274,61 +322,71 @@ public class Region extends Element {
       else if (prog < 1) {
         float moreProg = 1f / built.buildTime;
         slot.setBuildProgress(prog + moreProg);
+        continue;
       }
-      else {
-        final int income = built.incomeFrom(this);
-        totalIncome += Nums.max(0, income);
-        if      (owns == world.playerBase()) baseIncome += income;
-        else if (owns != null        ) mobIncome  += income;
-        built.applyStatEffects(this);
+      
+      final int income = built.incomeFrom(this);
+      totalIncome += Nums.max(0, income);
+      if      (owns == world.playerBase()) baseIncome += income;
+      else if (owns != null              ) mobIncome  += income;
+      
+      for (Region.Stat stat : Region.ALL_STATS) {
+        statLevels[stat.ID].bonus += built.bonusFor(stat);
       }
     }
     //
     //  All civic stats (employment, education, etc.) help to reduce crime, but
     //  will only converge to their 'ultimate' values quite slowly.
-    final int MCS = MAX_CIVIC_STAT;
     float crimeFactor = 0;
-    
+    float driftStat = MAX_CIVIC_STAT * numDays / STAT_DRIFT_TIME;
     for (Stat stat : CIVIC_STATS) {
       final Level l = statLevels[stat.ID];
-      
-      float drift = MCS * 1f / STAT_DRIFT_TIME;
       l.level = BASE_CIVIC_STAT;
-      float longTerm = Nums.min(l.level + l.bonus, MCS);
       
-      if (l.current >= longTerm) {
-        l.current = Nums.clamp(l.current - drift, longTerm, MCS);
-      }
-      else {
-        l.current = Nums.clamp(l.current + drift, 0, longTerm);
-      }
-      crimeFactor += Nums.clamp(MCS - l.current, 0, MCS);
+      float longTerm = Nums.min(l.level + l.bonus, MAX_CIVIC_STAT);
+      l.current = driftValue(l.current, longTerm, driftStat);
+      crimeFactor += Nums.clamp(MAX_CIVIC_STAT - l.current, 0, MAX_CIVIC_STAT);
     }
-    crimeFactor *= 100f / (MCS * CIVIC_STATS.length);
+    crimeFactor *= 100f / (MAX_CIVIC_STAT * CIVIC_STATS.length);
     //
     //  Open violence is reduced by deterrence efforts, while corruption is
     //  based on the average of open violence and the percentage of business
     //  income controlled by criminals.  (Businesses you own help reduce this
     //  further.)
-    float deterrence = currentValue(DETERRENCE), corruption;
+    float deterrence = statLevels[DETERRENCE.ID].level;
+    float trust      = statLevels[TRUST     .ID].level;
+    float corruption = 0;
+    
     crimeFactor = Nums.clamp(crimeFactor - deterrence, 0, 100);
     setLevel(VIOLENCE, (int) crimeFactor, true);
     crimeFactor = currentValue(VIOLENCE);
     
-    corruption  = mobIncome * 100f / Nums.max(1, totalIncome + baseIncome);
-    corruption  = (corruption + crimeFactor) / 2;
-    setLevel(DETERRENCE, (int) deterrence - REPUTATION_DECAY, true);
+    corruption = mobIncome * 100f / Nums.max(1, totalIncome + baseIncome);
+    corruption = (corruption + crimeFactor) / 2;
+    
+    float driftRep = numDays / REPUTE_DRIFT_TIME;
+    deterrence = driftValue(deterrence, 0            , driftRep);
+    trust      = driftValue(trust     , DEFAULT_TRUST, driftRep);
+    
+    setLevel(DETERRENCE, (int) deterrence , true);
+    setLevel(TRUST     , (int) trust      , true);
     setLevel(CORRUPTION, (int) corruption , true);
     setLevel(INCOME    , (int) totalIncome, true);
     
     //  TODO:  Rate social stats out of a hundred, so you can see improvement
-    //  (or decay) within a week or two.
+    //  (or decay) within a week or two?
+  }
+  
+  
+  float driftValue(float init, float target, float drift) {
+    if (init > target) return Nums.max(init - drift, target);
+    else               return Nums.min(init + drift, target);
   }
   
   
   public void updateRegion() {
     if (! world.timing.dayIsUp()) return;
-    updateStats();
+    updateStats(1);
   }
   
   
