@@ -85,15 +85,14 @@ public class Region extends Element {
     CORRUPTION = new Stat(
       "Corruption", 6,
       "Corruption reduces your chance for convictions after arrest, and "+
-      "siphons money away from legitimate investors.  Reduce it by lowering "+
-      "violence, shutting down criminals' business fronts and neutralising "+
-      "masterminds."
+      "siphons money away from legitimate investors.  Reduce it by shutting "+
+      "down criminals' business fronts and neutralising masterminds."
     ),
     VIOLENCE = new Stat(
       "Violence", 7,
       "Violence keeps common citizens in fear of the mob and takes a "+
-      "constant toll on lives and property.  Reduce it by tackling "+
-      "corruption, and providing jobs, healthcare, education and diversions."
+      "constant toll on lives and property.  Reduce it by providing jobs, "+
+      "healthcare, education and diversions."
     ),
     SOCIAL_STATS[] = { DETERRENCE, TRUST, CORRUPTION, VIOLENCE },
     
@@ -165,10 +164,10 @@ public class Region extends Element {
   
   /**  General stat-queries and modifications-
     */
-  public void nudgeCurrentStat(Stat stat, float inc) {
+  public void incLevel(Stat stat, float inc, boolean asCurrent) {
     Level l = this.statLevels[stat.ID];
-    final float oldL = l.current;
-    l.current = Nums.clamp(l.current + inc, 0, 100);
+    final float oldL = l.level;
+    setLevel(stat, l.level + inc, asCurrent);
     if (oldL != l.current) recordChange(stat, oldL, l.current);
   }
   
@@ -285,15 +284,17 @@ public class Region extends Element {
   
   /**  Updates and life-cycle:
     */
-  public void initialiseRegion(Base owns) {
+  public void initialiseRegion() {
     
     final PlaceType DF[] = kind().defaultFacilities;
     for (int i = 0; i < buildSlots.length; i++) {
       if (DF == null || i >= DF.length) break;
-      setupFacility(DF[i], i, owns, true);
+      setupFacility(DF[i], i, null, true);
     }
     updateStats(0);
     
+    incLevel(Region.TRUST     , kind().defaultTrust     , true);
+    incLevel(Region.DETERRENCE, kind().defaultDeterrence, true);
     for (Stat stat : CIVIC_STATS) {
       final Level l = statLevels[stat.ID];
       l.current = l.level + l.bonus;

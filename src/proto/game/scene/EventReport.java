@@ -118,8 +118,8 @@ public class EventReport implements Session.Saveable {
   
   public void applyOutcomeEffects(Place place) {
     final Region region = place.region();
-    region.nudgeCurrentStat(Region.DETERRENCE, deterEffect);
-    region.nudgeCurrentStat(Region.TRUST     , trustEffect);
+    region.incLevel(Region.DETERRENCE, deterEffect, true);
+    region.incLevel(Region.TRUST     , trustEffect, true);
   }
   
   
@@ -189,7 +189,7 @@ public class EventReport implements Session.Saveable {
   
   
   String descFrom(float rating, String desc[]) {
-    if (rating == 0) return desc[0];
+    if (rating <= 0) return desc[0];
     int len = desc.length;
     int index = (int) (rating * (len - 1));
     return desc[Nums.clamp(1 + index, len)];

@@ -120,7 +120,7 @@ public class World implements Session.Saveable {
   
   /**  Supplementary setup methods:
     */
-  public void attachDistricts(Region... districts) {
+  public void attachRegions(Region... districts) {
     this.regions = districts;
   }
   

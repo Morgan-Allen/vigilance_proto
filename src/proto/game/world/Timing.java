@@ -81,6 +81,7 @@ public class Timing {
     final float realGap = 1f / RunGame.FRAME_RATE;
     hoursInTick = realGap * World.GAME_HOURS_PER_REAL_SECOND;
     timeHours += hoursInTick;
+    dayIsUp = monthIsUp = false;
     
     while (timeHours > World.HOURS_PER_DAY) {
       timeDays++;

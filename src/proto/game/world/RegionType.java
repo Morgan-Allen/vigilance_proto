@@ -17,10 +17,11 @@ public class RegionType extends Kind {
     */
   final public RegionAssets view = new RegionAssets();
   
-  int     maxFacilities  = 3    ;
-  float   defaultTrust   = 0.00f;
-  int     baseFunding    = 250  ;
-  boolean defaultMember  = true ;
+  int     maxFacilities     = 3    ;
+  float   defaultTrust      = 25   ;
+  float   defaultDeterrence = 25   ;
+  int     baseFunding       = 75   ;
+  boolean defaultMember     = true ;
   PlaceType defaultFacilities[];
   
   

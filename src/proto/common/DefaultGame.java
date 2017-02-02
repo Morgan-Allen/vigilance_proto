@@ -46,13 +46,9 @@ public class DefaultGame extends RunGame {
     Region[] regions = new Region[numN];
     for (int n = 0; n < numN; n++) {
       regions[n] = new Region(Regions.ALL_REGIONS[n], world);
+      regions[n].initialiseRegion();
     }
-    for (Region region : regions) {
-      region.initialiseRegion(null);
-      region.nudgeCurrentStat(Region.TRUST     , 25);
-      region.nudgeCurrentStat(Region.DETERRENCE, 25);
-    }
-    world.attachDistricts(regions);
+    world.attachRegions(regions);
   }
   
   
@@ -110,7 +106,7 @@ public class DefaultGame extends RunGame {
       base.stocks.incStock(t, 2);
     }
     
-    base.finance.setSecretPercent(2);
+    base.finance.setSecretPercent(5);
     base.finance.incPublicFunds(2000);
     base.finance.incSecretFunds(200);
     base.finance.updateFinance();

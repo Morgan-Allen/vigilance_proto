@@ -81,7 +81,7 @@ public class InvestingView extends UINode {
       float violence   = region.currentValue(Region.VIOLENCE  ) / 100f;
       float corruption = region.currentValue(Region.CORRUPTION) / 100f;
       int baseIncome   = region.kind().baseFunding();
-      int regionIncome = region.incomeFor(base);
+      int regionIncome = region.incomeFor(base) - region.expensesFor(base);
       int violenceLoss = (int) (baseIncome * violence  );
       int corruptLoss  = (int) (baseIncome * corruption);
       
