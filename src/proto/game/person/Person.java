@@ -175,7 +175,7 @@ public class Person extends Element {
     assigned.setAssigned(this, true);
     if (assigned instanceof Scene) scene = (Scene) assigned;
     
-    //I.say(this+" assigned to "+assigned);
+    I.say(this+" assigned to "+assigned);
     return true;
   }
   
@@ -187,7 +187,7 @@ public class Person extends Element {
     assigned.setAssigned(this, false);
     if (scene == assigned) scene = null;
     
-    //I.say(this+" removed from assignment "+assigned);
+    I.say(this+" removed from assignment "+assigned);
     return true;
   }
   

@@ -270,6 +270,15 @@ public abstract class Task implements Assignment {
   }
   
   
+  public float testChance() {
+    float chance = 1.0f;
+    for (int n = tested.length; n-- > 0;) {
+      chance *= testChance(n);
+    }
+    return chance;
+  }
+  
+  
   protected boolean performTest(Series <Person> active) {
     boolean okay = true;
     float xpRate = timeTaken * 1f / World.MINUTES_PER_HOUR;

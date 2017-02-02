@@ -132,10 +132,18 @@ public class EquipmentView extends UINode {
       down += 10;
       
       int craftTime = hovered.craftingTime() / World.HOURS_PER_DAY;
+      float progress = hovered.craftingProgress();
       String desc = hovered.made().defaultInfo();
-      
       desc += "\n  "+hovered.testInfo();
-      desc += "\n  Crafting time: "+craftTime+" days";
+      desc += "\n  Cost: "+hovered.made().buildCost;
+      
+      if (craftTime == -1) {
+        desc += "\n  Insufficient skill to craft.";
+      }
+      else {
+        desc += "\n  Crafting time: "+craftTime+" days";
+        desc += " ("+(int) (progress * 100)+"% complete).";
+      }
       
       g.setColor(Color.LIGHT_GRAY);
       ViewUtils.drawWrappedString(desc, g, vx + across, vy + down, 320, 200);

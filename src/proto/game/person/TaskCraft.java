@@ -19,40 +19,73 @@ public class TaskCraft extends Task {
   
   
   final ItemType made;
+  int numOrders = 0;
   float progress = 0;
   
   
   public TaskCraft(ItemType made, Base base) {
-    super(base, made.craftTime, made.craftArgs);
+    super(base, TIME_INDEF, made.craftArgs);
     this.made = made;
   }
   
   
   public TaskCraft(Session s) throws Exception {
     super(s);
-    made = (ItemType) s.loadObject();
-    progress = s.loadFloat();
+    made      = (ItemType) s.loadObject();
+    numOrders = s.loadInt();
+    progress  = s.loadFloat();
   }
   
   
   public void saveState(Session s) throws Exception {
     super.saveState(s);
     s.saveObject(made);
-    s.saveFloat(progress);
+    s.saveInt  (numOrders);
+    s.saveFloat(progress );
   }
   
   
   
   /**  Task performance and completion-
     */
-  protected void onFailure() {
-    base.finance.incSecretFunds(0 - made.buildCost / 2);
+  public boolean updateAssignment() {
+    if (! super.updateAssignment()) return false;
+    advanceCrafting();
+    return true;
   }
   
   
-  protected void onSuccess() {
-    base.finance.incSecretFunds(0 - made.buildCost);
-    base.stocks.incStock(made, 1);
+  protected void advanceCrafting() {
+    int craftTime = craftingTime();
+    if (craftTime == -1) return;
+    
+    if (progress == 0) {
+      base.finance.incSecretFunds(0 - made.buildCost);
+    }
+    
+    //  TODO:  Grant experience in the relevant skills!
+    progress += base.world().timing.hoursInTick() / craftTime;
+    
+    if (progress >= 1) {
+      progress = 0;
+      base.stocks.incStock(made, 1);
+      presentMessage();
+    }
+  }
+  
+  
+  public int craftingTime() {
+    if (active().empty()) return made.craftTime;
+    float craftChance = testChance();
+    if (craftChance <= 0) return -1;
+    int baseTime = made.craftTime;
+    baseTime *= 4 - (craftChance * 3);
+    return baseTime;
+  }
+  
+  
+  public float craftingProgress() {
+    return progress;
   }
   
   
@@ -68,11 +101,6 @@ public class TaskCraft extends Task {
   
   public ItemType made() {
     return made;
-  }
-  
-  
-  public int craftingTime() {
-    return super.timeTaken;
   }
   
   
@@ -102,13 +130,6 @@ public class TaskCraft extends Task {
   }
   
   
-  public String testInfo() {
-    String info = super.testInfo();
-    info += " Cost: "+made.buildCost;
-    return info;
-  }
-  
-  
   public TaskView createView(MainView parent) {
     TaskView view = super.createView(parent);
     view.showIcon = false;
@@ -126,14 +147,7 @@ public class TaskCraft extends Task {
       s.append(p.name());
       if (p != active.last()) s.append(" and ");
     }
-    s.append(" attempted to make "+made+".");
-    
-    if (success()) {
-      s.append(" They were successful.");
-    }
-    else {
-      s.append(" They encountered difficulties.");
-    }
+    s.append(" crafted "+made+".");
     
     for (String info : logs) {
       s.append("\n");

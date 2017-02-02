@@ -18,6 +18,7 @@ public class TaskTrain extends Task {
     */
   Ability trained;
   Trait talking;
+  Person lastLevelled;
   
   
   public TaskTrain(Ability trained, Trait talking, Base base) {
@@ -70,7 +71,11 @@ public class TaskTrain extends Task {
       final int oldLevel = p.stats.levelFor(trained);
       advanceTraining(p, timeHours);
       final int newLevel = p.stats.levelFor(trained);
-      if (newLevel > oldLevel) presentMessage();
+      if (newLevel > oldLevel) {
+        p.stats.updateStats();
+        lastLevelled = p;
+        presentMessage();
+      }
     }
     
     return true;
@@ -80,9 +85,9 @@ public class TaskTrain extends Task {
   /**  Training-specific methods-
     */
   void advanceTraining(Person person, float timeHours) {
-    int level = person.stats.levelFor(trained);
-    float xpGain = trained.xpRequired(level);
-    xpGain *= timeHours / trainingTime(person);
+    final int level = person.stats.levelFor(trained);
+    float xpGain = trained.xpRequired(level), trainTime = trainingTime(person);
+    xpGain *= timeHours / trainTime;
     person.stats.gainXP(trained, xpGain);
   }
   
@@ -170,23 +175,14 @@ public class TaskTrain extends Task {
   
   protected void presentMessage() {
     final World world = base.world();
-    final Series <String> logs = world.events.extractLogInfo(this);
-    if (logs.empty()) return;
-    
     StringBuffer s = new StringBuffer();
     
-    final Series <Person> active = active();
-    for (Person p : active) {
-      s.append(p.name());
-      if (p != active.last()) s.append(" and ");
+    final Person p = lastLevelled;
+    if (p != null) {
+      int level = p.stats.levelFor(trained);
+      s.append("  "+p+" "+trained+": "+trained.levelDesc(level));
     }
-    s.append(" trained their "+trained);
     
-    for (String info : logs) {
-      s.append("\n");
-      s.append(info);
-    }
-
     world.view().queueMessage(new MessageView(
       world.view(),
       icon(), "Task complete: "+activeInfo(),

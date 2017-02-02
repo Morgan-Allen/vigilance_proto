@@ -99,7 +99,6 @@ public class PersonStats {
   
   
   final Person person;
-  
   List <Ability> abilities = new List();
   
   static class Level {
@@ -412,13 +411,12 @@ public class PersonStats {
     final Level l = getLevel(stat);
     l.xpGained += XP;
     
-    while (l.xpGained >= l.level + 1) {
-      l.xpGained -= l.level + 1;
-      l.level++;
+    while (true) {
+      final float xpNeed = stat.xpRequired((int) l.level);
+      if (l.xpGained < xpNeed) break;
+      l.xpGained -= xpNeed;
+      setLevel(stat, l.level + 1, true);
       person.world().events.log(person+" reached level "+l.level+" in "+stat);
-    }
-    for (Trait root : stat.roots()) {
-      gainXP(root, XP / (3f * stat.roots().length));
     }
   }
 }

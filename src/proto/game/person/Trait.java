@@ -52,7 +52,7 @@ public class Trait extends Index.Entry implements Session.Saveable {
   
   
   public float xpRequired(int oldLevel) {
-    return oldLevel + 1;
+    return (oldLevel + 1) * (oldLevel + 1);
   }
   
   
