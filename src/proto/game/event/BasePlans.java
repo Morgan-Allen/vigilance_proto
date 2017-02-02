@@ -46,6 +46,27 @@ public class BasePlans {
   }
   
   
+  public void assignPlan(Plan newPlan, int hoursDelay) {
+    currentPlan = newPlan;
+    if (currentPlan == null) return;
+    
+    I.say("Assigning new plan...");
+    int stepTime = base.world().timing.totalHours() + hoursDelay;
+    
+    for (PlanStep step : currentPlan.steps()) {
+      final Event event = step.matchedEvent();
+      event.setBeginTime(stepTime);
+      stepTime = event.timeEnds() + (int) Rand.range(
+        GameSettings.MIN_PLOT_STEP_DELAY,
+        GameSettings.MAX_PLOT_STEP_DELAY
+      );
+      I.say("  Step is: "+step);
+      I.say("  Begin/End: "+event.timeBegins()+"/"+event.timeEnds());
+    }
+    updateCurrentPlanSteps(-1, false);
+  }
+  
+  
   public void updatePlanning() {
     if (Visit.empty(stepTypes)) return;
     final int maxDepth = 6, numPlans = 4;
@@ -54,21 +75,17 @@ public class BasePlans {
     //  new one from scratch, and assign a suitable time interval before the
     //  execution of each step-
     if (currentPlan == null || planComplete(currentPlan)) {
-      currentPlan = generateNextPlan(numPlans, maxDepth, null);
-      if (currentPlan != null) {
-        int stepTime = base.world().timing.totalHours() + (int) Rand.range(
-          GameSettings.MIN_PLOT_THINKING_TIME,
-          GameSettings.MAX_PLOT_THINKING_TIME
-        );
-        for (PlanStep step : currentPlan.steps()) {
-          step.matchedEvent().setBeginTime(stepTime);
-          stepTime += (int) Rand.range(
-            GameSettings.MIN_PLOT_STEP_DELAY,
-            GameSettings.MAX_PLOT_STEP_DELAY
-          );
-        }
-      }
+      int delay = (int) Rand.range(
+        GameSettings.MIN_PLOT_THINKING_TIME,
+        GameSettings.MAX_PLOT_THINKING_TIME
+      );
+      assignPlan(generateNextPlan(numPlans, maxDepth, null), delay);
     }
+    updateCurrentPlanSteps(maxDepth, true);
+  }
+  
+  
+  void updateCurrentPlanSteps(int maxDepth, boolean allowRevision) {
     if (currentPlan == null) return;
     //
     //  If you don't have a step scheduled, or the current step is complete,
@@ -83,7 +100,7 @@ public class BasePlans {
       if (nextStep != null && nextStep.currentlyPossible()) {
         base.world().events.scheduleEvent(nextStep.matchedEvent());
       }
-      else {
+      else if (allowRevision) {
         currentPlan.reviseAfter(nextStep, maxDepth / 2, base);
         currentPlan = generateNextPlan(1, maxDepth, currentPlan);
         nextStep = null;

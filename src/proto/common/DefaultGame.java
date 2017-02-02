@@ -105,8 +105,9 @@ public class DefaultGame extends RunGame {
       Gadgets.MED_KIT,
       Gadgets.SONIC_PROBE
     };
-    for (Object t : craftTechs) {
+    for (ItemType t : craftTechs) {
       base.addTech(t);
+      base.stocks.incStock(t, 2);
     }
     
     base.finance.setSecretPercent(2);

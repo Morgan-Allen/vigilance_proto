@@ -80,14 +80,21 @@ public abstract class Lead extends Task {
       s.append(p.name());
       if (p != active.last()) s.append(" and ");
     }
-    s.append(" tested their ");
-    for (Trait t : tested()) {
-      s.append(t);
-      if (t != Visit.last(tested())) s.append(" and ");
+    
+    if (tested().length > 0) {
+      s.append(" tested their ");
+      for (Trait t : tested()) {
+        s.append(t);
+        if (t != Visit.last(tested())) s.append(" and ");
+      }
+      s.append(".");
+      if (success()) s.append("  They were successful in "+activeInfo());
+      else           s.append("  They failed in "+activeInfo());
     }
-    s.append(".");
-    if (success()) s.append("  They were successful.");
-    else           s.append("  They had no luck."    );
+    else {
+      s.append(" were successful in "+activeInfo());
+    }
+    
     
     final World world = base.world();
     for (String action : world.events.extractLogInfo(this)) {

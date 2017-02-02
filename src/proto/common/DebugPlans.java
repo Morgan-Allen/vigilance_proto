@@ -11,82 +11,44 @@ import proto.util.*;
 
 
 
-public class DebugPlans {
+public class DebugPlans extends RunGame {
   
   
   public static void main(String args[]) {
-    
-    Assets.compileAssetList("proto");
-    Assets.advanceAssetLoading(-1);
+    runGame(new DebugPlans(), "saves/debug_plans");
+  }
+  
+  
+  protected World setupWorld() {
+    this.world = new World(this, savePath);
+    DefaultGame.initDefaultTime   (world);
+    DefaultGame.initDefaultRegions(world);
+    DefaultGame.initDefaultBase   (world);
+    DefaultGame.initDefaultCrime  (world);
     
     //  TODO:  Also, you need to avoid different bosses interfering with
-    //  eachother (if reasonably possible.)
+    //  eachother if reasonably possible?
     
-    I.say("Now running sketch!\n");
-    
-    World world = new World();
-    Person boss = new Person(Crooks.GANGSTER, world, "Crime Boss");
-    Batch <Person> civvies = new Batch();
-    Batch <Person> crooks  = new Batch();
-    
-    for (int n = 5; n-- > 0;) {
-      Person civvy = genRandomPerson(Civilians.CIVILIAN, world);
-      world.setInside(civvy, true);
-      civvies.add(civvy);
-      Person crook = genRandomPerson(Crooks.BRUISER, world);
-      world.setInside(crook, true);
-      crooks.add(crook);
-    }
-    
-    Place bank = new Place(Facilities.BUSINESS_PARK, 0, world);
-    world.setInside(bank, true);
-    Person worker = (Person) Rand.pickFrom(civvies);
-    Place.setResident(worker, bank, true);
+    final Place bank = world.regionFor(Regions.SECTOR02).setupFacility(
+      Facilities.BUSINESS_PARK, 1, world.playerBase(), true
+    );
     
     I.say("\nBeginning plan-generation...");
-    Plan plan = new Plan(boss, world, StepTypes.ALL_TYPES);
+    final Base crookBase = world.bases().atIndex(1);
+    final Person boss = crookBase.leader();
+    final Plan plan = new Plan(boss, world, StepTypes.ALL_TYPES);
     plan.verbose = true;
-    for (Element crook : crooks) plan.addObtained(crook);
+    for (Element crook : crookBase.roster()) plan.addObtained(crook);
     
-    PlanStep firstStep = StepTypes.HEIST.asGoal(bank, plan);
+    final PlanStep firstStep = StepTypes.HEIST.asGoal(bank, plan);
     plan.addGoal(firstStep, 10);
     plan.advancePlan(6);
-    plan.printFullPlan();
-  }
-  
-  
-  final static String FIRST_NAMES[] = {
-    "Lenny", "Steve", "Marco", "Tommy", "Joey", "Abed", "Lance", "Zeke"
-  };
-  final static String LAST_NAMES[] = {
-    "Cruz", "Martin", "Conway", "Tomasi", "Braun", "Phelton", "Mara", "Soren"
-  };
-  
-  
-  private static Person genRandomPerson(Kind kind, World world) {
-    String name = pickFrom(FIRST_NAMES)+" "+pickFrom(LAST_NAMES);
-    Person person = new Person(kind, world, name);
+    crookBase.plans.assignPlan(plan, 16);
+    GameSettings.freeTipoffs = true;
     
-    for (Trait stat : PersonStats.BASE_STATS) {
-      person.stats.setLevel(stat, 5 + (int) (Math.random() * 10), true);
-    }
-    for (Trait stat : PersonStats.SKILL_STATS) {
-      person.stats.setLevel(stat, (int) (Math.random() * 10), true);
-    }
-    
-    return person;
+    return world;
   }
-  
-  
-  public static Object pickFrom(Object array[]) {
-    return array[(int) (Math.random() * array.length)];
-  }
-  
 }
-
-
-
-
 
 
 

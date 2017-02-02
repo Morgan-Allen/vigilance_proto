@@ -172,8 +172,8 @@ public class Event implements Session.Saveable, Assignment {
         if (tips) {
           final Lead tipoff = new LeadTipoff(played, perp);
           final CaseFile file = played.leads.caseFor(perp);
-          file.recordCurrentRole(this, tipoff);
-          presentTipoffMessage(TIPOFF_HEADER, "", tipoff);
+          Object role = file.recordCurrentRole(this, tipoff);
+          presentTipoffMessage(TIPOFF_HEADER, "", file, role);
         }
       }
     }
@@ -211,8 +211,8 @@ public class Event implements Session.Saveable, Assignment {
       Base played = world().playerBase();
       final Lead crimeReport = new LeadCrimeReport(played, this);
       final CaseFile file = played.leads.caseFor(this);
-      file.recordRole(this, CaseFile.ROLE_CRIME, crimeReport);
-      presentTipoffMessage(REPORT_HEADER, "", crimeReport);
+      Object role = file.recordRole(this, CaseFile.ROLE_CRIME, crimeReport);
+      presentTipoffMessage(REPORT_HEADER, "", file, role);
     }
   }
   
@@ -272,13 +272,12 @@ public class Event implements Session.Saveable, Assignment {
     REPORT_HEADER = "News Report";
   
   protected void presentTipoffMessage(
-    String header, String mainText, Lead... leads
+    String header, String mainText, CaseFile file, Object role
   ) {
+    if (file == null || role == null) return;
     StringBuffer s = new StringBuffer(mainText);
-    for (Lead lead : leads) {
-      s.append("\n  ");
-      s.append(lead.toString());
-    }
+    if (mainText.length() > 0) s.append("\n\n");
+    file.shortDescription(role, s);
     
     final MainView view = world.view();
     view.queueMessage(new MessageView(

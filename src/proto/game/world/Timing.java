@@ -139,7 +139,7 @@ public class Timing {
   
   
   public int totalHours() {
-    return (timeDays * 24 * 60) + (int) (timeHours);
+    return (timeDays * 24) + (int) (timeHours);
   }
   
   

@@ -100,14 +100,14 @@ public class CaseFile implements Session.Saveable {
   /**  Recording involvement in criminal actions and other information
     *  updates-
     */
-  public boolean recordCurrentRole(Event event, Lead lead) {
+  public Role recordCurrentRole(Event event, Lead lead) {
     int roleID = Visit.indexOf(subject, event.planStep().needs());
-    if (roleID == -1) { I.complain("Subject not involved!"); return false; }
+    if (roleID == -1) { I.complain("Subject not involved!"); return null; }
     return recordRole(event, roleID, lead);
   }
   
   
-  public boolean recordRole(Event event, int roleID, Lead lead) {
+  public Role recordRole(Event event, int roleID, Lead lead) {
     //
     //  Try to find a pre-existing role which matches this signature, or create
     //  a new one otherwise.  Quit if the same lead has already been recorded.
@@ -122,7 +122,9 @@ public class CaseFile implements Session.Saveable {
       role.event  = event ;
       role.roleID = roleID;
     }
-    else if (role.evidence.includes(lead)) return false;
+    else for (Lead l : role.evidence) {
+      if (l.matchType(lead)) return null;
+    }
     //
     //  Record the new evidence, refresh options and return-
     role.maxEvidence = Nums.max(role.maxEvidence, lead.evidenceLevel());
@@ -134,7 +136,7 @@ public class CaseFile implements Session.Saveable {
     
     refreshInvestigationOptions();
     base.world().pauseMonitoring();
-    return true;
+    return role;
   }
   
   
@@ -362,8 +364,10 @@ public class CaseFile implements Session.Saveable {
   }
   
   
-  public void shortDescription(Role role, StringBuffer s) {
+  public void shortDescription(Object roleRef, StringBuffer s) {
+    if (! (roleRef instanceof Role)) return;
     
+    final Role role = (Role) roleRef;
     Lead lead = role.evidence.last();
     String tenseDesc = "is", strengthDesc = "suggests";
     if (! role.event.hasBegun()) tenseDesc = "will be";

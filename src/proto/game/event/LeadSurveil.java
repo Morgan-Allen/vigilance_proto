@@ -89,11 +89,9 @@ public class LeadSurveil extends Lead {
     //
     //  First, give tipoffs on anyone directly involved in the crime underway:
     for (Element e : step.needs()) if (e != null) {
-      I.say("  Involved: "+e+" at "+e.place());
-      
       if (e.type == Kind.TYPE_PERSON && e.place() == place) {
         final CaseFile fileE = base.leads.caseFor(e);
-        intel |= fileE.recordCurrentRole(involved, this);
+        intel |= fileE.recordCurrentRole(involved, this) != null;
       }
     }
     //
@@ -112,12 +110,12 @@ public class LeadSurveil extends Lead {
       Event afterEvent = after.matchedEvent();
       Place scene = afterEvent.targetLocation();
       final CaseFile fileP = base.leads.caseFor(scene);
-      intel |= fileP.recordRole(afterEvent, ROLE_SCENE, this);
+      intel |= fileP.recordRole(afterEvent, ROLE_SCENE, this) != null;
     }
     
     if (baseTip && hideout != null) {
       final CaseFile fileH = base.leads.caseFor(hideout);
-      intel |= fileH.recordRole(involved, ROLE_HIDEOUT, this);
+      intel |= fileH.recordRole(involved, ROLE_HIDEOUT, this) != null;
     }
     
     return intel;
