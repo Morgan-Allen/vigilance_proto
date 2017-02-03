@@ -118,7 +118,12 @@ public class BasePlans {
       bestRating = current.calcPlanRating() * 2;
     }
     
-    for (int n = numPlans; n-- > 0;) {
+    if (GameSettings.SIMPLE_EVENTS) {
+      final Plan plan = new Plan(base.leader(), base.world(), stepTypes);
+      plan.selectInitialGoal(base);
+      return plan;
+    }
+    else for (int n = numPlans; n-- > 0;) {
       final Plan plan = new Plan(base.leader(), base.world(), stepTypes);
       plan.selectInitialGoal(base);
       plan.advancePlan(maxDepth);

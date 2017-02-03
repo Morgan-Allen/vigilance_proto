@@ -150,11 +150,12 @@ public class TrainingView extends UINode {
     }
     
     if (hovered != null) {
-      int bonus = person.stats.bonusFor(hovered);
-      float XP = person.stats.xpLevelFor(hovered);
+      //int bonus = person.stats.bonusFor(hovered);
+      //float XP = person.stats.xpLevelFor(hovered);
       
       g.setColor(Color.LIGHT_GRAY);
       String desc = "";
+      /*
       if (person.stats.levelFor(hovered) == 0) {
         desc += "\n  This skill is untrained.";
       }
@@ -170,6 +171,7 @@ public class TrainingView extends UINode {
         }
         desc += ", XP: "+((int) (XP * 100))+"%";
       }
+      //*/
       desc = hovered.description + desc;
       
       ViewUtils.drawWrappedString(

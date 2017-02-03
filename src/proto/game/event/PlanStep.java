@@ -81,6 +81,11 @@ public class PlanStep implements Session.Saveable {
   }
   
   
+  public PlanStep parent() {
+    return parent;
+  }
+  
+  
   public Object roleForParent() {
     if (parent == null) return null;
     return parent.type.needTypes[parentNeedID];

@@ -18,7 +18,6 @@ public class TaskTrain extends Task {
     */
   Ability trained;
   Trait talking;
-  Person lastLevelled;
   
   
   public TaskTrain(Ability trained, Trait talking, Base base) {
@@ -73,8 +72,7 @@ public class TaskTrain extends Task {
       final int newLevel = p.stats.levelFor(trained);
       if (newLevel > oldLevel) {
         p.stats.updateStats();
-        lastLevelled = p;
-        presentMessage();
+        presentTrainingMessage(p);
       }
     }
     
@@ -173,16 +171,13 @@ public class TaskTrain extends Task {
   }
   
   
-  protected void presentMessage() {
+  protected void presentTrainingMessage(final Person p) {
     final World world = base.world();
     StringBuffer s = new StringBuffer();
     final Task trainTask = this;
-    
-    final Person p = lastLevelled;
-    if (p != null) {
-      int level = p.stats.levelFor(trained);
-      s.append("  "+p+" "+trained+": "+trained.levelDesc(level));
-    }
+
+    int level = p.stats.levelFor(trained);
+    s.append("  "+p+" "+trained+": "+trained.levelDesc(level));
     
     final MainView view = world.view();
     view.queueMessage(new MessageView(

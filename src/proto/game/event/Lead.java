@@ -71,8 +71,7 @@ public abstract class Lead extends Task {
   
   /**  Rendering, debug and interface methods-
     */
-  protected void presentMessage() {
-    //  TODO:  Move this out to the .view directory?
+  protected void presentMessage(Batch <Object> rolesUncovered) {
     StringBuffer s = new StringBuffer();
     
     final Series <Person> active = active();

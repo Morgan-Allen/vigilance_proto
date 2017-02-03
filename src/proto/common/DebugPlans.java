@@ -15,6 +15,7 @@ public class DebugPlans extends RunGame {
   
   
   public static void main(String args[]) {
+    GameSettings.freeTipoffs = true;
     runGame(new DebugPlans(), "saves/debug_plans");
   }
   
@@ -25,9 +26,6 @@ public class DebugPlans extends RunGame {
     DefaultGame.initDefaultRegions(world);
     DefaultGame.initDefaultBase   (world);
     DefaultGame.initDefaultCrime  (world);
-    
-    //  TODO:  Also, you need to avoid different bosses interfering with
-    //  eachother if reasonably possible?
     
     final Place bank = world.regionFor(Regions.SECTOR02).setupFacility(
       Facilities.BUSINESS_PARK, 1, world.playerBase(), true
@@ -40,15 +38,26 @@ public class DebugPlans extends RunGame {
     plan.verbose = true;
     for (Element crook : crookBase.roster()) plan.addObtained(crook);
     
+    
+    //  TODO:  You need to avoid plans that are overly baroque or involve
+    //  seemingly contradictory goals (such as both bribing and kidnapping the
+    //  same expert.)
+    
+    //  TODO:  Also, you need to avoid different bosses interfering with
+    //  eachother if reasonably possible?
+    
     final PlanStep firstStep = StepTypes.HEIST.asGoal(bank, plan);
     plan.addGoal(firstStep, 10);
     plan.advancePlan(6);
     crookBase.plans.assignPlan(plan, 16);
-    GameSettings.freeTipoffs = true;
     
     return world;
   }
 }
+
+
+
+
 
 
 

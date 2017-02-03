@@ -102,7 +102,7 @@ public abstract class RunGame extends JFrame implements ActionListener {
     add(this.surface = new Surface(this), BorderLayout.CENTER);
     
     pack();
-    setTitle("Run Game");
+    setTitle("Vigilance");
     setLocationRelativeTo(null);
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 

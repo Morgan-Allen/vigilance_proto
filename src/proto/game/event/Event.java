@@ -153,8 +153,14 @@ public class Event implements Session.Saveable, Assignment {
       Base played = world().playerBase();
       Place place = targetLocation();
       Region region = place.region();
-      
       I.say("Event begun: "+this);
+      
+      if (GameSettings.SIMPLE_EVENTS) {
+        final Lead tipoff = new LeadTipoff(played, place);
+        final CaseFile file = played.leads.caseFor(place);
+        Object role = file.recordRole(this, CaseFile.ROLE_SCENE, tipoff);
+        presentTipoffMessage(TIPOFF_HEADER, "", file, role, null);
+      }
       
       for (Element e : step.needs()) {
         if (e == null || e.type != Kind.TYPE_PERSON) continue;
@@ -168,6 +174,7 @@ public class Event implements Session.Saveable, Assignment {
         if (perp.isCivilian()) tipoffChance *= 2;
         I.say("  Tipoff chance for "+e+" in "+region+": "+tipoffChance);
         boolean tips = Rand.num() < tipoffChance || GameSettings.freeTipoffs;
+        if (GameSettings.SIMPLE_EVENTS) tips = false;
         
         if (tips) {
           final Lead tipoff = new LeadTipoff(played, perp);

@@ -86,6 +86,10 @@ public class LeadSurveil extends Lead {
     final Place place = subject.place();
     boolean intel = false;
     I.say("\nSurveillance succeeded on "+subject+", event: "+involved);
+    
+    I.say("Full plan is: ");
+    involved.planStep().plan.printFullPlan();
+    
     //
     //  First, give tipoffs on anyone directly involved in the crime underway,
     //  along with the scene itself-
@@ -100,15 +104,13 @@ public class LeadSurveil extends Lead {
     //
     //  Then, see if you overhear anything about where the next crime is going
     //  down, or where the boss might be hiding.
-    PlanStep after = step.plan.stepAfter(step);
     Place hideout = step.plan.agent.base();
+    PlanStep after = step.parent();
     float overhearChance = 0.5f;
     boolean stepTip = Rand.num() < overhearChance;
     boolean baseTip = Rand.num() < overhearChance;
     if (GameSettings.freeTipoffs || true) stepTip = baseTip = true;
     
-    //  TODO:  You shouldn't neccesarily tip off the next step in the plan-
-    //  only the next step that this step contributes to!
     if (stepTip && after != null) {
       Event afterEvent = after.matchedEvent();
       Place scene = afterEvent.targetLocation();
@@ -143,10 +145,6 @@ public class LeadSurveil extends Lead {
   
   /**  Rendering, debug and interface methods-
     */
-  protected void presentMessage(World world) {
-  }
-  
-  
   public String choiceInfo(Person p) {
     return "Surveil "+subject;
   }

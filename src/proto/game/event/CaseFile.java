@@ -277,6 +277,7 @@ public class CaseFile implements Session.Saveable {
     followOptions = new List();
     refreshOptions = false;
     
+    
     //  TODO:  I'm going to return to these later, and gradually add more
     //  options.
     /*
@@ -294,6 +295,7 @@ public class CaseFile implements Session.Saveable {
         Lead tailing = new LeadSurveil(base, person);
         tryAddingOption(tailing, followOptions, oldOptions);
       }
+      /*
       if (threatens != null && ! threatens.complete()) {
         Lead guarding = new LeadGuard(base, person.place(), threatens);
         tryAddingOption(guarding, followOptions, oldOptions);
@@ -301,6 +303,7 @@ public class CaseFile implements Session.Saveable {
       if (suspected != null) {
         //  TODO:  Include questioning and arrest options.
       }
+      //*/
     }
     
     if (subject instanceof Place) {
@@ -312,6 +315,7 @@ public class CaseFile implements Session.Saveable {
         Lead guarding = new LeadGuard(base, place, crime);
         tryAddingOption(guarding, followOptions, oldOptions);
       }
+      /*
       if (crime != null && ! crime.complete()) {
         Lead surveil = new LeadSurveil(base, place);
         tryAddingOption(surveil, followOptions, oldOptions);
@@ -319,6 +323,7 @@ public class CaseFile implements Session.Saveable {
       if (lair != null) {
         //  TODO:  Include the option to raid.
       }
+      //*/
     }
     
     scrubOldOptions(followOptions, oldOptions);

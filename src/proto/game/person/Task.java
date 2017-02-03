@@ -247,7 +247,6 @@ public abstract class Task implements Assignment {
   
   
   protected void onCompletion() {
-    presentMessage();
     for (Person p : assigned) p.removeAssignment(this);
   }
   
@@ -333,10 +332,6 @@ public abstract class Task implements Assignment {
   
   /**  Rendering, debug and interface methods-
     */
-  protected abstract void presentMessage();
-  public abstract String choiceInfo(Person p);
-  
-  
   public String testInfo() {
     StringBuffer s = new StringBuffer("Requires: ");
     for (int n = 0; n < tested.length;) {
@@ -354,6 +349,9 @@ public abstract class Task implements Assignment {
   public TaskView createView(UINode parent) {
     return new TaskView(this, parent);
   }
+  
+  
+  public abstract String choiceInfo(Person p);
   
   
   public String toString() {
