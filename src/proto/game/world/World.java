@@ -66,8 +66,9 @@ public class World implements Session.Saveable {
     s.cacheInstance(this);
     
     regions = (Region[]) s.loadObjectArray(Region.class);
-    played    = (Base) s.loadObject();
+    played  = (Base    ) s.loadObject();
     s.loadObjects(bases);
+    s.loadObjects(elements);
     
     events.loadState(s);
     timing.loadState(s);
@@ -78,10 +79,11 @@ public class World implements Session.Saveable {
   
   
   public void saveState(Session s) throws Exception {
-    s.saveObjectArray(regions);
     
+    s.saveObjectArray(regions);
     s.saveObject(played);
     s.saveObjects(bases);
+    s.saveObjects(elements);
     
     events.saveState(s);
     timing.saveState(s);

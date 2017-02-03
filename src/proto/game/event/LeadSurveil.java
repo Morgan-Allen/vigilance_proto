@@ -87,13 +87,16 @@ public class LeadSurveil extends Lead {
     boolean intel = false;
     I.say("\nSurveillance succeeded on "+subject+", event: "+involved);
     //
-    //  First, give tipoffs on anyone directly involved in the crime underway:
+    //  First, give tipoffs on anyone directly involved in the crime underway,
+    //  along with the scene itself-
     for (Element e : step.needs()) if (e != null) {
       if (e.type == Kind.TYPE_PERSON && e.place() == place) {
         final CaseFile fileE = base.leads.caseFor(e);
         intel |= fileE.recordCurrentRole(involved, this) != null;
       }
     }
+    final CaseFile fileP = base.leads.caseFor(place);
+    intel |= fileP.recordRole(involved, ROLE_SCENE, this) != null;
     //
     //  Then, see if you overhear anything about where the next crime is going
     //  down, or where the boss might be hiding.
@@ -109,8 +112,8 @@ public class LeadSurveil extends Lead {
     if (stepTip && after != null) {
       Event afterEvent = after.matchedEvent();
       Place scene = afterEvent.targetLocation();
-      final CaseFile fileP = base.leads.caseFor(scene);
-      intel |= fileP.recordRole(afterEvent, ROLE_SCENE, this) != null;
+      final CaseFile fileAP = base.leads.caseFor(scene);
+      intel |= fileAP.recordRole(afterEvent, ROLE_SCENE, this) != null;
     }
     
     if (baseTip && hideout != null) {
