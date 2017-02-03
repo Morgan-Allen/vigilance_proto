@@ -139,6 +139,7 @@ public class TaskCraft extends Task {
   
   protected void presentMessage() {
     final World world = base.world();
+    final Task craftTask = this;
     final Series <String> logs = world.events.extractLogInfo(this);
     StringBuffer s = new StringBuffer();
 
@@ -153,29 +154,28 @@ public class TaskCraft extends Task {
       s.append("\n");
       s.append(info);
     }
-    
-    world.view().queueMessage(new MessageView(
-      world.view(),
+
+    final MainView view = world.view();
+    view.queueMessage(new MessageView(
+      view,
       icon(), "Task complete: "+activeInfo(),
       s.toString(),
-      "Dismiss"
+      "Continue Crafting",
+      "New Assignment"
     ) {
       protected void whenClicked(String option, int optionID) {
-        world.view().dismissMessage(this);
+        if (optionID == 0) {
+          view.dismissMessage(this);
+        }
+        if (optionID == 1) {
+          for (Person p : active) p.removeAssignment(craftTask);
+          view.switchToTab(view.equipView);
+          view.dismissMessage(this);
+        }
       }
     });
   }
   
 }
-
-
-
-
-
-
-
-
-
-
 
 

@@ -7,6 +7,7 @@ import proto.content.places.*;
 import proto.content.events.*;
 import proto.game.person.*;
 import proto.game.world.*;
+import proto.game.event.*;
 import proto.util.*;
 
 import java.awt.EventQueue;
@@ -31,6 +32,11 @@ public class DefaultGame extends RunGame {
     initDefaultRegions(world);
     initDefaultBase   (world);
     initDefaultCrime  (world);
+    
+    for (Base base : world.bases()) if (base.criminal()) {
+      Plan initPlan = base.plans.generateNextPlan(4, 4, null);
+      base.plans.assignPlan(initPlan, 0);
+    }
     return world;
   }
   

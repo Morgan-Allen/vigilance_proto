@@ -176,6 +176,7 @@ public class TaskTrain extends Task {
   protected void presentMessage() {
     final World world = base.world();
     StringBuffer s = new StringBuffer();
+    final Task trainTask = this;
     
     final Person p = lastLevelled;
     if (p != null) {
@@ -183,18 +184,30 @@ public class TaskTrain extends Task {
       s.append("  "+p+" "+trained+": "+trained.levelDesc(level));
     }
     
-    world.view().queueMessage(new MessageView(
-      world.view(),
+    final MainView view = world.view();
+    view.queueMessage(new MessageView(
+      view,
       icon(), "Task complete: "+activeInfo(),
       s.toString(),
-      "Dismiss"
+      "Continue Training",
+      "New Assignment"
     ) {
       protected void whenClicked(String option, int optionID) {
-        world.view().dismissMessage(this);
+        if (optionID == 0) {
+          view.dismissMessage(this);
+        }
+        if (optionID == 1) {
+          p.removeAssignment(trainTask);
+          view.switchToTab(view.trainView);
+          view.dismissMessage(this);
+        }
       }
     });
   }
 }
+
+
+
 
 
 

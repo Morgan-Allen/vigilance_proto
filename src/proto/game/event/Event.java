@@ -153,10 +153,8 @@ public class Event implements Session.Saveable, Assignment {
       Base played = world().playerBase();
       Place place = targetLocation();
       Region region = place.region();
-      float tipoffChance = region.currentValue(Region.TRUST) / 100f;
       
       I.say("Event begun: "+this);
-      I.say("  Tipoff chance in "+region+": "+tipoffChance);
       
       for (Element e : step.needs()) {
         if (e == null || e.type != Kind.TYPE_PERSON) continue;
@@ -166,14 +164,16 @@ public class Event implements Session.Saveable, Assignment {
         perp.addAssignment(this);
         setAssigned(perp, true);
         
+        float tipoffChance = region.currentValue(Region.TRUST) / 100f;
+        if (perp.isCivilian()) tipoffChance *= 2;
+        I.say("  Tipoff chance for "+e+" in "+region+": "+tipoffChance);
         boolean tips = Rand.num() < tipoffChance || GameSettings.freeTipoffs;
-        //if (! perp.isCriminal()) tips = false;
         
         if (tips) {
           final Lead tipoff = new LeadTipoff(played, perp);
           final CaseFile file = played.leads.caseFor(perp);
           Object role = file.recordCurrentRole(this, tipoff);
-          presentTipoffMessage(TIPOFF_HEADER, "", file, role);
+          presentTipoffMessage(TIPOFF_HEADER, "", file, role, null);
         }
       }
     }
@@ -212,7 +212,7 @@ public class Event implements Session.Saveable, Assignment {
       final Lead crimeReport = new LeadCrimeReport(played, this);
       final CaseFile file = played.leads.caseFor(this);
       Object role = file.recordRole(this, CaseFile.ROLE_CRIME, crimeReport);
-      presentTipoffMessage(REPORT_HEADER, "", file, role);
+      presentTipoffMessage(REPORT_HEADER, "", file, role, report);
     }
   }
   
@@ -272,12 +272,20 @@ public class Event implements Session.Saveable, Assignment {
     REPORT_HEADER = "News Report";
   
   protected void presentTipoffMessage(
-    String header, String mainText, CaseFile file, Object role
+    String header, String mainText,
+    CaseFile file, Object role, EventReport report
   ) {
     if (file == null || role == null) return;
     StringBuffer s = new StringBuffer(mainText);
     if (mainText.length() > 0) s.append("\n\n");
     file.shortDescription(role, s);
+    
+    if (report != null) {
+      Region region = targetLocation().region();
+      float trust = report.trustEffect, deter = report.deterEffect;
+      s.append("\n"+region+" Trust "     +I.signNum((int) trust)+"%");
+      s.append("\n"+region+" Deterrence "+I.signNum((int) deter)+"%");
+    }
     
     final MainView view = world.view();
     view.queueMessage(new MessageView(
@@ -289,6 +297,7 @@ public class Event implements Session.Saveable, Assignment {
     });
   }
 }
+
 
 
 

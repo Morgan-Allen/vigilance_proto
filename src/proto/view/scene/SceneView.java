@@ -153,6 +153,7 @@ public class SceneView extends UINode {
     for (Person p : scene.othersTeam()) {
       float fog = scene.fogAt(p.currentTile(), Person.Side.HEROES);
       if (fog <= 0 && ! GameSettings.debugScene) continue;
+      if (p.isCivilian() || ! p.health.conscious()) continue;
       
       Vec3D exactPos = p.exactPosition();
       float sightRange = p.stats.sightRange();

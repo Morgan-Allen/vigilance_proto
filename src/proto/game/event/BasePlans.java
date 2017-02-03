@@ -109,7 +109,7 @@ public class BasePlans {
   }
   
   
-  private Plan generateNextPlan(int numPlans, int maxDepth, Plan current) {
+  public Plan generateNextPlan(int numPlans, int maxDepth, Plan current) {
     Plan picked = null;
     float bestRating = 0;
     

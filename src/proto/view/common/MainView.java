@@ -27,21 +27,20 @@ public class MainView extends UINode {
   SceneView  sceneView ;
   UINode     mainUI    ;
   final public RosterView rosterView;
-  PersonInsetView personView;
   
   
   UINode tabsNode;
   UINode tabButtons[], tabContent[];
   UINode currentTab = null;
   
-  EquipmentView equipView  ;
-  TrainingView  trainView  ;
-  MissionsView  missionView;
-  InvestingView investView ;
-  HistoryView   historyView;
+  final public EquipmentView equipView  ;
+  final public TrainingView  trainView  ;
+  final public MissionsView  missionView;
+  final public InvestingView investView ;
+  final public HistoryView   historyView;
   
-  ProgressOptionsView progOptions;
-  StatsReadoutView mainReadout;
+  final public ProgressOptionsView progOptions;
+  final public StatsReadoutView mainReadout;
   
   final public Image alertMarker, selectCircle, selectSquare;
   
@@ -68,12 +67,9 @@ public class MainView extends UINode {
     addChildren(sceneView, mainUI);
     
     rosterView = new RosterView(mainUI, new Box2D(
-      320, 0, fullWide - 320, 120
+      0, 0, fullWide, 120
     ));
-    personView = new PersonInsetView(mainUI, new Box2D(
-      0, 0, 320, 145
-    ));
-    mainUI.addChildren(personView, rosterView);
+    mainUI.addChildren(rosterView);
     
     //  Add views for each tab:
     final Box2D tabSubBounds = new Box2D(0, 145, fullWide, fullHigh - 145);
@@ -86,7 +82,7 @@ public class MainView extends UINode {
       missionView, investView, equipView, trainView
     };
     
-    tabsNode = new UINode(mainUI, new Box2D(320, 120, fullWide - 320, 25));
+    tabsNode = new UINode(mainUI, new Box2D(0, 120, fullWide, 25));
     Box2D blank = new Box2D();
     final String tabNames[] = {
       "Mission Control", "Investments", "Armory", "Training Room"
@@ -137,7 +133,7 @@ public class MainView extends UINode {
   
   /**  Switching tabs:
     */
-  void switchToTab(UINode content) {
+  public void switchToTab(UINode content) {
     int index = Visit.indexOf(content, tabContent);
     for (int i = tabButtons.length; i-- > 0;) {
       ((StringButton) tabButtons[i]).toggled = i == index;
