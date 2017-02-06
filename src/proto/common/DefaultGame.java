@@ -105,6 +105,7 @@ public class DefaultGame extends RunGame {
       Gadgets.BODY_ARMOUR,
       Gadgets.KEVLAR_VEST,
       Gadgets.MED_KIT,
+      Gadgets.TEAR_GAS,
       Gadgets.SONIC_PROBE
     };
     for (ItemType t : craftTechs) {

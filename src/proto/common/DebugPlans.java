@@ -38,7 +38,6 @@ public class DebugPlans extends RunGame {
     plan.verbose = true;
     for (Element crook : crookBase.roster()) plan.addObtained(crook);
     
-    
     //  TODO:  You need to avoid plans that are overly baroque or involve
     //  seemingly contradictory goals (such as both bribing and kidnapping the
     //  same expert.)
@@ -54,9 +53,6 @@ public class DebugPlans extends RunGame {
     return world;
   }
 }
-
-
-
 
 
 

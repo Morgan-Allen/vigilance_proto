@@ -107,11 +107,11 @@ public class SceneTypeGrid extends SceneType {
     I.say("GENERATING GRID SCENE "+this);
     
     final int gridSize = size / resolution, wallPad = thickWalls ? 1 : 0;
-    size = (gridSize * resolution) + ((gridSize + 1) * wallPad) + 2;
+    size = (gridSize * resolution) + ((gridSize + 1) * wallPad) + 4;
     
     Scene scene = new Scene(world, size);
     scene.setupScene(forTesting);
-    applyToScene(scene, 1, 1, N, size, forTesting);
+    applyToScene(scene, 2, 2, N, size, forTesting);
     
     return scene;
   }
