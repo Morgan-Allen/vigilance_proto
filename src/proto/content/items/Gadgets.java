@@ -101,6 +101,64 @@ public class Gadgets {
   };
   
   
+  final public static Ability BOLAS_THROW = new Ability(
+    "Throw Bolas", "ability_bolas_throw",
+    ICONS_DIR+"icon_bolas.png",
+    "Temporarily entangles a subject, preventing most physical actions. "+
+    "High-strength targets or escape artists can break free.",
+    Ability.IS_ACTIVE | Ability.IS_EQUIPPED | Ability.IS_RANGED, 1,
+    Ability.MINOR_HARM, Ability.MEDIUM_POWER
+  ) {
+    public boolean allowsTarget(Object target, Scene scene, Person acting) {
+      if (! (target instanceof Person)) return false;
+      return true;
+    }
+    
+    public void applyOnActionEnd(Action use) {
+      final Person target = (Person) use.target;
+      target.stats.applyCondition(this, use.acting, 3);
+      use.acting.gear.useCharge(BOLAS, -1);
+    }
+    
+    public void applyConditionOnTurn(Person person, Person source) {
+      float strength = person.stats.levelFor(MUSCLE  ) / 20f;
+      float reflex   = person.stats.levelFor(REFLEXES) / 20f;
+      if      (Rand.num() < strength) {
+        person.stats.removeCondition(this, source);
+      }
+      else if (Rand.num() < reflex  ) {
+        person.stats.removeCondition(this, source);
+      }
+    }
+    
+    public boolean conditionAllowsAbility(Ability a) {
+      if (a.equipped()) return false;
+      if (a.melee   ()) return false;
+      return false;
+    }
+    
+    final Image MISSILE_IMG = Kind.loadImage(SPRITE_DIR+"sprite_bolas.png");
+    
+    public void renderUsageFX(Action use, Scene scene, Graphics2D g) {
+      FX.renderMissile(use, scene, MISSILE_IMG, g);
+    }
+  };
+  
+  final public static ItemType BOLAS = new ItemType(
+    "Bolas", "item_bolas",
+    "Temporarily entangles a subject, preventing most physical actions. "+
+    "High-strength targets or escape artists can break free.",
+    ICONS_DIR+"icon_bolas.png",
+    SPRITE_DIR+"sprite_bolas.png",
+      SLOT_TYPE_ITEM, 15, new Object[] {
+        ENGINEERING, 2
+      },
+      IS_CONSUMED, BOLAS_THROW
+  ) {
+    
+  };
+  
+  
   final static Ability MED_KIT_HEAL = new Ability(
     "First Aid (Medkit)", "ability_med_kit_heal",
     ICONS_DIR+"icon_med_kit.png",

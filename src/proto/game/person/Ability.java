@@ -2,6 +2,7 @@
 
 package proto.game.person;
 import proto.game.world.*;
+import proto.game.person.PersonStats.Condition;
 import proto.game.scene.*;
 import proto.util.*;
 import proto.view.scene.AbilityFX;
@@ -29,9 +30,10 @@ public abstract class Ability extends Trait {
     IS_AREA_EFFECT    = 1 << 8 ,
     IS_STUNNING       = 1 << 8 ,
     IS_BASIC          = 1 << 10,
-    IS_EQUIPPED       = 1 << 11,
-    TRIGGER_ON_ATTACK = 1 << 12,
-    TRIGGER_ON_DEFEND = 1 << 13;
+    IS_NATURAL        = 1 << 11,
+    IS_EQUIPPED       = 1 << 12,
+    TRIGGER_ON_ATTACK = 1 << 13,
+    TRIGGER_ON_DEFEND = 1 << 14;
   final public static float
     MAJOR_HELP = -2.0f,
     REAL_HELP  = -1.0f,
@@ -88,6 +90,11 @@ public abstract class Ability extends Trait {
   
   public boolean ranged() {
     return hasProperty(IS_RANGED);
+  }
+  
+  
+  public boolean melee() {
+    return hasProperty(IS_MELEE);
   }
   
   
@@ -164,12 +171,22 @@ public abstract class Ability extends Trait {
   }
   
   
-  public void applyConditionOnTurn(Person person) {
+  public void applyConditionOnTurn(Person person, Person source) {
     return;
   }
   
   
   public boolean allowsAssignment(Person p, Assignment a) {
+    return true;
+  }
+  
+  
+  public boolean conditionAllowsAbility(Ability a) {
+    return true;
+  }
+  
+  
+  public boolean conditionAllowsAction(Action a) {
     return true;
   }
   
@@ -256,6 +273,12 @@ public abstract class Ability extends Trait {
     if (costAP > acting.actions.currentAP()) {
       return failResult("Not enough AP", failLog);
     }
+    for (Condition c : acting.stats.conditions) {
+      if (! c.basis.conditionAllowsAction(newAction)) {
+        return failResult(c.basis+" prevents use", failLog);
+      }
+    }
+    
     return newAction;
   }
   

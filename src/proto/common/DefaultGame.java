@@ -104,6 +104,7 @@ public class DefaultGame extends RunGame {
       Gadgets.REVOLVER,
       Gadgets.BODY_ARMOUR,
       Gadgets.KEVLAR_VEST,
+      Gadgets.BOLAS,
       Gadgets.MED_KIT,
       Gadgets.TEAR_GAS,
       Gadgets.SONIC_PROBE

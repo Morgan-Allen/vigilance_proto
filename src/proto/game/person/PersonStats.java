@@ -193,12 +193,18 @@ public class PersonStats {
   public Series <Ability> listAbilities() {
     //  TODO:  I'm not certain, at the moment, if this shouldn't be considered
     //  a UI method.  Check.
-    Batch <Ability> all = new Batch();
+    List <Ability> all = new List();
     for (Ability a : abilities) {
       all.add(a);
     }
     for (Item i : person.gear.equipped()) if (i.charges > 0) {
       for (Ability a : i.kind().abilities) all.include(a);
+    }
+    for (Condition c : conditions) for (Ability a : all) {
+      if (! c.basis.conditionAllowsAbility(a)) {
+        all.remove(a);
+        break;
+      }
     }
     return all;
   }
@@ -346,7 +352,7 @@ public class PersonStats {
   
   boolean onTurnStart() {
     for (Condition c : conditions) {
-      c.basis.applyConditionOnTurn(person);
+      c.basis.applyConditionOnTurn(person, c.casts);
     }
     //  TODO:  Restore these.
     /*
@@ -370,20 +376,26 @@ public class PersonStats {
   
   /**  Assigning conditions-
     */
-  public void applyCondition(Ability basis, Person casts, int duration) {
-    Condition match = null;
-    for (Condition c : conditions) {
-      if (c.basis == basis && c.casts == casts) {
-        match = c;
-        break;
-      }
-    }
-    if (match == null) {
-      conditions.add(match = new Condition());
-    }
+  public void applyCondition(Ability basis, Person source, int duration) {
+    Condition match = conditionMatching(basis, source);
+    if (match == null) conditions.add(match = new Condition());
     match.basis = basis;
-    match.casts = casts;
+    match.casts = source;
     match.countdown = Nums.max(duration, match.countdown);
+  }
+  
+  
+  public void removeCondition(Ability basis, Person source) {
+    Condition match = conditionMatching(basis, source);
+    if (match != null) conditions.remove(match);
+  }
+  
+  
+  Condition conditionMatching(Ability basis, Person source) {
+    for (Condition c : conditions) {
+      if (c.basis == basis && c.casts == source) return c;
+    }
+    return null;
   }
   
   
