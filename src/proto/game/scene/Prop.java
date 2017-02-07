@@ -20,7 +20,7 @@ public class Prop extends Element implements TileConstants {
   int facing = TileConstants.N;
   
   
-  Prop(Kind kind, World world) {
+  Prop(PropType kind, World world) {
     super(kind, world);
   }
   

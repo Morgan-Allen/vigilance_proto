@@ -1,8 +1,9 @@
 
 
 package proto.content.agents;
+import proto.common.*;
+import proto.game.person.*;
 import static proto.game.person.PersonStats.*;
-import proto.common.Kind;
 
 
 
@@ -21,8 +22,8 @@ public class Civilians {
   
   final static String IMG_DIR = "media assets/character icons/common/";
   
-  final public static Kind
-    CIVILIAN = Kind.ofPerson(
+  final public static PersonType
+    CIVILIAN = new PersonType(
       "Civilian", "person_kind_civilian", IMG_DIR+"icon_civilian.png",
       "", COMMON_NAMES,
       Kind.SUBTYPE_CIVILIAN,
@@ -31,7 +32,7 @@ public class Civilians {
       WILL    , 2 ,
       MUSCLE  , 2
     ),
-    DOCTOR = Kind.ofPerson(
+    DOCTOR = new PersonType(
       "Doctor", "person_kind_doctor", IMG_DIR+"icon_doctor.png",
       "", COMMON_NAMES,
       Kind.SUBTYPE_CIVILIAN,
@@ -42,7 +43,7 @@ public class Civilians {
       
       MEDICINE, 7
     ),
-    INVENTOR = Kind.ofPerson(
+    INVENTOR = new PersonType(
       "Inventor", "person_kind_inventor", IMG_DIR+"icon_inventor.png",
       "", COMMON_NAMES,
       Kind.SUBTYPE_CIVILIAN,
@@ -53,7 +54,7 @@ public class Civilians {
       
       ENGINEERING, 7
     ),
-    BROKER = Kind.ofPerson(
+    BROKER = new PersonType(
       "Broker", "person_kind_broker", IMG_DIR+"icon_broker.png",
       "", Civilians.COMMON_NAMES,
       Kind.SUBTYPE_CIVILIAN,

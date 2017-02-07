@@ -16,8 +16,8 @@ public class Heroes {
   
   final static String IMG_DIR = "media assets/character icons/heroes/";
   
-  final public static Kind
-    HERO_PHOBOS = Kind.ofPerson(
+  final public static PersonType
+    HERO_PHOBOS = new PersonType(
       "Phobos", "hero_kind_phobos", IMG_DIR+"icon_phobos.png",
       "<phobos description>",
       null,
@@ -37,8 +37,8 @@ public class Heroes {
     )
   ;
   
-  final public static Kind
-    HERO_DEIMOS = Kind.ofPerson(
+  final public static PersonType
+    HERO_DEIMOS = new PersonType(
       "Deimos", "hero_kind_deimos", IMG_DIR+"icon_deimos.png",
       "<deimos description>",
       null,
@@ -58,8 +58,8 @@ public class Heroes {
     )
   ;
   
-  final public static Kind
-    HERO_NIGHT_SWIFT = Kind.ofPerson(
+  final public static PersonType
+    HERO_NIGHT_SWIFT = new PersonType(
       "Night Swift", "hero_kind_night_swift", IMG_DIR+"icon_night_swift.png",
       "<night swift description>",
       null,
@@ -79,8 +79,8 @@ public class Heroes {
     )
   ;
   
-  final public static Kind
-    HERO_DR_YANG = Kind.ofPerson(
+  final public static PersonType
+    HERO_DR_YANG = new PersonType(
       "Dr. Yang", "hero_kind_dr_yang", IMG_DIR+"icon_dr_yang.png",
       "<dr. yang description>",
       null,

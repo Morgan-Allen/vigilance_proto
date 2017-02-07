@@ -12,7 +12,7 @@ public class SceneTypeFixed extends SceneType {
   
   /**  Data fields and construction-
     */
-  final Kind fixedPropTypes[];
+  final PropType fixedPropTypes[];
   final int wide, high;
   final byte fixedLayoutGrid[][];
   
@@ -20,7 +20,7 @@ public class SceneTypeFixed extends SceneType {
   
   public SceneTypeFixed(
     String name, String ID,
-    Kind floor, Kind propTypes[], int wide, int high, byte typeGrid[][]
+    PropType floor, PropType propTypes[], int wide, int high, byte typeGrid[][]
   ) {
     super(
       name, ID,
@@ -73,7 +73,7 @@ public class SceneTypeFixed extends SceneType {
   }
   
   
-  Kind propType(int gx, int gy) {
+  PropType propType(int gx, int gy) {
     try {
       byte index = fixedLayoutGrid[gy][gx];
       return index > 0 ? fixedPropTypes[index - 1] : null;
@@ -99,7 +99,7 @@ public class SceneTypeFixed extends SceneType {
       int sx = (int) (temp.x + offX), sy = (int) (temp.y + offY);
       
       scene.addProp(floors, sx, sy, facing);
-      Kind type = propType(c.x, c.y);
+      PropType type = propType(c.x, c.y);
       if (type == null || ! scene.hasSpace(type, sx, sy, facing)) continue;
       scene.addProp(type, sx, sy, facing);
     }

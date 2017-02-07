@@ -38,7 +38,6 @@ public class Kind extends Index.Entry implements Session.Saveable {
   String name;
   String defaultInfo;
   Image sprite;
-  String firstNames[], lastNames[];
   
   int type, subtype;
   int wide, high;
@@ -60,6 +59,25 @@ public class Kind extends Index.Entry implements Session.Saveable {
   }
   
   
+  protected Kind(
+    String name, String ID, String spritePath, String defaultInfo,
+    int wide, int high,
+    int blockLevel, boolean blockSight,
+    int type, int subtype,
+    Object... initStats
+  ) {
+    this(name, ID, defaultInfo, TYPE_PROP);
+    this.wide = wide;
+    this.high = high;
+    this.blockLevel = blockLevel;
+    this.blockSight = blockSight;
+    this.type    = type   ;
+    this.subtype = subtype;
+    initStatsFor(this, initStats);
+    sprite = loadImage(spritePath);
+  }
+  
+  
   public static Kind loadConstant(Session s) throws Exception {
     return INDEX.loadEntry(s.input());
   }
@@ -67,44 +85,6 @@ public class Kind extends Index.Entry implements Session.Saveable {
   
   public void saveState(Session s) throws Exception {
     INDEX.saveEntry(this, s.output());
-  }
-  
-  
-  public static Kind ofPerson(
-    String name, String ID, String spritePath, String defaultInfo,
-    String personNames[][],
-    int subtype, Object... initStats
-  ) {
-    Kind k = new Kind(name, ID, defaultInfo, TYPE_PERSON);
-    k.subtype = subtype;
-    k.wide = k.high = 1;
-    k.blockSight = false;
-    k.blockLevel = BLOCK_PARTIAL;
-    initStatsFor(k, initStats);
-    
-    k.sprite = loadImage(spritePath);
-    if (personNames == null) personNames = new String[2][0];
-    k.firstNames = personNames[0];
-    k.lastNames  = personNames[1];
-    
-    return k;
-  }
-  
-  
-  public static Kind ofProp(
-    String name, String ID, String spritePath,
-    int wide, int high, int blockLevel, boolean blockSight,
-    Object... initStats
-  ) {
-    Kind k = new Kind(name, ID, "", TYPE_PROP);
-    k.wide = wide;
-    k.high = high;
-    k.blockLevel = blockLevel;
-    k.blockSight = blockSight;
-    initStatsFor(k, initStats);
-    
-    k.sprite = loadImage(spritePath);
-    return k;
   }
   
   
@@ -176,8 +156,6 @@ public class Kind extends Index.Entry implements Session.Saveable {
   public String name  () { return name  ; }
   public Image  sprite() { return sprite; }
   public String defaultInfo() { return defaultInfo; }
-  public String[] firstNames() { return firstNames; }
-  public String[] lastNames () { return lastNames ; }
   public String toString() { return name; }
   
   

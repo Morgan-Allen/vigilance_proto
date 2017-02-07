@@ -67,7 +67,7 @@ public class Person extends Element {
   }
   
   
-  public Person(Kind kind, World world) {
+  public Person(PersonType kind, World world) {
     this(kind, world, kind.name());
   }
   
@@ -120,7 +120,7 @@ public class Person extends Element {
   }
   
   
-  public static Person randomOfKind(Kind kind, World world) {
+  public static Person randomOfKind(PersonType kind, World world) {
     final String
       firsts[] = kind.firstNames(), lasts[] = kind.lastNames(),
       name = Rand.pickFrom(firsts)+" "+Rand.pickFrom(lasts);

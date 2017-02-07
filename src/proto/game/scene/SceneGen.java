@@ -252,7 +252,7 @@ public class SceneGen implements TileConstants {
   
   
   boolean insertProp(
-    int atX, int atY, Kind kind, byte markVal, boolean replace
+    int atX, int atY, PropType kind, byte markVal, boolean replace
   ) {
     if (kind == null) return false;
     if ((! replace) && (! scene.hasSpace(kind, atX, atY, N))) return false;

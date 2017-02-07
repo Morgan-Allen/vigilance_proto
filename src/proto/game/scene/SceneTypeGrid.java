@@ -41,8 +41,8 @@ public class SceneTypeGrid extends SceneType {
   public SceneTypeGrid(
     String name, String ID,
     int resolution, int maxUnitSize, boolean thickWalls,
-    Kind wallType, Kind doorType, Kind windowType, Kind floorType,
-    GridUnit... units
+    PropType wallType, PropType doorType, PropType windowType,
+    PropType floorType, GridUnit... units
   ) {
     super(
       name, ID,

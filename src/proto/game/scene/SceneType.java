@@ -30,9 +30,8 @@ public abstract class SceneType extends Index.Entry implements
   final String name;
   
   int minSize = -1, maxSize = -1;
-  Kind borders, door, window;
-  Kind floors;
-  Kind props[];
+  PropType borders, door, window, floors;
+  PropType props[];
   float propWeights[];
   SceneType kidTypes[] = new SceneType[0];
   
@@ -43,22 +42,22 @@ public abstract class SceneType extends Index.Entry implements
     super(INDEX, ID);
     this.name = name;
     
-    Batch <Kind     > propB  = new Batch();
+    Batch <PropType > propB  = new Batch();
     Batch <SceneType> childB = new Batch();
     
     for (int i = 0; i < args.length; i += 2) try {
       final Object label = args[i], val = args[i + 1];
-      if (label == BORDERS ) borders = (Kind) val;
-      if (label == FLOORS  ) floors  = (Kind) val;
-      if (label == DOOR    ) door    = (Kind) val;
-      if (label == WINDOW  ) window  = (Kind) val;
-      if (label == PROP    ) propB .add((Kind) val);
+      if (label == BORDERS ) borders = (PropType) val;
+      if (label == FLOORS  ) floors  = (PropType) val;
+      if (label == DOOR    ) door    = (PropType) val;
+      if (label == WINDOW  ) window  = (PropType) val;
+      if (label == PROP    ) propB .add((PropType) val);
       if (label == CHILD   ) childB.add((SceneType) val);
       if (label == MIN_SIZE) minSize = (Integer) val;
       if (label == MAX_SIZE) maxSize = (Integer) val;
     } catch (Exception e) { I.report(e); }
     
-    props    = propB .toArray(Kind.class);
+    props    = propB .toArray(PropType.class);
     kidTypes = childB.toArray(SceneType.class);
   }
   

@@ -19,7 +19,7 @@ public class Base extends Place {
   
   Person leader = null;
   List <Person> roster = new List();
-  List <Kind> goonTypes = new List();
+  List <PersonType> goonTypes = new List();
   boolean criminal;
   
   final public BaseFinance  finance  = new BaseFinance (this);
@@ -137,13 +137,13 @@ public class Base extends Place {
   }
   
   
-  public Series <Kind> goonTypes() {
+  public Series <PersonType> goonTypes() {
     return goonTypes;
   }
   
   
-  public void setGoonTypes(Kind... types) {
-    for (Kind type: types) goonTypes.add(type);
+  public void setGoonTypes(PersonType... types) {
+    for (PersonType type: types) goonTypes.add(type);
   }
   
   

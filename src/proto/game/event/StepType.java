@@ -140,12 +140,12 @@ public abstract class StepType extends EventType {
     
     final float dangerLevel = 0.5f;
     final Base faction = step.plan.agent.base();
-    final Kind GOONS[] = faction.goonTypes().toArray(Kind.class);
+    final PersonType GOONS[] = faction.goonTypes().toArray(Kind.class);
     float forceLimit = dangerLevel * 10;
     float forceSum   = 0;
     
     while (forceSum < forceLimit) {
-      Kind ofGoon = (Kind) Rand.pickFrom(GOONS);
+      PersonType ofGoon = (PersonType) Rand.pickFrom(GOONS);
       Person goon = Person.randomOfKind(ofGoon, event.world());
       forceSum += goon.stats.powerLevel();
       forces.add(goon);

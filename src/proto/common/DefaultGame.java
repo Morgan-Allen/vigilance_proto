@@ -124,10 +124,10 @@ public class DefaultGame extends RunGame {
   
   public static void initDefaultCrime(World world) {
     
-    final Kind goonTypes[] = {
+    final PersonType goonTypes[] = {
       Crooks.BRUISER, Crooks.BRUISER, Crooks.GANGSTER
     };
-    final Kind seniorTypes[] = {
+    final PersonType seniorTypes[] = {
       Crooks.GANGSTER, Civilians.DOCTOR, Civilians.INVENTOR, Civilians.BROKER
     };
     
@@ -154,7 +154,7 @@ public class DefaultGame extends RunGame {
       base.setGoonTypes(goonTypes);
       base.plans.assignStepTypes(StepTypes.ALL_TYPES);
       
-      for (Kind type : seniorTypes) {
+      for (PersonType type : seniorTypes) {
         Person senior = Person.randomOfKind(type, world);
         base.addToRoster(senior);
       }

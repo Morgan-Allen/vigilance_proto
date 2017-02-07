@@ -251,7 +251,7 @@ public class SceneTypeCorridors extends SceneType {
     //final Box2D a = room.area;
     float roomArea = room.wide * room.high;
     
-    for (Kind propType : room.type.props) {
+    for (PropType propType : room.type.props) {
       float areaUsed = 0, maxUsed = (roomArea * 0.5f) / room.type.props.length;
       float propArea = propType.wide() * propType.high();
       int numTries = 0, maxTries = (int) (roomArea * 4f / propArea);

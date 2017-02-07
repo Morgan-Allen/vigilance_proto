@@ -16,8 +16,8 @@ public class Crooks {
   final static String IMG_DIR = "media assets/character icons/common/";
   
   
-  final public static Kind
-    BRUISER = Kind.ofPerson(
+  final public static PersonType
+    BRUISER = new PersonType(
       "Bruiser", "person_kind_bruiser", IMG_DIR+"icon_bruiser.png",
       "", Civilians.COMMON_NAMES,
       Kind.SUBTYPE_MOOK,
@@ -26,7 +26,7 @@ public class Crooks {
       WILL    , 4 ,
       MUSCLE  , 8
     ),
-    GANGSTER = Kind.ofPerson(
+    GANGSTER = new PersonType(
       "Gangster", "person_kind_gangster", IMG_DIR+"icon_gangster.png",
       "", Civilians.COMMON_NAMES,
       Kind.SUBTYPE_MOOK,

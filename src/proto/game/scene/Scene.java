@@ -285,7 +285,7 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     */
   //  TODO:  Consider moving these out to the Prop class.
   
-  public boolean addProp(Kind type, int x, int y, int facing) {
+  public boolean addProp(PropType type, int x, int y, int facing) {
     Prop prop = new Prop(type, world);
     Tile first = null;
     
