@@ -114,7 +114,6 @@ public class SceneView extends UINode {
     
     int size = scene.size();
     Action done = scene.currentAction();
-    Batch <Person> visible = new Batch <Person> ();
     
     final Color SCALE[] = new Color[10];
     final Color ENEMY[] = new Color[10];
@@ -170,13 +169,22 @@ public class SceneView extends UINode {
     }
     //
     //  Render the persons themselves-
+    final List <Person> personsShown = new List <Person> () {
+      protected float queuePriority(Person r) {
+        return r.health.conscious() ? 1 : 0;
+      }
+    };
     for (Person p : scene.allPersons()) {
       float fog = scene.fogAt(p.currentTile(), Person.Side.HEROES);
       if (fog <= 0 && ! GameSettings.debugScene) continue;
-      p.renderTo(scene, this, surface, g);
-      visible.add(p);
+      personsShown.add(p);
     }
-    for (Person p : visible) {
+    personsShown.queueSort();
+    
+    for (Person p : personsShown) {
+      p.renderTo(scene, this, surface, g);
+    }
+    for (Person p : personsShown) {
       Color               teamColor = Color.GREEN;
       if (p.isHero    ()) teamColor = Color.BLUE;
       if (p.isCriminal()) teamColor = Color.RED;

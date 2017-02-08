@@ -44,7 +44,6 @@ public class Person extends Element {
   
   Tile location;
   Vec3D exactPos = new Vec3D();
-  private boolean oldBlock;
   
   
   public Person(Kind kind, World world, String name) {
@@ -92,7 +91,6 @@ public class Person extends Element {
     
     location = (Tile) s.loadObject();
     exactPos.loadFrom(s.input());
-    oldBlock = s.loadBool();
   }
   
   
@@ -116,7 +114,6 @@ public class Person extends Element {
     
     s.saveObject(location);
     exactPos.saveTo(s.output());
-    s.saveBool(oldBlock);
   }
   
   
@@ -264,11 +261,6 @@ public class Person extends Element {
     }
     else {
       stats.updateStats();
-    }
-    
-    if (blocksFull() != oldBlock) {
-      location.refreshPathing();
-      oldBlock = blocksFull();
     }
   }
   

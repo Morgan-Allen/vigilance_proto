@@ -100,7 +100,9 @@ public class SceneTypeFixed extends SceneType {
       
       scene.addProp(floors, sx, sy, facing);
       PropType type = propType(c.x, c.y);
-      if (type == null || ! scene.hasSpace(type, sx, sy, facing)) continue;
+      if (type == null || ! Prop.hasSpace(scene, type, sx, sy, facing)) {
+        continue;
+      }
       scene.addProp(type, sx, sy, facing);
     }
   }

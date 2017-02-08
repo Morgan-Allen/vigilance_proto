@@ -37,6 +37,8 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   int size;
   int time;
   Tile tiles[][] = new Tile[0][0];
+  byte wallM[][] = new byte[1][2];
+  byte opacM[][] = new byte[1][2];
   byte fogP [][] = new byte[0][0];
   byte fogO [][] = new byte[0][0];
   List <Prop> props = new List();
@@ -73,14 +75,14 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     size   = s.loadInt();
     time   = s.loadInt();
     int tS = s.loadInt();
-    tiles  = new Tile[tS][tS];
-    fogP   = new byte[tS][tS];
-    fogO   = new byte[tS][tS];
+    initArrays(tS);
     for (Coord c : Visit.grid(0, 0, tS, tS, 1)) {
       tiles[c.x][c.y] = (Tile) s.loadObject();
     }
-    s.loadByteArray(fogP);
-    s.loadByteArray(fogO);
+    s.loadByteArray(wallM);
+    s.loadByteArray(opacM);
+    s.loadByteArray(fogP );
+    s.loadByteArray(fogO );
     s.loadObjects(props);
     
     playerTurn = s.loadBool();
@@ -108,8 +110,10 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     for (Coord c : Visit.grid(0, 0, tS, tS, 1)) {
       s.saveObject(tiles[c.x][c.y]);
     }
-    s.saveByteArray(fogP);
-    s.saveByteArray(fogO);
+    s.saveByteArray(wallM);
+    s.saveByteArray(opacM);
+    s.saveByteArray(fogP );
+    s.saveByteArray(fogO );
     s.saveObjects(props);
     
     s.saveBool(playerTurn);
@@ -154,7 +158,7 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   
   
   
-  /**  Supplemental query and setup methods-
+  /**  Supplemental query methods-
     */
   public World world() {
     return world;
@@ -206,6 +210,31 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   }
   
   
+  public Series <Prop> props() {
+    return props;
+  }
+  
+  
+  public Series <Person> playerTeam() {
+    return playerTeam;
+  }
+  
+  
+  public Series <Person> othersTeam() {
+    return othersTeam;
+  }
+  
+  
+  public Series <Person> allPersons() {
+    return allPersons;
+  }
+  
+  
+  public Series <Person> didEnter() {
+    return didEnter;
+  }
+  
+  
   public Tile tileAt(int x, int y) {
     try { return tiles[x][y]; }
     catch (ArrayIndexOutOfBoundsException e) { return null; }
@@ -226,6 +255,15 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   }
   
   
+  public Action currentAction() {
+    if (nextActing == null) return null;
+    return nextActing.actions.nextAction();
+  }
+  
+  
+  
+  /**  Dealing with fog levels and line of sight:
+    */
   public float fogAt(Tile at, Person.Side side) {
     if (at == null) {
       I.say("?");
@@ -238,98 +276,47 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   
   
   public float degreeOfSight(Tile orig, Tile dest, Person p) {
-    
-    int spanX = dest.x - orig.x, spanY = dest.y - orig.y;
-    float ratioY = Nums.abs(spanY * 1f / spanX);
-    float maxSteps = distance(orig, dest) * 2;
-    
     float sight = 1f;
-    int x = orig.x, y = orig.y;
-    float scanY = ratioY;
     
-    while (true) {
-      
-      Tile t = tiles[x][y];
-      if (t == dest) break;
-      if (t.opaque() && t != p.currentTile()) {
-        sight *= 0;
-      }
-      if (sight == 0) break;
-      if (maxSteps-- < 0) { I.complain("TOO MANY STEPS!"); break; }
-      
-      if (spanX == 0) { y += spanY > 0 ? 1 : -1; continue; }
-      if (spanY == 0) { x += spanX > 0 ? 1 : -1; continue; }
-      
-      boolean incY = scanY >= 1, incX = scanY <= 1;
-      if (incX) {
-        x += spanX > 0 ? 1 : -1;
-        scanY += ratioY;
-      }
-      if (incY) {
-        y += spanY > 0 ? 1 : -1;
-        scanY--;
-      }
+    Box2D area = new Box2D(orig.x, orig.y, 0, 0);
+    area.include(dest.x, dest.y, 0).expandBy(1);
+    Vec2D o = new Vec2D(orig.x, orig.y), l = new Vec2D(dest.x, dest.y).sub(o);
+    
+    for (Coord c : Visit.grid(area)) {
+      if (l.lineDist(c.x - o.x, c.y - o.y) > 0.5f) continue;
+      final Tile t = tiles[c.x][c.y];
+      sight *= t.blocksSight(o, l) ? 0 : 1;
     }
+    
     return sight;
-  }
-  
-  
-  public Action currentAction() {
-    if (nextActing == null) return null;
-    return nextActing.actions.nextAction();
   }
   
   
   
   /**  Supplementary population methods for use during initial setup-
     */
-  //  TODO:  Consider moving these out to the Prop class.
+  private void initArrays(int size) {
+    tiles = new Tile[size][size];
+    wallM = new byte[size + 1][size * 2];
+    opacM = new byte[size + 1][size * 2];
+    fogP  = new byte[size][size];
+    fogO  = new byte[size][size];
+  }
+  
+  
+  public void setupScene(boolean forTesting) {
+    this.state = forTesting ? STATE_TEST : STATE_SETUP;
+    initArrays(size);
+    
+    for (Coord c : Visit.grid(0, 0, size, size, 1)) {
+      tiles[c.x][c.y] = new Tile(this, c.x, c.y);
+    }
+  }
+  
   
   public boolean addProp(PropType type, int x, int y, int facing) {
-    Prop prop = new Prop(type, world);
-    Tile first = null;
-    
-    for (Coord c : Prop.coordsUnder(type, x, y, facing)) {
-      Tile under = tileAt(c.x, c.y);
-      if (under == null) continue;
-      
-      for (Element e : under.inside()) if (e.wouldBlock(type)) {
-        removeProp((Prop) e);
-      }
-      under.setInside(prop, true);
-      if (first == null) first = under;
-    }
-    
-    prop.origin = first;
-    prop.facing = facing;
-    props.add(prop);
-    return true;
-  }
-  
-  
-  public boolean removeProp(Prop prop) {
-    Tile at = prop.origin();
-    for (Coord c : Prop.coordsUnder(prop.kind(), at.x, at.y, prop.facing())) {
-      Tile under = tileAt(c.x, c.y);
-      if (under != null) under.setInside(prop, false);
-    }
-    props.remove(prop);
-    return true;
-  }
-  
-  
-  public boolean hasSpace(Kind type, int x, int y, int facing) {
-    for (Coord c : Prop.coordsUnder(type, x, y, facing)) {
-      Tile under = tileAt(c.x, c.y);
-      if (under == null) return false;
-      for (Element e : under.inside()) if (e.wouldBlock(type)) return false;
-    }
-    return true;
-  }
-  
-  
-  public Series <Prop> props() {
-    return props;
+    final Prop prop = new Prop(type, world);
+    return prop.enterScene(this, x, y, facing);
   }
   
   
@@ -357,43 +344,10 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   }
   
   
-  public Series <Person> playerTeam() {
-    return playerTeam;
-  }
-  
-  
-  public Series <Person> othersTeam() {
-    return othersTeam;
-  }
-  
-  
-  public Series <Person> allPersons() {
-    return allPersons;
-  }
-  
-  
-  public Series <Person> didEnter() {
-    return didEnter;
-  }
-  
-  
   public Series <Prop> propsOfKind(Kind type) {
     Batch ofKind = new Batch();
     for (Prop p : props) if (p.kind == type) ofKind.add(p);
     return ofKind;
-  }
-  
-  
-  public void setupScene(boolean forTesting) {
-    this.state = forTesting ? STATE_TEST : STATE_SETUP;
-    
-    tiles = new Tile[size][size];
-    fogP  = new byte[size][size];
-    fogO  = new byte[size][size];
-    
-    for (Coord c : Visit.grid(0, 0, size, size, 1)) {
-      tiles[c.x][c.y] = new Tile(this, c.x, c.y);
-    }
   }
   
   

@@ -23,13 +23,7 @@ public class MoveSearch extends Search <Tile> {
   
   
   protected Tile[] adjacent(Tile spot) {
-    for (int n : TileConstants.T_INDEX) {
-      temp[n] = dest.scene.tileAt(
-        spot.x + TileConstants.T_X[n],
-        spot.y + TileConstants.T_Y[n]
-      );
-    }
-    return temp;
+    return spot.tilesAdjacent(temp);
   }
   
   
@@ -42,6 +36,10 @@ public class MoveSearch extends Search <Tile> {
   protected boolean canEnter(Tile spot) {
     if (spot == moves.currentTile()) return true;
     if (spot.blocked()) return false;
+    
+    final Series <Person> inside = spot.persons();
+    if (inside != null && ! inside.empty()) return false;
+    
     return true;
   }
   
