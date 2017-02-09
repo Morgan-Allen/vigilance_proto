@@ -151,8 +151,8 @@ public class Tile implements Session.Saveable {
   
   public Tile[] tilesAdjacent(Tile temp[]) {
     for (int n : T_ADJACENT) {
-      if (wallMaskVal(n) == Kind.BLOCK_FULL) continue;
-      temp[n] = scene.tileAt(x + T_X[n], y + T_Y[n]);
+      if (wallMaskVal(n) == Kind.BLOCK_FULL) temp[n] = null;
+      else temp[n] = scene.tileAt(x + T_X[n], y + T_Y[n]);
     }
     for (int n : T_DIAGONAL) {
       Tile a = temp[(n + 1) % 8], b = temp[(n + 7) % 8];
@@ -165,23 +165,23 @@ public class Tile implements Session.Saveable {
   
   boolean blocksSight(Vec2D origin, Vec2D line) {
     //
-    //  TODO:  You have to check for neg-inf values below!
-    //
-    //  TODO:  Also, opacity solves this automatically.
-    /*
-    float eastY = solveY(origin, line, x), westY = solveY(origin, line, x + 1);
-    float nortX = solveX(origin, line, y), soutX = solveX(origin, line, y + 1);
-    if (opacityVal(N) > 0 && nortX >= x && nortX <= x + 1) return true;
-    if (opacityVal(S) > 0 && soutX >= x && soutX <= x + 1) return true;
-    if (opacityVal(W) > 0 && westY >= y && westY >= y + 1) return true;
-    if (opacityVal(E) > 0 && eastY >= y && eastY >= y + 1) return true;
-    //*/
+    //  TODO:  North/south/east/west values aren't being handled consistently
+    //         here.  Address this in the TileConstants class and follow
+    //         through to all affected code.
+    float nortX = solveX(origin, line, y + 0);
+    if (nortX >= 0 && (opaque || opacityVal(W) > 0)) return true;
+    float soutX = solveX(origin, line, y + 1);
+    if (soutX >= 0 && (opaque || opacityVal(E) > 0)) return true;
+    float eastY = solveY(origin, line, x + 0);
+    if (eastY >= 0 && (opaque || opacityVal(S) > 0)) return true;
+    float westY = solveY(origin, line, x + 1);
+    if (westY >= 0 && (opaque || opacityVal(N) > 0)) return true;
     return false;
   }
   
   
   private float solveX(Vec2D o, Vec2D l, float atY) {
-    if (o.y < atY && l.y <= 0) return Float.NEGATIVE_INFINITY;
+    if (! checkRange(o.y, l.y, atY)) return Float.NEGATIVE_INFINITY;
     atY -= o.y;
     atY /= l.y;
     return o.x + (l.x * atY);
@@ -189,10 +189,16 @@ public class Tile implements Session.Saveable {
   
   
   private float solveY(Vec2D o, Vec2D l, float atX) {
-    if (o.x < atX && l.x <= 0) return Float.NEGATIVE_INFINITY;
+    if (! checkRange(o.x, l.x, atX)) return Float.NEGATIVE_INFINITY;
     atX -= o.x;
     atX /= l.x;
     return o.y + (l.y * atX);
+  }
+  
+  
+  private boolean checkRange(float o, float l, float at) {
+    if (l < 0) return o + l <= at && at <= o;
+    else return o <= at && at <= o + l;
   }
   
   

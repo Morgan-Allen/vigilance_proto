@@ -262,37 +262,6 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   
   
   
-  /**  Dealing with fog levels and line of sight:
-    */
-  public float fogAt(Tile at, Person.Side side) {
-    if (at == null) {
-      I.say("?");
-    }
-    
-    if (side == Person.Side.HEROES  ) return fogP[at.x][at.y] / 100f;
-    if (side == Person.Side.VILLAINS) return fogO[at.x][at.y] / 100f;
-    return 1;
-  }
-  
-  
-  public float degreeOfSight(Tile orig, Tile dest, Person p) {
-    float sight = 1f;
-    
-    Box2D area = new Box2D(orig.x, orig.y, 0, 0);
-    area.include(dest.x, dest.y, 0).expandBy(1);
-    Vec2D o = new Vec2D(orig.x, orig.y), l = new Vec2D(dest.x, dest.y).sub(o);
-    
-    for (Coord c : Visit.grid(area)) {
-      if (l.lineDist(c.x - o.x, c.y - o.y) > 0.5f) continue;
-      final Tile t = tiles[c.x][c.y];
-      sight *= t.blocksSight(o, l) ? 0 : 1;
-    }
-    
-    return sight;
-  }
-  
-  
-  
   /**  Supplementary population methods for use during initial setup-
     */
   private void initArrays(int size) {
@@ -536,6 +505,34 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
       if (checkSight) val *= degreeOfSight(point, t, looks);
       fog[t.x][t.y] = (byte) Nums.max(val, fog[t.x][t.y]);
     }
+  }
+  
+  
+  public float fogAt(Tile at, Person.Side side) {
+    if (at == null) {
+      I.say("?");
+    }
+    
+    if (side == Person.Side.HEROES  ) return fogP[at.x][at.y] / 100f;
+    if (side == Person.Side.VILLAINS) return fogO[at.x][at.y] / 100f;
+    return 1;
+  }
+  
+  
+  public float degreeOfSight(Tile orig, Tile dest, Person p) {
+    float sight = 1f;
+    
+    Box2D area = new Box2D(orig.x, orig.y, 0, 0);
+    area.include(dest.x, dest.y, 0).expandBy(1);
+    Vec2D o = new Vec2D(orig.x, orig.y), l = new Vec2D(dest.x, dest.y).sub(o);
+    
+    for (Coord c : Visit.grid(area)) {
+      if (l.lineDist(c.x - o.x, c.y - o.y) > 0.5f) continue;
+      final Tile t = tiles[c.x][c.y];
+      sight *= t.blocksSight(o, l) ? 0 : 1;
+    }
+    
+    return sight;
   }
   
   
