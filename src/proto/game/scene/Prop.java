@@ -57,13 +57,15 @@ public class Prop extends Element implements TileConstants {
   
   /**  Placement, removal and occupation methods-
     */
-  private static Coord translate(Coord c, int facing, boolean invert) {
-    int x = 0, y = 0, m = invert ? -1 : 1;
+  private static Coord rotate(Coord c, int facing, boolean back) {
+    if (back) facing = (8 - facing) % 8;
+    int x = 0, y = 0;
     switch (facing) {
-      case(N): x =  c.x * m; y =  c.y * m; break;
-      case(E): x =  c.y * m; y = -c.x * m; break;
-      case(S): x = -c.x * m; y = -c.y * m; break;
-      case(W): x = -c.y * m; y =  c.x * m; break;
+      case(CENTRE):
+      case(N): x =  c.x; y =  c.y; break;
+      case(E): x =  c.y; y = -c.x; break;
+      case(S): x = -c.x; y = -c.y; break;
+      case(W): x = -c.y; y =  c.x; break;
     }
     c.x = x;
     c.y = y;
@@ -84,7 +86,7 @@ public class Prop extends Element implements TileConstants {
       }
       
       public Tile next() {
-        Coord c = translate(base.next(), facing, false);
+        Coord c = rotate(base.next(), facing, false);
         return scene.tileAt(c.x + x, c.y + y);
       }
     };
@@ -104,19 +106,28 @@ public class Prop extends Element implements TileConstants {
   
   public boolean enterScene(Scene scene, int x, int y, int facing) {
     if (origin != null) I.complain("Already in scene!");
+    this.origin = scene.tileAt(x, y);
+    this.facing = facing;
+    if (origin == null) I.complain("Origin outside bounds!");
+    
     final PropType kind = kind();
+    boolean verbose = false;
+    
+    if (kind.wide() > 1 || kind.high() > 1) {
+      I.say("Adding prop: "+kind);
+      verbose = true;
+    }
     
     for (Tile under : tilesUnder(kind, scene, x, y, facing)) {
       if (under == null) continue;
       for (Element e : under.inside()) if (e.wouldBlock(kind) && e.isProp()) {
         ((Prop) e).exitScene();
       }
+      
+      if (verbose) I.say("  entered at "+under);
       under.setInside(this, true);
       under.wipePathing();
     }
-    
-    this.origin = scene.tileAt(x, y);
-    this.facing = facing;
     scene.props.add(this);
     
     for (Tile under : tilesUnder(kind, scene, x, y, facing)) {
@@ -148,26 +159,28 @@ public class Prop extends Element implements TileConstants {
   }
   
   
-  public int blockageAtOffset(int relX, int relY, int facing) {
+  public boolean occupies(int relX, int relY, int facing) {
     PropType type = kind();
-    Coord c = translate(new Coord(relX, relY), facing, true);
+    Coord c = rotate(new Coord(relX, relY), this.facing, true);
     relX = c.x;
     relY = c.y;
     facing = (facing + 8 - this.facing) % 8;
-    int w = type.wide(), h = type.high(), block = type.blockLevel();
+    int w = type.wide(), h = type.high();
     
+    //  TODO:  These will have to be swapped (N and S are actually along the x-
+    //  axis!)
     if (h == 0) {
-      if (relY == 0 && facing == N) return block;
-      if (relY == 1 && facing == S) return block;
+      if (relY == 0 && facing == N) return true;
+      if (relY == 1 && facing == S) return true;
     }
     if (w == 0) {
-      if (relX == 0 && facing == E) return block;
-      if (relX == 1 && facing == W) return block;
+      if (relX == 0 && facing == E) return true;
+      if (relX == 1 && facing == W) return true;
     }
     if (relX >= 0 && relX < w && relY >= 0 && relY < h) {
-      return block;
+      return true;
     }
-    return 0;
+    return false;
   }
   
   
@@ -178,9 +191,9 @@ public class Prop extends Element implements TileConstants {
     float midX = origin.x, midY = origin.y;
     float w = kind().wide(), h = kind().high();
     
-    if (facing == E) { midY += w; }
-    if (facing == W) { midX += h; }
-    if (facing == S) { midX += w; midY += h; }
+    if (facing == E) { midY += 1; }
+    if (facing == W) { midX += 1; }
+    if (facing == S) { midX += 1; midY += 1; }
     
     view.renderAt(midX, midY, w, h, kind().sprite(), facing * -45, null, g);
   }
@@ -190,6 +203,9 @@ public class Prop extends Element implements TileConstants {
     return blockLevel();
   }
 }
+
+
+
 
 
 

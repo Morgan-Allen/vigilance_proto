@@ -114,24 +114,36 @@ public class Tile implements Session.Saveable {
   
   
   void updatePathing() {
+    
     blocked = false;
     opaque  = false;
+    
     for (int dir : T_ON_CENTRE) {
       if (dir != CENTRE && dir % 2 == 1) continue;
       Tile near = scene.tileAt(x + T_X[dir], y + T_Y[dir]);
       
+      /*
+      if (x == 5 && y == 4 && inside().size() > 1 && dir == CENTRE) {
+        I.say("Updating pathing for: "+this);
+      }
+      //*/
+      
       if (near != null) for (Element e : near.inside()) if (e.isProp()) {
         final Prop prop = (Prop) e;
         final Tile o = prop.origin();
+        final boolean occupies = prop.occupies(near.x - o.x, near.y - o.y, dir);
         final int
-          blocks  = prop.blockageAtOffset(dir, near.x - o.x, near.y - o.y),
-          opacity = prop.blockSight() ? 1 : 0
+          blocks  = occupies ? prop.blockLevel() : 0,
+          opacity = (prop.blockSight() && occupies) ? 1 : 0
         ;
-        setWallMask(dir, (byte) Nums.max(blocks , wallMaskVal(dir)));
-        setOpacity (dir, (byte) Nums.max(opacity, opacityVal (dir)));
-        
-        if (dir == CENTRE && blocks == Kind.BLOCK_FULL) blocked = true;
-        if (dir == CENTRE && opacity > 0              ) opaque  = true;
+        if (dir == CENTRE) {
+          if (blocks == Kind.BLOCK_FULL) blocked = true;
+          if (opacity > 0              ) opaque  = true;
+        }
+        else {
+          setWallMask(dir, (byte) Nums.max(blocks , wallMaskVal(dir)));
+          setOpacity (dir, (byte) Nums.max(opacity, opacityVal (dir)));
+        }
       }
     }
   }
@@ -154,12 +166,16 @@ public class Tile implements Session.Saveable {
   boolean blocksSight(Vec2D origin, Vec2D line) {
     //
     //  TODO:  You have to check for neg-inf values below!
+    //
+    //  TODO:  Also, opacity solves this automatically.
+    /*
     float eastY = solveY(origin, line, x), westY = solveY(origin, line, x + 1);
     float nortX = solveX(origin, line, y), soutX = solveX(origin, line, y + 1);
     if (opacityVal(N) > 0 && nortX >= x && nortX <= x + 1) return true;
     if (opacityVal(S) > 0 && soutX >= x && soutX <= x + 1) return true;
     if (opacityVal(W) > 0 && westY >= y && westY >= y + 1) return true;
     if (opacityVal(E) > 0 && eastY >= y && eastY >= y + 1) return true;
+    //*/
     return false;
   }
   
