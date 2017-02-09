@@ -297,8 +297,9 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     */
   private void initArrays(int size) {
     tiles = new Tile[size][size];
-    wallM = new byte[size + 1][size * 2];
-    opacM = new byte[size + 1][size * 2];
+    int wallS = (size * 2) + 1;
+    wallM = new byte[wallS][wallS];
+    opacM = new byte[wallS][wallS];
     fogP  = new byte[size][size];
     fogO  = new byte[size][size];
   }

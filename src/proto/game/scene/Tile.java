@@ -79,29 +79,29 @@ public class Tile implements Session.Saveable {
   //  opacity arrays are actually declared within the Scene class, so it's
   //  easier to relate the math?
   
-  final static Coord WALL_MASK_COORDS[] = {
-    new Coord(0, 1),
-    new Coord(1, 1),
-    new Coord(0, 0),
-    new Coord(1, 0)
-  };
-  int wallMaskX(int dir) { return (x * 1) + WALL_MASK_COORDS[dir / 2].x; }
-  int wallMaskY(int dir) { return (y * 2) + WALL_MASK_COORDS[dir / 2].y; }
+  static int wallMaskX(int x, int dir) {
+    return (x * 2) + 1 + T_X[dir];
+  }
+  static int wallMaskY(int y, int dir) {
+    return (y * 2) + 1 + T_Y[dir];
+  }
+  
+  final static int CHECK_DIRS[] = { N, E, S, W, CENTRE };
   
   int wallMaskVal(int dir) {
-    return scene.wallM[wallMaskX(dir)][wallMaskY(dir)];
+    return scene.wallM[wallMaskX(x, dir)][wallMaskY(y, dir)];
   }
   
   int opacityVal(int dir) {
-    return scene.opacM[wallMaskX(dir)][wallMaskY(dir)];
+    return scene.opacM[wallMaskX(x, dir)][wallMaskY(y, dir)];
   }
   
   void setWallMask(int dir, byte val) {
-    scene.wallM[wallMaskX(dir)][wallMaskY(dir)] = val;
+    scene.wallM[wallMaskX(x, dir)][wallMaskY(y, dir)] = val;
   }
   
   void setOpacity(int dir, byte val) {
-    scene.opacM[wallMaskX(dir)][wallMaskY(dir)] = val;
+    scene.opacM[wallMaskX(x, dir)][wallMaskY(y, dir)] = val;
   }
 
   
@@ -113,29 +113,28 @@ public class Tile implements Session.Saveable {
   }
   
   
+  
+  public static boolean stopCheck = false;
+  
   void updatePathing() {
-    
     blocked = false;
     opaque  = false;
     
-    for (int dir : T_ON_CENTRE) {
-      if (dir != CENTRE && dir % 2 == 1) continue;
-      Tile near = scene.tileAt(x + T_X[dir], y + T_Y[dir]);
+    boolean report = inside().size() > 1 && stopCheck;
+    if (report) I.say("  Update pathing at "+this);
+
+    for (Element e : inside()) if (e.isProp()) {
+      final Prop prop = (Prop) e;
+      final Tile o = prop.origin();
       
-      /*
-      if (x == 5 && y == 4 && inside().size() > 1 && dir == CENTRE) {
-        I.say("Updating pathing for: "+this);
-      }
-      //*/
-      
-      if (near != null) for (Element e : near.inside()) if (e.isProp()) {
-        final Prop prop = (Prop) e;
-        final Tile o = prop.origin();
-        final boolean occupies = prop.occupies(near.x - o.x, near.y - o.y, dir);
+      for (int dir : CHECK_DIRS) {
+        final boolean occupies = prop.occupies(x - o.x, y - o.y, dir);
         final int
           blocks  = occupies ? prop.blockLevel() : 0,
           opacity = (prop.blockSight() && occupies) ? 1 : 0
         ;
+        if (report) I.say("  Occupied at "+DIR_NAMES[dir]+": "+occupies);
+        
         if (dir == CENTRE) {
           if (blocks == Kind.BLOCK_FULL) blocked = true;
           if (opacity > 0              ) opaque  = true;
@@ -144,6 +143,7 @@ public class Tile implements Session.Saveable {
           setWallMask(dir, (byte) Nums.max(blocks , wallMaskVal(dir)));
           setOpacity (dir, (byte) Nums.max(opacity, opacityVal (dir)));
         }
+        //*/
       }
     }
   }
@@ -225,7 +225,45 @@ public class Tile implements Session.Saveable {
   public String toString() {
     return "Tile at "+x+"|"+y;
   }
+  
+  
+  public static void printWallsMask(Scene scene) {
+    int size = scene.size(), span = (size * 2) + 1;
+    I.say("\nPRINTING WALLS FOR SCENE");
+
+    for (int y = 0; y < span; y++) {
+      I.add("\n  ");
+      boolean centY = y % 2 == 0;
+      
+      for (int x = 0; x < span; x++) {
+        boolean centX = x % 2 == 0;
+        byte val = scene.wallM[x][y];
+        
+        if (val > 0) {
+          if (centY) I.add("_");
+          else I.add("|");
+        }
+        else {
+          if (centX && centY) I.add(".");
+          else I.add(" ");
+        }
+      }
+    }
+  }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

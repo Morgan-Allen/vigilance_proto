@@ -14,7 +14,7 @@ public class DebugSceneWithLayout extends RunGame {
   
   
   final public static PropType
-    THIN_WALL = new PropType(
+    KIND_THIN_WALL = new PropType(
       "Wall", "prop_wall_thin",
       "media assets/scene layout/common/sprite_wall_thin.png",
       1, 0, Kind.BLOCK_FULL, true
@@ -75,13 +75,28 @@ public class DebugSceneWithLayout extends RunGame {
     SceneType sceneType = FIXED_TEST_SCENE;
     Scene mission = sceneType.generateScene(world, 12, true);
     
-    mission.addProp(KIND_POOL_TABLE, 5, 5, TileConstants.E);
+    Tile.stopCheck = true;
     
     /*
-    for (int y = mission.size(); y-- > 0;) {
-      mission.addProp(THIN_WALL, 6, y, TileConstants.E);
+    mission.addProp(KIND_POOL_TABLE, 0, 0, TileConstants.N);
+    mission.addProp(KIND_POOL_TABLE, 8, 0, TileConstants.W);
+    mission.addProp(KIND_POOL_TABLE, 8, 8, TileConstants.S);
+    mission.addProp(KIND_POOL_TABLE, 0, 8, TileConstants.E);
+    
+    for (int x = 4; x-- > 0;) {
+      int dir = TileConstants.T_ADJACENT[x];
+      mission.addProp(KIND_THIN_WALL, 1 + (x * 2), 4, dir);
+      mission.addProp(KIND_JUKEBOX  , 1 + (x * 2), 3, dir);
     }
     //*/
+    
+    //*
+    for (int x = mission.size(); x-- > 0;) {
+      mission.addProp(KIND_THIN_WALL, x, 3, TileConstants.N);
+    }
+    //*/
+    
+    Tile.printWallsMask(mission);
     
     GameSettings.debugScene = true;
     //GameSettings.pauseScene = true;

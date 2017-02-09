@@ -7,6 +7,7 @@ import proto.view.common.*;
 import proto.view.scene.*;
 import proto.util.*;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 
 
@@ -75,10 +76,12 @@ public class Prop extends Element implements TileConstants {
   
   private static Visit <Tile> tilesUnder(
     PropType type, final Scene scene,
-    final int x, final int y, final int facing
+    final int x, final int y, final int facing, final int margin
   ) {
     final int w = Nums.max(1, type.wide()), h = Nums.max(1, type.high());
-    final Visit <Coord> base = Visit.grid(0, 0, w, h, 1);
+    final Visit <Coord> base = Visit.grid(
+      0 - margin, 0 - margin, w + (margin * 2), h + (margin * 2), 1
+    );
     return new Visit <Tile> () {
       
       public boolean hasNext() {
@@ -96,7 +99,7 @@ public class Prop extends Element implements TileConstants {
   public static boolean hasSpace(
     Scene scene, PropType type, int x, int y, int facing
   ) {
-    for (Tile under : tilesUnder(type, scene, x, y, facing)) {
+    for (Tile under : tilesUnder(type, scene, x, y, facing, 0)) {
       if (under == null) return false;
       for (Element e : under.inside()) if (e.wouldBlock(type)) return false;
     }
@@ -111,26 +114,18 @@ public class Prop extends Element implements TileConstants {
     if (origin == null) I.complain("Origin outside bounds!");
     
     final PropType kind = kind();
-    boolean verbose = false;
-    
-    if (kind.wide() > 1 || kind.high() > 1) {
-      I.say("Adding prop: "+kind);
-      verbose = true;
-    }
-    
-    for (Tile under : tilesUnder(kind, scene, x, y, facing)) {
+    for (Tile under : tilesUnder(kind, scene, x, y, facing, 0)) {
       if (under == null) continue;
       for (Element e : under.inside()) if (e.wouldBlock(kind) && e.isProp()) {
         ((Prop) e).exitScene();
       }
       
-      if (verbose) I.say("  entered at "+under);
       under.setInside(this, true);
       under.wipePathing();
     }
     scene.props.add(this);
     
-    for (Tile under : tilesUnder(kind, scene, x, y, facing)) {
+    for (Tile under : tilesUnder(kind, scene, x, y, facing, 1)) {
       if (under != null) under.updatePathing();
     }
     return true;
@@ -142,7 +137,7 @@ public class Prop extends Element implements TileConstants {
     final Scene scene = origin.scene;
     final Tile at = origin;
     
-    for (Tile under : tilesUnder(kind(), scene, at.x, at.y, facing)) {
+    for (Tile under : tilesUnder(kind(), scene, at.x, at.y, facing, 0)) {
       if (under == null) continue;
       under.setInside(this, false);
       under.wipePathing();
@@ -152,7 +147,7 @@ public class Prop extends Element implements TileConstants {
     this.facing = -1;
     scene.props.remove(this);
     
-    for (Tile under : tilesUnder(kind(), scene, at.x, at.y, facing)) {
+    for (Tile under : tilesUnder(kind(), scene, at.x, at.y, facing, 1)) {
       if (under != null) under.updatePathing();
     }
     return true;
@@ -164,23 +159,18 @@ public class Prop extends Element implements TileConstants {
     Coord c = rotate(new Coord(relX, relY), this.facing, true);
     relX = c.x;
     relY = c.y;
-    facing = (facing + 8 - this.facing) % 8;
+    if (facing != CENTRE) facing = (facing + 8 - this.facing) % 8;
     int w = type.wide(), h = type.high();
     
-    //  TODO:  These will have to be swapped (N and S are actually along the x-
-    //  axis!)
-    if (h == 0) {
-      if (relY == 0 && facing == N) return true;
-      if (relY == 1 && facing == S) return true;
-    }
-    if (w == 0) {
-      if (relX == 0 && facing == E) return true;
-      if (relX == 1 && facing == W) return true;
-    }
-    if (relX >= 0 && relX < w && relY >= 0 && relY < h) {
-      return true;
-    }
+    if (h == 0 && relY == 0 && facing == W) return true;
+    if (w == 0 && relX == 0 && facing == N) return true;
+    if (relX >= 0 && relX < w && relY >= 0 && relY < h) return true;
     return false;
+  }
+  
+  
+  public boolean thin() {
+    return kind().wide() == 0 || kind.high() == 0;
   }
   
   
@@ -189,13 +179,21 @@ public class Prop extends Element implements TileConstants {
     */
   public void renderTo(Scene scene, SceneView view, Surface s, Graphics2D g) {
     float midX = origin.x, midY = origin.y;
-    float w = kind().wide(), h = kind().high();
+    float w = Nums.max(1, kind().wide()), h = Nums.max(1, kind().high());
     
-    if (facing == E) { midY += 1; }
-    if (facing == W) { midX += 1; }
-    if (facing == S) { midX += 1; midY += 1; }
+    if (facing == W) { midX += 1 - h; midY += w    ; }
+    if (facing == E) { midX += h    ; midY += 1 - w; }
+    if (facing == S) { midX += 1    ; midY += 1    ; }
     
-    view.renderAt(midX, midY, w, h, kind().sprite(), facing * -45, null, g);
+    view.renderAt(midX, midY, w, h, kind().sprite(), facing * 45, null, g);
+    
+    if (blockLevel() > 0 && GameSettings.viewSceneBlocks) {
+      for (Tile t : tilesUnder(kind(), scene, origin.x, origin.y, facing, 0)) {
+        if (t == null) continue;
+        Color c = t == origin ? Color.RED : Color.YELLOW;
+        view.renderAt(t.x, t.y, 0.5f, 0.5f, null, 0, c, g);
+      }
+    }
   }
   
   
@@ -203,8 +201,6 @@ public class Prop extends Element implements TileConstants {
     return blockLevel();
   }
 }
-
-
 
 
 
