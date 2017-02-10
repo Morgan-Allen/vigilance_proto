@@ -26,4 +26,8 @@ public class PropType extends Kind {
     super(name, uniqueID, info, TYPE_PROP);
   }
   
+  
+  public boolean thin() {
+    return wide() == 0 || high() == 0;
+  }
 }

@@ -34,13 +34,12 @@ public class SceneTypeGrid extends SceneType {
   }
   
   final int resolution;
-  final boolean thickWalls;
   final GridUnit units[];
   
   
   public SceneTypeGrid(
     String name, String ID,
-    int resolution, int maxUnitSize, boolean thickWalls,
+    int resolution, int maxUnitSize,
     PropType wallType, PropType doorType, PropType windowType,
     PropType floorType, GridUnit... units
   ) {
@@ -50,7 +49,6 @@ public class SceneTypeGrid extends SceneType {
       MAX_SIZE, (maxUnitSize > 1 ? (resolution * maxUnitSize) : -1)
     );
     this.resolution = resolution;
-    this.thickWalls = thickWalls;
     this.units      = units;
     this.borders = wallType;
     this.door    = doorType;
@@ -106,13 +104,12 @@ public class SceneTypeGrid extends SceneType {
   public Scene generateScene(World world, int size, boolean forTesting) {
     I.say("GENERATING GRID SCENE "+this);
     
-    final int gridSize = size / resolution, wallPad = thickWalls ? 1 : 0;
-    size = (gridSize * resolution) + ((gridSize + 1) * wallPad) + 4;
+    final int gridSize = size / resolution;
+    size = (gridSize * resolution) + 4;
     
     Scene scene = new Scene(world, size);
     scene.setupScene(forTesting);
-    applyToScene(scene, 2, 2, N, size, forTesting);
-    
+    applyToScene(scene, 2, 2, N, gridSize * resolution, forTesting);
     return scene;
   }
   
@@ -120,8 +117,7 @@ public class SceneTypeGrid extends SceneType {
   public void applyToScene(
     Scene scene, int offX, int offY, int facing, int size, boolean forTesting
   ) {
-    int wallPad = thickWalls ? 1 : 0;
-    int gridSize = (size - wallPad) / (resolution + wallPad);
+    int gridSize = size / resolution;
     SceneGenGrid gen = new SceneGenGrid();
     gen.scene      = scene;
     gen.gridSize   = gridSize;
@@ -136,15 +132,14 @@ public class SceneTypeGrid extends SceneType {
   
   
   void populateWithAreas(Scene scene, SceneGenGrid g) {
-    int wallPad = thickWalls ? 1 : 0;
     int counts[] = new int[units.length];
     
     //  TODO:  You need to select optimal facings as well- and iterate over
     //  types before you iterate over locations.
     
     for (Coord c : Visit.grid(0, 0, g.gridSize, g.gridSize, 1)) {
-      int atX = g.offX + wallPad + (c.x * (resolution + wallPad));
-      int atY = g.offY + wallPad + (c.y * (resolution + wallPad));
+      int atX = g.offX + (c.x * resolution);
+      int atY = g.offY + (c.y * resolution);
       
       Pick <GridUnit> pick = new Pick();
       for (GridUnit unit : units) {
@@ -190,51 +185,41 @@ public class SceneTypeGrid extends SceneType {
     //  on an area (including outside) that demand a partition will have that
     //  point recorded as a wall.
     for (Coord p : Visit.grid(g.offX, g.offY, g.limit, g.limit, 1)) {
-      Room under = areaUnder(p.x, p.y, g);
-      if (under != null) continue;
-      Batch <Room> nearB = new Batch(8);
-      int numOutside = 0;
-      boolean walled = false;
-      
-      for (int dir : T_INDEX) {
-        Room next = areaUnder(p.x + T_X[dir], p.y + T_Y[dir], g);
-        if (next != null) nearB.include(next);
-        else numOutside++;
-      }
-      for (Room a : nearB) {
-        for (Room b : nearB) if (a != b) {
-          walled |= tryRecordingWall(p, a, b, g);
+      Room atP = areaUnder(p.x, p.y, g);
+      for (int dir : T_ADJACENT) {
+        Room atN = areaUnder(p.x + T_X[dir], p.y + T_Y[dir], g);
+        if (atP != atN) {
+          //  TODO:  NOTE- this is a hack and should be fixed by patching up
+          //  the TileConstants class...
+          int fudgedDir = (dir + 2) % 8;
+          tryRecordingWall(p, fudgedDir, atP, atN, g);
         }
-        if (numOutside > 4) {
-          walled |= tryRecordingWall(p, a, null, g);
-        }
-      }
-      if ((! walled) && (! nearB.empty())) {
-        scene.addProp(floors, p.x, p.y, N);
       }
     }
     //
     //  Once all wall-points have been recorded, we populate the area with
     //  actual wall-objects accordingly, and punctuate with doors and windows.
     for (Wall wall : g.walls) {
-      for (Coord c : wall.points) {
-        scene.addProp(borders, c.x, c.y, N);
+      for (WallPiece p : wall.pieces) {
+        p.wall = scene.addProp(borders, p.x, p.y, p.facing);
       }
     }
     for (Wall wall : g.walls) {
-      Batch <Coord> canDoor = new Batch();
-      for (Coord c : wall.points) {
-        if (canInsertDoor(c.x, c.y, 1, 0, scene)) canDoor.add(c);
-        if (canInsertDoor(c.x, c.y, 0, 1, scene)) canDoor.add(c);
+      Batch <WallPiece> canDoor = new Batch();
+      for (WallPiece p : wall.pieces) {
+        if (canInsertDoor(p.x, p.y, 1, 0, scene)) canDoor.add(p);
+        if (canInsertDoor(p.x, p.y, 0, 1, scene)) canDoor.add(p);
       }
       if (! canDoor.empty()) {
-        Coord d = (Coord) Rand.pickFrom(canDoor);
-        Coord w = (Coord) Rand.pickFrom(canDoor);
+        WallPiece d = (WallPiece) Rand.pickFrom(canDoor);
+        WallPiece w = (WallPiece) Rand.pickFrom(canDoor);
         if (wall.wallTypeDiff < 2) {
-          scene.addProp(door, d.x, d.y, N);
+          if (d.wall != null) d.wall.exitScene();
+          d.wall = scene.addProp(door, d.x, d.y, d.facing);
         }
         if (w != d && ! wall.indoor) {
-          scene.addProp(window, w.x, w.y, N);
+          if (w.wall != null) w.wall.exitScene();
+          w.wall = scene.addProp(window, w.x, w.y, w.facing);
         }
       }
     }
@@ -247,7 +232,9 @@ public class SceneTypeGrid extends SceneType {
   }
   
   
-  boolean tryRecordingWall(Coord p, Room from, Room other, SceneGenGrid g) {
+  boolean tryRecordingWall(
+    Coord p, int facing, Room from, Room other, SceneGenGrid g
+  ) {
     int forO = other == null ? WALL_NONE : ((GridUnit) other.unit).wallType;
     int forF = from  == null ? WALL_NONE : ((GridUnit) from .unit).wallType;
     
@@ -257,8 +244,9 @@ public class SceneTypeGrid extends SceneType {
     if (! shouldWall) return false;
     
     Wall wall = wallBetween(from, other, g);
-    for (Coord c : wall.points) if (c.matches(p)) return false;
-    wall.points.add(new Coord(p));
+    if (wall.indoor && (facing == E || facing == N)) return false;
+    
+    wall.pieces.add(new WallPiece(p.x, p.y, facing));
     wall.wallTypeDiff = Nums.abs(forO - forF);
     return true;
   }

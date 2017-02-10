@@ -97,13 +97,22 @@ public class Prop extends Element implements TileConstants {
   
   
   public static boolean hasSpace(
-    Scene scene, PropType type, int x, int y, int facing
+    Scene scene, PropType kind, int x, int y, int facing
   ) {
-    for (Tile under : tilesUnder(type, scene, x, y, facing, 0)) {
+    for (Tile under : tilesUnder(kind, scene, x, y, facing, 0)) {
       if (under == null) return false;
-      for (Element e : under.inside()) if (e.wouldBlock(type)) return false;
+      for (Element e : under.inside()) if (e.isProp()) {
+        final Prop p = (Prop) e;
+        if (p.wouldBlock(kind, x, y, facing)) return false;
+      }
     }
     return true;
+  }
+  
+  
+  public boolean wouldBlock(PropType type, int x, int y, int facing) {
+    if (kind().thin() || type.thin()) return false;
+    return kind().blockLevel() > 0 == type.blockLevel() > 0;
   }
   
   
@@ -116,8 +125,9 @@ public class Prop extends Element implements TileConstants {
     final PropType kind = kind();
     for (Tile under : tilesUnder(kind, scene, x, y, facing, 0)) {
       if (under == null) continue;
-      for (Element e : under.inside()) if (e.wouldBlock(kind) && e.isProp()) {
-        ((Prop) e).exitScene();
+      for (Element e : under.inside()) if (e.isProp()) {
+        final Prop p = (Prop) e;
+        if (p.wouldBlock(kind, x, y, facing)) p.exitScene();
       }
       
       under.setInside(this, true);
@@ -169,11 +179,6 @@ public class Prop extends Element implements TileConstants {
   }
   
   
-  public boolean thin() {
-    return kind().wide() == 0 || kind.high() == 0;
-  }
-  
-  
   
   /**  Rendering, debug and interface methods-
     */
@@ -198,7 +203,7 @@ public class Prop extends Element implements TileConstants {
   
   
   public int renderPriority() {
-    return blockLevel();
+    return blockLevel() + (kind().thin() ? 2 : 0);
   }
 }
 

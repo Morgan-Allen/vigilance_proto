@@ -50,14 +50,13 @@ public class SceneEntry implements TileConstants {
   }
   
   
-  
   public Tile findEntryPoint(int x, int y, Person enters) {
     Tile under = scene.tileAt(x, y);
     int dir = T_INDEX[Rand.index(T_INDEX.length)], size = scene.size();
     
     while (under != null) {
       if (x != Nums.clamp(x, size) || y != Nums.clamp(y, size)) break;
-      if (! under.blocked()) return under;
+      if (! (under.blocked() || under.occupied())) return under;
       x += T_X[dir];
       y += T_Y[dir];
       under = scene.tileAt(x, y);

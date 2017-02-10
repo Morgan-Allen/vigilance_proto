@@ -140,7 +140,7 @@ public abstract class StepType extends EventType {
     
     final float dangerLevel = 0.5f;
     final Base faction = step.plan.agent.base();
-    final PersonType GOONS[] = faction.goonTypes().toArray(Kind.class);
+    final PersonType GOONS[] = faction.goonTypes().toArray(PersonType.class);
     float forceLimit = dangerLevel * 10;
     float forceSum   = 0;
     

@@ -138,12 +138,6 @@ public class Element implements Session.Saveable {
   }
   
   
-  public boolean wouldBlock(Kind other) {
-    if (kind().type() != other.type()) return false;
-    return kind().blockLevel() > 0 == other.blockLevel() > 0;
-  }
-  
-  
   
   /**  Rendering, debug and interface methods-
     */

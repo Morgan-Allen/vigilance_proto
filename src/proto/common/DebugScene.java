@@ -15,6 +15,7 @@ public class DebugScene extends RunGame {
   
   
   public static void main(String args[]) {
+    GameSettings.freeTipoffs = true;
     runGame(new DebugScene(), "saves/debug_scene");
   }
   
@@ -25,8 +26,6 @@ public class DebugScene extends RunGame {
     DefaultGame.initDefaultRegions(world);
     DefaultGame.initDefaultBase   (world);
     DefaultGame.initDefaultCrime  (world);
-    
-    GameSettings.freeTipoffs = true;
     
     Base   crooks   = world.bases().atIndex(1);
     Person boss     = new Person(Crooks.GANGSTER, world, "Crime Boss");
@@ -47,14 +46,23 @@ public class DebugScene extends RunGame {
     PlanStep kidnapStep = StepTypes.KIDNAP.asGoal(victim, plan);
     kidnapStep.setNeed(TypeKidnap.Needs.VENUE        , home, null);
     kidnapStep.setNeed(TypeKidnap.Needs.ALARM_CRACKER, perp, null);
-    
-    Event kidnapEvent = kidnapStep.matchedEvent();
-    world.events.scheduleEvent(kidnapEvent, 8);
+    plan.addStep(kidnapStep);
+    boss.base().plans.assignPlan(plan, 0);
     
     final Base base = world.playerBase();
     final Lead tipoff = new LeadTipoff(base, perp);
     final CaseFile file = base.leads.caseFor(home);
+    Event kidnapEvent = kidnapStep.matchedEvent();
     file.recordRole(kidnapEvent, CaseFile.ROLE_SCENE, tipoff);
+    
+    GameSettings.debugScene = true;
+    
+    //  TODO:
+    //  Sub-scenes are not being rotated in a manner consistent with prop-
+    //  sprites.
+    //  Fog mechanics need to be fixed (try and debug this using the hover-
+    //  mechanics.)
+    //  Doors are no longer traversable, thanks to fog-limitations!
     
     final Base HQ = world.playerBase();
     Task guarding = file.investigationOptions().first();
@@ -73,4 +81,10 @@ public class DebugScene extends RunGame {
     return world;
   }
 }
+
+
+
+
+
+
 

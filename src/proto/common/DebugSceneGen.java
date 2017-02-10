@@ -14,21 +14,11 @@ import java.awt.EventQueue;
 
 public class DebugSceneGen {
   
-  
   public static void main(String args[]) {
     World world = new World();
     Place park = new Place(Facilities.BUSINESS_PARK, 0, world);
     SceneType root = park.kind().sceneType();
     root.generateScene(world, 32, true);
   }
+  
 }
-
-
-
-
-
-
-
-
-
-

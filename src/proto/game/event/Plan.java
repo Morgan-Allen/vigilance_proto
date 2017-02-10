@@ -94,6 +94,16 @@ public class Plan implements Session.Saveable {
   }
   
   
+  public void addStep(PlanStep step) {
+    step.uniqueID = steps.size();
+    steps.addFirst(step);
+    if (step.parent != null) {
+      step.parent.setStepForNeed(step.parentNeedID, step);
+    }
+    if (verbose) I.say("Have added step: "+step.langDescription());
+  }
+  
+  
   public void selectInitialGoal(Base base) {
     if (verbose) I.say("\nSelecting goal-");
     resetObtainedFrom(base);
@@ -169,16 +179,6 @@ public class Plan implements Session.Saveable {
     }
     
     return picked;
-  }
-  
-  
-  private void addStep(PlanStep step) {
-    step.uniqueID = steps.size();
-    steps.addFirst(step);
-    if (step.parent != null) {
-      step.parent.setStepForNeed(step.parentNeedID, step);
-    }
-    if (verbose) I.say("Have added step: "+step.langDescription());
   }
   
   

@@ -15,6 +15,11 @@ public class UrbanScenes {
   final public static PropType
     KIND_WALL = new PropType(
       "Wall", "prop_wall_urban",
+      IMG_DIR+"sprite_wall_thin.png",
+      1, 0, Kind.BLOCK_FULL, true
+    ),
+    KIND_THICK_WALL = new PropType(
+      "Thick Wall", "prop_thick_wall_urban",
       IMG_DIR+"sprite_wall.png",
       1, 1, Kind.BLOCK_FULL, true
     ),
@@ -25,14 +30,14 @@ public class UrbanScenes {
     ),
     KIND_DOOR = new PropType(
       "Door", "prop_door_urban",
-      IMG_DIR+"sprite_door.png",
-      1, 1, Kind.BLOCK_PARTIAL, true,
+      IMG_DIR+"sprite_door_thin.png",
+      1, 0, Kind.BLOCK_PARTIAL, true,
       PlacesCommon.ALARMED, 1
     ),
     KIND_WINDOW = new PropType(
       "Window", "prop_window_urban",
-      IMG_DIR+"sprite_window.png",
-      1, 1, Kind.BLOCK_FULL, false,
+      IMG_DIR+"sprite_window_thin.png",
+      1, 0, Kind.BLOCK_FULL, false,
       PlacesCommon.ALARMED, 1
     ),
     
@@ -79,7 +84,7 @@ public class UrbanScenes {
       KIND_BAR_TAPS,
       KIND_JUKEBOX,
       KIND_PINBALL_MACHINE,
-      KIND_WALL
+      KIND_THICK_WALL
     }
   ;
   
@@ -146,8 +151,7 @@ public class UrbanScenes {
     BATHROOM_PROP_TYPES[] = {
       KIND_BATHROOM_STALL,
       KIND_BASIN,
-      KIND_WALL,
-      KIND_DOOR
+      KIND_THICK_WALL
     }
   ;
   
@@ -158,9 +162,9 @@ public class UrbanScenes {
       { 2, 0, 1, 1, 3, 0, 0, 0 },
       { 0, 0, 1, 1, 3, 0, 0, 0 },
       { 3, 0, 1, 1, 3, 0, 0, 0 },
-      { 2, 0, 0, 0, 4, 0, 0, 0 },
-      { 0, 0, 1, 1, 3, 3, 4, 3 },
-      { 3, 0, 1, 1, 3, 0, 2, 2 },
+      { 2, 0, 0, 0, 0, 0, 0, 0 },
+      { 0, 0, 1, 1, 3, 3, 0, 3 },
+      { 3, 0, 1, 1, 3, 2, 0, 2 },
       { 2, 0, 1, 1, 3, 0, 0, 0 },
       { 0, 0, 0, 0, 3, 0, 0, 0 },
     }
@@ -168,7 +172,7 @@ public class UrbanScenes {
   
   final public static SceneType URBAN_SCENE = new SceneTypeGrid(
     "urban scene", "type_urban_scene",
-    8, 3, true,
+    8, 3,
     KIND_WALL, KIND_DOOR, KIND_WINDOW, KIND_FLOOR,
     numberUnit         (ROOM_MAIN_BAR , WALL_EXTERIOR, 1    ),
     numberOrPercentUnit(ROOM_BATHROOM , WALL_INTERIOR, 20, 1),

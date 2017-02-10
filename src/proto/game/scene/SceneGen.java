@@ -48,17 +48,23 @@ public class SceneGen implements TileConstants {
     boolean valid;
   }
   
+  static class WallPiece extends Coord {
+    int facing;
+    Prop wall;
+    WallPiece(int xp, int yp, int f) { super(xp, yp); facing = f; }
+  }
+  
   static class Wall {
     boolean indoor;
     Room side1, side2;
     int wallTypeDiff;
-    Batch <Coord> points = new Batch();
+    
+    Batch <WallPiece> pieces = new Batch();
   }
   
   static class Room {
     SceneType type;
     Object unit;
-    //Box2D area;
     int ID;
     int minX, minY, wide, high;
     
@@ -123,30 +129,24 @@ public class SceneGen implements TileConstants {
     
     for (Coord c : Visit.grid(x, y, w, h, 1)) {
       if (floorVal != MARK_NONE) markup[c.x][c.y] = floorVal;
-      room.floor  .points.add(new Coord(c));
-      room.ceiling.points.add(new Coord(c));
+      room.floor  .pieces.add(new WallPiece(c.x, c.y, CENTRE));
+      room.ceiling.pieces.add(new WallPiece(c.x, c.y, CENTRE));
     }
     //
     //  Then we iterate over the perimeter, mark as required, and store an
-    //  array of points visited as walls.  (Note some post-processing to ensure
-    //  corners appear in both adjoining walls.)
+    //  array of points visited as walls.
     int wallIndex = 0, tileIndex = 0;
     for (Coord c : Visit.perimeter(x, y, w, h)) {
       if (wallVal != MARK_NONE) markup[c.x][c.y] = wallVal;
       Wall wall = room.walls.atIndex(wallIndex);
       if (wall == null) room.walls.add(wall = new Wall());
-      wall.points.add(new Coord(c));
+      wall.pieces.add(new WallPiece(c.x, c.y, wallIndex * 2));
       
       int maxLength = (wallIndex % 2 == 0) ? (w + 1) : (h + 1);
       if (++tileIndex >= maxLength) {
         tileIndex = 0;
         wallIndex++;
       }
-    }
-    for (int i = 4; i-- > 0;) {
-      Wall wall = room.walls.atIndex(i);
-      Wall nextWall = room.walls.atIndex((i + 1) % 4);
-      wall.points.add(nextWall.points.first());
     }
     //
     //  Finally, we update the frequencies for this room-type:
@@ -163,17 +163,17 @@ public class SceneGen implements TileConstants {
 
   void visitWalls(Room room, int visitMode, Tiling visit) {
     if (visitMode == VISIT_FLOORS || visitMode == VISIT_CEILING) {
-      for (Coord c : room.floor.points) {
+      for (Coord c : room.floor.pieces) {
         visit.tile(room.floor, c, CENTRE);
       }
     }
     else if (visitMode == VISIT_CEILING) {
-      for (Coord c : room.ceiling.points) {
+      for (Coord c : room.ceiling.pieces) {
         visit.tile(room.ceiling, c, CENTRE);
       }
     }
     else for (Wall wall : room.walls) {
-      Series <Coord> points = wall.points;
+      Series <WallPiece> points = wall.pieces;
       final int dir = T_ADJACENT[(room.walls.indexOf(wall) + 3) % 4];
       
       if (visitMode == VISIT_ALL) {

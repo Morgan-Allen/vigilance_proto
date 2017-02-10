@@ -284,9 +284,9 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   }
   
   
-  public boolean addProp(PropType type, int x, int y, int facing) {
+  public Prop addProp(PropType type, int x, int y, int facing) {
     final Prop prop = new Prop(type, world);
-    return prop.enterScene(this, x, y, facing);
+    return prop.enterScene(this, x, y, facing) ? prop : null;
   }
   
   

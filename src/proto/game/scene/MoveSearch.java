@@ -35,11 +35,7 @@ public class MoveSearch extends Search <Tile> {
   
   protected boolean canEnter(Tile spot) {
     if (spot == moves.currentTile()) return true;
-    if (spot.blocked()) return false;
-    
-    final Series <Person> inside = spot.persons();
-    if (inside != null && ! inside.empty()) return false;
-    
+    if (spot.blocked() || spot.occupied()) return false;
     return true;
   }
   

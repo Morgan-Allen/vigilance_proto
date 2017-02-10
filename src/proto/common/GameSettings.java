@@ -24,6 +24,7 @@ public class GameSettings {
     freeLeads       = false || SIMPLE_EVENTS,
     debugScene      = false,
     pauseScene      = false,
+    debugLineSight  = false,
     viewSceneBlocks = false
   ;
   

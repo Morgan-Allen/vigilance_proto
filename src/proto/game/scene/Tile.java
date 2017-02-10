@@ -113,16 +113,10 @@ public class Tile implements Session.Saveable {
   }
   
   
-  
-  public static boolean stopCheck = false;
-  
   void updatePathing() {
     blocked = false;
     opaque  = false;
     
-    boolean report = inside().size() > 1 && stopCheck;
-    if (report) I.say("  Update pathing at "+this);
-
     for (Element e : inside()) if (e.isProp()) {
       final Prop prop = (Prop) e;
       final Tile o = prop.origin();
@@ -133,7 +127,6 @@ public class Tile implements Session.Saveable {
           blocks  = occupies ? prop.blockLevel() : 0,
           opacity = (prop.blockSight() && occupies) ? 1 : 0
         ;
-        if (report) I.say("  Occupied at "+DIR_NAMES[dir]+": "+occupies);
         
         if (dir == CENTRE) {
           if (blocks == Kind.BLOCK_FULL) blocked = true;
@@ -209,6 +202,11 @@ public class Tile implements Session.Saveable {
   
   public boolean opaque() {
     return opaque;
+  }
+  
+  
+  public boolean occupied() {
+    return persons.size() > 0;
   }
   
   
