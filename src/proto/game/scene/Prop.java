@@ -2,6 +2,7 @@
 
 package proto.game.scene;
 import proto.common.*;
+import proto.game.person.Person;
 import proto.game.world.*;
 import proto.view.common.*;
 import proto.view.scene.*;
@@ -176,6 +177,14 @@ public class Prop extends Element implements TileConstants {
     if (w == 0 && relX == 0 && facing == N) return true;
     if (relX >= 0 && relX < w && relY >= 0 && relY < h) return true;
     return false;
+  }
+  
+  
+  
+  /**  Special manipulations-
+    */
+  public Action manipulationFor(Person person, Scene scene) {
+    return kind().manipulationFor(person, scene, this);
   }
   
   

@@ -47,7 +47,7 @@ public class Common {
       "Move", "ability_move",
       SPRITE_DIR+"move.png",
       "Move to the chosen point.",
-      Ability.IS_BASIC | Ability.NO_NEED_LOS, 1,
+      Ability.IS_BASIC | Ability.NO_NEED_LOS | Ability.NO_NEED_FOG, 1,
       Ability.NO_HARM, Ability.MINOR_POWER
     ) {
       
@@ -188,10 +188,6 @@ public class Common {
   };
   
 }
-
-
-
-
 
 
 

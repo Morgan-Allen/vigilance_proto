@@ -1,6 +1,7 @@
 
 
 package proto.game.scene;
+import proto.game.person.*;
 import proto.common.*;
 
 
@@ -27,7 +28,20 @@ public class PropType extends Kind {
   }
   
   
+  /**  Special pathing/opacity methods-
+    */
   public boolean thin() {
     return wide() == 0 || high() == 0;
   }
+  
+  
+  /**  Custom action support-
+    */
+  public Action manipulationFor(Person p, Scene s, Prop ofType) {
+    return null;
+  }
 }
+
+
+
+

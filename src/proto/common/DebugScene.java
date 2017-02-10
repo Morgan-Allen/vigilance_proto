@@ -57,9 +57,6 @@ public class DebugScene extends RunGame {
     
     GameSettings.debugScene = true;
     
-    //  TODO:
-    //  Doors are no longer traversable, thanks to fog-limitations!
-    
     final Base HQ = world.playerBase();
     Task guarding = file.investigationOptions().first();
     int ID = 0;

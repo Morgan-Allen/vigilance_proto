@@ -13,14 +13,6 @@ import static proto.content.places.UrbanScenes.*;
 public class DebugSceneWithLayout extends RunGame {
   
   
-  final public static PropType
-    KIND_THIN_WALL = new PropType(
-      "Wall", "prop_wall_thin",
-      "media assets/scene layout/common/sprite_wall_thin.png",
-      1, 0, Kind.BLOCK_FULL, true
-    );
-  
-  
   final public static SceneType FIXED_TEST_SCENE = new SceneTypeFixed(
     "fixed test scene", "type_urban_scene_fixed",
     KIND_FLOOR,
@@ -62,10 +54,11 @@ public class DebugSceneWithLayout extends RunGame {
     SceneType sceneType = FIXED_TEST_SCENE;
     final Scene mission = new Scene(world, 12);
     mission.setupScene(true);
-    sceneType.applyToScene(mission, 2, 2, TileConstants.S, 8, true);
+    sceneType.applyToScene(mission, 2, 2, TileConstants.N, 8, true);
     
     for (int y = mission.size() - 1; y-- > 1;) {
-      mission.addProp(KIND_THIN_WALL, 4, y, TileConstants.E);
+      PropType kind = y == 6 ? KIND_DOOR : KIND_WALL;
+      mission.addProp(kind, 4, y, TileConstants.E);
     }
     
     /*
@@ -80,12 +73,11 @@ public class DebugSceneWithLayout extends RunGame {
       mission.addProp(KIND_JUKEBOX  , 1 + (x * 2), 3, dir);
     }
     //*/
-    
     Tile.printWallsMask(mission);
     
     GameSettings.debugScene = true;
     GameSettings.viewSceneBlocks = true;
-    GameSettings.debugLineSight = true;
+    //GameSettings.debugLineSight = true;
     //GameSettings.pauseScene = true;
     //
     //  Then introduce the agents themselves-
@@ -96,6 +88,7 @@ public class DebugSceneWithLayout extends RunGame {
       p.gear.equipItem(Gadgets.TEAR_GAS, PersonGear.SLOT_ITEM_1);
       p.addAssignment(mission);
       mission.enterScene(p, 0, across++);
+      break;
     }
     
     //

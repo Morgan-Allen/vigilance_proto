@@ -2,8 +2,9 @@
 
 package proto.game.world;
 import proto.common.*;
+import proto.game.person.*;
 import proto.game.event.*;
-import proto.game.scene.Prop;
+import proto.game.scene.*;
 import proto.util.*;
 
 import java.awt.Image;
@@ -135,6 +136,11 @@ public class Element implements Session.Saveable {
   
   public boolean blockSight() {
     return kind.blockSight();
+  }
+  
+  
+  public Action manipulationFor(Person person, Scene scene) {
+    return null;
   }
   
   
