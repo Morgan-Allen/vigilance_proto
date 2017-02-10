@@ -502,7 +502,7 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
       float dist = distance(t, point);
       if (dist >= radius) continue;
       byte val = (byte) (100 * Nums.clamp(1.5f - (dist / radius), 0, 1));
-      if (checkSight) val *= degreeOfSight(point, t, looks);
+      if (checkSight) val *= degreeOfSight(point, t, looks, false);
       fog[t.x][t.y] = (byte) Nums.max(val, fog[t.x][t.y]);
     }
   }
@@ -519,17 +519,28 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   }
   
   
-  public float degreeOfSight(Tile orig, Tile dest, Person p) {
+  public float degreeOfSight(Tile orig, Tile dest, Person p, boolean report) {
     float sight = 1f;
     
     Box2D area = new Box2D(orig.x, orig.y, 0, 0);
-    area.include(dest.x, dest.y, 0).expandBy(1);
-    Vec2D o = new Vec2D(orig.x, orig.y), l = new Vec2D(dest.x, dest.y).sub(o);
+    area.include(dest.x, dest.y, 0);
+    area.incHigh(1);
+    area.incWide(1);
+    Vec2D o = new Vec2D(orig.x + 0.5f, orig.y + 0.5f);
+    Vec2D l = new Vec2D(dest.x + 0.5f, dest.y + 0.5f).sub(o);
     
+    if (report) {
+      I.say("Checking line of sight between "+orig+" and "+dest);
+      I.say("  Origin: "+o);
+      I.say("  Vector: "+l);
+    }
     for (Coord c : Visit.grid(area)) {
-      if (l.lineDist(c.x - o.x, c.y - o.y) > 0.5f) continue;
+      float lineDist = l.lineDist(c.x + 0.5f - o.x, c.y + 0.5f - o.y);
+      if (report) I.say("    "+c+": "+lineDist+" away");
+      if (lineDist > 0.5f) continue;
       final Tile t = tiles[c.x][c.y];
-      sight *= t.blocksSight(o, l) ? 0 : 1;
+      sight *= t.blocksSight(o, l, report) ? 0 : 1;
+      if (report) I.say("    "+c+" LoS: "+sight);
     }
     
     return sight;

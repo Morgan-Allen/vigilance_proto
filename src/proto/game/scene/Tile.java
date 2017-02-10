@@ -156,19 +156,34 @@ public class Tile implements Session.Saveable {
   }
   
   
-  boolean blocksSight(Vec2D origin, Vec2D line) {
+  boolean blocksSight(Vec2D origin, Vec2D line, boolean report) {
     //
     //  TODO:  North/south/east/west values aren't being handled consistently
     //         here.  Address this in the TileConstants class and follow
     //         through to all affected code.
+    //  
+    //  TODO:  Move this into the Scene class?  Or move the LoS methods in
+    //  here?
     float nortX = solveX(origin, line, y + 0);
-    if (nortX >= 0 && (opaque || opacityVal(W) > 0)) return true;
+    if (nortX >= 0 && (opaque || opacityVal(W) > 0)) {
+      if (report) I.say("    Intersects Y="+(y + 0)+" at "+nortX);
+      return true;
+    }
     float soutX = solveX(origin, line, y + 1);
-    if (soutX >= 0 && (opaque || opacityVal(E) > 0)) return true;
+    if (soutX >= 0 && (opaque || opacityVal(E) > 0)) {
+      if (report) I.say("    Intersects Y="+(y + 1)+" at "+soutX);
+      return true;
+    }
     float eastY = solveY(origin, line, x + 0);
-    if (eastY >= 0 && (opaque || opacityVal(S) > 0)) return true;
+    if (eastY >= 0 && (opaque || opacityVal(S) > 0)) {
+      if (report) I.say("    Intersects X="+(x + 0)+" at "+eastY);
+      return true;
+    }
     float westY = solveY(origin, line, x + 1);
-    if (westY >= 0 && (opaque || opacityVal(N) > 0)) return true;
+    if (westY >= 0 && (opaque || opacityVal(N) > 0)) {
+      if (report) I.say("    Intersects X="+(x + 1)+" at "+westY);
+      return true;
+    }
     return false;
   }
   
@@ -177,7 +192,9 @@ public class Tile implements Session.Saveable {
     if (! checkRange(o.y, l.y, atY)) return Float.NEGATIVE_INFINITY;
     atY -= o.y;
     atY /= l.y;
-    return o.x + (l.x * atY);
+    float solveX = o.x + (l.x * atY);
+    if (solveX < x || solveX > x + 1) return Float.NEGATIVE_INFINITY;
+    return solveX;
   }
   
   
@@ -185,7 +202,9 @@ public class Tile implements Session.Saveable {
     if (! checkRange(o.x, l.x, atX)) return Float.NEGATIVE_INFINITY;
     atX -= o.x;
     atX /= l.x;
-    return o.y + (l.y * atX);
+    float solveY = o.y + (l.y * atX);
+    if (solveY < y || solveY > y + 1) return Float.NEGATIVE_INFINITY;
+    return solveY;
   }
   
   

@@ -27,7 +27,7 @@ public class SceneView extends UINode {
   
   final ActionsView actionsView;
   
-  Tile zoomTile;
+  Tile zoomTile, hoverTile;
   int zoomX, zoomY;
   Person activePerson;
   
@@ -81,6 +81,7 @@ public class SceneView extends UINode {
     final Person old = activePerson;
     this.activePerson = acting;
     if (acting != old || ! keepActiveAbility) actionsView.clearSelection();
+    I.talkAbout = activePerson;
   }
   
   
@@ -95,6 +96,21 @@ public class SceneView extends UINode {
     fx.duration = (int) (numSeconds * RunGame.FRAME_RATE);
     fx.framesLeft = fx.duration;
     tempFX.add(fx);
+  }
+  
+  
+  public Person selectedPerson() {
+    return activePerson;
+  }
+  
+  
+  public Tile zoomTile() {
+    return zoomTile;
+  }
+  
+  
+  public Tile hoveredTile() {
+    return hoverTile;
   }
   
   
@@ -238,16 +254,17 @@ public class SceneView extends UINode {
     int HT = TILE_SIZE / 2;
     int hoverX = (surface.mouseX() + zoomX + HT - vx) / TILE_SIZE;
     int hoverY = (surface.mouseY() + zoomY + HT - vy) / TILE_SIZE;
-    Tile hoverT = hasFocus ? scene.tileAt(hoverX, hoverY) : null;
+    hoverTile = hasFocus ? scene.tileAt(hoverX, hoverY) : null;
     
-    if (hoverT != null) {
-      if (! hoverT.blocked()) {
-        renderAt(hoverT.x, hoverT.y, 1, 1, hoverBox, 0, null, g);
+    if (hoverTile != null) {
+      if (! hoverTile.blocked()) {
+        renderAt(hoverTile.x, hoverTile.y, 1, 1, hoverBox, 0, null, g);
       }
-      Object hovered = topObjectAt(hoverT);
+      
+      Object hovered = topObjectAt(hoverTile);
       boolean canDoAction = false;
       
-      if (actionsView.previewActionDelivery(hovered, hoverT, surface, g)) {
+      if (actionsView.previewActionDelivery(hovered, hoverTile, surface, g)) {
         canDoAction = true;
       }
       
@@ -260,11 +277,21 @@ public class SceneView extends UINode {
           Person pickP = null;
           if (hovered instanceof Person) pickP = (Person) hovered;
           if (pickP != null) setSelection(pickP, true);
-          else setZoomPoint(hoverT);
+          else setZoomPoint(hoverTile);
         }
       }
     }
-    
+    //
+    //  Finally, some supplementary debugging-related checks:
+    if (
+      GameSettings.debugLineSight && I.used60Frames &&
+      zoomTile != null && zoomTile == hoverTile &&
+      activePerson != null && zoomTile != activePerson.currentTile()
+    ) {
+      Tile.printWallsMask(scene);
+      Tile orig = activePerson.currentTile();
+      scene.degreeOfSight(orig, zoomTile, activePerson, true);
+    }
     return true;
   }
   

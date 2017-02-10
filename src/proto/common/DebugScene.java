@@ -58,8 +58,6 @@ public class DebugScene extends RunGame {
     GameSettings.debugScene = true;
     
     //  TODO:
-    //  Fog mechanics need to be fixed (try and debug this using the hover-
-    //  mechanics.)
     //  Doors are no longer traversable, thanks to fog-limitations!
     
     final Base HQ = world.playerBase();

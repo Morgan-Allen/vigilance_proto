@@ -85,6 +85,7 @@ public class DebugSceneWithLayout extends RunGame {
     
     GameSettings.debugScene = true;
     GameSettings.viewSceneBlocks = true;
+    GameSettings.debugLineSight = true;
     //GameSettings.pauseScene = true;
     //
     //  Then introduce the agents themselves-
