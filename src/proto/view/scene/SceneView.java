@@ -160,8 +160,12 @@ public class SceneView extends UINode {
       area.expandBy(Nums.ceil(sightRange));
       
       for (Coord c : Visit.grid(area)) {
+        Tile atG = scene.tileAt(c.x, c.y);
+        float fogG = atG == null ? 0 : scene.fogAt(atG, Person.Side.VILLAINS);
+        if (fogG <= 0) continue;
+        
         float dist = exactPos.distance(c.x + 0.5f, c.y + 0.5f, 0) - 0.5f;
-        float glare = Nums.clamp(dist / sightRange, 0, 1);
+        float glare = 1 - Nums.clamp(dist / sightRange, 0, 1);
         if (glare <= 0) continue;
         Color warns = ENEMY[Nums.clamp((int) (glare * 10), 10)];
         renderAt(c.x, c.y, 1, 1, null, 0, warns, g);

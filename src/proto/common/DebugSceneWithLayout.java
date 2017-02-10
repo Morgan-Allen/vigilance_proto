@@ -25,7 +25,7 @@ public class DebugSceneWithLayout extends RunGame {
     "fixed test scene", "type_urban_scene_fixed",
     KIND_FLOOR,
     new PropType[] {
-      KIND_WALL      ,
+      KIND_THICK_WALL,
       KIND_DOOR      ,
       KIND_WINDOW    ,
       KIND_POOL_TABLE,
@@ -34,28 +34,15 @@ public class DebugSceneWithLayout extends RunGame {
       KIND_JUKEBOX   ,
     },
     8, 8, new byte[][] {
-      { 0, 0, 0, 0, 0, 0, 0, 0 },
-      { 0, 0, 0, 0, 0, 0, 0, 0 },
-      { 0, 0, 0, 0, 0, 0, 0, 0 },
-      { 0, 0, 0, 0, 0, 0, 0, 0 },
-      { 0, 0, 0, 0, 0, 0, 0, 0 },
-      { 0, 0, 0, 0, 0, 0, 0, 0 },
-      { 0, 0, 0, 0, 0, 0, 0, 0 },
-      { 0, 0, 0, 0, 0, 0, 0, 0 },
-    }
-    
-    /*
-    8, 8, new byte[][] {
-      { 0, 0, 0, 0, 0, 0, 7, 0 },
-      { 0, 0, 0, 0, 0, 0, 0, 6 },
-      { 4, 4, 4, 0, 0, 0, 5, 5 },
-      { 4, 4, 4, 0, 0, 0, 6, 0 },
+      { 0, 0, 0, 0, 0, 0, 1, 0 },
+      { 0, 0, 0, 0, 0, 0, 7, 6 },
+      { 4, 4, 4, 0, 0, 0, 0, 0 },
+      { 4, 4, 4, 0, 0, 0, 0, 0 },
       { 0, 0, 0, 0, 0, 0, 6, 0 },
-      { 7, 0, 6, 6, 0, 5, 5, 0 },
-      { 0, 0, 5, 5, 0, 6, 6, 0 },
+      { 1, 0, 6, 6, 0, 5, 5, 0 },
+      { 7, 0, 5, 5, 0, 6, 6, 0 },
       { 0, 0, 6, 6, 0, 0, 0, 0 },
     }
-    //*/
   );
   
   
@@ -73,15 +60,19 @@ public class DebugSceneWithLayout extends RunGame {
     //
     //  Generate the scene-
     SceneType sceneType = FIXED_TEST_SCENE;
-    Scene mission = sceneType.generateScene(world, 12, true);
+    final Scene mission = new Scene(world, 12);
+    mission.setupScene(true);
+    sceneType.applyToScene(mission, 2, 2, TileConstants.S, 8, true);
     
-    Tile.stopCheck = true;
+    for (int y = mission.size() - 1; y-- > 1;) {
+      mission.addProp(KIND_THIN_WALL, 4, y, TileConstants.E);
+    }
     
     /*
     mission.addProp(KIND_POOL_TABLE, 0, 0, TileConstants.N);
-    mission.addProp(KIND_POOL_TABLE, 8, 0, TileConstants.W);
+    mission.addProp(KIND_POOL_TABLE, 8, 0, TileConstants.E);
     mission.addProp(KIND_POOL_TABLE, 8, 8, TileConstants.S);
-    mission.addProp(KIND_POOL_TABLE, 0, 8, TileConstants.E);
+    mission.addProp(KIND_POOL_TABLE, 0, 8, TileConstants.W);
     
     for (int x = 4; x-- > 0;) {
       int dir = TileConstants.T_ADJACENT[x];
@@ -90,15 +81,10 @@ public class DebugSceneWithLayout extends RunGame {
     }
     //*/
     
-    //*
-    for (int x = mission.size(); x-- > 0;) {
-      mission.addProp(KIND_THIN_WALL, x, 3, TileConstants.N);
-    }
-    //*/
-    
     Tile.printWallsMask(mission);
     
     GameSettings.debugScene = true;
+    GameSettings.viewSceneBlocks = true;
     //GameSettings.pauseScene = true;
     //
     //  Then introduce the agents themselves-
@@ -108,11 +94,8 @@ public class DebugSceneWithLayout extends RunGame {
     for (Person p : active) {
       p.gear.equipItem(Gadgets.TEAR_GAS, PersonGear.SLOT_ITEM_1);
       p.addAssignment(mission);
-      mission.enterScene(p, across++, 0);
+      mission.enterScene(p, 0, across++);
     }
-    
-    //
-    //  TODO:  Then introduce some random goons?
     
     //
     //  Then enter and return-

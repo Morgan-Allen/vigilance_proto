@@ -83,20 +83,21 @@ public class SceneTypeFixed extends SceneType {
   
   
   public void applyToScene(
-    Scene scene, int offX, int offY, int facing, int resolution, boolean forTesting
+    Scene scene, int offX, int offY, int facing, int resolution,
+    boolean forTesting
   ) {
     offX -= (wide - resolution) / 2;
     offY -= (high - resolution) / 2;
-    
-    Mat2D rot = new Mat2D().setIdentity().rotateAndRound(facing * 45);
-    if (facing == E) { offY += high - 1; }
-    if (facing == W) { offX += wide - 1; }
+    Mat2D rot = new Mat2D().setIdentity().rotateAndRound(facing * -45);
+    if (facing == E) { offX += high - 1; }
+    if (facing == W) { offY += wide - 1; }
     if (facing == S) { offX += wide - 1; offY += high - 1; }
     Vec2D temp = new Vec2D();
     
     for (Coord c : Visit.grid(0, 0, wide, high, 1)) {
       rot.transform(temp.set(c.x, c.y));
       int sx = (int) (temp.x + offX), sy = (int) (temp.y + offY);
+      if (scene.tileAt(sx, sy) == null) continue;
       
       scene.addProp(floors, sx, sy, facing);
       PropType type = propType(c.x, c.y);

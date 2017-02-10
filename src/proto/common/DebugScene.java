@@ -58,8 +58,6 @@ public class DebugScene extends RunGame {
     GameSettings.debugScene = true;
     
     //  TODO:
-    //  Sub-scenes are not being rotated in a manner consistent with prop-
-    //  sprites.
     //  Fog mechanics need to be fixed (try and debug this using the hover-
     //  mechanics.)
     //  Doors are no longer traversable, thanks to fog-limitations!

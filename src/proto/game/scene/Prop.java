@@ -59,7 +59,7 @@ public class Prop extends Element implements TileConstants {
   /**  Placement, removal and occupation methods-
     */
   private static Coord rotate(Coord c, int facing, boolean back) {
-    if (back) facing = (8 - facing) % 8;
+    if (! back) facing = (8 - facing) % 8;
     int x = 0, y = 0;
     switch (facing) {
       case(CENTRE):
@@ -185,18 +185,18 @@ public class Prop extends Element implements TileConstants {
   public void renderTo(Scene scene, SceneView view, Surface s, Graphics2D g) {
     float midX = origin.x, midY = origin.y;
     float w = Nums.max(1, kind().wide()), h = Nums.max(1, kind().high());
-    
-    if (facing == W) { midX += 1 - h; midY += w    ; }
-    if (facing == E) { midX += h    ; midY += 1 - w; }
-    if (facing == S) { midX += 1    ; midY += 1    ; }
+    if (facing == E) { midX += 1; midY += 0; }
+    if (facing == W) { midX += 0; midY += 1; }
+    if (facing == S) { midX += 1; midY += 1; }
     
     view.renderAt(midX, midY, w, h, kind().sprite(), facing * 45, null, g);
     
     if (blockLevel() > 0 && GameSettings.viewSceneBlocks) {
       for (Tile t : tilesUnder(kind(), scene, origin.x, origin.y, facing, 0)) {
         if (t == null) continue;
+        float radius = Nums.min(Nums.max(w, h), 3) / 4f;
         Color c = t == origin ? Color.RED : Color.YELLOW;
-        view.renderAt(t.x, t.y, 0.5f, 0.5f, null, 0, c, g);
+        view.renderAt(t.x, t.y, radius, radius, null, 0, c, g);
       }
     }
   }
@@ -206,10 +206,4 @@ public class Prop extends Element implements TileConstants {
     return blockLevel() + (kind().thin() ? 2 : 0);
   }
 }
-
-
-
-
-
-
 
