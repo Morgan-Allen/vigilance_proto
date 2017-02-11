@@ -136,7 +136,6 @@ public class Tile implements Session.Saveable {
           setWallMask(dir, (byte) Nums.max(blocks , wallMaskVal(dir)));
           setOpacity (dir, (byte) Nums.max(opacity, opacityVal (dir)));
         }
-        //*/
       }
     }
   }
@@ -156,7 +155,21 @@ public class Tile implements Session.Saveable {
   }
   
   
-  boolean blocksSight(Vec2D origin, Vec2D line, boolean report) {
+  public int coverLevel(int dir) {
+    int block = wallMaskVal(dir), opaque = opacityVal(dir);
+    if (opaque == 0) block--;
+    return block;
+  }
+  
+  
+  public int coverLevel(Vec2D origin, Vec2D line, boolean report) {
+    //  TODO:  This is a basically similar problem to determining sight-
+    //  blockage, I think...
+    return -1;
+  }
+  
+  
+  public boolean blocksSight(Vec2D origin, Vec2D line, boolean report) {
     //
     //  TODO:  North/south/east/west values aren't being handled consistently
     //         here.  Address this in the TileConstants class and follow
@@ -230,7 +243,7 @@ public class Tile implements Session.Saveable {
   
   
   
-  /**  Modifying state-
+  /**  Modifying occupancy-
     */
   public void setInside(Element p, boolean is) {
     if (is) inside.include(p);

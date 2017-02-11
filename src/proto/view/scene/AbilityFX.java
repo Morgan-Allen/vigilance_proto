@@ -74,8 +74,8 @@ public class AbilityFX {
     pX += target.x * progress;
     pY += target.y * progress;
     
-    //  TODO:  Include rotation here?
-    s.view().renderAt(pX, pY, 0.5f, 0.5f, sprite, 0, null, g);
+    //  TODO:  Include rotation here!
+    s.view().renderSprite(pX, pY, 0.5f, 0.5f, 0, sprite, g);
   }
   
   
@@ -105,7 +105,7 @@ public class AbilityFX {
   ) {
     Tile under = s.tileUnder(at);
     float px = under.x - radius, py = under.y - radius, r2 = radius * 2;
-    s.view().renderAt(px, py, r2, r2, sprite, 0, null, g);
+    s.view().renderSprite(px, py, r2, r2, 0, sprite, g);
   }
   
   

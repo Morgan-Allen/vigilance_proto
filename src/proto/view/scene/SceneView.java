@@ -15,7 +15,7 @@ import java.awt.geom.AffineTransform;
 
 
 
-public class SceneView extends UINode {
+public class SceneView extends UINode implements TileConstants {
   
   
   /**  Data fields, construction and save/load methods-
@@ -23,7 +23,12 @@ public class SceneView extends UINode {
   final static int
     TILE_SIZE = 64;
   final static String
-    IMG_DIR = "media assets/scene view/";
+    IMG_DIR = "media assets/action view/";
+  
+  final static Image
+    COVER_PARTIAL = Kind.loadImage(IMG_DIR+"cover_partial.png"),
+    COVER_FULL    = Kind.loadImage(IMG_DIR+"cover_full.png"   );
+  
   
   final ActionsView actionsView;
   
@@ -184,7 +189,7 @@ public class SceneView extends UINode {
         float glare = 1 - Nums.clamp(dist / sightRange, 0, 1);
         if (glare <= 0) continue;
         Color warns = ENEMY[Nums.clamp((int) (glare * 10), 10)];
-        renderAt(c.x, c.y, 1, 1, null, 0, warns, g);
+        renderColor(c.x, c.y, 1, 1, warns, g);
       }
     }
     //
@@ -212,14 +217,15 @@ public class SceneView extends UINode {
       float healthLevel = p.health.healthLevel();
       float stunLevel   = 1 - p.health.harmToStunRatio();
       Color pale = PALES[(int) (stunLevel * 9.9f)];
-      
-      renderAt(pos.x, pos.y + 0.9f, 1, 0.1f, null, 0, Color.BLACK, g);
-      renderAt(pos.x, pos.y + 0.9f, 1, 0.1f, null, 0, pale, g);
-      renderAt(pos.x, pos.y + 0.9f, healthLevel, 0.1f, null, 0, teamColor, g);
+      //
+      //  Including their health-bars:
+      renderColor(pos.x, pos.y + 0.9f, 1, 0.1f, Color.BLACK, g);
+      renderColor(pos.x, pos.y + 0.9f, 1, 0.1f, pale, g);
+      renderColor(pos.x, pos.y + 0.9f, healthLevel, 0.1f, teamColor, g);
       renderString(pos.x, pos.y + 0.5f, p.name(), Color.WHITE, g);
       
       if (p == activePerson) {
-        renderAt(pos.x, pos.y, 1, 1, hoverBox, 0, null, g);
+        renderSprite(pos.x, pos.y, 1, 1, 0, hoverBox, g);
       }
     }
     //
@@ -229,7 +235,7 @@ public class SceneView extends UINode {
     }
     for (TempFX fx : tempFX) {
       float px = fx.pos.x - fx.size, py = fx.pos.y - fx.size, s2 = fx.size * 2;
-      renderAt(px, py, s2, s2, fx.sprite, 0, null, g);
+      renderSprite(px, py, s2, s2, 0, fx.sprite, g);
       fx.framesLeft--;
       if (fx.framesLeft <= 0) tempFX.remove(fx);
     }
@@ -240,7 +246,7 @@ public class SceneView extends UINode {
       float fogAlpha = 1f - scene.fogAt(t, Person.Side.HEROES);
       if (GameSettings.debugScene) fogAlpha /= 3;
       Color black = SCALE[Nums.clamp((int) (fogAlpha * 10), 10)];
-      renderAt(c.x, c.y, 1, 1, null, 0, black, g);
+      renderColor(c.x, c.y, 1, 1, black, g);
     }
     //
     //  If complete, display a summary of the results!
@@ -258,7 +264,10 @@ public class SceneView extends UINode {
     
     if (hoverTile != null) {
       if (! hoverTile.blocked()) {
-        renderAt(hoverTile.x, hoverTile.y, 1, 1, hoverBox, 0, null, g);
+        //renderSprite(hoverTile.x, hoverTile.y, 1, 1, hoverBox, 0, g);
+        
+        this.renderColor(hoverTile.x, hoverTile.y, 1, 1, Color.GREEN, g);
+        renderCoverIndicators(hoverTile, surface, g);
       }
       
       Object hovered = topObjectAt(hoverTile);
@@ -296,6 +305,24 @@ public class SceneView extends UINode {
   }
   
   
+  void renderCoverIndicators(Tile hovered, Surface surface, Graphics2D g) {
+    for (int dir : T_ADJACENT) {
+      Image img = null;
+      int coverLevel = hovered.coverLevel(dir);
+      if (coverLevel == Kind.BLOCK_PARTIAL) img = COVER_PARTIAL;
+      if (coverLevel == Kind.BLOCK_FULL   ) img = COVER_FULL   ;
+      if (img == null) continue;
+      
+      float scale = 0.66f;
+      renderSprite(
+        hovered.x + (T_X[dir] * scale * 1),
+        hovered.y + (T_Y[dir] * scale * 1),
+        scale, scale, (dir + 2) * 45, img, g
+      );
+    }
+  }
+  
+  
   public void renderString(
     float px, float py, String s, Color c, Graphics2D g
   ) {
@@ -307,31 +334,49 @@ public class SceneView extends UINode {
   }
   
   
-  public void renderAt(
-    float px, float py, float w, float h,
-    Image sprite, float angle, Color fill, Graphics2D g
+  public void renderSprite(
+    float px, float py, float w, float h, float angle,
+    Image sprite, Graphics2D g
+  ) {
+    //
+    //  Firstly, determine the centre of the tile in the visual field:
+    int x = vx + (int) (px * TILE_SIZE);
+    int y = vy + (int) (py * TILE_SIZE);
+    //
+    //  You want to centre the image on the centre of the tile, and rotate
+    //  around that point.  However, the default image-rendering routines in
+    //  java will only render from the image's top-left corner and rotate from
+    //  there, so we have to offset the image to compensate.
+    final float
+      offAngle = Nums.atan2(-w, -h) - Nums.toRadians(angle),
+      offDist  = Nums.sqrt((w * w) + (h * h)) / 2,
+      offX     = Nums.sin(offAngle) * offDist,
+      offY     = Nums.cos(offAngle) * offDist;
+    x += offX * TILE_SIZE;
+    y += offY * TILE_SIZE;
+    //
+    //  We can then adjust the scale of the image to stretch out the sprite
+    //  correctly, apply the needed transformations, and render:
+    w *= TILE_SIZE * 1f / sprite.getWidth (null);
+    h *= TILE_SIZE * 1f / sprite.getHeight(null);
+    AffineTransform t = new AffineTransform();
+    t.translate(x - zoomX, y - zoomY);
+    t.rotate(Nums.toRadians(angle));
+    t.scale(w, h);
+    g.drawImage(sprite, t, null);
+  }
+  
+  
+  public void renderColor(
+    float px, float py, float w, float h, Color fill, Graphics2D g
   ) {
     int x, y;
-    x = vx + (int) ((px - 0.5f) * TILE_SIZE);
-    y = vy + (int) ((py - 0.5f) * TILE_SIZE);
+    x = vx + (int) ((px - (w / 2)) * TILE_SIZE);
+    y = vy + (int) ((py - (h / 2)) * TILE_SIZE);
     w *= TILE_SIZE;
     h *= TILE_SIZE;
-    
-    if (sprite != null) {
-      angle = Nums.toRadians(angle);
-      w /= sprite.getWidth (null);
-      h /= sprite.getHeight(null);
-      AffineTransform t = AffineTransform.getTranslateInstance(
-        x - zoomX, y - zoomY
-      );
-      t.rotate(angle);
-      t.scale(w, h);
-      g.drawImage(sprite, t, null);
-    }
-    if (fill != null) {
-      g.setColor(fill);
-      g.fillRect(x - zoomX, y - zoomY, (int) w, (int) h);
-    }
+    g.setColor(fill);
+    g.fillRect(x - zoomX, y - zoomY, (int) w, (int) h);
   }
   
   

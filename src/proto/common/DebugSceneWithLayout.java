@@ -51,17 +51,18 @@ public class DebugSceneWithLayout extends RunGame {
     DefaultGame.initDefaultCrime  (world);
     //
     //  Generate the scene-
-    SceneType sceneType = FIXED_TEST_SCENE;
     final Scene mission = new Scene(world, 12);
     mission.setupScene(true);
-    sceneType.applyToScene(mission, 2, 2, TileConstants.N, 8, true);
     
+    /*
+    SceneType sceneType = FIXED_TEST_SCENE;
+    sceneType.applyToScene(mission, 2, 2, TileConstants.E, 8, true);
     for (int y = mission.size() - 1; y-- > 1;) {
       PropType kind = y == 6 ? KIND_DOOR : KIND_WALL;
       mission.addProp(kind, 4, y, TileConstants.E);
     }
-    
-    /*
+    //*/
+    //*
     mission.addProp(KIND_POOL_TABLE, 0, 0, TileConstants.N);
     mission.addProp(KIND_POOL_TABLE, 8, 0, TileConstants.E);
     mission.addProp(KIND_POOL_TABLE, 8, 8, TileConstants.S);
@@ -69,8 +70,8 @@ public class DebugSceneWithLayout extends RunGame {
     
     for (int x = 4; x-- > 0;) {
       int dir = TileConstants.T_ADJACENT[x];
-      mission.addProp(KIND_THIN_WALL, 1 + (x * 2), 4, dir);
-      mission.addProp(KIND_JUKEBOX  , 1 + (x * 2), 3, dir);
+      mission.addProp(KIND_WALL   , 1 + (x * 2), 4, dir);
+      mission.addProp(KIND_JUKEBOX, 1 + (x * 2), 3, dir);
     }
     //*/
     Tile.printWallsMask(mission);

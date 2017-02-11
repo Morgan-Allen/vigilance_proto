@@ -194,18 +194,22 @@ public class Prop extends Element implements TileConstants {
   public void renderTo(Scene scene, SceneView view, Surface s, Graphics2D g) {
     float midX = origin.x, midY = origin.y;
     float w = Nums.max(1, kind().wide()), h = Nums.max(1, kind().high());
-    if (facing == E) { midX += 1; midY += 0; }
-    if (facing == W) { midX += 0; midY += 1; }
-    if (facing == S) { midX += 1; midY += 1; }
     
-    view.renderAt(midX, midY, w, h, kind().sprite(), facing * 45, null, g);
+    //  TODO:  Have a centre() method which returns this coordinate!
+    float hw = (w - 1) / 2f, hh = (h - 1) / 2f;
+    if (facing == N) { midX += hw; midY += hh; }
+    if (facing == E) { midX -= hh; midY += hw; }
+    if (facing == S) { midX -= hw; midY -= hh; }
+    if (facing == W) { midX += hh; midY -= hw; }
+    
+    view.renderSprite(midX, midY, w, h, facing * 45, kind().sprite(), g);
     
     if (blockLevel() > 0 && GameSettings.viewSceneBlocks) {
       for (Tile t : tilesUnder(kind(), scene, origin.x, origin.y, facing, 0)) {
         if (t == null) continue;
         float radius = Nums.min(Nums.max(w, h), 3) / 4f;
         Color c = t == origin ? Color.RED : Color.YELLOW;
-        view.renderAt(t.x, t.y, radius, radius, null, 0, c, g);
+        view.renderColor(t.x, t.y, radius, radius, c, g);
       }
     }
   }
@@ -215,4 +219,7 @@ public class Prop extends Element implements TileConstants {
     return blockLevel() + (kind().thin() ? 2 : 0);
   }
 }
+
+
+
 

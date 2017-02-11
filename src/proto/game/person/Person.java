@@ -366,7 +366,7 @@ public class Person extends Element {
   
   public void renderTo(Scene scene, SceneView view, Surface s, Graphics2D g) {
     Vec3D pos = exactPosition();
-    view.renderAt(pos.x, pos.y, 1, 1, kind().sprite(), 0, null, g);
+    view.renderSprite(pos.x + 0, pos.y + 0, 1, 1, 0, kind().sprite(), g);
   }
 }
 
