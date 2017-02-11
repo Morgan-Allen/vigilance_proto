@@ -54,7 +54,7 @@ public class DebugSceneWithLayout extends RunGame {
     final Scene mission = new Scene(world, 12);
     mission.setupScene(true);
     
-    /*
+    //*
     SceneType sceneType = FIXED_TEST_SCENE;
     sceneType.applyToScene(mission, 2, 2, TileConstants.E, 8, true);
     for (int y = mission.size() - 1; y-- > 1;) {
@@ -62,7 +62,7 @@ public class DebugSceneWithLayout extends RunGame {
       mission.addProp(kind, 4, y, TileConstants.E);
     }
     //*/
-    //*
+    /*
     mission.addProp(KIND_POOL_TABLE, 0, 0, TileConstants.N);
     mission.addProp(KIND_POOL_TABLE, 8, 0, TileConstants.E);
     mission.addProp(KIND_POOL_TABLE, 8, 8, TileConstants.S);

@@ -27,7 +27,8 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     STATE_ABSENT =  4;
   
   final World world;
-  final public SceneEntry entry = new SceneEntry(this);
+  final public SceneEntry  entry  = new SceneEntry (this);
+  final public SceneVision vision = new SceneVision(this);
   
   List <Person> playerTeam = new List();
   List <Person> othersTeam = new List();
@@ -300,7 +301,7 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     p.setExactPosition(this, x, y, 0);
     allPersons.include(p);
     didEnter.include(p);
-    liftFogInSight(p);
+    vision.liftFogInSight(p);
     return true;
   }
   
@@ -348,7 +349,7 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     view().setSelection(nextActing, false);
     playerTurn = true;
     
-    updateFog();
+    vision.updateFog();
     for (Person p : playerTeam) p.onTurnStart();
     for (Person p : othersTeam) p.onTurnStart();
   }
@@ -450,7 +451,8 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
       else {
         //
         //  Zoom to the unit in question (if they're visible...)
-        if (fogAt(nextActing.currentTile(), Person.Side.HEROES) > 0) {
+        //  TODO:  Ideally this should be handled within the UI!
+        if (vision.fogAt(nextActing.currentTile(), Person.Side.HEROES) > 0) {
           I.say("    Will zoom to "+nextActing);
           view().setSelection(nextActing, false);
           view().setZoomPoint(nextActing.currentTile());
@@ -459,91 +461,6 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
       }
     }
     I.say("\nWARNING- COULD NOT FIND NEXT ACTIVE PERSON!");
-  }
-  
-
-  
-  /**  Fog and visibility updates-
-    */
-  public void updateFog() {
-    for (Coord c : Visit.grid(0, 0, size, size, 1)) {
-      fogP[c.x][c.y] = 0;
-      fogO[c.x][c.y] = 0;
-    }
-    for (Person p : playerTeam) if (p.health.conscious()) {
-      liftFogInSight(p);
-    }
-    for (Person p : othersTeam) if (p.health.conscious())  {
-      liftFogInSight(p);
-    }
-  }
-  
-  
-  public void liftFogInSight(Person p) {
-    final float radius = p.stats.sightRange();
-    liftFogAround(p.currentTile(), radius, p, true);
-  }
-  
-  
-  public void liftFogAround(
-    Tile point, float radius, Person looks, boolean checkSight
-  ) {
-    byte fog[][] = null;
-    if (looks.side() == Person.Side.HEROES  ) fog = fogP;
-    if (looks.side() == Person.Side.VILLAINS) fog = fogO;
-    if (fog == null) return;
-    
-    final int lim = Nums.ceil(radius);
-    for (Coord c : Visit.grid(
-      point.x - lim, point.y - lim, lim * 2, lim * 2, 1
-    )) {
-      Tile t = tileAt(c.x, c.y);
-      if (t == null) continue;
-      float dist = distance(t, point);
-      if (dist >= radius) continue;
-      byte val = (byte) (100 * Nums.clamp(1.5f - (dist / radius), 0, 1));
-      if (checkSight) val *= degreeOfSight(point, t, looks, false);
-      fog[t.x][t.y] = (byte) Nums.max(val, fog[t.x][t.y]);
-    }
-  }
-  
-  
-  public float fogAt(Tile at, Person.Side side) {
-    if (at == null) {
-      I.say("?");
-    }
-    
-    if (side == Person.Side.HEROES  ) return fogP[at.x][at.y] / 100f;
-    if (side == Person.Side.VILLAINS) return fogO[at.x][at.y] / 100f;
-    return 1;
-  }
-  
-  
-  public float degreeOfSight(Tile orig, Tile dest, Person p, boolean report) {
-    float sight = 1f;
-    
-    Box2D area = new Box2D(orig.x, orig.y, 0, 0);
-    area.include(dest.x, dest.y, 0);
-    area.incHigh(1);
-    area.incWide(1);
-    Vec2D o = new Vec2D(orig.x + 0.5f, orig.y + 0.5f);
-    Vec2D l = new Vec2D(dest.x + 0.5f, dest.y + 0.5f).sub(o);
-    
-    if (report) {
-      I.say("Checking line of sight between "+orig+" and "+dest);
-      I.say("  Origin: "+o);
-      I.say("  Vector: "+l);
-    }
-    for (Coord c : Visit.grid(area)) {
-      float lineDist = l.lineDist(c.x + 0.5f - o.x, c.y + 0.5f - o.y);
-      if (report) I.say("    "+c+": "+lineDist+" away");
-      if (lineDist > 0.5f) continue;
-      final Tile t = tiles[c.x][c.y];
-      sight *= t.blocksSight(o, l, report) ? 0 : 1;
-      if (report) I.say("    "+c+" LoS: "+sight);
-    }
-    
-    return sight;
   }
   
   

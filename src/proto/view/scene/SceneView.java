@@ -171,7 +171,7 @@ public class SceneView extends UINode implements TileConstants {
     //  Render enemy-sight on top of objects but beneath persons- but ONLY if
     //  the enemy is visible themselves.
     for (Person p : scene.othersTeam()) {
-      float fog = scene.fogAt(p.currentTile(), Person.Side.HEROES);
+      float fog = scene.vision.fogAt(p.currentTile(), Person.Side.HEROES);
       if (fog <= 0 && ! GameSettings.debugScene) continue;
       if (p.isCivilian() || ! p.health.conscious()) continue;
       
@@ -182,8 +182,7 @@ public class SceneView extends UINode implements TileConstants {
       
       for (Coord c : Visit.grid(area)) {
         Tile atG = scene.tileAt(c.x, c.y);
-        float fogG = atG == null ? 0 : scene.fogAt(atG, Person.Side.VILLAINS);
-        if (fogG <= 0) continue;
+        if (atG == null || ! p.actions.hasSight(atG)) continue;
         
         float dist = exactPos.distance(c.x + 0.5f, c.y + 0.5f, 0) - 0.5f;
         float glare = 1 - Nums.clamp(dist / sightRange, 0, 1);
@@ -200,7 +199,7 @@ public class SceneView extends UINode implements TileConstants {
       }
     };
     for (Person p : scene.allPersons()) {
-      float fog = scene.fogAt(p.currentTile(), Person.Side.HEROES);
+      float fog = scene.vision.fogAt(p.currentTile(), Person.Side.HEROES);
       if (fog <= 0 && ! GameSettings.debugScene) continue;
       personsShown.add(p);
     }
@@ -243,7 +242,7 @@ public class SceneView extends UINode implements TileConstants {
     //  Then render our own fog on top of all objects-
     for (Coord c : Visit.grid(0, 0, size, size, 1)) {
       Tile t = scene.tileAt(c.x, c.y);
-      float fogAlpha = 1f - scene.fogAt(t, Person.Side.HEROES);
+      float fogAlpha = 1f - scene.vision.fogAt(t, Person.Side.HEROES);
       if (GameSettings.debugScene) fogAlpha /= 3;
       Color black = SCALE[Nums.clamp((int) (fogAlpha * 10), 10)];
       renderColor(c.x, c.y, 1, 1, black, g);
@@ -300,8 +299,7 @@ public class SceneView extends UINode implements TileConstants {
       activePerson != null && zoomTile != activePerson.currentTile()
     ) {
       Tile.printWallsMask(scene);
-      Tile orig = activePerson.currentTile();
-      scene.degreeOfSight(orig, zoomTile, activePerson, true);
+      scene.vision.degreeOfSight(activePerson, zoomTile);
     }
     return true;
   }

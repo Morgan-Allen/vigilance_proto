@@ -280,7 +280,7 @@ public class Gadgets {
     
     public void applyOnActionEnd(Action use) {
       final Tile at = use.scene().tileUnder(use.target);
-      use.scene().liftFogAround(at, 4, use.acting, true);
+      use.scene().vision.liftFogAround(at, 4, use.acting, true);
       use.scene().view().addTempFX(BURST_IMG, 3, at.x, at.y, 0, 1);
     }
   };

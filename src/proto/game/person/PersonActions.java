@@ -136,7 +136,7 @@ public class PersonActions {
       (alpha * n.y) + ((1 - alpha) * l.y),
       0
     );
-    if (person.currentTile() != oldLoc) scene.updateFog();
+    if (person.currentTile() != oldLoc) scene.vision.updateFog();
     
     if (timeSteps > path.length) {
       if (! a.started()) {
@@ -161,7 +161,7 @@ public class PersonActions {
   public boolean hasSight(Tile point) {
     Scene scene = person.currentScene();
     if (scene == null) return false;
-    return scene.fogAt(point, person.side()) > 0;
+    return scene.vision.fogAt(point, person.side()) > 0;
   }
   
   
@@ -170,7 +170,7 @@ public class PersonActions {
     if (scene == null) return false;
     
     Tile  under      = scene.tileUnder(point);
-    float visibility = scene.fogAt(under, person.side());
+    float visibility = scene.vision.fogAt(under, person.side());
     if (visibility <= 0) return false;
     
     if (point instanceof Person) {
