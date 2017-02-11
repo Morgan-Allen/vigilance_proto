@@ -264,9 +264,11 @@ public class SceneView extends UINode implements TileConstants {
     
     if (hoverTile != null) {
       if (! hoverTile.blocked()) {
-        //renderSprite(hoverTile.x, hoverTile.y, 1, 1, hoverBox, 0, g);
-        
-        this.renderColor(hoverTile.x, hoverTile.y, 1, 1, Color.GREEN, g);
+        renderSprite(hoverTile.x, hoverTile.y, 1, 1, 0, hoverBox, g);
+      }
+      
+      final Ability ability = actionsView.selectAbility;
+      if (ability == Common.MOVE && ! hoverTile.blocked()) {
         renderCoverIndicators(hoverTile, surface, g);
       }
       
@@ -340,8 +342,8 @@ public class SceneView extends UINode implements TileConstants {
   ) {
     //
     //  Firstly, determine the centre of the tile in the visual field:
-    int x = vx + (int) (px * TILE_SIZE);
-    int y = vy + (int) (py * TILE_SIZE);
+    float x = vx + (px * TILE_SIZE);
+    float y = vy + (py * TILE_SIZE);
     //
     //  You want to centre the image on the centre of the tile, and rotate
     //  around that point.  However, the default image-rendering routines in
@@ -383,11 +385,16 @@ public class SceneView extends UINode implements TileConstants {
   public Object topObjectAt(Tile at) {
     if (at == null) return null;
     final Pick <Object> pick = new Pick();
-    for (Element e : at.inside()) if (e.isPerson()) {
-      final Person p = (Person) e;
-      pick.compare(p, p.health.conscious() ? 1.5f : 1);
+    for (Element e : at.inside()) {
+      if (e.isPerson()) {
+        final Person p = (Person) e;
+        pick.compare(p, p.health.conscious() ? 20 : 15);
+      }
+      if (e.isProp()) {
+        final Prop p = (Prop) e;
+        pick.compare(p, (p.blockLevel() + 1) * (p.kind().thin() ? 0 : 1));
+      }
     }
-    pick.compare(at.topInside(), 0.5f);
     pick.compare(at, 0.1f);
     return pick.result();
   }

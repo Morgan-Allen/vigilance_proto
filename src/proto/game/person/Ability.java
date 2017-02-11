@@ -226,7 +226,7 @@ public abstract class Ability extends Trait {
     Scene scene, Tile pathToTake[], StringBuffer failLog
   ) {
     if (acting == null || ! allowsTarget(target, scene, acting)) {
-      return failResult("X", failLog);
+      return failResult("Invalid Target", failLog);
     }
     if (requiresFog() && ! acting.actions.hasSight(dest)) {
       return failResult("Hidden In Fog", failLog);

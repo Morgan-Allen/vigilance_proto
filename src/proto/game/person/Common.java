@@ -52,10 +52,9 @@ public class Common {
     ) {
       
       public boolean allowsTarget(Object target, Scene scene, Person acting) {
-        if (target instanceof Prop) {
-          return ! ((Prop) target).blocksFull();
-        }
-        return target instanceof Tile;
+        final Tile under = scene.tileUnder(target);
+        if (under == null || under.blocked()) return false;
+        return true;
       }
       
       public void applyOnActionEnd(Action use) {
