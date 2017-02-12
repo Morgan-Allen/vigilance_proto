@@ -28,7 +28,7 @@ public class Common {
       "Bare fists and moxy.",
       ICONS_DIR+null,
       SPRITE_DIR+"sprite_punch.png",
-      SLOT_WEAPON, 0, new Object[0],
+      Kind.SUBTYPE_BLUNT, SLOT_WEAPON, 0, new Object[0],
       IS_WEAPON | IS_MELEE | IS_KINETIC
     ),
     UNARMOURED = new ItemType(
@@ -36,7 +36,7 @@ public class Common {
       "Nothin' but the clothes on your back.",
       ICONS_DIR+null,
       SPRITE_DIR+"sprite_deflect.png",
-      SLOT_ARMOUR, 0, new Object[0],
+      Kind.SUBTYPE_ARMOUR, SLOT_ARMOUR, 0, new Object[0],
       IS_ARMOUR
     );
   

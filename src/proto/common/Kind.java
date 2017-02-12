@@ -28,7 +28,18 @@ public class Kind extends Index.Entry implements Session.Saveable {
     SUBTYPE_CIVILIAN = 1,
     SUBTYPE_MOOK     = 2,
     SUBTYPE_HERO     = 3,
-    SUBTYPE_BOSS     = 4
+    SUBTYPE_BOSS     = 4,
+    
+    SUBTYPE_HEAVY_GUN   = 0,
+    SUBTYPE_PRECISE_GUN = 1,
+    SUBTYPE_WING_BLADE  = 2,
+    SUBTYPE_BOW         = 3,
+    SUBTYPE_BLADE       = 4,
+    SUBTYPE_BLUNT       = 5,
+    SUBTYPE_GRENADE     = 6,
+    SUBTYPE_GADGET      = 7,
+    SUBTYPE_ARMOUR      = 8,
+    SUBTYPE_TRACE       = 9
   ;
   final public static int
     BLOCK_NONE    = 0,

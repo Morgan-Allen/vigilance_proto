@@ -50,12 +50,16 @@ public class ItemType extends Kind {
   public ItemType(
     String name, String ID, String description,
     String iconImgPath, Object media,
-    int slotType, int buildCost, Object craftArgs[],
+    int subtype, int slotType,
+    int buildCost, Object craftArgs[],
     int properties, Ability... abilities
   ) {
-    super(name, ID, description, Kind.TYPE_ITEM);
-    this.icon  = Kind.loadImage(iconImgPath);
+    super(
+      name, ID, null, description,
+      1, 1, Kind.BLOCK_NONE, false, Kind.TYPE_ITEM, subtype
+    );
     
+    this.icon  = Kind.loadImage(iconImgPath);
     if (! (media instanceof String)) this.media = media;
     else this.media = Kind.loadImage((String) media);
     

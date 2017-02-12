@@ -3,6 +3,7 @@ package proto.content.items;
 import static proto.game.person.ItemType.*;
 import static proto.game.person.PersonGear.*;
 import static proto.game.person.PersonStats.*;
+import proto.common.Kind;
 import proto.game.person.*;
 
 
@@ -20,7 +21,7 @@ public class Clues {
     "",
     ICONS_DIR+"icon_evidence.png",
     SPRITE_DIR+null,
-    SLOT_TYPE_ITEM, 0, new Object[] {},
+    Kind.SUBTYPE_TRACE, SLOT_TYPE_ITEM, 0, new Object[] {},
     IS_CUSTOM
   ) {
   };
@@ -30,7 +31,7 @@ public class Clues {
     "",
     ICONS_DIR+"icon_blueprint.png",
     SPRITE_DIR+null,
-    SLOT_TYPE_ITEM, 0, new Object[] {},
+    Kind.SUBTYPE_TRACE, SLOT_TYPE_ITEM, 0, new Object[] {},
     IS_CUSTOM
   ) {
   };
@@ -40,7 +41,7 @@ public class Clues {
     "",
     ICONS_DIR+"icon_bomb.png",
     SPRITE_DIR+null,
-    SLOT_TYPE_ITEM, 0, new Object[] {},
+    Kind.SUBTYPE_TRACE, SLOT_TYPE_ITEM, 0, new Object[] {},
     IS_CONSUMED
   ) {
   };
@@ -50,7 +51,7 @@ public class Clues {
     "",
     ICONS_DIR+"icon_cash.png",
     SPRITE_DIR+null,
-    SLOT_TYPE_ITEM, 0, new Object[] {},
+    Kind.SUBTYPE_TRACE, SLOT_TYPE_ITEM, 0, new Object[] {},
     IS_CONSUMED
   ) {
   };

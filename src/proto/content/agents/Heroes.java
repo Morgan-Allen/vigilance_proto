@@ -2,11 +2,8 @@
 
 package proto.content.agents;
 import proto.common.*;
-import proto.content.items.Gadgets;
-import proto.game.world.*;
-import proto.game.event.*;
+import proto.content.items.*;
 import proto.game.person.*;
-import static proto.game.person.Common.*;
 import static proto.game.person.PersonStats.*;
 
 
@@ -32,8 +29,8 @@ public class Heroes {
       QUESTION     , 7,
       PERSUADE     , 5,
       
-      Gadgets.WING_BLADES,
-      Gadgets.KEVLAR_VEST
+      Weapons.WING_BLADES,
+      Armours.KEVLAR_VEST
     )
   ;
   
@@ -53,8 +50,8 @@ public class Heroes {
       QUESTION     , 5,
       PERSUADE     , 7,
       
-      Gadgets.REVOLVER,
-      Gadgets.BODY_ARMOUR
+      Weapons.REVOLVER,
+      Armours.BODY_ARMOUR
     )
   ;
   
@@ -74,8 +71,8 @@ public class Heroes {
       QUESTION     , 7,
       PERSUADE     , 8,
       
-      Gadgets.WING_BLADES,
-      Gadgets.BODY_ARMOUR
+      Weapons.WING_BLADES,
+      Armours.BODY_ARMOUR
     )
   ;
   
@@ -95,8 +92,8 @@ public class Heroes {
       QUESTION     , 8,
       PERSUADE     , 5,
       
-      Gadgets.REVOLVER,
-      Gadgets.KEVLAR_VEST
+      Weapons.REVOLVER,
+      Armours.KEVLAR_VEST
     )
   ;
   

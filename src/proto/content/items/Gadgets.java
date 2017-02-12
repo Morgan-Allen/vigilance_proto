@@ -5,7 +5,7 @@ import proto.common.*;
 import proto.game.person.*;
 import proto.game.scene.*;
 import proto.game.world.*;
-import proto.util.Rand;
+import proto.util.*;
 
 import static proto.game.person.PersonStats.*;
 import static proto.game.person.ItemType.*;
@@ -23,82 +23,6 @@ public class Gadgets {
     ICONS_DIR  = "media assets/item icons/",
     SPRITE_DIR = "media assets/character sprites/"
   ;
-  
-  final public static ItemType WING_BLADES = new ItemType(
-    "Wing Blades", "item_wing_blades",
-    "Lightweight, throwable projectiles, useful to disarm or startle foes.",
-    ICONS_DIR+"icon_wing_blades.png",
-    SPRITE_DIR+"sprite_wing_blade.png",
-    SLOT_TYPE_WEAPON, 20, new Object[] {
-      ENGINEERING, 2
-    },
-    IS_WEAPON | IS_RANGED | IS_KINETIC | IS_CONSUMED
-  ) {
-    public float passiveModifierFor(Person person, Trait trait) {
-      if (trait == MIN_DAMAGE) return 2;
-      if (trait == RNG_DAMAGE) return 3;
-      return 0;
-    }
-  };
-  
-  final public static ItemType REVOLVER = new ItemType(
-    "Revolver", "item_revolver",
-    "A light, portable sidearm.  Deals significant damage, but with a higher "+
-    "risk of death or lasting injury.",
-    ICONS_DIR+"icon_revolver.png",
-    SPRITE_DIR+"sprite_bullets.png",
-    SLOT_TYPE_WEAPON, 40, new Object[] {
-      ENGINEERING, 4
-    },
-    IS_WEAPON | IS_RANGED | IS_KINETIC 
-  ) {
-    public float passiveModifierFor(Person person, Trait trait) {
-      if (trait == MIN_DAMAGE) return 4;
-      if (trait == RNG_DAMAGE) return 5;
-      return 0;
-    }
-    
-    public void applyOnAttackEnd(Volley volley) {
-      Person mark = volley.targAsPerson();
-      mark.health.receiveTrauma(2 + Rand.index(4));
-      mark.health.toggleBleeding(true);
-      return;
-    }
-  };
-  
-  final public static ItemType BODY_ARMOUR = new ItemType(
-    "Body Armour", "item_body_armour",
-    "Heavy ceramic body armour.  Grants excellent protection but impedes "+
-    "stealth.",
-    ICONS_DIR+"icon_body_armour.png",
-    SPRITE_DIR+"sprite_deflect.png",
-    SLOT_TYPE_ARMOUR, 200, new Object[] {
-      ENGINEERING, 3
-    },
-    IS_ARMOUR
-  ) {
-    public float passiveModifierFor(Person person, Trait trait) {
-      if (trait == ARMOUR ) return  3;
-      if (trait == HIDE_RANGE) return -2;
-      return 0;
-    }
-  };
-  
-  final public static ItemType KEVLAR_VEST = new ItemType(
-    "Kevlar Vest", "item_kevlar_vest",
-    "Lightweight kevlar provides reasonable protection and good mobility.",
-    ICONS_DIR+"icon_kevlar_vest.png",
-    SPRITE_DIR+"sprite_deflect.png",
-    SLOT_TYPE_ARMOUR, 140, new Object[] {
-      ENGINEERING, 4
-    },
-    IS_ARMOUR
-  ) {
-    public float passiveModifierFor(Person person, Trait trait) {
-      if (trait == ARMOUR) return 1;
-      return 0;
-    }
-  };
   
   
   final public static Ability BOLAS_THROW = new Ability(
@@ -150,10 +74,9 @@ public class Gadgets {
     "High-strength targets or escape artists can break free.",
     ICONS_DIR+"icon_bolas.png",
     SPRITE_DIR+"sprite_bolas.png",
-      SLOT_TYPE_ITEM, 15, new Object[] {
-        ENGINEERING, 2
-      },
-      IS_CONSUMED, BOLAS_THROW
+    Kind.SUBTYPE_GADGET, SLOT_TYPE_ITEM,
+    15, new Object[] { ENGINEERING, 2 },
+    IS_CONSUMED, BOLAS_THROW
   ) {
     
   };
@@ -188,9 +111,8 @@ public class Gadgets {
     "subjects.",
     ICONS_DIR+"icon_med_kit.png",
     SPRITE_DIR+"sprite_treatment.png",
-    SLOT_TYPE_ITEM, 25, new Object[] {
-      MEDICINE, 4
-    },
+    Kind.SUBTYPE_GADGET, SLOT_TYPE_ITEM,
+    25, new Object[] { MEDICINE, 4 },
     IS_CONSUMED, MED_KIT_HEAL
   ) {
   };
@@ -250,9 +172,8 @@ public class Gadgets {
     "with relative impunity.",
     ICONS_DIR+"icon_tear_gas.png",
     SPRITE_DIR+"sprite_grenade.png",
-    SLOT_TYPE_ITEM, 35, new Object[] {
-      MEDICINE, 6
-    },
+    Kind.SUBTYPE_GADGET, SLOT_TYPE_ITEM,
+    35, new Object[] { MEDICINE, 6 },
     IS_CONSUMED, TEAR_GAS_ABILITY
   ) {
     
@@ -290,9 +211,8 @@ public class Gadgets {
     "Can be thrown to reveal areas of hidden terrain.",
     ICONS_DIR+"icon_sonic_probe.png",
     SPRITE_DIR+"sprite_sonic_probe.png",
-    SLOT_TYPE_ITEM, 65, new Object[] {
-      ENGINEERING, 7
-    },
+    Kind.SUBTYPE_GADGET, SLOT_TYPE_ITEM,
+    65, new Object[] { ENGINEERING, 7 },
     IS_CONSUMED, SONIC_PROBE_ABILITY
   ) {
     

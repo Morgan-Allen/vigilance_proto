@@ -2,10 +2,8 @@
 
 package proto.content.agents;
 import proto.common.*;
-import proto.content.items.Gadgets;
-import proto.game.world.*;
+import proto.content.items.*;
 import proto.game.person.*;
-import proto.util.*;
 import static proto.game.person.PersonStats.*;
 
 
@@ -24,7 +22,8 @@ public class Crooks {
       BRAINS  , 2 ,
       REFLEXES, 4 ,
       WILL    , 4 ,
-      MUSCLE  , 8
+      MUSCLE  , 8 ,
+      Weapons.BRASS_KNUCKLES, Weapons.BASEBALL_BAT
     ),
     GANGSTER = new PersonType(
       "Gangster", "person_kind_gangster", IMG_DIR+"icon_gangster.png",
@@ -34,12 +33,24 @@ public class Crooks {
       REFLEXES, 6 ,
       WILL    , 4 ,
       MUSCLE  , 6 ,
-      Gadgets.REVOLVER
+      Weapons.REVOLVER, Weapons.AUTOMATIC
     ),
-    HITMAN = null,
+    HITMAN = new PersonType(
+      "Hitman", "person_kind_hitman", IMG_DIR+"icon_gangster.png",
+      "", Civilians.COMMON_NAMES,
+      Kind.SUBTYPE_MOOK,
+      BRAINS  , 6 ,
+      REFLEXES, 8 ,
+      WILL    , 6 ,
+      MUSCLE  , 6 ,
+      Weapons.REVOLVER, Weapons.RIFLE
+    ),
     PSYCHO = null
   ;
 }
+
+
+
 
 
 

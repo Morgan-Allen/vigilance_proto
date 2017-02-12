@@ -100,10 +100,10 @@ public class DefaultGame extends RunGame {
     for (Object t : learnTechs) base.addTech(t);
     
     final ItemType craftTechs[] = {
-      Gadgets.WING_BLADES,
-      Gadgets.REVOLVER,
-      Gadgets.BODY_ARMOUR,
-      Gadgets.KEVLAR_VEST,
+      Weapons.WING_BLADES,
+      Weapons.REVOLVER,
+      Armours.BODY_ARMOUR,
+      Armours.KEVLAR_VEST,
       Gadgets.BOLAS,
       Gadgets.MED_KIT,
       Gadgets.TEAR_GAS,
