@@ -69,8 +69,6 @@ public class PersonMind {
   
   
   
-  
-  
   public Action selectActionAsAI() {
     Scene scene = person.currentScene();
     if (scene == null || ! person.actions.canTakeAction()) return null;
@@ -107,53 +105,18 @@ public class PersonMind {
       }
     }
     if (pick.empty()) {
-      //  TODO:  Select from either enemies or allies here!
-      Series <Person> foes = scene.playerTeam();
+      Batch <Person> foes = new Batch();
+      for (Person p : scene.allPersons()) {
+        if (p.isEnemy(person) && person.actions.canNotice(p)) foes.add(p);
+      }
       Action motion = retreating() ?
-        pickRetreatAction(foes) :
-        pickAdvanceAction(foes)
+        AIUtils.pickRetreatAction(person, foes) :
+        AIUtils.pickAdvanceAction(person, foes)
       ;
       pick.compare(motion, 1);
     }
     
     return pick.result();
-  }
-  
-  
-  Action pickAdvanceAction(Series <Person> foes) {
-    Scene scene = person.currentScene();
-    for (Person p : foes) {
-      Action motion = Common.MOVE.bestMotionToward(p, person, scene);
-      if (motion != null) return motion;
-    }
-    
-    int range = Nums.ceil(person.stats.sightRange() / 2);
-    final Tile location = person.currentTile();
-    Tile pick = scene.tileAt(
-      location.x + (Rand.index(range + 1) * (Rand.yes() ? 1 : -1)),
-      location.y + (Rand.index(range + 1) * (Rand.yes() ? 1 : -1))
-    );
-    
-    I.say(person+" picked random tile to approach: "+pick+" (at "+location+")");
-    
-    return Common.MOVE.bestMotionToward(pick, person, scene);
-  }
-  
-  
-  Action pickRetreatAction(Series <Person> foes) {
-    Scene scene = person.currentScene();
-    int hS = scene.size() / 2, sD = scene.size() - 1;
-    Tile exits[] = {
-      scene.tileAt(0 , hS),
-      scene.tileAt(hS, 0 ),
-      scene.tileAt(sD, hS),
-      scene.tileAt(hS, sD)
-    };
-    
-    final Pick <Tile> pick = new Pick();
-    final Tile location = person.currentTile();
-    for (Tile t : exits) pick.compare(t, 0 - scene.distance(t, location));
-    return Common.MOVE.bestMotionToward(pick.result(), person, scene);
   }
   
   

@@ -8,6 +8,8 @@ import proto.game.scene.*;
 import proto.util.*;
 import static proto.content.places.UrbanScenes.*;
 
+import proto.content.agents.Crooks;
+
 
 
 public class DebugSceneWithLayout extends RunGame {
@@ -42,7 +44,7 @@ public class DebugSceneWithLayout extends RunGame {
   public static void main(String args[]) {
     GameSettings.debugScene      = true;
     GameSettings.viewSceneBlocks = true;
-    GameSettings.debugLineSight  = true;
+    //GameSettings.debugLineSight  = true;
     runGame(new DebugSceneWithLayout(), "saves/debug_fixed_scene");
   }
   
@@ -56,7 +58,6 @@ public class DebugSceneWithLayout extends RunGame {
     //  Generate the scene-
     final Scene mission = new Scene(world, 12);
     mission.setupScene(true);
-    
     //*
     SceneType sceneType = FIXED_TEST_SCENE;
     sceneType.applyToScene(mission, 2, 2, TileConstants.E, 8, true);
@@ -90,10 +91,19 @@ public class DebugSceneWithLayout extends RunGame {
       break;
     }
     //
+    //  And a random goon-
+    Person goon = Person.randomOfKind(Crooks.HITMAN, world);
+    goon.addAssignment(mission);
+    mission.enterScene(goon, mission.size() - 1, 4);
+    //
     //  Then enter and return-
     world.enterScene(mission);
     return world;
   }
 }
+
+
+
+
 
 

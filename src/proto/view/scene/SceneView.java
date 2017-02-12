@@ -86,7 +86,6 @@ public class SceneView extends UINode implements TileConstants {
     final Person old = activePerson;
     this.activePerson = acting;
     if (acting != old || ! keepActiveAbility) actionsView.clearSelection();
-    I.talkAbout = activePerson;
   }
   
   

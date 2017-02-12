@@ -146,10 +146,24 @@ public class Tile implements Session.Saveable {
       if (wallMaskVal(n) == Kind.BLOCK_FULL) temp[n] = null;
       else temp[n] = scene.tileAt(x + T_X[n], y + T_Y[n]);
     }
+    
+    int dirA, dirB, block;
     for (int n : T_DIAGONAL) {
-      Tile a = temp[(n + 1) % 8], b = temp[(n + 7) % 8];
-      if (a == null || b == null) temp[n] = null;
-      else temp[n] = scene.tileAt(x + T_X[n], y + T_Y[n]);
+      temp[n] = null;
+      Tile d = scene.tileAt(x + T_X[n], y + T_Y[n]);
+      if (d == null) continue;
+      
+      dirA = (n + 1) % 8;
+      dirB = (n + 7) % 8;
+      block = Nums.max(wallMaskVal(dirA), wallMaskVal(dirB));
+      if (block == Kind.BLOCK_FULL) continue;
+      
+      dirA = (n + 3) % 8;
+      dirB = (n + 5) % 8;
+      block = Nums.max(d.wallMaskVal(dirA), d.wallMaskVal(dirB));
+      if (block == Kind.BLOCK_FULL) continue;
+      
+      temp[n] = d;
     }
     return temp;
   }
@@ -157,7 +171,7 @@ public class Tile implements Session.Saveable {
   
   public int coverLevel(int dir) {
     int block = wallMaskVal(dir), opaque = opacityVal(dir);
-    if (opaque == 0) block--;
+    if (opaque == 0 && block > 0) block--;
     return block;
   }
   

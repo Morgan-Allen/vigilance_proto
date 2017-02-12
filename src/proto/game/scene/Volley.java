@@ -232,10 +232,10 @@ public class Volley implements Session.Saveable {
   
   protected float coverBonus(Object orig, Object targ, Scene scene) {
     Tile origT = scene.tileUnder(orig), targT = scene.tileUnder(targ);
-    
-    float angle = new Vec2D(targT.x - origT.x, targT.y - origT.y).toAngle();
-    int dir = 2 * (int) (angle / 90);
-    
+    int dir = scene.direction(origT, targT);
+    //
+    //  TODO:  This will not count in the case of elliptical trajectories!  You
+    //  need to model that with a different equation.
     int cover = targT.coverLevel(dir);
     if (cover == Kind.BLOCK_PARTIAL) return 30;
     if (cover == Kind.BLOCK_FULL   ) return 45;

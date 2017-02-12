@@ -250,15 +250,43 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   }
   
   
+  public float distance(Object a, Object b) {
+    return distance(tileUnder(a), tileUnder(b));
+  }
+  
+  
   public float distance(Tile a, Tile b) {
     final int xd = a.x - b.x, yd = a.y - b.y;
     return Nums.sqrt((xd * xd) + (yd * yd));
   }
   
   
+  public int direction(Tile from, Tile to) {
+    float angle = new Vec2D(to.x - from.x, to.y - from.y).toAngle();
+    int dir = 2 * (int) (angle / 90);
+    return (N + dir) % 8;
+  }
+  
+  
   public Action currentAction() {
     if (nextActing == null) return null;
     return nextActing.actions.nextAction();
+  }
+  
+  
+  public Visit <Tile> tilesInArea(Box2D area) {
+    final Visit <Coord> base = Visit.grid(area);
+    return new Visit <Tile> () {
+      
+      public Tile next() {
+        Coord c = base.next();
+        return tileAt(c.x, c.y);
+      }
+      
+      public boolean hasNext() {
+        return base.hasNext();
+      }
+    };
   }
   
   
@@ -449,6 +477,7 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
         playerTurn = ! playerTurn;
       }
       else {
+        I.talkAbout = nextActing;
         //
         //  Zoom to the unit in question (if they're visible...)
         //  TODO:  Ideally this should be handled within the UI!

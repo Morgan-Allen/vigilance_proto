@@ -47,7 +47,6 @@ public class InvestingView extends UINode {
     
     Person person = mainView.rosterView.selectedPerson();
     int across = 10, down = 10;
-
     /*
     int income = region.incomeFor(base), expense = region.expensesFor(base);
     g.drawString("Income: " +income , vx + 30 , vy + down);
