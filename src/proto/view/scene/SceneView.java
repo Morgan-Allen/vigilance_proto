@@ -233,8 +233,8 @@ public class SceneView extends UINode implements TileConstants {
       done.used.renderUsageFX(done, scene, g);
     }
     for (TempFX fx : tempFX) {
-      float px = fx.pos.x - fx.size, py = fx.pos.y - fx.size, s2 = fx.size * 2;
-      renderSprite(px, py, s2, s2, 0, fx.sprite, g);
+      float fSize = fx.size * 2;
+      renderSprite(fx.pos.x, fx.pos.y, fSize, fSize, 0, fx.sprite, g);
       fx.framesLeft--;
       if (fx.framesLeft <= 0) tempFX.remove(fx);
     }
@@ -299,7 +299,7 @@ public class SceneView extends UINode implements TileConstants {
       activePerson != null && zoomTile != activePerson.currentTile()
     ) {
       Tile.printWallsMask(scene);
-      scene.vision.degreeOfSight(activePerson, zoomTile);
+      scene.vision.degreeOfSight(activePerson, zoomTile, true);
     }
     return true;
   }

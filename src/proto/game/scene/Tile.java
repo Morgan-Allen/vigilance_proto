@@ -162,13 +162,6 @@ public class Tile implements Session.Saveable {
   }
   
   
-  public int coverLevel(Vec2D origin, Vec2D line, boolean report) {
-    //  TODO:  This is a basically similar problem to determining sight-
-    //  blockage, I think...
-    return -1;
-  }
-  
-  
   public boolean blocksSight(Vec2D origin, Vec2D line, boolean report) {
     //
     //  TODO:  North/south/east/west values aren't being handled consistently

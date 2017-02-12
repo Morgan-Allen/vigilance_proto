@@ -54,6 +54,7 @@ public class Volley implements Session.Saveable {
     s.cacheInstance(this);
     orig = s.loadObject();
     targ = s.loadObject();
+    
     weaponType = (ItemType) s.loadObject();
     armourType = (ItemType) s.loadObject();
     ranged     = s.loadBool();
@@ -204,6 +205,7 @@ public class Volley implements Session.Saveable {
       float distance  = scene.distance(self.currentTile(), hits.currentTile());
       selfAccuracy -= 25 * (distance - normRange);
       hitsDefence = hits.stats.levelFor(DEFENCE);
+      hitsDefence += coverBonus(orig, targ, scene);
     }
     
     hitsDefence  = Nums.max(hitsDefence , 1);
@@ -221,11 +223,25 @@ public class Volley implements Session.Saveable {
       accuracyMargin = 100 - (int) (defChance * 100);
     }
     critPercent = ((25 + selfAccuracy) * accuracyMargin) / (5 * 50);
-
+    
     if (weapon != nativeWeapon) {
       self.gear.equipItem(nativeWeapon, PersonGear.SLOT_WEAPON);
     }
   }
+  
+  
+  protected float coverBonus(Object orig, Object targ, Scene scene) {
+    Tile origT = scene.tileUnder(orig), targT = scene.tileUnder(targ);
+    
+    float angle = new Vec2D(targT.x - origT.x, targT.y - origT.y).toAngle();
+    int dir = 2 * (int) (angle / 90);
+    
+    int cover = targT.coverLevel(dir);
+    if (cover == Kind.BLOCK_PARTIAL) return 30;
+    if (cover == Kind.BLOCK_FULL   ) return 45;
+    return 0;
+  }
+  
   
   
   public void beginVolley() {

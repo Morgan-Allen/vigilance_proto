@@ -242,7 +242,7 @@ public abstract class Ability extends Trait {
       if (range > (acting.stats.sightRange() + 1)) {
         return failResult("Outside Sight Range", failLog);
       }
-      if (scene.vision.degreeOfSight(acting, dest) <= 0) {
+      if (scene.vision.degreeOfSight(acting, dest, false) <= 0) {
         return failResult("No Sight Line", failLog);
       }
     }

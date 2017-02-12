@@ -40,6 +40,9 @@ public class DebugSceneWithLayout extends RunGame {
   
   
   public static void main(String args[]) {
+    GameSettings.debugScene      = true;
+    GameSettings.viewSceneBlocks = true;
+    GameSettings.debugLineSight  = true;
     runGame(new DebugSceneWithLayout(), "saves/debug_fixed_scene");
   }
   
@@ -75,11 +78,6 @@ public class DebugSceneWithLayout extends RunGame {
     }
     //*/
     Tile.printWallsMask(mission);
-    
-    GameSettings.debugScene = true;
-    GameSettings.viewSceneBlocks = true;
-    //GameSettings.debugLineSight = true;
-    //GameSettings.pauseScene = true;
     //
     //  Then introduce the agents themselves-
     final Base base = world.playerBase();
@@ -91,20 +89,11 @@ public class DebugSceneWithLayout extends RunGame {
       mission.enterScene(p, 0, across++);
       break;
     }
-    
     //
     //  Then enter and return-
     world.enterScene(mission);
     return world;
   }
 }
-
-
-
-
-
-
-
-
 
 

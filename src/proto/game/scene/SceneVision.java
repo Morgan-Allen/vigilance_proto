@@ -10,6 +10,8 @@ import proto.util.*;
 public class SceneVision implements TileConstants {
   
   
+  /**  Data fields, construction and save/load methods-
+    */
   final Scene scene;
   
   
@@ -18,6 +20,9 @@ public class SceneVision implements TileConstants {
   }
   
   
+  
+  /**  Regular updates and basic data queries-
+    */
   public void updateFog() {
     //  TODO:  You need to include visibility-lifting persistent items or
     //  debuffs here...
@@ -54,19 +59,21 @@ public class SceneVision implements TileConstants {
   }
   
   
-  public float degreeOfSight(Person p, Tile dest) {
+  public float degreeOfSight(Person p, Tile dest, boolean report) {
     final Tile vantage[] = vantagePoints(p);
     final SightLine lines[] = new SightLine[vantage.length];
     configSightLines(lines, vantage, dest);
-    return degreeOfSight(lines, dest, p, false);
+    return degreeOfSight(lines, dest, p, report);
   }
   
   
   private Tile[] vantagePoints(Person p) {
+    //
+    //  Essentially, we allow an agent to 'peek around corners' to determine
+    //  visibility, in the event that they're in full cover.
     final Tile orig = p.currentTile();
     Batch <Tile> vantage = new Batch();
     boolean nextToWall = false;
-    
     for (int dir : T_ADJACENT) {
       Tile near = scene.tileAt(orig.x + T_X[dir], orig.y + T_Y[dir]);
       if (near == null) continue;
@@ -75,10 +82,11 @@ public class SceneVision implements TileConstants {
       }
       else vantage.add(near);
     }
-    
+    //
+    //  If they're *not* in full cover, they can only check visibility from
+    //  their point of origin-
     if (! nextToWall) vantage.clear();
     vantage.add(orig);
-    
     return vantage.toArray(Tile.class);
   }
   
@@ -139,7 +147,7 @@ public class SceneVision implements TileConstants {
     Box2D area = new Box2D(dest.x, dest.y, 0, 0);
     for (SightLine l : lines) {
       if (l.dest != dest) I.complain("Sights to do not converge on target!");
-      area.include(l.orig.x, l.orig.y, 0);
+      area.include(l.vantage.x, l.vantage.y, 0);
     }
     area.incHigh(1);
     area.incWide(1);
@@ -148,7 +156,7 @@ public class SceneVision implements TileConstants {
       float sight = 1f;
       final Vec2D l = line.line, o = line.orig;
       if (report) {
-        I.say("Checking line of sight between "+o+" and "+dest);
+        I.say("Checking line of sight between "+line.vantage+" and "+dest);
         I.say("  Origin: "+o);
         I.say("  Vector: "+l);
       }

@@ -126,7 +126,7 @@ public class Weapons {
   };
   
   final public static ItemType RIFLE = new WeaponType(
-    "Rifle", "item_revolver",
+    "Rifle", "item_rifle",
     "A hunter's rifle, suitable for long-range sniping.",
     ICONS_DIR+"icon_rifle.png",
     SPRITE_DIR+"sprite_bullets.png",
