@@ -263,8 +263,9 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   
   public int direction(Tile from, Tile to) {
     float angle = new Vec2D(to.x - from.x, to.y - from.y).toAngle();
+    angle = (angle + 360 + 45) % 360;
     int dir = 2 * (int) (angle / 90);
-    return (N + dir) % 8;
+    return (N + dir + 8) % 8;
   }
   
   

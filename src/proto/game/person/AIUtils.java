@@ -19,7 +19,7 @@ public class AIUtils implements TileConstants {
     float baseFear = 0.25f + Nums.clamp(1 - p.mind.confidence(), 0, 0.75f);
     
     for (int dir : T_ADJACENT) {
-      float cover = at.coverLevel(dir) * 1f / Kind.BLOCK_FULL;
+      float cover = at.coverVal(dir) * 1f / Kind.BLOCK_FULL;
       int oppDir = dir + 4 % 8, threatFromDir = 1;
       for (Person f : foes) {
         if (scene.direction(at, f.currentTile()) == oppDir) threatFromDir++;
@@ -49,11 +49,9 @@ public class AIUtils implements TileConstants {
     final Pick <Action> pick = new Pick(0);
     
     for (Tile t : scene.tilesInArea(area)) {
-      if (t == null || ! person.actions.canNotice(t)) continue;
-      if (t.occupied()) continue;
+      if (t == null || t.blocked() || t.occupied()) continue;
       float rating = rateTileDefence(t, person, foes, range, true);
       if (rating <= 0) continue;
-      ///I.say("  Rating for tile: "+t+" is "+rating);
       
       Action motion = Common.MOVE.bestMotionToward(t, person, scene);
       if (motion.target != t) continue;

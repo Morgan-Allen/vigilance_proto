@@ -53,7 +53,8 @@ public class SceneVision implements TileConstants {
   /**  Helper methods for determining visibility for persons-
     */
   public void liftFogInSight(Person p) {
-    final float radius = p.stats.sightRange();
+    float size = Nums.max(p.kind().wide(), p.kind().high());
+    final float radius = p.stats.sightRange() + (size / 2);
     final Tile vantage[] = vantagePoints(p);
     liftFogAround(p.currentTile(), radius, p, true, vantage);
   }
@@ -67,6 +68,25 @@ public class SceneVision implements TileConstants {
   }
   
   
+  public int coverFor(Tile at, Tile from, boolean report) {
+    Scene scene = from.scene;
+    final SightLine line = new SightLine();
+    line.setTo(from, at);
+    if (report) I.say("\nChecking cover around "+at+" from "+from);
+    
+    int maxVal = 0;
+    for (int dir : T_INDEX) {
+      Tile t = scene.tileAt(at.x + T_X[dir], at.y + T_Y[dir]);
+      if (t == null) continue;
+      if (report) I.say("  Checking tile: "+t);
+      maxVal = Nums.max(maxVal, t.coverLevel(line.orig, line.line, report));
+    }
+    
+    if (report) I.say("  Best cover is: "+maxVal);
+    return maxVal;
+  }
+  
+  
   private Tile[] vantagePoints(Person p) {
     //
     //  Essentially, we allow an agent to 'peek around corners' to determine
@@ -77,7 +97,7 @@ public class SceneVision implements TileConstants {
     for (int dir : T_ADJACENT) {
       Tile near = scene.tileAt(orig.x + T_X[dir], orig.y + T_Y[dir]);
       if (near == null) continue;
-      if (orig.coverLevel(dir) >= Kind.BLOCK_FULL) {
+      if (orig.coverVal(dir) >= Kind.BLOCK_FULL) {
         nextToWall = true;
       }
       else vantage.add(near);
@@ -126,7 +146,7 @@ public class SceneVision implements TileConstants {
     )) {
       Tile t = scene.tileAt(c.x, c.y);
       if (t == null) continue;
-      float dist = scene.distance(t, point);
+      float dist = scene.distance(t, point) - 0.5f;
       if (dist >= radius) continue;
       //
       //  Then generate suitable sight-line/s and check for visibility before

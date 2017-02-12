@@ -299,6 +299,7 @@ public class SceneView extends UINode implements TileConstants {
     ) {
       Tile.printWallsMask(scene);
       scene.vision.degreeOfSight(activePerson, zoomTile, true);
+      scene.vision.coverFor(zoomTile, activePerson.currentTile(), true);
     }
     return true;
   }
@@ -307,7 +308,7 @@ public class SceneView extends UINode implements TileConstants {
   void renderCoverIndicators(Tile hovered, Surface surface, Graphics2D g) {
     for (int dir : T_ADJACENT) {
       Image img = null;
-      int coverLevel = hovered.coverLevel(dir);
+      int coverLevel = hovered.coverVal(dir);
       if (coverLevel == Kind.BLOCK_PARTIAL) img = COVER_PARTIAL;
       if (coverLevel == Kind.BLOCK_FULL   ) img = COVER_FULL   ;
       if (img == null) continue;

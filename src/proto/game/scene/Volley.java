@@ -210,18 +210,7 @@ public class Volley implements Session.Saveable {
     
     hitsDefence  = Nums.max(hitsDefence , 1);
     selfAccuracy = Nums.max(selfAccuracy, 1);
-    if (selfAccuracy > hitsDefence) {
-      float hitChance = 0;
-      hitChance = ((selfAccuracy - hitsDefence) * 1f / selfAccuracy);
-      hitChance += 0.5f * (1 - hitChance);
-      accuracyMargin = (int) (hitChance * 100);
-    }
-    else {
-      float defChance = 0;
-      defChance = ((hitsDefence - selfAccuracy) * 1f / hitsDefence);
-      defChance += 0.5f * (1 - defChance);
-      accuracyMargin = 100 - (int) (defChance * 100);
-    }
+    accuracyMargin = (int) (selfAccuracy - hitsDefence);
     critPercent = ((25 + selfAccuracy) * accuracyMargin) / (5 * 50);
     
     if (weapon != nativeWeapon) {
@@ -232,11 +221,10 @@ public class Volley implements Session.Saveable {
   
   protected float coverBonus(Object orig, Object targ, Scene scene) {
     Tile origT = scene.tileUnder(orig), targT = scene.tileUnder(targ);
-    int dir = scene.direction(origT, targT);
     //
     //  TODO:  This will not count in the case of elliptical trajectories!  You
     //  need to model that with a different equation.
-    int cover = targT.coverLevel(dir);
+    int cover = scene.vision.coverFor(targT, origT, false);
     if (cover == Kind.BLOCK_PARTIAL) return 30;
     if (cover == Kind.BLOCK_FULL   ) return 45;
     return 0;

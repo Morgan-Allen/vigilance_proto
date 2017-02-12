@@ -44,7 +44,7 @@ public class DebugSceneWithLayout extends RunGame {
   public static void main(String args[]) {
     GameSettings.debugScene      = true;
     GameSettings.viewSceneBlocks = true;
-    //GameSettings.debugLineSight  = true;
+    GameSettings.debugLineSight  = true;
     runGame(new DebugSceneWithLayout(), "saves/debug_fixed_scene");
   }
   

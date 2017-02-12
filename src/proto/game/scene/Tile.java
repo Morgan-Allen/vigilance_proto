@@ -75,39 +75,52 @@ public class Tile implements Session.Saveable {
   
   /**  Methods related to wall-blockage and opacity-
     */
-  //  TODO:  Try and put this code somewhere closer to where the wall and
-  //  opacity arrays are actually declared within the Scene class, so it's
-  //  easier to relate the math?
+  final static int OP_VAL = 0, BL_VAL = 1, CV_VAL = 2;
+  final static int CHECK_DIRS[] = { N, E, S, W, CENTRE };
   
   static int wallMaskX(int x, int dir) {
     return (x * 2) + 1 + T_X[dir];
   }
+  
   static int wallMaskY(int y, int dir) {
     return (y * 2) + 1 + T_Y[dir];
   }
   
-  final static int CHECK_DIRS[] = { N, E, S, W, CENTRE };
-  
-  int wallMaskVal(int dir) {
-    return scene.wallM[wallMaskX(x, dir)][wallMaskY(y, dir)];
-  }
-  
-  int opacityVal(int dir) {
-    return scene.opacM[wallMaskX(x, dir)][wallMaskY(y, dir)];
-  }
-  
-  void setWallMask(int dir, byte val) {
+  void setBlockage(int dir, byte val) {
     scene.wallM[wallMaskX(x, dir)][wallMaskY(y, dir)] = val;
   }
   
   void setOpacity(int dir, byte val) {
     scene.opacM[wallMaskX(x, dir)][wallMaskY(y, dir)] = val;
   }
+  
+  public int blockageVal(int dir) {
+    return scene.wallM[wallMaskX(x, dir)][wallMaskY(y, dir)];
+  }
+  
+  public int opacityVal(int dir) {
+    return scene.opacM[wallMaskX(x, dir)][wallMaskY(y, dir)];
+  }
+  
+  public int coverVal(int dir) {
+    int block = blockageVal(dir), opaque = opacityVal(dir);
+    if (opaque == 0 && block > 0) block--;
+    return block;
+  }
+  
+  int wallVal(int dir, int valID) {
+    switch (valID) {
+      case(OP_VAL): return opacityVal (dir);
+      case(BL_VAL): return blockageVal(dir);
+      case(CV_VAL): return coverVal   (dir);
+    }
+    return 0;
+  }
 
   
   void wipePathing() {
     for (int dir : T_ADJACENT) {
-      setWallMask(dir, (byte) 0);
+      setBlockage(dir, (byte) 0);
       setOpacity (dir, (byte) 0);
     }
   }
@@ -133,7 +146,7 @@ public class Tile implements Session.Saveable {
           if (opacity > 0              ) opaque  = true;
         }
         else {
-          setWallMask(dir, (byte) Nums.max(blocks , wallMaskVal(dir)));
+          setBlockage(dir, (byte) Nums.max(blocks , blockageVal(dir)));
           setOpacity (dir, (byte) Nums.max(opacity, opacityVal (dir)));
         }
       }
@@ -143,7 +156,7 @@ public class Tile implements Session.Saveable {
   
   public Tile[] tilesAdjacent(Tile temp[]) {
     for (int n : T_ADJACENT) {
-      if (wallMaskVal(n) == Kind.BLOCK_FULL) temp[n] = null;
+      if (blockageVal(n) == Kind.BLOCK_FULL) temp[n] = null;
       else temp[n] = scene.tileAt(x + T_X[n], y + T_Y[n]);
     }
     
@@ -155,12 +168,12 @@ public class Tile implements Session.Saveable {
       
       dirA = (n + 1) % 8;
       dirB = (n + 7) % 8;
-      block = Nums.max(wallMaskVal(dirA), wallMaskVal(dirB));
+      block = Nums.max(blockageVal(dirA), blockageVal(dirB));
       if (block == Kind.BLOCK_FULL) continue;
       
       dirA = (n + 3) % 8;
       dirB = (n + 5) % 8;
-      block = Nums.max(d.wallMaskVal(dirA), d.wallMaskVal(dirB));
+      block = Nums.max(d.blockageVal(dirA), d.blockageVal(dirB));
       if (block == Kind.BLOCK_FULL) continue;
       
       temp[n] = d;
@@ -169,42 +182,56 @@ public class Tile implements Session.Saveable {
   }
   
   
-  public int coverLevel(int dir) {
-    int block = wallMaskVal(dir), opaque = opacityVal(dir);
-    if (opaque == 0 && block > 0) block--;
-    return block;
+  public int coverLevel(Vec2D origin, Vec2D line, boolean report) {
+    return wallVal(origin, line, CV_VAL, report);
   }
   
   
   public boolean blocksSight(Vec2D origin, Vec2D line, boolean report) {
+    return wallVal(origin, line, OP_VAL, report) > 0;
+  }
+  
+  
+  private int wallVal(
+    Vec2D origin, Vec2D line, int valID, boolean report
+  ) {
+    int maxVal = 0, fillVal = 0;
+    switch (valID) {
+      case(OP_VAL): fillVal = blocked ? Kind.BLOCK_FULL : 0;
+      case(BL_VAL): fillVal = opaque ? 1 : 0;
+      case(CV_VAL): fillVal = 0;
+    }
     //
     //  TODO:  North/south/east/west values aren't being handled consistently
     //         here.  Address this in the TileConstants class and follow
     //         through to all affected code.
-    //  
-    //  TODO:  Move this into the Scene class?  Or move the LoS methods in
-    //  here?
     float nortX = solveX(origin, line, y + 0);
-    if (nortX >= 0 && (opaque || opacityVal(W) > 0)) {
-      if (report) I.say("    Intersects Y="+(y + 0)+" at "+nortX);
-      return true;
-    }
     float soutX = solveX(origin, line, y + 1);
-    if (soutX >= 0 && (opaque || opacityVal(E) > 0)) {
+    float westY = solveY(origin, line, x + 0);
+    float eastY = solveY(origin, line, x + 1);
+    
+    if (nortX >= 0) {
+      if (report) I.say("    Intersects Y="+(y + 0)+" at "+nortX);
+      maxVal = Nums.max(maxVal, fillVal);
+      maxVal = Nums.max(maxVal, wallVal(W, valID));
+    }
+    if (soutX >= 0) {
       if (report) I.say("    Intersects Y="+(y + 1)+" at "+soutX);
-      return true;
+      maxVal = Nums.max(maxVal, fillVal);
+      maxVal = Nums.max(maxVal, wallVal(E, valID));
     }
-    float eastY = solveY(origin, line, x + 0);
-    if (eastY >= 0 && (opaque || opacityVal(S) > 0)) {
-      if (report) I.say("    Intersects X="+(x + 0)+" at "+eastY);
-      return true;
+    if (westY >= 0) {
+      if (report) I.say("    Intersects X="+(x + 0)+" at "+westY);
+      maxVal = Nums.max(maxVal, fillVal);
+      maxVal = Nums.max(maxVal, wallVal(S, valID));
     }
-    float westY = solveY(origin, line, x + 1);
-    if (westY >= 0 && (opaque || opacityVal(N) > 0)) {
-      if (report) I.say("    Intersects X="+(x + 1)+" at "+westY);
-      return true;
+    if (eastY >= 0) {
+      if (report) I.say("    Intersects X="+(x + 1)+" at "+eastY);
+      maxVal = Nums.max(maxVal, fillVal);
+      maxVal = Nums.max(maxVal, wallVal(N, valID));
     }
-    return false;
+    
+    return maxVal;
   }
   
   
