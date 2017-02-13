@@ -217,9 +217,9 @@ public class SceneView extends UINode implements TileConstants {
       Color pale = PALES[(int) (stunLevel * 9.9f)];
       //
       //  Including their health-bars:
-      renderColor(pos.x, pos.y + 0.9f, 1, 0.1f, Color.BLACK, g);
-      renderColor(pos.x, pos.y + 0.9f, 1, 0.1f, pale, g);
-      renderColor(pos.x, pos.y + 0.9f, healthLevel, 0.1f, teamColor, g);
+      renderColor(pos.x, pos.y + 0.5f, 1, 0.1f, Color.BLACK, g);
+      renderColor(pos.x, pos.y + 0.5f, 1, 0.1f, pale, g);
+      renderColor(pos.x, pos.y + 0.5f, healthLevel, 0.1f, teamColor, g);
       renderString(pos.x, pos.y + 0.5f, p.name(), Color.WHITE, g);
       
       if (p == activePerson) {
@@ -241,7 +241,7 @@ public class SceneView extends UINode implements TileConstants {
     //  Then render our own fog on top of all objects-
     for (Coord c : Visit.grid(0, 0, size, size, 1)) {
       Tile t = scene.tileAt(c.x, c.y);
-      float fogAlpha = 1f - scene.vision.fogAt(t, Person.Side.HEROES);
+      float fogAlpha = 1f - tileVisibilityKluge(t, Person.Side.HEROES);
       if (GameSettings.debugScene) fogAlpha /= 3;
       Color black = SCALE[Nums.clamp((int) (fogAlpha * 10), 10)];
       renderColor(c.x, c.y, 1, 1, black, g);
@@ -320,6 +320,30 @@ public class SceneView extends UINode implements TileConstants {
         scale, scale, (dir + 2) * 45, img, g
       );
     }
+  }
+  
+  
+  private float tileVisibilityKluge(Tile tile, Person.Side side) {
+    //  
+    //  TODO:  Like the names says, this is a hack necessitated by the limits
+    //  of the Java2D API's rendering of images (i.e, fog has to be drawn on
+    //  top, rather than as a form of tinting for specific sprites.)  Remove
+    //  as soon as possible once you migrate to a proper graphics engine.
+    
+    Scene scene = tile.scene;
+    float maxSight = scene.vision.fogAt(tile, side);
+    if (maxSight > 0) return maxSight;
+    
+    for (int dir : T_ADJACENT) {
+      if (tile.hasWall(dir)) continue;
+      
+      Tile near = scene.tileAt(tile.x + T_X[dir], tile.y + T_Y[dir]);
+      if (near == null) continue;
+      if (near.hasWall((dir + 4) % 8)) continue;
+      
+      maxSight = Nums.max(maxSight, scene.vision.fogAt(near, side));
+    }
+    return maxSight;
   }
   
   

@@ -276,6 +276,16 @@ public class Tile implements Session.Saveable {
   }
   
   
+  public boolean hasWall(int dir) {
+    int facing = (dir + 2) % 8;
+    for (Element e : inside()) if (e.isProp()) {
+      Prop p = (Prop) e;
+      if (p.kind().thin() && p.facing() == facing) return true;
+    }
+    return false;
+  }
+  
+  
   
   /**  Modifying occupancy-
     */

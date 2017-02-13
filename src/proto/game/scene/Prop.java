@@ -192,11 +192,17 @@ public class Prop extends Element implements TileConstants {
   /**  Rendering, debug and interface methods-
     */
   public void renderTo(Scene scene, SceneView view, Surface s, Graphics2D g) {
+    int truW = kind().wide(), truH = kind().high();
     float midX = origin.x, midY = origin.y;
-    float w = Nums.max(1, kind().wide()), h = Nums.max(1, kind().high());
+    float w = Nums.max(1, truW), h = Nums.max(1, truH);
     
-    //  TODO:  Have a centre() method which returns this coordinate!
+    //  TODO:  Have a centre() method which returns this coordinate?
+    //  NOTE:  The zero-dimensions offsets are intended for walls and doors (a
+    //  slight hack.)
     float hw = (w - 1) / 2f, hh = (h - 1) / 2f;
+    if (truW == 0) hw -= 0.05f;
+    if (truH == 0) hh -= 0.05f;
+    
     if (facing == N) { midX += hw; midY += hh; }
     if (facing == E) { midX -= hh; midY += hw; }
     if (facing == S) { midX -= hw; midY -= hh; }
