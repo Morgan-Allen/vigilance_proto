@@ -33,7 +33,8 @@ public abstract class Ability extends Trait {
     IS_NATURAL        = 1 << 11,
     IS_EQUIPPED       = 1 << 12,
     TRIGGER_ON_ATTACK = 1 << 13,
-    TRIGGER_ON_DEFEND = 1 << 14;
+    TRIGGER_ON_DEFEND = 1 << 14,
+    TRIGGER_ON_ACTION = 1 << 15;
   final public static float
     MAJOR_HELP = -2.0f,
     REAL_HELP  = -1.0f,

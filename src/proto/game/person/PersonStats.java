@@ -290,9 +290,9 @@ public class PersonStats {
     updateStat(ACT_POINTS , actPoints, true);
     updateStat(MOVE_SPEED , moveSpeed, true);
     
-    //  Average accuracy is 50%.  Average defence is 20%.
+    //  Average accuracy is 50%.  Average defence is 15%.
     float accLevel = (5 + reflexes) * 5;
-    float defLevel = (accLevel / 2) - 5;
+    float defLevel = 5 * (int) (reflexes / 2);
     updateStat(ACCURACY   , accLevel, true);
     updateStat(DEFENCE    , defLevel, true);
     

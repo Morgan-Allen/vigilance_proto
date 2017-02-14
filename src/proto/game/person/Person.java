@@ -224,7 +224,9 @@ public class Person extends Element {
   public void setExactPosition(Scene scene, float x, float y, float z) {
     final Tile old = this.location;
     
-    location = scene == null ? null : scene.tileAt((int) x, (int) y);
+    location = scene == null ? null : scene.tileAt(
+      (int) (x + 0.5f), (int) (y + 0.5f)
+    );
     exactPos.set(x, y, z);
     
     if (old != location) {

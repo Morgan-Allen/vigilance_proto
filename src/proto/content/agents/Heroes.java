@@ -20,7 +20,7 @@ public class Heroes {
       null,
       Kind.SUBTYPE_HERO,
       BRAINS  , 8 ,
-      REFLEXES, 6 ,
+      REFLEXES, 8 ,
       WILL    , 8 ,
       MUSCLE  , 6 ,
       
@@ -42,7 +42,7 @@ public class Heroes {
       Kind.SUBTYPE_HERO,
       BRAINS  , 6 ,
       REFLEXES, 8 ,
-      WILL    , 6 ,
+      WILL    , 8 ,
       MUSCLE  , 8 ,
       
       ENGINEERING  , 6,

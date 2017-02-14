@@ -7,7 +7,6 @@ import proto.game.person.*;
 import proto.game.scene.*;
 import proto.util.*;
 import static proto.content.places.UrbanScenes.*;
-
 import proto.content.agents.Crooks;
 
 
@@ -42,9 +41,9 @@ public class DebugSceneWithLayout extends RunGame {
   
   
   public static void main(String args[]) {
-    GameSettings.debugScene      = true;
-    GameSettings.viewSceneBlocks = true;
-    GameSettings.debugLineSight  = true;
+    //GameSettings.debugScene      = true;
+    //GameSettings.viewSceneBlocks = true;
+    //GameSettings.debugLineSight  = true;
     runGame(new DebugSceneWithLayout(), "saves/debug_fixed_scene");
   }
   
@@ -80,21 +79,26 @@ public class DebugSceneWithLayout extends RunGame {
     //*/
     Tile.printWallsMask(mission);
     //
-    //  Then introduce the agents themselves-
+    //  Then introduce the agent/s themselves-
     final Base base = world.playerBase();
-    Series <Person> active = base.roster();
-    int across = (mission.size() - (active.size())) / 2;
-    for (Person p : active) {
-      p.gear.equipItem(Gadgets.TEAR_GAS, PersonGear.SLOT_ITEM_1);
-      p.addAssignment(mission);
-      mission.enterScene(p, 0, across++);
-      break;
-    }
+    int across = (mission.size() - 0) / 2;
+    Person hero = base.roster().first();
+    hero.gear.equipItem(Gadgets.TEAR_GAS, PersonGear.SLOT_ITEM_1);
+    hero.addAssignment(mission);
+    mission.enterScene(hero, 0, across++);
+    hero.onTurnStart();
+    hero.actions.assignAction(Common.GUARD.configAction(
+      hero, hero.currentTile(), hero, mission, null, null
+    ));
     //
     //  And a random goon-
-    Person goon = Person.randomOfKind(Crooks.HITMAN, world);
+    Person goon = Person.randomOfKind(Crooks.BRUISER, world);
     goon.addAssignment(mission);
-    mission.enterScene(goon, mission.size() - 1, 4);
+    mission.enterScene(goon, 0, across++);
+    goon.onTurnStart();
+    goon.actions.assignAction(Common.STRIKE.configAction(
+      goon, hero.currentTile(), hero, mission, null, null
+    ));
     //
     //  Then enter and return-
     world.enterScene(mission);

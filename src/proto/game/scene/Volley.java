@@ -193,8 +193,9 @@ public class Volley implements Session.Saveable {
     hitsArmour      = hits.stats.levelFor(ARMOUR    );
     
     if (weaponType.melee() && ! ranged) {
-      float brawnBonus = self.stats.levelFor(MUSCLE) / 2f;
       selfAccuracy = self.stats.levelFor(ACCURACY);
+      selfAccuracy += 50;
+      float brawnBonus = self.stats.levelFor(MUSCLE) / 2f;
       selfDamageBase  += Nums.ceil (brawnBonus);
       selfDamageRange += Nums.floor(brawnBonus);
       hitsDefence = hits.stats.levelFor(DEFENCE);
@@ -203,15 +204,16 @@ public class Volley implements Session.Saveable {
       selfAccuracy = self.stats.levelFor(ACCURACY);
       float normRange = self.stats.sightRange();
       float distance  = scene.distance(self.currentTile(), hits.currentTile());
-      selfAccuracy -= 25 * (distance - normRange);
+      float coverBonus = coverBonus(orig, targ, scene);
+      selfAccuracy -= 100 * ((distance - 1) - normRange) / normRange;
       hitsDefence = hits.stats.levelFor(DEFENCE);
-      hitsDefence += coverBonus(orig, targ, scene);
+      hitsDefence += coverBonus;
     }
     
     hitsDefence  = Nums.max(hitsDefence , 1);
     selfAccuracy = Nums.max(selfAccuracy, 1);
-    accuracyMargin = (int) (selfAccuracy - hitsDefence);
-    critPercent = ((25 + selfAccuracy) * accuracyMargin) / (5 * 50);
+    accuracyMargin = (int) Nums.clamp(selfAccuracy - hitsDefence, 0, 100);
+    critPercent = ((selfAccuracy - 25) * accuracyMargin) / (5 * 50);
     
     if (weapon != nativeWeapon) {
       self.gear.equipItem(nativeWeapon, PersonGear.SLOT_WEAPON);
