@@ -129,8 +129,8 @@ public class Person extends Element {
   
   /**  General state queries-
     */
-  public Kind kind() {
-    return kind;
+  public PersonType kind() {
+    return (PersonType) kind;
   }
   
   

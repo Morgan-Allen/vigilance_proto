@@ -25,7 +25,7 @@ public class Civilians {
   final public static PersonType
     CIVILIAN = new PersonType(
       "Civilian", "person_kind_civilian", IMG_DIR+"icon_civilian.png",
-      "", COMMON_NAMES,
+      "", COMMON_NAMES, null,
       Kind.SUBTYPE_CIVILIAN,
       BRAINS  , 2 ,
       REFLEXES, 2 ,
@@ -34,7 +34,7 @@ public class Civilians {
     ),
     DOCTOR = new PersonType(
       "Doctor", "person_kind_doctor", IMG_DIR+"icon_doctor.png",
-      "", COMMON_NAMES,
+      "", COMMON_NAMES, null,
       Kind.SUBTYPE_CIVILIAN,
       BRAINS  , 7 ,
       REFLEXES, 3 ,
@@ -45,7 +45,7 @@ public class Civilians {
     ),
     INVENTOR = new PersonType(
       "Inventor", "person_kind_inventor", IMG_DIR+"icon_inventor.png",
-      "", COMMON_NAMES,
+      "", COMMON_NAMES, null,
       Kind.SUBTYPE_CIVILIAN,
       BRAINS  , 7 ,
       REFLEXES, 3 ,
@@ -56,7 +56,7 @@ public class Civilians {
     ),
     BROKER = new PersonType(
       "Broker", "person_kind_broker", IMG_DIR+"icon_broker.png",
-      "", Civilians.COMMON_NAMES,
+      "", Civilians.COMMON_NAMES, null,
       Kind.SUBTYPE_CIVILIAN,
       BRAINS  , 6 ,
       REFLEXES, 3 ,

@@ -96,9 +96,6 @@ public class DefaultGame extends RunGame {
       }
     }
     
-    final Ability learnTechs[] = Techniques.PHYS_TECHNIQUES;
-    for (Object t : learnTechs) base.addTech(t);
-    
     final ItemType craftTechs[] = {
       Weapons.WING_BLADES,
       Weapons.REVOLVER,

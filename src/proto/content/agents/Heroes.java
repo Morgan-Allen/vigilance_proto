@@ -17,7 +17,7 @@ public class Heroes {
     HERO_PHOBOS = new PersonType(
       "Phobos", "hero_kind_phobos", IMG_DIR+"icon_phobos.png",
       "<phobos description>",
-      null,
+      null, Techniques.CORE_TECHNIQUES,
       Kind.SUBTYPE_HERO,
       BRAINS  , 8 ,
       REFLEXES, 8 ,
@@ -38,7 +38,7 @@ public class Heroes {
     HERO_DEIMOS = new PersonType(
       "Deimos", "hero_kind_deimos", IMG_DIR+"icon_deimos.png",
       "<deimos description>",
-      null,
+      null, Techniques.CORE_TECHNIQUES,
       Kind.SUBTYPE_HERO,
       BRAINS  , 6 ,
       REFLEXES, 8 ,
@@ -59,7 +59,7 @@ public class Heroes {
     HERO_NIGHT_SWIFT = new PersonType(
       "Night Swift", "hero_kind_night_swift", IMG_DIR+"icon_night_swift.png",
       "<night swift description>",
-      null,
+      null, Techniques.CORE_TECHNIQUES,
       Kind.SUBTYPE_HERO,
       BRAINS  , 6 ,
       REFLEXES, 6 ,
@@ -80,7 +80,7 @@ public class Heroes {
     HERO_DR_YANG = new PersonType(
       "Dr. Yang", "hero_kind_dr_yang", IMG_DIR+"icon_dr_yang.png",
       "<dr. yang description>",
-      null,
+      null, Techniques.CORE_TECHNIQUES,
       Kind.SUBTYPE_HERO,
       BRAINS  , 8 ,
       REFLEXES, 5 ,

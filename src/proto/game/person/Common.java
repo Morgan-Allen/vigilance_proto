@@ -17,7 +17,7 @@ import java.awt.Graphics2D;
 public class Common {
 
   final static String
-    ICONS_DIR  = "media assets/item icons/",
+    ICONS_DIR  = "media assets/ability icons/",
     SPRITE_DIR = "media assets/character sprites/"
   ;
   
@@ -45,7 +45,7 @@ public class Common {
     
     MOVE = new Ability(
       "Move", "ability_move",
-      SPRITE_DIR+"move.png",
+      ICONS_DIR+"icon_move.png",
       "Move to the chosen point.",
       Ability.IS_BASIC | Ability.NO_NEED_LOS | Ability.NO_NEED_FOG, 1,
       Ability.NO_HARM, Ability.MINOR_POWER
@@ -70,7 +70,7 @@ public class Common {
     
     STRIKE = new Ability(
       "Strike", "ability_strike",
-      SPRITE_DIR+"strike.png",
+      ICONS_DIR+"icon_strike.png",
       "Strike a melee target.  (Base damage scales with strength and weapon "+
       "bonus, 50% stun damage.)",
       Ability.IS_BASIC | Ability.IS_MELEE,
@@ -101,7 +101,7 @@ public class Common {
     
     FIRE = new Ability(
       "Fire", "ability_throw",
-      SPRITE_DIR+"throw.png",
+      ICONS_DIR+"icon_fire.png",
       "Fire a shot using ranged weaponry.  Accuracy falls off with distance.",
       Ability.IS_BASIC | Ability.IS_RANGED, 1,
       Ability.REAL_HARM, Ability.MINOR_POWER
@@ -129,7 +129,7 @@ public class Common {
     
     GUARD = new Ability(
       "Guard", "ability_guard",
-      SPRITE_DIR+"guard.png",
+      ICONS_DIR+"icon_guard.png",
       "Reserve AP to reduce incoming damage and grant chance to counter-"+
       "attack in melee.  Ends turn.",
       Ability.IS_BASIC | Ability.IS_DELAYED | Ability.TRIGGER_ON_DEFEND,

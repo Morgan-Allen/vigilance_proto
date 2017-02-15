@@ -14,7 +14,7 @@ public class Villains {
   final public static PersonType
     MORETTI  = new PersonType(
       "Moretti", "villain_kind_moretti", IMG_DIR+"icon_moretti.png",
-      "<moretti description>", null,
+      "<moretti description>", null, null,
       Kind.SUBTYPE_BOSS,
       BRAINS  , 8 ,
       REFLEXES, 5 ,
@@ -26,7 +26,7 @@ public class Villains {
     ),
     SNAKE_EYES = new PersonType(
       "Snake Eyes", "villain_kind_snake_eyes", IMG_DIR+"icon_snake_eyes.png",
-      "<snake-eyes description>", null,
+      "<snake-eyes description>", null, null,
       Kind.SUBTYPE_BOSS,
       BRAINS  , 7 ,
       REFLEXES, 7 ,

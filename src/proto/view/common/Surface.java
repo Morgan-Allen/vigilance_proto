@@ -81,6 +81,11 @@ public class Surface extends JPanel implements
   }
   
   
+  public Object lastFocus() {
+    return lastFocus;
+  }
+  
+  
   
   /**  Root rendering method/s-
     */

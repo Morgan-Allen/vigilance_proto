@@ -34,7 +34,7 @@ public abstract class Ability extends Trait {
     IS_EQUIPPED       = 1 << 12,
     TRIGGER_ON_ATTACK = 1 << 13,
     TRIGGER_ON_DEFEND = 1 << 14,
-    TRIGGER_ON_ACTION = 1 << 15;
+    TRIGGER_ON_NOTICE = 1 << 15;
   final public static float
     MAJOR_HELP = -2.0f,
     REAL_HELP  = -1.0f,
@@ -61,9 +61,10 @@ public abstract class Ability extends Trait {
   public Ability(
     String name, String ID, String imgPath, String description,
     int properties, int costAP,
-    float harmLevel, float powerLevel
+    float harmLevel, float powerLevel,
+    Ability... roots
   ) {
-    super(name, ID, imgPath, description);
+    super(name, ID, imgPath, description, roots);
     this.properties  = properties;
     this.costAP      = costAP;
     this.harmLevel   = harmLevel;
@@ -217,6 +218,11 @@ public abstract class Ability extends Trait {
   }
   
   
+  public boolean allowsUse(Person acting, StringBuffer failLog) {
+    return true;
+  }
+  
+  
   public boolean allowsTarget(Object target, Scene scene, Person acting) {
     return false;
   }
@@ -226,6 +232,9 @@ public abstract class Ability extends Trait {
     Person acting, Tile dest, Object target,
     Scene scene, Tile pathToTake[], StringBuffer failLog
   ) {
+    if (! allowsUse(acting, failLog)) {
+      return null;
+    }
     if (acting == null || ! allowsTarget(target, scene, acting)) {
       return failResult("Invalid Target", failLog);
     }

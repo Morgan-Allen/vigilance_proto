@@ -64,11 +64,32 @@ public class TrainingView extends UINode {
   ) {
     final Base base = mainView.world().playerBase();
     int down = 10, across = 10;
-    
+
     TaskTrain current = null;
     for (Assignment a : person.assignments()) if (a instanceof TaskTrain) {
       current = (TaskTrain) a;
     }
+    
+    down += 30;
+    TaskTrain hovered = current;
+    
+    AbilityPalette palette = person.kind().abilityPalette();
+    palette.renderTo(surface, g, across + 40, down, this);
+    
+    //  TODO:  Remove this
+    Object focus = surface.lastFocus();
+    if (focus instanceof Ability) {
+      final Ability a = (Ability) focus;
+      String desc = ""+a.name;
+      desc += "\n  "+a.description;
+      
+      down += 300;
+      
+      g.setColor(Color.LIGHT_GRAY);
+      ViewUtils.drawWrappedString(desc, g, vx + across, vy + down, 320, 200);
+    }
+    
+    /*
     g.setColor(Color.WHITE);
     ViewUtils.drawWrappedString(
       "Training: "+(current == null ? "None" : current.trained()), g,
@@ -86,6 +107,7 @@ public class TrainingView extends UINode {
       down += view.relBounds.ydim() + 10;
       if (surface.wasHovered(option)) hovered = option;
     }
+    //*/
     
     if (hovered != null) {
       down += 10;
@@ -97,7 +119,7 @@ public class TrainingView extends UINode {
       String desc = hovered.trained().description;
       
       if (trainTime <= 0) desc += "\n  Cannot train when badly wounded.";
-      else desc += "\n  Training time: "+trainTime+" days";
+      else                desc += "\n  Training time: "+trainTime+" days";
       desc += " ("+(int) (xp * 100)+"% complete).";
       if (costAP > 0) desc += "\n  Base AP cost: "+costAP;
       

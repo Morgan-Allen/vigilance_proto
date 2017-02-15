@@ -17,7 +17,7 @@ public class Crooks {
   final public static PersonType
     BRUISER = new PersonType(
       "Bruiser", "person_kind_bruiser", IMG_DIR+"icon_bruiser.png",
-      "", Civilians.COMMON_NAMES,
+      "", Civilians.COMMON_NAMES, null,
       Kind.SUBTYPE_MOOK,
       BRAINS  , 2 ,
       REFLEXES, 4 ,
@@ -27,7 +27,7 @@ public class Crooks {
     ),
     GANGSTER = new PersonType(
       "Gangster", "person_kind_gangster", IMG_DIR+"icon_gangster.png",
-      "", Civilians.COMMON_NAMES,
+      "", Civilians.COMMON_NAMES, null,
       Kind.SUBTYPE_MOOK,
       BRAINS  , 4 ,
       REFLEXES, 6 ,
@@ -37,7 +37,7 @@ public class Crooks {
     ),
     HITMAN = new PersonType(
       "Hitman", "person_kind_hitman", IMG_DIR+"icon_gangster.png",
-      "", Civilians.COMMON_NAMES,
+      "", Civilians.COMMON_NAMES, null,
       Kind.SUBTYPE_MOOK,
       BRAINS  , 6 ,
       REFLEXES, 8 ,

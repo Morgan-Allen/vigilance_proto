@@ -10,51 +10,25 @@ import static proto.game.person.ItemType.*;
 import static proto.game.person.PersonGear.*;
 import static proto.game.person.PersonStats.*;
 
+import proto.view.base.*;
+
+import java.awt.Graphics2D;
 import java.awt.Image;
-
-
-/*
-Couple of ideas for the moment...
-
-Close Combat
-  Punisher
-    Joint Break
-  Disarm
-    Sleeper Hold
-  Block & Counter
-    Long Throw
-
-Observation
-  Evasion
-    Low Profile
-  Vigilance
-    Steady Aim
-  Rapid Volley
-    Parting Shot
-
-Stamina
-  Diehard
-    Iron Will
-  Chest Work
-    Wrestler
-  Leg Day
-    Long Jump
-//*/
 
 
 
 public class Techniques {
   
   final static String
-    ICONS_DIR  = "media assets/item icons/",
+    ICONS_DIR  = "media assets/ability icons/",
     SPRITE_DIR = "media assets/character sprites/"
   ;
   
   final public static Ability
     
-    PUNISHMENT = new Ability(
-      "Punishment", "ability_punishment",
-      SPRITE_DIR+"sprite_punch.png",
+    PUNISHER = new Ability(
+      "Punisher", "ability_punisher",
+      ICONS_DIR+"icon_punisher.png",
       "Deals additional melee damage with increased risk of lethality and "+
       "chance to stun.",
       Ability.IS_MELEE, 1, Ability.REAL_HARM, Ability.MINOR_POWER
@@ -79,12 +53,15 @@ public class Techniques {
       }
       
       final Image missile = Kind.loadImage(SPRITE_DIR+"sprite_punch.png");
-      public Image missileSprite() { return missile; }
+      
+      public void renderUsageFX(Action action, Scene scene, Graphics2D g) {
+        FX.renderMissile(action, scene, missile, g);
+      }
     },
     
     DISARM = new Ability(
       "Disarm", "ability_disarm",
-      SPRITE_DIR+"sprite_punch.png",
+      ICONS_DIR+"icon_disarm.png",
       "Deals nonlethal damage with a chance to remove the target's weapon.",
       Ability.IS_MELEE, 2, Ability.REAL_HARM, Ability.MINOR_POWER
     ) {
@@ -116,12 +93,30 @@ public class Techniques {
       }
       
       final Image missile = Kind.loadImage(SPRITE_DIR+"sprite_punch.png");
-      public Image missileSprite() { return missile; }
+      
+      public void renderUsageFX(Action action, Scene scene, Graphics2D g) {
+        FX.renderMissile(action, scene, missile, g);
+      }
+    },
+    
+    SPRINTER = new Ability(
+      "Sprinter", "ability_sprinter",
+      ICONS_DIR+"icon_sprinter.png",
+      "Increases movement speed by 1 tile per experience grade and provides "+
+      "a small bonus to defence.",
+      Ability.IS_PASSIVE, 0, Ability.NO_HARM, Ability.MINOR_POWER
+    ) {
+      public float passiveModifierFor(Person person, Trait trait) {
+        int level = person.stats.levelFor(this);
+        if (trait == MOVE_SPEED) return level * 1;
+        if (trait == DEFENCE   ) return Nums.max(0, (level * 2) - 1);
+        return 0;
+      }
     },
     
     EVASION = new Ability(
       "Evasion", "ability_evasion",
-      SPRITE_DIR+"move.png",
+      ICONS_DIR+"icon_evasion.png",
       "Reserve AP to increase chance to dodge enemy attacks by at least 20%. "+
       "Ends turn.",
       Ability.IS_DELAYED | Ability.TRIGGER_ON_DEFEND, 1,
@@ -152,7 +147,7 @@ public class Techniques {
     
     ENDURANCE = new Ability(
       "Endurance", "ability_endurance",
-      SPRITE_DIR+"move.png",
+      ICONS_DIR+"icon_endurance.png",
       "Grants 2 bonus health per experience grade.",
       Ability.IS_PASSIVE, 1,
       Ability.NO_HARM, Ability.MINOR_POWER
@@ -164,9 +159,102 @@ public class Techniques {
       }
     },
     
-    PHYS_TECHNIQUES[] = { PUNISHMENT, DISARM, EVASION, ENDURANCE };
+    STEADY_AIM = new Ability(
+      "Steady Aim", "ability_steady_aim",
+      ICONS_DIR+"icon_steady_aim.png",
+      "Grants +25 accuracy to your next ranged attacks (+5 per experience "+
+      "grade) for one turn.",
+      Ability.IS_DELAYED | Ability.IS_ACTIVE | Ability.IS_CONDITION, 1,
+      Ability.MINOR_HELP, Ability.MINOR_POWER
+    ) {
+      public void applyOnActionStart(Action use) {
+        use.acting.stats.applyCondition(this, use.acting, 1);
+      }
+      
+      //  TODO:  You need to ensure this applies correctly!
+      
+      public void applyOnAttackStart(Volley volley) {
+        Person using = volley.origAsPerson();
+        int level = using.stats.levelFor(this);
+        if (volley.ranged()) volley.selfAccuracy += 25 + (level * 5);
+      }
+    },
+    
+    OVERWATCH = new Ability(
+      "Overwatch", "ability_overwatch",
+      ICONS_DIR+"icon_overwatch.png",
+      "Readies a ranged weapon for use when an enemy comes in view, at a -15 "+
+      "accuracy penality (+5 per experience grade.)",
+      Ability.IS_DELAYED | Ability.TRIGGER_ON_NOTICE, 1,
+      Ability.MINOR_HELP, Ability.MINOR_POWER
+    ) {
+      public boolean triggerOnNoticeAction(Person using, Action action) {
+        return action.acting.isEnemy(using);
+      }
+      
+      //  TODO:  You need to implement support for these event-triggers!
+      
+      public void applyOnNoticeAction(Person using, Action action) {
+        Person mark = action.acting;
+        Scene scene = using.currentScene();
+        Common.FIRE.takeFreeAction(using, mark.currentTile(), mark, scene);
+      }
+    },
+    
+    FLESH_WOUND = new Ability(
+      "Flesh Wound", "ability_flesh_wound",
+      ICONS_DIR+"icon_flesh_wound.png",
+      "Reduces accuracy and crit chance to reduce lethality with blades or "+
+      "precision firearms.",
+      Ability.IS_MELEE, 2, Ability.REAL_HARM, Ability.MINOR_POWER
+    ) {
+      
+      public boolean allowsUse(Person acting, StringBuffer failLog) {
+        final ItemType weapon = acting.gear.weaponType();
+        int subtype = weapon.subtype();
+        if (subtype == Kind.SUBTYPE_BLADE      ) return true;
+        if (subtype == Kind.SUBTYPE_PRECISE_GUN) return true;
+        return false;
+      }
+      
+      public boolean allowsTarget(Object target, Scene scene, Person acting) {
+        if (target instanceof Person) {
+          final Person other = (Person) target;
+          return other.isEnemy(acting);
+        }
+        return false;
+      }
+      
+      protected Volley createVolley(Action use, Object target, Scene scene) {
+        Volley volley = new Volley();
+        volley.setupMeleeVolley(use.acting, (Person) target, scene);
+        volley.stunPercent = 100;
+        return volley;
+      }
+      
+      public void renderUsageFX(Action action, Scene scene, Graphics2D g) {
+        final ItemType weapon = action.acting.gear.weaponType();
+        if (weapon.melee()) Common.STRIKE.renderUsageFX(action, scene, g);
+        else                Common.FIRE  .renderUsageFX(action, scene, g);
+      }
+    };
   
+  final public static AbilityPalette CORE_TECHNIQUES;
+  static {
+    AbilityPalette p = CORE_TECHNIQUES = new AbilityPalette(2, 4);
+    p.attachAbility(SPRINTER   , 0, 0);
+    p.attachAbility(ENDURANCE  , 0, 1);
+    p.attachAbility(DISARM     , 0, 2);
+    p.attachAbility(PUNISHER , 0, 3);
+    
+    p.attachAbility(STEADY_AIM , 1, 0);
+    p.attachAbility(OVERWATCH  , 1, 1);
+    p.attachAbility(EVASION    , 1, 2);
+    p.attachAbility(FLESH_WOUND, 1, 3);
+  }
 }
+
+
 
 
 
