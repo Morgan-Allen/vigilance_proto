@@ -84,19 +84,34 @@ public class TaskTrain extends Task {
     */
   void advanceTraining(Person person, float timeHours) {
     final int level = person.stats.levelFor(trained);
-    float xpGain = trained.xpRequired(level), trainTime = trainingTime(person);
+    float xpGain = trained.xpRequired(level);
+    float trainTime = trainingTime(person, trained);
     xpGain *= timeHours / trainTime;
     person.stats.gainXP(trained, xpGain);
   }
   
   
-  float trainBonus(Person person) {
+  public Ability trained() {
+    return trained;
+  }
+  
+  
+  static Series <Person> activeTraining(Ability trained, Base base) {
+    Batch <Person> active = new Batch();
+    for (Person p : base.roster()) if (p.topAssignment() instanceof TaskTrain) {
+      active.add(p);
+    }
+    return active;
+  }
+  
+  
+  static float trainBonus(Person person, Ability trained) {
     float trainBonus = 0;
     //
     //  If you're training in a group, then you gain a bonus for whoever has
     //  the highest skill-rating, and for having a needed conversation skill.
     int numPeers = 0, maxLevel = 0;
-    for (Person p : active()) if (p != person) {
+    for (Person p : activeTraining(trained, person.base())) if (p != person) {
       maxLevel = Nums.max(maxLevel, p.stats.levelFor(trained));
       numPeers++;
     }
@@ -114,8 +129,8 @@ public class TaskTrain extends Task {
   }
   
   
-  public int trainingTime(Person person) {
-    float trainBonus = trainBonus(person);
+  public static int trainingTime(Person person, Ability trained) {
+    float trainBonus = trainBonus(person, trained);
     if (trainBonus <= -1) return -1;
     int defaultTime = GameSettings.DEF_ABILITY_TRAIN_TIME;
     int level = person.stats.levelFor(trained);
@@ -123,14 +138,9 @@ public class TaskTrain extends Task {
   }
   
   
-  public int trainingTimeLeft(Person person) {
+  public static int trainingTimeLeft(Person person, Ability trained) {
     float xp = person.stats.xpLevelFor(trained);
-    return (int) (trainingTime(person) * (1 - xp));
-  }
-  
-  
-  public Ability trained() {
-    return trained;
+    return (int) (trainingTime(person, trained) * (1 - xp));
   }
   
   

@@ -62,61 +62,65 @@ public class TrainingView extends UINode {
   private void renderTraining(
     Surface surface, Graphics2D g, final Person person
   ) {
-    final Base base = mainView.world().playerBase();
     int down = 10, across = 10;
 
+    final Base played = mainView.world().playerBase();
+    Ability hovered = null;
     TaskTrain current = null;
     for (Assignment a : person.assignments()) if (a instanceof TaskTrain) {
       current = (TaskTrain) a;
+      hovered = current.trained();
     }
     
-    down += 30;
-    TaskTrain hovered = current;
-    
-    AbilityPalette palette = person.kind().abilityPalette();
-    palette.renderTo(surface, g, across + 40, down, this);
-    
-    //  TODO:  Remove this
-    Object focus = surface.lastFocus();
-    if (focus instanceof Ability) {
-      final Ability a = (Ability) focus;
-      String desc = ""+a.name;
-      desc += "\n  "+a.description;
-      
-      down += 300;
-      
-      g.setColor(Color.LIGHT_GRAY);
-      ViewUtils.drawWrappedString(desc, g, vx + across, vy + down, 320, 200);
-    }
-    
-    /*
     g.setColor(Color.WHITE);
     ViewUtils.drawWrappedString(
-      "Training: "+(current == null ? "None" : current.trained()), g,
+      "Currently training: "+(current == null ? "None" : current.trained()), g,
       vx + across, vy + down, 320, 30
     );
     
-    down += 30;
-    TaskTrain hovered = current;
     
-    for (TaskTrain option : base.training.trainingTasksFor(person)) {
-      TaskView view = option.createView(mainView);
-      view.showIcon = false;
-      view.relBounds.set(vx + across, vy + down, 320, 20);
-      view.renderNow(surface, g);
-      down += view.relBounds.ydim() + 10;
-      if (surface.wasHovered(option)) hovered = option;
+    AbilityPalette palette = person.kind().abilityPalette();
+    int iconSize = 50, padding = 15;
+    down += 30; across = 90;
+    
+    for (Coord c : Visit.grid(0, 0, palette.wide, palette.high, 1)) {
+      final Ability a = palette.grid[c.x][c.y];
+      if (a == null) continue;
+      
+      Image icon = a.icon();
+      int x = c.x * (iconSize + padding), y = c.y * (iconSize + padding);
+      int w = iconSize, h = iconSize;
+      x += across + (padding / 2);
+      y += down   + (padding / 2);
+      
+      Box2D bound = new Box2D(x, y, w, h);
+      g.setColor(Color.LIGHT_GRAY);
+      g.drawRect(vx + x - 2, vy + y - 2, w + 4, h + 5);
+      
+      ImageButton b = new ImageButton(icon, bound, this) {
+        protected void whenClicked() {
+          selectTraining(a, person, played);
+        }
+      };
+      b.refers = a;
+      b.renderNow(surface, g);
     }
-    //*/
+    
+    
+    Object focus = surface.lastFocus();
+    if (focus instanceof Ability) hovered = (Ability) focus;
     
     if (hovered != null) {
-      down += 10;
+      down += 20 + (palette.high * (iconSize + padding));
+      across = 10;
       
-      Ability trained = hovered.trained();
-      float xp = person.stats.xpLevelFor(trained);
-      int trainTime = hovered.trainingTime(person) / World.HOURS_PER_DAY;
-      int costAP = trained.minCostAP();
-      String desc = hovered.trained().description;
+      float xp = person.stats.xpLevelFor(hovered);
+      int trainTime = TaskTrain.trainingTime(person, hovered);
+      trainTime /= World.HOURS_PER_DAY;
+      int costAP = hovered.minCostAP();
+      
+      String desc = hovered.name;
+      desc += "\n"+hovered.description;
       
       if (trainTime <= 0) desc += "\n  Cannot train when badly wounded.";
       else                desc += "\n  Training time: "+trainTime+" days";
@@ -126,10 +130,12 @@ public class TrainingView extends UINode {
       g.setColor(Color.LIGHT_GRAY);
       ViewUtils.drawWrappedString(desc, g, vx + across, vy + down, 320, 200);
     }
-    
-    //  TODO:  You'll want a different presentation-method for this, given
-    //  time- show the actual structure of the skill-tree so you can prioritise
-    //  accordingly.
+  }
+  
+  
+  void selectTraining(Ability trained, Person person, Base base) {
+    TaskTrain trainTask = base.training.trainingFor(trained);
+    person.addAssignment(trainTask);
   }
   
   

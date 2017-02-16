@@ -31,21 +31,12 @@ public class BaseTraining {
   }
   
   
-
-  public Series <TaskTrain> trainingTasksFor(Person person) {
-    if (! tasks.empty()) return tasks;
+  public TaskTrain trainingFor(Ability ability) {
+    for (TaskTrain task : tasks) if (task.trained() == ability) return task;
     
-    //  TODO:  Also include any abilities that are unlocked from whatever that
-    //  person currently knows!  (This will require caching tasks per agent.)
-    
-    for (Object tech : base.knownTech) {
-      if (tech instanceof Ability) {
-        Ability type = (Ability) tech;
-        tasks.add(new TaskTrain(type, PersonStats.PERSUADE, base));
-      }
-    }
-    
-    return tasks;
+    TaskTrain newTask = new TaskTrain(ability, PersonStats.PERSUADE, base);
+    tasks.add(newTask);
+    return newTask;
   }
   
   
