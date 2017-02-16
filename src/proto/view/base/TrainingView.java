@@ -63,7 +63,8 @@ public class TrainingView extends UINode {
     Surface surface, Graphics2D g, final Person person
   ) {
     int down = 10, across = 10;
-
+    //
+    //  Describe whatever the agent is currently training in-
     final Base played = mainView.world().playerBase();
     Ability hovered = null;
     TaskTrain current = null;
@@ -71,18 +72,36 @@ public class TrainingView extends UINode {
       current = (TaskTrain) a;
       hovered = current.trained();
     }
-    
     g.setColor(Color.WHITE);
     ViewUtils.drawWrappedString(
       "Currently training: "+(current == null ? "None" : current.trained()), g,
       vx + across, vy + down, 320, 30
     );
     
-    
     AbilityPalette palette = person.kind().abilityPalette();
     int iconSize = 50, padding = 15;
     down += 30; across = 90;
-    
+    //
+    //  Draw lines to indicate dependency between abilities-
+    for (Coord c : Visit.grid(0, 0, palette.wide, palette.high, 1)) {
+      final Ability a = palette.grid[c.x][c.y];
+      if (a == null) continue;
+      
+      g.setColor(Color.LIGHT_GRAY);
+      for (Trait t : a.roots()) if (t instanceof Ability) {
+        Coord at = palette.gridLocation((Ability) t);
+        if (at == null) continue;
+        
+        int lineX = vx + across, lineY = vy + down;
+        int xa = (int) ((c .x + 0.5f) * (iconSize + padding));
+        int ya = (int) ((c .y + 0.5f) * (iconSize + padding));
+        int xb = (int) ((at.x + 0.5f) * (iconSize + padding));
+        int yb = (int) ((at.y + 0.5f) * (iconSize + padding));
+        g.drawLine(lineX + xa, lineY + ya, lineX + xb, lineY + yb);
+      }
+    }
+    //
+    //  And buttons for the abilities themselves-
     for (Coord c : Visit.grid(0, 0, palette.wide, palette.high, 1)) {
       final Ability a = palette.grid[c.x][c.y];
       if (a == null) continue;
@@ -92,21 +111,26 @@ public class TrainingView extends UINode {
       int w = iconSize, h = iconSize;
       x += across + (padding / 2);
       y += down   + (padding / 2);
-      
       Box2D bound = new Box2D(x, y, w, h);
-      g.setColor(Color.LIGHT_GRAY);
-      g.drawRect(vx + x - 2, vy + y - 2, w + 4, h + 5);
+      
+      boolean canLearn = a.canLearn(person);
       
       ImageButton b = new ImageButton(icon, bound, this) {
         protected void whenClicked() {
           selectTraining(a, person, played);
         }
       };
+      b.valid = canLearn;
       b.refers = a;
       b.renderNow(surface, g);
+      
+      if (! canLearn) {
+        g.setColor(new Color(1, 1, 1, 0.5f));
+        g.fillRect(vx + x - 2, vy + y - 2, w + 4, h + 5);
+      }
     }
-    
-    
+    //
+    //  And provide a description for the current ability-
     Object focus = surface.lastFocus();
     if (focus instanceof Ability) hovered = (Ability) focus;
     
@@ -121,6 +145,12 @@ public class TrainingView extends UINode {
       
       String desc = hovered.name;
       desc += "\n"+hovered.description;
+      
+      Series <Ability> path = TaskTrain.trainingPath(hovered, person);
+      for (Ability a : path) if (a != hovered) {
+        desc += "\n  Requires: "+a.name;
+        break;
+      }
       
       if (trainTime <= 0) desc += "\n  Cannot train when badly wounded.";
       else                desc += "\n  Training time: "+trainTime+" days";

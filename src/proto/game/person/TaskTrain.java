@@ -16,6 +16,7 @@ public class TaskTrain extends Task {
   
   /**  Data fields, construction and save/load methods-
     */
+  //  TODO:  Specify an end-goal and a specific person!
   Ability trained;
   Trait talking;
   
@@ -141,6 +142,25 @@ public class TaskTrain extends Task {
   public static int trainingTimeLeft(Person person, Ability trained) {
     float xp = person.stats.xpLevelFor(trained);
     return (int) (trainingTime(person, trained) * (1 - xp));
+  }
+  
+  
+  public static Series <Ability> trainingPath(Ability goal, Person person) {
+    final Stack <Ability> path = new Stack();
+    final Stack <Ability> fore = new Stack();
+    fore.add(goal);
+    
+    while (! fore.empty()) {
+      for (Ability a : fore) {
+        path.addLast(a);
+        fore.remove(a);
+        if (a.canLearn(person)) continue;
+        for (Trait t : a.roots()) if (t instanceof Ability) {
+          fore.include((Ability) t);
+        }
+      }
+    }
+    return path;
   }
   
   

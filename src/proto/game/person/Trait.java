@@ -18,7 +18,7 @@ public class Trait extends Index.Entry implements Session.Saveable {
   final public String description;
   final public Image icon;
   
-  final Trait roots[];
+  private Trait roots[];
   
   
   public Trait(
@@ -29,7 +29,7 @@ public class Trait extends Index.Entry implements Session.Saveable {
     this.name        = name;
     this.description = description;
     this.icon        = Kind.loadImage(imgPath);
-    this.roots       = roots;
+    attachRoots(roots);
   }
   
   
@@ -46,6 +46,11 @@ public class Trait extends Index.Entry implements Session.Saveable {
   
   /**  Typing and properties-
     */
+  public void attachRoots(Trait... roots) {
+    this.roots = roots;
+  }
+  
+  
   public Trait[] roots() {
     return roots;
   }

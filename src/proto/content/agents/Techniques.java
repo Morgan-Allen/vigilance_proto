@@ -26,6 +26,27 @@ public class Techniques {
   
   final public static Ability
     
+    BRAWLER = new Ability(
+      "Brawler", "ability_brawler",
+      ICONS_DIR+"icon_brawler.png",
+      "Deal 1 extra damage in melee (+0.5 per experience grade), once armour "+
+      "is penetrated.",
+      Ability.IS_PASSIVE | Ability.IS_MELEE | Ability.TRIGGER_ON_ATTACK,
+      1, Ability.MINOR_HARM, Ability.MINOR_POWER
+    ) {
+      public void applyOnAttackEnd(Volley volley) {
+        Person self = volley.origAsPerson();
+        Person mark = volley.targAsPerson();
+        int level = self.stats.levelFor(this);
+        
+        if (volley.melee() && mark != null && volley.didDamage) {
+          int extra = level > 1 ? Rand.index(level - 1) : 0;
+          mark.health.receiveInjury(1 + extra);
+        }
+        return;
+      }
+    },
+    
     PUNISHER = new Ability(
       "Punisher", "ability_punisher",
       ICONS_DIR+"icon_punisher.png",
@@ -62,7 +83,8 @@ public class Techniques {
     DISARM = new Ability(
       "Disarm", "ability_disarm",
       ICONS_DIR+"icon_disarm.png",
-      "Deals nonlethal damage with a chance to remove the target's weapon.",
+      "Deals nonlethal melee damage with a chance to remove the target's "+
+      "weapon.",
       Ability.IS_MELEE, 2, Ability.REAL_HARM, Ability.MINOR_POWER
     ) {
       
@@ -162,8 +184,8 @@ public class Techniques {
     STEADY_AIM = new Ability(
       "Steady Aim", "ability_steady_aim",
       ICONS_DIR+"icon_steady_aim.png",
-      "Grants +25 accuracy to your next ranged attacks (+5 per experience "+
-      "grade) for one turn.",
+      "Grants +25 accuracy to your ranged attacks (+5 per experience grade) "+
+      "for one turn.",
       Ability.IS_DELAYED | Ability.IS_ACTIVE | Ability.IS_CONDITION, 1,
       Ability.MINOR_HELP, Ability.MINOR_POWER
     ) {
@@ -241,16 +263,25 @@ public class Techniques {
   
   final public static AbilityPalette CORE_TECHNIQUES;
   static {
-    AbilityPalette p = CORE_TECHNIQUES = new AbilityPalette(2, 4);
-    p.attachAbility(SPRINTER   , 0, 0);
-    p.attachAbility(ENDURANCE  , 0, 1);
-    p.attachAbility(DISARM     , 0, 2);
-    p.attachAbility(PUNISHER , 0, 3);
+    AbilityPalette p = CORE_TECHNIQUES = new AbilityPalette(3, 4);
+    p.attachAbility(ENDURANCE  , 0, 0);
+    p.attachAbility(SPRINTER   , 0, 1);
+    p.attachAbility(EVASION    , 0, 2);
+    SPRINTER.attachRoots(ENDURANCE);
+    EVASION .attachRoots(SPRINTER );
     
-    p.attachAbility(STEADY_AIM , 1, 0);
-    p.attachAbility(OVERWATCH  , 1, 1);
-    p.attachAbility(EVASION    , 1, 2);
-    p.attachAbility(FLESH_WOUND, 1, 3);
+    p.attachAbility(BRAWLER    , 1, 0);
+    p.attachAbility(DISARM     , 1, 1);
+    p.attachAbility(PUNISHER   , 1, 2);
+    DISARM  .attachRoots(BRAWLER);
+    PUNISHER.attachRoots(DISARM );
+    
+    p.attachAbility(STEADY_AIM , 2, 0);
+    p.attachAbility(OVERWATCH  , 2, 1);
+    p.attachAbility(FLESH_WOUND, 2, 2);
+    OVERWATCH  .attachRoots(STEADY_AIM);
+    FLESH_WOUND.attachRoots(OVERWATCH );
+    
   }
 }
 
