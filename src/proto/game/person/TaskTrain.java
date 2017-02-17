@@ -16,29 +16,29 @@ public class TaskTrain extends Task {
   
   /**  Data fields, construction and save/load methods-
     */
-  //  TODO:  Specify an end-goal and a specific person!
-  Ability trained;
-  Trait talking;
+  final Person trains;
+  Ability trainNow, trainGoal;
   
   
-  public TaskTrain(Ability trained, Trait talking, Base base) {
-    super(base, TIME_INDEF, trained, 0);
-    this.trained = trained;
-    this.talking = talking;
+  public TaskTrain(Person trains, Base base) {
+    super(base, TIME_INDEF);
+    this.trains = trains;
   }
   
   
   public TaskTrain(Session s) throws Exception {
     super(s);
-    trained = (Ability) s.loadObject();
-    talking = (Trait  ) s.loadObject();
+    trains    = (Person ) s.loadObject();
+    trainNow  = (Ability) s.loadObject();
+    trainGoal = (Ability) s.loadObject();
   }
   
   
   public void saveState(Session s) throws Exception {
     super.saveState(s);
-    s.saveObject(trained);
-    s.saveObject(talking);
+    s.saveObject(trains   );
+    s.saveObject(trainNow );
+    s.saveObject(trainGoal);
   }
   
   
@@ -46,7 +46,7 @@ public class TaskTrain extends Task {
   /**  Filler methods for task completion-
     */
   public boolean allowsAssignment(Person p) {
-    for (Trait root : trained.roots()) {
+    for (Trait root : trainNow.roots()) {
       if (p.stats.levelFor(root) <= 0) return false;
     }
     return true;
@@ -68,9 +68,9 @@ public class TaskTrain extends Task {
     
     float timeHours = base.world().timing.hoursInTick();
     for (Person p : active()) {
-      final int oldLevel = p.stats.levelFor(trained);
+      final int oldLevel = p.stats.levelFor(trainNow);
       advanceTraining(p, timeHours);
-      final int newLevel = p.stats.levelFor(trained);
+      final int newLevel = p.stats.levelFor(trainNow);
       if (newLevel > oldLevel) {
         p.stats.updateStats();
         presentTrainingMessage(p);
@@ -83,23 +83,46 @@ public class TaskTrain extends Task {
   
   /**  Training-specific methods-
     */
-  void advanceTraining(Person person, float timeHours) {
-    final int level = person.stats.levelFor(trained);
-    float xpGain = trained.xpRequired(level);
-    float trainTime = trainingTime(person, trained);
-    xpGain *= timeHours / trainTime;
-    person.stats.gainXP(trained, xpGain);
+  public void assignTraining(Ability goal) {
+    Series <Ability> path = TaskTrain.trainingPath(goal, trains);
+    this.trainGoal = goal;
+    this.trainNow  = path.first();
   }
   
   
-  public Ability trained() {
-    return trained;
+  void advanceTraining(Person person, float timeHours) {
+    if (trainNow == null) return;
+    final int level = person.stats.levelFor(trainNow);
+    float xpGain = trainNow.xpRequired(level);
+    float trainTime = trainingTime(person, trainNow);
+    xpGain *= timeHours / trainTime;
+    person.stats.gainXP(trainNow, xpGain);
+    
+    final int newLevel = person.stats.levelFor(trainNow);
+    if (level != newLevel) assignTraining(trainGoal);
+  }
+  
+  
+  public Ability trainingNow() {
+    return trainNow;
+  }
+  
+  
+  public Ability trainingGoal() {
+    return trainGoal;
+  }
+  
+  
+  public Person trains() {
+    return trains;
   }
   
   
   static Series <Person> activeTraining(Ability trained, Base base) {
     Batch <Person> active = new Batch();
     for (Person p : base.roster()) if (p.topAssignment() instanceof TaskTrain) {
+      TaskTrain t = (TaskTrain) p.topAssignment();
+      if (t.trainingNow() != trained) continue;
       active.add(p);
     }
     return active;
@@ -152,7 +175,7 @@ public class TaskTrain extends Task {
     
     while (! fore.empty()) {
       for (Ability a : fore) {
-        path.addLast(a);
+        path.addFirst(a);
         fore.remove(a);
         if (a.canLearn(person)) continue;
         for (Trait t : a.roots()) if (t instanceof Ability) {
@@ -169,23 +192,23 @@ public class TaskTrain extends Task {
     */
   public Image icon() {
     //  TODO:  Get a better variety of these.
-    return trained.icon();
+    return trainNow.icon();
   }
   
   
   public String choiceInfo(Person p) {
-    int level = p.stats.levelFor(trained) + 1;
-    return "Train "+trained+" ("+trained.levelDesc(level)+")";
+    int level = p.stats.levelFor(trainNow) + 1;
+    return "Train "+trainNow+" ("+trainNow.levelDesc(level)+")";
   }
   
   
   public String activeInfo() {
-    return "Learning technique: "+trained;
+    return "Learning technique: "+trainNow;
   }
   
   
   public String helpInfo() {
-    return trained.description;
+    return trainNow.description;
   }
   
   
@@ -205,9 +228,9 @@ public class TaskTrain extends Task {
     final World world = base.world();
     StringBuffer s = new StringBuffer();
     final Task trainTask = this;
-
-    int level = p.stats.levelFor(trained);
-    s.append("  "+p+" "+trained+": "+trained.levelDesc(level));
+    
+    int level = p.stats.levelFor(trainNow);
+    s.append("  "+p+" "+trainNow+": "+trainNow.levelDesc(level));
     
     final MainView view = world.view();
     view.queueMessage(new MessageView(

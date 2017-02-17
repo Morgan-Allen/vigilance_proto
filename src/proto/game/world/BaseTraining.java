@@ -31,10 +31,10 @@ public class BaseTraining {
   }
   
   
-  public TaskTrain trainingFor(Ability ability) {
-    for (TaskTrain task : tasks) if (task.trained() == ability) return task;
+  public TaskTrain trainingFor(Person person) {
+    for (TaskTrain task : tasks) if (task.trains() == person) return task;
     
-    TaskTrain newTask = new TaskTrain(ability, PersonStats.PERSUADE, base);
+    TaskTrain newTask = new TaskTrain(person, base);
     tasks.add(newTask);
     return newTask;
   }

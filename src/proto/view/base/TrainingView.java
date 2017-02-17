@@ -66,15 +66,26 @@ public class TrainingView extends UINode {
     //
     //  Describe whatever the agent is currently training in-
     final Base played = mainView.world().playerBase();
+    Series <Ability> trainPath = new Batch();
     Ability hovered = null;
     TaskTrain current = null;
     for (Assignment a : person.assignments()) if (a instanceof TaskTrain) {
       current = (TaskTrain) a;
-      hovered = current.trained();
+      hovered = current.trainingNow();
+      trainPath = TaskTrain.trainingPath(current.trainingGoal(), person);
     }
     g.setColor(Color.WHITE);
+    
+    String trainDesc = "None";
+    if (current != null) {
+      trainDesc = ""+current.trainingNow();
+      if (current.trainingGoal() != current.trainingNow()) {
+        trainDesc += " (Goal: "+current.trainingGoal()+")";
+      }
+    }
+    
     ViewUtils.drawWrappedString(
-      "Currently training: "+(current == null ? "None" : current.trained()), g,
+      "Currently training: "+trainDesc, g,
       vx + across, vy + down, 320, 30
     );
     
@@ -115,12 +126,26 @@ public class TrainingView extends UINode {
       
       boolean canLearn = a.canLearn(person);
       
+      Color status = null;
+      if (a == trainPath.first()) {
+        status = Color.BLUE;
+      }
+      else if (a == trainPath.last()) {
+        status = Color.RED;
+      }
+      else if (trainPath.includes(a)) {
+        status = Color.MAGENTA;
+      }
+      if (status != null) {
+        g.setColor(status);
+        g.fillRect(vx + x - 2, vy + y - 2, w + 4, h + 5);
+      }
+      
       ImageButton b = new ImageButton(icon, bound, this) {
         protected void whenClicked() {
           selectTraining(a, person, played);
         }
       };
-      b.valid = canLearn;
       b.refers = a;
       b.renderNow(surface, g);
       
@@ -147,10 +172,8 @@ public class TrainingView extends UINode {
       desc += "\n"+hovered.description;
       
       Series <Ability> path = TaskTrain.trainingPath(hovered, person);
-      for (Ability a : path) if (a != hovered) {
-        desc += "\n  Requires: "+a.name;
-        break;
-      }
+      Ability nextNeed = path.atIndex(path.size() - 2);
+      if (nextNeed != null) desc += "\n  Requires: "+nextNeed.name;
       
       if (trainTime <= 0) desc += "\n  Cannot train when badly wounded.";
       else                desc += "\n  Training time: "+trainTime+" days";
@@ -164,7 +187,8 @@ public class TrainingView extends UINode {
   
   
   void selectTraining(Ability trained, Person person, Base base) {
-    TaskTrain trainTask = base.training.trainingFor(trained);
+    TaskTrain trainTask = base.training.trainingFor(person);
+    trainTask.assignTraining(trained);
     person.addAssignment(trainTask);
   }
   
