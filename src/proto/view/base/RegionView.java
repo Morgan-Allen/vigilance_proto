@@ -146,7 +146,7 @@ public class RegionView extends UINode {
       
       String desc = "";
       desc += built.defaultInfo();
-      desc += "\nOwned by: "+owns;
+      desc += "\nInvestor: "+owns;
       if (prog < 1) desc += " ("+((int) (prog * 100))+"% complete)";
       
       ViewUtils.drawWrappedString(

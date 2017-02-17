@@ -2,8 +2,9 @@
 
 package proto.content.agents;
 import proto.common.*;
-import proto.content.items.*;
+import proto.game.world.*;
 import proto.game.person.*;
+import proto.content.items.*;
 import static proto.game.person.PersonStats.*;
 
 
@@ -12,6 +13,12 @@ public class Heroes {
   
   
   final static String IMG_DIR = "media assets/character icons/heroes/";
+  
+  
+  final public static Faction JANUS_INDUSTRIES = new Faction(
+    "Janus Industries", "faction_janus_industries", false
+  );
+  
   
   final public static PersonType
     HERO_PHOBOS = new PersonType(

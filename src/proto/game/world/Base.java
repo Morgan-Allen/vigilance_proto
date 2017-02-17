@@ -17,10 +17,10 @@ public class Base extends Place {
     SLOTS_WIDE     = 3 ;
   
   
+  Faction faction = null;
   Person leader = null;
   List <Person> roster = new List();
   List <PersonType> goonTypes = new List();
-  boolean criminal;
   
   final public BaseFinance  finance  = new BaseFinance (this);
   final public BaseStocks   stocks   = new BaseStocks  (this);
@@ -32,19 +32,19 @@ public class Base extends Place {
   List <Object> knownTech = new List();
   
   
-  public Base(PlaceType kind, World world, boolean criminal) {
+  public Base(PlaceType kind, World world, Faction faction) {
     super(kind, 0, world);
-    this.criminal = criminal;
+    this.faction = faction;
   }
   
   
   public Base(Session s) throws Exception {
     super(s);
     
-    leader = (Person) s.loadObject();
+    faction = (Faction) s.loadObject();
+    leader  = (Person) s.loadObject();
     s.loadObjects(roster);
     s.loadObjects(goonTypes);
-    criminal = s.loadBool();
     
     finance .loadState(s);
     stocks  .loadState(s);
@@ -62,10 +62,10 @@ public class Base extends Place {
   public void saveState(Session s) throws Exception {
     super.saveState(s);
     
-    s.saveObject(leader);
+    s.saveObject(faction);
+    s.saveObject(leader );
     s.saveObjects(roster);
     s.saveObjects(goonTypes);
-    s.saveBool(criminal);
     
     finance .saveState(s);
     stocks  .saveState(s);
@@ -83,10 +83,8 @@ public class Base extends Place {
   
   /**  General stat queries-
     */
+  public Faction faction() { return faction; }
   public World world() { return world; }
-  
-  public boolean criminal() { return criminal; }
-  
   
   
   /**  Regular updates and life-cycle methods:
@@ -233,7 +231,7 @@ public class Base extends Place {
   
   
   public String toString() {
-    return "Base ("+leader+")";
+    return faction.name;
   }
 }
 

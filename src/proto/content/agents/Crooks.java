@@ -2,8 +2,9 @@
 
 package proto.content.agents;
 import proto.common.*;
-import proto.content.items.*;
+import proto.game.world.*;
 import proto.game.person.*;
+import proto.content.items.*;
 import static proto.game.person.PersonStats.*;
 
 
@@ -12,6 +13,11 @@ public class Crooks {
   
   
   final static String IMG_DIR = "media assets/character icons/common/";
+  
+  
+  final public static Faction THE_MADE_MEN = new Faction(
+    "The Made Men", "faction_the_made_men", false
+  );
   
   
   final public static PersonType

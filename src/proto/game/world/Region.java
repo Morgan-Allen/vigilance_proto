@@ -194,7 +194,7 @@ public class Region extends Element {
   private int incomeFor(Base base, boolean positive) {
     int total = 0;
     
-    if (positive && ! base.criminal()) {
+    if (positive && ! base.faction().criminal) {
       float crime = 0;
       crime += currentValue(VIOLENCE  ) / 100f;
       crime += currentValue(CORRUPTION) / 100f;

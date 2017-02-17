@@ -33,7 +33,7 @@ public class DefaultGame extends RunGame {
     initDefaultBase   (world);
     initDefaultCrime  (world);
     
-    for (Base base : world.bases()) if (base.criminal()) {
+    for (Base base : world.bases()) if (base.faction().criminal) {
       Plan initPlan = base.plans.generateNextPlan(4, 4, null);
       base.plans.assignPlan(initPlan, 0);
     }
@@ -59,7 +59,8 @@ public class DefaultGame extends RunGame {
   
   
   public static void initDefaultBase(World world) {
-    final Base base = new Base(Facilities.MANOR, world, false);
+    final Faction owns = Heroes.JANUS_INDUSTRIES;
+    final Base base = new Base(Facilities.MANOR, world, owns);
     
     Person leader = new Person(Heroes.HERO_PHOBOS, world);
     base.setLeader(leader);
@@ -128,9 +129,10 @@ public class DefaultGame extends RunGame {
       Crooks.GANGSTER, Civilians.DOCTOR, Civilians.INVENTOR, Civilians.BROKER
     };
     
+    final Faction owns = Crooks.THE_MADE_MEN;
     final Batch <Base> hideouts = new Batch();
     final Person boss1 = new Person(Villains.MORETTI, world);
-    final Base base1 = new Base(Facilities.HIDEOUT, world, true);
+    final Base base1 = new Base(Facilities.HIDEOUT, world, owns);
     world.regionFor(Regions.SECTOR04).setAttached(base1, true);
     base1.setLeader(boss1);
     base1.finance.setSecretPercent(0);
