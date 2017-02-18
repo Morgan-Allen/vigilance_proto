@@ -27,30 +27,28 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     STATE_ABSENT =  4;
   
   final World world;
-  final public SceneEntry  entry  = new SceneEntry (this);
-  final public SceneVision vision = new SceneVision(this);
+  Place site;
+  Task playerTask;
+  Event triggerEvent;
+  int state = STATE_INIT;
   
   List <Person> playerTeam = new List();
   List <Person> othersTeam = new List();
   List <Person> allPersons = new List();
-  int state = STATE_INIT;
+  List <Person> didEnter   = new List();
   
   int size;
   int time;
   Tile tiles[][] = new Tile[0][0];
   byte wallM[][] = new byte[1][2];
   byte opacM[][] = new byte[1][2];
-  byte fogP [][] = new byte[0][0];
-  byte fogO [][] = new byte[0][0];
   List <Prop> props = new List();
+  
+  final public SceneEntry  entry  = new SceneEntry (this);
+  final public SceneVision vision = new SceneVision(this);
   
   boolean playerTurn;
   Person nextActing;
-  
-  Place site;
-  Task playerTask;
-  Event triggerEvent;
-  List <Person> didEnter = new List();
   
   
   public Scene(World world, int size) {
@@ -66,12 +64,12 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     site         = (Place) s.loadObject();
     playerTask   = (Task ) s.loadObject();
     triggerEvent = (Event) s.loadObject();
+    state = s.loadInt();
     
     s.loadObjects(playerTeam);
     s.loadObjects(othersTeam);
     s.loadObjects(allPersons);
     s.loadObjects(didEnter  );
-    state = s.loadInt();
     
     size   = s.loadInt();
     time   = s.loadInt();
@@ -82,9 +80,10 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     }
     s.loadByteArray(wallM);
     s.loadByteArray(opacM);
-    s.loadByteArray(fogP );
-    s.loadByteArray(fogO );
     s.loadObjects(props);
+    
+    entry .loadState(s);
+    vision.loadState(s);
     
     playerTurn = s.loadBool();
     nextActing = (Person) s.loadObject();
@@ -98,11 +97,12 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     s.saveObject (site        );
     s.saveObject (playerTask  );
     s.saveObject (triggerEvent);
-    s.saveObjects(playerTeam  );
-    s.saveObjects(othersTeam  );
-    s.saveObjects(allPersons  );
-    s.saveObjects(didEnter    );
     s.saveInt    (state       );
+    
+    s.saveObjects(playerTeam);
+    s.saveObjects(othersTeam);
+    s.saveObjects(allPersons);
+    s.saveObjects(didEnter  );
     
     s.saveInt(size);
     s.saveInt(time);
@@ -113,9 +113,10 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     }
     s.saveByteArray(wallM);
     s.saveByteArray(opacM);
-    s.saveByteArray(fogP );
-    s.saveByteArray(fogO );
     s.saveObjects(props);
+    
+    entry .saveState(s);
+    vision.saveState(s);
     
     s.saveBool(playerTurn);
     s.saveObject(nextActing);
@@ -299,8 +300,7 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     int wallS = (size * 2) + 1;
     wallM = new byte[wallS][wallS];
     opacM = new byte[wallS][wallS];
-    fogP  = new byte[size][size];
-    fogO  = new byte[size][size];
+    vision.setupFog(size);
   }
   
   

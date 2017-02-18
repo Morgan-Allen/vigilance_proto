@@ -210,16 +210,14 @@ public class Techniques {
       Ability.IS_DELAYED | Ability.TRIGGER_ON_NOTICE, 1,
       Ability.MINOR_HELP, Ability.MINOR_POWER
     ) {
-      public boolean triggerOnNoticeAction(Person using, Action action) {
-        return action.acting.isEnemy(using);
+      public boolean triggerOnNoticing(Person acts, Person seen, Action noted) {
+        if (! noted.inMotion()) return false;
+        return seen.isEnemy(acts);
       }
       
-      //  TODO:  You need to implement support for these event-triggers!
-      
-      public void applyOnNoticeAction(Person using, Action action) {
-        Person mark = action.acting;
-        Scene scene = using.currentScene();
-        Common.FIRE.takeFreeAction(using, mark.currentTile(), mark, scene);
+      public void applyOnNoticing(Person acts, Person seen, Action noted) {
+        Scene scene = acts.currentScene();
+        Common.FIRE.takeFreeAction(acts, seen.currentTile(), seen, scene);
       }
     },
     

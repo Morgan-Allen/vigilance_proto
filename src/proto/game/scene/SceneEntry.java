@@ -1,6 +1,7 @@
 
 
 package proto.game.scene;
+import proto.common.*;
 import proto.game.person.*;
 import proto.util.*;
 
@@ -14,6 +15,16 @@ public class SceneEntry implements TileConstants {
   
   SceneEntry(Scene scene) {
     this.scene = scene;
+  }
+  
+  
+  void loadState(Session s) throws Exception {
+    
+  }
+  
+  
+  void saveState(Session s) throws Exception {
+    
   }
   
   

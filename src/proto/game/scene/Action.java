@@ -1,9 +1,9 @@
 
 
 package proto.game.scene;
-import proto.common.Session;
-import proto.game.person.Ability;
-import proto.game.person.Person;
+import proto.common.*;
+import proto.game.person.*;
+import proto.util.*;
 
 
 
@@ -116,6 +116,24 @@ public class Action implements Session.Saveable {
   
   public Volley volley() {
     return volley;
+  }
+  
+  
+  public float moveRate() {
+    return 4;
+  }
+  
+  
+  public float timeSteps() {
+    int elapsed = timeElapsed();
+    float timeSteps = elapsed * moveRate() / RunGame.FRAME_RATE;
+    return timeSteps;
+  }
+  
+  
+  public boolean inMotion() {
+    if (Visit.empty(path)) return false;
+    return timeSteps() <= path.length;
   }
   
   

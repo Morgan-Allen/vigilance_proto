@@ -134,6 +134,11 @@ public abstract class Ability extends Trait {
   }
   
   
+  public boolean triggerOnNotice() {
+    return hasProperty(TRIGGER_ON_NOTICE);
+  }
+  
+  
   public boolean canLearn(Person learns) {
     for (Trait t : roots()) {
       if (learns.stats.levelFor(t) < 1) return false;
@@ -407,6 +412,19 @@ public abstract class Ability extends Trait {
   
   
   public void applyOnDefendEnd(Volley volley) {
+    return;
+  }
+  
+  
+  
+  /**  Dealing with other reactive actions-
+    */
+  public boolean triggerOnNoticing(Person using, Person seen, Action action) {
+    return false;
+  }
+  
+  
+  public void applyOnNoticing(Person using, Person seen, Action doing) {
     return;
   }
   

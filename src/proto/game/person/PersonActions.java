@@ -119,10 +119,8 @@ public class PersonActions {
     Scene scene = person.currentScene();
     Action a = nextAction;
     if (scene == null || a == null) return false;
-    
-    int elapsed = a.timeElapsed();
-    float moveRate = 4;
-    float timeSteps = elapsed * moveRate / RunGame.FRAME_RATE;
+
+    float timeSteps = a.timeSteps();
     
     float alpha = timeSteps % 1;
     Tile path[] = a.path();
@@ -136,7 +134,10 @@ public class PersonActions {
       (alpha * n.y) + ((1 - alpha) * l.y),
       0
     );
-    if (person.currentTile() != oldLoc) scene.vision.updateFog();
+    if (person.currentTile() != oldLoc) {
+      scene.vision.updateFog();
+      scene.vision.checkForEnemySightEntry(person, nextAction);
+    }
     
     if (timeSteps > path.length) {
       if (! a.started()) {
@@ -144,7 +145,7 @@ public class PersonActions {
         a.used.checkForTriggers(a, true, false);
       }
       float extraTime = a.used.animDuration();
-      a.setProgress((timeSteps - path.length) / (extraTime * moveRate));
+      a.setProgress((timeSteps - path.length) / (extraTime * a.moveRate()));
     }
     if (a.complete()) {
       a.used.checkForTriggers(a, false, true);
@@ -192,8 +193,16 @@ public class PersonActions {
   }
   
   
+  public void onNoticing(Person seen, Action doing) {
+    if (nextAction == null || ! nextAction.used.triggerOnNotice()) return;
+    if (! nextAction.used.triggerOnNoticing(person, seen, doing) ) return;
+    nextAction.used.applyOnNoticing(person, seen, doing);
+  }
   
 }
+
+
+
 
 
 

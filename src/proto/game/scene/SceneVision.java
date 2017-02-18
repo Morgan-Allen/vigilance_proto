@@ -14,9 +14,54 @@ public class SceneVision implements TileConstants {
     */
   final Scene scene;
   
+  static class FogMap {
+    Person.Side side;
+    byte fog[][];
+    Table <Person, Tile> lastSeen = new Table();
+  }
+  
+  private FogMap allMaps[];
+  
+  
   
   SceneVision(Scene scene) {
     this.scene = scene;
+  }
+  
+  
+  void setupFog(int size) {
+    Person.Side SIDES[] = Person.Side.values();
+    allMaps = new FogMap[SIDES.length];
+    
+    for (Person.Side side : SIDES) {
+      FogMap map = allMaps[side.ordinal()] = new FogMap();
+      map.side = side;
+      map.fog = new byte[size][size];
+    }
+  }
+  
+  
+  void loadState(Session s) throws Exception {
+    for (FogMap map : allMaps) {
+      s.loadByteArray(map.fog);
+      for (int i = s.loadInt(); i-- > 0;) {
+        Person p = (Person) s.loadObject();
+        Tile   t = (Tile  ) s.loadObject();
+        map.lastSeen.put(p, t);
+      }
+    }
+  }
+  
+  
+  void saveState(Session s) throws Exception {
+    for (FogMap map : allMaps) {
+      s.saveByteArray(map.fog);
+      s.saveInt(map.lastSeen.size());
+      for (Person p : map.lastSeen.keySet()) {
+        s.saveObject(p);
+        s.saveObject(map.lastSeen.get(p));
+      }
+    }
   }
   
   
@@ -26,14 +71,15 @@ public class SceneVision implements TileConstants {
   public void updateFog() {
     //  TODO:  You need to include visibility-lifting persistent items or
     //  debuffs here...
-    for (Coord c : Visit.grid(0, 0, scene.size, scene.size, 1)) {
-      scene.fogP[c.x][c.y] = 0;
-      scene.fogO[c.x][c.y] = 0;
+    for (FogMap map : allMaps) {
+      for (Coord c : Visit.grid(0, 0, scene.size, scene.size, 1)) {
+        map.fog[c.x][c.y] = 0;
+      }
     }
     for (Person p : scene.playerTeam) if (p.health.conscious()) {
       liftFogInSight(p);
     }
-    for (Person p : scene.othersTeam) if (p.health.conscious())  {
+    for (Person p : scene.othersTeam) if (p.health.conscious()) {
       liftFogInSight(p);
     }
   }
@@ -43,9 +89,7 @@ public class SceneVision implements TileConstants {
     if (at == null) {
       I.say("?");
     }
-    if (side == Person.Side.HEROES  ) return scene.fogP[at.x][at.y] / 100f;
-    if (side == Person.Side.VILLAINS) return scene.fogO[at.x][at.y] / 100f;
-    return 1;
+    return allMaps[side.ordinal()].fog[at.x][at.y] / 100f;
   }
   
   
@@ -57,6 +101,18 @@ public class SceneVision implements TileConstants {
     final float radius = p.stats.sightRange() + (size / 2);
     final Tile vantage[] = vantagePoints(p);
     liftFogAround(p.currentTile(), radius, p, true, vantage);
+  }
+  
+  
+  public void checkForEnemySightEntry(Person p, Action doing) {
+    for (Person other : scene.allPersons) if (other.side() != p.side()) {
+      float sight = degreeOfSight(other, p.currentTile(), false);
+      if (sight > 0) {
+        other.actions.onNoticing(p, doing);
+        FogMap map = allMaps[other.side().ordinal()];
+        map.lastSeen.put(p, p.currentTile());
+      }
+    }
   }
   
   
@@ -129,10 +185,7 @@ public class SceneVision implements TileConstants {
   ) {
     //
     //  Firstly, determine which fog-map to consult for the agent in question-
-    byte fog[][] = null;
-    if (looks.side() == Person.Side.HEROES  ) fog = scene.fogP;
-    if (looks.side() == Person.Side.VILLAINS) fog = scene.fogO;
-    if (fog == null) return;
+    byte fog[][] = allMaps[looks.side().ordinal()].fog;
     //
     //  Then generate sight-lines for each vantage point (which, by default, is
     //  simply the central tile itself.)
