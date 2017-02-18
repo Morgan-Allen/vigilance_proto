@@ -85,7 +85,7 @@ public class MainView extends UINode {
     tabsNode = new UINode(mainUI, new Box2D(0, 120, fullWide, 25));
     Box2D blank = new Box2D();
     final String tabNames[] = {
-      "Mission Control", "Investments", "Armory", "Training Room"
+      "Mission Control", "Investments", "Armory", "Training & Outfit"
     };
     tabButtons = new UINode[tabContent.length];
     int butW = (int) (tabsNode.relBounds.xdim() / tabButtons.length);

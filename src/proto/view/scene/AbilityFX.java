@@ -34,8 +34,34 @@ public class AbilityFX {
       
       s.append("\n  "+minDamage+"-"+maxDamage+" damage");
       int hitPercent = Nums.clamp(v.accuracyMargin, 101);
+      int critChance = v.critPercent;
       s.append("\n  "+hitPercent+"% to hit (armour "+v.hitsArmour+")");
+      s.append("\n  "+critChance+"% to crit");
     }
+    
+    //  TODO:  This needs to be worked on as a separate feature.
+    /*
+    else if (action != null && ! action.used.ranged()) {
+      Tile path[] = action.path();
+      Person.Side foes = Person.Side.VILLAINS;
+      float hideChance = action.acting.stats.hidingRange() / 10f;
+      
+      //  TODO:  MOVE THIS TO THE ACTIONS CLASS!
+      float sumFog = 0;
+      int sightChance = 0;
+      for (Tile t : path) {
+        float fog = scene.vision.fogAt(t, foes);
+        sumFog += 1 - fog;
+        sightChance += 20 * fog * Nums.clamp(fog - hideChance, 0, 1);
+      }
+      sumFog /= path.length;
+      sightChance = Nums.clamp(sightChance, 101);
+      
+      s.append("\n  Average enemy fog: "+(int) (sumFog * 100)+"%");
+      s.append("\n  Chance of detection: "+sightChance+"%");
+    }
+    //*/
+    
     return s.toString();
   }
   
