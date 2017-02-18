@@ -215,7 +215,7 @@ public class Prop extends Element implements TileConstants {
         if (t == null) continue;
         float radius = Nums.min(Nums.max(w, h), 3) / 4f;
         Color c = t == origin ? Color.RED : Color.YELLOW;
-        view.renderColor(t.x, t.y, radius, radius, c, g);
+        view.renderColor(t.x, t.y, radius, radius, true, c, g);
       }
     }
   }

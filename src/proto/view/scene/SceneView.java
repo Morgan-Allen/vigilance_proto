@@ -24,10 +24,20 @@ public class SceneView extends UINode implements TileConstants {
     TILE_SIZE = 64;
   final static String
     IMG_DIR = "media assets/action view/";
-  
   final static Image
     COVER_PARTIAL = Kind.loadImage(IMG_DIR+"cover_partial.png"),
     COVER_FULL    = Kind.loadImage(IMG_DIR+"cover_full.png"   );
+  
+  final static Color SCALE[] = new Color[10];
+  final static Color ENEMY[] = new Color[10];
+  final static Color PALES[] = new Color[10];
+  static {
+    for (int n = 10; n-- > 0;) {
+      SCALE[n] = new Color(0, 0, 0, n / 10f);
+      ENEMY[n] = new Color(1, 0, 0, n / 50f);
+      PALES[n] = new Color(1, 1, 1, n / 10f);
+    }
+  }
   
   
   final ActionsView actionsView;
@@ -134,16 +144,6 @@ public class SceneView extends UINode implements TileConstants {
     
     int size = scene.size();
     Action done = scene.currentAction();
-    
-    final Color SCALE[] = new Color[10];
-    final Color ENEMY[] = new Color[10];
-    final Color PALES[] = new Color[10];
-    for (int n = 10; n-- > 0;) {
-      SCALE[n] = new Color(0, 0, 0, n / 10f);
-      ENEMY[n] = new Color(1, 0, 0, n / 50f);
-      PALES[n] = new Color(1, 1, 1, n / 10f);
-    }
-    final Image hoverBox = mainView.selectCircle;
     //
     //  Update camera information first-
     if (zoomTile != null) {
@@ -187,7 +187,7 @@ public class SceneView extends UINode implements TileConstants {
         float glare = 1 - Nums.clamp(dist / sightRange, 0, 1);
         if (glare <= 0) continue;
         Color warns = ENEMY[Nums.clamp((int) (glare * 10), 10)];
-        renderColor(c.x, c.y, 1, 1, warns, g);
+        renderColor(c.x, c.y, 1, 1, true, warns, g);
       }
     }
     //
@@ -203,28 +203,8 @@ public class SceneView extends UINode implements TileConstants {
       personsShown.add(p);
     }
     personsShown.queueSort();
-    
     for (Person p : personsShown) {
-      p.renderTo(scene, this, surface, g);
-    }
-    for (Person p : personsShown) {
-      Color               teamColor = Color.GREEN;
-      if (p.isHero    ()) teamColor = Color.BLUE;
-      if (p.isCriminal()) teamColor = Color.RED;
-      Vec3D pos         = p.exactPosition();
-      float healthLevel = p.health.healthLevel();
-      float stunLevel   = 1 - p.health.harmToStunRatio();
-      Color pale = PALES[(int) (stunLevel * 9.9f)];
-      //
-      //  Including their health-bars:
-      renderColor(pos.x, pos.y + 0.5f, 1, 0.1f, Color.BLACK, g);
-      renderColor(pos.x, pos.y + 0.5f, 1, 0.1f, pale, g);
-      renderColor(pos.x, pos.y + 0.5f, healthLevel, 0.1f, teamColor, g);
-      renderString(pos.x, pos.y + 0.5f, p.name(), Color.WHITE, g);
-      
-      if (p == activePerson) {
-        renderSprite(pos.x, pos.y, 1, 1, 0, hoverBox, g);
-      }
+      renderPerson(p, scene, surface, g);
     }
     //
     //  Then render any action underway, and any temporary FX-
@@ -244,7 +224,7 @@ public class SceneView extends UINode implements TileConstants {
       float fogAlpha = 1f - tileVisibilityKluge(t, Person.Side.HEROES);
       if (GameSettings.debugScene) fogAlpha /= 3;
       Color black = SCALE[Nums.clamp((int) (fogAlpha * 10), 10)];
-      renderColor(c.x, c.y, 1, 1, black, g);
+      renderColor(c.x, c.y, 1, 1, true, black, g);
     }
     //
     //  If complete, display a summary of the results!
@@ -262,12 +242,13 @@ public class SceneView extends UINode implements TileConstants {
     
     if (hoverTile != null) {
       if (! hoverTile.blocked()) {
+        final Image hoverBox = mainView.selectCircle;
         renderSprite(hoverTile.x, hoverTile.y, 1, 1, 0, hoverBox, g);
       }
       
       final Ability ability = actionsView.selectAbility;
       if (ability == Common.MOVE && ! hoverTile.blocked()) {
-        renderCoverIndicators(hoverTile, surface, g);
+        renderCoverIndicators(hoverTile, scene, surface, g);
       }
       
       Object hovered = topObjectAt(hoverTile);
@@ -305,18 +286,51 @@ public class SceneView extends UINode implements TileConstants {
   }
   
   
-  void renderCoverIndicators(Tile hovered, Surface surface, Graphics2D g) {
+  void renderPerson(Person p, Scene s, Surface surface, Graphics2D g) {
+    //
+    //  Render the person themselves-
+    Vec3D pos = p.exactPosition();
+    p.renderTo(s, this, surface, g);
+    //
+    //  Then their health-bar/s:
+    Color               teamColor = Color.GREEN;
+    if (p.isHero    ()) teamColor = Color.BLUE;
+    if (p.isCriminal()) teamColor = Color.RED;
+    float healthLevel = p.health.healthLevel();
+    float stunLevel   = 1 - p.health.harmToStunRatio();
+    Color pale = PALES[(int) (stunLevel * 9.9f)];
+    renderColor(pos.x, pos.y + 0.9f, 1, 0.1f, false, Color.BLACK, g);
+    renderColor(pos.x, pos.y + 0.9f, 1, 0.1f, false, pale, g);
+    renderColor(pos.x, pos.y + 0.9f, healthLevel, 0.1f, false, teamColor, g);
+    renderString(pos.x, pos.y + 0.5f, p.name(), Color.WHITE, g);
+    //
+    //  And indicators for current conditions:
+    float offC = 0;
+    for (Ability c : p.stats.allConditions()) {
+      renderSprite(pos.x - 0.5f + offC, pos.y - 0.5f, 0.2f, 0.2f, 0, c.icon, g);
+      offC += 0.2f;
+    }
+    //
+    //  And a selection circle if needed...
+    if (p == activePerson) {
+      final Image hoverBox = mainView.selectCircle;
+      renderSprite(pos.x, pos.y, 1, 1, 0, hoverBox, g);
+    }
+  }
+  
+  
+  void renderCoverIndicators(Tile t, Scene s, Surface surface, Graphics2D g) {
     for (int dir : T_ADJACENT) {
       Image img = null;
-      int coverLevel = hovered.coverVal(dir);
+      int coverLevel = t.coverVal(dir);
       if (coverLevel == Kind.BLOCK_PARTIAL) img = COVER_PARTIAL;
       if (coverLevel == Kind.BLOCK_FULL   ) img = COVER_FULL   ;
       if (img == null) continue;
       
       float scale = 0.66f;
       renderSprite(
-        hovered.x + (T_X[dir] * scale * 1),
-        hovered.y + (T_Y[dir] * scale * 1),
+        t.x + (T_X[dir] * scale * 1),
+        t.y + (T_Y[dir] * scale * 1),
         scale, scale, (dir + 2) * 45, img, g
       );
     }
@@ -362,6 +376,7 @@ public class SceneView extends UINode implements TileConstants {
     float px, float py, float w, float h, float angle,
     Image sprite, Graphics2D g
   ) {
+    if (sprite == null) return;
     //
     //  Firstly, determine the centre of the tile in the visual field:
     float x = vx + (px * TILE_SIZE);
@@ -392,11 +407,13 @@ public class SceneView extends UINode implements TileConstants {
   
   
   public void renderColor(
-    float px, float py, float w, float h, Color fill, Graphics2D g
+    float px, float py, float w, float h, boolean centre,
+    Color fill, Graphics2D g
   ) {
     int x, y;
-    x = vx + (int) ((px - (w / 2)) * TILE_SIZE);
-    y = vy + (int) ((py - (h / 2)) * TILE_SIZE);
+    if (! centre) { px -= 0.5f; py -= 0.5f; }
+    x = vx + (int) ((px - (centre ? (w / 2) : 0)) * TILE_SIZE);
+    y = vy + (int) ((py - (centre ? (h / 2) : 0)) * TILE_SIZE);
     w *= TILE_SIZE;
     h *= TILE_SIZE;
     g.setColor(fill);

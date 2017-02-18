@@ -64,7 +64,13 @@ public class PersonActions {
     if (action == null          ) return;
     if (action.path().length > 0) action.setMoveRoll(Rand.avgNums(2));
     if (action.target != this   ) lastTarget = action.target;
+    action.used.applyOnActionAssigned(action);
     this.actionPoints -= action.used.costAP(action);
+  }
+  
+  
+  public void cancelAction() {
+    assignAction(null);
   }
   
   

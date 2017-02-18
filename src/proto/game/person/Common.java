@@ -135,12 +135,6 @@ public class Common {
       Ability.IS_BASIC | Ability.IS_DELAYED | Ability.TRIGGER_ON_DEFEND,
       1, Ability.NO_HARM, Ability.MINOR_POWER
     ) {
-      
-      public boolean allowsTarget(Object target, Scene scene, Person acting) {
-        return acting instanceof Person;
-      }
-      
-      
       public void applyOnDefendStart(Volley volley) {
         Person self = volley.targAsPerson();
         Person hits = volley.origAsPerson();

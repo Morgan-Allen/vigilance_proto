@@ -117,6 +117,14 @@ public class ActionsView extends UINode {
         }
       }
       
+      Series <Ability> conditions = p.stats.allConditions();
+      if (conditions.size() > 0) {
+        s.append("\n  Conditions:");
+        for (Ability c : conditions) {
+          s.append("\n    "+c.name());
+        }
+      }
+      
       boolean canCommand =
         action == null && p.actions.canTakeAction() && p.isPlayerOwned()
       ;

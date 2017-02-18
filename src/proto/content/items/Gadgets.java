@@ -128,7 +128,7 @@ public class Gadgets {
   
   final static Ability TEAR_GAS_ABILITY = new Ability(
     "Tear Gas", "tear_gas_condition",
-    ICONS_DIR+"sprite_grenade.png",
+    ICONS_DIR+"icon_tear_gas.png",
     "Reduces accuracy, sight range and action-points.  Lasts three turns.",
     Ability.IS_CONDITION | Ability.IS_AREA_EFFECT | Ability.IS_RANGED, 2,
     Ability.MINOR_HARM, Ability.MEDIUM_POWER
@@ -160,6 +160,10 @@ public class Gadgets {
       use.acting.gear.useCharge(Gadgets.TEAR_GAS, 1);
       final Tile at = use.scene().tileUnder(use.target);
       use.scene().view().addTempFX(BURST_IMG, 3, at.x, at.y, 0, 1);
+      
+      for (Element a : elementsInRange(use, at)) {
+        ((Person) a).stats.applyCondition(this, use.acting, 3);
+      }
     }
     
     public float conditionModifierFor(Person person, Trait trait) {

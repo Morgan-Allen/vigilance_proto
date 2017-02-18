@@ -189,7 +189,7 @@ public class Techniques {
       Ability.IS_DELAYED | Ability.IS_ACTIVE | Ability.IS_CONDITION, 1,
       Ability.MINOR_HELP, Ability.MINOR_POWER
     ) {
-      public void applyOnActionStart(Action use) {
+      public void applyOnActionAssigned(Action use) {
         use.acting.stats.applyCondition(this, use.acting, 1);
       }
       
@@ -208,6 +208,7 @@ public class Techniques {
       Ability.IS_DELAYED | Ability.TRIGGER_ON_NOTICE, 1,
       Ability.MINOR_HELP, Ability.MINOR_POWER
     ) {
+      
       public boolean triggerOnNoticing(Person acts, Person seen, Action noted) {
         if (! noted.inMotion()) return false;
         return seen.isEnemy(acts);
@@ -217,6 +218,7 @@ public class Techniques {
         Scene scene = acts.currentScene();
         //  TODO:  Add proper volley penalties!
         Common.FIRE.takeFreeAction(acts, seen.currentTile(), seen, scene);
+        acts.actions.cancelAction();
       }
     },
     

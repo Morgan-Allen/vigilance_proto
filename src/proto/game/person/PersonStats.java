@@ -399,6 +399,13 @@ public class PersonStats {
   }
   
   
+  public Series <Ability> allConditions() {
+    Batch <Ability> all = new Batch();
+    for (Condition c : conditions) all.add(c.basis);
+    return all;
+  }
+  
+  
   
   /**  Assigning experience and abilities-
     */

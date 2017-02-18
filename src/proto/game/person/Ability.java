@@ -228,7 +228,7 @@ public abstract class Ability extends Trait {
   
   
   public boolean allowsTarget(Object target, Scene scene, Person acting) {
-    return false;
+    return true;
   }
   
   
@@ -338,6 +338,8 @@ public abstract class Ability extends Trait {
     Scene  scene  = use.acting.currentScene();
     Volley volley = use.volley();
     
+    //  TODO:  Move this out to the PersonActions class.
+    
     if (volley != null) {
       Person self = volley.origAsPerson();
       Person hits = volley.targAsPerson();
@@ -390,6 +392,11 @@ public abstract class Ability extends Trait {
       
       if (end && hits != null) hits.health.receiveAttack(volley);
     }
+  }
+  
+  
+  public void applyOnActionAssigned(Action use) {
+    return;
   }
   
   
