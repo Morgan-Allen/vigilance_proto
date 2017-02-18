@@ -40,6 +40,7 @@ public class Gadgets {
     
     public void applyOnActionEnd(Action use) {
       final Person target = (Person) use.target;
+      I.say("Applying bolas to target: "+target);
       target.stats.applyCondition(this, use.acting, 3);
       use.acting.gear.useCharge(BOLAS, -1);
     }
@@ -56,9 +57,16 @@ public class Gadgets {
     }
     
     public boolean conditionAllowsAbility(Ability a) {
-      if (a.equipped()) return false;
-      if (a.melee   ()) return false;
+      if (a == Common.MOVE) return false;
+      if (a.equipped    ()) return false;
+      if (a.melee       ()) return false;
       return false;
+    }
+    
+    
+    public boolean conditionAllowsAction(Action a) {
+      if (! Visit.empty(a.path())) return false;
+      return true;
     }
     
     final Image MISSILE_IMG = Kind.loadImage(SPRITE_DIR+"sprite_bolas.png");

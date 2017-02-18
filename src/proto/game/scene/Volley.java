@@ -212,12 +212,16 @@ public class Volley implements Session.Saveable {
     
     hitsDefence  = Nums.max(hitsDefence , 1);
     selfAccuracy = Nums.max(selfAccuracy, 1);
-    accuracyMargin = (int) Nums.clamp(selfAccuracy - hitsDefence, 0, 100);
-    critPercent = ((selfAccuracy - 25) * accuracyMargin) / (5 * 50);
     
     if (weapon != nativeWeapon) {
       self.gear.equipItem(nativeWeapon, PersonGear.SLOT_WEAPON);
     }
+  }
+  
+  
+  protected void calcMargins() {
+    accuracyMargin = (int) Nums.clamp(selfAccuracy - hitsDefence, 0, 100);
+    critPercent = ((selfAccuracy - 25) * accuracyMargin) / (5 * 50);
   }
   
   
@@ -249,6 +253,7 @@ public class Volley implements Session.Saveable {
   
   
   void resolveConnection() {
+    calcMargins();
     I.say("  Resolving connection (hit chance "+accuracyMargin+"%)");
     
     accuracyRoll = Rand.index(100);

@@ -193,8 +193,6 @@ public class Techniques {
         use.acting.stats.applyCondition(this, use.acting, 1);
       }
       
-      //  TODO:  You need to ensure this applies correctly!
-      
       public void applyOnAttackStart(Volley volley) {
         Person using = volley.origAsPerson();
         int level = using.stats.levelFor(this);
@@ -217,6 +215,7 @@ public class Techniques {
       
       public void applyOnNoticing(Person acts, Person seen, Action noted) {
         Scene scene = acts.currentScene();
+        //  TODO:  Add proper volley penalties!
         Common.FIRE.takeFreeAction(acts, seen.currentTile(), seen, scene);
       }
     },

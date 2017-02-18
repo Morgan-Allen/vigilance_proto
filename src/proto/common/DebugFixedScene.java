@@ -6,12 +6,12 @@ import proto.content.items.*;
 import proto.game.person.*;
 import proto.game.scene.*;
 import proto.util.*;
+import proto.content.agents.*;
 import static proto.content.places.UrbanScenes.*;
-import proto.content.agents.Crooks;
 
 
 
-public class DebugSceneWithLayout extends RunGame {
+public class DebugFixedScene extends RunGame {
   
   
   final public static SceneType FIXED_TEST_SCENE = new SceneTypeFixed(
@@ -39,12 +39,11 @@ public class DebugSceneWithLayout extends RunGame {
   );
   
   
-  
   public static void main(String args[]) {
-    //GameSettings.debugScene      = true;
+    GameSettings.debugScene      = true;
     //GameSettings.viewSceneBlocks = true;
     //GameSettings.debugLineSight  = true;
-    runGame(new DebugSceneWithLayout(), "saves/debug_fixed_scene");
+    runGame(new DebugFixedScene(), "saves/debug_fixed_scene");
   }
   
   
@@ -84,17 +83,23 @@ public class DebugSceneWithLayout extends RunGame {
     int across = (mission.size() - 0) / 2;
     Person hero = base.roster().first();
     hero.gear.equipItem(Gadgets.TEAR_GAS, PersonGear.SLOT_ITEM_1);
+    hero.gear.equipItem(Gadgets.BOLAS   , PersonGear.SLOT_ITEM_2);
+    hero.stats.setLevel(Techniques.STEADY_AIM, 1, true);
+    hero.stats.setLevel(Techniques.OVERWATCH , 1, true);
     hero.addAssignment(mission);
     mission.enterScene(hero, 0, across++);
     hero.onTurnStart();
+    
     hero.actions.assignAction(Common.GUARD.configAction(
       hero, hero.currentTile(), hero, mission, null, null
     ));
+    //  TODO:  Health-bars need to be non-centred again!
+    
     //
     //  And a random goon-
     Person goon = Person.randomOfKind(Crooks.BRUISER, world);
     goon.addAssignment(mission);
-    mission.enterScene(goon, 0, across++);
+    mission.enterScene(goon, mission.size() - 1, across++);
     goon.onTurnStart();
     goon.actions.assignAction(Common.STRIKE.configAction(
       goon, hero.currentTile(), hero, mission, null, null

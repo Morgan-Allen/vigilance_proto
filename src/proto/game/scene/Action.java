@@ -141,7 +141,9 @@ public class Action implements Session.Saveable {
   
   /**  Rendering, debug and interface methods-
     */
-  
+  public String toString() {
+    return used.name+": "+acting+" -> "+target;
+  }
 }
 
 

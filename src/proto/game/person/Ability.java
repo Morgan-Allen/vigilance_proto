@@ -236,9 +236,15 @@ public abstract class Ability extends Trait {
     Person acting, Tile dest, Object target,
     Scene scene, Tile pathToTake[], StringBuffer failLog
   ) {
+    for (Condition c : acting.stats.conditions) {
+      if (! c.basis.conditionAllowsAbility(this)) {
+        return failResult(c.basis+" Prevents Use", failLog);
+      }
+    }
     if (! allowsUse(acting, failLog)) {
       return null;
     }
+    
     if (acting == null || ! allowsTarget(target, scene, acting)) {
       return failResult("Invalid Target", failLog);
     }
@@ -313,6 +319,7 @@ public abstract class Ability extends Trait {
     applyOnActionStart(newAction);
     checkForTriggers(newAction, true, false);
     
+    //  TODO:  You'll need to delay this instead!
     newAction.setProgress(1);
     
     checkForTriggers(newAction, false, true);

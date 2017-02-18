@@ -39,7 +39,7 @@ public class AIUtils implements TileConstants {
   
   
   static Action pickAdvanceAction(Person person, Series <Person> foes) {
-    I.say("Picking advance action for "+person);
+    I.say("  Picking advance action for "+person);
     
     Scene scene = person.currentScene();
     Tile orig = person.currentTile();
@@ -54,12 +54,12 @@ public class AIUtils implements TileConstants {
       if (rating <= 0) continue;
       
       Action motion = Common.MOVE.bestMotionToward(t, person, scene);
-      if (motion.target != t) continue;
+      if (motion == null || motion.target != t) continue;
       pick.compare(motion, rating);
     }
     
     if (! pick.empty()) {
-      I.say("  "+person+" picked action: "+pick.result());
+      I.say("  "+person+" taking cover at: "+pick.result());
       return pick.result();
     }
 
@@ -70,7 +70,7 @@ public class AIUtils implements TileConstants {
     }
     
     if (! pick.empty()) {
-      I.say("  "+person+" picked action: "+pick.result());
+      I.say("  "+person+" moving toward foe at: "+pick.result());
       return pick.result();
     }
     

@@ -1,12 +1,11 @@
 
 
 package proto.game.person;
+import proto.common.*;
 import proto.game.scene.*;
 import proto.game.event.*;
 import proto.util.*;
 import static proto.game.person.PersonStats.*;
-
-import proto.common.Session;
 
 
 
@@ -32,16 +31,16 @@ public class PersonMind {
   
   
   void loadState(Session s) throws Exception {
-    AIstate      = s.loadInt   ();
-    confidence   = s.loadFloat ();
-    wariness     = s.loadFloat ();
+    AIstate    = s.loadInt  ();
+    confidence = s.loadFloat();
+    wariness   = s.loadFloat();
   }
   
   
   void saveState(Session s) throws Exception {
-    s.saveInt   (AIstate     );
-    s.saveFloat (confidence  );
-    s.saveFloat (wariness    );
+    s.saveInt   (AIstate   );
+    s.saveFloat (confidence);
+    s.saveFloat (wariness  );
   }
   
   
@@ -72,7 +71,7 @@ public class PersonMind {
   public Action selectActionAsAI() {
     Scene scene = person.currentScene();
     if (scene == null || ! person.actions.canTakeAction()) return null;
-    boolean report = I.talkAbout == this;
+    boolean report = true;
     if (report) I.say("\nGetting next AI action for "+this);
     
     Pick <Action> pick = new Pick(0);
@@ -86,6 +85,7 @@ public class PersonMind {
       
       for (Person p : scene.allPersons()) {
         if (! person.actions.canNotice(p)) {
+          if (report) I.say("  Not currently aware of "+p);
           continue;
         }
         for (Ability a : abilities) {
@@ -141,7 +141,6 @@ public class PersonMind {
     }
     
     //  TODO:  Refine these, and use constants to define the math.
-    
     float courage = 0.2f, minAlert = (
       person.stats.levelFor(REFLEXES) +
       person.stats.levelFor(WILL    )
@@ -168,4 +167,5 @@ public class PersonMind {
       I.say("Confidence for "+person+": "+confidence);
     }
   }
+  
 }
