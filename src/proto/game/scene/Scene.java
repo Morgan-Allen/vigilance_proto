@@ -48,7 +48,7 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   final public SceneVision vision = new SceneVision(this);
   
   boolean playerTurn;
-  Person nextActing;
+  Stack <Action> actionStack = new Stack();
   
   
   public Scene(World world, int size) {
@@ -86,7 +86,7 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     vision.loadState(s);
     
     playerTurn = s.loadBool();
-    nextActing = (Person) s.loadObject();
+    s.loadObjects(actionStack);
     
     view().loadState(s);
   }
@@ -119,7 +119,7 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     vision.saveState(s);
     
     s.saveBool(playerTurn);
-    s.saveObject(nextActing);
+    s.saveObjects(actionStack);
     
     view().saveState(s);
   }
@@ -207,11 +207,6 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   }
   
   
-  public int time() {
-    return time;
-  }
-  
-  
   public Series <Prop> props() {
     return props;
   }
@@ -243,6 +238,11 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   }
   
   
+  public Tile tileAt(float x, float y) {
+    return tileAt((int) (x + 0.5f), (int) (y + 0.5f));
+  }
+  
+  
   public Tile tileUnder(Object object) {
     if (object instanceof Tile  ) return  (Tile  ) object;
     if (object instanceof Person) return ((Person) object).currentTile();
@@ -271,8 +271,18 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   
   
   public Action currentAction() {
-    if (nextActing == null) return null;
-    return nextActing.actions.nextAction();
+    return actionStack.first();
+  }
+  
+  
+  public Person currentActing() {
+    if (actionStack.empty()) return null;
+    return actionStack.first().acting;
+  }
+  
+  
+  public Series <Action> actionStack() {
+    return actionStack;
   }
   
   
@@ -370,14 +380,13 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     int numT = playerTeam.size();
     int x = (size - numT) / 2, y = 0;
     view().setZoomPoint(tileAt(x, y));
+    
     for (Person p : playerTeam) {
       enterScene(p, x, y);
       x += 1;
     }
-    nextActing = playerTeam.first();
-    view().setSelection(nextActing, false);
-    playerTurn = true;
     
+    playerTurn = true;
     vision.updateFog();
     for (Person p : playerTeam) p.onTurnStart();
     for (Person p : othersTeam) p.onTurnStart();
@@ -386,29 +395,23 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   
   public void updateScene() {
     if (GameSettings.pauseScene) return;
+    
+    Action nextAction = currentAction();
+    Person nextActing = currentActing();
 
     for (Person p : playerTeam) if (p != nextActing) {
-      p.updateInScene(false);
+      p.updateInScene(false, null);
     }
     for (Person p : othersTeam) if (p != nextActing) {
-      p.updateInScene(false);
+      p.updateInScene(false, null);
     }
-    if (nextActing != null) {
-      final PersonActions nextPA = nextActing.actions;
-      Action last = nextPA.nextAction();
-      nextActing.updateInScene(true);
-      Action taken = nextPA.nextAction();
+    if (nextActing != null && ! nextAction.complete()) {
+      nextAction.incTimeSpent(1);
+      nextActing.updateInScene(true, nextAction);
+      time += 1;
       
-      if (taken != null) {
-        time += 1;
-      }
-      else {
-        if (last != null) view().setSelection(nextActing, false);
-        
-        if (! (nextPA.canTakeAction() && playerTurn)) {
-          moveToNextPersonsTurn();
-        }
-      }
+      I.say("  "+nextActing+" at "+nextActing.exactPosition());
+      I.add(" ("+actionStack.size()+" actions)");
     }
     else moveToNextPersonsTurn();
     
@@ -420,77 +423,73 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   }
   
   
-  public void setNextActing(Person acting) {
-    nextActing = acting;
+  public void pushNextAction(Action action) {
+    actionStack.addFirst(action);
   }
   
   
   public void moveToNextPersonsTurn() {
-    I.say("\n  Trying to find next active person...");
-    I.say("  Active: "+nextActing);
-    
-    PersonActions NA = nextActing == null ? null : nextActing.actions;
-    if ((NA != null) && (! NA.turnDone()) && (! NA.canTakeAction())) {
-      I.say("\n    Ending turn for "+nextActing);
-      nextActing.onTurnEnd();
+    //
+    //  Remove any expired actions from the action-stack first (if any remain,
+    //  return and let those execute first.)
+    for (Action a : actionStack) {
+      I.say("Current action: "+a+" (complete: "+a.complete()+")");
+      if (a.complete()) actionStack.remove(a);
     }
-    nextActing = null;
-    final int numTeams = 2;
-    
-    for (int maxTries = numTeams + 1; maxTries-- > 0;) {
-      Series <Person> team     = playerTurn ? playerTeam : othersTeam;
-      Series <Person> nextTeam = playerTurn ? othersTeam : playerTeam;
+    if (! actionStack.empty()) return;
+    //
+    //  If it's the player's turn, simply check that that all action-points
+    //  haven't been exhausted yet (we wait for input from the human player.)
+    //  If they have, refresh AP and switch to the other team.
+    if (playerTurn) {
+      boolean noOneLeft = true;
+      for (Person p : playerTeam) {
+        if (p.actions.canTakeAction()) noOneLeft = false;
+      }
       
-      I.say("\n    Trying to find active person from ");
-      if (playerTurn) I.add("player team"); else I.add("enemy team");
+      if (noOneLeft) {
+        I.say("\nNo action-points left on player team...");
+        playerTurn = false;
+        for (Person p : othersTeam) if (p.currentScene() == this) {
+          p.onTurnStart();
+        }
+      }
+    }
+    //
+    //  If it's the AI turn, we iterate across all non-player agents, see if
+    //  they can settle on a suitable action, and assign the first that gets
+    //  returned.
+    //  In the event that no actions can be assigned, refresh AP and switch
+    //  back to the player.
+    else {
+      I.say("\nSelecting next action from AI team...");
       
-      for (Person p : team) {
-        final PersonActions PA = p.actions;
-        if (! PA.canTakeAction()) continue;
-        
-        if (playerTurn) {
-          I.say("    ACTIVE PC: "+p+", AP: "+PA.currentAP());
-          nextActing = p;
+      boolean noOneLeft = true;
+      for (Person p : othersTeam) {
+        if (! p.actions.canTakeAction()) continue;
+
+        Action taken = p.mind.selectActionAsAI();
+        if (taken != null) {
+          I.say("  "+p+" will take action: "+taken);
+          p.actions.assignAction(taken);
+          pushNextAction(taken);
+          noOneLeft = false;
           break;
         }
         else {
-          I.say("    FOUND NPC: "+p+", AP: "+PA.currentAP());
-          Action taken = p.mind.selectActionAsAI();
-          if (taken != null) {
-            I.say("    "+p+" will take action: "+taken.used);
-            nextActing = p;
-            PA.assignAction(taken);
-            break;
-          }
-          else {
-            I.say("    "+p+" could not decide on action.");
-            PA.setActionPoints(0);
-            continue;
-          }
+          I.say("  "+p+" could not decide on action.");
+          p.actions.setActionPoints(0);
         }
       }
       
-      if (nextActing == null) {
-        I.say("    Will refresh AP and try other team...");
-        for (Person p : nextTeam) if (p.currentScene() == this) {
+      if (noOneLeft) {
+        I.say("\n  No action-points left on others team...");
+        playerTurn = true;
+        for (Person p : playerTeam) if (p.currentScene() == this) {
           p.onTurnStart();
         }
-        playerTurn = ! playerTurn;
-      }
-      else {
-        I.talkAbout = nextActing;
-        //
-        //  Zoom to the unit in question (if they're visible...)
-        //  TODO:  Ideally this should be handled within the UI!
-        if (vision.fogAt(nextActing.currentTile(), Person.Side.HEROES) > 0) {
-          I.say("    Will zoom to "+nextActing);
-          view().setSelection(nextActing, false);
-          view().setZoomPoint(nextActing.currentTile());
-        }
-        return;
       }
     }
-    I.say("\nWARNING- COULD NOT FIND NEXT ACTIVE PERSON!");
   }
   
   

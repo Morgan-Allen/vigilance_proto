@@ -286,7 +286,7 @@ public abstract class Ability extends Trait {
     }
     
     Action newAction = new Action(this, acting, target);
-    newAction.attachPath(path, scene.time());
+    newAction.attachPath(path);
     newAction.attachVolley(createVolley(newAction, target, scene));
     final int costAP = costAP(newAction);
     
@@ -313,18 +313,9 @@ public abstract class Ability extends Trait {
     Person acting, Tile dest, Object target, Scene scene
   ) {
     Action newAction = new Action(this, acting, target);
-    newAction.attachPath(new Tile[] { acting.location }, scene.time());
+    newAction.attachPath(new Tile[] { acting.location });
     newAction.attachVolley(createVolley(newAction, target, scene));
-    
-    applyOnActionStart(newAction);
-    checkForTriggers(newAction, true, false);
-    
-    //  TODO:  You'll need to delay this instead!
-    newAction.setProgress(1);
-    
-    checkForTriggers(newAction, false, true);
-    applyOnActionEnd(newAction);
-    
+    scene.pushNextAction(newAction);
     return newAction;
   }
   

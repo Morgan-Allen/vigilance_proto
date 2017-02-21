@@ -43,13 +43,14 @@ public class ActionsView extends UINode {
     Object hovered, Tile at, Surface surface, Graphics2D g
   ) {
     final Scene scene = mainView.world().activeScene();
-    if (selectAbility == null || sceneView.activePerson == null) return false;
+    final Person selected = sceneView.selectedPerson();
+    if (selectAbility == null || selected == null) return false;
     
     StringBuffer failLog = new StringBuffer();
     selectAction = null;
     if (! selectAbility.delayed()) {
       selectAction = selectAbility.configAction(
-        sceneView.activePerson, at, hovered, scene, null, failLog
+        selected, at, hovered, scene, null, failLog
       );
     }
     if (selectAction != null) {
@@ -86,7 +87,7 @@ public class ActionsView extends UINode {
     if (scene.complete() && ! GameSettings.debugScene) return "";
     
     final StringBuffer s = new StringBuffer();
-    final Person   p      = sceneView.activePerson;
+    final Person   p      = sceneView.selectedPerson();
     final Ability  a      = selectAbility;
     final Action   action = scene.currentAction();
     

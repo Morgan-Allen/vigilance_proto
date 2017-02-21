@@ -42,9 +42,10 @@ public class SceneView extends UINode implements TileConstants {
   
   final ActionsView actionsView;
   
-  Tile zoomTile, hoverTile;
+  Vec3D zoomPoint = new Vec3D();
+  Tile hoverTile, zoomTile;
   int zoomX, zoomY;
-  Person activePerson;
+  Person selectedPerson;
   
   static class TempFX {
     Image sprite;
@@ -65,20 +66,21 @@ public class SceneView extends UINode implements TileConstants {
   
   
   public void loadState(Session s) throws Exception {
-    zoomTile = (Tile) s.loadObject();
+    zoomPoint.loadFrom(s.input());
+    setZoomPoint(zoomPoint);
     zoomX    = s.loadInt();
     zoomY    = s.loadInt();
-    activePerson = (Person) s.loadObject();
+    selectedPerson = (Person) s.loadObject();
     actionsView.selectAbility = (Ability) s.loadObject();
     actionsView.selectAction  = (Action ) s.loadObject();
   }
   
   
   public void saveState(Session s) throws Exception {
-    s.saveObject(zoomTile);
+    zoomPoint.saveTo(s.output());
     s.saveInt   (zoomX   );
     s.saveInt   (zoomY   );
-    s.saveObject(activePerson);
+    s.saveObject(selectedPerson);
     s.saveObject(actionsView.selectAbility);
     s.saveObject(actionsView.selectAction );
   }
@@ -88,13 +90,20 @@ public class SceneView extends UINode implements TileConstants {
   /**  Public utility methods-
     */
   public void setZoomPoint(Tile t) {
-    this.zoomTile = t;
+    setZoomPoint(new Vec3D(t.x, t.y, 0));
+  }
+  
+  
+  public void setZoomPoint(Vec3D pos) {
+    zoomPoint.setTo(pos);
+    Scene scene = mainView.world().activeScene();
+    if (scene != null) zoomTile = scene.tileAt(pos.x, pos.y);
   }
   
   
   public void setSelection(Person acting, boolean keepActiveAbility) {
-    final Person old = activePerson;
-    this.activePerson = acting;
+    final Person old = selectedPerson;
+    this.selectedPerson = acting;
     if (acting != old || ! keepActiveAbility) actionsView.clearSelection();
   }
   
@@ -114,12 +123,7 @@ public class SceneView extends UINode implements TileConstants {
   
   
   public Person selectedPerson() {
-    return activePerson;
-  }
-  
-  
-  public Tile zoomTile() {
-    return zoomTile;
+    return selectedPerson;
   }
   
   
@@ -147,8 +151,8 @@ public class SceneView extends UINode implements TileConstants {
     //
     //  Update camera information first-
     if (zoomTile != null) {
-      zoomX = zoomTile.x * TILE_SIZE;
-      zoomY = zoomTile.y * TILE_SIZE;
+      zoomX = (int) (zoomPoint.x * TILE_SIZE);
+      zoomY = (int) (zoomPoint.y * TILE_SIZE);
       zoomX -= vw / 2;
       zoomY -= vh / 2;
     }
@@ -260,8 +264,9 @@ public class SceneView extends UINode implements TileConstants {
       
       if (surface.mouseClicked()) {
         if (done == null && canDoAction) {
-          scene.setNextActing(activePerson);
-          activePerson.actions.assignAction(actionsView.selectAction);
+          selectedPerson.actions.assignAction(actionsView.selectAction);
+          scene.pushNextAction(actionsView.selectAction);
+          actionsView.clearSelection();
         }
         else {
           Person pickP = null;
@@ -272,15 +277,27 @@ public class SceneView extends UINode implements TileConstants {
       }
     }
     //
+    //  We can track the position of any enemy movement in sight-
+    /*
+    Action baseAction = scene.actionStack().last();
+    Person acting = baseAction == null ? null : baseAction.acting;
+    if (
+      acting != null && (true || ! acting.isHero()) &&
+      scene.vision.fogAt(acting.currentTile(), Person.Side.HEROES) > 0
+    ) {
+      setZoomPoint(acting.exactPosition());
+    }
+    //*/
+    //
     //  Finally, some supplementary debugging-related checks:
     if (
       GameSettings.debugLineSight && I.used60Frames &&
       zoomTile != null && zoomTile == hoverTile &&
-      activePerson != null && zoomTile != activePerson.currentTile()
+      selectedPerson != null && zoomTile != selectedPerson.currentTile()
     ) {
       Tile.printWallsMask(scene);
-      scene.vision.degreeOfSight(activePerson, zoomTile, true);
-      scene.vision.coverFor(zoomTile, activePerson.currentTile(), true);
+      scene.vision.degreeOfSight(selectedPerson, zoomTile, true);
+      scene.vision.coverFor(zoomTile, selectedPerson.currentTile(), true);
     }
     return true;
   }
@@ -312,7 +329,7 @@ public class SceneView extends UINode implements TileConstants {
     }
     //
     //  And a selection circle if needed...
-    if (p == activePerson) {
+    if (p == selectedPerson) {
       final Image hoverBox = mainView.selectCircle;
       renderSprite(pos.x, pos.y, 1, 1, 0, hoverBox, g);
     }

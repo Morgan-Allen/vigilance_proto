@@ -223,10 +223,7 @@ public class Person extends Element {
     */
   public void setExactPosition(Scene scene, float x, float y, float z) {
     final Tile old = this.location;
-    
-    location = scene == null ? null : scene.tileAt(
-      (int) (x + 0.5f), (int) (y + 0.5f)
-    );
+    location = scene == null ? null : scene.tileAt(x, y);
     exactPos.set(x, y, z);
     
     if (old != location) {
@@ -256,9 +253,9 @@ public class Person extends Element {
   }
   
   
-  public void updateInScene(boolean duringOwnTurn) {
+  public void updateInScene(boolean duringOwnTurn, Action doing) {
     if (duringOwnTurn) {
-      actions.updateDuringTurn();
+      actions.updateDuringTurn(doing);
       stats.updateStats();
     }
     else {

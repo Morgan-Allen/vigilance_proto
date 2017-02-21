@@ -72,7 +72,7 @@ public class PersonMind {
     Scene scene = person.currentScene();
     if (scene == null || ! person.actions.canTakeAction()) return null;
     boolean report = true;
-    if (report) I.say("\nGetting next AI action for "+this);
+    if (report) I.say("\nGetting next AI action for "+person);
     
     Pick <Action> pick = new Pick(0);
     Series <Ability> abilities = person.stats.listAbilities();

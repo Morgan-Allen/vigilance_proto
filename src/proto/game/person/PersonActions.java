@@ -122,13 +122,11 @@ public class PersonActions {
   }
   
   
-  boolean updateDuringTurn() {
+  boolean updateDuringTurn(Action a) {
     Scene scene = person.currentScene();
-    Action a = nextAction;
     if (scene == null || a == null) return false;
-
-    float timeSteps = a.timeSteps();
     
+    float timeSteps = a.timeSteps();
     float alpha = timeSteps % 1;
     Tile path[] = a.path();
     Tile l = path[Nums.clamp((int)  timeSteps     , path.length)];

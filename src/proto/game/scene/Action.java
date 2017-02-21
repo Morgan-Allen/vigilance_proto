@@ -17,7 +17,7 @@ public class Action implements Session.Saveable {
   float moveRoll;
   Tile path[];
   Volley volley;
-  int timeStart;
+  int timeSpent;
   float progress;
   
   
@@ -37,7 +37,7 @@ public class Action implements Session.Saveable {
     volley    = (Volley ) s.loadObject();
     target    = s.loadObject();
     moveRoll  = s.loadFloat ();
-    timeStart = s.loadInt   ();
+    timeSpent = s.loadInt   ();
     progress  = s.loadFloat ();
   }
   
@@ -49,7 +49,7 @@ public class Action implements Session.Saveable {
     s.saveObject(volley   );
     s.saveObject(target   );
     s.saveFloat (moveRoll );
-    s.saveInt   (timeStart);
+    s.saveInt   (timeSpent);
     s.saveFloat (progress );
   }
   
@@ -57,9 +57,8 @@ public class Action implements Session.Saveable {
   
   /**  General query methods-
     */
-  public void attachPath(Tile path[], int timeStart) {
+  public void attachPath(Tile path[]) {
     this.path      = path;
-    this.timeStart = timeStart;
     this.moveRoll  = 1.0f;
   }
   
@@ -84,8 +83,8 @@ public class Action implements Session.Saveable {
   }
   
   
-  public int timeElapsed() {
-    return scene().time() - timeStart;
+  public int timeSpent() {
+    return timeSpent;
   }
   
   
@@ -124,10 +123,13 @@ public class Action implements Session.Saveable {
   }
   
   
+  public void incTimeSpent(int timeInc) {
+    timeSpent += timeInc;
+  }
+  
+  
   public float timeSteps() {
-    int elapsed = timeElapsed();
-    float timeSteps = elapsed * moveRate() / RunGame.FRAME_RATE;
-    return timeSteps;
+    return timeSpent * moveRate() / RunGame.FRAME_RATE;
   }
   
   
