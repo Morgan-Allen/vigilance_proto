@@ -88,7 +88,7 @@ public class Common {
       protected Volley createVolley(Action use, Object target, Scene scene) {
         Volley volley = new Volley();
         volley.setupMeleeVolley(use.acting, (Person) target, scene);
-        volley.stunPercent = 50;
+        volley.stunPercent.inc(50, this);
         return volley;
       }
       
@@ -115,7 +115,6 @@ public class Common {
       protected Volley createVolley(Action use, Object target, Scene scene) {
         Volley volley = new Volley();
         volley.setupVolley(use.acting, (Person) target, true, scene);
-        volley.stunPercent = 0;
         return volley;
       }
       
@@ -140,8 +139,8 @@ public class Common {
         Person hits = volley.origAsPerson();
         FX.dodgePosition(self, hits, 0.33f);
         float baseArmour = self.stats.levelFor(PersonStats.ARMOUR);
-        volley.hitsArmour  += 2 + (baseArmour / 2f);
-        volley.hitsDefence += 5 + (self.actions.currentAP() * 5);
+        volley.hitsArmour .inc(2 + (baseArmour / 2f), this);
+        volley.hitsDefence.inc(5 + (self.actions.currentAP() * 5), this);
       }
       
       
@@ -152,7 +151,7 @@ public class Common {
         Tile at = self.currentTile();
         self.setExactPosition(at.scene, at.x, at.y, 0);
         float counterChance = 0.5f;
-        boolean opening = volley.melee() && ! volley.didConnect;
+        boolean opening = volley.melee() && ! volley.didConnect();
         if (Rand.num() < counterChance && opening) {
           STRIKE.takeFreeAction(self, hits.currentTile(), hits, scene);
         }

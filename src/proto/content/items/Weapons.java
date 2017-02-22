@@ -5,7 +5,6 @@ import proto.common.*;
 import proto.game.person.*;
 import proto.game.scene.*;
 import proto.util.*;
-import static proto.game.person.ItemType.*;
 import static proto.game.person.PersonGear.*;
 import static proto.game.person.PersonStats.*;
 
@@ -55,12 +54,12 @@ public class Weapons {
     
     public void applyOnAttackStart(Volley volley) {
       if (subtype() == SUBTYPE_BLUNT) {
-        volley.stunPercent = 50;
+        volley.stunPercent.set(50, "Blunt Weapon");
       }
     }
     
     public void applyOnAttackEnd(Volley volley) {
-      if (! volley.didConnect) return;
+      if (! volley.didConnect()) return;
       if (subtype() == SUBTYPE_HEAVY_GUN || subtype() == SUBTYPE_PRECISE_GUN) {
         Person mark = volley.targAsPerson();
         float trauma = minDamage + Rand.index(rangeDamage + 1);
@@ -120,7 +119,7 @@ public class Weapons {
     55, new Object[] { ENGINEERING, 4 }
   ) {
     public void applyOnAttackStart(Volley volley) {
-      volley.hitsArmour -= Rand.index(2) + 1;
+      volley.hitsArmour.inc(0 - (Rand.index(2) + 1), this);
       super.applyOnAttackStart(volley);
     }
   };

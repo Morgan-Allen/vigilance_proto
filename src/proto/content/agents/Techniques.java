@@ -37,11 +37,10 @@ public class Techniques {
       public void applyOnAttackEnd(Volley volley) {
         Person self = volley.origAsPerson();
         Person mark = volley.targAsPerson();
-        int level = self.stats.levelFor(this);
+        int level = self.stats.levelFor(this) - 1;
         
-        if (volley.melee() && mark != null && volley.didDamage) {
-          int extra = level > 1 ? Rand.index(level - 1) : 0;
-          mark.health.receiveInjury(1 + extra);
+        if (volley.melee() && mark != null && volley.didDamage()) {
+          mark.health.receiveInjury(1 + (level * 0.5f));
         }
         return;
       }
@@ -67,8 +66,8 @@ public class Techniques {
         int level = use.acting.stats.levelFor(this);
         Volley volley = new Volley();
         volley.setupMeleeVolley(use.acting, (Person) target, scene);
-        volley.selfDamageRange += 1 + level;
-        volley.stunPercent = 20;
+        volley.selfDamageRange.inc(1 + level, this);
+        volley.stunPercent    .set(20       , this);
         //  TODO:  Include actual stun effects!
         return volley;
       }
@@ -99,13 +98,13 @@ public class Techniques {
       protected Volley createVolley(Action use, Object target, Scene scene) {
         Volley volley = new Volley();
         volley.setupMeleeVolley(use.acting, (Person) target, scene);
-        volley.stunPercent = 100;
+        volley.stunPercent.set(100, this);
         return volley;
       }
       
       public void applyOnActionEnd(Action use) {
         Person struck       = use.volley().targAsPerson();
-        int    damage       = use.volley().damageMargin;
+        int    damage       = use.volley().damageMargin.value();
         float  disarmChance = damage * 2 / struck.health.maxHealth();
         
         if (Rand.num() < disarmChance && struck.gear.hasEquipped(SLOT_WEAPON)) {
@@ -155,8 +154,8 @@ public class Techniques {
         int level = self.stats.levelFor(this);
         
         FX.dodgePosition(self, hits, 0.33f);
-        volley.hitsDefence += level * 5;
-        volley.hitsDefence += 20 + (self.actions.currentAP() * 5);
+        int dodgeBonus = 20 + (self.actions.currentAP() * 5) + (level * 5);
+        volley.hitsDefence.inc(dodgeBonus, this);
       }
       
       public void applyOnDefendEnd(Volley volley) {
@@ -189,6 +188,7 @@ public class Techniques {
       Ability.IS_SELF_ONLY | Ability.IS_CONDITION | Ability.TRIGGER_ON_ATTACK,
       2, Ability.MINOR_HELP, Ability.MINOR_POWER
     ) {
+      
       public void applyOnActionAssigned(Action use) {
         use.acting.stats.applyCondition(this, use.acting, 1);
       }
@@ -196,7 +196,7 @@ public class Techniques {
       public void modifyAttackVolley(Volley volley) {
         Person using = volley.origAsPerson();
         int level = using.stats.levelFor(this) - 1;
-        if (volley.ranged()) volley.selfAccuracy += 25 + (level * 5);
+        if (volley.ranged()) volley.selfAccuracy.inc(25 + (level * 5), this);
       }
     },
     
@@ -204,8 +204,7 @@ public class Techniques {
       "Overwatch", "ability_overwatch",
       ICONS_DIR+"icon_overwatch.png",
       "Readies a ranged weapon for use when an enemy comes in view, at a -15 "+
-      "accuracy penality (+5 per experience grade.)  Reserving additional AP "+
-      "can boost accuracy.",
+      "accuracy penality (+5 per experience grade.)",
       Ability.IS_DELAYED | Ability.TRIGGER_ON_NOTICE, 1,
       Ability.MINOR_HELP, Ability.MINOR_POWER
     ) {
@@ -219,10 +218,12 @@ public class Techniques {
         Scene scene = acts.currentScene();
         int level = acts.stats.levelFor(this);
         
+        //  TODO:  Include an added bonus for reserving AP!
+        
         final Action fire = Common.FIRE.takeFreeAction(
           acts, seen.currentTile(), seen, scene
         );
-        fire.volley().selfAccuracy += (level * 5) - 20;
+        fire.volley().selfAccuracy.inc((level * 5) - 20, this);
         
         acts.actions.cancelAction();
       }
@@ -255,7 +256,7 @@ public class Techniques {
       protected Volley createVolley(Action use, Object target, Scene scene) {
         Volley volley = new Volley();
         volley.setupMeleeVolley(use.acting, (Person) target, scene);
-        volley.stunPercent = 100;
+        volley.stunPercent.set(100, this);
         return volley;
       }
       

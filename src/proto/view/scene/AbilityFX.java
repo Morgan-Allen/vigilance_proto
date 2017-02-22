@@ -34,10 +34,27 @@ public class AbilityFX {
       int maxDamage = Nums.ceil (v.maxDamage());
       
       s.append("\n  "+minDamage+"-"+maxDamage+" damage");
-      int hitPercent = Nums.clamp(v.accuracyMargin, 101);
-      int critChance = v.critPercent;
-      s.append("\n  "+hitPercent+"% to hit (armour "+v.hitsArmour+")");
-      s.append("\n  "+critChance+"% to crit");
+      s.append("\n  target armour "+v.hitsArmour+")");
+      
+      s.append("\n  "+v.accuracyMargin+"% to hit");
+      for (Volley.Modifier m : v.extractModifiers(
+        v.selfAccuracy, v.hitsDefence
+      )) {
+        int aimMult = m.stat == v.selfAccuracy ? 1 : -1;
+        s.append("\n    "+m.source+": "+I.signNum(m.modValue * aimMult));
+      }
+      
+      s.append("\n  "+v.critPercent+"% to crit");
+      for (Volley.Modifier m : v.extractModifiers(v.critPercent)) {
+        s.append("\n    "+m.source+": "+I.signNum(m.modValue));
+      }
+      
+      s.append("\n  "+v.stunPercent+"% stun damage");
+      for (Volley.Modifier m : v.extractModifiers(v.stunDamage)) {
+        s.append("\n    "+m.source+": "+I.signNum(m.modValue));
+      }
+      
+      s.append("\n");
     }
     
     //  TODO:  This needs to be worked on as a separate feature.

@@ -141,9 +141,9 @@ public class PersonHealth {
   
   
   public void receiveAttack(Volley attack) {
-    if (attack.didConnect) {
-      receiveInjury(attack.injureDamage);
-      receiveStun  (attack.stunDamage  );
+    if (attack.didConnect()) {
+      receiveInjury(attack.injureDamage.value());
+      receiveStun  (attack.stunDamage  .value());
     }
     float bleedRisk = totalHarm / maxHealth();
     if (Rand.num() < bleedRisk) {
