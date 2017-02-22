@@ -181,6 +181,16 @@ public class ItemType extends Kind {
   }
   
   
+  public void modifyAttackVolley(Volley volley) {
+    return;
+  }
+  
+  
+  public void modifyDefendVolley(Volley volley) {
+    return;
+  }
+  
+  
   public void applyOnDefendStart(Volley volley) {
     return;
   }

@@ -108,9 +108,12 @@ public class PersonStats {
   Table <Trait, Level> levels = new Table();
   
   static class Condition {
+    //  TODO:  Just refer to the source action instead.
     Ability basis;
     Person casts;
     int countdown;
+    
+    public String toString() { return basis+" ("+countdown+" turns)"; }
   }
   List <Condition> conditions = new List();
   

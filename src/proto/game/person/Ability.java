@@ -19,22 +19,23 @@ public abstract class Ability extends Trait {
     */
   final public static int
     NONE              = 0      ,
-    IS_MELEE          = 1 << 0 ,
-    IS_RANGED         = 1 << 1 ,
-    IS_ACTIVE         = 1 << 2 ,
-    IS_PASSIVE        = 1 << 3 ,
-    IS_DELAYED        = 1 << 4 ,
-    NO_NEED_FOG       = 1 << 5 ,
-    NO_NEED_LOS       = 1 << 6 ,
-    IS_CONDITION      = 1 << 7 ,
-    IS_AREA_EFFECT    = 1 << 8 ,
-    IS_STUNNING       = 1 << 8 ,
-    IS_BASIC          = 1 << 10,
-    IS_NATURAL        = 1 << 11,
-    IS_EQUIPPED       = 1 << 12,
-    TRIGGER_ON_ATTACK = 1 << 13,
-    TRIGGER_ON_DEFEND = 1 << 14,
-    TRIGGER_ON_NOTICE = 1 << 15;
+    IS_SELF_ONLY      = 1 << 0 ,
+    IS_MELEE          = 1 << 1 ,
+    IS_RANGED         = 1 << 2 ,
+    IS_ACTIVE         = 1 << 3 ,
+    IS_PASSIVE        = 1 << 4 ,
+    IS_DELAYED        = 1 << 5 ,  //  TODO- Remove in favour of Conditions
+    NO_NEED_FOG       = 1 << 6 ,
+    NO_NEED_LOS       = 1 << 7 ,
+    IS_CONDITION      = 1 << 8 ,
+    IS_AREA_EFFECT    = 1 << 9 ,
+    IS_STUNNING       = 1 << 10,
+    IS_BASIC          = 1 << 11,
+    IS_NATURAL        = 1 << 12,
+    IS_EQUIPPED       = 1 << 13,
+    TRIGGER_ON_ATTACK = 1 << 14,
+    TRIGGER_ON_DEFEND = 1 << 15,
+    TRIGGER_ON_NOTICE = 1 << 16;
   final public static float
     MAJOR_HELP = -2.0f,
     REAL_HELP  = -1.0f,
@@ -89,13 +90,18 @@ public abstract class Ability extends Trait {
   }
   
   
-  public boolean ranged() {
-    return hasProperty(IS_RANGED);
+  public boolean selfOnly() {
+    return hasProperty(IS_SELF_ONLY);
   }
   
   
   public boolean melee() {
     return hasProperty(IS_MELEE);
+  }
+  
+  
+  public boolean ranged() {
+    return hasProperty(IS_RANGED);
   }
   
   
@@ -236,7 +242,8 @@ public abstract class Ability extends Trait {
     Person acting, Tile dest, Object target,
     Scene scene, Tile pathToTake[], StringBuffer failLog
   ) {
-    for (Condition c : acting.stats.conditions) {
+    final Series <Condition> conds = acting.stats.conditions;
+    if (! conds.empty()) for (Condition c : conds) {
       if (! c.basis.conditionAllowsAbility(this)) {
         return failResult(c.basis+" Prevents Use", failLog);
       }
@@ -271,7 +278,7 @@ public abstract class Ability extends Trait {
     if (pathToTake != null) {
       path = pathToTake;
     }
-    else if (ranged() || delayed()) {
+    else if (ranged() || delayed() || selfOnly()) {
       path = new Tile[] { acting.location };
     }
     else {
@@ -288,12 +295,17 @@ public abstract class Ability extends Trait {
     Action newAction = new Action(this, acting, target);
     newAction.attachPath(path);
     newAction.attachVolley(createVolley(newAction, target, scene));
+    
+    //  TODO:  YOU NEED TO INCLUDE VOLLEY EFFECTS FROM EQUIPMENT, CONDITIONS,
+    //  DELAYED AND PASSIVE ABILITIES, AT BOTH THE ORIGIN AND TARGET!
+    applyTriggerEffects(newAction, false, false, true);
+    
     final int costAP = costAP(newAction);
     
     if (costAP > acting.actions.currentAP()) {
       return failResult("Not enough AP", failLog);
     }
-    for (Condition c : acting.stats.conditions) {
+    if (! conds.empty()) for (Condition c : conds) {
       if (! c.basis.conditionAllowsAction(newAction)) {
         return failResult(c.basis+" prevents use", failLog);
       }
@@ -320,15 +332,12 @@ public abstract class Ability extends Trait {
   }
   
   
-  protected Volley createVolley(Action use, Object target, Scene scene) {
-    return null;
-  }
-  
-  
-  protected void checkForTriggers(Action use, boolean start, boolean end) {
+  protected void applyTriggerEffects(
+    Action use, boolean start, boolean end, boolean configOnly
+  ) {
     Scene  scene  = use.acting.currentScene();
     Volley volley = use.volley();
-    
+    if (configOnly) start = end = false;
     //  TODO:  Move this out to the PersonActions class.
     
     if (volley != null) {
@@ -338,14 +347,27 @@ public abstract class Ability extends Trait {
       if (end  ) volley.completeVolley();
       
       if (self != null) for (Item item : self.gear.equipped()) {
-        if (! item.kind().triggerOnAttack(volley)) continue;
-        if (start) item.kind().applyOnAttackStart(volley);
-        if (end  ) item.kind().applyOnAttackEnd  (volley);
+        ItemType t = item.kind();
+        if (t.triggerOnAttack(volley)) {
+          t.triggerOnAttack(volley);
+          if (start) t.applyOnAttackStart(volley);
+          if (end  ) t.applyOnAttackEnd  (volley);
+        }
       }
       
+      //  TODO:  *Just* use conditions here.
       if (self != null && self.actions.nextAction() != null) {
         Ability a = self.actions.nextAction().used;
         if (a.triggerOnAttack() && a.allowsTarget(self, scene, self)) {
+          a.modifyAttackVolley(volley);
+          if (start) a.applyOnAttackStart(volley);
+          if (end  ) a.applyOnAttackEnd  (volley);
+        }
+      }
+      if (self != null) for (Condition c : self.stats.conditions) {
+        Ability a = c.basis;
+        if (a.triggerOnAttack() && a.allowsTarget(self, scene, self)) {
+          a.modifyAttackVolley(volley);
           if (start) a.applyOnAttackStart(volley);
           if (end  ) a.applyOnAttackEnd  (volley);
         }
@@ -354,20 +376,34 @@ public abstract class Ability extends Trait {
       if (self != null) for (Ability a : self.stats.listAbilities()) {
         if (! a.passive()) continue;
         if (a.triggerOnAttack() && a.allowsTarget(self, scene, self)) {
+          a.modifyAttackVolley(volley);
           if (start) a.applyOnAttackStart(volley);
           if (end  ) a.applyOnAttackEnd  (volley);
         }
       }
       
       if (hits != null) for (Item item : hits.gear.equipped()) {
-        if (! item.kind().triggerOnDefend(volley)) continue;
-        if (start) item.kind().applyOnDefendStart(volley);
-        if (end  ) item.kind().applyOnDefendEnd  (volley);
+        ItemType t = item.kind();
+        if (t.triggerOnDefend(volley)) {
+          t.modifyDefendVolley(volley);
+          if (start) t.applyOnDefendStart(volley);
+          if (end  ) t.applyOnDefendEnd  (volley);
+        }
       }
       
+      //  TODO:  *Just* use conditions here.
       if (hits != null && hits.actions.nextAction() != null) {
         Ability a = hits.actions.nextAction().used;
         if (a.triggerOnDefend() && a.allowsTarget(hits, scene, hits)) {
+          a.modifyDefendVolley(volley);
+          if (start) a.applyOnDefendStart(volley);
+          if (end  ) a.applyOnDefendEnd  (volley);
+        }
+      }
+      if (hits != null) for (Condition c : self.stats.conditions) {
+        Ability a = c.basis;
+        if (a.triggerOnDefend() && a.allowsTarget(hits, scene, hits)) {
+          a.modifyDefendVolley(volley);
           if (start) a.applyOnDefendStart(volley);
           if (end  ) a.applyOnDefendEnd  (volley);
         }
@@ -376,6 +412,7 @@ public abstract class Ability extends Trait {
       if (hits != null) for (Ability a : hits.stats.listAbilities()) {
         if (! a.passive()) continue;
         if (a.triggerOnDefend() && a.allowsTarget(hits, scene, hits)) {
+          a.modifyDefendVolley(volley);
           if (start) a.applyOnDefendStart(volley);
           if (end  ) a.applyOnDefendEnd  (volley);
         }
@@ -383,6 +420,21 @@ public abstract class Ability extends Trait {
       
       if (end && hits != null) hits.health.receiveAttack(volley);
     }
+  }
+  
+  
+  protected Volley createVolley(Action use, Object target, Scene scene) {
+    return null;
+  }
+  
+  
+  public void modifyAttackVolley(Volley volley) {
+    return;
+  }
+  
+  
+  public void modifyDefendVolley(Volley volley) {
+    return;
   }
   
   

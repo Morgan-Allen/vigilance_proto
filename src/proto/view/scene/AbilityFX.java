@@ -29,6 +29,7 @@ public class AbilityFX {
     
     if (action != null && action.volley() != null) {
       Volley v = action.volley();
+      v.calcMargins();
       int minDamage = Nums.floor(v.minDamage());
       int maxDamage = Nums.ceil (v.maxDamage());
       

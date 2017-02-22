@@ -409,9 +409,7 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
       nextAction.incTimeSpent(1);
       nextActing.updateInScene(true, nextAction);
       time += 1;
-      
-      I.say("  "+nextActing+" at "+nextActing.exactPosition());
-      I.add(" ("+actionStack.size()+" actions)");
+      ///I.say("Action is: "+nextAction+", time: "+time);
     }
     else moveToNextPersonsTurn();
     
@@ -467,7 +465,7 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
       boolean noOneLeft = true;
       for (Person p : othersTeam) {
         if (! p.actions.canTakeAction()) continue;
-
+        
         Action taken = p.mind.selectActionAsAI();
         if (taken != null) {
           I.say("  "+p+" will take action: "+taken);

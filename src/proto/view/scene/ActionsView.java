@@ -48,7 +48,7 @@ public class ActionsView extends UINode {
     
     StringBuffer failLog = new StringBuffer();
     selectAction = null;
-    if (! selectAbility.delayed()) {
+    if (! (selectAbility.delayed() || selectAbility.selfOnly())) {
       selectAction = selectAbility.configAction(
         selected, at, hovered, scene, null, failLog
       );
@@ -132,7 +132,7 @@ public class ActionsView extends UINode {
       if (canCommand) {
         s.append("\n\n  Abilities (Press 1-9):");
         char key = '1';
-        for (Ability r : p.stats.listAbilities())  {
+        for (Ability r : p.stats.listAbilities()) {
           if (! r.active()) continue;
           s.append("\n    "+r.name());
           
@@ -148,14 +148,13 @@ public class ActionsView extends UINode {
           s.append("\n  Pass Turn (X)");
           if (surface.isPressed('x')) {
             p.onTurnEnd();
-            scene.moveToNextPersonsTurn();
           }
         }
         //  TODO:  Allow zooming to and tabbing through party members.
         //  Note:  Delayed actions only target the self, so no selection is
         //  needed, only confirmation.
         else {
-          if (a.delayed()) {
+          if (a.delayed() || a.selfOnly()) {
             selectAction = a.configAction(
               p, p.currentTile(), p, scene, null, null
             );
@@ -163,7 +162,7 @@ public class ActionsView extends UINode {
             s.append("\n  Confirm (Y)");
             if (surface.isPressed('y')) {
               p.actions.assignAction(selectAction);
-              scene.moveToNextPersonsTurn();
+              scene.pushNextAction(selectAction);
             }
           }
           else {

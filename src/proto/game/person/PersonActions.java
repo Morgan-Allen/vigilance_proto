@@ -146,15 +146,17 @@ public class PersonActions {
     
     if (timeSteps > path.length) {
       if (! a.started()) {
+        I.say("Started action: "+a);
         a.used.applyOnActionStart(a);
-        a.used.checkForTriggers(a, true, false);
+        a.used.applyTriggerEffects(a, true, false, false);
       }
       float extraTime = a.used.animDuration();
       a.setProgress((timeSteps - path.length) / (extraTime * a.moveRate()));
     }
     if (a.complete()) {
-      a.used.checkForTriggers(a, false, true);
+      a.used.applyTriggerEffects(a, false, true, false);
       a.used.applyOnActionEnd(a);
+      I.say("Ended action: "+a);
       nextAction = null;
     }
     return true;

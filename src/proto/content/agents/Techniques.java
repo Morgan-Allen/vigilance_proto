@@ -186,16 +186,16 @@ public class Techniques {
       ICONS_DIR+"icon_steady_aim.png",
       "Grants +25 accuracy to your ranged attacks (+5 per experience grade) "+
       "for one turn.",
-      Ability.IS_DELAYED | Ability.IS_ACTIVE | Ability.IS_CONDITION, 1,
-      Ability.MINOR_HELP, Ability.MINOR_POWER
+      Ability.IS_SELF_ONLY | Ability.IS_CONDITION | Ability.TRIGGER_ON_ATTACK,
+      2, Ability.MINOR_HELP, Ability.MINOR_POWER
     ) {
       public void applyOnActionAssigned(Action use) {
         use.acting.stats.applyCondition(this, use.acting, 1);
       }
       
-      public void applyOnAttackStart(Volley volley) {
+      public void modifyAttackVolley(Volley volley) {
         Person using = volley.origAsPerson();
-        int level = using.stats.levelFor(this);
+        int level = using.stats.levelFor(this) - 1;
         if (volley.ranged()) volley.selfAccuracy += 25 + (level * 5);
       }
     },
@@ -204,7 +204,8 @@ public class Techniques {
       "Overwatch", "ability_overwatch",
       ICONS_DIR+"icon_overwatch.png",
       "Readies a ranged weapon for use when an enemy comes in view, at a -15 "+
-      "accuracy penality (+5 per experience grade.)",
+      "accuracy penality (+5 per experience grade.)  Reserving additional AP "+
+      "can boost accuracy.",
       Ability.IS_DELAYED | Ability.TRIGGER_ON_NOTICE, 1,
       Ability.MINOR_HELP, Ability.MINOR_POWER
     ) {
@@ -216,8 +217,13 @@ public class Techniques {
       
       public void applyOnNoticing(Person acts, Person seen, Action noted) {
         Scene scene = acts.currentScene();
-        //  TODO:  Add proper volley penalties!
-        Common.FIRE.takeFreeAction(acts, seen.currentTile(), seen, scene);
+        int level = acts.stats.levelFor(this);
+        
+        final Action fire = Common.FIRE.takeFreeAction(
+          acts, seen.currentTile(), seen, scene
+        );
+        fire.volley().selfAccuracy += (level * 5) - 20;
+        
         acts.actions.cancelAction();
       }
     },

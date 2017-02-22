@@ -202,8 +202,8 @@ public class Volley implements Session.Saveable {
     }
     if (ranged) {
       selfAccuracy = self.stats.levelFor(ACCURACY);
-      float normRange = self.stats.sightRange();
-      float distance  = scene.distance(self.currentTile(), hits.currentTile());
+      float normRange  = self.stats.sightRange();
+      float distance   = scene.distance(self.currentTile(), hits.currentTile());
       float coverBonus = coverBonus(orig, targ, scene);
       selfAccuracy -= 100 * ((distance - 1) - normRange) / normRange;
       hitsDefence = hits.stats.levelFor(DEFENCE);
@@ -212,6 +212,7 @@ public class Volley implements Session.Saveable {
     
     hitsDefence  = Nums.max(hitsDefence , 1);
     selfAccuracy = Nums.max(selfAccuracy, 1);
+    calcMargins();
     
     if (weapon != nativeWeapon) {
       self.gear.equipItem(nativeWeapon, PersonGear.SLOT_WEAPON);
@@ -219,7 +220,7 @@ public class Volley implements Session.Saveable {
   }
   
   
-  protected void calcMargins() {
+  public void calcMargins() {
     accuracyMargin = (int) Nums.clamp(selfAccuracy - hitsDefence, 0, 100);
     critPercent = ((selfAccuracy - 25) * accuracyMargin) / (5 * 50);
   }
