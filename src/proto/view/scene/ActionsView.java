@@ -20,6 +20,7 @@ public class ActionsView extends UINode {
   
   Ability selectAbility;
   Action  selectAction;
+  long delayToJump = 0;
   
   
   ActionsView(SceneView parent) {
@@ -33,48 +34,41 @@ public class ActionsView extends UINode {
   }
   
   
-  void clearSelection() {
+  void confirmActionChoice(Action action) {
+    Person agent = action.acting;
+    agent.actions.assignAction(action);
+    action.scene().pushNextAction(action);
+    clearChoices();
+  }
+  
+  
+  void clearChoices() {
     selectAbility = null;
     selectAction  = null;
   }
   
   
-  boolean previewActionDelivery(
-    Object hovered, Tile at, Surface surface, Graphics2D g
-  ) {
-    final Scene scene = mainView.world().activeScene();
-    final Person selected = sceneView.selectedPerson();
-    if (selectAbility == null || selected == null) return false;
-    
-    StringBuffer failLog = new StringBuffer();
-    selectAction = null;
-    if (! (selectAbility.delayed() || selectAbility.selfOnly())) {
-      selectAction = selectAbility.configAction(
-        selected, at, hovered, scene, null, failLog
-      );
-    }
-    if (selectAction != null) {
-      int costAP = selectAction.used.costAP(selectAction);
-      selectAction.used.FX.tracePath(selectAction.path(), scene, g);
-      sceneView.renderString(at.x, at.y - 0.5f, "AP: "+costAP, Color.GREEN, g);
-      return true;
-    }
-    else {
-      sceneView.renderString(at.x, at.y - 0.5f, ""+failLog, Color.RED, g);
-      return false;
-    }
-  }
-  
-  
   protected boolean renderTo(Surface surface, Graphics2D g) {
-    
+    //
+    //  First, print the general description for what the agent is trying-
     g.setColor(new Color(0, 0, 0, 0.66f));
     g.fillRect(vx, vy, vw, vh);
-    
     String desc = description(surface);
     g.setColor(Color.LIGHT_GRAY);
     ViewUtils.drawWrappedString(desc, g, vx, vy, vw, vh);
-    
+    //
+    //  Then try jumping to the next agent on the team once a given action is
+    //  completed, after a short delay-
+    final Scene scene = sceneView.scene();
+    Person agent = sceneView.selectedPerson();
+    if (scene.currentAction() == null & delayToJump <= 0) {
+      if (agent == null || ! agent.actions.canTakeAction()) {
+        delayToJump = 30;
+      }
+    }
+    if (delayToJump > 0 && --delayToJump <= 0) {
+      sceneView.jumpToNextAgent(agent);
+    }
     return true;
   }
   
@@ -161,9 +155,7 @@ public class ActionsView extends UINode {
             s.append("\n\n"+a.FX.describeAction(selectAction, scene));
             s.append("\n  Confirm (Y)");
             if (surface.isPressed('y')) {
-              p.actions.assignAction(selectAction);
-              scene.pushNextAction(selectAction);
-              clearSelection();
+              confirmActionChoice(selectAction);
             }
           }
           else {
@@ -187,6 +179,35 @@ public class ActionsView extends UINode {
     return s.toString();
   }
   
+  
+  
+  /**  Rendering previews for an action-
+    */
+  boolean previewActionDelivery(
+    Object hovered, Tile at, Surface surface, Graphics2D g
+  ) {
+    final Scene scene = mainView.world().activeScene();
+    final Person selected = sceneView.selectedPerson();
+    if (selectAbility == null || selected == null) return false;
+    
+    StringBuffer failLog = new StringBuffer();
+    selectAction = null;
+    if (! (selectAbility.delayed() || selectAbility.selfOnly())) {
+      selectAction = selectAbility.configAction(
+        selected, at, hovered, scene, null, failLog
+      );
+    }
+    if (selectAction != null) {
+      int costAP = selectAction.used.costAP(selectAction);
+      selectAction.used.FX.previewAction(selectAction, scene, g);
+      sceneView.renderString(at.x, at.y - 0.5f, "AP: "+costAP, Color.GREEN, g);
+      return true;
+    }
+    else {
+      sceneView.renderString(at.x, at.y - 0.5f, ""+failLog, Color.RED, g);
+      return false;
+    }
+  }
 }
 
 

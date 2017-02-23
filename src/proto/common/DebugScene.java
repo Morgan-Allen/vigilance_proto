@@ -15,7 +15,9 @@ public class DebugScene extends RunGame {
   
   
   public static void main(String args[]) {
-    GameSettings.freeTipoffs = true;
+    
+    //GameSettings.freeTipoffs = true;
+    //GameSettings.debugScene  = true;
     runGame(new DebugScene(), "saves/debug_scene");
   }
   
@@ -55,13 +57,11 @@ public class DebugScene extends RunGame {
     Event kidnapEvent = kidnapStep.matchedEvent();
     file.recordRole(kidnapEvent, CaseFile.ROLE_SCENE, tipoff);
     
-    GameSettings.debugScene = true;
-    
     final Base HQ = world.playerBase();
     Task guarding = file.investigationOptions().first();
     int ID = 0;
     for (Person p : HQ.roster()) {
-      ItemType gadget1 = ID % 2 == 0 ? Gadgets.MED_KIT     : Gadgets.MED_KIT ;
+      ItemType gadget1 = ID % 2 == 0 ? Gadgets.MED_KIT     : Gadgets.BOLAS   ;
       ItemType gadget2 = ID % 2 == 0 ? Gadgets.SONIC_PROBE : Gadgets.TEAR_GAS;
       p.gear.equipItem(gadget1, PersonGear.SLOT_ITEM_1);
       p.gear.equipItem(gadget2, PersonGear.SLOT_ITEM_2);

@@ -75,7 +75,7 @@ public class Techniques {
       final Image missile = Kind.loadImage(SPRITE_DIR+"sprite_punch.png");
       
       public void renderUsageFX(Action action, Scene scene, Graphics2D g) {
-        FX.renderMissile(action, scene, missile, g);
+        FX.renderMissile(action, scene, missile, 0.5f, g);
       }
     },
     
@@ -116,7 +116,7 @@ public class Techniques {
       final Image missile = Kind.loadImage(SPRITE_DIR+"sprite_punch.png");
       
       public void renderUsageFX(Action action, Scene scene, Graphics2D g) {
-        FX.renderMissile(action, scene, missile, g);
+        FX.renderMissile(action, scene, missile, 0.5f, g);
       }
     },
     
@@ -229,12 +229,14 @@ public class Techniques {
       }
     },
     
+    //  TODO:  This needs to be either ranged or melee, depending on the type
+    //  of the user's weapon!
     FLESH_WOUND = new Ability(
       "Flesh Wound", "ability_flesh_wound",
       ICONS_DIR+"icon_flesh_wound.png",
-      "Reduces accuracy and crit chance to reduce lethality with blades or "+
-      "precision firearms.",
-      Ability.IS_MELEE, 2, Ability.REAL_HARM, Ability.MINOR_POWER
+      "Reduces accuracy and crit chance to reduce lethality with precision "+
+      "firearms.",
+      Ability.IS_RANGED, 2, Ability.REAL_HARM, Ability.MINOR_POWER
     ) {
       
       public boolean allowsUse(Person acting, StringBuffer failLog) {
@@ -255,8 +257,8 @@ public class Techniques {
       
       protected Volley createVolley(Action use, Object target, Scene scene) {
         Volley volley = new Volley();
-        volley.setupMeleeVolley(use.acting, (Person) target, scene);
-        volley.stunPercent.set(100, this);
+        volley.setupVolley(use.acting, (Person) target, true, scene);
+        volley.stunPercent.inc(50, this);
         return volley;
       }
       

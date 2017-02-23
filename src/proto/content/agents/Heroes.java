@@ -36,6 +36,10 @@ public class Heroes {
       QUESTION     , 7,
       PERSUADE     , 5,
       
+      Techniques.STEADY_AIM, 1,
+      Techniques.SPRINTER  , 1,
+      Techniques.EVASION   , 1,
+      
       Weapons.WING_BLADES,
       Armours.KEVLAR_VEST
     )
@@ -56,6 +60,10 @@ public class Heroes {
       MEDICINE     , 6,
       QUESTION     , 5,
       PERSUADE     , 7,
+      
+      Techniques.FLESH_WOUND, 1,
+      Techniques.BRAWLER    , 1,
+      Techniques.ENDURANCE  , 1,
       
       Weapons.REVOLVER,
       Armours.BODY_ARMOUR
@@ -78,6 +86,10 @@ public class Heroes {
       QUESTION     , 7,
       PERSUADE     , 8,
       
+      Techniques.ENDURANCE, 1,
+      Techniques.BRAWLER  , 1,
+      Techniques.DISARM   , 1,
+      
       Weapons.WING_BLADES,
       Armours.BODY_ARMOUR
     )
@@ -98,6 +110,10 @@ public class Heroes {
       MEDICINE     , 6,
       QUESTION     , 8,
       PERSUADE     , 5,
+      
+      Techniques.STEADY_AIM, 1,
+      Techniques.OVERWATCH , 1,
+      Techniques.SPRINTER  , 1,
       
       Weapons.REVOLVER,
       Armours.KEVLAR_VEST

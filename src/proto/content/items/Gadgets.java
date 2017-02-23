@@ -72,7 +72,7 @@ public class Gadgets {
     final Image MISSILE_IMG = Kind.loadImage(SPRITE_DIR+"sprite_bolas.png");
     
     public void renderUsageFX(Action use, Scene scene, Graphics2D g) {
-      FX.renderMissile(use, scene, MISSILE_IMG, g);
+      FX.renderMissile(use, scene, MISSILE_IMG, 0.5f, g);
     }
   };
   
@@ -174,7 +174,7 @@ public class Gadgets {
     }
     
     public void renderUsageFX(Action use, Scene scene, Graphics2D g) {
-      FX.renderMissile(use, scene, GRENADE_IMG, g);
+      FX.renderMissile(use, scene, GRENADE_IMG, 0.5f, g);
     }
   };
   
@@ -196,7 +196,7 @@ public class Gadgets {
   final static Ability SONIC_PROBE_ABILITY = new Ability(
     "Sonic Probe", "sonic_probe_ability",
     ICONS_DIR+"sprite_sonic_probe.png",
-    "Reveals an area hidden in the fog of war.",
+    "Reveals an area hidden in the fog of war.  Lasts 2 turns.",
     Ability.IS_RANGED | Ability.NO_NEED_FOG, 1,
     Ability.NO_HARM, Ability.MINOR_POWER
   ) {
@@ -208,13 +208,35 @@ public class Gadgets {
     final Image BURST_IMG   = Kind.loadImage(SPRITE_DIR+"sprite_sonic.png"  );
     
     public void renderUsageFX(Action use, Scene scene, Graphics2D g) {
-      FX.renderMissile(use, scene, GRENADE_IMG, g);
+      FX.renderMissile(use, scene, GRENADE_IMG, 0.5f, g);
     }
     
     public void applyOnActionEnd(Action use) {
-      final Tile at = use.scene().tileUnder(use.target);
-      use.scene().vision.liftFogAround(at, 4, use.acting, true);
+      Scene scene = use.scene();
+      Tile at = scene.tileUnder(use.target);
+      PropEffect probe = new PropEffect(SONIC_PROBE_PROP, use, scene.world());
+      probe.enterScene(scene, at.x, at.y, TileConstants.N);
+      probe.turnsLeft = 2;
+      SONIC_PROBE_PROP.updateFogFor(scene, probe);
       use.scene().view().addTempFX(BURST_IMG, 3, at.x, at.y, 0, 1);
+      use.acting.gear.useCharge(SONIC_PROBE, 1);
+    }
+  };
+  
+  final public static PropType SONIC_PROBE_PROP = new PropType(
+    "Sonic Probe", "prop_sonic_probe",
+    SPRITE_DIR+"sprite_grenade.png",
+    Kind.SUBTYPE_EFFECT, 1, 0, Kind.BLOCK_NONE, false
+  ) {
+    public void updateFogFor(Scene s, PropEffect ofType) {
+      Action source = ofType.source;
+      Tile at = ofType.origin();
+      s.vision.liftFogAround(at, 4, source.acting, true, at);
+      super.updateFogFor(s, ofType);
+    }
+
+    protected float spriteScale() {
+      return 0.5f;
     }
   };
   

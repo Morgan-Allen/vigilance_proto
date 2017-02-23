@@ -164,6 +164,18 @@ public class PersonStats {
   }
   
   
+  void initStats() {
+    for (Ability a : Common.BASIC_ABILITIES) {
+      setLevel(a, 1, true);
+    }
+    for (Trait s : person.kind.baseTraits()) {
+      float base = person.kind().baseLevel(s);
+      setLevel(s, base, true);
+    }
+    updateStats();
+  }
+  
+  
   
   /**  General statistical queries-
     */
@@ -247,18 +259,6 @@ public class PersonStats {
   
   /**  Regular updates-
     */
-  void initStats() {
-    for (Trait s : person.kind.baseTraits()) {
-      float base = person.kind().baseLevel(s);
-      setLevel(s, base, true);
-    }
-    for (Ability a : Common.BASIC_ABILITIES) {
-      setLevel(a, 1, true);
-    }
-    updateStats();
-  }
-  
-  
   void updateStats() {
     
     //  These are all assumed to have averages of 5, ranging from 0 to 10.
@@ -288,7 +288,7 @@ public class PersonStats {
     updateStat(HIDE_RANGE , hideRange , true);
     
     //  Average action points is 4.  Average move speed is 11.
-    float actPoints = 2 + (reflexes / 3);
+    float actPoints = 2 + 2;//(reflexes / 3);
     float moveSpeed = 6 + (reflexes / 1);
     updateStat(ACT_POINTS , actPoints, true);
     updateStat(MOVE_SPEED , moveSpeed, true);

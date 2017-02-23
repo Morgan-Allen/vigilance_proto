@@ -147,8 +147,9 @@ public class Prop extends Element implements TileConstants {
     if (origin == null) I.complain("Never entered scene!");
     final Scene scene = origin.scene;
     final Tile at = origin;
-    
-    for (Tile under : tilesUnder(kind(), scene, at.x, at.y, facing, 0)) {
+
+    final PropType kind = kind();
+    for (Tile under : tilesUnder(kind, scene, at.x, at.y, facing, 0)) {
       if (under == null) continue;
       under.setInside(this, false);
       under.wipePathing();
@@ -158,7 +159,7 @@ public class Prop extends Element implements TileConstants {
     this.facing = -1;
     scene.props.remove(this);
     
-    for (Tile under : tilesUnder(kind(), scene, at.x, at.y, facing, 1)) {
+    for (Tile under : tilesUnder(kind, scene, at.x, at.y, facing, 1)) {
       if (under != null) under.updatePathing();
     }
     return true;
@@ -193,7 +194,7 @@ public class Prop extends Element implements TileConstants {
     */
   public void renderTo(Scene scene, SceneView view, Surface s, Graphics2D g) {
     int truW = kind().wide(), truH = kind().high();
-    float midX = origin.x, midY = origin.y;
+    float midX = origin.x, midY = origin.y, scale = kind().spriteScale();
     float w = Nums.max(1, truW), h = Nums.max(1, truH);
     
     //  TODO:  Have a centre() method which returns this coordinate?
@@ -208,6 +209,8 @@ public class Prop extends Element implements TileConstants {
     if (facing == S) { midX -= hw; midY -= hh; }
     if (facing == W) { midX += hh; midY -= hw; }
     
+    w *= scale;
+    h *= scale;
     view.renderSprite(midX, midY, w, h, facing * 45, kind().sprite(), g);
     
     if (blockLevel() > 0 && GameSettings.viewSceneBlocks) {

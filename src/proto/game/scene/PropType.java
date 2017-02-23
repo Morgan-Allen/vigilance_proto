@@ -12,13 +12,13 @@ public class PropType extends Kind {
   
   public PropType(
     String name, String ID, String spritePath,
-    int wide, int high, int blockLevel, boolean blockSight,
+    int subtype, int wide, int high, int blockLevel, boolean blockSight,
     Object... initStats
   ) {
     super(
       name, ID, spritePath, "",
       wide, high, blockLevel, blockSight,
-      TYPE_PROP, -1, initStats
+      TYPE_PROP, subtype, initStats
     );
   }
   
@@ -35,13 +35,40 @@ public class PropType extends Kind {
   }
   
   
+  public boolean effect() {
+    return subtype() == Kind.SUBTYPE_EFFECT;
+  }
+  
+  
+  
   /**  Custom action support-
     */
   public Action manipulationFor(Person p, Scene s, Prop ofType) {
     return null;
   }
+  
+  
+  public void onPersonEntry(Person p, Scene s, Prop ofType) {
+    return;
+  }
+  
+  
+  public void updateFogFor(Scene s, PropEffect ofType) {
+    return;
+  }
+  
+  
+  public void onTurnEnd(Scene s, PropEffect ofType) {
+    return;
+  }
+  
+  
+  
+  /**  Rendering support-
+    */
+  protected float spriteScale() {
+    return 1.0f;
+  }
 }
-
-
 
 

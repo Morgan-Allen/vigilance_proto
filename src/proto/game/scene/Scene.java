@@ -43,6 +43,7 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   byte wallM[][] = new byte[1][2];
   byte opacM[][] = new byte[1][2];
   List <Prop> props = new List();
+  List <PropEffect> effectProps = new List();
   
   final public SceneEntry  entry  = new SceneEntry (this);
   final public SceneVision vision = new SceneVision(this);
@@ -81,6 +82,7 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     s.loadByteArray(wallM);
     s.loadByteArray(opacM);
     s.loadObjects(props);
+    s.loadObjects(effectProps);
     
     entry .loadState(s);
     vision.loadState(s);
@@ -114,6 +116,7 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     s.saveByteArray(wallM);
     s.saveByteArray(opacM);
     s.saveObjects(props);
+    s.saveObjects(effectProps);
     
     entry .saveState(s);
     vision.saveState(s);
@@ -334,7 +337,7 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     Tile location = tileAt(x, y);
     if (location == null) return false;
     
-    p.gear.refreshCharges();
+    p.gear .refreshCharges  ();
     p.stats.refreshCooldowns();
     
     p.setExactPosition(this, x, y, 0);
@@ -400,7 +403,6 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     Person nextActing = currentActing();
 
     if (nextActing != null && ! nextAction.complete()) {
-      ///I.say("Action is: "+nextAction+", time: "+time);
       
       for (Person p : playerTeam) if (p != nextActing) {
         p.updateInScene(false, null);
@@ -486,6 +488,9 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
         playerTurn = true;
         for (Person p : playerTeam) if (p.currentScene() == this) {
           p.onTurnStart();
+        }
+        for (PropEffect p : effectProps) {
+          p.onTurnEnd();
         }
       }
     }

@@ -16,65 +16,65 @@ public class UrbanScenes {
     KIND_WALL = new PropType(
       "Wall", "prop_wall_urban",
       IMG_DIR+"sprite_wall_thin.png",
-      1, 0, Kind.BLOCK_FULL, true
+      Kind.SUBTYPE_WALLING, 1, 0, Kind.BLOCK_FULL, true
     ),
     KIND_THICK_WALL = new PropType(
       "Thick Wall", "prop_thick_wall_urban",
       IMG_DIR+"sprite_wall.png",
-      1, 1, Kind.BLOCK_FULL, true
+      Kind.SUBTYPE_WALLING, 1, 1, Kind.BLOCK_FULL, true
     ),
     KIND_FLOOR = new PropType(
       "Floor", "prop_floor_urban",
       IMG_DIR+"sprite_floor.png",
-      1, 1, Kind.BLOCK_NONE, false
+      Kind.SUBTYPE_WALLING, 1, 1, Kind.BLOCK_NONE, false
     ),
     KIND_DOOR = new PropType(
       "Door", "prop_door_urban",
       IMG_DIR+"sprite_door_thin.png",
-      1, 0, Kind.BLOCK_PARTIAL, true,
+      Kind.SUBTYPE_WALLING, 1, 0, Kind.BLOCK_PARTIAL, true,
       PlacesCommon.ALARMED, 1
     ),
     KIND_WINDOW = new PropType(
       "Window", "prop_window_urban",
       IMG_DIR+"sprite_window_thin.png",
-      1, 0, Kind.BLOCK_FULL, false,
+      Kind.SUBTYPE_WALLING, 1, 0, Kind.BLOCK_FULL, false,
       PlacesCommon.ALARMED, 1
     ),
     
     KIND_POOL_TABLE = new PropType(
       "Pool Table", "prop_pool_table_urban",
       IMG_DIR+"sprite_pool_table.png",
-      3, 2, Kind.BLOCK_FULL, false
+      Kind.SUBTYPE_FURNISH, 3, 2, Kind.BLOCK_FULL, false
     ),
     KIND_BAR_TABLE = new PropType(
       "Bar Table", "prop_bar_table_urban",
       IMG_DIR+"sprite_bar_table.png",
-      2, 1, Kind.BLOCK_FULL, false
+      Kind.SUBTYPE_FURNISH, 2, 1, Kind.BLOCK_FULL, false
     ),
     KIND_BAR_STOOL = new PropType(
       "Bar Stool", "prop_bar_stool_urban",
       IMG_DIR+"sprite_bar_stool.png",
-      1, 1, Kind.BLOCK_PARTIAL, false
+      Kind.SUBTYPE_FURNISH, 1, 1, Kind.BLOCK_PARTIAL, false
     ),
     KIND_BAR_STOOLS = new PropType(
       "Bar Stools", "prop_bar_stools_urban",
       IMG_DIR+"sprite_bar_stools.png",
-      1, 1, Kind.BLOCK_PARTIAL, false
+      Kind.SUBTYPE_FURNISH, 1, 1, Kind.BLOCK_PARTIAL, false
     ),
     KIND_BAR_TAPS = new PropType(
       "Bar Taps", "prop_bar_taps_urban",
       IMG_DIR+"sprite_bar_taps.png",
-      3, 2, Kind.BLOCK_FULL, false
+      Kind.SUBTYPE_FURNISH, 3, 2, Kind.BLOCK_FULL, false
     ),
     KIND_JUKEBOX = new PropType(
       "Jukebox", "prop_jukebox_urban",
       IMG_DIR+"sprite_jukebox.png",
-      1, 1, Kind.BLOCK_FULL, true
+      Kind.SUBTYPE_FURNISH, 1, 1, Kind.BLOCK_FULL, true
     ),
     KIND_PINBALL_MACHINE = new PropType(
       "Pinball Machine", "prop_pinball_machine_urban",
       IMG_DIR+"sprite_pinball_machine.png",
-      1, 1, Kind.BLOCK_FULL, true
+      Kind.SUBTYPE_FURNISH, 1, 1, Kind.BLOCK_FULL, true
     ),
     BAR_ROOM_PROP_TYPES[] = {
       KIND_POOL_TABLE,
@@ -136,17 +136,17 @@ public class UrbanScenes {
     KIND_BATHROOM_FLOOR = new PropType(
       "Bathroom Floor", "prop_bathroom_floor_urban",
       IMG_DIR+"sprite_bathroom_floor.png",
-      1, 1, Kind.BLOCK_NONE, false
+      Kind.SUBTYPE_WALLING, 1, 1, Kind.BLOCK_NONE, false
     ),
     KIND_BATHROOM_STALL = new PropType(
       "Bathroom Stall", "prop_bathroom_stall_urban",
       IMG_DIR+"sprite_bathroom_stall.png",
-      2, 1, Kind.BLOCK_FULL, true
+      Kind.SUBTYPE_FURNISH, 2, 1, Kind.BLOCK_FULL, true
     ),
     KIND_BASIN = new PropType(
       "Basin", "prop_basin_urban",
       IMG_DIR+"sprite_basin.png",
-      1, 1, Kind.BLOCK_PARTIAL, false
+      Kind.SUBTYPE_FURNISH, 1, 1, Kind.BLOCK_PARTIAL, false
     ),
     BATHROOM_PROP_TYPES[] = {
       KIND_BATHROOM_STALL,

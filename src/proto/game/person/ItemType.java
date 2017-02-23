@@ -239,8 +239,7 @@ public class ItemType extends Kind {
       }
       else {
         Image missile = missileSprite();
-        
-        used.FX.renderMissile(a, s, missile, g);
+        used.FX.renderMissile(a, s, missile, 0.5f, g);
       }
     }
   }

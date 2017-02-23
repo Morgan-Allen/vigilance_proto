@@ -82,6 +82,9 @@ public class SceneVision implements TileConstants {
     for (Person p : scene.othersTeam) if (p.health.conscious()) {
       liftFogInSight(p);
     }
+    for (PropEffect p : scene.effectProps) if (p.source != null) {
+      p.kind().updateFogFor(scene, p);
+    }
   }
   
   
@@ -117,10 +120,25 @@ public class SceneVision implements TileConstants {
   
   
   public float degreeOfSight(Person p, Tile dest, boolean report) {
-    final Tile vantage[] = vantagePoints(p);
-    final SightLine lines[] = new SightLine[vantage.length];
-    configSightLines(lines, vantage, dest);
+    final Tile vantages[] = vantagePoints(p);
+    final SightLine lines[] = new SightLine[vantages.length];
+    configSightLines(lines, vantages, dest);
     return degreeOfSight(lines, dest, p, report);
+  }
+  
+  
+  public Tile bestVantage(Person p, Tile dest, boolean report) {
+    final Tile vantages[] = vantagePoints(p), temp[] = new Tile[1];
+    final SightLine lines[] = new SightLine[1];
+    
+    Pick <Tile> pick = new Pick(0);
+    for (Tile v : vantages) {
+      temp[0] = v;
+      configSightLines(lines, temp, dest);
+      float sight = degreeOfSight(lines, dest, p, report);
+      pick.compare(v, sight);
+    }
+    return pick.result();
   }
   
   

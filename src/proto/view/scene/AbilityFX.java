@@ -84,28 +84,58 @@ public class AbilityFX {
   }
   
   
-  public void tracePath(Tile path[], Scene s, Graphics2D g) {
-    final int TS = SceneView.TILE_SIZE;
-    final SceneView SV = s.view();
-    int offX = SV.zoomX, offY = SV.zoomY;
+  public void previewAction(Action action, Scene s, Graphics2D g) {
     
+    if (! Visit.empty(action.path())) {
+      previewPath(action.path(), s, g);
+    }
+    if (action.used.ranged()) {
+      previewTrajectory(action, s, g);
+    }
+  }
+  
+  
+  public void previewPath(Tile path[], Scene s, Graphics2D g) {
     g.setStroke(new BasicStroke(2));
     g.setColor(new Color(1, 1, 1, 0.5f));
     
     for (int i = 0; i < path.length - 1; i++) {
       Tile a = path[i], b = path[i + 1];
-      g.drawLine(
-        (a.x * TS) - offX,
-        (a.y * TS) - offY,
-        (b.x * TS) - offX,
-        (b.y * TS) - offY
-      );
+      drawLine(a, b, s, g);
     }
   }
   
   
+  public void previewTrajectory(Action a, Scene s, Graphics2D g) {
+    Tile t = s.tileUnder(a.target), o = a.acting.currentTile();
+    Tile v = s.vision.bestVantage(a.acting, t, false);
+    if (v == null) return;
+    
+    g.setStroke(new BasicStroke(2));
+    g.setColor(new Color(1, 1, 0, 0.5f));
+    drawLine(o, v, s, g);
+    drawLine(v, t, s, g);
+  }
+  
+  
+  private void drawLine(Tile a, Tile b, Scene s, Graphics2D g) {
+    int TS = SceneView.TILE_SIZE;
+    SceneView SV = s.view();
+    int offX = SV.zoomX, offY = SV.zoomY;
+    g.drawLine(
+      (a.x * TS) - offX,
+      (a.y * TS) - offY,
+      (b.x * TS) - offX,
+      (b.y * TS) - offY
+    );
+  }
+  
+  
+  
+  /**  Rendering of various special FX during action execution-
+    */
   public void renderMissile(
-    Action action, Scene s, Image sprite, Graphics2D g
+    Action action, Scene s, Image sprite, float size, Graphics2D g
   ) {
     if (sprite == null) return;
     Person using = action.acting;
@@ -119,7 +149,7 @@ public class AbilityFX {
     pY += target.y * progress;
     
     //  TODO:  Include rotation here!
-    s.view().renderSprite(pX, pY, 0.5f, 0.5f, 0, sprite, g);
+    s.view().renderSprite(pX, pY, size, size, 0, sprite, g);
   }
   
   

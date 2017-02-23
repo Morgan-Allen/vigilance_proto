@@ -265,8 +265,8 @@ public abstract class Ability extends Trait {
     if (maxRange > 0 && range > maxRange) {
       return failResult("Outside Max. Range", failLog);
     }
-    if (maxRange > 0 && requiresSight()) {
-      if (range > (acting.stats.sightRange() + 1)) {
+    if (requiresSight()) {
+      if (maxRange > 0 && range > (acting.stats.sightRange() + 1)) {
         return failResult("Outside Sight Range", failLog);
       }
       if (scene.vision.degreeOfSight(acting, dest, false) <= 0) {

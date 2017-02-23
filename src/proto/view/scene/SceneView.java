@@ -86,6 +86,11 @@ public class SceneView extends UINode implements TileConstants {
   }
   
   
+  public Scene scene() {
+    return mainView.world().activeScene();
+  }
+  
+  
   
   /**  Public utility methods-
     */
@@ -96,7 +101,7 @@ public class SceneView extends UINode implements TileConstants {
   
   public void setZoomPoint(Vec3D pos) {
     zoomPoint.setTo(pos);
-    Scene scene = mainView.world().activeScene();
+    Scene scene = scene();
     if (scene != null) zoomTile = scene.tileAt(pos.x, pos.y);
   }
   
@@ -104,7 +109,17 @@ public class SceneView extends UINode implements TileConstants {
   public void setSelection(Person acting, boolean keepActiveAbility) {
     final Person old = selectedPerson;
     this.selectedPerson = acting;
-    if (acting != old || ! keepActiveAbility) actionsView.clearSelection();
+    if (acting != old || ! keepActiveAbility) actionsView.clearChoices();
+  }
+  
+  
+  public void jumpToNextAgent(Person current) {
+    final Scene scene = scene();
+    for (Person p : scene.playerTeam()) if (p.actions.canTakeAction()) {
+      setSelection(p, false);
+      setZoomPoint(p.exactPosition());
+      break;
+    }
   }
   
   
@@ -143,7 +158,7 @@ public class SceneView extends UINode implements TileConstants {
   
   
   protected boolean renderTo(Surface surface, Graphics2D g) {
-    final Scene scene = mainView.world().activeScene();
+    final Scene scene = scene();
     if (scene == null) return false;
     
     int size = scene.size();
@@ -226,7 +241,7 @@ public class SceneView extends UINode implements TileConstants {
     for (Coord c : Visit.grid(0, 0, size, size, 1)) {
       Tile t = scene.tileAt(c.x, c.y);
       float fogAlpha = 1f - tileVisibilityKluge(t, Person.Side.HEROES);
-      if (GameSettings.debugScene) fogAlpha /= 3;
+      if (GameSettings.debugScene) fogAlpha /= 2;
       Color black = SCALE[Nums.clamp((int) (fogAlpha * 10), 10)];
       renderColor(c.x, c.y, 1, 1, true, black, g);
     }
@@ -264,9 +279,7 @@ public class SceneView extends UINode implements TileConstants {
       
       if (surface.mouseClicked()) {
         if (done == null && canDoAction) {
-          selectedPerson.actions.assignAction(actionsView.selectAction);
-          scene.pushNextAction(actionsView.selectAction);
-          actionsView.clearSelection();
+          actionsView.confirmActionChoice(actionsView.selectAction);
         }
         else {
           Person pickP = null;

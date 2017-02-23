@@ -95,7 +95,7 @@ public class Common {
       final Image missile = Kind.loadImage(SPRITE_DIR+"sprite_punch.png");
       
       public void renderUsageFX(Action action, Scene scene, Graphics2D g) {
-        FX.renderMissile(action, scene, missile, g);
+        FX.renderMissile(action, scene, missile, 0.5f, g);
       }
     },
     
