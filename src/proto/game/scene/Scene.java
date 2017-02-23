@@ -399,17 +399,19 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     Action nextAction = currentAction();
     Person nextActing = currentActing();
 
-    for (Person p : playerTeam) if (p != nextActing) {
-      p.updateInScene(false, null);
-    }
-    for (Person p : othersTeam) if (p != nextActing) {
-      p.updateInScene(false, null);
-    }
     if (nextActing != null && ! nextAction.complete()) {
+      ///I.say("Action is: "+nextAction+", time: "+time);
+      
+      for (Person p : playerTeam) if (p != nextActing) {
+        p.updateInScene(false, null);
+      }
+      for (Person p : othersTeam) if (p != nextActing) {
+        p.updateInScene(false, null);
+      }
+      
       nextAction.incTimeSpent(1);
       nextActing.updateInScene(true, nextAction);
       time += 1;
-      ///I.say("Action is: "+nextAction+", time: "+time);
     }
     else moveToNextPersonsTurn();
     
@@ -431,7 +433,6 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     //  Remove any expired actions from the action-stack first (if any remain,
     //  return and let those execute first.)
     for (Action a : actionStack) {
-      I.say("Current action: "+a+" (complete: "+a.complete()+")");
       if (a.complete()) actionStack.remove(a);
     }
     if (! actionStack.empty()) return;

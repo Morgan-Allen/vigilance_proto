@@ -526,33 +526,8 @@ public abstract class Ability extends Trait {
   
   
   
-  
   /**  Supplementary methods for AI decision-making.
     */
-  //  TODO:  Move these to an AI class.
-  
-  public Action bestMotionToward(Object point, Person acting, Scene scene) {
-    Tile at = scene.tileUnder(point);
-    if (at == null) return null;
-    
-    if (point instanceof Person && ! acting.actions.canNotice(point)) {
-      return null;
-    }
-    MoveSearch search = new MoveSearch(acting, acting.location, at);
-    search.doSearch();
-    if (! search.success()) return null;
-    
-    Tile path[] = search.fullPath(Tile.class);
-    for (int n = path.length; n-- > 0;) {
-      Tile shortPath[] = new Tile[n + 1], t = path[n];
-      System.arraycopy(path, 0, shortPath, 0, n + 1);
-      Action use = configAction(acting, t, t, scene, shortPath, null);
-      if (use != null) return use;
-    }
-    return null;
-  }
-  
-  
   public float rateUsage(Action use) {
     Person acts = use.acting;
     float rating = 1, relation = 0;
@@ -570,7 +545,6 @@ public abstract class Ability extends Trait {
     
     //  TODO:  Include a rating for hit-chance, assuming that a Volley is
     //  involved?  (Maybe base on brains?)
-    
     return rating;
   }
   

@@ -4,7 +4,6 @@ package proto.game.person;
 import proto.common.*;
 import proto.game.scene.*;
 import proto.util.*;
-import static proto.game.person.PersonStats.*;
 
 
 
@@ -17,8 +16,10 @@ public class PersonActions {
   
   int actionPoints;
   boolean turnDone;
-  Object lastTarget;
+  
   Action nextAction;
+  Object lastTarget;
+  float turnMoveRoll;
   
   
   PersonActions(Person person) {
@@ -31,6 +32,7 @@ public class PersonActions {
     turnDone     = s.loadBool  ();
     lastTarget   = s.loadObject();
     nextAction   = (Action) s.loadObject();
+    turnMoveRoll = s.loadFloat();
   }
   
   
@@ -39,6 +41,7 @@ public class PersonActions {
     s.saveBool  (turnDone    );
     s.saveObject(lastTarget  );
     s.saveObject(nextAction  );
+    s.saveFloat(turnMoveRoll );
   }
   
   
@@ -61,11 +64,11 @@ public class PersonActions {
     */
   public void assignAction(Action action) {
     this.nextAction = action;
-    if (action == null          ) return;
-    if (action.path().length > 0) action.setMoveRoll(Rand.avgNums(2));
-    if (action.target != this   ) lastTarget = action.target;
+    if (action == null) return;
+    lastTarget = action.target;
     action.used.applyOnActionAssigned(action);
     this.actionPoints -= action.used.costAP(action);
+    if (action.used.delayed()) onTurnEnd();
   }
   
   
@@ -105,6 +108,7 @@ public class PersonActions {
     actionPoints = person.stats.maxActionPoints();
     nextAction   = null;
     turnDone     = false;
+    turnMoveRoll = Rand.avgNums(2);
     person.stats.updateStats();
     person.mind.assessConfidence();
     return true;
@@ -157,7 +161,6 @@ public class PersonActions {
       a.used.applyTriggerEffects(a, false, true, false);
       a.used.applyOnActionEnd(a);
       I.say("Ended action: "+a);
-      nextAction = null;
     }
     return true;
   }
@@ -173,7 +176,7 @@ public class PersonActions {
   }
   
   
-  public boolean canNotice(Object point) {
+  public boolean checkToNotice(Object point) {
     Scene scene = person.currentScene();
     if (scene == null) return false;
     
@@ -185,15 +188,21 @@ public class PersonActions {
       Person other = (Person) point;
       if (other.isAlly(person)) return true;
       
-      float   sighting = Nums.max(1, person.stats.sightRange());
-      float   stealth  = other.stats.hidingRange();
-      Action  action   = other.actions.nextAction();
-      boolean focused  = lastTarget == other;
+      I.say("\n"+person+" checking to notice "+other);
       
-      sighting *= person.mind.wariness() + (focused ? 0.5f : 0);
-      stealth  *= action == null ? 0.5f : action.moveRoll();
-      stealth  /= sighting;
-      if (stealth > visibility) return false;
+      boolean focused = lastTarget == other;
+      float sighting  = Nums.max(1, person.stats.sightRange());
+      float aware     = person.mind.wariness() + (focused ? 0.5f : 0);
+      float stealth   = other.stats.hidingRange();
+      float moveRoll  = other.actions.turnMoveRoll * 2;
+      float hideLevel = (stealth * moveRoll) / (sighting * aware);
+      
+      I.say("  Sighting: "+sighting+" Stealth:  "+stealth);
+      I.say("  Awareness: "+aware+" Move Roll: "+moveRoll);
+      I.say("  Visibility: "+visibility+" vs. Hide Level: "+hideLevel);
+      I.say("  Will notice: "+(visibility >= hideLevel)+"\n");
+      
+      if (hideLevel > visibility) return false;
     }
     
     return true;

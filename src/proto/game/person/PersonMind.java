@@ -84,7 +84,7 @@ public class PersonMind {
       AIstate = STATE_ACTIVE;
       
       for (Person p : scene.allPersons()) {
-        if (! person.actions.canNotice(p)) {
+        if (! person.actions.checkToNotice(p)) {
           if (report) I.say("  Not currently aware of "+p);
           continue;
         }
@@ -107,7 +107,7 @@ public class PersonMind {
     if (pick.empty()) {
       Batch <Person> foes = new Batch();
       for (Person p : scene.allPersons()) {
-        if (p.isEnemy(person) && person.actions.canNotice(p)) foes.add(p);
+        if (p.isEnemy(person) && person.actions.checkToNotice(p)) foes.add(p);
       }
       Action motion = retreating() ?
         AIUtils.pickRetreatAction(person, foes) :
@@ -136,7 +136,7 @@ public class PersonMind {
       }
       else if (p.isEnemy(person) && person.actions.hasSight(p.currentTile())) {
         enemySight++;
-        if (person.actions.canNotice(p)) enemySight++;
+        if (person.actions.checkToNotice(p)) enemySight++;
       }
     }
     

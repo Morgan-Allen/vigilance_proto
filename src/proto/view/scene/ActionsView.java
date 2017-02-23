@@ -163,6 +163,7 @@ public class ActionsView extends UINode {
             if (surface.isPressed('y')) {
               p.actions.assignAction(selectAction);
               scene.pushNextAction(selectAction);
+              clearSelection();
             }
           }
           else {

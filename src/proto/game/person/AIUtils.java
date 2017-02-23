@@ -53,7 +53,7 @@ public class AIUtils implements TileConstants {
       float rating = rateTileDefence(t, person, foes, range, true);
       if (rating <= 0) continue;
       
-      Action motion = Common.MOVE.bestMotionToward(t, person, scene);
+      Action motion = bestMotionToward(t, person, scene);
       if (motion == null || motion.target != t) continue;
       pick.compare(motion, rating);
     }
@@ -64,7 +64,7 @@ public class AIUtils implements TileConstants {
     }
 
     for (Person p : foes) {
-      Action motion = Common.MOVE.bestMotionToward(p, person, scene);
+      Action motion = bestMotionToward(p, person, scene);
       float proximity = range / (scene.distance(p, person) + range);
       pick.compare(motion, proximity);
     }
@@ -82,7 +82,7 @@ public class AIUtils implements TileConstants {
     );
     
     I.say("  "+person+" picked random tile to approach: "+random);
-    return Common.MOVE.bestMotionToward(random, person, scene);
+    return bestMotionToward(random, person, scene);
   }
   
   
@@ -99,11 +99,36 @@ public class AIUtils implements TileConstants {
     final Pick <Tile> pick = new Pick();
     final Tile location = person.currentTile();
     for (Tile t : exits) pick.compare(t, 0 - scene.distance(t, location));
-    return Common.MOVE.bestMotionToward(pick.result(), person, scene);
+    return bestMotionToward(pick.result(), person, scene);
   }
   
   
-  
+  static Action bestMotionToward(Object point, Person acting, Scene scene) {
+    Tile at = scene.tileUnder(point);
+    if (at == null) return null;
+    
+    if (point instanceof Person && ! acting.actions.checkToNotice(point)) {
+      return null;
+    }
+    MoveSearch search = new MoveSearch(acting, acting.location, at);
+    search.doSearch();
+    if (! search.success()) return null;
+    
+    Ability moving = Common.MOVE;
+    Tile path[] = search.fullPath(Tile.class);
+    
+    for (int n = path.length; n-- > 0;) {
+      Tile shortPath[] = new Tile[n + 1], t = path[n];
+      System.arraycopy(path, 0, shortPath, 0, n + 1);
+      Action use = moving.configAction(acting, t, t, scene, shortPath, null);
+      if (use != null) return use;
+    }
+    return null;
+  }
   
   
 }
+
+
+
+

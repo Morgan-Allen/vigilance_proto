@@ -129,20 +129,21 @@ public class Common {
     GUARD = new Ability(
       "Guard", "ability_guard",
       ICONS_DIR+"icon_guard.png",
-      "Reserve AP to reduce incoming damage and grant chance to counter-"+
-      "attack in melee.  Ends turn.",
+      "Reserve AP to reduce incoming damage and grant 50% chance to counter-"+
+      "attack if you successfully defend.  Boosts defence by 25%, +5 per AP.  "+
+      "Ends turn.",
       Ability.IS_BASIC | Ability.IS_DELAYED | Ability.TRIGGER_ON_DEFEND,
       1, Ability.NO_HARM, Ability.MINOR_POWER
     ) {
+      
       public void applyOnDefendStart(Volley volley) {
         Person self = volley.targAsPerson();
         Person hits = volley.origAsPerson();
         FX.dodgePosition(self, hits, 0.33f);
         float baseArmour = self.stats.levelFor(PersonStats.ARMOUR);
         volley.hitsArmour .inc(2 + (baseArmour / 2f), this);
-        volley.hitsDefence.inc(5 + (self.actions.currentAP() * 5), this);
+        volley.hitsDefence.inc(25 + (self.actions.currentAP() * 5), this);
       }
-      
       
       public void applyOnDefendEnd(Volley volley) {
         Person self  = volley.targAsPerson();
