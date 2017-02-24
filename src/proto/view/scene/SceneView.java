@@ -113,16 +113,6 @@ public class SceneView extends UINode implements TileConstants {
   }
   
   
-  public void jumpToNextAgent(Person current) {
-    final Scene scene = scene();
-    for (Person p : scene.playerTeam()) if (p.actions.canTakeAction()) {
-      setSelection(p, false);
-      setZoomPoint(p.exactPosition());
-      break;
-    }
-  }
-  
-  
   public void addTempFX(
     Image sprite, float size,
     float posX, float posY, float posZ, float numSeconds
@@ -289,18 +279,6 @@ public class SceneView extends UINode implements TileConstants {
         }
       }
     }
-    //
-    //  We can track the position of any enemy movement in sight-
-    /*
-    Action baseAction = scene.actionStack().last();
-    Person acting = baseAction == null ? null : baseAction.acting;
-    if (
-      acting != null && (true || ! acting.isHero()) &&
-      scene.vision.fogAt(acting.currentTile(), Person.Side.HEROES) > 0
-    ) {
-      setZoomPoint(acting.exactPosition());
-    }
-    //*/
     //
     //  Finally, some supplementary debugging-related checks:
     if (

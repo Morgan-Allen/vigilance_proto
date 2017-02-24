@@ -2,7 +2,7 @@
 
 package proto.game.scene;
 import proto.common.*;
-import proto.game.person.Person;
+import proto.game.person.*;
 import proto.game.world.*;
 import proto.view.common.*;
 import proto.view.scene.*;

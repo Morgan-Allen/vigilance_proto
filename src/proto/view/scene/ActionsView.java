@@ -36,9 +36,25 @@ public class ActionsView extends UINode {
   
   void confirmActionChoice(Action action) {
     Person agent = action.acting;
+    Scene scene = agent.currentScene();
     agent.actions.assignAction(action);
-    action.scene().pushNextAction(action);
+    scene.pushNextAction(action);
+    sceneView.setZoomPoint(scene.tileUnder(action.target));
     clearChoices();
+    
+    if (! agent.actions.canTakeAction()) {
+      delayToJump = action.used.ranged() ? 30 : 5;
+    }
+  }
+  
+  
+  void jumpToNextAgent(Person current) {
+    final Scene scene = sceneView.scene();
+    for (Person p : scene.playerTeam()) if (p.actions.canTakeAction()) {
+      sceneView.setSelection(p, false);
+      sceneView.setZoomPoint(p.exactPosition());
+      break;
+    }
   }
   
   
@@ -59,15 +75,11 @@ public class ActionsView extends UINode {
     //
     //  Then try jumping to the next agent on the team once a given action is
     //  completed, after a short delay-
-    final Scene scene = sceneView.scene();
-    Person agent = sceneView.selectedPerson();
-    if (scene.currentAction() == null & delayToJump <= 0) {
-      if (agent == null || ! agent.actions.canTakeAction()) {
-        delayToJump = 30;
+    if (delayToJump > 0) {
+      Action taken = sceneView.scene().currentAction();
+      if (taken == null && --delayToJump <= 0) {
+        jumpToNextAgent(sceneView.selectedPerson());
       }
-    }
-    if (delayToJump > 0 && --delayToJump <= 0) {
-      sceneView.jumpToNextAgent(agent);
     }
     return true;
   }
