@@ -168,8 +168,10 @@ public class TrainingView extends UINode {
       int trainTime = TaskTrain.trainingTime(person, hovered);
       trainTime /= World.HOURS_PER_DAY;
       int costAP = hovered.minCostAP();
+      int level = person.stats.levelFor(hovered);
       
       String desc = hovered.name;
+      desc += " ("+hovered.levelDesc(level + 1)+")";
       desc += "\n"+hovered.description;
       
       Series <Ability> path = TaskTrain.trainingPath(hovered, person);
@@ -284,7 +286,7 @@ public class TrainingView extends UINode {
       String slotName = PersonGear.SLOT_TYPE_NAMES[slotType];
       
       final boolean hovered = surface.tryHover(
-        vx + 5 + across, vy + down, vw - 10, 40, "Slot_"+slotID
+        vx + 5 + across, vy + down, 320, 40, "Slot_"+slotID
       );
       if (hovered) g.setColor(Color.YELLOW);
       else         g.setColor(Color.WHITE );

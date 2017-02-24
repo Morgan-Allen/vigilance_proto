@@ -150,19 +150,19 @@ public class Gadgets {
       return true;
     }
     
-    protected boolean affectsTargetInRange(
-      Element affects, Scene scene, Person acting
-    ) {
-      return affects.isPerson();
-    }
-    
     public void applyOnActionEnd(Action use) {
       use.acting.gear.useCharge(Gadgets.TEAR_GAS, 1);
       final Tile at = use.scene().tileUnder(use.target);
+      final World world = at.scene.world();
       use.scene().view().addTempFX(BURST_IMG, 3, at.x, at.y, 0, 1);
       
-      for (Element a : elementsInRange(use, at)) {
-        ((Person) a).stats.applyCondition(this, use.acting, 3);
+      for (Tile t : tilesInRange(use, at)) {
+        final PropEffect effect = new PropEffect(TEAR_GAS_EFFECT, use, world);
+        effect.enterScene(at.scene, t.x, t.y, TileConstants.N);
+        effect.turnsLeft = 2;
+        for (Person p : t.persons()) {
+          TEAR_GAS_EFFECT.onPersonEntry(p, at.scene, effect);
+        }
       }
     }
     
@@ -175,6 +175,17 @@ public class Gadgets {
     
     public void renderUsageFX(Action use, Scene scene, Graphics2D g) {
       FX.renderMissile(use, scene, GRENADE_IMG, 0.5f, g);
+    }
+  };
+  
+  final public static PropType TEAR_GAS_EFFECT = new PropType(
+    "Tear gas", "prop_tear_gas",
+    SPRITE_DIR+"sprite_smoke.png",
+    Kind.SUBTYPE_EFFECT, 1, 1, Kind.BLOCK_NONE, false
+  ) {
+    public void onPersonEntry(Person p, Scene s, Prop ofType) {
+      Action source = ((PropEffect) ofType).source;
+      p.stats.applyCondition(source.used, source.acting, 3);
     }
   };
   
@@ -214,19 +225,19 @@ public class Gadgets {
     public void applyOnActionEnd(Action use) {
       Scene scene = use.scene();
       Tile at = scene.tileUnder(use.target);
-      PropEffect probe = new PropEffect(SONIC_PROBE_PROP, use, scene.world());
+      PropEffect probe = new PropEffect(SONIC_PROBE_EFFECT, use, scene.world());
       probe.enterScene(scene, at.x, at.y, TileConstants.N);
       probe.turnsLeft = 2;
-      SONIC_PROBE_PROP.updateFogFor(scene, probe);
+      SONIC_PROBE_EFFECT.updateFogFor(scene, probe);
       use.scene().view().addTempFX(BURST_IMG, 3, at.x, at.y, 0, 1);
       use.acting.gear.useCharge(SONIC_PROBE, 1);
     }
   };
   
-  final public static PropType SONIC_PROBE_PROP = new PropType(
+  final public static PropType SONIC_PROBE_EFFECT = new PropType(
     "Sonic Probe", "prop_sonic_probe",
     SPRITE_DIR+"sprite_grenade.png",
-    Kind.SUBTYPE_EFFECT, 1, 0, Kind.BLOCK_NONE, false
+    Kind.SUBTYPE_EFFECT, 1, 1, Kind.BLOCK_NONE, false
   ) {
     public void updateFogFor(Scene s, PropEffect ofType) {
       Action source = ofType.source;

@@ -501,24 +501,29 @@ public abstract class Ability extends Trait {
   }
   
   
-  protected Series <Element> elementsInRange(Action use, Tile centre) {
-    final Batch <Element> all = new Batch();
+  protected Series <Tile> tilesInRange(Action use, Tile centre) {
+    final Batch <Tile> all = new Batch();
     int range = maxEffectRange();
     if (range <= 0) return all;
-    
     Scene scene = use.scene();
     int minX = centre.x - range, minY = centre.y - range;
     
     for (Coord c : Visit.grid(minX, minY, range * 2, range * 2, 1)) {
       Tile t = scene.tileAt(c.x, c.y);
-      
-      if (t != null) for (Element e : t.inside()) {
-        float dist = scene.distance(t, scene.tileUnder(e));
-        if (dist > range) continue;
-        
-        if (affectsTargetInRange(e, scene, use.acting)) {
-          all.include(e);
-        }
+      if (t == null || scene.distance(centre, t) > range) continue;
+      all.add(t);
+    }
+    return all;
+  }
+  
+  
+  protected Series <Element> elementsInRange(Action use, Tile centre) {
+    final Batch <Element> all = new Batch();
+    Scene scene = use.scene();
+    
+    for (Tile t : tilesInRange(use, centre)) for (Element e : t.inside()) {
+      if (affectsTargetInRange(e, scene, use.acting)) {
+        all.include(e);
       }
     }
     return all;

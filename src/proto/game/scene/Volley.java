@@ -74,6 +74,10 @@ public class Volley implements Session.Saveable {
     public Stat stat;
     public Object source;
     public int modValue;
+    
+    public String toString() {
+      return stat.label+" "+modValue+" ("+source+")";
+    }
   }
   private Stack <Modifier> modifiers = new Stack();
   
@@ -209,8 +213,8 @@ public class Volley implements Session.Saveable {
       selfAccuracy.inc(self.stats.levelFor(ACCURACY), ACCURACY);
       float normRange  = self.stats.sightRange();
       float distance   = scene.distance(self.currentTile(), hits.currentTile());
-      float coverBonus = coverBonus(orig, targ, scene);
-      float rangeMod   = 50 * ((distance - 1) - normRange) / normRange;
+      float coverBonus = coverBonus(self, targ, scene);
+      float rangeMod   = 100 * ((distance - 1) - normRange) / normRange;
       selfAccuracy.inc(0 - (int) rangeMod, "Range");
       hitsDefence.inc(hits.stats.levelFor(DEFENCE), DEFENCE);
       hitsDefence.inc((int) coverBonus, "Cover");
@@ -232,8 +236,9 @@ public class Volley implements Session.Saveable {
   }
   
   
-  protected float coverBonus(Object orig, Object targ, Scene scene) {
-    Tile origT = scene.tileUnder(orig), targT = scene.tileUnder(targ);
+  protected float coverBonus(Person self, Object targ, Scene scene) {
+    Tile targT = scene.tileUnder(targ);
+    Tile origT = scene.vision.bestVantage(self, targT, false);
     //
     //  TODO:  This will not count in the case of elliptical trajectories!  You
     //  need to model that with a different equation.
@@ -246,7 +251,10 @@ public class Volley implements Session.Saveable {
   
   protected void recordModifier(Stat stat, int inc, Object source) {
     Modifier match = null;
-    for (Modifier m : modifiers) if (m.source == source) { match = m; break; }
+    for (Modifier m : modifiers) if (m.source == source && m.stat == stat) {
+      match = m;
+      break;
+    }
     if (match == null) modifiers.add(match = new Modifier());
     
     match.stat     = stat;

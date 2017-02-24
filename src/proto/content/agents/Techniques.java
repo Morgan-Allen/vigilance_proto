@@ -105,7 +105,7 @@ public class Techniques {
       public void applyOnActionEnd(Action use) {
         Person struck       = use.volley().targAsPerson();
         int    damage       = use.volley().damageMargin.value();
-        float  disarmChance = damage * 2 / struck.health.maxHealth();
+        float  disarmChance = damage * 2f / struck.health.maxHealth();
         
         if (Rand.num() < disarmChance && struck.gear.hasEquipped(SLOT_WEAPON)) {
           I.say(struck+" dropped their weapon!");
@@ -236,7 +236,7 @@ public class Techniques {
       ICONS_DIR+"icon_flesh_wound.png",
       "Reduces accuracy and crit chance to reduce lethality with precision "+
       "firearms.",
-      Ability.IS_RANGED, 2, Ability.REAL_HARM, Ability.MINOR_POWER
+      Ability.IS_RANGED, 1, Ability.REAL_HARM, Ability.MINOR_POWER
     ) {
       
       public boolean allowsUse(Person acting, StringBuffer failLog) {
@@ -257,8 +257,14 @@ public class Techniques {
       
       protected Volley createVolley(Action use, Object target, Scene scene) {
         Volley volley = new Volley();
+        int level = use.acting.stats.levelFor(this) - 1;
         volley.setupVolley(use.acting, (Person) target, true, scene);
-        volley.stunPercent.inc(50, this);
+        int miss = -15 + (level * 5 );
+        int soft =  40 + (level * 10);
+        int crit = -10;
+        volley.selfAccuracy.inc(miss, this);
+        volley.stunPercent .inc(soft, this);
+        volley.critPercent .inc(crit, this);
         return volley;
       }
       

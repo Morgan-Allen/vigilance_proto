@@ -3,6 +3,7 @@
 package proto.game.person;
 import proto.common.*;
 import proto.game.scene.*;
+import proto.game.world.Element;
 import proto.util.*;
 
 
@@ -146,6 +147,11 @@ public class PersonActions {
     if (person.currentTile() != oldLoc) {
       scene.vision.updateFog();
       scene.vision.checkForEnemySightEntry(person, nextAction);
+      
+      for (Element e : person.currentTile().inside()) if (e.isProp()) {
+        Prop p = (Prop) e;
+        p.kind().onPersonEntry(person, scene, p);
+      }
     }
     
     if (timeSteps > path.length) {
@@ -179,6 +185,7 @@ public class PersonActions {
   public boolean checkToNotice(Object point) {
     Scene scene = person.currentScene();
     if (scene == null) return false;
+    boolean report = false;
     
     Tile  under      = scene.tileUnder(point);
     float visibility = scene.vision.fogAt(under, person.side());
@@ -188,8 +195,6 @@ public class PersonActions {
       Person other = (Person) point;
       if (other.isAlly(person)) return true;
       
-      I.say("\n"+person+" checking to notice "+other);
-      
       boolean focused = lastTarget == other;
       float sighting  = Nums.max(1, person.stats.sightRange());
       float aware     = person.mind.wariness() + (focused ? 0.5f : 0);
@@ -197,10 +202,13 @@ public class PersonActions {
       float moveRoll  = other.actions.turnMoveRoll * 2;
       float hideLevel = (stealth * moveRoll) / (sighting * aware);
       
-      I.say("  Sighting: "+sighting+" Stealth:  "+stealth);
-      I.say("  Awareness: "+aware+" Move Roll: "+moveRoll);
-      I.say("  Visibility: "+visibility+" vs. Hide Level: "+hideLevel);
-      I.say("  Will notice: "+(visibility >= hideLevel)+"\n");
+      if (report) {
+        I.say("\n"+person+" checking to notice "+other);
+        I.say("  Sighting: "+sighting+" Stealth:  "+stealth);
+        I.say("  Awareness: "+aware+" Move Roll: "+moveRoll);
+        I.say("  Visibility: "+visibility+" vs. Hide Level: "+hideLevel);
+        I.say("  Will notice: "+(visibility >= hideLevel)+"\n");
+      }
       
       if (hideLevel > visibility) return false;
     }

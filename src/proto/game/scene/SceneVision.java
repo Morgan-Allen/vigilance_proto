@@ -146,6 +146,7 @@ public class SceneVision implements TileConstants {
     Scene scene = from.scene;
     final SightLine line = new SightLine();
     line.setTo(from, at);
+    line.shrinkToDest(1.44f);
     if (report) I.say("\nChecking cover around "+at+" from "+from);
     
     int maxVal = 0;

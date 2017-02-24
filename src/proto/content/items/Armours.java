@@ -4,10 +4,9 @@ package proto.content.items;
 import proto.game.person.*;
 import proto.game.scene.*;
 import proto.util.*;
-import static proto.game.person.ItemType.*;
-import static proto.game.person.PersonGear.*;
+import static proto.game.person.ItemType   .*;
+import static proto.game.person.PersonGear .*;
 import static proto.game.person.PersonStats.*;
-
 import proto.common.Kind;
 
 
@@ -32,7 +31,8 @@ public class Armours {
   ) {
     public float passiveModifierFor(Person person, Trait trait) {
       if (trait == ARMOUR    ) return  5;
-      if (trait == HIDE_RANGE) return -2;
+      if (trait == HEALTH    ) return  5;
+      if (trait == HIDE_RANGE) return -3;
       return 0;
     }
   };
@@ -48,6 +48,7 @@ public class Armours {
   ) {
     public float passiveModifierFor(Person person, Trait trait) {
       if (trait == ARMOUR) return 2;
+      if (trait == HEALTH) return 2;
       return 0;
     }
   };

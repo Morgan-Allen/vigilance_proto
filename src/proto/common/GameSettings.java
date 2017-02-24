@@ -7,7 +7,8 @@ import proto.game.world.World;
 public class GameSettings {
   
   final public static boolean
-    SIMPLE_EVENTS = true
+    SIMPLE_EVENTS = true,
+    EASY_MODE     = true
   ;
   
   final public static int

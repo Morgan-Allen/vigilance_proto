@@ -112,7 +112,8 @@ public class Prop extends Element implements TileConstants {
   
   
   public boolean wouldBlock(PropType type, int x, int y, int facing) {
-    if (kind().thin() || type.thin()) return false;
+    if (kind().thin  () || type.thin  ()) return false;
+    if (kind().effect() || type.effect()) return false;
     return kind().blockLevel() > 0 == type.blockLevel() > 0;
   }
   
@@ -134,11 +135,12 @@ public class Prop extends Element implements TileConstants {
       under.setInside(this, true);
       under.wipePathing();
     }
-    scene.props.add(this);
     
     for (Tile under : tilesUnder(kind, scene, x, y, facing, 1)) {
       if (under != null) under.updatePathing();
     }
+    
+    scene.props.add(this);
     return true;
   }
   
@@ -147,6 +149,9 @@ public class Prop extends Element implements TileConstants {
     if (origin == null) I.complain("Never entered scene!");
     final Scene scene = origin.scene;
     final Tile at = origin;
+    
+    //  TODO:  Check this to see what happens immediately after removal, under
+    //  a specific tile.
 
     final PropType kind = kind();
     for (Tile under : tilesUnder(kind, scene, at.x, at.y, facing, 0)) {
@@ -155,13 +160,13 @@ public class Prop extends Element implements TileConstants {
       under.wipePathing();
     }
     
-    this.origin = null;
-    this.facing = -1;
-    scene.props.remove(this);
-    
     for (Tile under : tilesUnder(kind, scene, at.x, at.y, facing, 1)) {
       if (under != null) under.updatePathing();
     }
+    
+    this.origin = null;
+    this.facing = -1;
+    scene.props.remove(this);
     return true;
   }
   
@@ -225,9 +230,12 @@ public class Prop extends Element implements TileConstants {
   
   
   public int renderPriority() {
-    return blockLevel() + (kind().thin() ? 2 : 0);
+    return blockLevel() + (kind().thin() || kind().effect() ? 5 : 0);
   }
 }
+
+
+
 
 
 

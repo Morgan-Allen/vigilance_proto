@@ -77,6 +77,7 @@ public class Tile implements Session.Saveable {
     */
   final static int OP_VAL = 0, BL_VAL = 1, CV_VAL = 2;
   final static int CHECK_DIRS[] = { N, E, S, W, CENTRE };
+  final static float NO_LINE = Float.NEGATIVE_INFINITY;
   
   static int wallMaskX(int x, int dir) {
     return (x * 2) + 1 + T_X[dir];
@@ -236,21 +237,21 @@ public class Tile implements Session.Saveable {
   
   
   private float solveX(Vec2D o, Vec2D l, float atY) {
-    if (! checkRange(o.y, l.y, atY)) return Float.NEGATIVE_INFINITY;
+    if (! checkRange(o.y, l.y, atY)) return NO_LINE;
     atY -= o.y;
     atY /= l.y;
     float solveX = o.x + (l.x * atY);
-    if (solveX < x || solveX > x + 1) return Float.NEGATIVE_INFINITY;
+    if (solveX < x || solveX > x + 1) return NO_LINE;
     return solveX;
   }
   
   
   private float solveY(Vec2D o, Vec2D l, float atX) {
-    if (! checkRange(o.x, l.x, atX)) return Float.NEGATIVE_INFINITY;
+    if (! checkRange(o.x, l.x, atX)) return NO_LINE;
     atX -= o.x;
     atX /= l.x;
     float solveY = o.y + (l.y * atX);
-    if (solveY < y || solveY > y + 1) return Float.NEGATIVE_INFINITY;
+    if (solveY < y || solveY > y + 1) return NO_LINE;
     return solveY;
   }
   
@@ -272,7 +273,9 @@ public class Tile implements Session.Saveable {
   
   
   public boolean occupied() {
-    return persons.size() > 0;
+    if (persons.size() == 0) return false;
+    for (Person p : persons) if (p.health.conscious()) return true;
+    return false;
   }
   
   
@@ -303,7 +306,7 @@ public class Tile implements Session.Saveable {
   /**  Rendering, debug and interface methods-
     */
   public String toString() {
-    return "Tile at "+x+"|"+y;
+    return "T\\"+x+"|"+y;
   }
   
   

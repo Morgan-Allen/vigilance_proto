@@ -51,13 +51,17 @@ public class PropEffect extends Prop {
   
   
   protected void onTurnEnd() {
-    kind().onTurnEnd(origin().scene, this);
+    final Scene scene = origin.scene;
+    kind().onTurnEnd(scene, this);
     if (turnsLeft > 0 && --turnsLeft == 0) {
       exitScene();
     }
   }
   
 }
+
+
+
 
 
 

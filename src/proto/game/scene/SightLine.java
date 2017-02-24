@@ -19,4 +19,11 @@ public class SightLine {
     line.set(dest.x - vantage.x, dest.y - vantage.y);
   }
   
+  
+  void shrinkToDest(float length) {
+    Vec2D atDest = line.add(orig, null);
+    line.normalise().scale(length);
+    orig.setTo(atDest.sub(line));
+  }
+  
 }

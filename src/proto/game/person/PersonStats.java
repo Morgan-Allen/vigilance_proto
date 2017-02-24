@@ -271,8 +271,11 @@ public class PersonStats {
     float brains   = levelFor(BRAINS  );
     float will     = levelFor(WILL    );
     
-    //  Average hit point total is 15.  Damage and armour start at 0.
-    float maxHP = 10 + muscle;
+    //  Average hit point total is 9.  Damage and armour start at 0.
+    float maxHP = 4 + (muscle * 1);
+    //  TODO:  Make this more tweakable later...
+    if (GameSettings.EASY_MODE && person.isHero()) maxHP *= 1.6f;
+    
     updateStat(HEALTH    , maxHP, false);
     //  TODO:  Incorporate these.
     //float maxEnergy  = (muscle + will) / 2f;
