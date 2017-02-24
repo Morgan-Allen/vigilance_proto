@@ -158,8 +158,29 @@ public class Common {
         }
       }
     },
+
+    //  TODO:  Have a special command for swapping weapons, then merge strike/
+    //  fire into one ability, along with guard/overwatch.
+    HIDE = new Ability(
+      "Hide", "ability_hide",
+      ICONS_DIR+"icon_hide.png",
+      "Crouch down to improve hide range by 2 and defence by 20.  Ends turn.",
+      Ability.IS_SELF_ONLY | Ability.IS_CONDITION, 1,
+      Ability.REAL_HARM, Ability.MINOR_POWER
+    ) {
+      public void applyOnActionAssigned(Action use) {
+        use.acting.stats.applyCondition(this, use.acting, 1);
+        use.acting.onTurnEnd();
+      }
+      
+      public float conditionModifierFor(Person person, Trait trait) {
+        if (trait == PersonStats.HIDE_RANGE) return 2 ;
+        if (trait == PersonStats.DEFENCE   ) return 20;
+        return 0;
+      }
+    },
     
-    BASIC_ABILITIES[] = { MOVE, STRIKE, FIRE, GUARD };
+    BASIC_ABILITIES[] = { MOVE, STRIKE, FIRE, GUARD, HIDE };
   
   
   final public static Ability SPECIAL_ACTION = new Ability(
