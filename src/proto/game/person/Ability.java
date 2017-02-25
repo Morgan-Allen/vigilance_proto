@@ -244,6 +244,7 @@ public abstract class Ability extends Trait {
     Scene scene, Tile pathToTake[], StringBuffer failLog
   ) {
     final Series <Condition> conds = acting.stats.conditions;
+    
     if (! conds.empty()) for (Condition c : conds) {
       if (! c.basis.conditionAllowsAbility(this)) {
         return failResult(c.basis+" Prevents Use", failLog);
@@ -270,7 +271,7 @@ public abstract class Ability extends Trait {
       if (maxRange > 0 && range > (acting.stats.sightRange() + 1)) {
         return failResult("Outside Sight Range", failLog);
       }
-      if (scene.vision.degreeOfSight(acting, dest, false) <= 0) {
+      if (ranged() && scene.vision.degreeOfSight(acting, dest, false) <= 0) {
         return failResult("No Sight Line", failLog);
       }
     }
