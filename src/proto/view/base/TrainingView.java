@@ -1,12 +1,12 @@
 
 
 package proto.view.base;
+import proto.common.*;
 import proto.game.person.*;
 import proto.game.world.*;
-import proto.game.event.*;
-import proto.util.*;
 import proto.view.common.*;
 import static proto.game.person.PersonStats.*;
+import proto.util.*;
 
 import java.awt.Graphics2D;
 import java.awt.Image;

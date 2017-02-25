@@ -1,7 +1,6 @@
 
 
-package proto.game.person;
-import proto.common.*;
+package proto.common;
 import proto.util.*;
 import java.awt.Image;
 
@@ -18,6 +17,8 @@ public class Trait extends Index.Entry implements Session.Saveable {
   final public String description;
   final public Image icon;
   
+  //  TODO:  You may need a more sophisticated system for describing
+  //  dependencies (allowing for 'ors' and 'ands', for example.)
   private Trait roots[];
   
   
@@ -30,6 +31,17 @@ public class Trait extends Index.Entry implements Session.Saveable {
     this.description = description;
     this.icon        = Kind.loadImage(imgPath);
     attachRoots(roots);
+  }
+  
+  
+  public static Trait[] traitsWith(
+    String prefixID, String baseImgPath, String... names
+  ) {
+    Trait traits[] = new Trait[names.length];
+    for (int i = 0 ; i < names.length; i++) traits[i] = new Trait(
+      names[i], prefixID+"_"+names[i], baseImgPath+names[i], ""
+    );
+    return traits;
   }
   
   

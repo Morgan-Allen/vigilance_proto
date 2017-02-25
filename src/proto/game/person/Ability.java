@@ -1,14 +1,14 @@
 
 
 package proto.game.person;
+import proto.common.*;
 import proto.game.world.*;
-import proto.game.person.PersonStats.Condition;
 import proto.game.scene.*;
 import proto.util.*;
+import proto.game.person.PersonStats.Condition;
 import proto.view.scene.AbilityFX;
 
 import java.awt.Graphics2D;
-import java.awt.Image;
 
 
 

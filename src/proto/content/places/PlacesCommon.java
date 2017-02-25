@@ -1,7 +1,7 @@
 
 
 package proto.content.places;
-import proto.game.person.Trait;
+import proto.common.*;
 
 
 public class PlacesCommon {

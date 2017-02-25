@@ -1,13 +1,11 @@
 
 
 package proto.content.items;
+import proto.common.*;
 import proto.game.person.*;
-import proto.game.scene.*;
-import proto.util.*;
 import static proto.game.person.ItemType   .*;
 import static proto.game.person.PersonGear .*;
 import static proto.game.person.PersonStats.*;
-import proto.common.Kind;
 
 
 

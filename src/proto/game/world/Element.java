@@ -110,7 +110,7 @@ public class Element implements Session.Saveable {
   
   
   
-  /**  AI-support methods-
+  /**  AI-support and detective-work methods-
     */
   public static enum Access {
     GRANTED, POSSIBLE, SECRET
@@ -118,6 +118,13 @@ public class Element implements Session.Saveable {
   
   public Access accessLevel(Base base) {
     return Access.POSSIBLE;
+  }
+  
+  
+  final static Batch NO_TRAITS = new Batch();
+  
+  public Series <Object> traits() {
+    return NO_TRAITS;
   }
   
   

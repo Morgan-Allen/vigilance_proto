@@ -201,6 +201,61 @@ public class Common {
     }
   };
   
+  
+  //
+  //  Persons have a couple of randomly-defined basic traits.
+  final static Trait HAIR_COLOURS[] = Trait.traitsWith(
+    "hair", "XXX",
+    "Hair: Red"   ,
+    "Hair: Blonde",
+    "Hair: Brown" ,
+    "Hair: Black" ,
+    "Hair: Grey"  ,
+    "Hair: White"
+  );
+  final static Trait EYE_COLOURS[] = Trait.traitsWith(
+    "eyes", "XXX",
+    "Eyes: Grey" ,
+    "Eyes: Green",
+    "Eyes: Brown",
+    "Eyes: Blue"
+  );
+  final static Trait RACES[] = Trait.traitsWith(
+    "race", "XXX",
+    "Race: Black"  ,
+    "Race: Indian" ,
+    "Race: Asian"  ,
+    "Race: White"  ,
+    "Race: Amerind",
+    "Race: Mixed"
+  );
+  final static Trait BUILD[] = Trait.traitsWith(
+    "build", "XXX",
+    "Build: Stout" ,
+    "Build: Skinny",
+    "Build: Tall"  ,
+    "Build: Petit"
+  );
+  
+  //
+  //  Locations have a number of trace elements that can be inferred from
+  //  forensics, based on interior elements.
+  //  Hot, Cold, Wet, Sunny?
+  //  Treat proximities as traits?
+  final static Trait PLACE_TRAITS[] = Trait.traitsWith(
+    "place_trait", "XXX",
+    "Rural"     ,
+    "Industrial",
+    "Medical"   ,
+    "Slum"      ,
+    "Office"    ,
+    "Ritzy"     ,
+    "Public"    ,
+    "Academic"  ,
+    "Domestic"  ,
+    "Secure"
+  );
+  
 }
 
 
