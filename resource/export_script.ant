@@ -19,7 +19,7 @@
     
     <jar destfile="${output}/vigilance.jar" basedir="bin">
       <manifest>
-        <attribute name="Main-Class" value="proto.common.RunGame"/>
+        <attribute name="Main-Class" value="proto.common.DefaultGame"/>
       </manifest>
     </jar>
     
