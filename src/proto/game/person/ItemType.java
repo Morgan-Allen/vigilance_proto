@@ -134,6 +134,26 @@ public class ItemType extends Kind {
   }
   
   
+  public boolean preciseGun() {
+    return subtype() == SUBTYPE_PRECISE_GUN;
+  }
+  
+  
+  public boolean heavyGun() {
+    return subtype() == SUBTYPE_HEAVY_GUN;
+  }
+  
+  
+  public boolean blade() {
+    return subtype() == SUBTYPE_BLADE;
+  }
+  
+  
+  public boolean blunt() {
+    return subtype() == SUBTYPE_BLUNT;
+  }
+  
+  
   public boolean availableFor(Person user, Base base) {
     if (isCommon()) return true;
     if (inventor != null && user.kind() != inventor) return false;

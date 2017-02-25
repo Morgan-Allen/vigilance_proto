@@ -62,6 +62,9 @@ public class Techniques {
         return false;
       }
       
+      //  TODO:  Modify this to create a persistent 'punishment' effect after
+      //  melee attacks, to persistently hamper enemies.
+      
       protected Volley createVolley(Action use, Object target, Scene scene) {
         int level = use.acting.stats.levelFor(this);
         Volley volley = new Volley();

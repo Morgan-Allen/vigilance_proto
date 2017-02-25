@@ -166,7 +166,7 @@ public class Common {
       ICONS_DIR+"icon_hide.png",
       "Crouch down to improve hide range by 2 and defence by 20.  Ends turn.",
       Ability.IS_SELF_ONLY | Ability.IS_CONDITION, 1,
-      Ability.REAL_HARM, Ability.MINOR_POWER
+      Ability.NO_HARM, Ability.MINOR_POWER
     ) {
       public void applyOnActionAssigned(Action use) {
         use.acting.stats.applyCondition(this, use.acting, 1);

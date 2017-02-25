@@ -306,7 +306,7 @@ public class Tile implements Session.Saveable {
   /**  Rendering, debug and interface methods-
     */
   public String toString() {
-    return "T\\"+x+"|"+y;
+    return "T:"+x+"|"+y;
   }
   
   

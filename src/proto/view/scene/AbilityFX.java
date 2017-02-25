@@ -1,6 +1,7 @@
 
 
 package proto.view.scene;
+import proto.common.Kind;
 import proto.game.person.*;
 import proto.game.scene.*;
 import proto.util.*;
@@ -34,7 +35,7 @@ public class AbilityFX {
       int maxDamage = Nums.ceil (v.maxDamage());
       
       s.append("\n  "+minDamage+"-"+maxDamage+" damage");
-      s.append("\n  target armour "+v.hitsArmour+")");
+      s.append(" (target armour "+v.hitsArmour+")");
       
       s.append("\n  "+v.accuracyMargin+"% to hit");
       for (Volley.Modifier m : v.extractModifiers(
@@ -85,11 +86,22 @@ public class AbilityFX {
   
   
   public void previewAction(Action action, Scene s, Graphics2D g) {
-    
+    //
+    //  
     if (! Visit.empty(action.path())) {
       previewPath(action.path(), s, g);
     }
-    if (action.used.ranged()) {
+    //
+    //  This is used to draw elliptical arcs for grenades and throwables:
+    //  TODO:  Codify this a little more neatly...
+    Volley volley = action.volley();
+    ItemType weapon = volley == null ? null : volley.weaponType();
+    if (weapon != null && weapon.subtype() == Kind.SUBTYPE_WING_BLADE) {
+      previewCurvedTrajectory(action, s, g);
+    }
+    //
+    //  
+    else if (action.used.ranged()) {
       previewTrajectory(action, s, g);
     }
   }
@@ -115,6 +127,36 @@ public class AbilityFX {
     g.setColor(new Color(1, 1, 0, 0.5f));
     drawLine(o, v, s, g);
     drawLine(v, t, s, g);
+  }
+  
+  
+  public void previewCurvedTrajectory(Action a, Scene s, Graphics2D g) {
+    Tile t = s.tileUnder(a.target), v = a.acting.currentTile();
+    SceneView SV = s.view();
+    int TS = SceneView.TILE_SIZE;
+    int offX = SV.zoomX, offY = SV.zoomY;
+    int x = (v.x * TS) - offX, y = (v.y * TS) - offY;
+    int w = (t.x - v.x) * TS, h = (t.y - v.y) * TS;
+    
+    int numPoints = Nums.max(10, (int) s.distance(t, v));
+    Vec2D between = new Vec2D(w, h), perp = between.perp(null);
+    perp.normalise().scale(between.length() / 5f);
+    if (perp.y > 0) perp.scale(-1);
+    Vec2D last = new Vec2D(x + w, y + h);
+    
+    g.setStroke(new BasicStroke(2));
+    g.setColor(new Color(1, 1, 0, 0.5f));
+    for (int n = numPoints + 1; n-- > 0;) {
+      float mid = n * 1f / numPoints;
+      
+      Vec2D point = new Vec2D(between).scale(mid);
+      mid *= 4 * (1 - mid);
+      point.x += x + (perp.x * mid);
+      point.y += y + (perp.y * mid);
+      
+      g.drawLine((int) last.x, (int) last.y, (int) point.x, (int) point.y);
+      last = point;
+    }
   }
   
   

@@ -52,7 +52,7 @@ public class Weapons {
       return 0;
     }
     
-    public void applyOnAttackStart(Volley volley) {
+    public void modifyAttackVolley(Volley volley) {
       if (subtype() == SUBTYPE_BLUNT) {
         volley.stunPercent.set(50, "Blunt Weapon");
       }
@@ -73,12 +73,36 @@ public class Weapons {
   
   final public static ItemType WING_BLADES = new WeaponType(
     "Wing Blades", "item_wing_blades",
-    "Lightweight, throwable projectiles, useful to disarm or startle foes.",
+    "Lightweight, throwable projectiles.  Inflict modest damage, but can "+
+    "bypass cover and disarm opponents.",
     ICONS_DIR+"icon_wing_blades.png",
     SPRITE_DIR+"sprite_wing_blade.png",
     Kind.SUBTYPE_WING_BLADE, 2, 3,
     20, new Object[] { ENGINEERING, 2 }
-  );
+  ) {
+    public void modifyAttackVolley(Volley volley) {
+      int cover = volley.modifierFor(volley.hitsDefence, Volley.COVER);
+      int bypass = (int) Nums.clamp(Nums.round(cover / 2, 5, true), 20, cover);
+      volley.selfAccuracy.inc(bypass, "Wing Blade vs. Cover");
+      super.modifyAttackVolley(volley);
+    }
+    
+    public void applyOnAttackEnd(Volley volley) {
+      super.applyOnAttackEnd(volley);
+      
+      Person struck = volley.targAsPerson();
+      if (struck == null) return;
+      
+      ItemType weapon = struck.gear.weaponType();
+      int disarmChance = 10;
+      if (weapon.blade() || weapon.preciseGun()) disarmChance = 33;
+      disarmChance -= Rand.index(struck.stats.levelFor(MUSCLE) + 1);
+      
+      if (volley.didConnect() && Rand.index(100) < disarmChance) {
+        struck.gear.dropItem(SLOT_WEAPON);
+      }
+    }
+  };
   
   
   final public static ItemType BRASS_KNUCKLES = new WeaponType(
@@ -112,15 +136,16 @@ public class Weapons {
   
   final public static ItemType AUTOMATIC = new WeaponType(
     "Automatic", "item_automatic",
-    "A rapid-fire machine gun capable of shredding armour.",
+    "A rapid-fire machine gun capable of shredding armour and light cover.",
     ICONS_DIR+"icon_revolver.png",
     SPRITE_DIR+"sprite_bullets.png",
     Kind.SUBTYPE_HEAVY_GUN, 6, 4,
     55, new Object[] { ENGINEERING, 4 }
   ) {
-    public void applyOnAttackStart(Volley volley) {
-      volley.hitsArmour.inc(0 - (Rand.index(2) + 1), this);
-      super.applyOnAttackStart(volley);
+    public void modifyAttackVolley(Volley volley) {
+      //  TODO:  Shred any incidental objects providing cover.
+      volley.hitsArmour.inc(-2, this);
+      super.modifyAttackVolley(volley);
     }
   };
   
@@ -132,11 +157,17 @@ public class Weapons {
     Kind.SUBTYPE_PRECISE_GUN, 5, 5,
     40, new Object[] { ENGINEERING, 4 }
   ) {
-    public float passiveModifierFor(Person person, Trait trait) {
-      if (trait == ACCURACY) return 15;
-      return super.passiveModifierFor(person, trait);
+    public void modifyAttackVolley(Volley volley) {
+      int rangeMod = volley.modifierFor(volley.selfAccuracy, Volley.RANGE);
+      int accBonus = Nums.max(0, (rangeMod / -2) + 10);
+      volley.selfAccuracy.inc(accBonus, this);
+      super.modifyAttackVolley(volley);
     }
   };
   
 }
+
+
+
+
 

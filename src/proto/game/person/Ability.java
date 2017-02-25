@@ -234,6 +234,7 @@ public abstract class Ability extends Trait {
   
   
   public boolean allowsTarget(Object target, Scene scene, Person acting) {
+    if (delayed() || selfOnly()) return target == acting;
     return true;
   }
   
@@ -349,7 +350,7 @@ public abstract class Ability extends Trait {
       if (self != null) for (Item item : self.gear.equipped()) {
         ItemType t = item.kind();
         if (t.triggerOnAttack(volley)) {
-          t.triggerOnAttack(volley);
+          t.modifyAttackVolley(volley);
           if (start) t.applyOnAttackStart(volley);
           if (end  ) t.applyOnAttackEnd  (volley);
         }

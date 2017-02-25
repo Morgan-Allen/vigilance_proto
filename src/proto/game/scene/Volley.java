@@ -64,6 +64,12 @@ public class Volley implements Session.Saveable {
     injureDamage    = new Stat("injure_damage"    , 0  ),
     stunDamage      = new Stat("stun_damage"      , 0  );
   
+  final public static String
+    IN_MELEE = "In Melee",
+    RANGE    = "Range",
+    COVER    = "Cover"
+  ;
+  
   boolean didConnect;
   boolean didDamage ;
   boolean didCrit   ;
@@ -203,7 +209,7 @@ public class Volley implements Session.Saveable {
     
     if (weaponType.melee() && ! ranged) {
       selfAccuracy.inc(self.stats.levelFor(ACCURACY), ACCURACY);
-      selfAccuracy.inc(50, "In Melee");
+      selfAccuracy.inc(50, IN_MELEE);
       float brawnBonus = self.stats.levelFor(MUSCLE) / 2f;
       selfDamageBase .inc(Nums.ceil (brawnBonus), MUSCLE);
       selfDamageRange.inc(Nums.floor(brawnBonus), MUSCLE);
@@ -215,9 +221,9 @@ public class Volley implements Session.Saveable {
       float distance   = scene.distance(self.currentTile(), hits.currentTile());
       float coverBonus = coverBonus(self, targ, scene);
       float rangeMod   = 100 * ((distance - 1) - normRange) / normRange;
-      selfAccuracy.inc(0 - (int) rangeMod, "Range");
+      selfAccuracy.inc(0 - (int) rangeMod, RANGE);
       hitsDefence.inc(hits.stats.levelFor(DEFENCE), DEFENCE);
-      hitsDefence.inc((int) coverBonus, "Cover");
+      hitsDefence.inc((int) coverBonus, COVER);
     }
     
     calcMargins();
@@ -269,6 +275,14 @@ public class Volley implements Session.Saveable {
       if (Visit.arrayIncludes(affected, m.stat)) all.add(m);
     }
     return all;
+  }
+  
+  
+  public int modifierFor(Stat stat, Object source) {
+    for (Modifier m : modifiers) if (m.source == source && m.stat == stat) {
+      return m.modValue;
+    }
+    return 0;
   }
   
   

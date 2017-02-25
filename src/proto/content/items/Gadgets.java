@@ -42,7 +42,7 @@ public class Gadgets {
       final Person target = (Person) use.target;
       I.say("Applying bolas to target: "+target);
       target.stats.applyCondition(this, use.acting, 3);
-      use.acting.gear.useCharge(BOLAS, -1);
+      use.acting.gear.useCharge(BOLAS, 1);
     }
     
     public void applyConditionOnTurn(Person person, Person source) {
@@ -93,9 +93,9 @@ public class Gadgets {
   final static Ability MED_KIT_HEAL = new Ability(
     "First Aid (Medkit)", "ability_med_kit_heal",
     ICONS_DIR+"icon_med_kit.png",
-    "Patches up injury sustained in combat (up to 6 health), halts bleeding "+
+    "Patches up injury sustained in combat (up to 8 health), halts bleeding "+
     "and reduces recovery time.",
-    Ability.IS_ACTIVE | Ability.IS_EQUIPPED | Ability.IS_MELEE, 3,
+    Ability.IS_ACTIVE | Ability.IS_EQUIPPED | Ability.IS_MELEE, 2,
     Ability.REAL_HELP, Ability.MEDIUM_POWER
   ) {
     
@@ -106,7 +106,7 @@ public class Gadgets {
     
     public void applyOnActionEnd(Action use) {
       Person healed = (Person) use.target;
-      healed.health.liftInjury(6);
+      healed.health.liftInjury(6 + Rand.index(3));
       healed.health.liftTotalHarm(2);
       healed.health.toggleBleeding(false);
       use.acting.gear.useCharge(Gadgets.MED_KIT, 0.5f);
