@@ -58,6 +58,11 @@ public class PropType extends Kind {
   }
   
   
+  public void onTurnStart(Scene s, PropEffect ofType) {
+    return;
+  }
+  
+  
   public void onTurnEnd(Scene s, PropEffect ofType) {
     return;
   }

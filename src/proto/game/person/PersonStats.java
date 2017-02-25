@@ -358,7 +358,9 @@ public class PersonStats {
   
   boolean onTurnStart() {
     for (Condition c : conditions) {
-      c.basis.applyConditionOnTurn(person, c.casts);
+      c.countdown--;
+      if (c.countdown <= 0) conditions.remove(c);
+      else c.basis.applyConditionOnTurn(person, c.casts);
     }
     //  TODO:  Restore these.
     /*
@@ -371,10 +373,6 @@ public class PersonStats {
   
   
   boolean onTurnEnd() {
-    for (Condition c : conditions) {
-      c.countdown--;
-      if (c.countdown <= 0) conditions.remove(c);
-    }
     return true;
   }
   

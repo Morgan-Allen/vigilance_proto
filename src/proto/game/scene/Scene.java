@@ -451,7 +451,13 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
       if (noOneLeft) {
         I.say("\nNo action-points left on player team...");
         playerTurn = false;
+        for (Person p : playerTeam) if (p.currentScene() == this) {
+          p.onTurnEnd();
+        }
         for (Person p : othersTeam) if (p.currentScene() == this) {
+          p.onTurnStart();
+        }
+        for (PropEffect p : effectProps) {
           p.onTurnStart();
         }
       }
@@ -486,6 +492,9 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
       if (noOneLeft) {
         I.say("\n  No action-points left on others team...");
         playerTurn = true;
+        for (Person p : othersTeam) if (p.currentScene() == this) {
+          p.onTurnEnd();
+        }
         for (Person p : playerTeam) if (p.currentScene() == this) {
           p.onTurnStart();
         }
