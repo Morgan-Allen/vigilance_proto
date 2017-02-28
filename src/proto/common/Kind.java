@@ -24,6 +24,9 @@ public class Kind extends Index.Entry implements Session.Saveable {
     TYPE_PROP   =  6,
     TYPE_CLUE   =  7
   ;
+  
+  //  TODO:  These should be handled as traits or properties for a given Kind.
+  //         Take 'em out!
   final public static int
     SUBTYPE_CIVILIAN = 1,
     SUBTYPE_MOOK     = 2,

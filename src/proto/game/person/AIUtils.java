@@ -1,6 +1,7 @@
 
 package proto.game.person;
 import proto.common.*;
+import proto.game.world.*;
 import proto.game.scene.*;
 import proto.util.*;
 

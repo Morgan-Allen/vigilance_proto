@@ -234,6 +234,32 @@ public class CaseFile implements Session.Saveable {
   }
   
   
+  public Series <Event> involvedIn() {
+    Batch <Event> involved = new Batch();
+    for (Role role : roles) {
+      if (defunct(role)) continue;
+      involved.add(role.event);
+    }
+    return involved;
+  }
+  
+  
+  public float evidenceForInvolvement(Event event) {
+    float evidence = 0;
+    for (Role role : roles) if (role.event == event) {
+      evidence += role.maxEvidence;
+    }
+    return evidence;
+  }
+  
+  
+  public void updateEvidenceFrom(CaseFile other) {
+    for (Role role : other.roles) for (Lead lead : role.evidence) {
+      recordRole(role.event, role.roleID, lead);
+    }
+  }
+  
+  
   
   /**  Generating subsequent investigation options-
     */

@@ -59,9 +59,18 @@ public class DefaultGame extends RunGame {
   
   
   public static void initDefaultBase(World world) {
+    
+    final Faction city = Civilians.THE_CITY_COUNCIL;
+    final Base cityHall = new Base(Facilities.UNION_OFFICE, world, city);
+    world.regionFor(Regions.SECTOR05).setAttached(cityHall, true);
+    world.council.bindToFaction(cityHall);
+    
+    Region at = world.regionFor(Regions.SECTOR09);
+    Place prison = at.setupFacility(Facilities.HIDEOUT, 2, cityHall, true);
+    world.council.assignPrison(prison);
+    
     final Faction owns = Heroes.JANUS_INDUSTRIES;
     final Base base = new Base(Facilities.MANOR, world, owns);
-    
     Person leader = new Person(Heroes.HERO_PHOBOS, world);
     base.setLeader(leader);
     base.addToRoster(leader);

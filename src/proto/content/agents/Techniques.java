@@ -2,6 +2,7 @@
 
 package proto.content.agents;
 import proto.common.*;
+import proto.game.world.*;
 import proto.game.person.*;
 import proto.game.scene.*;
 import proto.util.*;

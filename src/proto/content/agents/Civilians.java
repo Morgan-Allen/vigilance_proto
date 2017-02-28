@@ -2,12 +2,21 @@
 
 package proto.content.agents;
 import proto.common.*;
+import proto.game.world.*;
 import proto.game.person.*;
+
 import static proto.game.person.PersonStats.*;
 
 
 
 public class Civilians {
+  
+  
+  final static String IMG_DIR = "media assets/character icons/common/";
+  
+  final public static Faction THE_CITY_COUNCIL = new Faction(
+    "The City Council", "faction_the_city_council", false
+  );
   
   
   final public static String
@@ -18,9 +27,6 @@ public class Civilians {
       "Stanfeld", "Turner", "Lewis", "Walker", "Bryant", "Cole"
     },
     COMMON_NAMES[][] = { COMMON_FIRST_NAMES, COMMON_LAST_NAMES };
-  
-  
-  final static String IMG_DIR = "media assets/character icons/common/";
   
   final public static PersonType
     CIVILIAN = new PersonType(

@@ -1,8 +1,9 @@
 
 
-package proto.game.person;
+package proto.game.world;
 import proto.common.*;
 import proto.game.event.*;
+import proto.game.person.*;
 import proto.game.scene.*;
 import proto.util.*;
 
@@ -253,7 +254,7 @@ public class Common {
     "Public"    ,
     "Academic"  ,
     "Domestic"  ,
-    "Secure"
+    "Secure"    
   );
   
 }

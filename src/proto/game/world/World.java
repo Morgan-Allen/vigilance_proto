@@ -2,15 +2,9 @@
 
 package proto.game.world;
 import proto.common.*;
-import proto.game.person.*;
 import proto.game.scene.*;
 import proto.util.*;
-import proto.view.*;
 import proto.view.common.MainView;
-import proto.content.agents.*;
-import proto.content.events.*;
-import proto.content.items.*;
-import proto.content.places.*;
 
 
 
@@ -40,8 +34,9 @@ public class World implements Session.Saveable {
   List <Base> bases = new List();
   List <Element> elements = new List();
   
-  final public Timing timing = new Timing(this);
-  final public Events events = new Events(this);
+  final public Timing  timing  = new Timing (this);
+  final public Events  events  = new Events (this);
+  final public Council council = new Council(this);
   
   boolean amWatching = false;
   Scene activeScene = null;
@@ -70,8 +65,9 @@ public class World implements Session.Saveable {
     s.loadObjects(bases);
     s.loadObjects(elements);
     
-    events.loadState(s);
-    timing.loadState(s);
+    events .loadState(s);
+    timing .loadState(s);
+    council.loadState(s);
     
     amWatching = s.loadBool ();
     activeScene = (Scene) s.loadObject();
@@ -85,8 +81,9 @@ public class World implements Session.Saveable {
     s.saveObjects(bases);
     s.saveObjects(elements);
     
-    events.saveState(s);
-    timing.saveState(s);
+    events .saveState(s);
+    timing .saveState(s);
+    council.saveState(s);
     
     s.saveBool (amWatching);
     s.saveObject(activeScene);
@@ -180,10 +177,10 @@ public class World implements Session.Saveable {
     if (activeScene != null) {
       activeScene.updateScene();
     }
-    
     else if (amWatching) {
-      timing.updateTiming();
-      events.updateEvents();
+      timing .updateTiming ();
+      events .updateEvents ();
+      council.updateCouncil();
       
       for (Region d : regions) {
         d.updateRegion();

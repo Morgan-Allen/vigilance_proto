@@ -135,6 +135,11 @@ public class Place extends Element {
   }
   
   
+  public Series <Person> residents() {
+    return residents;
+  }
+  
+  
   public static void setResident(Person person, Place place, boolean is) {
     //  NOTE:  This is intended to allow residence to be specified from either
     //  the person or place without entering a loop or forgetting to update one
