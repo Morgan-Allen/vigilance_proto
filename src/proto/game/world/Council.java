@@ -173,11 +173,9 @@ public class Council {
     //  TODO:  Construct a report for this!
     
     for (Person p : t.accused) {
-      CaseFile f = mainHall.leads.caseFor(p);
-      
       float sumEvidence = 0;
-      for (Event e : f.involvedIn()) {
-        sumEvidence += f.evidenceForInvolvement(e);
+      for (Crime c : mainHall.leads.involvedIn(p)) {
+        sumEvidence += mainHall.leads.evidenceForInvolvement(c, p);
       }
       
       float releaseChance = 1f / (1 + sumEvidence);

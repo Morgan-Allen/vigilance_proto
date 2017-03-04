@@ -17,11 +17,6 @@ public class TestCrime {
     
     
     
-    
-    Crime kidnapping = new Crime() {
-      
-    };
-    
   }
   
   

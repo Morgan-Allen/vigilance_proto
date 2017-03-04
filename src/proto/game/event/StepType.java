@@ -9,11 +9,15 @@ import proto.util.*;
 
 
 
+
+
+/*
 public abstract class StepType extends EventType {
   
   
   /**  Data fields, construction and state restoration-
     */
+  /*
   final Object needTypes[], giveTypes[];
   
   
@@ -37,6 +41,7 @@ public abstract class StepType extends EventType {
     *  targets, generating the initial step, and evaluating the odds and appeal
     *  of such an action.
     */
+  /*
   public PlanStep asGoal(Element target, Plan plan) {
     return null;
   }
@@ -106,6 +111,7 @@ public abstract class StepType extends EventType {
   
   /**  AI-control methods for within a particular scene:
     */
+  /*
   public Action specialAction(Person onTeam, PlanStep step, Scene scene) {
     return null;
   }
@@ -124,6 +130,7 @@ public abstract class StepType extends EventType {
   
   /**  And finally, handling the after-effects of a step:
     */
+  /*
   protected int duration(PlanStep step) {
     return Task.TIME_MEDIUM;
   }
@@ -132,7 +139,6 @@ public abstract class StepType extends EventType {
   public Series <Person> generateGroundForces(Event event) {
     final List <Person> forces = new List();
     
-    /*
     final PlanStep step = event.planStep();
     for (Element e : step.needs()) {
       if (e == null || e.type != Kind.TYPE_PERSON) continue;
@@ -151,7 +157,6 @@ public abstract class StepType extends EventType {
       forceSum += goon.stats.powerLevel();
       forces.add(goon);
     }
-    //*/
     
     return forces;
   }
@@ -165,14 +170,12 @@ public abstract class StepType extends EventType {
   
   
   protected void applyEffectsAfter(Event event) {
-    /*
     final PlanStep step = event.planStep();
     final Base base = step.plan.agent.base();
     for (Element e : step.gives()) {
       base.world().setInside(e, true);
       base.setAttached(e, true);
     }
-    //*/
     return;
   }
   
@@ -180,6 +183,7 @@ public abstract class StepType extends EventType {
   
   /**  Rendering, debug and interface methods-
     */
+  /*
   protected abstract String langDescription(PlanStep step);
   
 
@@ -196,6 +200,7 @@ public abstract class StepType extends EventType {
     //return step.longDescription();
   }
 }
+//*/
 
 
 

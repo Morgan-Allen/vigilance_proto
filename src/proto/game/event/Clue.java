@@ -20,6 +20,18 @@ public class Clue {
   float confidence;
   
   
+  Clue() {
+    return;
+  }
+  
+  
+  Clue(Object subject, Crime crime, int roleID) {
+    this.subject = subject;
+    this.crime   = crime  ;
+    this.roleID  = roleID ;
+  }
+  
+  
   static Clue loadClue(Session s) throws Exception {
     Clue c = new Clue();
     c.subject    = s.loadObject();
@@ -39,6 +51,13 @@ public class Clue {
     s.saveInt   (leadType  );
     s.saveObject(trait     );
     s.saveFloat (confidence);
+  }
+  
+  
+  void assignEvidence(Object trait, int leadType, float confidence) {
+    this.trait      = trait     ;
+    this.leadType   = leadType  ;
+    this.confidence = confidence;
   }
 }
 

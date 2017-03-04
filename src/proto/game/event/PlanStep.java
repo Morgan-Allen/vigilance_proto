@@ -8,11 +8,13 @@ import proto.util.*;
 
 
 
+/*
 public class PlanStep implements Session.Saveable {
   
   
   /**  Data fields, construction and save/load methods-
     */
+  /*
   final public StepType type;
   final public Plan plan;
   
@@ -72,6 +74,7 @@ public class PlanStep implements Session.Saveable {
   
   /**  Supplementary query/iteration methods-
     */
+  /*
   public PlanStep setParent(PlanStep parent, Object needType) {
     this.parent       = parent;
     this.parentNeedID = Visit.indexOf(needType, parent.needTypes());
@@ -165,6 +168,7 @@ public class PlanStep implements Session.Saveable {
   
   /**
     */
+  /*
   float baseSuccessChance() {
     return type.baseSuccessChance(this);
   }
@@ -188,6 +192,7 @@ public class PlanStep implements Session.Saveable {
   
   /**  Utility methods for plan-evaluation-
     */
+  /*
   void assignRating(float rating) {
     this.rating = rating;
   }
@@ -209,7 +214,6 @@ public class PlanStep implements Session.Saveable {
     //  when essential pre-reqs aren't yet met (while still giving a decent
     //  rating for the raw step until expanded.)
     return type.baseSuccessChance(this);
-    /*
     float chance = 1.0f;
     
     for (int r = needs.length; r-- > 0;) {
@@ -221,7 +225,6 @@ public class PlanStep implements Session.Saveable {
     
     chance *= baseSuccessChance();
     return chance;
-    //*/
   }
   
   
@@ -248,6 +251,7 @@ public class PlanStep implements Session.Saveable {
   
   /**  Translating into concrete events:
     */
+  /*
   public boolean currentlyPossible() {
     final Base base = plan.agent.base();
     for (Object typeN : needTypes()) {
@@ -281,6 +285,7 @@ public class PlanStep implements Session.Saveable {
   
   /**  Rendering, debug and feedback methods-
     */
+  /*
   public String toString() {
     return langDescription();
     //return type.name+" #"+uniqueID;
@@ -336,6 +341,7 @@ public class PlanStep implements Session.Saveable {
     return s.toString();
   }
 }
+//*/
 
 
 

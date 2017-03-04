@@ -34,6 +34,8 @@ public class DebugPlans extends RunGame {
     I.say("\nBeginning plan-generation...");
     final Base crookBase = world.bases().atIndex(1);
     final Person boss = crookBase.leader();
+    
+    /*
     final Plan plan = new Plan(boss, world, StepTypes.ALL_TYPES);
     plan.verbose = true;
     for (Element crook : crookBase.roster()) plan.addObtained(crook);
@@ -49,6 +51,7 @@ public class DebugPlans extends RunGame {
     plan.addGoal(firstStep, 10);
     plan.advancePlan(6);
     crookBase.plans.assignPlan(plan, 16);
+    //*/
     
     return world;
   }

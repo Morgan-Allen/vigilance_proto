@@ -1,21 +1,23 @@
 
 
 package proto.content.events;
-import proto.game.event.StepType;
 import proto.util.*;
+import proto.game.event.*;
 
 
 
-public class StepTypes {
+public class CrimeTypes {
   
   
-  private static Batch <StepType> types = new Batch();
-  private static StepType register(StepType type) {
+  private static Batch <CrimeType> types = new Batch();
+  private static CrimeType register(CrimeType type) {
     types.add(type);
     return type;
   }
   
-  final public static StepType
+  
+  final public static CrimeType
+    /*
     HEIST    = register(new TypeHeist()),
     MURDER   = register(new TypeMurder()),
     KIDNAP   = register(new TypeKidnap()),
@@ -23,7 +25,8 @@ public class StepTypes {
     BRIBE    = register(new TypeBribe()),
     MAKE     = register(new TypeMake()),
     RESEARCH = register(new TypeResearch()),
-    ALL_TYPES[] = types.toArray(StepType.class)
+    //*/
+    ALL_TYPES[] = types.toArray(CrimeType.class)
   ;
   
 }

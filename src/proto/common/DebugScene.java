@@ -44,12 +44,14 @@ public class DebugScene extends RunGame {
     boss.setBase(crooks);
     perp.setBase(crooks);
     
+    /*
     Plan plan = new Plan(boss, world, StepTypes.ALL_TYPES);
     PlanStep kidnapStep = StepTypes.KIDNAP.asGoal(victim, plan);
     kidnapStep.setNeed(TypeKidnap.Needs.VENUE        , home, null);
     kidnapStep.setNeed(TypeKidnap.Needs.ALARM_CRACKER, perp, null);
     plan.addStep(kidnapStep);
     boss.base().plans.assignPlan(plan, 0);
+    //*/
     
     
     //  TODO:  Just enter the scene directly.  Don't make this more complex

@@ -8,6 +8,7 @@ import proto.util.*;
 
 
 
+/*
 public class Plan implements Session.Saveable {
   
   final public Person agent;
@@ -55,6 +56,7 @@ public class Plan implements Session.Saveable {
   
   /**  Iterating over the full sequence of steps-
     */
+  /*
   public Series <PlanStep> steps() {
     return steps;
   }
@@ -81,6 +83,7 @@ public class Plan implements Session.Saveable {
   
   /**  Initial conditions and goal configuration-
     */
+  /*
   public void addObtained(Element thing) {
     preObtained.include(thing);
   }
@@ -152,6 +155,7 @@ public class Plan implements Session.Saveable {
   
   /**  Plan advancement and step selection/addition-
     */
+  /*
   public void advancePlan(int maxIterations) {
     while (maxIterations-- > 0) {
       if (verbose) I.say("\nAdvancing plan- "+this.hashCode());
@@ -252,6 +256,7 @@ public class Plan implements Session.Saveable {
   
   /**  Determining pre-conditions and keeping track of resource-reservations.
     */
+  /*
   protected boolean obtainedBefore(PlanStep step, Element need) {
     final Base base = agent.base();
     if (need.accessLevel(base) == Element.Access.GRANTED) return true;
@@ -276,6 +281,7 @@ public class Plan implements Session.Saveable {
   
   /**  Evaluating success-chance:
     */
+  /*
   public float successChance() {
     float chance = 1.0f;
     for (PlanStep step : steps) {
@@ -299,6 +305,7 @@ public class Plan implements Session.Saveable {
   
   /**  Debugging, graphics and interface methods-
     */
+  /*
   public void printFullPlan() {
     I.say("\n\nFinal plan: "+this.hashCode());
     for (PlanStep step : steps()) {
@@ -307,7 +314,7 @@ public class Plan implements Session.Saveable {
     }
   }
 }
-
+//*/
 
 
 

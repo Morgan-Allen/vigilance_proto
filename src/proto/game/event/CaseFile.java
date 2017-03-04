@@ -11,6 +11,8 @@ import proto.util.*;
 public class CaseFile implements Session.Saveable {
   
   
+  /**  Data fields, construction and save/load methods-
+    */
   final Base base;
   final public Object subject;
   List <Clue> clues = new List();
@@ -46,30 +48,8 @@ public class CaseFile implements Session.Saveable {
   
   /**  Extraction methods for use in sentencing-
     */
-  public Series <Event> involvedIn() {
-    Batch <Event> involved = new Batch();
-    /*
-    for (Role role : roles) {
-      if (defunct(role)) continue;
-      involved.add(role.event);
-    }
-    //*/
-    return involved;
-  }
-  
-  
-  public float evidenceForInvolvement(Event event) {
-    float evidence = 0;
-    /*
-    for (Role role : roles) if (role.event == event) {
-      evidence += role.maxEvidence;
-    }
-    //*/
-    return evidence;
-  }
-  
-  
   public void updateEvidenceFrom(CaseFile other) {
+    //  TODO:  Restore this!
     /*
     for (Role role : other.roles) for (Lead lead : role.evidence) {
       recordRole(role.event, role.roleID, lead);

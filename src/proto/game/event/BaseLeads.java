@@ -40,15 +40,13 @@ public class BaseLeads {
   public CaseFile caseFor(Object subject) {
     CaseFile match = files.get(subject);
     if (match != null) return match;
-    
     final CaseFile file = new CaseFile(base, subject);
     files.put(subject, file);
-    I.say("Creating case file for: "+subject);
     return file;
   }
   
   
-  Series <Clue> concerning(Crime crime, Element subject, int roleID) {
+  public Series <Clue> cluesFor(Crime crime, Object subject, int roleID) {
     Batch <Clue> matches = new Batch();
     CaseFile file = caseFor(subject);
     
@@ -60,6 +58,30 @@ public class BaseLeads {
     }
     return matches;
   }
+  
+  
+  public Series <Crime> involvedIn(Object subject) {
+    Batch <Crime> matches = new Batch();
+    CaseFile file = caseFor(subject);
+    
+    for (Clue c : file.clues) {
+      matches.include(c.crime);
+    }
+    return matches;
+  }
+  
+  
+  public float evidenceForInvolvement(Crime crime, Object subject) {
+    CaseFile file = caseFor(subject);
+    float evidence = 0;
+    
+    for (Clue c : file.clues) if (c.crime == crime) {
+      evidence += c.confidence;
+    }
+    return evidence;
+  }
+  
+  
   
 }
 

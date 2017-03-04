@@ -34,8 +34,8 @@ public class DefaultGame extends RunGame {
     initDefaultCrime  (world);
     
     for (Base base : world.bases()) if (base.faction().criminal) {
-      Plan initPlan = base.plans.generateNextPlan(4, 4, null);
-      base.plans.assignPlan(initPlan, 0);
+      Crime initCrime = base.plans.generateNextCrime();
+      base.plans.assignMasterCrime(initCrime);
     }
     return world;
   }
@@ -160,7 +160,7 @@ public class DefaultGame extends RunGame {
       world.addBase(base, false);
       base.addToRoster(base.leader());
       base.setGoonTypes(goonTypes);
-      base.plans.assignStepTypes(StepTypes.ALL_TYPES);
+      base.plans.assignCrimeTypes(CrimeTypes.ALL_TYPES);
       
       for (PersonType type : seniorTypes) {
         Person senior = Person.randomOfKind(type, world);
