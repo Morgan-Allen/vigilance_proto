@@ -6,10 +6,83 @@ import proto.game.person.*;
 import proto.game.world.*;
 import proto.util.*;
 
-import java.awt.Image;
+
+
+public class CaseFile implements Session.Saveable {
+  
+  
+  final Base base;
+  final public Object subject;
+  List <Clue> clues = new List();
+  
+  
+  
+  CaseFile(Base base, Object subject) {
+    this.base    = base   ;
+    this.subject = subject;
+  }
+  
+  
+  public CaseFile(Session s) throws Exception {
+    s.cacheInstance(this);
+    base    = (Base) s.loadObject();
+    subject =        s.loadObject();
+    
+    s.saveInt(clues.size());
+    for (Clue c : clues) c.saveClue(s);
+  }
+  
+  
+  public void saveState(Session s) throws Exception {
+    s.saveObject(base   );
+    s.saveObject(subject);
+    
+    for (int n = s.loadInt(); n-- > 0;) {
+      clues.add(Clue.loadClue(s));
+    }
+  }
+  
+  
+  
+  /**  Extraction methods for use in sentencing-
+    */
+  public Series <Event> involvedIn() {
+    Batch <Event> involved = new Batch();
+    /*
+    for (Role role : roles) {
+      if (defunct(role)) continue;
+      involved.add(role.event);
+    }
+    //*/
+    return involved;
+  }
+  
+  
+  public float evidenceForInvolvement(Event event) {
+    float evidence = 0;
+    /*
+    for (Role role : roles) if (role.event == event) {
+      evidence += role.maxEvidence;
+    }
+    //*/
+    return evidence;
+  }
+  
+  
+  public void updateEvidenceFrom(CaseFile other) {
+    /*
+    for (Role role : other.roles) for (Lead lead : role.evidence) {
+      recordRole(role.event, role.roleID, lead);
+    }
+    //*/
+  }
+  
+  
+}
 
 
 
+/*
 public class CaseFile implements Session.Saveable {
   
   
@@ -100,6 +173,7 @@ public class CaseFile implements Session.Saveable {
   /**  Recording involvement in criminal actions and other information
     *  updates-
     */
+  /*
   public Role recordCurrentRole(Event event, Lead lead) {
     int roleID = Visit.indexOf(subject, event.planStep().needs());
     if (roleID == -1) { I.complain("Subject not involved!"); return null; }
@@ -164,6 +238,7 @@ public class CaseFile implements Session.Saveable {
   
   /**  Information queries relevant to investigation options-
     */
+  /*
   Place knownLocation() {
     return knownLocation;
   }
@@ -263,6 +338,7 @@ public class CaseFile implements Session.Saveable {
   
   /**  Generating subsequent investigation options-
     */
+  /*
   public void refreshInvestigationOptions() {
     refreshOptions = true;
     investigationOptions();
@@ -306,10 +382,8 @@ public class CaseFile implements Session.Saveable {
     
     //  TODO:  I'm going to return to these later, and gradually add more
     //  options.
-    /*
     if (leadsTo instanceof Item || leadsTo instanceof Clue) {
     }
-    //*/
     
     if (subject instanceof Person) {
       final Person person = (Person) subject;
@@ -321,7 +395,6 @@ public class CaseFile implements Session.Saveable {
         Lead tailing = new LeadSurveil(base, person);
         tryAddingOption(tailing, followOptions, oldOptions);
       }
-      /*
       if (threatens != null && ! threatens.complete()) {
         Lead guarding = new LeadGuard(base, person.place(), threatens);
         tryAddingOption(guarding, followOptions, oldOptions);
@@ -329,7 +402,6 @@ public class CaseFile implements Session.Saveable {
       if (suspected != null) {
         //  TODO:  Include questioning and arrest options.
       }
-      //*/
     }
     
     if (subject instanceof Place) {
@@ -341,7 +413,6 @@ public class CaseFile implements Session.Saveable {
         Lead guarding = new LeadGuard(base, place, crime);
         tryAddingOption(guarding, followOptions, oldOptions);
       }
-      /*
       if (crime != null && ! crime.complete()) {
         Lead surveil = new LeadSurveil(base, place);
         tryAddingOption(surveil, followOptions, oldOptions);
@@ -349,7 +420,6 @@ public class CaseFile implements Session.Saveable {
       if (lair != null) {
         //  TODO:  Include the option to raid.
       }
-      //*/
     }
     
     scrubOldOptions(followOptions, oldOptions);
@@ -360,6 +430,7 @@ public class CaseFile implements Session.Saveable {
   
   /**  Rendering, debug and interface methods-
     */
+  /*
   final static Table <Integer, String> ROLE_DESC = Table.make(
     ROLE_GOON   , "<subject> <tense> an accomplice during the <event>.",
     ROLE_HIDEOUT, "<subject> <tense> a criminal hideout.",
@@ -439,6 +510,7 @@ public class CaseFile implements Session.Saveable {
     return "Case File: "+subject;
   }
 }
+//*/
 
 
 

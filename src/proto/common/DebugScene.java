@@ -51,6 +51,10 @@ public class DebugScene extends RunGame {
     plan.addStep(kidnapStep);
     boss.base().plans.assignPlan(plan, 0);
     
+    
+    //  TODO:  Just enter the scene directly.  Don't make this more complex
+    //  than it needs to be.
+    /*
     final Base base = world.playerBase();
     final Lead tipoff = new LeadTipoff(base, perp);
     final CaseFile file = base.leads.caseFor(home);
@@ -70,6 +74,7 @@ public class DebugScene extends RunGame {
       ID++;
     }
     guarding.setCompleted(true);
+    //*/
     
     return world;
   }

@@ -51,6 +51,7 @@ public class LeadsListView extends UINode {
     g.drawString(region.kind().name(), vx + across, vy + down);
     down += 20;
     
+    /*
     Lead hovered = null;
     
     for (CaseFile file : played.leads.casesForRegion(region)) {
@@ -108,6 +109,7 @@ public class LeadsListView extends UINode {
         g, vx + 25, vy + down + 20, vw - 30, 150
       );
     }
+    //*/
     
     return true;
   }

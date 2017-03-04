@@ -191,6 +191,7 @@ public class Common {
     1, Ability.NO_HARM, Ability.NO_POWER
   ) {
     
+    /*
     public float rateUsage(Action use) {
       PlanStep step = use.scene().triggerEventPlanStep();
       return step == null ? 0 : step.type.rateSpecialAction(use);
@@ -200,6 +201,7 @@ public class Common {
       PlanStep step = use.scene().triggerEventPlanStep();
       if (step != null) step.type.onSpecialActionEnd(use);
     }
+    //*/
   };
   
   

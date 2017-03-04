@@ -23,8 +23,7 @@ public class Event implements Session.Saveable, Assignment {
   final public EventType type;
   
   final World world;
-  PlanStep step  = null;
-  Place    place = null;
+  Place place = null;
   int timeBegins = -1;
   int duration   = -1;
   boolean complete;
@@ -42,7 +41,6 @@ public class Event implements Session.Saveable, Assignment {
     s.cacheInstance(this);
     type       = (EventType) s.loadObject();
     world      = (World    ) s.loadObject();
-    step       = (PlanStep ) s.loadObject();
     place      = (Place    ) s.loadObject();
     timeBegins = s.loadInt ();
     duration   = s.loadInt ();
@@ -54,7 +52,6 @@ public class Event implements Session.Saveable, Assignment {
   public void saveState(Session s) throws Exception {
     s.saveObject(type      );
     s.saveObject(world     );
-    s.saveObject(step      );
     s.saveObject(place     );
     s.saveInt   (timeBegins);
     s.saveInt   (duration  );
@@ -67,13 +64,8 @@ public class Event implements Session.Saveable, Assignment {
   /**  Supplemental setup/progression methods-
     */
   public void assignParameters(
-    PlanStep step, Place place, int durationHours
+    Place place, int durationHours
   ) {
-    if (step == null || place == null) {
-      I.complain("Step/place were: "+step+"/"+place+", must be non-null!");
-      return;
-    }
-    this.step     = step;
     this.place    = place;
     this.duration = durationHours * World.MINUTES_PER_HOUR;
   }
@@ -81,11 +73,6 @@ public class Event implements Session.Saveable, Assignment {
   
   public World world() {
     return place.world();
-  }
-  
-  
-  public PlanStep planStep() {
-    return step;
   }
   
   
@@ -108,8 +95,9 @@ public class Event implements Session.Saveable, Assignment {
   
   
   public boolean allowsAssignment(Person p) {
-    if (step == null) return false;
-    return Visit.arrayIncludes(step.needs(), p);
+    //if (step == null) return false;
+    //return Visit.arrayIncludes(step.needs(), p);
+    return true;
   }
   
   
@@ -149,6 +137,8 @@ public class Event implements Session.Saveable, Assignment {
   
   
   public void beginEvent() {
+    return;
+    /*
     if (step != null) {
       Base played = world().playerBase();
       Place place = targetLocation();
@@ -184,6 +174,7 @@ public class Event implements Session.Saveable, Assignment {
         }
       }
     }
+    //*/
   }
   
   
@@ -196,10 +187,11 @@ public class Event implements Session.Saveable, Assignment {
   /**  Helping with scene configuration and after-effects:
     */
   public Series <Person> populateScene(Scene scene) {
-    if (step == null) return new Batch();
-    final Series <Person> forces = step.type.generateGroundForces(this);
-    scene.entry.provideInProgressEntry(forces);
-    return forces;
+    //if (step == null) return new Batch();
+    //final Series <Person> forces = step.type.generateGroundForces(this);
+    //scene.entry.provideInProgressEntry(forces);
+    //return forces;
+    return new Batch();
   }
   
   
@@ -208,12 +200,15 @@ public class Event implements Session.Saveable, Assignment {
     involved.clear();
     complete = true;
     
+    /*
     if (step == null) return;
     EventReport report = new EventReport();
     step.type.updateReport(this, report);
     step.type.applyEffectsAfter(this);
     report.applyOutcomeEffects(targetLocation());
+    //*/
     
+    /*
     if (dangerous()) {
       Base played = world().playerBase();
       final Lead crimeReport = new LeadCrimeReport(played, this);
@@ -221,6 +216,7 @@ public class Event implements Session.Saveable, Assignment {
       Object role = file.recordRole(this, CaseFile.ROLE_CRIME, crimeReport);
       presentTipoffMessage(REPORT_HEADER, "", file, role, report);
     }
+    //*/
   }
   
   
@@ -230,9 +226,9 @@ public class Event implements Session.Saveable, Assignment {
     complete = true;
     world.events.closeEvent(this);
     
-    if (step == null) return;
-    step.type.updateReport(this, report);
-    if (! report.playerWon()) step.type.applyEffectsAfter(this);
+    //if (step == null) return;
+    //step.type.updateReport(this, report);
+    //if (! report.playerWon()) step.type.applyEffectsAfter(this);
   }
   
   
@@ -274,6 +270,7 @@ public class Event implements Session.Saveable, Assignment {
   }
   
   
+  /*
   final static String
     TIPOFF_HEADER = "New Tipoff",
     REPORT_HEADER = "News Report";
@@ -303,6 +300,8 @@ public class Event implements Session.Saveable, Assignment {
       }
     });
   }
+  //*/
+  
 }
 
 

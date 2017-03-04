@@ -3,14 +3,12 @@
 package proto.game.event;
 import proto.common.*;
 import proto.game.person.*;
-import proto.game.scene.Scene;
 import proto.game.world.*;
 import proto.util.*;
 
 
 
 public class PlanStep implements Session.Saveable {
-  
   
   
   /**  Data fields, construction and save/load methods-
@@ -275,7 +273,7 @@ public class PlanStep implements Session.Saveable {
       if ((place = e.place()) != null) break;
     }
     
-    event.assignParameters(this, place, Task.TIME_SHORT);
+    event.assignParameters(place, Task.TIME_SHORT);
     return event;
   }
   

@@ -29,7 +29,7 @@ public class EventReport implements Session.Saveable {
   public float forceRating, collateralRating, getawaysRating;
   public float trustEffect, deterEffect;
   public List <Person> involved = new List();
-  public List <Lead> newLeads = new List();
+  public List <Object> newLeads = new List();
   
   
   public EventReport() {

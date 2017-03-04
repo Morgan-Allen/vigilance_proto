@@ -152,10 +152,12 @@ public class MapInsetView extends UINode {
         Color.RED, Color.BLACK, crimeLevel, false, g
       );
       
+      /*
       Series <CaseFile> files = played.leads.casesForRegion(n);
       if (! files.empty()) {
         g.drawImage(mainView.alertMarker, x - 25, y - 25, 50, 50, null);
       }
+      //*/
       
       ViewUtils.renderAssigned(visitors(n), x + 25, y + 25, surface, g);
     }

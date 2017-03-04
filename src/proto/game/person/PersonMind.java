@@ -97,12 +97,14 @@ public class PersonMind {
         }
       }
       
+      /*
       PlanStep planStep = scene.triggerEventPlanStep();
       if (planStep != null) {
         Action special = planStep.type.specialAction(person, planStep, scene);
         float rating = special == null ? 0 : special.used.rateUsage(special);
         pick.compare(special, rating * 0.5f);
       }
+      //*/
     }
     if (pick.empty()) {
       Batch <Person> foes = new Batch();

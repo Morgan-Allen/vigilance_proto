@@ -130,9 +130,10 @@ public abstract class StepType extends EventType {
   
   
   public Series <Person> generateGroundForces(Event event) {
-    final PlanStep step = event.planStep();
     final List <Person> forces = new List();
     
+    /*
+    final PlanStep step = event.planStep();
     for (Element e : step.needs()) {
       if (e == null || e.type != Kind.TYPE_PERSON) continue;
       forces.add((Person) e);
@@ -150,6 +151,7 @@ public abstract class StepType extends EventType {
       forceSum += goon.stats.powerLevel();
       forces.add(goon);
     }
+    //*/
     
     return forces;
   }
@@ -163,12 +165,14 @@ public abstract class StepType extends EventType {
   
   
   protected void applyEffectsAfter(Event event) {
+    /*
     final PlanStep step = event.planStep();
     final Base base = step.plan.agent.base();
     for (Element e : step.gives()) {
       base.world().setInside(e, true);
       base.setAttached(e, true);
     }
+    //*/
     return;
   }
   
@@ -180,14 +184,16 @@ public abstract class StepType extends EventType {
   
 
   protected String nameFor(Event event) {
-    PlanStep step = event.step;
-    return langDescription(step);
+    return null;
+    //PlanStep step = event.step;
+    //return langDescription(step);
   }
   
   
   protected String infoFor(Event event) {
-    PlanStep step = event.step;
-    return step.longDescription();
+    return null;
+    //PlanStep step = event.step;
+    //return step.longDescription();
   }
 }
 

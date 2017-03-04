@@ -185,9 +185,11 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   }
   
   
+  /*
   public PlanStep triggerEventPlanStep() {
     return triggerEvent == null ? null : triggerEvent.planStep();
   }
+  //*/
   
   
   public boolean begun() {

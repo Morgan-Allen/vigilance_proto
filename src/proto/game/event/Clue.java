@@ -3,44 +3,49 @@
 package proto.game.event;
 import proto.common.*;
 import proto.game.world.*;
-import proto.game.person.*;
-import proto.util.*;
 
 
 
-public class Clue extends Element {
+public class Clue {
   
   
-  Session.Saveable revealed;
-  Trait traitKey;
-  float expireCount = Task.TIME_MEDIUM * World.MINUTES_PER_HOUR;
+  /**  Data fields, construction and save/load methods-
+    */
+  Object subject;
+  Crime crime;
+  int roleID;
+  
+  int leadType;
+  Object trait;
+  float confidence;
   
   
-  public Clue(ClueType kind, World world, Session.Saveable revealed) {
-    super(kind, world);
-    this.revealed = revealed;
+  static Clue loadClue(Session s) throws Exception {
+    Clue c = new Clue();
+    c.subject    = s.loadObject();
+    c.crime      = (Crime) s.loadObject();
+    c.roleID     = s.loadInt();
+    c.leadType   = s.loadInt();
+    c.trait      = s.loadObject();
+    c.confidence = s.loadFloat();
+    return c;
   }
   
   
-  public Clue(Session s) throws Exception {
-    super(s);
-    revealed    = s.loadObject();
-    traitKey    = (Trait) s.loadObject();
-    expireCount = s.loadFloat();
-  }
-  
-  
-  public void saveState(Session s) throws Exception {
-    super.saveState(s);
-    s.saveObject(revealed);
-    s.saveObject(traitKey);
-    s.saveFloat(expireCount);
-  }
-  
-  
-  public ClueType kind() {
-    return (ClueType) kind;
+  void saveClue(Session s) throws Exception {
+    s.saveObject(subject   );
+    s.saveObject(crime     );
+    s.saveInt   (roleID    );
+    s.saveInt   (leadType  );
+    s.saveObject(trait     );
+    s.saveFloat (confidence);
   }
 }
+
+
+
+
+
+
 
 

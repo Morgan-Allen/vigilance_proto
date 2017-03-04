@@ -12,7 +12,7 @@ public class BaseLeads {
   
   
   final Base base;
-  List <CaseFile> files = new List();
+  Table <Object, CaseFile> files = new Table();
   
   
   public BaseLeads(Base base) {
@@ -21,19 +21,16 @@ public class BaseLeads {
   
   
   public void loadState(Session s) throws Exception {
-    s.loadObjects(files);
+    s.loadTable(files);
   }
   
   
   public void saveState(Session s) throws Exception {
-    s.saveObjects(files);
+    s.saveTable(files);
   }
   
   
   public void updateLeads() {
-    for (CaseFile file : files) {
-      file.updateLeads();
-    }
   }
   
   
@@ -41,51 +38,30 @@ public class BaseLeads {
   /**  Assorted utility methods-
     */
   public CaseFile caseFor(Object subject) {
-    for (CaseFile file : files) if (file.subject == subject) {
-      return file;
-    }
+    CaseFile match = files.get(subject);
+    if (match != null) return match;
+    
     final CaseFile file = new CaseFile(base, subject);
-    files.add(file);
-    I.say("Creating case file for: "+subject+", location: "+file.trueLocation());
+    files.put(subject, file);
+    I.say("Creating case file for: "+subject);
     return file;
   }
   
   
-  public Event threateningEvent(Element subject) {
-    for (CaseFile file : files) {
-      Event e = file.threatens(subject);
-      if (e != null) return e;
+  Series <Clue> concerning(Crime crime, Element subject, int roleID) {
+    Batch <Clue> matches = new Batch();
+    CaseFile file = caseFor(subject);
+    
+    for (Clue c : file.clues) {
+      if (crime   != null && crime   != c.crime  ) continue;
+      if (subject != null && subject != c.subject) continue;
+      if (roleID  != -1   && roleID  != c.roleID ) continue;
+      matches.add(c);
     }
-    return null;
-  }
-  
-  
-  public Batch <CaseFile> casesForRegion(Region region) {
-    final Batch <CaseFile> cases = new Batch();
-    for (CaseFile file : files) if (file.lastSuspectEvent() != null) {
-      Place seen = file.trueLocation();
-      if (seen != null && seen.region() == region) cases.add(file);
-    }
-    return cases;
-  }
-  
-  
-  public Batch <CaseFile> allOpenCases() {
-    final Batch <CaseFile> cases = new Batch();
-    for (CaseFile file : files) if (file.lastSuspectEvent() != null) {
-      cases.add(file);
-    }
-    return cases;
+    return matches;
   }
   
 }
-
-
-
-
-
-
-
 
 
 

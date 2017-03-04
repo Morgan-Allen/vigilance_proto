@@ -6,6 +6,7 @@
 package proto.common;
 import java.io.*;
 import java.lang.reflect.*;
+import java.util.Map;
 
 import proto.util.*;
 
@@ -273,6 +274,26 @@ public final class Session {
       final Object o = loadObject();
       final float val = loadFloat();
       t.set(o, val);
+    }
+    return t;
+  }
+  
+  
+  public void saveTable(Table t) throws Exception {
+    saveInt(t.size());
+    for (Object o : t.entrySet()) {
+      Map.Entry entry = (Map.Entry) o;
+      saveObject(entry.getKey  ());
+      saveObject(entry.getValue());
+    }
+  }
+  
+  
+  public Table loadTable(Table t) throws Exception {
+    for (int n = loadInt(); n-- > 0;) {
+      final Object key = loadObject();
+      final Object val = loadObject();
+      t.put(key, val);
     }
     return t;
   }
