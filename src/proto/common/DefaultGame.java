@@ -170,7 +170,6 @@ public class DefaultGame extends RunGame {
       for (Person p : base.roster()) {
         world.setInside(p, true);
         base.setAttached(p, true);
-        I.say("Location of "+p+" is "+p.place());
       }
     }
   }

@@ -231,7 +231,7 @@ public class Base extends Place {
   
   
   public String toString() {
-    return faction.name;
+    return faction.name+" Headquarters";
   }
 }
 

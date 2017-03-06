@@ -25,6 +25,8 @@ public class Place extends Element {
     super(kind, world);
     this.slotID        = slotID;
     this.buildProgress = 1.0f;
+    
+    for (Trait t : kind.baseTraits()) setProperty(t, true);
   }
   
   

@@ -433,6 +433,12 @@ public class PersonStats {
   }
   
   
+  public void addTrait(Trait t) {
+    if (levelFor(t) > 0) return;
+    setLevel(t, 1, false);
+  }
+  
+  
   public void gainXP(Trait stat, float XP) {
     final Level l = getLevel(stat);
     l.xpGained += XP;

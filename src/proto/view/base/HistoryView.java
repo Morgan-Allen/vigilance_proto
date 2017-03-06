@@ -36,7 +36,8 @@ public class HistoryView extends UINode {
       "Tense", "Unfriendly", "Hostile", "Nemesis"
     };
     
-    for (Person other : person.history.sortedBonds()) {
+    for (Element b : person.history.sortedBonds()) if (b.isPerson()) {
+      Person other = (Person) b;
       float value = person.history.valueFor(other);
       
       g.drawImage(other.kind().sprite(), vx + 5, vy + down + 5, 40, 40, null);

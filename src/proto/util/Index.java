@@ -49,6 +49,11 @@ public class Index <T extends Index.Entry> implements Iterable <T> {
     public String entryKey() {
       return key;
     }
+    
+    
+    public String toString() {
+      return key+"("+uniqueID+")";
+    }
   }
   
   

@@ -11,22 +11,51 @@ import proto.util.*;
 public abstract class Crime extends Event {
   
   
+  /**  Role-definitions-
+    */
+  final static Index <RoleType> ROLES_INDEX = new Index <RoleType> ();
+  
+  static class RoleType extends Index.Entry implements Session.Saveable {
+    
+    public RoleType(String ID) {
+      super(ROLES_INDEX, ID);
+    }
+    
+    public static RoleType loadConstant(Session s) throws Exception {
+      return ROLES_INDEX.loadEntry(s.input());
+    }
+    
+    public void saveState(Session s) throws Exception {
+      ROLES_INDEX.saveEntry(this, s.output());
+    }
+  }
+  
+  protected class Role {
+    
+    RoleType roleID;
+    Element element;
+    Crime supplies;
+    
+    public String toString() {
+      return roleID.entryKey()+" ("+element+")";
+    }
+  }
+  
+  //  TODO:  Include default roles for 'base', 'hideout' and 'target'!
+  
+  
+  
   /**  Data fields, construction and save/load methods-
     */
   Base base;
   Place hideout;
   Element target;
-  
-  protected class Role {
-    int roleID;
-    Element element;
-  }
-  
   List <Role> roles = new List();
   
   
-  protected Crime(CrimeType type, World world) {
-    super(type, world);
+  protected Crime(CrimeType type, Base base) {
+    super(type, base.world());
+    this.base = base;
   }
   
   
@@ -35,6 +64,13 @@ public abstract class Crime extends Event {
     base    = (Base   ) s.loadObject();
     hideout = (Place  ) s.loadObject();
     target  = (Element) s.loadObject();
+    
+    for (int n = s.loadInt(); n-- > 0;) {
+      Role role = new Role();
+      role.roleID   = (Crime.RoleType) s.loadObject();
+      role.element  = (Element) s.loadObject();
+      role.supplies = (Crime  ) s.loadObject();
+    }
   }
   
   
@@ -43,36 +79,88 @@ public abstract class Crime extends Event {
     s.saveObject(base   );
     s.saveObject(hideout);
     s.saveObject(target );
+    
+    s.saveInt(roles.size());
+    for (Role role : roles) {
+      s.saveObject(role.roleID  );
+      s.saveObject(role.element );
+      s.saveObject(role.supplies);
+    }
   }
-  
-  
-  
-  /**  Clue extraction-
-    */
   
   
   
   /**  Utility methods for assigning roles, fulfilling needs and evaluating
     *  possible targets-
     */
-  public void assignRole(Element element, int roleID) {
-    Role match = roleFor(element);
+  public void assignTarget(Element target) {
+    this.target = target;
+  }
+  
+  
+  public void assignHideout(Place hideout) {
+    this.hideout = hideout;
+  }
+  
+  
+  public void assignRole(Element element, RoleType roleID) {
+    Role match = roleFor(element, roleID);
     if (match == null) roles.add(match = new Role());
     match.roleID  = roleID ;
     match.element = element;
   }
   
   
-  Role roleFor(Element element) {
+  protected Role roleFor(Element element, RoleType roleID) {
     for (Role role : roles) {
-      if (role.element == element) return role;
+      if (element != null && element != role.element) continue;
+      if (roleID  != null && roleID  != role.roleID ) continue;
+      return role;
     }
     return null;
   }
   
   
-  protected Series <Person> onRoster() {
-    return base.roster();
+  protected void fillExpertRole(
+    Trait trait, Series <Person> candidates, RoleType roleID
+  ) {
+    Pick <Person> pick = new Pick();
+    for (Person p : candidates) {
+      if (roleFor(p, null) != null) continue;
+      pick.compare(p, p.stats.levelFor(trait));
+    }
+    if (pick.empty()) return;
+    assignRole(pick.result(), roleID);
+  }
+  
+  
+  protected void fillInsideRole(
+    Place target, Crime.RoleType roleID
+  ) {
+    Pick <Person> pick = new Pick();
+    for (Person p : target.residents()) {
+      if (roleFor(p, null) != null) continue;
+      pick.compare(p, 0 - p.history.valueFor(target.owner()));
+    }
+    if (pick.empty()) return;
+    assignRole(pick.result(), roleID);
+  }
+  
+  
+  protected void fillItemRole(
+    ItemType type, World world, RoleType roleID
+  ) {
+    assignRole(new Item(type, world), roleID);
+  }
+  
+  
+  protected Series <Person> goonsOnRoster() {
+    Batch <Person> goons = new Batch();
+    for (Person p : base.roster()) {
+      if (p == base.leader()) continue;
+      goons.add(p);
+    }
+    return goons;
   }
   
   

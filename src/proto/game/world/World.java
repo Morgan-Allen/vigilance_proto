@@ -159,6 +159,12 @@ public class World implements Session.Saveable {
   }
   
   
+  public Base baseFor(Faction faction) {
+    for (Base b : bases) if (b.faction == faction) return b;
+    return null;
+  }
+  
+  
   public Series <Base> bases() {
     return bases;
   }

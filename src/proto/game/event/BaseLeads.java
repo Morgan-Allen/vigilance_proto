@@ -11,6 +11,8 @@ import proto.util.*;
 public class BaseLeads {
   
   
+  /**  Data fields, construction and save/load methods-
+    */
   final Base base;
   Table <Object, CaseFile> files = new Table();
   
@@ -46,14 +48,16 @@ public class BaseLeads {
   }
   
   
-  public Series <Clue> cluesFor(Crime crime, Object subject, int roleID) {
+  public Series <Clue> cluesFor(
+    Crime crime, Object match, Crime.RoleType roleID
+  ) {
     Batch <Clue> matches = new Batch();
-    CaseFile file = caseFor(subject);
+    CaseFile file = caseFor(match);
     
     for (Clue c : file.clues) {
-      if (crime   != null && crime   != c.crime  ) continue;
-      if (subject != null && subject != c.subject) continue;
-      if (roleID  != -1   && roleID  != c.roleID ) continue;
+      if (crime  != null && crime  != c.crime ) continue;
+      if (match  != null && match  != c.match ) continue;
+      if (roleID != null && roleID != c.roleID) continue;
       matches.add(c);
     }
     return matches;

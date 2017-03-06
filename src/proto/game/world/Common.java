@@ -208,7 +208,7 @@ public class Common {
   //
   //  Persons have a couple of randomly-defined basic traits.
   final public static Trait HAIR_COLOURS[] = Trait.traitsWith(
-    "hair", "XXX",
+    "hair", null,
     "Hair: Red"   ,
     "Hair: Blonde",
     "Hair: Brown" ,
@@ -217,14 +217,14 @@ public class Common {
     "Hair: White"
   );
   final public static Trait EYE_COLOURS[] = Trait.traitsWith(
-    "eyes", "XXX",
+    "eyes", null,
     "Eyes: Grey" ,
     "Eyes: Green",
     "Eyes: Brown",
     "Eyes: Blue"
   );
   final public static Trait RACES[] = Trait.traitsWith(
-    "race", "XXX",
+    "race", null,
     "Race: Black"  ,
     "Race: Indian" ,
     "Race: Asian"  ,
@@ -233,14 +233,19 @@ public class Common {
     "Race: Mixed"
   );
   final public static Trait BUILD[] = Trait.traitsWith(
-    "build", "XXX",
+    "build", null,
     "Build: Stout" ,
     "Build: Skinny",
     "Build: Tall"  ,
-    "Build: Petit"
+    "Build: Small"
+  );
+  final public static Trait SEX[] = Trait.traitsWith(
+    "sex", null,
+    "Sex: Male"  ,
+    "Sex: Female"
   );
   final public static Trait PERSON_TRAITS[] = (Trait[]) Visit.compose(
-    Trait.class, HAIR_COLOURS, EYE_COLOURS, RACES, BUILD
+    Trait.class, HAIR_COLOURS, EYE_COLOURS, RACES, BUILD, SEX
   );
   
   //
@@ -249,7 +254,7 @@ public class Common {
   //  Hot, Cold, Wet, Sunny?
   //  Treat proximities as traits?
   final public static Trait VENUE_TRAITS[] = Trait.traitsWith(
-    "place_trait", "XXX",
+    "place_trait", null,
     "Rural"     ,
     "Industrial",
     "Medical"   ,

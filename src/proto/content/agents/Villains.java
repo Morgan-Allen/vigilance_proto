@@ -3,6 +3,8 @@
 package proto.content.agents;
 import proto.common.*;
 import proto.game.person.*;
+import proto.game.world.Common;
+
 import static proto.game.person.PersonStats.*;
 
 
@@ -22,7 +24,14 @@ public class Villains {
       MUSCLE  , 3 ,
       
       QUESTION, 5 ,
-      PERSUADE, 8
+      PERSUADE, 8,
+      
+      //  TODO:  Allow for more explicit reference later...
+      Common.HAIR_COLOURS[2],
+      Common.EYE_COLOURS[0],
+      Common.BUILD[1],
+      Common.RACES[3],
+      Common.SEX[1]
     ),
     SNAKE_EYES = new PersonType(
       "Snake Eyes", "villain_kind_snake_eyes", IMG_DIR+"icon_snake_eyes.png",
@@ -34,7 +43,14 @@ public class Villains {
       MUSCLE  , 6 ,
       
       QUESTION, 8 ,
-      PERSUADE, 4
+      PERSUADE, 4 ,
+      
+      //  TODO:  Allow for more explicit reference later...
+      Common.HAIR_COLOURS[4],
+      Common.EYE_COLOURS[1],
+      Common.BUILD[2],
+      Common.RACES[3],
+      Common.SEX[0]
     )
   ;
 }

@@ -12,6 +12,8 @@ import proto.util.*;
 public abstract class CrimeType extends EventType {
   
   
+  /**  Construction-
+    */
   protected CrimeType(
     String name, String ID, String iconPath
   ) {
@@ -21,4 +23,27 @@ public abstract class CrimeType extends EventType {
   
   protected abstract Crime initCrime(Base base);
   
+
+  
+  /**  Rendering and interface:
+    */
+  protected String nameFor(Event event) {
+    Crime c = (Crime) event;
+    return name+": "+c.target;
+  }
+  
+  
+  protected String infoFor(Event event) {
+    //  TODO:  Fill this in.  (A lot of these probably aren't needed anyway...)
+    return null;
+  }
 }
+
+
+
+
+
+
+
+
+

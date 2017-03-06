@@ -121,7 +121,14 @@ public class Person extends Element {
     final String
       firsts[] = kind.firstNames(), lasts[] = kind.lastNames(),
       name = Rand.pickFrom(firsts)+" "+Rand.pickFrom(lasts);
+    
     Person person = new Person(kind, world, name);
+    person.stats.addTrait((Trait) Rand.pickFrom(Common.BUILD       ));
+    person.stats.addTrait((Trait) Rand.pickFrom(Common.RACES       ));
+    person.stats.addTrait((Trait) Rand.pickFrom(Common.EYE_COLOURS ));
+    person.stats.addTrait((Trait) Rand.pickFrom(Common.HAIR_COLOURS));
+    person.stats.addTrait((Trait) Rand.pickFrom(Common.SEX         ));
+    
     return person;
   }
   

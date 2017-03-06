@@ -39,7 +39,8 @@ public class Trait extends Index.Entry implements Session.Saveable {
   ) {
     Trait traits[] = new Trait[names.length];
     for (int i = 0 ; i < names.length; i++) traits[i] = new Trait(
-      names[i], prefixID+"_"+names[i], baseImgPath+names[i], ""
+      names[i], prefixID+"_"+names[i],
+      baseImgPath == null ? null : baseImgPath+names[i], ""
     );
     return traits;
   }

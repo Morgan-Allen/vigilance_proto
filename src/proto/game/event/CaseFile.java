@@ -46,6 +46,28 @@ public class CaseFile implements Session.Saveable {
   
   
   
+  /**  Resolving possible suspects:
+    */
+  public Series <Element> matchingSuspects(Series <Element> possible) {
+    Batch <Element> matches = new Batch();
+    search: for (Element e : possible) {
+      for (Clue c : clues) if (c.trait != null) {
+        if (e.isPerson()) {
+          Person p = (Person) e;
+          if (p.stats.levelFor(c.trait) <= 0) continue search;
+        }
+        if (e.isPlace()) {
+          Place p = (Place) e;
+          if (! p.hasProperty(c.trait)) continue search;
+        }
+        matches.add(e);
+      }
+    }
+    return matches;
+  }
+  
+  
+  
   /**  Extraction methods for use in sentencing-
     */
   public void updateEvidenceFrom(CaseFile other) {
