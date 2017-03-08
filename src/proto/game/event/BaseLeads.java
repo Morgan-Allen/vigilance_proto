@@ -49,15 +49,15 @@ public class BaseLeads {
   
   
   public Series <Clue> cluesFor(
-    Crime crime, Object match, Crime.RoleType roleID
+    Crime crime, Object match, Crime.Role role
   ) {
     Batch <Clue> matches = new Batch();
     CaseFile file = caseFor(match);
     
     for (Clue c : file.clues) {
-      if (crime  != null && crime  != c.crime ) continue;
-      if (match  != null && match  != c.match ) continue;
-      if (roleID != null && roleID != c.roleID) continue;
+      if (crime != null && crime != c.crime ) continue;
+      if (match != null && match != c.match ) continue;
+      if (role  != null && role  != c.role) continue;
       matches.add(c);
     }
     return matches;

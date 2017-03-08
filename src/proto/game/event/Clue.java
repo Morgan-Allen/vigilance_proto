@@ -12,7 +12,7 @@ public class Clue {
   /**  Data fields, construction and save/load methods-
     */
   Crime crime;
-  Crime.RoleType roleID;
+  Crime.Role role;
   Object match;
   
   int leadType;
@@ -26,16 +26,16 @@ public class Clue {
   }
   
   
-  Clue(Crime crime, Crime.RoleType roleID) {
-    this.crime  = crime ;
-    this.roleID = roleID;
+  Clue(Crime crime, Crime.Role role) {
+    this.crime = crime;
+    this.role  = role ;
   }
   
   
   static Clue loadClue(Session s) throws Exception {
     Clue c = new Clue();
-    c.crime      = (Crime) s.loadObject();
-    c.roleID     = (Crime.RoleType) s.loadObject();
+    c.crime      = (Crime     ) s.loadObject();
+    c.role       = (Crime.Role) s.loadObject();
     c.match      = s.loadObject();
     c.leadType   = s.loadInt();
     c.trait      = (Trait) s.loadObject();
@@ -47,7 +47,7 @@ public class Clue {
   
   void saveClue(Session s) throws Exception {
     s.saveObject(crime     );
-    s.saveObject(roleID    );
+    s.saveObject(role    );
     s.saveObject(match     );
     s.saveInt   (leadType  );
     s.saveObject(trait     );
@@ -80,7 +80,7 @@ public class Clue {
   public String toString() {
     if (trait != null) return
       Lead.LEAD_DESC[leadType]+" indicates "+
-      roleID.entryKey()+" has trait: "+trait
+      role.entryKey()+" has trait: "+trait
     ;
     return "";
   }

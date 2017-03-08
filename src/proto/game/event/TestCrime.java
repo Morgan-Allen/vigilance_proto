@@ -14,10 +14,10 @@ import static proto.game.person.PersonStats.*;
 public class TestCrime {
   
   
-  final static Crime.RoleType
-    ROLE_TAILS = new Crime.RoleType("role_tails"),
-    ROLE_GRABS = new Crime.RoleType("role_grabs"),
-    ROLE_DRUGS = new Crime.RoleType("role_drugs");
+  final static Crime.Role
+    ROLE_TAILS = new Crime.Role("role_tails"),
+    ROLE_GRABS = new Crime.Role("role_grabs"),
+    ROLE_DRUGS = new Crime.Role("role_drugs");
   
   static CrimeType TYPE_KIDNAP = new CrimeType(
     "Kidnapping", "crime_type_kidnap", null
@@ -45,14 +45,16 @@ public class TestCrime {
         pick.compare(p, Rand.num());
       }
     }
-    kidnap.assignTarget(pick.result());
+    
+    Person target = pick.result();
     Series <Person> goons = kidnap.goonsOnRoster();
     
+    kidnap.assignTarget(target, target.resides());
     kidnap.fillExpertRole(SIGHT_RANGE, goons, ROLE_TAILS);
     kidnap.fillExpertRole(MEDICINE   , goons, ROLE_DRUGS);
     kidnap.fillExpertRole(MUSCLE     , goons, ROLE_GRABS);
     
-    I.say("Roles are: "+kidnap.roles);
+    I.say("Roles are: "+kidnap.entries);
     Lead lead = new Lead(kidnap, Lead.TYPE_CANVAS, 0.5f);
     I.say("Assessing possible clues for: "+kidnap);
     for (Clue clue : lead.possibleClues(kidnap, null, null)) {
@@ -62,10 +64,6 @@ public class TestCrime {
   
   
 }
-
-
-
-
 
 
 

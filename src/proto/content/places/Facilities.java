@@ -36,7 +36,9 @@ public class Facilities {
     EMPLOYMENT, 3,
     HEALTH, -2,
     INCOME, 200,
-    Civilians.CIVILIAN, 2
+    Civilians.CIVILIAN, 2,
+    Common.VENUE_INDUSTRIAL,
+    Common.VENUE_SLUM
   ) {
     public float speedBonus(Task task) {
       if (task.needsSkill(PersonStats.ENGINEERING)) return 0.1f;
@@ -53,7 +55,9 @@ public class Facilities {
     EMPLOYMENT, 3,
     HEALTH, -2,
     INCOME, 200,
-    Civilians.CIVILIAN, 2
+    Civilians.CIVILIAN, 2,
+    Common.VENUE_INDUSTRIAL,
+    Common.VENUE_SLUM
   ){
     public float speedBonus(Task task) {
       if (task.needsSkill(PersonStats.MEDICINE)) return 0.1f;
@@ -72,7 +76,9 @@ public class Facilities {
     EDUCATION, -1,
     DETERRENCE, 10,
     INCOME, -100,
-    Civilians.CIVILIAN, 1
+    Civilians.CIVILIAN, 1,
+    Common.VENUE_OFFICE,
+    Common.VENUE_INDUSTRIAL
   );
   
   final public static PlaceType BUSINESS_PARK = new PlaceType(
@@ -83,7 +89,9 @@ public class Facilities {
     750, BUILD_TIME_MEDIUM, URBAN_SCENE,
     EMPLOYMENT, 1,
     INCOME, 200,
-    Civilians.BROKER, 1
+    Civilians.BROKER, 1,
+    Common.VENUE_COMMERCIAL,
+    Common.VENUE_INDUSTRIAL
   );
   
   final public static PlaceType TECH_STARTUP = new PlaceType(
@@ -96,7 +104,9 @@ public class Facilities {
     EMPLOYMENT, 1,
     EDUCATION, 1,
     INCOME, -100,
-    Civilians.INVENTOR, 1
+    Civilians.INVENTOR, 1,
+    Common.VENUE_OFFICE,
+    Common.VENUE_SCIENTIFIC
   );
   
   final public static PlaceType CITY_PARK = new PlaceType(
@@ -106,7 +116,8 @@ public class Facilities {
     "mind.",
     500, BUILD_TIME_LONG, URBAN_SCENE,
     HEALTH, 1,
-    DIVERSION, 1
+    DIVERSION, 1,
+    Common.VENUE_RURAL, Common.VENUE_CIVIC
   );
   
   final public static PlaceType SOUP_KITCHEN = new PlaceType(
@@ -117,7 +128,8 @@ public class Facilities {
     600, BUILD_TIME_SHORT, URBAN_SCENE,
     TRUST, 10,
     VIOLENCE, -10,
-    INCOME, -100
+    INCOME, -100,
+    Common.VENUE_DOMESTIC, Common.VENUE_MEDICAL
   );
   
   final public static PlaceType COMMUNITY_COLLEGE = new PlaceType(
@@ -130,7 +142,8 @@ public class Facilities {
     EDUCATION, 2,
     TRUST, 10,
     INCOME, -100,
-    Civilians.DOCTOR, 1
+    Civilians.DOCTOR, 1,
+    Common.VENUE_ACADEMIC, Common.VENUE_OFFICE
   );
   
   

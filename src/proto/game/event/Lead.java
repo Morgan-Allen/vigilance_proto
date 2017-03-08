@@ -62,38 +62,38 @@ public class Lead {
   
   
   Series <Clue> possibleClues(
-    Crime crime, Object match, Crime.RoleType roleID
+    Crime crime, Object match, Crime.Role role
   ) {
     final Batch <Clue> possible = new Batch();
     final int time = crime.base.world().timing.totalHours();
     
-    for (Crime.Role role : crime.roles) {
-      if (match  != null && role.element != match ) continue;
-      if (roleID != null && role.roleID  != roleID) continue;
+    for (Crime.RoleEntry entry : crime.entries) {
+      if (match != null && entry.element != match) continue;
+      if (role  != null && entry.role    != role ) continue;
       
-      if (role.element.isPerson()) {
-        Person p = (Person) role.element;
+      if (entry.element.isPerson()) {
+        Person p = (Person) entry.element;
         for (Trait t : Common.PERSON_TRAITS) {
           if (p.stats.levelFor(t) <= 0) continue;
-          Clue clue = new Clue(crime, role.roleID);
+          Clue clue = new Clue(crime, entry.role);
           clue.assignEvidence(t, leadType, confidence, time);
           possible.add(clue);
         }
       }
       
-      if (role.element.isPlace()) {
-        Place p = (Place) role.element;
+      if (entry.element.isPlace()) {
+        Place p = (Place) entry.element;
         for (Trait t : Common.VENUE_TRAITS) {
           if (! p.hasProperty(t)) continue;
-          Clue clue = new Clue(crime, role.roleID);
+          Clue clue = new Clue(crime, entry.role);
           clue.assignEvidence(t, leadType, confidence, time);
           possible.add(clue);
         }
       }
       
-      if (role.element.isItem()) {
-        Item p = (Item) role.element;
-        Clue clue = new Clue(crime, role.roleID);
+      if (entry.element.isItem()) {
+        Item p = (Item) entry.element;
+        Clue clue = new Clue(crime, entry.role);
         clue.confirmMatch(p, leadType, time);
         possible.add(clue);
       }

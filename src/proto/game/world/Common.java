@@ -207,43 +207,70 @@ public class Common {
   
   //
   //  Persons have a couple of randomly-defined basic traits.
-  final public static Trait HAIR_COLOURS[] = Trait.traitsWith(
-    "hair", null,
-    "Hair: Red"   ,
-    "Hair: Blonde",
-    "Hair: Brown" ,
-    "Hair: Black" ,
-    "Hair: Grey"  ,
-    "Hair: White"
-  );
-  final public static Trait EYE_COLOURS[] = Trait.traitsWith(
-    "eyes", null,
-    "Eyes: Grey" ,
-    "Eyes: Green",
-    "Eyes: Brown",
-    "Eyes: Blue"
-  );
-  final public static Trait RACES[] = Trait.traitsWith(
-    "race", null,
-    "Race: Black"  ,
-    "Race: Indian" ,
-    "Race: Asian"  ,
-    "Race: White"  ,
-    "Race: Amerind",
-    "Race: Mixed"
-  );
-  final public static Trait BUILD[] = Trait.traitsWith(
-    "build", null,
-    "Build: Stout" ,
-    "Build: Skinny",
-    "Build: Tall"  ,
-    "Build: Small"
-  );
-  final public static Trait SEX[] = Trait.traitsWith(
-    "sex", null,
-    "Sex: Male"  ,
-    "Sex: Female"
-  );
+  final public static Trait
+    HAIR_COLOURS[] = Trait.traitsWith(
+      "hair", null,
+      "Hair: Red"   ,
+      "Hair: Blonde",
+      "Hair: Brown" ,
+      "Hair: Black" ,
+      "Hair: Grey"  ,
+      "Hair: White"
+    ),
+    HAIR_RED    = HAIR_COLOURS[0],
+    HAIR_BLONDE = HAIR_COLOURS[1],
+    HAIR_BROWN  = HAIR_COLOURS[2],
+    HAIR_BLACK  = HAIR_COLOURS[3],
+    HAIR_GREY   = HAIR_COLOURS[4],
+    HAIR_WHITE  = HAIR_COLOURS[5];
+  final public static Trait
+    EYE_COLOURS[] = Trait.traitsWith(
+      "eyes", null,
+      "Eyes: Grey" ,
+      "Eyes: Green",
+      "Eyes: Brown",
+      "Eyes: Blue"
+    ),
+    EYES_GREY  = EYE_COLOURS[0],
+    EYES_GREEN = EYE_COLOURS[1],
+    EYES_BROWN = EYE_COLOURS[2],
+    EYES_BLUE  = EYE_COLOURS[3];
+  final public static Trait
+    RACES[] = Trait.traitsWith(
+      "race", null,
+      "Race: Black"  ,
+      "Race: Indian" ,
+      "Race: Asian"  ,
+      "Race: White"  ,
+      "Race: Amerind",
+      "Race: Mixed"
+    ),
+    RACE_BLACK   = RACES[0],
+    RACE_INDIAN  = RACES[1],
+    RACE_ASIAN   = RACES[2],
+    RACE_WHITE   = RACES[3],
+    RACE_AMERIND = RACES[4],
+    RACE_MIXED   = RACES[5];
+  final public static Trait
+    BUILD[] = Trait.traitsWith(
+      "build", null,
+      "Build: Stout" ,
+      "Build: Skinny",
+      "Build: Tall"  ,
+      "Build: Small"
+    ),
+    BUILD_STOUT  = BUILD[0],
+    BUILD_SKINNY = BUILD[1],
+    BUILD_TALL   = BUILD[2],
+    BUILD_SMALL  = BUILD[3];
+  final public static Trait
+    SEX[] = Trait.traitsWith(
+      "sex", null,
+      "Sex: Male"  ,
+      "Sex: Female"
+    ),
+    SEX_MALE   = SEX[0],
+    SEX_FEMALE = SEX[1];
   final public static Trait PERSON_TRAITS[] = (Trait[]) Visit.compose(
     Trait.class, HAIR_COLOURS, EYE_COLOURS, RACES, BUILD, SEX
   );
@@ -253,28 +280,36 @@ public class Common {
   //  forensics, based on interior elements.
   //  Hot, Cold, Wet, Sunny?
   //  Treat proximities as traits?
-  final public static Trait VENUE_TRAITS[] = Trait.traitsWith(
-    "place_trait", null,
-    "Rural"     ,
-    "Industrial",
-    "Medical"   ,
-    "Slum"      ,
-    "Office"    ,
-    "Ritzy"     ,
-    "Public"    ,
-    "Academic"  ,
-    "Domestic"  ,
-    "Secure"    
-  );
+  final public static Trait
+    VENUE_TRAITS[] = Trait.traitsWith(
+      "place_trait", null,
+      "Rural"     ,
+      "Industrial",
+      "Medical"   ,
+      "Commercial",
+      "Slum"      ,
+      "Office"    ,
+      "Ritzy"     ,
+      "Civic"     ,
+      "Scientific",
+      "Academic"  ,
+      "Domestic"  ,
+      "Security"  
+    ),
+    VENUE_RURAL      = VENUE_TRAITS[0 ],
+    VENUE_INDUSTRIAL = VENUE_TRAITS[1 ],
+    VENUE_MEDICAL    = VENUE_TRAITS[2 ],
+    VENUE_COMMERCIAL = VENUE_TRAITS[3 ],
+    VENUE_SLUM       = VENUE_TRAITS[4 ],
+    VENUE_OFFICE     = VENUE_TRAITS[5 ],
+    VENUE_RITZY      = VENUE_TRAITS[6 ],
+    VENUE_CIVIC      = VENUE_TRAITS[7 ],
+    VENUE_SCIENTIFIC = VENUE_TRAITS[8 ],
+    VENUE_ACADEMIC   = VENUE_TRAITS[9 ],
+    VENUE_DOMESTIC   = VENUE_TRAITS[10],
+    VENUE_SECURITY   = VENUE_TRAITS[11];
   
 }
-
-
-
-
-
-
-
 
 
 

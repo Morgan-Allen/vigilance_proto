@@ -13,15 +13,15 @@ public abstract class Crime extends Event {
   
   /**  Role-definitions-
     */
-  final static Index <RoleType> ROLES_INDEX = new Index <RoleType> ();
+  final static Index <Role> ROLES_INDEX = new Index <Role> ();
   
-  static class RoleType extends Index.Entry implements Session.Saveable {
+  static class Role extends Index.Entry implements Session.Saveable {
     
-    public RoleType(String ID) {
+    protected Role(String ID) {
       super(ROLES_INDEX, ID);
     }
     
-    public static RoleType loadConstant(Session s) throws Exception {
+    public static Role loadConstant(Session s) throws Exception {
       return ROLES_INDEX.loadEntry(s.input());
     }
     
@@ -30,44 +30,46 @@ public abstract class Crime extends Event {
     }
   }
   
-  protected class Role {
-    
-    RoleType roleID;
-    Element element;
-    Crime supplies;
-    
-    public String toString() {
-      return roleID.entryKey()+" ("+element+")";
-    }
-  }
-  
-  //  TODO:  Include default roles for 'base', 'hideout' and 'target'!
-  
+  final public static Role
+    ROLE_BASE      = new Role("role_base"     ),
+    ROLE_HIDEOUT   = new Role("role_hideout"  ),
+    ROLE_TARGET    = new Role("role_target"   ),
+    ROLE_TARGET_AT = new Role("role_target_at")
+  ;
   
   
   /**  Data fields, construction and save/load methods-
     */
-  Base base;
-  Place hideout;
-  Element target;
-  List <Role> roles = new List();
+  final Base base;
+  
+  protected class RoleEntry {
+    
+    Role role;
+    Element element;
+    Crime supplies;
+    
+    public String toString() {
+      return role.entryKey()+" ("+element+")";
+    }
+  }
+  
+  List <RoleEntry> entries = new List();
   
   
   protected Crime(CrimeType type, Base base) {
     super(type, base.world());
     this.base = base;
+    assignRole(base, ROLE_BASE);
   }
   
   
   public Crime(Session s) throws Exception {
     super(s);
     base    = (Base   ) s.loadObject();
-    hideout = (Place  ) s.loadObject();
-    target  = (Element) s.loadObject();
     
     for (int n = s.loadInt(); n-- > 0;) {
-      Role role = new Role();
-      role.roleID   = (Crime.RoleType) s.loadObject();
+      RoleEntry role = new RoleEntry();
+      role.role   = (Crime.Role) s.loadObject();
       role.element  = (Element) s.loadObject();
       role.supplies = (Crime  ) s.loadObject();
     }
@@ -77,12 +79,10 @@ public abstract class Crime extends Event {
   public void saveState(Session s) throws Exception {
     super.saveState(s);
     s.saveObject(base   );
-    s.saveObject(hideout);
-    s.saveObject(target );
     
-    s.saveInt(roles.size());
-    for (Role role : roles) {
-      s.saveObject(role.roleID  );
+    s.saveInt(entries.size());
+    for (RoleEntry role : entries) {
+      s.saveObject(role.role  );
       s.saveObject(role.element );
       s.saveObject(role.supplies);
     }
@@ -93,36 +93,66 @@ public abstract class Crime extends Event {
   /**  Utility methods for assigning roles, fulfilling needs and evaluating
     *  possible targets-
     */
-  public void assignTarget(Element target) {
-    this.target = target;
-  }
-  
-  
-  public void assignHideout(Place hideout) {
-    this.hideout = hideout;
-  }
-  
-  
-  public void assignRole(Element element, RoleType roleID) {
-    Role match = roleFor(element, roleID);
-    if (match == null) roles.add(match = new Role());
-    match.roleID  = roleID ;
+  public void assignRole(Element element, Role role) {
+    RoleEntry match = roleFor(element, role);
+    if (match == null) entries.add(match = new RoleEntry());
+    match.role    = role   ;
     match.element = element;
   }
   
   
-  protected Role roleFor(Element element, RoleType roleID) {
-    for (Role role : roles) {
-      if (element != null && element != role.element) continue;
-      if (roleID  != null && roleID  != role.roleID ) continue;
-      return role;
+  public void assignTarget(Element target, Place at) {
+    assignRole(target, ROLE_TARGET);
+    assignRole(at, ROLE_TARGET_AT);
+  }
+  
+  
+  public void assignHideout(Element hideout) {
+    assignRole(hideout, ROLE_HIDEOUT);
+  }
+  
+  
+  public Element target() {
+    return elementWithRole(ROLE_TARGET);
+  }
+  
+  
+  public Element targetAt() {
+    return elementWithRole(ROLE_TARGET_AT);
+  }
+  
+  
+  public Element hideout() {
+    return elementWithRole(ROLE_HIDEOUT);
+  }
+  
+  
+  public Element elementWithRole(Role role) {
+    return roleFor(null, role).element;
+  }
+  
+  
+  public Batch <Element> elementsWithRole(Role role) {
+    Batch <Element> matches = new Batch();
+    for (RoleEntry entry : entries) {
+      if (entry.role == role) matches.add(entry.element);
+    }
+    return matches;
+  }
+  
+  
+  protected RoleEntry roleFor(Element element, Role role) {
+    for (RoleEntry entry : entries) {
+      if (element != null && element != entry.element) continue;
+      if (role    != null && role    != entry.role   ) continue;
+      return entry;
     }
     return null;
   }
   
   
   protected void fillExpertRole(
-    Trait trait, Series <Person> candidates, RoleType roleID
+    Trait trait, Series <Person> candidates, Role role
   ) {
     Pick <Person> pick = new Pick();
     for (Person p : candidates) {
@@ -130,12 +160,12 @@ public abstract class Crime extends Event {
       pick.compare(p, p.stats.levelFor(trait));
     }
     if (pick.empty()) return;
-    assignRole(pick.result(), roleID);
+    assignRole(pick.result(), role);
   }
   
   
   protected void fillInsideRole(
-    Place target, Crime.RoleType roleID
+    Place target, Crime.Role role
   ) {
     Pick <Person> pick = new Pick();
     for (Person p : target.residents()) {
@@ -143,14 +173,14 @@ public abstract class Crime extends Event {
       pick.compare(p, 0 - p.history.valueFor(target.owner()));
     }
     if (pick.empty()) return;
-    assignRole(pick.result(), roleID);
+    assignRole(pick.result(), role);
   }
   
   
   protected void fillItemRole(
-    ItemType type, World world, RoleType roleID
+    ItemType type, World world, Role role
   ) {
-    assignRole(new Item(type, world), roleID);
+    assignRole(new Item(type, world), role);
   }
   
   

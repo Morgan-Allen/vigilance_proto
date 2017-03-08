@@ -29,7 +29,7 @@ public abstract class CrimeType extends EventType {
     */
   protected String nameFor(Event event) {
     Crime c = (Crime) event;
-    return name+": "+c.target;
+    return name+": "+c.elementWithRole(Crime.ROLE_TARGET);
   }
   
   

@@ -24,14 +24,13 @@ public class Villains {
       MUSCLE  , 3 ,
       
       QUESTION, 5 ,
-      PERSUADE, 8,
+      PERSUADE, 8 ,
       
-      //  TODO:  Allow for more explicit reference later...
-      Common.HAIR_COLOURS[2],
-      Common.EYE_COLOURS[0],
-      Common.BUILD[1],
-      Common.RACES[3],
-      Common.SEX[1]
+      Common.HAIR_BROWN,
+      Common.EYES_GREY,
+      Common.BUILD_SKINNY,
+      Common.RACE_WHITE,
+      Common.SEX_FEMALE
     ),
     SNAKE_EYES = new PersonType(
       "Snake Eyes", "villain_kind_snake_eyes", IMG_DIR+"icon_snake_eyes.png",
@@ -45,12 +44,11 @@ public class Villains {
       QUESTION, 8 ,
       PERSUADE, 4 ,
       
-      //  TODO:  Allow for more explicit reference later...
-      Common.HAIR_COLOURS[4],
-      Common.EYE_COLOURS[1],
-      Common.BUILD[2],
-      Common.RACES[3],
-      Common.SEX[0]
+      Common.HAIR_WHITE,
+      Common.EYES_GREEN,
+      Common.BUILD_TALL,
+      Common.RACE_WHITE,
+      Common.SEX_MALE
     )
   ;
 }
