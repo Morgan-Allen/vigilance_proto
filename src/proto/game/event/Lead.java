@@ -27,9 +27,11 @@ Area
 //*/
 
 
-public class Lead {
+public class Lead implements Session.Saveable {
   
   
+  /**  Data fields, construction and save/load methods-
+    */
   final public static int
     TYPE_SURVEIL    = 1,
     TYPE_DATABASE   = 2,
@@ -39,28 +41,55 @@ public class Lead {
     TYPE_UNDERCOVER = 6,
     TYPE_PATROL     = 7,
     TYPE_CANVAS     = 8,
-    TYPE_SCAN       = 9
-  ;
-  final public static String LEAD_DESC[] = {
-    null,
-    "Surveillance", "Database Records", "Questioning",
-    "Search", "Wiretaps", "Undercover Work",
-    "Patrols", "Canvassing", "Scanning Frequencies"
+    TYPE_SCAN       = 9;
+  final public static String LEAD_DESC[] = { null,
+    "Surveillance", "Database Check", "Questioning",
+    "Search", "Wiretap", "Undercover Work",
+    "Patrol", "Canvassing", "Scanning Frequencies"
+  };
+  final public static int
+    MEDIUM_MEETING  = 1,
+    MEDIUM_WIRE     = 2,
+    MEDIUM_SURVEIL  = 3,
+    MEDIUM_HEIST    = 4;
+  final public static String MEDIUM_DESC[] = { null,
+    "Meeting", "Wire", "Surveil", "Heist"
   };
   
   Crime crime;
+  Element focus;
   int leadType;
   float confidence = 1.0f;
   
   
-  Lead(Crime crime, int leadType, float confidence) {
+  Lead(Crime crime, Element focus, int leadType, float confidence) {
     this.crime      = crime     ;
+    this.focus      = focus     ;
     this.leadType   = leadType  ;
     this.confidence = confidence;
   }
   
   
+  public Lead(Session s) throws Exception {
+    s.cacheInstance(this);
+    crime      = (Crime  ) s.loadObject();
+    focus      = (Element) s.loadObject();
+    leadType   = s.loadInt  ();
+    confidence = s.loadFloat();
+  }
   
+  
+  public void saveState(Session s) throws Exception {
+    s.saveObject(crime);
+    s.saveObject(focus);
+    s.saveInt(leadType);
+    s.saveFloat(confidence);
+  }
+  
+  
+  
+  /**  Generation and screening of clues related to the case:
+    */
   Series <Clue> possibleClues(
     Crime crime, Object match, Crime.Role role
   ) {
@@ -103,7 +132,23 @@ public class Lead {
   }
   
   
+  //  TODO:  Now you need to establish which Clues you are likely to be able to
+  //  derive from tracking a particular element at a particular time.
+  
+  
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

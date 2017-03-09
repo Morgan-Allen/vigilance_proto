@@ -36,6 +36,7 @@ public class TestCrime {
     DefaultGame.initDefaultCrime  (world);
     
     Base crooks = world.baseFor(Crooks.THE_MADE_MEN);
+    Place hideout = crooks.place();
     Crime kidnap = TYPE_KIDNAP.initCrime(crooks);
     
     Pick <Person> pick = new Pick();
@@ -50,12 +51,28 @@ public class TestCrime {
     Series <Person> goons = kidnap.goonsOnRoster();
     
     kidnap.assignTarget(target, target.resides());
+    kidnap.assignOrganiser(crooks.leader(), hideout);
     kidnap.fillExpertRole(SIGHT_RANGE, goons, ROLE_TAILS);
     kidnap.fillExpertRole(MEDICINE   , goons, ROLE_DRUGS);
     kidnap.fillExpertRole(MUSCLE     , goons, ROLE_GRABS);
     
+    kidnap.queueContacts(
+      Lead.MEDIUM_MEETING, World.HOURS_PER_DAY, Crime.ROLE_ORGANISER,
+      ROLE_TAILS, ROLE_DRUGS, ROLE_GRABS
+    );
+    kidnap.queueContact(
+      Lead.MEDIUM_SURVEIL,
+      World.HOURS_PER_DAY,
+      ROLE_TAILS, Crime.ROLE_TARGET
+    );
+    kidnap.queueContact(
+      Lead.MEDIUM_MEETING,
+      World.HOURS_PER_DAY,
+      ROLE_DRUGS, ROLE_GRABS
+    );
+    
     I.say("Roles are: "+kidnap.entries);
-    Lead lead = new Lead(kidnap, Lead.TYPE_CANVAS, 0.5f);
+    Lead lead = new Lead(kidnap, hideout.region(), Lead.TYPE_CANVAS, 0.5f);
     I.say("Assessing possible clues for: "+kidnap);
     for (Clue clue : lead.possibleClues(kidnap, null, null)) {
       I.say("  "+clue);
@@ -64,7 +81,6 @@ public class TestCrime {
   
   
 }
-
 
 
 

@@ -33,8 +33,10 @@ public abstract class Crime extends Event {
   final public static Role
     ROLE_BASE      = new Role("role_base"     ),
     ROLE_HIDEOUT   = new Role("role_hideout"  ),
+    ROLE_ORGANISER = new Role("role_organiser"),
+    ROLE_BACKUP    = new Role("role_backup"   ),
     ROLE_TARGET    = new Role("role_target"   ),
-    ROLE_TARGET_AT = new Role("role_target_at")
+    ROLE_SCENE     = new Role("role_scene"    )
   ;
   
   
@@ -53,7 +55,20 @@ public abstract class Crime extends Event {
     }
   }
   
+  protected class Contact {
+    
+    int medium;
+    int timeTaken;
+    Role between[];
+    
+    int timeStart;
+    boolean spooked;
+  }
+  
   List <RoleEntry> entries = new List();
+  List <Contact> contacts = new List();
+  int spookLevel;
+  
   
   
   protected Crime(CrimeType type, Base base) {
@@ -65,28 +80,65 @@ public abstract class Crime extends Event {
   
   public Crime(Session s) throws Exception {
     super(s);
-    base    = (Base   ) s.loadObject();
+    base = (Base) s.loadObject();
     
     for (int n = s.loadInt(); n-- > 0;) {
-      RoleEntry role = new RoleEntry();
-      role.role   = (Crime.Role) s.loadObject();
-      role.element  = (Element) s.loadObject();
-      role.supplies = (Crime  ) s.loadObject();
+      RoleEntry entry = new RoleEntry();
+      entry.role     = (Crime.Role) s.loadObject();
+      entry.element  = (Element   ) s.loadObject();
+      entry.supplies = (Crime     ) s.loadObject();
+      entries.add(entry);
+    }
+    for (int n = s.loadInt(); n-- > 0;) {
+      Contact contact = new Contact();
+      contact.between   = (Role[]) s.loadObjectArray(Role.class);
+      contact.medium    = s.loadInt();
+      contact.timeTaken = s.loadInt();
+      contact.timeStart = s.loadInt();
+      contact.spooked   = s.loadBool();
+      contacts.add(contact);
     }
   }
   
   
   public void saveState(Session s) throws Exception {
     super.saveState(s);
-    s.saveObject(base   );
+    s.saveObject(base);
     
     s.saveInt(entries.size());
-    for (RoleEntry role : entries) {
-      s.saveObject(role.role  );
-      s.saveObject(role.element );
-      s.saveObject(role.supplies);
+    for (RoleEntry entry : entries) {
+      s.saveObject(entry.role    );
+      s.saveObject(entry.element );
+      s.saveObject(entry.supplies);
+    }
+    s.saveInt(contacts.size());
+    for (Contact contact : contacts) {
+      s.saveObjectArray(contact.between);
+      s.saveInt (contact.medium   );
+      s.saveInt (contact.timeTaken);
+      s.saveInt (contact.timeStart);
+      s.saveBool(contact.spooked  );
     }
   }
+  
+  
+  
+  /**  Queueing and executing sub-events and generating clues for
+    *  investigation-
+    */
+  public void queueContact(int medium, int timeTaken, Role... between) {
+    Contact c = new Contact();
+    c.between   = between;
+    c.medium    = medium;
+    c.timeTaken = timeTaken;
+    contacts.add(c);
+  }
+  
+  
+  public void queueContacts(int medium, int timeTaken, Role from, Role... to) {
+    for (Role r : to) queueContact(medium, timeTaken, from, r);
+  }
+  
   
   
   
@@ -101,14 +153,15 @@ public abstract class Crime extends Event {
   }
   
   
-  public void assignTarget(Element target, Place at) {
+  public void assignTarget(Element target, Place scene) {
     assignRole(target, ROLE_TARGET);
-    assignRole(at, ROLE_TARGET_AT);
+    assignRole(scene , ROLE_SCENE );
   }
   
   
-  public void assignHideout(Element hideout) {
-    assignRole(hideout, ROLE_HIDEOUT);
+  public void assignOrganiser(Person organiser, Place hideout) {
+    assignRole(organiser, ROLE_ORGANISER);
+    assignRole(hideout  , ROLE_HIDEOUT  );
   }
   
   
@@ -118,7 +171,7 @@ public abstract class Crime extends Event {
   
   
   public Element targetAt() {
-    return elementWithRole(ROLE_TARGET_AT);
+    return elementWithRole(ROLE_SCENE);
   }
   
   
