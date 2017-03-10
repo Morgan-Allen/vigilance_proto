@@ -57,7 +57,7 @@ public class TestCrime {
     kidnap.fillExpertRole(MUSCLE     , goons, ROLE_GRABS);
     
     kidnap.queueContacts(
-      Lead.MEDIUM_MEETING, World.HOURS_PER_DAY, Crime.ROLE_ORGANISER,
+      Lead.MEDIUM_MEET, World.HOURS_PER_DAY, Crime.ROLE_ORGANISER,
       ROLE_TAILS, ROLE_DRUGS, ROLE_GRABS
     );
     kidnap.queueContact(
@@ -66,21 +66,32 @@ public class TestCrime {
       ROLE_TAILS, Crime.ROLE_TARGET
     );
     kidnap.queueContact(
-      Lead.MEDIUM_MEETING,
+      Lead.MEDIUM_MEET,
       World.HOURS_PER_DAY,
       ROLE_DRUGS, ROLE_GRABS
     );
     
-    I.say("Roles are: "+kidnap.entries);
-    Lead lead = new Lead(kidnap, hideout.region(), Lead.TYPE_CANVAS, 0.5f);
-    I.say("Assessing possible clues for: "+kidnap);
-    for (Clue clue : lead.possibleClues(kidnap, null, null)) {
-      I.say("  "+clue);
+    I.say("\n\nRoles are: "+kidnap.entries);
+    Lead lead = new Lead(Lead.SURVEIL_PERSON, kidnap, crooks.leader());
+    
+    for (Crime.Contact contact : kidnap.contacts) {
+      if (! lead.canDetect(contact, Lead.TENSE_ANY, kidnap)) continue;
+      
+      Series <Clue> possible = lead.possibleClues(
+        contact, Lead.TENSE_ANY, kidnap
+      );
+      if (possible.empty()) continue;
+      
+      I.say("\nAssessing possible clues from contact.\n"+contact);
+      for (Clue clue : possible) {
+        I.say("  "+clue);
+      }
     }
   }
   
   
 }
+
 
 
 

@@ -61,13 +61,19 @@ public abstract class Crime extends Event {
     int timeTaken;
     Role between[];
     
-    int timeStart;
-    boolean spooked;
+    int timeStart = -1;
+    boolean spooked = false;
+    
+    public String toString() {
+      return "Contact between "+I.list(between);
+    }
   }
   
   List <RoleEntry> entries = new List();
   List <Contact> contacts = new List();
-  int spookLevel;
+  
+  int spookLevel   = 0;
+  int contactIndex = 0;
   
   
   
@@ -138,6 +144,26 @@ public abstract class Crime extends Event {
   public void queueContacts(int medium, int timeTaken, Role from, Role... to) {
     for (Role r : to) queueContact(medium, timeTaken, from, r);
   }
+  
+  
+  public void updateEvent() {
+    int time = world.timing.totalHours();
+    
+    Contact current = contacts.atIndex(contactIndex);
+    if (current != null) {
+      if (current.timeStart == -1) current.timeStart = time;
+      if (time >= current.timeStart + current.timeTaken) {
+        contactIndex++;
+      }
+      else {
+        //  TODO:  Notify anyone doing surveillance on the previous contact.
+      }
+    }
+    
+  }
+  
+  
+  
   
   
   

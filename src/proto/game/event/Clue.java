@@ -15,10 +15,10 @@ public class Clue {
   Crime.Role role;
   Object match;
   
-  int leadType;
+  Lead.Type leadType;
   Trait trait;
   float confidence;
-  int timeTaken;
+  int timeFound;
   
   
   Clue() {
@@ -37,40 +37,40 @@ public class Clue {
     c.crime      = (Crime     ) s.loadObject();
     c.role       = (Crime.Role) s.loadObject();
     c.match      = s.loadObject();
-    c.leadType   = s.loadInt();
+    c.leadType   = Lead.LEAD_TYPES[s.loadInt()];
     c.trait      = (Trait) s.loadObject();
     c.confidence = s.loadFloat();
-    c.timeTaken  = s.loadInt();
+    c.timeFound  = s.loadInt();
     return c;
   }
   
   
   void saveClue(Session s) throws Exception {
-    s.saveObject(crime     );
-    s.saveObject(role    );
-    s.saveObject(match     );
-    s.saveInt   (leadType  );
-    s.saveObject(trait     );
-    s.saveFloat (confidence);
-    s.saveInt   (timeTaken );
+    s.saveObject(crime      );
+    s.saveObject(role       );
+    s.saveObject(match      );
+    s.saveInt   (leadType.ID);
+    s.saveObject(trait      );
+    s.saveFloat (confidence );
+    s.saveInt   (timeFound  );
   }
   
   
   void assignEvidence(
-    Trait trait, int leadType, float confidence, int timeTaken
+    Trait trait, Lead.Type leadType, float confidence, int timeFound
   ) {
     this.trait      = trait     ;
     this.leadType   = leadType  ;
     this.confidence = confidence;
-    this.timeTaken  = timeTaken ;
+    this.timeFound  = timeFound ;
   }
   
   
-  void confirmMatch(Object match, int leadType, int timeTaken) {
+  void confirmMatch(Object match, Lead.Type leadType, int timeFound) {
     this.match      = match    ;
     this.leadType   = leadType ;
     this.confidence = 1.0f     ;
-    this.timeTaken  = timeTaken;
+    this.timeFound  = timeFound;
   }
   
   
@@ -79,7 +79,7 @@ public class Clue {
     */
   public String toString() {
     if (trait != null) return
-      Lead.LEAD_DESC[leadType]+" indicates "+
+      leadType.name+" indicates "+
       role.entryKey()+" has trait: "+trait
     ;
     return "";
