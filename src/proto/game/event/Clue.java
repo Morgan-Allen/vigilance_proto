@@ -80,7 +80,7 @@ public class Clue {
   public String toString() {
     if (trait != null) return
       leadType.name+" indicates "+
-      role.entryKey()+" has trait: "+trait
+      role+" has trait: "+trait
     ;
     return "";
   }

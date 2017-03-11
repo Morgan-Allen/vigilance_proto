@@ -15,9 +15,9 @@ public class TestCrime {
   
   
   final static Crime.Role
-    ROLE_TAILS = new Crime.Role("role_tails"),
-    ROLE_GRABS = new Crime.Role("role_grabs"),
-    ROLE_DRUGS = new Crime.Role("role_drugs");
+    ROLE_TAILS = new Crime.Role("role_tails", "Tails"),
+    ROLE_GRABS = new Crime.Role("role_grabs", "Grabs"),
+    ROLE_DRUGS = new Crime.Role("role_drugs", "Drugs");
   
   static CrimeType TYPE_KIDNAP = new CrimeType(
     "Kidnapping", "crime_type_kidnap", null
@@ -50,7 +50,7 @@ public class TestCrime {
     Person target = pick.result();
     Series <Person> goons = kidnap.goonsOnRoster();
     
-    kidnap.assignTarget(target, target.resides());
+    kidnap.assignTarget   (target, target.resides());
     kidnap.assignOrganiser(crooks.leader(), hideout);
     kidnap.fillExpertRole(SIGHT_RANGE, goons, ROLE_TAILS);
     kidnap.fillExpertRole(MEDICINE   , goons, ROLE_DRUGS);
@@ -71,9 +71,12 @@ public class TestCrime {
       ROLE_DRUGS, ROLE_GRABS
     );
     
-    I.say("\n\nRoles are: "+kidnap.entries);
-    Lead lead = new Lead(Lead.SURVEIL_PERSON, kidnap, crooks.leader());
+    I.say("\n\nRoles are: ");
+    for (Crime.RoleEntry entry : kidnap.entries) {
+      I.say("  "+entry);
+    }
     
+    Lead lead = new Lead(Lead.LEAD_SURVEIL_PERSON, kidnap, crooks.leader());
     for (Crime.Contact contact : kidnap.contacts) {
       if (! lead.canDetect(contact, Lead.TENSE_ANY, kidnap)) continue;
       
@@ -82,18 +85,12 @@ public class TestCrime {
       );
       if (possible.empty()) continue;
       
-      I.say("\nAssessing possible clues from contact.\n"+contact);
+      I.say("\nAssessing possible clues from contacts:\n  "+contact);
       for (Clue clue : possible) {
         I.say("  "+clue);
       }
     }
   }
   
-  
 }
-
-
-
-
-
 

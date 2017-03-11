@@ -301,8 +301,14 @@ public class Person extends Element {
   
   /**  Rudimentary AI methods-
     */
+  //  TODO:  Clean these up a bit.
   public boolean isHero() {
     return side == Side.HEROES && ! isCivilian();
+  }
+  
+  
+  public boolean isVillain() {
+    return side == Side.VILLAINS && kind().subtype() == Kind.SUBTYPE_BOSS;
   }
   
   
@@ -350,7 +356,7 @@ public class Person extends Element {
   /**  Interface, rendering and debug methods-
     */
   public String name() {
-    if (isHero()) return name;
+    if (isHero() || isVillain()) return name;
     return name+" ("+kind.name()+")";
   }
   

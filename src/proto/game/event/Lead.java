@@ -5,6 +5,7 @@ import proto.common.*;
 import proto.game.world.*;
 import proto.game.person.*;
 import proto.util.*;
+import static proto.game.person.PersonStats.*;
 
 
 
@@ -77,42 +78,42 @@ public class Lead implements Session.Saveable {
 
   private static Batch <Type> TYPE_B = new Batch();
   final public static Type
-    SURVEIL_PERSON = new Type(
-      "Surveil", 0,
+    LEAD_SURVEIL_PERSON = new Type(
+      "Surveillance", 0,
       MEDIUM_SURVEIL, FOCUS_PERSON, TENSE_DURING, PROFILE_LOW,
       CONFIDENCE_HIGH, MEDIUM_MEET
     ),
-    SURVEIL_BUILDING = new Type(
-      "Surveil", 1,
+    LEAD_SURVEIL_BUILDING = new Type(
+      "Surveillance", 1,
       MEDIUM_SURVEIL, FOCUS_BUILDING, TENSE_DURING, PROFILE_LOW,
       CONFIDENCE_MODERATE, MEDIUM_MEET
     ),
-    QUESTION = new Type(
-      "Question", 2,
+    LEAD_QUESTION = new Type(
+      "Questioning", 2,
       MEDIUM_QUESTION, FOCUS_PERSON, TENSE_AFTER, PROFILE_HIGH,
       CONFIDENCE_MODERATE, MEDIUM_ANY
     ),
-    WIRETAP = new Type(
+    LEAD_WIRETAP = new Type(
       "Wiretap", 3,
       MEDIUM_WIRE, FOCUS_BUILDING, TENSE_DURING, PROFILE_LOW,
       CONFIDENCE_HIGH, MEDIUM_WIRE
     ),
-    PATROL = new Type(
-      "Patrol", 4,
+    LEAD_PATROL = new Type(
+      "Patrolling", 4,
       MEDIUM_SURVEIL, FOCUS_REGION, TENSE_DURING, PROFILE_LOW,
       CONFIDENCE_MODERATE, MEDIUM_MEET, MEDIUM_SURVEIL
     ),
-    SCAN = new Type(
-      "Scan", 5,
+    LEAD_SCAN = new Type(
+      "Scanning", 5,
       MEDIUM_WIRE, FOCUS_REGION, TENSE_DURING, PROFILE_LOW,
       CONFIDENCE_MODERATE, MEDIUM_WIRE
     ),
-    CANVAS = new Type(
-      "Canvas", 6,
+    LEAD_CANVAS = new Type(
+      "Canvassing", 6,
       MEDIUM_QUESTION, FOCUS_REGION, TENSE_AFTER, PROFILE_SUSPICIOUS,
       CONFIDENCE_LOW, MEDIUM_ANY
     ),
-    SEARCH = new Type(
+    LEAD_SEARCH = new Type(
       "Search", 7,
       MEDIUM_SURVEIL, FOCUS_BUILDING, TENSE_AFTER, PROFILE_LOW,
       CONFIDENCE_MODERATE, MEDIUM_WIRE, MEDIUM_MEET
@@ -123,7 +124,7 @@ public class Lead implements Session.Saveable {
   final Type type;
   final Crime crime;
   final Element focus;
-  boolean done;
+  private boolean done;
   
   
   Lead(Type type, Crime crime, Element focus) {
@@ -209,11 +210,6 @@ public class Lead implements Session.Saveable {
   }
   
   
-  protected int detectResult() {
-    return -1;
-  }
-  
-  
   protected Series <Clue> possibleClues(
     Crime.Contact contact, int tense, Crime crime
   ) {
@@ -256,52 +252,86 @@ public class Lead implements Session.Saveable {
   }
   
   
-  /*
-  protected Series <Clue> possibleClues(
-    Crime crime, Object match, Crime.Role role
-  ) {
-    final Batch <Clue> possible = new Batch();
-    final int time = crime.base.world().timing.totalHours();
+  
+  
+  public float successChance(Person follows) {
+    float skill = 0, obstacle = 1;
     
-    for (Crime.RoleEntry entry : crime.entries) {
-      if (match != null && entry.element != match) continue;
-      if (role  != null && entry.role    != role ) continue;
-      
-      if (entry.element.isPerson()) {
-        Person p = (Person) entry.element;
-        for (Trait t : Common.PERSON_TRAITS) {
-          if (p.stats.levelFor(t) <= 0) continue;
-          Clue clue = new Clue(crime, entry.role);
-          clue.assignEvidence(t, type, type.confidence, time);
-          possible.add(clue);
-        }
-      }
-      
-      if (entry.element.isPlace()) {
-        Place p = (Place) entry.element;
-        for (Trait t : Common.VENUE_TRAITS) {
-          if (! p.hasProperty(t)) continue;
-          Clue clue = new Clue(crime, entry.role);
-          clue.assignEvidence(t, type, type.confidence, time);
-          possible.add(clue);
-        }
-      }
-      
-      if (entry.element.isItem()) {
-        Item p = (Item) entry.element;
-        Clue clue = new Clue(crime, entry.role);
-        clue.confirmMatch(p, type, time);
-        possible.add(clue);
-      }
+    if (type.medium == MEDIUM_SURVEIL) {
+      Person perp = (Person) focus;
+      skill    = follows.stats.levelFor(SIGHT_RANGE);
+      obstacle = perp   .stats.levelFor(HIDE_RANGE );
     }
     
-    return possible;
+    if (type.medium == MEDIUM_WIRE) {
+      Place site = (Place) focus;
+      skill    = follows.stats.levelFor(ENGINEERING);
+      obstacle = 5;
+    }
+    
+    if (type.medium == MEDIUM_QUESTION) {
+      Person perp = (Person) focus;
+      skill    = follows.stats.levelFor(QUESTION);
+      obstacle = perp.stats.levelFor(PERSUADE);
+    }
+    
+    if (type.medium == MEDIUM_COVER) {
+      Place site = (Place) focus;
+      skill    = follows.stats.levelFor(PERSUADE);
+      obstacle = 5;
+    }
+    
+    return skill / (skill + obstacle);
   }
-  //*/
+  
+  
+  protected float followResult(Person follows) {
+    float chance = successChance(follows);
+    boolean roll1 = Rand.num() < chance, roll2 = Rand.num() < chance;
+    
+    if (roll1 && roll2) return RESULT_HOT;
+    if (roll1 || roll2) return RESULT_PARTIAL;
+    return RESULT_COLD;
+  }
+  
+  
+  public float followAttempt(
+    Person follows, Crime.Contact contact, int tense, Crime crime
+  ) {
+    float result = followResult(follows);
+    int time = crime.base.world().timing.totalHours();
+    this.done = true;
+    //
+    //  TODO:  You could sharpen this up a little, with separate success-chance
+    //  for each party involved in a contact?
+    
+    if (result <= RESULT_COLD) {
+      return result;
+    }
+    else if (result <= RESULT_PARTIAL) {
+      //  TODO:  You might consider only giving information on the rough
+      //  location of a meet or wiretap trace?
+      //  ...Yeah.  Determine location and traits in a separate step.
+      
+      for (Clue clue : possibleClues(contact, tense, crime)) {
+        if (Rand.num() > 0.5f) continue;
+        CaseFile file = follows.base().leads.caseFor(clue.match);
+        file.addClue(clue);
+      }
+    }
+    else if (result <= RESULT_HOT) {
+      for (Crime.Role role : contact.between) {
+        Element subject = crime.elementWithRole(role);
+        CaseFile file = follows.base().leads.caseFor(subject);
+        
+        Clue clue = new Clue(crime,role);
+        clue.confirmMatch(subject, type, time);
+        file.addClue(clue);
+      }
+    }
+    return result;
+  }
   
   
 }
-
-
-
 

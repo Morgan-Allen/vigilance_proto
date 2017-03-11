@@ -14,6 +14,9 @@ public class CaseFile implements Session.Saveable {
   /**  Data fields, construction and save/load methods-
     */
   final Base base;
+  
+  //  TODO:  Consider making this specific to Crimes, rather than arbitrary
+  //  objects?
   final public Object subject;
   List <Clue> clues = new List();
   
@@ -48,8 +51,17 @@ public class CaseFile implements Session.Saveable {
   
   /**  Resolving possible suspects:
     */
+  public void addClue(Clue clue) {
+    clues.include(clue);
+  }
+  
+  
   public Series <Element> matchingSuspects(Series <Element> possible) {
     Batch <Element> matches = new Batch();
+    
+    //  TODO:  Require the Clue class to handle this match-elimination process
+    //  internally...
+    
     search: for (Element e : possible) {
       for (Clue c : clues) if (c.trait != null) {
         if (e.isPerson()) {

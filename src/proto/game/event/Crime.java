@@ -17,8 +17,11 @@ public abstract class Crime extends Event {
   
   static class Role extends Index.Entry implements Session.Saveable {
     
-    protected Role(String ID) {
+    final String name;
+    
+    protected Role(String ID, String name) {
       super(ROLES_INDEX, ID);
+      this.name = name;
     }
     
     public static Role loadConstant(Session s) throws Exception {
@@ -28,15 +31,19 @@ public abstract class Crime extends Event {
     public void saveState(Session s) throws Exception {
       ROLES_INDEX.saveEntry(this, s.output());
     }
+    
+    public String toString() {
+      return name;
+    }
   }
   
   final public static Role
-    ROLE_BASE      = new Role("role_base"     ),
-    ROLE_HIDEOUT   = new Role("role_hideout"  ),
-    ROLE_ORGANISER = new Role("role_organiser"),
-    ROLE_BACKUP    = new Role("role_backup"   ),
-    ROLE_TARGET    = new Role("role_target"   ),
-    ROLE_SCENE     = new Role("role_scene"    )
+    ROLE_BASE      = new Role("role_base"     , "Base"     ),
+    ROLE_HIDEOUT   = new Role("role_hideout"  , "Hideout"  ),
+    ROLE_ORGANISER = new Role("role_organiser", "Organiser"),
+    ROLE_BACKUP    = new Role("role_backup"   , "Backup"   ),
+    ROLE_TARGET    = new Role("role_target"   , "Target"   ),
+    ROLE_SCENE     = new Role("role_scene"    , "Scene"    )
   ;
   
   
@@ -51,7 +58,7 @@ public abstract class Crime extends Event {
     Crime supplies;
     
     public String toString() {
-      return role.entryKey()+" ("+element+")";
+      return role.name+" ("+element+")";
     }
   }
   

@@ -230,8 +230,8 @@ public class Base extends Place {
   }
   
   
-  public String toString() {
-    return faction.name+" Headquarters";
+  public String name() {
+    return kind().name()+" (Base for "+faction.name+")";
   }
 }
 
