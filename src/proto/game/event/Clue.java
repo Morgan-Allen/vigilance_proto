@@ -13,10 +13,12 @@ public class Clue {
     */
   Crime crime;
   Crime.Role role;
+
   Object match;
+  boolean confirmed;
+  Trait trait;
   
   Lead.Type leadType;
-  Trait trait;
   float confidence;
   int timeFound;
   
@@ -37,8 +39,9 @@ public class Clue {
     c.crime      = (Crime     ) s.loadObject();
     c.role       = (Crime.Role) s.loadObject();
     c.match      = s.loadObject();
-    c.leadType   = Lead.LEAD_TYPES[s.loadInt()];
+    c.confirmed  = s.loadBool();
     c.trait      = (Trait) s.loadObject();
+    c.leadType   = Lead.LEAD_TYPES[s.loadInt()];
     c.confidence = s.loadFloat();
     c.timeFound  = s.loadInt();
     return c;
@@ -49,16 +52,19 @@ public class Clue {
     s.saveObject(crime      );
     s.saveObject(role       );
     s.saveObject(match      );
-    s.saveInt   (leadType.ID);
+    s.saveBool  (confirmed  );
     s.saveObject(trait      );
+    s.saveInt   (leadType.ID);
     s.saveFloat (confidence );
     s.saveInt   (timeFound  );
   }
   
   
   void assignEvidence(
-    Trait trait, Lead.Type leadType, float confidence, int timeFound
+    Object match, Trait trait,
+    Lead.Type leadType, float confidence, int timeFound
   ) {
+    this.match      = match     ;
     this.trait      = trait     ;
     this.leadType   = leadType  ;
     this.confidence = confidence;
@@ -66,11 +72,23 @@ public class Clue {
   }
   
   
-  void confirmMatch(Object match, Lead.Type leadType, int timeFound) {
+  void confirmMatch(
+    Object match, Lead.Type leadType, int timeFound
+  ) {
     this.match      = match    ;
+    this.confirmed  = true     ;
     this.leadType   = leadType ;
     this.confidence = 1.0f     ;
     this.timeFound  = timeFound;
+  }
+  
+  
+  boolean matchesType(Clue other) {
+    if (crime != other.crime) return false;
+    if (role  != other.role ) return false;
+    if (trait != other.trait) return false;
+    if (match != other.match) return false;
+    return true;
   }
   
   
@@ -81,6 +99,10 @@ public class Clue {
     if (trait != null) return
       leadType.name+" indicates "+
       role+" has trait: "+trait
+    ;
+    else if (match != null) return
+      leadType.name+" indicates "+
+      role+" is: "+match
     ;
     return "";
   }

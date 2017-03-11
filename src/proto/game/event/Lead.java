@@ -225,7 +225,7 @@ public class Lead implements Session.Saveable {
         for (Trait t : Common.PERSON_TRAITS) {
           if (p.stats.levelFor(t) <= 0) continue;
           Clue clue = new Clue(crime, role);
-          clue.assignEvidence(t, type, type.confidence, time);
+          clue.assignEvidence(p, t, type, type.confidence, time);
           possible.add(clue);
         }
       }
@@ -235,7 +235,7 @@ public class Lead implements Session.Saveable {
         for (Trait t : Common.VENUE_TRAITS) {
           if (! p.hasProperty(t)) continue;
           Clue clue = new Clue(crime, role);
-          clue.assignEvidence(t, type, type.confidence, time);
+          clue.assignEvidence(p, t, type, type.confidence, time);
           possible.add(clue);
         }
       }
@@ -254,7 +254,7 @@ public class Lead implements Session.Saveable {
   
   
   
-  public float successChance(Person follows) {
+  public float followChance(Person follows) {
     float skill = 0, obstacle = 1;
     
     if (type.medium == MEDIUM_SURVEIL) {
@@ -286,7 +286,8 @@ public class Lead implements Session.Saveable {
   
   
   protected float followResult(Person follows) {
-    float chance = successChance(follows);
+    float chance = followChance(follows);
+    chance = 1 - (Nums.sqrt(1 - chance));
     boolean roll1 = Rand.num() < chance, roll2 = Rand.num() < chance;
     
     if (roll1 && roll2) return RESULT_HOT;
@@ -316,7 +317,7 @@ public class Lead implements Session.Saveable {
       for (Clue clue : possibleClues(contact, tense, crime)) {
         if (Rand.num() > 0.5f) continue;
         CaseFile file = follows.base().leads.caseFor(clue.match);
-        file.addClue(clue);
+        file.recordClue(clue);
       }
     }
     else if (result <= RESULT_HOT) {
@@ -326,7 +327,7 @@ public class Lead implements Session.Saveable {
         
         Clue clue = new Clue(crime,role);
         clue.confirmMatch(subject, type, time);
-        file.addClue(clue);
+        file.recordClue(clue);
       }
     }
     return result;
@@ -334,4 +335,7 @@ public class Lead implements Session.Saveable {
   
   
 }
+
+
+
 

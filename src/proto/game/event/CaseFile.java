@@ -51,29 +51,39 @@ public class CaseFile implements Session.Saveable {
   
   /**  Resolving possible suspects:
     */
-  public void addClue(Clue clue) {
-    clues.include(clue);
+  public void recordClue(Clue clue) {
+    for (Clue prior : clues) {
+      if (prior.matchesType(clue)) return;
+    }
+    clues.add(clue);
   }
   
   
-  public Series <Element> matchingSuspects(Series <Element> possible) {
+  public Series <Element> matchingSuspects(
+    Series <? extends Element> possible
+  ) {
     Batch <Element> matches = new Batch();
     
     //  TODO:  Require the Clue class to handle this match-elimination process
     //  internally...
     
     search: for (Element e : possible) {
-      for (Clue c : clues) if (c.trait != null) {
-        if (e.isPerson()) {
-          Person p = (Person) e;
-          if (p.stats.levelFor(c.trait) <= 0) continue search;
+      for (Clue c : clues) {
+        if (c.match != null && c.confirmed && c.match != e) {
+          continue search;
         }
-        if (e.isPlace()) {
-          Place p = (Place) e;
-          if (! p.hasProperty(c.trait)) continue search;
+        if (c.trait != null) {
+          if (e.isPerson()) {
+            Person p = (Person) e;
+            if (p.stats.levelFor(c.trait) <= 0) continue search;
+          }
+          if (e.isPlace()) {
+            Place p = (Place) e;
+            if (! p.hasProperty(c.trait)) continue search;
+          }
         }
-        matches.add(e);
       }
+      matches.add(e);
     }
     return matches;
   }

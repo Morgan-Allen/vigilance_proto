@@ -35,9 +35,15 @@ public class TestCrime {
     DefaultGame.initDefaultBase   (world);
     DefaultGame.initDefaultCrime  (world);
     
+    Base heroes = world.baseFor(Heroes.JANUS_INDUSTRIES);
+    Person sleuth = heroes.roster().first();
+    
     Base crooks = world.baseFor(Crooks.THE_MADE_MEN);
     Place hideout = crooks.place();
     Crime kidnap = TYPE_KIDNAP.initCrime(crooks);
+    
+    //  TODO:  Generate relationships (kin and otherwise) between persons in
+    //  nearby venues!  
     
     Pick <Person> pick = new Pick();
     for (Region r : world.regions()) for (Place b : r.buildSlots()) {
@@ -71,26 +77,55 @@ public class TestCrime {
       ROLE_DRUGS, ROLE_GRABS
     );
     
+    
     I.say("\n\nRoles are: ");
     for (Crime.RoleEntry entry : kidnap.entries) {
       I.say("  "+entry);
     }
     
     Lead lead = new Lead(Lead.LEAD_SURVEIL_PERSON, kidnap, crooks.leader());
+    I.say("\nFollowing Lead...");
+    
     for (Crime.Contact contact : kidnap.contacts) {
       if (! lead.canDetect(contact, Lead.TENSE_ANY, kidnap)) continue;
       
-      Series <Clue> possible = lead.possibleClues(
-        contact, Lead.TENSE_ANY, kidnap
-      );
-      if (possible.empty()) continue;
+      float chance = 0, result = 0;
+      chance = lead.followChance(sleuth);
+      result = lead.followAttempt(sleuth, contact, Lead.TENSE_ANY, kidnap);
       
-      I.say("\nAssessing possible clues from contacts:\n  "+contact);
-      for (Clue clue : possible) {
+      I.say("  Detected: "+contact);
+      I.say("  Chance "+chance+"  Result: "+result);
+    }
+    
+    for (Crime.RoleEntry entry : kidnap.entries) {
+      CaseFile file = heroes.leads.caseFor(entry.element);
+      
+      Series <Clue> clues = file.clues;
+      if (clues.empty()) {
+        I.say("\nNo clues obtained on "+entry);
+        continue;
+      }
+      
+      I.say("\nObtained clues on "+entry);
+      for (Clue clue : clues) {
         I.say("  "+clue);
       }
+      
+      Series <Element> suspects = file.matchingSuspects(crooks.roster());
+      if (suspects.empty()) {
+        I.say("  No matching suspects.");
+        continue;
+      }
+      
+      I.say("  Possible suspects: ");
+      for (Element s : suspects) {
+        I.say("    "+s);
+      }
     }
+    
   }
   
 }
+
+
 
