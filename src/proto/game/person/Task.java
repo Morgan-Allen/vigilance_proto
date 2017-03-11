@@ -162,9 +162,6 @@ public abstract class Task implements Assignment {
   }
   
   
-  public abstract Place targetLocation();
-  
-  
   
   /**  Skill and type requirements-
     */

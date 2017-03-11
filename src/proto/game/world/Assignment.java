@@ -34,8 +34,10 @@ public interface Assignment extends Session.Saveable {
   Series <Person> assigned();
   boolean complete();
   
-  Place targetLocation();
+  Place targetLocation(Person p);
 }
+
+
 
 
 

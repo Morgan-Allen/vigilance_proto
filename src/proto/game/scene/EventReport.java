@@ -173,7 +173,7 @@ public class EventReport implements Session.Saveable {
     s.append("\nUse of Force: "+descFrom(forceRating     , FORCE_DESC     ));
     s.append("\nCollateral: "  +descFrom(collateralRating, COLLATERAL_DESC));
     s.append("\nGetaways: "    +descFrom(getawaysRating  , GETAWAYS_DESC  ));
-    Region region = scene.targetLocation().region();
+    Region region = scene.site.region();
     s.append("\n"+region+" Trust "     +I.signNum((int) trustEffect)+"%");
     s.append("\n"+region+" Deterrence "+I.signNum((int) deterEffect)+"%");
     

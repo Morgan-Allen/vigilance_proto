@@ -77,9 +77,8 @@ public class Timing {
   }
   
   
-  void updateTiming() {
-    final float realGap = 1f / RunGame.FRAME_RATE;
-    hoursInTick = realGap * World.GAME_HOURS_PER_REAL_SECOND;
+  public void advanceTime(float hoursGone) {
+    hoursInTick = hoursGone;
     timeHours += hoursInTick;
     dayIsUp = monthIsUp = false;
     
@@ -88,18 +87,24 @@ public class Timing {
       daysMonth++;
       timeHours -= World.HOURS_PER_DAY;
       dayIsUp = true;
+      
+      if (dayIsUp && daysMonth >= daysInMonth()) {
+        daysMonth = 0;
+        monthsYear++;
+        monthIsUp = true;
+      }
+      
+      if (monthIsUp && monthsYear >= 12) {
+        monthsYear = 0;
+        timeYears++;
+      }
     }
-    
-    if (dayIsUp && daysMonth >= daysInMonth()) {
-      daysMonth = 0;
-      monthsYear++;
-      monthIsUp = true;
-    }
-    
-    if (monthIsUp && monthsYear >= 12) {
-      monthsYear = 0;
-      timeYears++;
-    }
+  }
+  
+  
+  void updateTiming() {
+    final float realGap = 1f / RunGame.FRAME_RATE;
+    advanceTime(realGap * World.GAME_HOURS_PER_REAL_SECOND);
   }
   
   

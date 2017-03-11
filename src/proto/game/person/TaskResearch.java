@@ -58,7 +58,7 @@ public class TaskResearch extends Task {
   }
   
   
-  public Place targetLocation() {
+  public Place targetLocation(Person p) {
     return room;
   }
   

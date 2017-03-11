@@ -296,7 +296,7 @@ public class Lead implements Session.Saveable {
   }
   
   
-  public float followAttempt(
+  protected float performFollow(
     Person follows, Crime.Contact contact, int tense, Crime crime
   ) {
     float result = followResult(follows);
@@ -334,7 +334,28 @@ public class Lead implements Session.Saveable {
   }
   
   
+  public void updateLead(World world, Person follows) {
+    int time = world.timing.totalHours();
+    
+    for (Event event : world.events.active()) {
+      if (! (event instanceof Crime)) continue;
+      Crime crime = (Crime) event;
+      for (Crime.Contact contact : crime.allContacts()) {
+        
+        int start = contact.timeStart, tense = TENSE_BEFORE;
+        boolean begun = start >= 0;
+        boolean done = time > (contact.timeStart + contact.timeTaken);
+        if (begun) tense = done ? TENSE_AFTER : TENSE_DURING;
+        
+        if (! canDetect(contact, tense, crime)) continue;
+        performFollow(follows, contact, tense, crime);
+      }
+    }
+  }
+  
+  
 }
+
 
 
 

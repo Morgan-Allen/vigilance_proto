@@ -12,10 +12,7 @@ import java.awt.Image;
 
 
 
-//  TODO:  Events have to implement Assignment.  Yeah.
-
-
-public class Event implements Session.Saveable, Assignment {
+public abstract class Event implements Session.Saveable, Assignment {
   
   
   /**  Data fields, construction and save/load methods-
@@ -23,9 +20,7 @@ public class Event implements Session.Saveable, Assignment {
   final public EventType type;
   
   final World world;
-  Place place = null;
   int timeBegins = -1;
-  int duration   = -1;
   boolean complete;
   
   List <Person> involved = new List();
@@ -41,9 +36,7 @@ public class Event implements Session.Saveable, Assignment {
     s.cacheInstance(this);
     type       = (EventType) s.loadObject();
     world      = (World    ) s.loadObject();
-    place      = (Place    ) s.loadObject();
     timeBegins = s.loadInt ();
-    duration   = s.loadInt ();
     complete   = s.loadBool();
     s.loadObjects(involved);
   }
@@ -52,9 +45,7 @@ public class Event implements Session.Saveable, Assignment {
   public void saveState(Session s) throws Exception {
     s.saveObject(type      );
     s.saveObject(world     );
-    s.saveObject(place     );
     s.saveInt   (timeBegins);
-    s.saveInt   (duration  );
     s.saveBool  (complete  );
     s.saveObjects(involved);
   }
@@ -63,21 +54,8 @@ public class Event implements Session.Saveable, Assignment {
   
   /**  Supplemental setup/progression methods-
     */
-  public void assignParameters(
-    Place place, int durationHours
-  ) {
-    this.place    = place;
-    this.duration = durationHours * World.MINUTES_PER_HOUR;
-  }
-  
-  
   public World world() {
-    return place.world();
-  }
-  
-  
-  public Place targetLocation() {
-    return place;
+    return world;
   }
   
   
@@ -95,8 +73,6 @@ public class Event implements Session.Saveable, Assignment {
   
   
   public boolean allowsAssignment(Person p) {
-    //if (step == null) return false;
-    //return Visit.arrayIncludes(step.needs(), p);
     return true;
   }
   
@@ -119,9 +95,8 @@ public class Event implements Session.Saveable, Assignment {
   }
   
   
-  public int timeEnds() {
-    if (timeBegins == -1) return -1;
-    return timeBegins + duration;
+  public boolean scheduled() {
+    return timeBegins >= 0;
   }
   
   

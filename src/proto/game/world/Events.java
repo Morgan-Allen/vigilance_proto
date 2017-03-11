@@ -67,8 +67,7 @@ public class Events {
     }
     
     for (Event event : active) {
-      if (event.timeEnds() <= time || event.complete()) {
-        event.completeEvent();
+      if (event.complete()) {
         closeEvent(event);
       }
       else {
@@ -102,15 +101,6 @@ public class Events {
   
   /**  Logging background events-
     */
-  /*
-  public void logAssignment(Assignment action) {
-    //  TODO:  It's possible the assignment associated should be passed to the
-    //  log method directly...
-    this.currentAction = action;
-  }
-  //*/
-  
-  
   public void log(String info, int priority) {
     if (currentAction == null) return;
     final LogEntry entry = new LogEntry();

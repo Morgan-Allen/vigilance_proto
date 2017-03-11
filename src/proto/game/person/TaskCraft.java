@@ -89,7 +89,7 @@ public class TaskCraft extends Task {
   }
   
   
-  public Place targetLocation() {
+  public Place targetLocation(Person p) {
     return base;
   }
   

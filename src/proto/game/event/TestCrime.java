@@ -77,7 +77,6 @@ public class TestCrime {
       ROLE_DRUGS, ROLE_GRABS
     );
     
-    
     I.say("\n\nRoles are: ");
     for (Crime.RoleEntry entry : kidnap.entries) {
       I.say("  "+entry);
@@ -86,15 +85,13 @@ public class TestCrime {
     Lead lead = new Lead(Lead.LEAD_SURVEIL_PERSON, kidnap, crooks.leader());
     I.say("\nFollowing Lead...");
     
-    for (Crime.Contact contact : kidnap.contacts) {
-      if (! lead.canDetect(contact, Lead.TENSE_ANY, kidnap)) continue;
-      
-      float chance = 0, result = 0;
-      chance = lead.followChance(sleuth);
-      result = lead.followAttempt(sleuth, contact, Lead.TENSE_ANY, kidnap);
-      
-      I.say("  Detected: "+contact);
-      I.say("  Chance "+chance+"  Result: "+result);
+    world.beginMonitoring();
+    crooks.plans.assignMasterCrime(kidnap);
+    
+    for (int hours = 8, days = 5, n = days * 24 / hours; n-- > 0;) {
+      world.timing.advanceTime(hours);
+      world.updateWorld();
+      lead.updateLead(world, sleuth);
     }
     
     for (Crime.RoleEntry entry : kidnap.entries) {

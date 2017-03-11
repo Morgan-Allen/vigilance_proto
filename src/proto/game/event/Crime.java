@@ -50,37 +50,9 @@ public abstract class Crime extends Event {
   /**  Data fields, construction and save/load methods-
     */
   final Base base;
-  
-  protected class RoleEntry {
-    
-    Role role;
-    Element element;
-    Crime supplies;
-    
-    public String toString() {
-      return role.name+" ("+element+")";
-    }
-  }
-  
-  protected class Contact {
-    
-    int medium;
-    int timeTaken;
-    Role between[];
-    
-    int timeStart = -1;
-    boolean spooked = false;
-    
-    public String toString() {
-      return "Contact between "+I.list(between);
-    }
-  }
-  
+  int spookLevel = 0;
   List <RoleEntry> entries = new List();
   List <Contact> contacts = new List();
-  
-  int spookLevel   = 0;
-  int contactIndex = 0;
   
   
   
@@ -94,6 +66,7 @@ public abstract class Crime extends Event {
   public Crime(Session s) throws Exception {
     super(s);
     base = (Base) s.loadObject();
+    spookLevel = s.loadInt();
     
     for (int n = s.loadInt(); n-- > 0;) {
       RoleEntry entry = new RoleEntry();
@@ -117,6 +90,7 @@ public abstract class Crime extends Event {
   public void saveState(Session s) throws Exception {
     super.saveState(s);
     s.saveObject(base);
+    s.saveInt(spookLevel);
     
     s.saveInt(entries.size());
     for (RoleEntry entry : entries) {
@@ -139,6 +113,22 @@ public abstract class Crime extends Event {
   /**  Queueing and executing sub-events and generating clues for
     *  investigation-
     */
+  //  TODO:  Consider having this extend Task.
+  protected class Contact {
+    
+    int medium;
+    int timeTaken;
+    Role between[];
+    
+    int timeStart = -1;
+    boolean spooked = false;
+    
+    public String toString() {
+      return "Contact between "+I.list(between);
+    }
+  }
+  
+  
   public void queueContact(int medium, int timeTaken, Role... between) {
     Contact c = new Contact();
     c.between   = between;
@@ -153,31 +143,39 @@ public abstract class Crime extends Event {
   }
   
   
-  public void updateEvent() {
-    int time = world.timing.totalHours();
-    
-    Contact current = contacts.atIndex(contactIndex);
-    if (current != null) {
-      if (current.timeStart == -1) current.timeStart = time;
-      if (time >= current.timeStart + current.timeTaken) {
-        contactIndex++;
-      }
-      else {
-        //  TODO:  Notify anyone doing surveillance on the previous contact.
-      }
-    }
-    
+  public boolean contactBegun(Contact contact) {
+    return contact != null && contact.timeStart >= 0;
   }
   
   
+  public boolean contactComplete(Contact contact) {
+    if (! contactBegun(contact)) return false;
+    int time = base.world().timing.totalHours();
+    return time >= contact.timeStart + contact.timeTaken;
+  }
   
   
+  public Series <Contact> allContacts() {
+    return contacts;
+  }
   
   
   
   /**  Utility methods for assigning roles, fulfilling needs and evaluating
     *  possible targets-
     */
+  protected class RoleEntry {
+    
+    Role role;
+    Element element;
+    Crime supplies;
+    
+    public String toString() {
+      return role.name+" ("+element+")";
+    }
+  }
+  
+  
   public void assignRole(Element element, Role role) {
     RoleEntry match = roleFor(element, role);
     if (match == null) entries.add(match = new RoleEntry());
@@ -198,18 +196,23 @@ public abstract class Crime extends Event {
   }
   
   
-  public Element target() {
-    return elementWithRole(ROLE_TARGET);
+  public Person organiser() {
+    return (Person) elementWithRole(ROLE_ORGANISER);
   }
   
   
-  public Element targetAt() {
-    return elementWithRole(ROLE_SCENE);
+  public Place hideout() {
+    return (Place) elementWithRole(ROLE_HIDEOUT);
   }
   
   
-  public Element hideout() {
-    return elementWithRole(ROLE_HIDEOUT);
+  public Person target() {
+    return (Person) elementWithRole(ROLE_TARGET);
+  }
+  
+  
+  public Place scene() {
+    return (Place) elementWithRole(ROLE_SCENE);
   }
   
   
@@ -296,7 +299,74 @@ public abstract class Crime extends Event {
     return venues;
   }
   
+
+  
+  /**  Life cycle and execution:
+    */
+  public boolean fillRoles() {
+    //  TODO:  Make abstract and implement per-subclass.
+    return false;
+  }
+  
+  
+  public boolean possible() {
+    for (RoleEntry entry : entries) {
+      if (! rolePossible(entry.role, entry.element, entry.supplies)) {
+        return false;
+      }
+    }
+    return true;
+  }
+  
+  
+  public void updateEvent() {
+    for (RoleEntry entry : entries) if (entry.supplies != null) {
+      if (! entry.supplies.hasBegun()) {
+        world.events.scheduleEvent(entry.supplies);
+      }
+    }
+    
+    //  TODO:  Re-satisfy needs as and when required.
+    if (! possible()) return;
+    
+    int time = world.timing.totalHours();
+    Contact current = null, next = null;
+    
+    for (Contact c : contacts) {
+      if (next    == null && ! contactBegun(c)) next    = c;
+      if (current == null &&   contactBegun(c)) current = c;
+    }
+    if ((current == null || contactComplete(current)) && next != null) {
+      next.timeStart = time;
+    }
+    
+    if (current == contacts.last() && contactComplete(current)) {
+      //  TODO:  Execute the actual crime.
+      
+      completeEvent();
+    }
+  }
+  
+  
+  protected boolean rolePossible(Role role, Element element, Crime supplies) {
+    if (supplies != null) {
+      if (! supplies.possible()) return false;
+      if (! supplies.complete()) return false;
+    }
+    return true;
+  }
+  
+  
+  public Place targetLocation(Person p) {
+    return scene();
+  }
+  
 }
+
+
+
+
+
 
 
 

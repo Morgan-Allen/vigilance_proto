@@ -50,7 +50,7 @@ public class MissionsView extends UINode {
       String assignDesc = "None", locDesc = "";
       if (task != null) {
         assignDesc = task.activeInfo();
-        locDesc = " ("+task.targetLocation().region()+")";
+        locDesc = " ("+task.targetLocation(person).region()+")";
       }
       else {
         assignDesc = "At Base";

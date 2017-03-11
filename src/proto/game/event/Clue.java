@@ -96,13 +96,13 @@ public class Clue {
   /**  Rendering, debug and interface methods-
     */
   public String toString() {
+    if (match != null && confirmed) return
+      leadType.name+" indicates "+
+      role+" is: "+match
+    ;
     if (trait != null) return
       leadType.name+" indicates "+
       role+" has trait: "+trait
-    ;
-    else if (match != null) return
-      leadType.name+" indicates "+
-      role+" is: "+match
     ;
     return "";
   }
