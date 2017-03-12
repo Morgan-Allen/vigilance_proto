@@ -13,6 +13,7 @@ public class Volley implements Session.Saveable {
   
   /**  Data fields, construction and save/load methods-
     */
+  Ability source;
   Object orig;
   Object targ;
   ItemType weaponType;
@@ -20,6 +21,9 @@ public class Volley implements Session.Saveable {
   int damageType;
   boolean ranged;
   
+  //  Provides a 'gatekeeper' around increments and decrements to relevant
+  //  volley parameters, to ensure that all modifiers can be recorded (see
+  //  below.)
   public class Stat {
     String label;
     int value;
@@ -70,6 +74,7 @@ public class Volley implements Session.Saveable {
     COVER    = "Cover"
   ;
   
+  boolean didBegin  ;
   boolean didConnect;
   boolean didDamage ;
   boolean didCrit   ;
@@ -98,6 +103,7 @@ public class Volley implements Session.Saveable {
     orig = s.loadObject();
     targ = s.loadObject();
     
+    source     = (Ability ) s.loadObject();
     weaponType = (ItemType) s.loadObject();
     armourType = (ItemType) s.loadObject();
     ranged     = s.loadBool();
@@ -107,6 +113,7 @@ public class Volley implements Session.Saveable {
       stat.value = s.loadInt();
     }
     
+    didBegin   = s.loadBool();
     didConnect = s.loadBool();
     didDamage  = s.loadBool();
     didCrit    = s.loadBool();
@@ -116,6 +123,8 @@ public class Volley implements Session.Saveable {
   public void saveState(Session s) throws Exception {
     s.saveObject((Session.Saveable) orig);
     s.saveObject((Session.Saveable) targ);
+    
+    s.saveObject(source    );
     s.saveObject(weaponType);
     s.saveObject(armourType);
     s.saveBool  (ranged    );
@@ -125,9 +134,15 @@ public class Volley implements Session.Saveable {
       s.saveInt(stat.value);
     }
     
+    s.saveBool(didBegin  );
     s.saveBool(didConnect);
     s.saveBool(didDamage );
     s.saveBool(didCrit   );
+  }
+  
+  
+  public Ability sourceAbility() {
+    return source;
   }
   
   
@@ -170,37 +185,23 @@ public class Volley implements Session.Saveable {
     *  and any other contributing factors-
     */
   public void setupVolley(
-    Person self, Person hits, boolean ranged, Scene scene
+    Person self, Person hits, Ability source, boolean ranged, Scene scene
   ) {
     Item weapon = self.gear.weapon(), armour = hits.gear.armour();
-    setupVolley(self, weapon, hits, armour, ranged, scene);
-  }
-  
-  
-  public void setupMeleeVolley(Person self, Person hits, Scene scene) {
-    Item weapon = self.gear.weapon(), armour = hits.gear.armour();
-    if (weapon != null && ! weapon.kind().melee()) {
-      weapon = new Item(Common.UNARMED, self.world());
-    }
-    setupVolley(self, weapon, hits, armour, ranged, scene);
+    setupVolley(self, weapon, hits, armour, source, ranged, scene);
   }
   
   
   public void setupVolley(
     Person self, Item weapon,
     Person hits, Item armour,
-    boolean ranged, Scene scene
+    Ability source, boolean ranged, Scene scene
   ) {
-    final Item nativeWeapon = self.gear.weapon();
     this.orig       = self  ;
     this.targ       = hits  ;
     this.ranged     = ranged;
     this.weaponType = weapon == null ? Common.UNARMED    : weapon.kind();
     this.armourType = armour == null ? Common.UNARMOURED : armour.kind();
-    
-    if (weapon != nativeWeapon) {
-      self.gear.equipItem(weapon, PersonGear.SLOT_WEAPON);
-    }
     
     damageType      = weaponType.properties;
     selfDamageBase .inc(self.stats.levelFor(MIN_DAMAGE), MIN_DAMAGE);
@@ -227,10 +228,6 @@ public class Volley implements Session.Saveable {
     }
     
     calcMargins();
-    
-    if (weapon != nativeWeapon) {
-      self.gear.equipItem(nativeWeapon, PersonGear.SLOT_WEAPON);
-    }
   }
   
   

@@ -112,7 +112,7 @@ public class Heroes {
       PERSUADE     , 5,
       
       Techniques.STEADY_AIM, 1,
-      Techniques.OVERWATCH , 1,
+      Techniques.VIGILANCE , 1,
       Techniques.SPRINTER  , 1,
       
       Weapons.REVOLVER,

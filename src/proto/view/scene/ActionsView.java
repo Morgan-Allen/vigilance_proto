@@ -138,7 +138,7 @@ public class ActionsView extends UINode {
       if (canCommand) {
         s.append("\n\n  Abilities (Press 1-9):");
         char key = '1';
-        for (Ability r : p.stats.listAbilities()) {
+        for (Ability r : p.actions.listAbilities()) {
           if (! r.active()) continue;
           s.append("\n    "+r.name());
           

@@ -54,6 +54,12 @@ public class Techniques {
       Ability.IS_MELEE, 1, Ability.REAL_HARM, Ability.MINOR_POWER
     ) {
       
+      public boolean allowsUse(Person acting) {
+        if (! acting.gear.weaponType().melee()) return false;
+        return true;
+      }
+      
+      
       public boolean allowsTarget(Object target, Scene scene, Person acting) {
         if (target instanceof Person) {
           final Person other = (Person) target;
@@ -68,7 +74,7 @@ public class Techniques {
       protected Volley createVolley(Action use, Object target, Scene scene) {
         int level = use.acting.stats.levelFor(this);
         Volley volley = new Volley();
-        volley.setupMeleeVolley(use.acting, (Person) target, scene);
+        volley.setupVolley(use.acting, (Person) target, this, false, scene);
         volley.selfDamageRange.inc(1 + level, this);
         volley.stunPercent    .set(20       , this);
         //  TODO:  Include actual stun effects!
@@ -90,6 +96,11 @@ public class Techniques {
       Ability.IS_MELEE, 2, Ability.REAL_HARM, Ability.MINOR_POWER
     ) {
       
+      public boolean allowsUse(Person acting) {
+        if (! acting.gear.weaponType().melee()) return false;
+        return true;
+      }
+      
       public boolean allowsTarget(Object target, Scene scene, Person acting) {
         if (target instanceof Person) {
           final Person other = (Person) target;
@@ -100,7 +111,7 @@ public class Techniques {
       
       protected Volley createVolley(Action use, Object target, Scene scene) {
         Volley volley = new Volley();
-        volley.setupMeleeVolley(use.acting, (Person) target, scene);
+        volley.setupVolley(use.acting, (Person) target, this, false, scene);
         volley.stunPercent.set(100, this);
         return volley;
       }
@@ -203,32 +214,19 @@ public class Techniques {
       }
     },
     
-    OVERWATCH = new Ability(
-      "Overwatch", "ability_overwatch",
-      ICONS_DIR+"icon_overwatch.png",
-      "Readies a ranged weapon for use when an enemy comes in view, at a -15 "+
-      "accuracy penality (+5 per experience grade.)",
-      Ability.IS_DELAYED | Ability.TRIGGER_ON_NOTICE, 1,
+    VIGILANCE = new Ability(
+      "Vigilance", "ability_vigilance",
+      ICONS_DIR+"icon_vigilance.png",
+      "Reduces the accuracy penalty for reaction fire and provides a slight "+
+      "bonus to sight range.",
+      Ability.IS_PASSIVE | Ability.TRIGGER_ON_ATTACK, 1,
       Ability.MINOR_HELP, Ability.MINOR_POWER
     ) {
-      
-      public boolean triggerOnNoticing(Person acts, Person seen, Action noted) {
-        if (! noted.inMotion()) return false;
-        return seen.isEnemy(acts);
-      }
-      
-      public void applyOnNoticing(Person acts, Person seen, Action noted) {
-        Scene scene = acts.currentScene();
+      public void modifyAttackVolley(Volley volley) {
+        if (volley.sourceAbility() != Common.OVERWATCH) return;
+        Person acts = volley.origAsPerson();
         int level = acts.stats.levelFor(this);
-        
-        //  TODO:  Include an added bonus for reserving AP!
-        
-        final Action fire = Common.FIRE.takeFreeAction(
-          acts, seen.currentTile(), seen, scene
-        );
-        fire.volley().selfAccuracy.inc((level * 5) - 20, this);
-        
-        acts.actions.cancelAction();
+        volley.selfAccuracy.inc(level * 5, this);
       }
     },
     
@@ -261,7 +259,7 @@ public class Techniques {
       protected Volley createVolley(Action use, Object target, Scene scene) {
         Volley volley = new Volley();
         int level = use.acting.stats.levelFor(this) - 1;
-        volley.setupVolley(use.acting, (Person) target, true, scene);
+        volley.setupVolley(use.acting, (Person) target, this, true, scene);
         int miss = -15 + (level * 5 );
         int soft =  40 + (level * 10);
         int crit = -10;
@@ -294,11 +292,10 @@ public class Techniques {
     PUNISHER.attachRoots(DISARM );
     
     p.attachAbility(STEADY_AIM , 2, 0);
-    p.attachAbility(OVERWATCH  , 2, 1);
+    p.attachAbility(VIGILANCE  , 2, 1);
     p.attachAbility(FLESH_WOUND, 2, 2);
-    OVERWATCH  .attachRoots(STEADY_AIM);
-    FLESH_WOUND.attachRoots(OVERWATCH );
-    
+    VIGILANCE  .attachRoots(STEADY_AIM);
+    FLESH_WOUND.attachRoots(VIGILANCE );
   }
 }
 

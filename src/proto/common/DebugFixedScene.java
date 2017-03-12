@@ -85,7 +85,7 @@ public class DebugFixedScene extends RunGame {
     hero.gear.equipItem(Gadgets.TEAR_GAS, PersonGear.SLOT_ITEM_1);
     hero.gear.equipItem(Gadgets.BOLAS   , PersonGear.SLOT_ITEM_2);
     hero.stats.setLevel(Techniques.STEADY_AIM, 1, true);
-    hero.stats.setLevel(Techniques.OVERWATCH , 1, true);
+    hero.stats.setLevel(Techniques.VIGILANCE , 1, true);
     hero.addAssignment(mission);
     mission.enterScene(hero, 0, across++);
     hero.onTurnStart();

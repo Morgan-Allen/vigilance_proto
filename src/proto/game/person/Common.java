@@ -87,7 +87,7 @@ public class Common {
       
       protected Volley createVolley(Action use, Object target, Scene scene) {
         Volley volley = new Volley();
-        volley.setupMeleeVolley(use.acting, (Person) target, scene);
+        volley.setupVolley(use.acting, (Person) target, this, false, scene);
         volley.stunPercent.inc(50, this);
         return volley;
       }
@@ -114,7 +114,7 @@ public class Common {
       
       protected Volley createVolley(Action use, Object target, Scene scene) {
         Volley volley = new Volley();
-        volley.setupVolley(use.acting, (Person) target, true, scene);
+        volley.setupVolley(use.acting, (Person) target, this, true, scene);
         return volley;
       }
       
@@ -158,7 +158,48 @@ public class Common {
         }
       }
     },
-
+    
+    OVERWATCH = new Ability(
+      "Overwatch", "ability_overwatch",
+      ICONS_DIR+"icon_overwatch.png",
+      "Readies a ranged weapon for use when an enemy comes in view, at a -15 "+
+      "accuracy penality (+5 per experience grade.)",
+      Ability.IS_DELAYED | Ability.TRIGGER_ON_NOTICE, 1,
+      Ability.MINOR_HELP, Ability.MINOR_POWER
+    ) {
+      
+      public boolean triggerOnNoticing(Person acts, Person seen, Action noted) {
+        if (! noted.inMotion()) return false;
+        return seen.isEnemy(acts);
+      }
+      
+      public void applyOnNoticing(Person acts, Person seen, Action noted) {
+        Scene scene = acts.currentScene();
+        int level = acts.stats.levelFor(this);
+        
+        //  TODO:  Include an added bonus for reserving AP!
+        
+        final Action fire = Common.FIRE.takeFreeAction(
+          acts, seen.currentTile(), seen, scene
+        );
+        fire.volley().selfAccuracy.inc((level * 5) - 20, this);
+        
+        acts.actions.cancelAction();
+      }
+    },
+    
+    SWITCH = new Ability(
+      "Switch Weapon", "ability_switch",
+      ICONS_DIR+"icon_switch.png",
+      "Switches your current weapon.",
+      Ability.IS_SELF_ONLY, 1,
+      Ability.NO_HARM, Ability.NO_POWER
+    ) {
+      public void applyOnActionAssigned(Action use) {
+        use.acting.gear.switchWeapon();
+      }
+    },
+    
     //  TODO:  Have a special command for swapping weapons, then merge strike/
     //  fire into one ability, along with guard/overwatch.
     HIDE = new Ability(
@@ -178,9 +219,8 @@ public class Common {
         if (trait == PersonStats.DEFENCE   ) return 20;
         return 0;
       }
-    },
-    
-    BASIC_ABILITIES[] = { MOVE, STRIKE, FIRE, GUARD, HIDE };
+    };
+    //BASIC_ABILITIES[] = { MOVE, STRIKE, FIRE, GUARD, HIDE };
   
   
   final public static Ability SPECIAL_ACTION = new Ability(

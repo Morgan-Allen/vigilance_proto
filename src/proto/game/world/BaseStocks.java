@@ -47,10 +47,10 @@ public class BaseStocks {
       if (! type.availableFor(person, base)) continue;
       available.include(type);
     }
-    if (slotType == PersonGear.SLOT_ARMOUR) {
+    if (slotType == PersonGear.SLOT_TYPE_ARMOUR) {
       available.add(Common.UNARMOURED);
     }
-    if (slotType == PersonGear.SLOT_WEAPON) {
+    if (slotType == PersonGear.SLOT_TYPE_WEAPON) {
       available.add(Common.UNARMED);
     }
     return available;

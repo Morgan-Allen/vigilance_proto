@@ -228,7 +228,7 @@ public abstract class Ability extends Trait {
   }
   
   
-  public boolean allowsUse(Person acting, StringBuffer failLog) {
+  public boolean allowsUse(Person acting) {
     return true;
   }
   
@@ -243,15 +243,15 @@ public abstract class Ability extends Trait {
     Person acting, Tile dest, Object target,
     Scene scene, Tile pathToTake[], StringBuffer failLog
   ) {
-    final Series <Condition> conds = acting.stats.conditions;
+    if (! allowsUse(acting)) {
+      return null;
+    }
     
+    final Series <Condition> conds = acting.stats.conditions;
     if (! conds.empty()) for (Condition c : conds) {
       if (! c.basis.conditionAllowsAbility(this)) {
         return failResult(c.basis+" Prevents Use", failLog);
       }
-    }
-    if (! allowsUse(acting, failLog)) {
-      return null;
     }
     
     if (acting == null || ! allowsTarget(target, scene, acting)) {
@@ -375,7 +375,7 @@ public abstract class Ability extends Trait {
         }
       }
       
-      if (self != null) for (Ability a : self.stats.listAbilities()) {
+      if (self != null) for (Ability a : self.actions.listAbilities()) {
         if (! a.passive()) continue;
         if (a.triggerOnAttack() && a.allowsTarget(self, scene, self)) {
           a.modifyAttackVolley(volley);
@@ -411,7 +411,7 @@ public abstract class Ability extends Trait {
         }
       }
       
-      if (hits != null) for (Ability a : hits.stats.listAbilities()) {
+      if (hits != null) for (Ability a : hits.actions.listAbilities()) {
         if (! a.passive()) continue;
         if (a.triggerOnDefend() && a.allowsTarget(hits, scene, hits)) {
           a.modifyDefendVolley(volley);
