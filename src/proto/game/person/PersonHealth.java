@@ -29,6 +29,8 @@ public class PersonHealth {
   
   int luck = INIT_LUCK, stress = INIT_STRESS;
   float injury, stun, totalHarm;
+  
+  //  TODO:  Make alive/conscious into States (see Person class.)
   boolean bleed = false, alive = true, conscious = true;
   
   

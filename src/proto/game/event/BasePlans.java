@@ -53,7 +53,7 @@ public class BasePlans {
   
   public void updatePlanning() {
     if (masterCrime != null) {
-      //  TODO:  Add a delay here...
+      //  TODO:  Add a delay here!
       
       if (! masterCrime.scheduled()) {
         base.world().events.scheduleEvent(masterCrime);

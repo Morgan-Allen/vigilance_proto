@@ -21,8 +21,11 @@ public class Person extends Element {
     HEROES, CIVILIANS, VILLAINS
   };
   
+  public static enum State {
+    HEALTHY, HOSPITALISED, CAPTIVE, DECEASED
+  }
   
-  Side side;
+  
   String name;
   
   final public PersonMind    mind    = new PersonMind   (this);
@@ -31,7 +34,9 @@ public class Person extends Element {
   final public PersonStats   stats   = new PersonStats  (this);
   final public PersonHealth  health  = new PersonHealth (this);
   final public PersonGear    gear    = new PersonGear   (this);
-  
+
+  Side side;
+  State state;
   Base base;
   Place resides;
   Scene scene;
@@ -74,8 +79,7 @@ public class Person extends Element {
   public Person(Session s) throws Exception {
     super(s);
     
-    side  = (Side ) s.loadEnum(Side.values());
-    name  = s.loadString();
+    name = s.loadString();
     
     mind   .loadState(s);
     history.loadState(s);
@@ -83,7 +87,9 @@ public class Person extends Element {
     stats  .loadState(s);
     health .loadState(s);
     gear   .loadState(s);
-    
+
+    side    = (Side ) s.loadEnum(Side .values());
+    state   = (State) s.loadEnum(State.values());
     base    = (Base ) s.loadObject();
     resides = (Place) s.loadObject();
     scene   = (Scene) s.loadObject();
@@ -97,7 +103,6 @@ public class Person extends Element {
   public void saveState(Session s) throws Exception {
     super.saveState(s);
     
-    s.saveEnum  (side);
     s.saveString(name);
     
     mind   .saveState(s);
@@ -106,7 +111,9 @@ public class Person extends Element {
     stats  .saveState(s);
     health .saveState(s);
     gear   .saveState(s);
-    
+
+    s.saveEnum  (side   );
+    s.saveEnum  (state  );
     s.saveObject(base   );
     s.saveObject(resides);
     s.saveObject(scene  );
@@ -203,7 +210,7 @@ public class Person extends Element {
   
   
   
-  /**  Setting base and residence:
+  /**  Setting base, state and residence:
     */
   public void setBase(Base base) {
     this.base = base;
@@ -215,6 +222,11 @@ public class Person extends Element {
   }
   
   
+  public void setState(State state) {
+    this.state = state;
+  }
+  
+  
   public Base base() {
     return base;
   }
@@ -222,6 +234,11 @@ public class Person extends Element {
   
   public Place resides() {
     return resides;
+  }
+  
+  
+  public State state() {
+    return state;
   }
   
   
