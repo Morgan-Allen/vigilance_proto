@@ -6,10 +6,18 @@ import proto.game.world.*;
 import proto.game.person.*;
 import proto.util.*;
 import static proto.game.person.PersonStats.*;
+import java.awt.Image;
 
 
+//
+//  TODO:  You could sharpen this up a little, with separate success-chance
+//  for each party involved in a contact?
+//  TODO:  You might consider only giving information on the rough
+//  location of a meet or wiretap trace?
+//  ...Yeah.  Determine location and traits in a separate step.
 
-public class Lead implements Session.Saveable {
+
+public class Lead extends Task {
   
   
   /**  Data fields, construction and save/load methods-
@@ -124,10 +132,12 @@ public class Lead implements Session.Saveable {
   final Type type;
   final Crime crime;
   final Element focus;
-  private boolean done;
+  private String lastContactID;
   
   
-  Lead(Type type, Crime crime, Element focus) {
+  Lead(Base base, Type type, Crime crime, Element focus) {
+    super(base, Task.TIME_INDEF);
+    
     this.type  = type ;
     this.crime = crime;
     this.focus = focus;
@@ -147,19 +157,20 @@ public class Lead implements Session.Saveable {
   
   
   public Lead(Session s) throws Exception {
-    s.cacheInstance(this);
+    super(s);
     type  = LEAD_TYPES[s.loadInt()];
     crime = (Crime  ) s.loadObject();
     focus = (Element) s.loadObject();
-    done = s.loadBool();
+    lastContactID = s.loadString();
   }
   
   
   public void saveState(Session s) throws Exception {
+    super.saveState(s);
     s.saveInt(type.ID);
     s.saveObject(crime);
     s.saveObject(focus);
-    s.saveBool(done);
+    s.saveString(lastContactID);
   }
   
   
@@ -254,30 +265,30 @@ public class Lead implements Session.Saveable {
   
   
   
-  public float followChance(Person follows) {
+  public float followChance(Series <Person> follow) {
     float skill = 0, obstacle = 1;
     
     if (type.medium == MEDIUM_SURVEIL) {
       Person perp = (Person) focus;
-      skill    = follows.stats.levelFor(SIGHT_RANGE);
+      skill = teamStatBonus(follow, SIGHT_RANGE);
       obstacle = perp   .stats.levelFor(HIDE_RANGE );
     }
     
     if (type.medium == MEDIUM_WIRE) {
       Place site = (Place) focus;
-      skill    = follows.stats.levelFor(ENGINEERING);
+      skill = teamStatBonus(follow, ENGINEERING);
       obstacle = 5;
     }
     
     if (type.medium == MEDIUM_QUESTION) {
       Person perp = (Person) focus;
-      skill    = follows.stats.levelFor(QUESTION);
+      skill = teamStatBonus(follow, QUESTION);
       obstacle = perp.stats.levelFor(PERSUADE);
     }
     
     if (type.medium == MEDIUM_COVER) {
       Place site = (Place) focus;
-      skill    = follows.stats.levelFor(PERSUADE);
+      skill = teamStatBonus(follow, PERSUADE);
       obstacle = 5;
     }
     
@@ -285,8 +296,19 @@ public class Lead implements Session.Saveable {
   }
   
   
-  protected float followResult(Person follows) {
-    float chance = followChance(follows);
+  protected float teamStatBonus(Series <Person> follow, Trait stat) {
+    float bestStat = 0, sumStats = 0;
+    for (Person p : follow) {
+      float level = p.stats.levelFor(stat);
+      sumStats += level;
+      bestStat = Nums.max(bestStat, level);
+    }
+    return bestStat + ((sumStats - bestStat) / 2);
+  }
+  
+  
+  protected float followResult(Series <Person> follow) {
+    float chance = followChance(follow);
     chance = 1 - (Nums.sqrt(1 - chance));
     boolean roll1 = Rand.num() < chance, roll2 = Rand.num() < chance;
     
@@ -297,63 +319,91 @@ public class Lead implements Session.Saveable {
   
   
   protected float performFollow(
-    Person follows, Crime.Contact contact, int tense, Crime crime
+    Crime.Contact contact, int tense, Crime crime, Series <Person> follow
   ) {
-    float result = followResult(follows);
-    int time = crime.base.world().timing.totalHours();
-    this.done = true;
     //
-    //  TODO:  You could sharpen this up a little, with separate success-chance
-    //  for each party involved in a contact?
+    //  First, check to see whether anything has actually changed here:
+    String contactID = contact.ID+"_"+tense;
+    if (contactID.equals(lastContactID)) {
+      return RESULT_NONE;
+    }
+
+    float result = followResult(follow);
+    int time = crime.base.world().timing.totalHours();
     
     if (result <= RESULT_COLD) {
-      return result;
+      
     }
     else if (result <= RESULT_PARTIAL) {
-      //  TODO:  You might consider only giving information on the rough
-      //  location of a meet or wiretap trace?
-      //  ...Yeah.  Determine location and traits in a separate step.
-      
       for (Clue clue : possibleClues(contact, tense, crime)) {
         if (Rand.num() > 0.5f) continue;
-        CaseFile file = follows.base().leads.caseFor(clue.match);
+        CaseFile file = base.leads.caseFor(clue.match);
         file.recordClue(clue);
       }
     }
     else if (result <= RESULT_HOT) {
       for (Crime.Role role : contact.between) {
         Element subject = crime.elementWithRole(role);
-        CaseFile file = follows.base().leads.caseFor(subject);
+        CaseFile file = base.leads.caseFor(subject);
         
         Clue clue = new Clue(crime,role);
         clue.confirmMatch(subject, type, time);
         file.recordClue(clue);
       }
     }
+    
+    crime.takeSpooking(type.profile);
     return result;
   }
   
   
-  public void updateLead(World world, Person follows) {
-    int time = world.timing.totalHours();
+  public boolean updateAssignment() {
+    if (! super.updateAssignment()) return false;
+    Series <Person> active = active();
     
-    for (Event event : world.events.active()) {
+    for (Event event : base.world().events.active()) {
       if (! (event instanceof Crime)) continue;
       Crime crime = (Crime) event;
+      
       for (Crime.Contact contact : crime.allContacts()) {
-        
-        int start = contact.timeStart, tense = TENSE_BEFORE;
-        boolean begun = start >= 0;
-        boolean done = time > (contact.timeStart + contact.timeTaken);
-        if (begun) tense = done ? TENSE_AFTER : TENSE_DURING;
-        
+        int tense = crime.contactTense(contact);
         if (! canDetect(contact, tense, crime)) continue;
-        performFollow(follows, contact, tense, crime);
+        performFollow(contact, tense, crime, active);
       }
     }
+    
+    return true;
   }
   
   
+  
+  public Place targetLocation(Person p) {
+    return focus.place();
+  }
+  
+  
+  
+  /**  Rendering, debug and interface methods-
+    */
+  //  TODO:  Fill these out-
+  public String activeInfo() {
+    return null;
+  }
+  
+  
+  public String helpInfo() {
+    return null;
+  }
+  
+  
+  public Image icon() {
+    return null;
+  }
+  
+  
+  public String choiceInfo(Person p) {
+    return null;
+  }
 }
 
 

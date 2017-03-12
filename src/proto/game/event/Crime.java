@@ -50,9 +50,9 @@ public abstract class Crime extends Event {
   /**  Data fields, construction and save/load methods-
     */
   final Base base;
-  int spookLevel = 0;
-  List <RoleEntry> entries = new List();
-  List <Contact> contacts = new List();
+  int spookLevel = 0, nextContactID = 0;
+  List <RoleEntry> entries  = new List();
+  List <Contact  > contacts = new List();
   
   
   
@@ -66,7 +66,8 @@ public abstract class Crime extends Event {
   public Crime(Session s) throws Exception {
     super(s);
     base = (Base) s.loadObject();
-    spookLevel = s.loadInt();
+    spookLevel    = s.loadInt();
+    nextContactID = s.loadInt();
     
     for (int n = s.loadInt(); n-- > 0;) {
       RoleEntry entry = new RoleEntry();
@@ -80,6 +81,7 @@ public abstract class Crime extends Event {
       contact.between   = (Role[]) s.loadObjectArray(Role.class);
       contact.medium    = s.loadInt();
       contact.timeTaken = s.loadInt();
+      contact.ID        = s.loadInt();
       contact.timeStart = s.loadInt();
       contact.spooked   = s.loadBool();
       contacts.add(contact);
@@ -90,7 +92,8 @@ public abstract class Crime extends Event {
   public void saveState(Session s) throws Exception {
     super.saveState(s);
     s.saveObject(base);
-    s.saveInt(spookLevel);
+    s.saveInt(spookLevel   );
+    s.saveInt(nextContactID);
     
     s.saveInt(entries.size());
     for (RoleEntry entry : entries) {
@@ -103,6 +106,7 @@ public abstract class Crime extends Event {
       s.saveObjectArray(contact.between);
       s.saveInt (contact.medium   );
       s.saveInt (contact.timeTaken);
+      s.saveInt (contact.ID       );
       s.saveInt (contact.timeStart);
       s.saveBool(contact.spooked  );
     }
@@ -113,12 +117,13 @@ public abstract class Crime extends Event {
   /**  Queueing and executing sub-events and generating clues for
     *  investigation-
     */
-  //  TODO:  Consider having this extend Task.
+  //  TODO:  Have this extend Task.
   protected class Contact {
     
     int medium;
     int timeTaken;
     Role between[];
+    int ID;
     
     int timeStart = -1;
     boolean spooked = false;
@@ -134,6 +139,7 @@ public abstract class Crime extends Event {
     c.between   = between;
     c.medium    = medium;
     c.timeTaken = timeTaken;
+    c.ID        = nextContactID++;
     contacts.add(c);
   }
   
@@ -155,8 +161,24 @@ public abstract class Crime extends Event {
   }
   
   
+  public int contactTense(Contact contact) {
+    int time = base.world().timing.totalHours();
+    int start = contact.timeStart, tense = Lead.TENSE_BEFORE;
+    boolean begun = start >= 0;
+    boolean done = time > (contact.timeStart + contact.timeTaken);
+    if (begun) tense = done ? Lead.TENSE_AFTER : Lead.TENSE_DURING;
+    return tense;
+  }
+  
+  
   public Series <Contact> allContacts() {
     return contacts;
+  }
+  
+  
+  public void takeSpooking(int spookAmount) {
+    spookLevel += spookAmount;
+    //  TODO:  Abort the heist if you're too spooked!
   }
   
   
@@ -303,9 +325,15 @@ public abstract class Crime extends Event {
   
   /**  Life cycle and execution:
     */
-  public boolean fillRoles() {
+  protected boolean fillRoles() {
     //  TODO:  Make abstract and implement per-subclass.
     return false;
+  }
+  
+  
+  protected void onCompletion(Contact contact) {
+    //  TODO:  Make abstract and implement per-subclass.
+    return;
   }
   
   
@@ -342,7 +370,6 @@ public abstract class Crime extends Event {
     
     if (current == contacts.last() && contactComplete(current)) {
       //  TODO:  Execute the actual crime.
-      
       completeEvent();
     }
   }
@@ -362,15 +389,6 @@ public abstract class Crime extends Event {
   }
   
 }
-
-
-
-
-
-
-
-
-
 
 
 

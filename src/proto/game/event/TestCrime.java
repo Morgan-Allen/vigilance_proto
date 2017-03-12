@@ -82,16 +82,20 @@ public class TestCrime {
       I.say("  "+entry);
     }
     
-    Lead lead = new Lead(Lead.LEAD_SURVEIL_PERSON, kidnap, crooks.leader());
     I.say("\nFollowing Lead...");
     
+    Lead lead = null;
     world.beginMonitoring();
     crooks.plans.assignMasterCrime(kidnap);
+    
+    
+    lead = new Lead(heroes, Lead.LEAD_SURVEIL_PERSON, kidnap, crooks.leader());
+    sleuth.addAssignment(lead);
     
     for (int hours = 8, days = 5, n = days * 24 / hours; n-- > 0;) {
       world.timing.advanceTime(hours);
       world.updateWorld();
-      lead.updateLead(world, sleuth);
+      lead.updateAssignment();
     }
     
     for (Crime.RoleEntry entry : kidnap.entries) {
