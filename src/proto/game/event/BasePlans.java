@@ -14,8 +14,8 @@ public class BasePlans {
     */
   final Base base;
   
-  CrimeType crimeTypes[] = new CrimeType[0];
-  Crime masterCrime;
+  PlotType plotTypes[] = new PlotType[0];
+  Plot rootPlot;
   
   
   
@@ -25,38 +25,38 @@ public class BasePlans {
   
   
   public void loadState(Session s) throws Exception {
-    crimeTypes  = (CrimeType[]) s.loadObjectArray(CrimeType.class);
-    masterCrime = (Crime) s.loadObject();
+    plotTypes = (PlotType[]) s.loadObjectArray(PlotType.class);
+    rootPlot  = (Plot) s.loadObject();
   }
   
   
   public void saveState(Session s) throws Exception {
-    s.saveObjectArray(crimeTypes);
-    s.saveObject(masterCrime);
+    s.saveObjectArray(plotTypes);
+    s.saveObject(rootPlot);
   }
   
   
-  public void assignCrimeTypes(CrimeType... types) {
-    this.crimeTypes = types;
+  public void assignPlotTypes(PlotType... types) {
+    this.plotTypes = types;
   }
   
   
-  public Crime generateNextCrime() {
+  public Plot generateNextPlot() {
     return null;
   }
   
   
-  public void assignMasterCrime(Crime master) {
-    this.masterCrime = master;
+  public void assignRootPlot(Plot master) {
+    this.rootPlot = master;
   }
   
   
   public void updatePlanning() {
-    if (masterCrime != null) {
+    if (rootPlot != null) {
       //  TODO:  Add a delay here!
       
-      if (! masterCrime.scheduled()) {
-        base.world().events.scheduleEvent(masterCrime);
+      if (! rootPlot.scheduled()) {
+        base.world().events.scheduleEvent(rootPlot);
       }
     }
   }

@@ -8,7 +8,7 @@ import proto.util.*;
 
 
 
-public abstract class Crime extends Event {
+public abstract class Plot extends Event {
   
   
   /**  Role-definitions-
@@ -51,19 +51,19 @@ public abstract class Crime extends Event {
     */
   final Base base;
   int spookLevel = 0, nextContactID = 0;
-  List <RoleEntry> entries  = new List();
-  List <Contact  > contacts = new List();
+  List <RoleEntry> entries = new List();
+  List <Step  > steps   = new List();
   
   
   
-  protected Crime(CrimeType type, Base base) {
+  protected Plot(PlotType type, Base base) {
     super(type, base.world());
     this.base = base;
     assignRole(base, ROLE_BASE);
   }
   
   
-  public Crime(Session s) throws Exception {
+  public Plot(Session s) throws Exception {
     super(s);
     base = (Base) s.loadObject();
     spookLevel    = s.loadInt();
@@ -71,20 +71,20 @@ public abstract class Crime extends Event {
     
     for (int n = s.loadInt(); n-- > 0;) {
       RoleEntry entry = new RoleEntry();
-      entry.role     = (Crime.Role) s.loadObject();
-      entry.element  = (Element   ) s.loadObject();
-      entry.supplies = (Crime     ) s.loadObject();
+      entry.role     = (Plot.Role) s.loadObject();
+      entry.element  = (Element  ) s.loadObject();
+      entry.supplies = (Plot     ) s.loadObject();
       entries.add(entry);
     }
     for (int n = s.loadInt(); n-- > 0;) {
-      Contact contact = new Contact();
-      contact.between   = (Role[]) s.loadObjectArray(Role.class);
-      contact.medium    = s.loadInt();
-      contact.timeTaken = s.loadInt();
-      contact.ID        = s.loadInt();
-      contact.timeStart = s.loadInt();
-      contact.spooked   = s.loadBool();
-      contacts.add(contact);
+      Step step = new Step();
+      step.between   = (Role[]) s.loadObjectArray(Role.class);
+      step.medium    = s.loadInt();
+      step.timeTaken = s.loadInt();
+      step.ID        = s.loadInt();
+      step.timeStart = s.loadInt();
+      step.spooked   = s.loadBool();
+      steps.add(step);
     }
   }
   
@@ -101,14 +101,14 @@ public abstract class Crime extends Event {
       s.saveObject(entry.element );
       s.saveObject(entry.supplies);
     }
-    s.saveInt(contacts.size());
-    for (Contact contact : contacts) {
-      s.saveObjectArray(contact.between);
-      s.saveInt (contact.medium   );
-      s.saveInt (contact.timeTaken);
-      s.saveInt (contact.ID       );
-      s.saveInt (contact.timeStart);
-      s.saveBool(contact.spooked  );
+    s.saveInt(steps.size());
+    for (Step step : steps) {
+      s.saveObjectArray(step.between);
+      s.saveInt (step.medium   );
+      s.saveInt (step.timeTaken);
+      s.saveInt (step.ID       );
+      s.saveInt (step.timeStart);
+      s.saveBool(step.spooked  );
     }
   }
   
@@ -117,8 +117,8 @@ public abstract class Crime extends Event {
   /**  Queueing and executing sub-events and generating clues for
     *  investigation-
     */
-  //  TODO:  Have this extend Task.
-  protected class Contact {
+  //  TODO:  Have this extend Task?
+  protected class Step {
     
     int medium;
     int timeTaken;
@@ -129,50 +129,50 @@ public abstract class Crime extends Event {
     boolean spooked = false;
     
     public String toString() {
-      return "Contact between "+I.list(between);
+      return "Step involving "+I.list(between);
     }
   }
   
   
-  public void queueContact(int medium, int timeTaken, Role... between) {
-    Contact c = new Contact();
-    c.between   = between;
-    c.medium    = medium;
-    c.timeTaken = timeTaken;
-    c.ID        = nextContactID++;
-    contacts.add(c);
+  public void queueStep(int medium, int timeTaken, Role... involved) {
+    Step s = new Step();
+    s.between   = involved;
+    s.medium    = medium;
+    s.timeTaken = timeTaken;
+    s.ID        = nextContactID++;
+    steps.add(s);
   }
   
   
-  public void queueContacts(int medium, int timeTaken, Role from, Role... to) {
-    for (Role r : to) queueContact(medium, timeTaken, from, r);
+  public void queueSteps(int medium, int timeTaken, Role from, Role... to) {
+    for (Role r : to) queueStep(medium, timeTaken, from, r);
   }
   
   
-  public boolean contactBegun(Contact contact) {
-    return contact != null && contact.timeStart >= 0;
+  public boolean stepBegun(Step step) {
+    return step != null && step.timeStart >= 0;
   }
   
   
-  public boolean contactComplete(Contact contact) {
-    if (! contactBegun(contact)) return false;
+  public boolean stepComplete(Step step) {
+    if (! stepBegun(step)) return false;
     int time = base.world().timing.totalHours();
-    return time >= contact.timeStart + contact.timeTaken;
+    return time >= step.timeStart + step.timeTaken;
   }
   
   
-  public int contactTense(Contact contact) {
+  public int stepTense(Step step) {
     int time = base.world().timing.totalHours();
-    int start = contact.timeStart, tense = Lead.TENSE_BEFORE;
+    int start = step.timeStart, tense = Lead.TENSE_BEFORE;
     boolean begun = start >= 0;
-    boolean done = time > (contact.timeStart + contact.timeTaken);
+    boolean done = time > (step.timeStart + step.timeTaken);
     if (begun) tense = done ? Lead.TENSE_AFTER : Lead.TENSE_DURING;
     return tense;
   }
   
   
-  public Series <Contact> allContacts() {
-    return contacts;
+  public Series <Step> allSteps() {
+    return steps;
   }
   
   
@@ -190,7 +190,7 @@ public abstract class Crime extends Event {
     
     Role role;
     Element element;
-    Crime supplies;
+    Plot supplies;
     
     public String toString() {
       return role.name+" ("+element+")";
@@ -276,7 +276,7 @@ public abstract class Crime extends Event {
   
   
   protected void fillInsideRole(
-    Place target, Crime.Role role
+    Place target, Plot.Role role
   ) {
     Pick <Person> pick = new Pick();
     for (Person p : target.residents()) {
@@ -331,7 +331,7 @@ public abstract class Crime extends Event {
   }
   
   
-  protected void onCompletion(Contact contact) {
+  protected void onCompletion(Step step) {
     //  TODO:  Make abstract and implement per-subclass.
     return;
   }
@@ -358,24 +358,24 @@ public abstract class Crime extends Event {
     if (! possible()) return;
     
     int time = world.timing.totalHours();
-    Contact current = null, next = null;
+    Step current = null, next = null;
     
-    for (Contact c : contacts) {
-      if (next    == null && ! contactBegun(c)) next    = c;
-      if (current == null &&   contactBegun(c)) current = c;
+    for (Step c : steps) {
+      if (next    == null && ! stepBegun(c)) next    = c;
+      if (current == null &&   stepBegun(c)) current = c;
     }
-    if ((current == null || contactComplete(current)) && next != null) {
+    if ((current == null || stepComplete(current)) && next != null) {
       next.timeStart = time;
     }
     
-    if (current == contacts.last() && contactComplete(current)) {
+    if (current == steps.last() && stepComplete(current)) {
       //  TODO:  Execute the actual crime.
       completeEvent();
     }
   }
   
   
-  protected boolean rolePossible(Role role, Element element, Crime supplies) {
+  protected boolean rolePossible(Role role, Element element, Plot supplies) {
     if (supplies != null) {
       if (! supplies.possible()) return false;
       if (! supplies.complete()) return false;

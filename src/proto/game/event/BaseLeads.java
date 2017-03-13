@@ -49,31 +49,31 @@ public class BaseLeads {
   }
   
   
-  Lead leadFor(Crime crime, Element focus, Lead.Type type) {
+  Lead leadFor(Plot plot, Element focus, Lead.Type type) {
     for (Lead lead : leads) {
-      if (lead.crime == crime && lead.focus == focus && lead.type == type) {
+      if (lead.plot == plot && lead.focus == focus && lead.type == type) {
         return lead;
       }
     }
-    Lead lead = new Lead(base, type, crime, focus);
+    Lead lead = new Lead(base, type, plot, focus);
     leads.add(lead);
     return lead;
   }
   
   
-  public Series <Lead> leadsFor(Crime crime, Element focus) {
+  public Series <Lead> leadsFor(Plot plot, Element focus) {
     final Batch <Lead> all = new Batch();
     if (focus.isPerson()) {
-      all.add(leadFor(crime, focus, Lead.LEAD_SURVEIL_PERSON));
-      all.add(leadFor(crime, focus, Lead.LEAD_QUESTION));
+      all.add(leadFor(plot, focus, Lead.LEAD_SURVEIL_PERSON));
+      all.add(leadFor(plot, focus, Lead.LEAD_QUESTION));
     }
     if (focus.isPlace()) {
-      all.add(leadFor(crime, focus, Lead.LEAD_SURVEIL_BUILDING));
-      all.add(leadFor(crime, focus, Lead.LEAD_WIRETAP));
+      all.add(leadFor(plot, focus, Lead.LEAD_SURVEIL_BUILDING));
+      all.add(leadFor(plot, focus, Lead.LEAD_WIRETAP));
     }
     if (focus.isRegion()) {
-      all.add(leadFor(crime, focus, Lead.LEAD_PATROL));
-      all.add(leadFor(crime, focus, Lead.LEAD_CANVAS));
+      all.add(leadFor(plot, focus, Lead.LEAD_PATROL));
+      all.add(leadFor(plot, focus, Lead.LEAD_CANVAS));
     }
     return all;
   }
@@ -92,37 +92,37 @@ public class BaseLeads {
   
   
   public Series <Clue> cluesFor(
-    Crime crime, Object match, Crime.Role role
+    Plot plot, Object match, Plot.Role role
   ) {
     Batch <Clue> matches = new Batch();
     CaseFile file = caseFor(match);
     
     for (Clue c : file.clues) {
-      if (crime != null && crime != c.crime ) continue;
-      if (match != null && match != c.match ) continue;
-      if (role  != null && role  != c.role) continue;
+      if (plot  != null && plot  != c.plot ) continue;
+      if (match != null && match != c.match) continue;
+      if (role  != null && role  != c.role ) continue;
       matches.add(c);
     }
     return matches;
   }
   
   
-  public Series <Crime> involvedIn(Object subject) {
-    Batch <Crime> matches = new Batch();
+  public Series <Plot> involvedIn(Object subject) {
+    Batch <Plot> matches = new Batch();
     CaseFile file = caseFor(subject);
     
     for (Clue c : file.clues) {
-      matches.include(c.crime);
+      matches.include(c.plot);
     }
     return matches;
   }
   
   
-  public float evidenceForInvolvement(Crime crime, Object subject) {
+  public float evidenceForInvolvement(Plot plot, Object subject) {
     CaseFile file = caseFor(subject);
     float evidence = 0;
     
-    for (Clue c : file.clues) if (c.crime == crime) {
+    for (Clue c : file.clues) if (c.plot == plot) {
       evidence += c.confidence;
     }
     return evidence;

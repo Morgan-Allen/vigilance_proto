@@ -174,8 +174,8 @@ public class Council {
     
     for (Person p : t.accused) {
       float sumEvidence = 0;
-      for (Crime c : mainHall.leads.involvedIn(p)) {
-        sumEvidence += mainHall.leads.evidenceForInvolvement(c, p);
+      for (Plot plot : mainHall.leads.involvedIn(p)) {
+        sumEvidence += mainHall.leads.evidenceForInvolvement(plot, p);
       }
       
       float releaseChance = 1f / (1 + sumEvidence);

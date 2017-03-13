@@ -9,27 +9,27 @@ import proto.util.*;
 
 
 
-public abstract class CrimeType extends EventType {
+public abstract class PlotType extends EventType {
   
   
   /**  Construction-
     */
-  protected CrimeType(
+  protected PlotType(
     String name, String ID, String iconPath
   ) {
     super(name, ID, iconPath);
   }
   
   
-  protected abstract Crime initCrime(Base base);
+  protected abstract Plot initPlot(Base base);
   
 
   
   /**  Rendering and interface:
     */
   protected String nameFor(Event event) {
-    Crime c = (Crime) event;
-    return name+": "+c.elementWithRole(Crime.ROLE_TARGET);
+    Plot c = (Plot) event;
+    return name+": "+c.elementWithRole(Plot.ROLE_TARGET);
   }
   
   

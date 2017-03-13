@@ -11,7 +11,7 @@ import java.awt.Image;
 
 //
 //  TODO:  You could sharpen this up a little, with separate success-chance
-//  for each party involved in a contact?
+//  for each party involved in a step?
 //  TODO:  You might consider only giving information on the rough
 //  location of a meet or wiretap trace?
 //  ...Yeah.  Determine location and traits in a separate step.
@@ -130,16 +130,16 @@ public class Lead extends Task {
   
   
   final Type type;
-  final Crime crime;
+  final Plot plot;
   final Element focus;
   private String lastContactID;
   
   
-  Lead(Base base, Type type, Crime crime, Element focus) {
+  Lead(Base base, Type type, Plot plot, Element focus) {
     super(base, Task.TIME_INDEF);
     
     this.type  = type ;
-    this.crime = crime;
+    this.plot  = plot ;
     this.focus = focus;
     
     boolean badFocus = false;
@@ -159,7 +159,7 @@ public class Lead extends Task {
   public Lead(Session s) throws Exception {
     super(s);
     type  = LEAD_TYPES[s.loadInt()];
-    crime = (Crime  ) s.loadObject();
+    plot  = (Plot   ) s.loadObject();
     focus = (Element) s.loadObject();
     lastContactID = s.loadString();
   }
@@ -168,7 +168,7 @@ public class Lead extends Task {
   public void saveState(Session s) throws Exception {
     super.saveState(s);
     s.saveInt(type.ID);
-    s.saveObject(crime);
+    s.saveObject(plot);
     s.saveObject(focus);
     s.saveString(lastContactID);
   }
@@ -178,13 +178,13 @@ public class Lead extends Task {
   /**  Generation and screening of clues related to the case:
     */
   protected boolean canDetect(
-    Crime.Contact contact, int tense, Crime crime
+    Plot.Step step, int tense, Plot plot
   ) {
     //  TODO:  Consider splitting this off into separate sub-methods for
     //  override by subclasses.
     //
     //  First check the tense and crime-
-    if (crime != this.crime) {
+    if (plot != this.plot) {
       return false;
     }
     if (tense != TENSE_ANY && type.tense != TENSE_ANY && tense != type.tense) {
@@ -194,7 +194,7 @@ public class Lead extends Task {
     //  Then, check the medium-
     boolean matchMedium = false;
     for (int medium : type.cluesMedia) {
-      if (medium == MEDIUM_ANY || medium == contact.medium) {
+      if (medium == MEDIUM_ANY || medium == step.medium) {
         matchMedium = true;
         break;
       }
@@ -203,8 +203,8 @@ public class Lead extends Task {
     //
     //  Then check the focus-
     boolean matchFocus = false;
-    for (Crime.Role role : contact.between) {
-      Element contacts = crime.elementWithRole(role);
+    for (Plot.Role role : step.between) {
+      Element contacts = plot.elementWithRole(role);
       
       if (type.focus == FOCUS_REGION) {
         if (contacts.region() != focus) continue;
@@ -222,20 +222,20 @@ public class Lead extends Task {
   
   
   protected Series <Clue> possibleClues(
-    Crime.Contact contact, int tense, Crime crime
+    Plot.Step step, int tense, Plot plot
   ) {
     Batch <Clue> possible = new Batch();
-    int time = crime.base.world().timing.totalHours();
+    int time = plot.base.world().timing.totalHours();
     
-    for (Crime.Role role : contact.between) {
-      Element contacts = crime.elementWithRole(role);
+    for (Plot.Role role : step.between) {
+      Element contacts = plot.elementWithRole(role);
       if (contacts == focus) continue;
       
       if (contacts.isPerson()) {
         Person p = (Person) contacts;
         for (Trait t : Common.PERSON_TRAITS) {
           if (p.stats.levelFor(t) <= 0) continue;
-          Clue clue = new Clue(crime, role);
+          Clue clue = new Clue(plot, role);
           clue.assignEvidence(p, t, type, type.confidence, time);
           possible.add(clue);
         }
@@ -245,7 +245,7 @@ public class Lead extends Task {
         Place p = (Place) contacts;
         for (Trait t : Common.VENUE_TRAITS) {
           if (! p.hasProperty(t)) continue;
-          Clue clue = new Clue(crime, role);
+          Clue clue = new Clue(plot, role);
           clue.assignEvidence(p, t, type, type.confidence, time);
           possible.add(clue);
         }
@@ -253,7 +253,7 @@ public class Lead extends Task {
       
       if (contacts.isItem()) {
         Item p = (Item) contacts;
-        Clue clue = new Clue(crime,role);
+        Clue clue = new Clue(plot,role);
         clue.confirmMatch(p, type, time);
         possible.add(clue);
       }
@@ -319,40 +319,40 @@ public class Lead extends Task {
   
   
   protected float performFollow(
-    Crime.Contact contact, int tense, Crime crime, Series <Person> follow
+    Plot.Step step, int tense, Plot plot, Series <Person> follow
   ) {
     //
     //  First, check to see whether anything has actually changed here:
-    String contactID = contact.ID+"_"+tense;
+    String contactID = step.ID+"_"+tense;
     if (contactID.equals(lastContactID)) {
       return RESULT_NONE;
     }
 
     float result = followResult(follow);
-    int time = crime.base.world().timing.totalHours();
+    int time = base.world().timing.totalHours();
     
     if (result <= RESULT_COLD) {
       
     }
     else if (result <= RESULT_PARTIAL) {
-      for (Clue clue : possibleClues(contact, tense, crime)) {
+      for (Clue clue : possibleClues(step, tense, plot)) {
         if (Rand.num() > 0.5f) continue;
         CaseFile file = base.leads.caseFor(clue.match);
         file.recordClue(clue);
       }
     }
     else if (result <= RESULT_HOT) {
-      for (Crime.Role role : contact.between) {
-        Element subject = crime.elementWithRole(role);
+      for (Plot.Role role : step.between) {
+        Element subject = plot.elementWithRole(role);
         CaseFile file = base.leads.caseFor(subject);
         
-        Clue clue = new Clue(crime,role);
+        Clue clue = new Clue(plot,role);
         clue.confirmMatch(subject, type, time);
         file.recordClue(clue);
       }
     }
     
-    crime.takeSpooking(type.profile);
+    plot.takeSpooking(type.profile);
     return result;
   }
   
@@ -362,13 +362,13 @@ public class Lead extends Task {
     Series <Person> active = active();
     
     for (Event event : base.world().events.active()) {
-      if (! (event instanceof Crime)) continue;
-      Crime crime = (Crime) event;
+      if (! (event instanceof Plot)) continue;
+      Plot plot = (Plot) event;
       
-      for (Crime.Contact contact : crime.allContacts()) {
-        int tense = crime.contactTense(contact);
-        if (! canDetect(contact, tense, crime)) continue;
-        performFollow(contact, tense, crime, active);
+      for (Plot.Step step : plot.allSteps()) {
+        int tense = plot.stepTense(step);
+        if (! canDetect(step, tense, plot)) continue;
+        performFollow(step, tense, plot, active);
       }
     }
     

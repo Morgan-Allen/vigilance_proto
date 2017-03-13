@@ -55,6 +55,7 @@ public class LeadsListView extends UINode {
     Person person = mainView.rosterView.selectedPerson();
     Lead hovered = null;
     
+    /*
     for (CaseFile file : played.leads.casesForRegion(region)) {
       //
       //  Firstly, draw an illustrative icon for the lead we've picked up and
@@ -87,6 +88,7 @@ public class LeadsListView extends UINode {
       g.setColor(Color.DARK_GRAY);
       g.drawRect(vx + 10, vy + initDown, vw - 20, down - initDown);
     }
+    //*/
     
     if (hovered != null) {
       g.setColor(Color.LIGHT_GRAY);

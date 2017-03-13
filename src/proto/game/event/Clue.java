@@ -2,6 +2,7 @@
 
 package proto.game.event;
 import proto.common.*;
+import proto.game.person.Person;
 import proto.game.world.*;
 
 
@@ -11,8 +12,8 @@ public class Clue {
   
   /**  Data fields, construction and save/load methods-
     */
-  Crime crime;
-  Crime.Role role;
+  Plot plot;
+  Plot.Role role;
 
   Object match;
   boolean confirmed;
@@ -28,16 +29,16 @@ public class Clue {
   }
   
   
-  Clue(Crime crime, Crime.Role role) {
-    this.crime = crime;
-    this.role  = role ;
+  Clue(Plot plot, Plot.Role role) {
+    this.plot = plot;
+    this.role = role;
   }
   
   
   static Clue loadClue(Session s) throws Exception {
     Clue c = new Clue();
-    c.crime      = (Crime     ) s.loadObject();
-    c.role       = (Crime.Role) s.loadObject();
+    c.plot       = (Plot     ) s.loadObject();
+    c.role       = (Plot.Role) s.loadObject();
     c.match      = s.loadObject();
     c.confirmed  = s.loadBool();
     c.trait      = (Trait) s.loadObject();
@@ -49,7 +50,7 @@ public class Clue {
   
   
   void saveClue(Session s) throws Exception {
-    s.saveObject(crime      );
+    s.saveObject(plot       );
     s.saveObject(role       );
     s.saveObject(match      );
     s.saveBool  (confirmed  );
@@ -60,6 +61,9 @@ public class Clue {
   }
   
   
+  
+  /**  Assignment of evidence & matches-
+    */
   void assignEvidence(
     Object match, Trait trait,
     Lead.Type leadType, float confidence, int timeFound
@@ -84,10 +88,31 @@ public class Clue {
   
   
   boolean matchesType(Clue other) {
-    if (crime != other.crime) return false;
+    if (plot  != other.plot ) return false;
     if (role  != other.role ) return false;
     if (trait != other.trait) return false;
     if (match != other.match) return false;
+    return true;
+  }
+  
+  
+  
+  /**  Evaluation of possible suspects-
+    */
+  protected boolean matchesSuspect(Element e) {
+    if (match != null && confirmed && match != e) {
+      return false;
+    }
+    if (trait != null) {
+      if (e.isPerson()) {
+        Person p = (Person) e;
+        if (p.stats.levelFor(trait) <= 0) return false;
+      }
+      if (e.isPlace()) {
+        Place p = (Place) e;
+        if (! p.hasProperty(trait)) return false;
+      }
+    }
     return true;
   }
   

@@ -2,10 +2,10 @@
 
 package proto.game.person;
 import proto.common.*;
-import proto.game.person.PersonStats.Condition;
 import proto.game.scene.*;
-import proto.game.world.Element;
+import proto.game.world.*;
 import proto.util.*;
+import proto.game.person.PersonStats.Condition;
 
 
 

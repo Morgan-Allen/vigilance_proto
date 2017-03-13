@@ -14,16 +14,16 @@ import static proto.game.person.PersonStats.*;
 public class TestCrime {
   
   
-  final static Crime.Role
-    ROLE_TAILS = new Crime.Role("role_tails", "Tails"),
-    ROLE_GRABS = new Crime.Role("role_grabs", "Grabs"),
-    ROLE_DRUGS = new Crime.Role("role_drugs", "Drugs");
+  final static Plot.Role
+    ROLE_TAILS = new Plot.Role("role_tails", "Tails"),
+    ROLE_GRABS = new Plot.Role("role_grabs", "Grabs"),
+    ROLE_DRUGS = new Plot.Role("role_drugs", "Drugs");
   
-  static CrimeType TYPE_KIDNAP = new CrimeType(
+  static PlotType TYPE_KIDNAP = new PlotType(
     "Kidnapping", "crime_type_kidnap", null
   ) {
-    protected Crime initCrime(Base base) {
-      return new Crime(this, base) {};
+    protected Plot initPlot(Base base) {
+      return new Plot(this, base) {};
     }
   };
   
@@ -40,7 +40,7 @@ public class TestCrime {
     
     Base crooks = world.baseFor(Crooks.THE_MADE_MEN);
     Place hideout = crooks.place();
-    Crime kidnap = TYPE_KIDNAP.initCrime(crooks);
+    Plot kidnap = TYPE_KIDNAP.initPlot(crooks);
     
     //  TODO:  Generate relationships (kin and otherwise) between persons in
     //  nearby venues!  
@@ -62,23 +62,23 @@ public class TestCrime {
     kidnap.fillExpertRole(MEDICINE   , goons, ROLE_DRUGS);
     kidnap.fillExpertRole(MUSCLE     , goons, ROLE_GRABS);
     
-    kidnap.queueContacts(
-      Lead.MEDIUM_MEET, World.HOURS_PER_DAY, Crime.ROLE_ORGANISER,
+    kidnap.queueSteps(
+      Lead.MEDIUM_MEET, World.HOURS_PER_DAY, Plot.ROLE_ORGANISER,
       ROLE_TAILS, ROLE_DRUGS, ROLE_GRABS
     );
-    kidnap.queueContact(
+    kidnap.queueStep(
       Lead.MEDIUM_SURVEIL,
       World.HOURS_PER_DAY,
-      ROLE_TAILS, Crime.ROLE_TARGET
+      ROLE_TAILS, Plot.ROLE_TARGET
     );
-    kidnap.queueContact(
+    kidnap.queueStep(
       Lead.MEDIUM_MEET,
       World.HOURS_PER_DAY,
       ROLE_DRUGS, ROLE_GRABS
     );
     
     I.say("\n\nRoles are: ");
-    for (Crime.RoleEntry entry : kidnap.entries) {
+    for (Plot.RoleEntry entry : kidnap.entries) {
       I.say("  "+entry);
     }
     
@@ -86,7 +86,7 @@ public class TestCrime {
     
     Lead lead = null;
     world.beginMonitoring();
-    crooks.plans.assignMasterCrime(kidnap);
+    crooks.plans.assignRootPlot(kidnap);
     
     
     lead = new Lead(heroes, Lead.LEAD_SURVEIL_PERSON, kidnap, crooks.leader());
@@ -98,7 +98,7 @@ public class TestCrime {
       lead.updateAssignment();
     }
     
-    for (Crime.RoleEntry entry : kidnap.entries) {
+    for (Plot.RoleEntry entry : kidnap.entries) {
       CaseFile file = heroes.leads.caseFor(entry.element);
       
       Series <Clue> clues = file.clues;
