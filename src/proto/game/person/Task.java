@@ -308,7 +308,7 @@ public abstract class Task implements Assignment {
   }
   
   
-  protected void resetTask() {
+  public void resetTask() {
     complete = success = false;
     initTime = -1;
   }

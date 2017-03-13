@@ -95,38 +95,25 @@ public class BaseStocks {
   
   /**  Generating and updating manufacturing tasks-
     */
-  public Series <TaskCraft> craftingTasksFor(Person person) {
+  public Series <TaskCraft> craftingTasks() {
     if (! tasks.empty()) return tasks;
-    
     for (Object tech : base.knownTech) {
       if (tech instanceof ItemType) {
         ItemType type = (ItemType) tech;
         tasks.add(new TaskCraft(type, base));
       }
     }
-    
     return tasks;
   }
   
   
   void updateCrafting() {
     for (TaskCraft task : tasks) {
+      if (task.complete()) task.resetTask();
       task.updateAssignment();
     }
   }
-  
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 

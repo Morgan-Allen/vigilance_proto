@@ -12,6 +12,7 @@ public abstract class StringButton extends UINode {
   
   
   public String label;
+  public Color baseTone = Color.BLUE;
   public boolean toggled = false, valid = true;
   public Object refers = this;
   
@@ -33,7 +34,7 @@ public abstract class StringButton extends UINode {
     if      (toggled) g.setColor(Color.GREEN );
     else if (hovered) g.setColor(Color.YELLOW);
     else if (! valid) g.setColor(Color.GRAY  );
-    else              g.setColor(Color.BLUE  );
+    else              g.setColor(baseTone    );
     g.drawString(label, vx + 5, vy + 15);
     g.drawRect(vx, vy, vw, vh);
     

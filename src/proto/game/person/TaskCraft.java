@@ -11,15 +11,11 @@ import java.awt.Image;
 
 
 
-//  TODO:  Show progress in the task based on skill level, and redefine
-//  completion-criteria.
-
-
 public class TaskCraft extends Task {
   
   
   final ItemType made;
-  int numOrders = 0;
+  int numOrders = 1;
   float progress = 0;
   
   
@@ -32,7 +28,7 @@ public class TaskCraft extends Task {
   public TaskCraft(Session s) throws Exception {
     super(s);
     made      = (ItemType) s.loadObject();
-    numOrders = s.loadInt();
+    numOrders = s.loadInt  ();
     progress  = s.loadFloat();
   }
   
@@ -68,8 +64,12 @@ public class TaskCraft extends Task {
     
     if (progress >= 1) {
       progress = 0;
+      numOrders--;
       base.stocks.incStock(made, 1);
       presentMessage();
+    }
+    if (numOrders <= 0) {
+      setCompleted(true);
     }
   }
   
@@ -104,6 +104,24 @@ public class TaskCraft extends Task {
   }
   
   
+  public void incOrders(int inc) {
+    numOrders += inc;
+    if (numOrders < 0) numOrders = 0;
+  }
+  
+  
+  public int numOrders() {
+    return numOrders;
+  }
+  
+  
+  public void resetTask() {
+    super.resetTask();
+    numOrders = 1;
+    progress  = 0;
+  }
+  
+  
 
   /**  Rendering, debug and interface methods-
     */
@@ -113,9 +131,9 @@ public class TaskCraft extends Task {
   
   
   public String choiceInfo(Person p) {
-    String info = "Craft "+made;
+    String info = ""+made;
     int total = base.stocks.numStored(made);
-    info += "  (In stock: "+total+")";
+    info += "  ("+total+")";
     return info;
   }
   
