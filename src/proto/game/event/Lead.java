@@ -20,7 +20,7 @@ import java.awt.Image;
 public class Lead extends Task {
   
   
-  /**  Data fields, construction and save/load methods-
+  /**  Some preliminaries needed for built-in type-definitions:
     */
   final static int
     //  The method by which a lead can be followed (and which contacts it can
@@ -32,15 +32,18 @@ public class Lead extends Task {
     MEDIUM_COVER    =  5,
     MEDIUM_HEIST    =  6,
     MEDIUM_ANY      = -1,
+    PHYSICAL_MEDIA[] = { 1, 3, 4, 5, 6 },
+    SOCIAL_MEDIA  [] = { 1, 4 },
+    WIRED_MEDIA   [] = { 2 },
     //  Whether this lead can pick up on past/present/future contacts-
-    TENSE_BEFORE =  0,
-    TENSE_DURING =  1,
-    TENSE_AFTER  =  2,
-    TENSE_ANY    = -1,
+    TENSE_BEFORE    =  0,
+    TENSE_DURING    =  1,
+    TENSE_AFTER     =  2,
+    TENSE_ANY       = -1,
     //  The type of focus this lead is intended for-
-    FOCUS_PERSON   = 0,
-    FOCUS_BUILDING = 1,
-    FOCUS_REGION   = 2,
+    FOCUS_PERSON    =  0,
+    FOCUS_BUILDING  =  1,
+    FOCUS_REGION    =  2,
     //  How likely following a lead is to spook the perpetrator-
     PROFILE_HIDDEN     = 0,
     PROFILE_LOW        = 1,
@@ -57,6 +60,22 @@ public class Lead extends Task {
     CONFIDENCE_LOW      = 0.33f,
     CONFIDENCE_MODERATE = 0.66f,
     CONFIDENCE_HIGH     = 1.00f;
+  
+  
+  public static boolean isPhysical(int medium) {
+    for (int m : PHYSICAL_MEDIA) if (m == medium) return true;
+    return false;
+  }
+  
+  public static boolean isSocial(int medium) {
+    for (int m : SOCIAL_MEDIA) if (m == medium) return true;
+    return false;
+  }
+  
+  public static boolean isWired(int medium) {
+    for (int m : WIRED_MEDIA) if (m == medium) return true;
+    return false;
+  }
   
   
   public static class Type {
@@ -129,6 +148,9 @@ public class Lead extends Task {
     LEAD_TYPES[] = TYPE_B.toArray(Type.class);
   
   
+  
+  /**  Data fields, construction and save/load methods-
+    */
   final Type type;
   final Plot plot;
   final Element focus;
@@ -178,7 +200,7 @@ public class Lead extends Task {
   /**  Generation and screening of clues related to the case:
     */
   protected boolean canDetect(
-    Plot.Step step, int tense, Plot plot
+    Step step, int tense, Plot plot
   ) {
     //  TODO:  Consider splitting this off into separate sub-methods for
     //  override by subclasses.
@@ -222,7 +244,7 @@ public class Lead extends Task {
   
   
   protected Series <Clue> possibleClues(
-    Plot.Step step, int tense, Plot plot
+    Step step, int tense, Plot plot
   ) {
     Batch <Clue> possible = new Batch();
     int time = plot.base.world().timing.totalHours();
@@ -319,7 +341,7 @@ public class Lead extends Task {
   
   
   protected float performFollow(
-    Plot.Step step, int tense, Plot plot, Series <Person> follow
+    Step step, int tense, Plot plot, Series <Person> follow
   ) {
     //
     //  First, check to see whether anything has actually changed here:
@@ -365,7 +387,7 @@ public class Lead extends Task {
       if (! (event instanceof Plot)) continue;
       Plot plot = (Plot) event;
       
-      for (Plot.Step step : plot.allSteps()) {
+      for (Step step : plot.allSteps()) {
         int tense = plot.stepTense(step);
         if (! canDetect(step, tense, plot)) continue;
         performFollow(step, tense, plot, active);

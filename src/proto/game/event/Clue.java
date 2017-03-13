@@ -17,7 +17,11 @@ public class Clue {
 
   Object match;
   boolean confirmed;
+  
   Trait trait;
+  
+  Place near;
+  int nearRange;
   
   Lead.Type leadType;
   float confidence;
@@ -37,11 +41,13 @@ public class Clue {
   
   static Clue loadClue(Session s) throws Exception {
     Clue c = new Clue();
-    c.plot       = (Plot     ) s.loadObject();
+    c.plot       = (Plot) s.loadObject();
     c.role       = (Plot.Role) s.loadObject();
     c.match      = s.loadObject();
     c.confirmed  = s.loadBool();
     c.trait      = (Trait) s.loadObject();
+    c.near       = (Place) s.loadObject();
+    c.nearRange  = s.loadInt();
     c.leadType   = Lead.LEAD_TYPES[s.loadInt()];
     c.confidence = s.loadFloat();
     c.timeFound  = s.loadInt();
@@ -55,6 +61,8 @@ public class Clue {
     s.saveObject(match      );
     s.saveBool  (confirmed  );
     s.saveObject(trait      );
+    s.saveObject(near       );
+    s.saveInt   (nearRange  );
     s.saveInt   (leadType.ID);
     s.saveFloat (confidence );
     s.saveInt   (timeFound  );

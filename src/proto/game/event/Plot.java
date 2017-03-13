@@ -41,7 +41,7 @@ public abstract class Plot extends Event {
     ROLE_BASE      = new Role("role_base"     , "Base"     ),
     ROLE_HIDEOUT   = new Role("role_hideout"  , "Hideout"  ),
     ROLE_ORGANISER = new Role("role_organiser", "Organiser"),
-    ROLE_BACKUP    = new Role("role_backup"   , "Backup"   ),
+    ROLE_ENFORCER  = new Role("role_enforcer" , "Enforcer" ),
     ROLE_TARGET    = new Role("role_target"   , "Target"   ),
     ROLE_SCENE     = new Role("role_scene"    , "Scene"    )
   ;
@@ -77,14 +77,7 @@ public abstract class Plot extends Event {
       entries.add(entry);
     }
     for (int n = s.loadInt(); n-- > 0;) {
-      Step step = new Step();
-      step.between   = (Role[]) s.loadObjectArray(Role.class);
-      step.medium    = s.loadInt();
-      step.timeTaken = s.loadInt();
-      step.ID        = s.loadInt();
-      step.timeStart = s.loadInt();
-      step.spooked   = s.loadBool();
-      steps.add(step);
+      steps.add(Step.loadStep(s));
     }
   }
   
@@ -103,12 +96,7 @@ public abstract class Plot extends Event {
     }
     s.saveInt(steps.size());
     for (Step step : steps) {
-      s.saveObjectArray(step.between);
-      s.saveInt (step.medium   );
-      s.saveInt (step.timeTaken);
-      s.saveInt (step.ID       );
-      s.saveInt (step.timeStart);
-      s.saveBool(step.spooked  );
+      step.saveStep(s);
     }
   }
   
@@ -117,30 +105,15 @@ public abstract class Plot extends Event {
   /**  Queueing and executing sub-events and generating clues for
     *  investigation-
     */
-  //  TODO:  Have this extend Task?
-  protected class Step {
-    
-    int medium;
-    int timeTaken;
-    Role between[];
-    int ID;
-    
-    int timeStart = -1;
-    boolean spooked = false;
-    
-    public String toString() {
-      return "Step involving "+I.list(between);
-    }
-  }
-  
-  
-  public void queueStep(int medium, int timeTaken, Role... involved) {
+  public Step queueStep(int medium, int timeTaken, Role... involved) {
     Step s = new Step();
-    s.between   = involved;
-    s.medium    = medium;
+    s.between   = involved ;
+    s.medium    = medium   ;
     s.timeTaken = timeTaken;
     s.ID        = nextContactID++;
+    if (Lead.isPhysical(medium)) s.setMeetsAt(involved[0]);
     steps.add(s);
+    return s;
   }
   
   

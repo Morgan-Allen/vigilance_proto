@@ -11,7 +11,7 @@ import static proto.game.person.PersonStats.*;
 
 
 
-public class TestCrime {
+public class TestPlots {
   
   
   final static Plot.Role
@@ -64,8 +64,14 @@ public class TestCrime {
     
     kidnap.queueSteps(
       Lead.MEDIUM_MEET, World.HOURS_PER_DAY, Plot.ROLE_ORGANISER,
-      ROLE_TAILS, ROLE_DRUGS, ROLE_GRABS
+      ROLE_TAILS, ROLE_DRUGS
     );
+    kidnap.queueStep(
+      Lead.MEDIUM_MEET,
+      World.HOURS_PER_DAY,
+      Plot.ROLE_ORGANISER, Plot.ROLE_ENFORCER
+    ).setInfoGiven(Plot.ROLE_TARGET);
+    
     kidnap.queueStep(
       Lead.MEDIUM_SURVEIL,
       World.HOURS_PER_DAY,
@@ -74,7 +80,12 @@ public class TestCrime {
     kidnap.queueStep(
       Lead.MEDIUM_MEET,
       World.HOURS_PER_DAY,
-      ROLE_DRUGS, ROLE_GRABS
+      ROLE_TAILS, ROLE_DRUGS, ROLE_GRABS
+    );
+    kidnap.queueStep(
+      Lead.MEDIUM_HEIST,
+      World.HOURS_PER_DAY,
+      Plot.ROLE_TARGET, ROLE_TAILS, ROLE_GRABS, Plot.ROLE_ENFORCER
     );
     
     I.say("\n\nRoles are: ");
@@ -83,7 +94,6 @@ public class TestCrime {
     }
     
     I.say("\nFollowing Lead...");
-    
     Lead lead = null;
     world.beginMonitoring();
     crooks.plans.assignRootPlot(kidnap);
