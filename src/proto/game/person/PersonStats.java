@@ -166,9 +166,6 @@ public class PersonStats {
   
   
   void initStats() {
-    for (Ability a : Common.BASIC_ABILITIES) {
-      setLevel(a, 1, true);
-    }
     for (Trait s : person.kind.baseTraits()) {
       float base = person.kind().baseLevel(s);
       setLevel(s, base, true);
@@ -203,26 +200,6 @@ public class PersonStats {
     Level l = levels.get(trait);
     if (l == null) return 0;
     return (int) l.bonus;
-  }
-  
-  
-  public Series <Ability> listAbilities() {
-    //  TODO:  I'm not certain, at the moment, if this shouldn't be considered
-    //  a UI method.  Check.
-    List <Ability> all = new List();
-    for (Ability a : abilities) {
-      all.add(a);
-    }
-    for (Item i : person.gear.equipped()) if (i.charges > 0) {
-      for (Ability a : i.kind().abilities) all.include(a);
-    }
-    for (Condition c : conditions) for (Ability a : all) {
-      if (! c.basis.conditionAllowsAbility(a)) {
-        all.remove(a);
-        break;
-      }
-    }
-    return all;
   }
   
   
@@ -311,7 +288,7 @@ public class PersonStats {
     updateStat(ENGINEERING, levelTechs   , true);
     updateStat(MEDICINE   , levelTechs   , true);
     
-    Series <Ability> abilities = listAbilities();
+    Series <Ability> abilities = person.actions.listAbilities();
     for (Ability a : abilities) if (a.passive()) {
       a.applyPassiveStatsBonus(person);
     }
@@ -359,7 +336,9 @@ public class PersonStats {
   
   boolean onTurnStart() {
     for (Condition c : conditions) {
-      c.basis.applyConditionOnTurn(person, c.casts);
+      c.countdown--;
+      if (c.countdown <= 0) conditions.remove(c);
+      else c.basis.applyConditionOnTurn(person, c.casts);
     }
     //  TODO:  Restore these.
     /*
@@ -372,10 +351,6 @@ public class PersonStats {
   
   
   boolean onTurnEnd() {
-    for (Condition c : conditions) {
-      c.countdown--;
-      if (c.countdown <= 0) conditions.remove(c);
-    }
     return true;
   }
   

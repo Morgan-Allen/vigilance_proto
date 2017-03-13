@@ -75,7 +75,7 @@ public class PersonMind {
     if (report) I.say("\nGetting next AI action for "+person);
     
     Pick <Action> pick = new Pick(0);
-    Series <Ability> abilities = person.stats.listAbilities();
+    Series <Ability> abilities = person.actions.listAbilities();
     
     if (confidence < 1) {
       AIstate = STATE_RETREAT;

@@ -248,13 +248,13 @@ public abstract class Task implements Assignment {
   }
   
   
-  public float testChance(int testIndex) {
+  public float testChance(int testIndex, Series <Person> active) {
     Trait stat = tested [testIndex];
     int   mod  = testMod[testIndex];
     int   DC   = testDCs[testIndex] + Nums.max(0, -mod);
     
     float maxLevel = 0, sumLevels = 0;
-    for (Person p : active()) {
+    for (Person p : active) {
       float level = p.stats.levelFor(stat) + Nums.max(0, mod);
       maxLevel  = Nums.max(level, maxLevel);
       sumLevels += level;
@@ -269,7 +269,7 @@ public abstract class Task implements Assignment {
   public float testChance() {
     float chance = 1.0f;
     for (int n = tested.length; n-- > 0;) {
-      chance *= testChance(n);
+      chance *= testChance(n, active());
     }
     return chance;
   }
@@ -282,7 +282,7 @@ public abstract class Task implements Assignment {
     
     for (int n = tested.length; n-- > 0;) {
       Trait stat = tested[n];
-      float winChance = testChance(n);
+      float winChance = testChance(n, active);
       okay &= results[n] = (Rand.num() < winChance);
       
       for (Person p : active) {
@@ -305,7 +305,7 @@ public abstract class Task implements Assignment {
   }
   
   
-  protected void resetTask() {
+  public void resetTask() {
     complete = success = false;
     initTime = -1;
   }
@@ -329,13 +329,18 @@ public abstract class Task implements Assignment {
   
   /**  Rendering, debug and interface methods-
     */
-  public String testInfo() {
+  public String testInfo(Person p) {
     StringBuffer s = new StringBuffer("Requires: ");
+    
+    Batch <Person> active = new Batch();
+    Visit.appendTo(active, active());
+    active.include(p);
+    
     for (int n = 0; n < tested.length;) {
       s.append(tested[n].name+" "+testDCs[n]);
       
-      float chance = testChance(n);
-      s.append(" ("+((int) (chance * 100))+"%)");
+      float chance = testChance(n, active);
+      s.append(" ("+((int) (chance * 100))+"% effective)");
       
       if (++n < tested.length) s.append(", ");
     }
@@ -355,14 +360,6 @@ public abstract class Task implements Assignment {
     return activeInfo();
   }
 }
-
-
-
-
-
-
-
-
 
 
 

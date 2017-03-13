@@ -2,6 +2,7 @@
 
 package proto.game.person;
 import proto.common.*;
+import proto.game.person.PersonStats.Condition;
 import proto.game.scene.*;
 import proto.game.world.Element;
 import proto.util.*;
@@ -57,6 +58,40 @@ public class PersonActions {
   public boolean captive() {
     //  TODO:  Add some nuance here!
     return person.isCivilian();// && side == Side.VILLAINS;
+  }
+  
+  
+  public Series <Ability> listAbilities() {
+    List <Ability> all = new List();
+    all.add(Common.MOVE);
+    if (person.gear.weaponType().melee()) {
+      all.add(Common.STRIKE);
+      all.add(Common.GUARD );
+    }
+    if (person.gear.weaponType().ranged()) {
+      all.add(Common.FIRE     );
+      all.add(Common.OVERWATCH);
+    }
+    all.add(Common.SWITCH);
+    all.add(Common.HIDE  );
+    
+    for (Ability a : person.stats.abilities) {
+      if (! a.allowsUse(person)) continue;
+      all.add(a);
+    }
+    for (Item i : person.gear.equipped()) if (i.charges > 0) {
+      for (Ability a : i.kind().abilities) {
+        if (! a.allowsUse(person)) continue;
+        all.include(a);
+      }
+    }
+    for (Condition c : person.stats.conditions) for (Ability a : all) {
+      if (! c.basis.conditionAllowsAbility(a)) {
+        all.remove(a);
+        break;
+      }
+    }
+    return all;
   }
   
   

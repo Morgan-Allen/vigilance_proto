@@ -228,12 +228,13 @@ public abstract class Ability extends Trait {
   }
   
   
-  public boolean allowsUse(Person acting, StringBuffer failLog) {
+  public boolean allowsUse(Person acting) {
     return true;
   }
   
   
   public boolean allowsTarget(Object target, Scene scene, Person acting) {
+    if (delayed() || selfOnly()) return target == acting;
     return true;
   }
   
@@ -242,14 +243,15 @@ public abstract class Ability extends Trait {
     Person acting, Tile dest, Object target,
     Scene scene, Tile pathToTake[], StringBuffer failLog
   ) {
+    if (! allowsUse(acting)) {
+      return null;
+    }
+    
     final Series <Condition> conds = acting.stats.conditions;
     if (! conds.empty()) for (Condition c : conds) {
       if (! c.basis.conditionAllowsAbility(this)) {
         return failResult(c.basis+" Prevents Use", failLog);
       }
-    }
-    if (! allowsUse(acting, failLog)) {
-      return null;
     }
     
     if (acting == null || ! allowsTarget(target, scene, acting)) {
@@ -269,7 +271,7 @@ public abstract class Ability extends Trait {
       if (maxRange > 0 && range > (acting.stats.sightRange() + 1)) {
         return failResult("Outside Sight Range", failLog);
       }
-      if (scene.vision.degreeOfSight(acting, dest, false) <= 0) {
+      if (ranged() && scene.vision.degreeOfSight(acting, dest, false) <= 0) {
         return failResult("No Sight Line", failLog);
       }
     }
@@ -349,7 +351,7 @@ public abstract class Ability extends Trait {
       if (self != null) for (Item item : self.gear.equipped()) {
         ItemType t = item.kind();
         if (t.triggerOnAttack(volley)) {
-          t.triggerOnAttack(volley);
+          t.modifyAttackVolley(volley);
           if (start) t.applyOnAttackStart(volley);
           if (end  ) t.applyOnAttackEnd  (volley);
         }
@@ -373,7 +375,7 @@ public abstract class Ability extends Trait {
         }
       }
       
-      if (self != null) for (Ability a : self.stats.listAbilities()) {
+      if (self != null) for (Ability a : self.actions.listAbilities()) {
         if (! a.passive()) continue;
         if (a.triggerOnAttack() && a.allowsTarget(self, scene, self)) {
           a.modifyAttackVolley(volley);
@@ -409,7 +411,7 @@ public abstract class Ability extends Trait {
         }
       }
       
-      if (hits != null) for (Ability a : hits.stats.listAbilities()) {
+      if (hits != null) for (Ability a : hits.actions.listAbilities()) {
         if (! a.passive()) continue;
         if (a.triggerOnDefend() && a.allowsTarget(hits, scene, hits)) {
           a.modifyDefendVolley(volley);

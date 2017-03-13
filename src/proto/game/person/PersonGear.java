@@ -16,18 +16,19 @@ public class PersonGear {
     SLOT_TYPE_ARMOUR = 1,
     SLOT_TYPE_ITEM   = 2,
     
-    SLOT_WEAPON = 0,
-    SLOT_ARMOUR = 1,
-    SLOT_ITEM_1 = 2,
-    SLOT_ITEM_2 = 3,
-    SLOT_ITEM_3 = 4,
-    SLOT_ITEM_4 = 5,
+    SLOT_WEAPON  = 0,
+    SLOT_OFFHAND = 1,
+    SLOT_ARMOUR  = 2,
+    SLOT_ITEM_1  = 3,
+    SLOT_ITEM_2  = 4,
+    SLOT_ITEM_3  = 5,
+    SLOT_ITEM_4  = 6,
     
     SLOT_IDS[] = {
       0, 1, 2, 3, 4, 5
     },
     SLOT_TYPES[] = {
-      0, 1, 2, 2, 2, 2
+      0, 0, 1, 2, 2, 2, 2
     },
     DEFAULT_MAX_SLOTS = 4;
   final public static String
@@ -35,6 +36,7 @@ public class PersonGear {
   
   final Person person;
   List <Item> equipped = new List();
+  Item weaponPicked = null;
   Element carried = null;
   
   
@@ -46,12 +48,14 @@ public class PersonGear {
   
   void loadState(Session s) throws Exception {
     s.loadObjects(equipped);
+    weaponPicked = (Item) s.loadObject();
     carried = (Element) s.loadObject();
   }
   
   
   void saveState(Session s) throws Exception {
     s.saveObjects(equipped);
+    s.saveObject(weaponPicked);
     s.saveObject(carried);
   }
   
@@ -96,19 +100,24 @@ public class PersonGear {
     equipItem(new Item(kind, person.world()), slotID);
   }
   
-
+  
   public void equipItem(Item item, int slotID) {
     equipItem(item, slotID, null);
   }
   
   
   public void equipItem(Item item, int slotID, Base from) {
+    //
+    //  First, check the type and ensure that the range of the slot is legal-
+    int slotType = SLOT_TYPES[slotID];
     int maxSlots = maxSlots();
     if (slotID >= maxSlots) {
       I.complain("Cannot add item to slot: "+slotID);
       return;
     }
-    
+    //
+    //  Remove the old item, in any was present in the slot, and add the new
+    //  item.  (If a base was involved, swap with inventory.)
     final Item oldItem = itemInSlot(slotID);
     if (oldItem != null) {
       equipped.remove(oldItem);
@@ -120,6 +129,18 @@ public class PersonGear {
       item.setCarries(person, slotID);
       equipped.add(item);
     }
+    //
+    //  Check to see if the current weapon-pick should be changed:
+    if (slotType == SLOT_TYPE_WEAPON) {
+      weaponPicked = null;
+      for (int i : SLOT_IDS) if (SLOT_TYPES[i] == SLOT_TYPE_WEAPON) {
+        Item arm = itemInSlot(i);
+        if (arm != null) { weaponPicked = arm; break; }
+      }
+    }
+    //
+    //  And update stats (which might to due to change thanks to new passive
+    //  bonuses.)
     person.stats.updateStats();
   }
   
@@ -172,28 +193,48 @@ public class PersonGear {
   /**  Specific queries related to weapons and armour-
     */
   public ItemType weaponType() {
-    Item weapon = itemInSlot(SLOT_WEAPON);
+    Item weapon = weapon();
     return weapon == null ? Common.UNARMED : weapon.kind();
   }
   
   
   public ItemType armourType() {
-    Item armour = itemInSlot(SLOT_ARMOUR);
+    Item armour = armour();
     return armour == null ? Common.UNARMOURED : armour.kind();
   }
   
   
   public Item weapon() {
-    return itemInSlot(SLOT_WEAPON);
+    return weaponPicked;
   }
   
   
   public Item armour() {
     return itemInSlot(SLOT_ARMOUR);
   }
+  
+  
+  public void switchWeapon() {
+    Object weapon = weapon();
+    if (weapon == null) weapon = Common.UNARMED;
+    
+    Batch options = new Batch();
+    for (int i : SLOT_IDS) if (SLOT_TYPES[i] == SLOT_TYPE_WEAPON) {
+      Item arm = itemInSlot(i);
+      if (arm != null) options.include(arm);
+    }
+    options.include(Common.UNARMED);
+    
+    int index = options.indexOf(weapon);
+    index = (index + 1) % options.size();
+    
+    weapon = options.atIndex(index);
+    if (weapon == Common.UNARMED) weapon = null;
+    
+    this.weaponPicked = (Item) weapon;
+  }
+  
 }
-
-
 
 
 

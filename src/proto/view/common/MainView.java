@@ -130,6 +130,11 @@ public class MainView extends UINode {
   }
   
   
+  public Base player() {
+    return world.playerBase();
+  }
+  
+  
   
   /**  Switching tabs:
     */

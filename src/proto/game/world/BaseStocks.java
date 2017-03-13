@@ -47,10 +47,10 @@ public class BaseStocks {
       if (! type.availableFor(person, base)) continue;
       available.include(type);
     }
-    if (slotType == PersonGear.SLOT_ARMOUR) {
+    if (slotType == PersonGear.SLOT_TYPE_ARMOUR) {
       available.add(Common.UNARMOURED);
     }
-    if (slotType == PersonGear.SLOT_WEAPON) {
+    if (slotType == PersonGear.SLOT_TYPE_WEAPON) {
       available.add(Common.UNARMED);
     }
     return available;
@@ -95,38 +95,25 @@ public class BaseStocks {
   
   /**  Generating and updating manufacturing tasks-
     */
-  public Series <TaskCraft> craftingTasksFor(Person person) {
+  public Series <TaskCraft> craftingTasks() {
     if (! tasks.empty()) return tasks;
-    
     for (Object tech : base.knownTech) {
       if (tech instanceof ItemType) {
         ItemType type = (ItemType) tech;
         tasks.add(new TaskCraft(type, base));
       }
     }
-    
     return tasks;
   }
   
   
   void updateCrafting() {
     for (TaskCraft task : tasks) {
+      if (task.complete()) task.resetTask();
       task.updateAssignment();
     }
   }
-  
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 

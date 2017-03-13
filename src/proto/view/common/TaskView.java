@@ -11,6 +11,9 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 
 
+//  TODO:  Given the various specialised sub-interfaces, I may not need this
+//  any more.
+
 
 public class TaskView extends UINode {
   
@@ -46,12 +49,6 @@ public class TaskView extends UINode {
       task.choiceInfo(person), g,
       vx + 20 + iconSize + 5, vy, vw - (20 + iconSize + 20), vh - 0
     );
-    /*
-    ViewUtils.drawWrappedString(
-      task.testInfo(), g,
-      vx + 20 + iconSize + 5, vy + vh - 20, vw - (20 + iconSize + 20), 20
-    );
-    //*/
     //
     //  Draw the highlight/selection rectangle, and toggle selection if
     //  clicked-

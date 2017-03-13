@@ -50,6 +50,12 @@ public class PropEffect extends Prop {
   }
   
   
+  protected void onTurnStart() {
+    final Scene scene = origin.scene;
+    kind().onTurnStart(scene, this);
+  }
+  
+  
   protected void onTurnEnd() {
     final Scene scene = origin.scene;
     kind().onTurnEnd(scene, this);
