@@ -21,7 +21,7 @@ public abstract class PlotType extends EventType {
   }
   
   
-  protected abstract Plot initPlot(Base base);
+  public abstract Plot initPlot(Base base);
   
 
   
@@ -29,7 +29,7 @@ public abstract class PlotType extends EventType {
     */
   protected String nameFor(Event event) {
     Plot c = (Plot) event;
-    return name+": "+c.elementWithRole(Plot.ROLE_TARGET);
+    return name+": "+c.filling(Plot.ROLE_TARGET);
   }
   
   

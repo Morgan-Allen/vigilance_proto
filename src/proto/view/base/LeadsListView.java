@@ -52,8 +52,49 @@ public class LeadsListView extends UINode {
     g.drawString(region.kind().name(), vx + across, vy + down);
     down += 20;
     
+    
+    //
+    //  TODO:  Allow selection of a particular crime to investigate leads on.
     Person person = mainView.rosterView.selectedPerson();
     Lead hovered = null;
+    
+    //
+    //  TODO:  List known suspects and known roles in a grid format, and allow
+    //  clicking on those to open up options for investigation, along with a
+    //  tab for all past clues (the most recent will be listed automatically.)
+    //  
+    //  Yeah, okay.  That works.  Clicking on segments of the map can likewise
+    //  display info on buildings inside, and clicking on buildings can show
+    //  residents, and then you have similar options for seeing their known
+    //  associates, et cetera.  Hyperlink exploration!
+    
+    for (Plot plot : played.leads.knownPlots()) {
+      for (Element e : played.leads.knownInvolvedIn(plot)) {
+        
+        g.setColor(Color.LIGHT_GRAY);
+        /*
+        CaseFile file = played.leads.caseFor(e);
+        StringBuffer desc = new StringBuffer();
+        file.shortDescription(desc);
+        //*/
+        String desc = ""+e.name();
+        
+        ViewUtils.drawWrappedString(
+          desc.toString(), g, vx + 60, vy + down, vw - 80, 60
+        );
+        down += 60;
+        
+        for (Lead option : played.leads.leadsFor(plot, e)) {
+          TaskView view = option.createView(mainView);
+          view.showIcon = false;
+          view.relBounds.set(vx, vy + down, vw, 20);
+          view.renderNow(surface, g);
+          down += view.relBounds.ydim() + 10;
+          noEvents = false;
+          if (surface.wasHovered(option)) hovered = option;
+        }
+      }
+    }
     
     /*
     for (CaseFile file : played.leads.casesForRegion(region)) {

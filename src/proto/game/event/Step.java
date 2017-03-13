@@ -60,12 +60,12 @@ public class Step {
   
   /**  Additional config and support methods-
     */
-  void setMeetsAt(Plot.Role meetsAt) {
+  public void setMeetsAt(Plot.Role meetsAt) {
     this.meetsAt = meetsAt;
   }
   
   
-  void setInfoGiven(Plot.Role infoGiven) {
+  public void setInfoGiven(Plot.Role infoGiven) {
     this.infoGiven = infoGiven;
   }
   

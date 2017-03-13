@@ -15,11 +15,11 @@ public abstract class Plot extends Event {
     */
   final static Index <Role> ROLES_INDEX = new Index <Role> ();
   
-  static class Role extends Index.Entry implements Session.Saveable {
+  public static class Role extends Index.Entry implements Session.Saveable {
     
     final String name;
     
-    protected Role(String ID, String name) {
+    public Role(String ID, String name) {
       super(ROLES_INDEX, ID);
       this.name = name;
     }
@@ -105,7 +105,7 @@ public abstract class Plot extends Event {
   /**  Queueing and executing sub-events and generating clues for
     *  investigation-
     */
-  public Step queueStep(int medium, int timeTaken, Role... involved) {
+  protected Step queueStep(int medium, int timeTaken, Role... involved) {
     Step s = new Step();
     s.between   = involved ;
     s.medium    = medium   ;
@@ -117,12 +117,12 @@ public abstract class Plot extends Event {
   }
   
   
-  public void queueSteps(int medium, int timeTaken, Role from, Role... to) {
+  protected void queueSteps(int medium, int timeTaken, Role from, Role... to) {
     for (Role r : to) queueStep(medium, timeTaken, from, r);
   }
   
   
-  public boolean stepBegun(Step step) {
+  protected boolean stepBegun(Step step) {
     return step != null && step.timeStart >= 0;
   }
   
@@ -191,27 +191,32 @@ public abstract class Plot extends Event {
   }
   
   
+  public Base base() {
+    return base;
+  }
+  
+  
   public Person organiser() {
-    return (Person) elementWithRole(ROLE_ORGANISER);
+    return (Person) filling(ROLE_ORGANISER);
   }
   
   
   public Place hideout() {
-    return (Place) elementWithRole(ROLE_HIDEOUT);
+    return (Place) filling(ROLE_HIDEOUT);
   }
   
   
   public Person target() {
-    return (Person) elementWithRole(ROLE_TARGET);
+    return (Person) filling(ROLE_TARGET);
   }
   
   
   public Place scene() {
-    return (Place) elementWithRole(ROLE_SCENE);
+    return (Place) filling(ROLE_SCENE);
   }
   
   
-  public Element elementWithRole(Role role) {
+  public Element filling(Role role) {
     return roleFor(null, role).element;
   }
   
@@ -298,16 +303,13 @@ public abstract class Plot extends Event {
   
   /**  Life cycle and execution:
     */
-  protected boolean fillRoles() {
-    //  TODO:  Make abstract and implement per-subclass.
-    return false;
+  public void fillAndExpand() {
+    fillRoles();
   }
   
   
-  protected void onCompletion(Step step) {
-    //  TODO:  Make abstract and implement per-subclass.
-    return;
-  }
+  protected abstract boolean fillRoles();
+  protected abstract void onCompletion(Step step);
   
   
   public boolean possible() {
@@ -361,7 +363,23 @@ public abstract class Plot extends Event {
     return scene();
   }
   
+  
+  
+  /**  Rendering, debug and interface methods-
+    */
+  public void printRoles() {
+    I.say("\n\nRoles are: ");
+    for (Plot.RoleEntry entry : entries) {
+      I.say("  "+entry);
+    }
+  }
 }
+
+
+
+
+
+
 
 
 

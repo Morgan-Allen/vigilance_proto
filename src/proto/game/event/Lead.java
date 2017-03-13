@@ -22,7 +22,7 @@ public class Lead extends Task {
   
   /**  Some preliminaries needed for built-in type-definitions:
     */
-  final static int
+  final public static int
     //  The method by which a lead can be followed (and which contacts it can
     //  pick up on)-
     MEDIUM_MEET     =  1,
@@ -50,7 +50,7 @@ public class Lead extends Task {
     PROFILE_SUSPICIOUS = 2,
     PROFILE_HIGH       = 3,
     PROFILE_OBVIOUS    = 4;
-  final static float
+  final public static float
     //  Degrees of success in investigation-
     RESULT_NONE    = -1,
     RESULT_COLD    =  0,
@@ -226,7 +226,7 @@ public class Lead extends Task {
     //  Then check the focus-
     boolean matchFocus = false;
     for (Plot.Role role : step.between) {
-      Element contacts = plot.elementWithRole(role);
+      Element contacts = plot.filling(role);
       
       if (type.focus == FOCUS_REGION) {
         if (contacts.region() != focus) continue;
@@ -250,7 +250,7 @@ public class Lead extends Task {
     int time = plot.base.world().timing.totalHours();
     
     for (Plot.Role role : step.between) {
-      Element involved = plot.elementWithRole(role);
+      Element involved = plot.filling(role);
       if (involved == focus) continue;
       
       if (involved.isPerson()) {
@@ -292,17 +292,18 @@ public class Lead extends Task {
     int time = plot.base.world().timing.totalHours();
     
     for (Plot.Role role : step.between) {
-      Element involved = plot.elementWithRole(role);
+      Element involved = plot.filling(role);
       if (involved == focus) continue;
       
       Element p = (Element) involved;
       Region at = involved.region();
-      int placeRange = Rand.index(4) == 0 ? 0 : 1;
+      int placeRange = Rand.yes() ? 0 : 1;
       Series <Region> around = base.world().regionsInRange(at, placeRange);
       
       Region near = (Region) Rand.pickFrom(around);
       Clue clue = new Clue(plot, role);
       clue.assignNearbyRegion(p, near, placeRange, type, type.confidence, time);
+      possible.add(clue);
     }
     
     return possible;
@@ -372,7 +373,7 @@ public class Lead extends Task {
     if (contactID.equals(lastContactID)) {
       return RESULT_NONE;
     }
-
+    
     float result = followResult(follow);
     int time = base.world().timing.totalHours();
     
@@ -394,7 +395,7 @@ public class Lead extends Task {
     }
     else if (result <= RESULT_HOT) {
       for (Plot.Role role : step.between) {
-        Element subject = plot.elementWithRole(role);
+        Element subject = plot.filling(role);
         CaseFile file = base.leads.caseFor(subject);
         
         Clue clue = new Clue(plot,role);
@@ -427,7 +428,6 @@ public class Lead extends Task {
   }
   
   
-  
   public Place targetLocation(Person p) {
     return focus.place();
   }
@@ -456,8 +456,6 @@ public class Lead extends Task {
     return null;
   }
 }
-
-
 
 
 

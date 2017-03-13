@@ -6,6 +6,7 @@ import proto.game.person.Person;
 import proto.game.world.*;
 
 
+//  TODO:  Have this extend Element as originally intended...
 
 public class Clue {
   
@@ -15,7 +16,7 @@ public class Clue {
   Plot plot;
   Plot.Role role;
 
-  Object match;
+  Element match;
   boolean confirmed;
   
   Trait trait;
@@ -34,7 +35,7 @@ public class Clue {
   }
   
   
-  Clue(Plot plot, Plot.Role role) {
+  public Clue(Plot plot, Plot.Role role) {
     this.plot = plot;
     this.role = role;
   }
@@ -44,7 +45,7 @@ public class Clue {
     Clue c = new Clue();
     c.plot       = (Plot) s.loadObject();
     c.role       = (Plot.Role) s.loadObject();
-    c.match      = s.loadObject();
+    c.match      = (Element) s.loadObject();
     c.confirmed  = s.loadBool();
     c.trait      = (Trait) s.loadObject();
     c.near       = (Region) s.loadObject();
@@ -75,8 +76,8 @@ public class Clue {
   
   /**  Assignment of evidence & matches-
     */
-  void assignEvidence(
-    Object match, Trait trait,
+  public void assignEvidence(
+    Element match, Trait trait,
     Lead.Type leadType, float confidence, int timeFound
   ) {
     this.match      = match     ;
@@ -87,8 +88,8 @@ public class Clue {
   }
   
   
-  void assignNearbyRegion(
-    Object match, Region near, int range,
+  public void assignNearbyRegion(
+    Element match, Region near, int range,
     Lead.Type leadType, float confidence, int timeFound
   ) {
     this.match      = match     ;
@@ -100,8 +101,8 @@ public class Clue {
   }
   
   
-  void confirmMatch(
-    Object match, Lead.Type leadType, int timeFound
+  public void confirmMatch(
+    Element match, Lead.Type leadType, int timeFound
   ) {
     this.match      = match    ;
     this.confirmed  = true     ;
@@ -111,7 +112,7 @@ public class Clue {
   }
   
   
-  boolean matchesType(Clue other) {
+  public boolean matchesType(Clue other) {
     if (plot  != other.plot ) return false;
     if (role  != other.role ) return false;
     if (trait != other.trait) return false;
@@ -158,11 +159,17 @@ public class Clue {
       leadType.name+" indicates "+
       role+" has trait: "+trait
     ;
+    if (near != null && nearRange == 0) return
+      leadType.name+" indicates "+
+      role+" is within: "+near
+    ;
+    if (near != null && nearRange > 0) return
+      leadType.name+" indicates "+
+      role+" is near: "+near
+    ;
     return "";
   }
 }
-
-
 
 
 

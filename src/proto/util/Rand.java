@@ -58,6 +58,7 @@ public class Rand {
   
   
   final public static Object pickFrom(Series list) {
+    if (list.empty()) return null;
     return list.atIndex(index(list.size()));
   }
   

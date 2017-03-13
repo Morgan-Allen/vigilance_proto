@@ -33,8 +33,9 @@ public class CaseFile implements Session.Saveable {
     base    = (Base) s.loadObject();
     subject =        s.loadObject();
     
-    s.saveInt(clues.size());
-    for (Clue c : clues) c.saveClue(s);
+    for (int n = s.loadInt(); n-- > 0;) {
+      clues.add(Clue.loadClue(s));
+    }
   }
   
   
@@ -42,9 +43,8 @@ public class CaseFile implements Session.Saveable {
     s.saveObject(base   );
     s.saveObject(subject);
     
-    for (int n = s.loadInt(); n-- > 0;) {
-      clues.add(Clue.loadClue(s));
-    }
+    s.saveInt(clues.size());
+    for (Clue c : clues) c.saveClue(s);
   }
   
   

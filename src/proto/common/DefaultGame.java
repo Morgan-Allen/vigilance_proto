@@ -34,8 +34,8 @@ public class DefaultGame extends RunGame {
     initDefaultCrime  (world);
     
     for (Base base : world.bases()) if (base.faction().criminal) {
-      Plot initPlot = base.plans.generateNextPlot();
-      base.plans.assignRootPlot(initPlot);
+      Plot initPlot = base.plots.generateNextPlot();
+      base.plots.assignRootPlot(initPlot);
     }
     return world;
   }
@@ -135,7 +135,8 @@ public class DefaultGame extends RunGame {
       Crooks.BRUISER, Crooks.BRUISER, Crooks.GANGSTER
     };
     final PersonType seniorTypes[] = {
-      Crooks.GANGSTER, Civilians.DOCTOR, Civilians.INVENTOR, Civilians.BROKER
+      Crooks.GANGSTER, Crooks.GANGSTER, Crooks.HITMAN,
+      Civilians.DOCTOR, Civilians.INVENTOR, Civilians.BROKER
     };
     
     final Faction owns = Crooks.THE_MADE_MEN;
@@ -160,7 +161,7 @@ public class DefaultGame extends RunGame {
       world.addBase(base, false);
       base.addToRoster(base.leader());
       base.setGoonTypes(goonTypes);
-      base.plans.assignPlotTypes(CrimeTypes.ALL_TYPES);
+      base.plots.assignPlotTypes(CrimeTypes.ALL_TYPES);
       
       for (PersonType type : seniorTypes) {
         Person senior = Person.randomOfKind(type, world);

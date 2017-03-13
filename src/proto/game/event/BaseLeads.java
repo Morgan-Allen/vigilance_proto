@@ -82,6 +82,28 @@ public class BaseLeads {
   
   /**  Assorted utility methods-
     */
+  public Series <Plot> knownPlots() {
+    Batch <Plot> known = new Batch();
+    for (CaseFile file : files.values()) {
+      for (Clue c : file.clues) if (! c.plot.complete()) {
+        known.include(c.plot);
+      }
+    }
+    return known;
+  }
+  
+  
+  public Series <Element> knownInvolvedIn(Plot plot) {
+    Batch <Element> known = new Batch();
+    for (CaseFile file : files.values()) {
+      for (Clue c : file.clues) if (c.plot == plot && c.confirmed) {
+        known.include(c.match);
+      }
+    }
+    return known;
+  }
+  
+  
   public CaseFile caseFor(Object subject) {
     CaseFile match = files.get(subject);
     if (match != null) return match;

@@ -26,7 +26,7 @@ public class Base extends Place {
   final public BaseStocks   stocks   = new BaseStocks  (this);
   final public BaseTraining training = new BaseTraining(this);
   final public BaseLeads    leads    = new BaseLeads   (this);
-  final public BasePlans    plans    = new BasePlans   (this);
+  final public BasePlots    plots    = new BasePlots   (this);
   
   Place rooms[] = new Place[MAX_FACILITIES];
   List <Object> knownTech = new List();
@@ -50,7 +50,7 @@ public class Base extends Place {
     stocks  .loadState(s);
     training.loadState(s);
     leads   .loadState(s);
-    plans   .loadState(s);
+    plots   .loadState(s);
     
     for (int n = 0 ; n < MAX_FACILITIES; n++) {
       rooms[n] = (Place) s.loadObject();
@@ -71,7 +71,7 @@ public class Base extends Place {
     stocks  .saveState(s);
     training.saveState(s);
     leads   .saveState(s);
-    plans   .saveState(s);
+    plots   .saveState(s);
     
     for (int n = 0 ; n < MAX_FACILITIES; n++) {
       s.saveObject(rooms[n]);
@@ -100,7 +100,7 @@ public class Base extends Place {
     stocks.updateCrafting();
     training.updateTraining();
     leads.updateLeads();
-    plans.updatePlanning();
+    plots.updatePlanning();
   }
   
   

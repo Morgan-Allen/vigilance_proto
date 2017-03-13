@@ -7,7 +7,7 @@ import proto.util.*;
 
 
 
-public class BasePlans {
+public class BasePlots {
   
   
   /**  Data fields, construction and save/load methods-
@@ -19,7 +19,7 @@ public class BasePlans {
   
   
   
-  public BasePlans(Base base) {
+  public BasePlots(Base base) {
     this.base = base;
   }
   
@@ -41,7 +41,11 @@ public class BasePlans {
   }
   
   
+  
+  
   public Plot generateNextPlot() {
+    //  TODO:  You need to iterate across possible plot-types here, and come up
+    //  with a promising candidate...
     return null;
   }
   

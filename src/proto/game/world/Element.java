@@ -107,6 +107,7 @@ public class Element implements Session.Saveable {
   public boolean isItem  () { return type == Kind.TYPE_ITEM  ; }
   public boolean isProp  () { return type == Kind.TYPE_PROP  ; }
   public boolean isClue  () { return type == Kind.TYPE_CLUE  ; }
+  public boolean isBase  () { return this instanceof Base    ; }
   
   
   
