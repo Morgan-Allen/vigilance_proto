@@ -3,7 +3,8 @@
 package proto.view.base;
 import proto.game.event.*;
 import proto.game.world.*;
-import proto.util.Box2D;
+import proto.game.person.*;
+import proto.util.*;
 import proto.view.common.*;
 
 import java.awt.Color;
@@ -34,7 +35,7 @@ public class LeadsListView extends UINode {
     
     int across = 10, down = 10;
     boolean noEvents = true;
-    Base played = mainView.world().playerBase();
+    Base played = mainView.player();
     Region region = parent.mapView.selectedRegion();
     
     if (region == null) {
@@ -51,6 +52,7 @@ public class LeadsListView extends UINode {
     g.drawString(region.kind().name(), vx + across, vy + down);
     down += 20;
     
+    Person person = mainView.rosterView.selectedPerson();
     Lead hovered = null;
     
     for (CaseFile file : played.leads.casesForRegion(region)) {
@@ -89,7 +91,7 @@ public class LeadsListView extends UINode {
     if (hovered != null) {
       g.setColor(Color.LIGHT_GRAY);
       ViewUtils.drawWrappedString(
-        hovered.testInfo(),
+        hovered.testInfo(person),
         g, vx + 25, vy + down + 20, vw - 30, 150
       );
     }

@@ -87,8 +87,8 @@ public class TaskResearch extends Task {
   }
   
   
-  public String testInfo() {
-    String info = super.testInfo();
+  public String testInfo(Person p) {
+    String info = super.testInfo(p);
     return info;
   }
   

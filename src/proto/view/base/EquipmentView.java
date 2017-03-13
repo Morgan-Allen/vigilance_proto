@@ -62,6 +62,10 @@ public class EquipmentView extends UINode {
       pickOption.toggled = option == selectedItem;
       pickOption.refers = option;
       pickOption.renderNow(surface, g);
+      
+      ViewUtils.renderAssigned(
+        option.assigned(), vx + across + 300, vy + down + 20, surface, g
+      );
       down += 25;
     }
     
@@ -77,7 +81,7 @@ public class EquipmentView extends UINode {
       
       float craftTime = selectedItem.craftingTime() * 1f / World.HOURS_PER_DAY;
       String desc = selectedItem.made().defaultInfo();
-      desc += "\n  "+selectedItem.testInfo();
+      desc += "\n  "+selectedItem.testInfo(person);
       desc += "\n  Cost: "+selectedItem.made().buildCost;
       
       if (craftTime == -1) {
@@ -93,14 +97,20 @@ public class EquipmentView extends UINode {
       down += 120;
       final Person crafter = person;
       
+      boolean isCrafted = ! selectedItem.assigned().empty();
+      boolean isHelping = crafter.assignments().includes(selectedItem);
+      String increaseDesc = "Begin Manufacture";
+      if (isHelping) increaseDesc = "Increase Order";
+      else if (isCrafted) increaseDesc = "Assist Manufacture";
+      
       StringButton increaseButton = new StringButton(
-        "Begin Manufacture", new Box2D(across, down, 200, 20), this
+        increaseDesc, new Box2D(across, down, 200, 20), this
       ) {
         protected void whenClicked() {
-          if (! selectedItem.assigned().empty()) {
+          if (crafter.assignments().includes(selectedItem)) {
             selectedItem.incOrders(1);
           }
-          crafter.addAssignment(selectedItem);
+          else crafter.addAssignment(selectedItem);
         }
       };
       StringButton cancelButton = new StringButton(
@@ -134,7 +144,7 @@ public class EquipmentView extends UINode {
     class arrival {
       TaskCraft task;
       ItemType made;
-      float time;
+      float time, prog;
     }
     
     List <arrival> arrivals = new List <arrival> () {
@@ -153,6 +163,7 @@ public class EquipmentView extends UINode {
         a.task = task;
         a.made = made;
         a.time = craftTime * (order - prog);
+        a.prog = order == 1 ? prog : -1;
         arrivals.add(a);
       }
     }
@@ -172,10 +183,10 @@ public class EquipmentView extends UINode {
     }
     else for (arrival a : arrivals) {
       float time = a.time / World.HOURS_PER_DAY;
-      
       String desc = "  "+a.made+" ("+I.shorten(time, 1)+" days)";
-      if (a == arrivals.first()) {
-        int prog = (int) (100 * a.task.craftingProgress());
+      
+      if (a.prog >= 0) {
+        int prog = (int) (100 * a.prog);
         desc += " ("+prog+"% complete)";
       }
       
