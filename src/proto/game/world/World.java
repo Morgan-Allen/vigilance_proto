@@ -138,19 +138,8 @@ public class World implements Session.Saveable {
   
   /**  General query methods-
     */
-  public Region[] regions() {
-    return regions;
-  }
-  
-  
   public Series <Element> inside() {
     return elements;
-  }
-  
-  
-  public Region regionFor(RegionType r) {
-    for (Region d : regions) if (d.kind() == r) return d;
-    return null;
   }
   
   
@@ -172,6 +161,37 @@ public class World implements Session.Saveable {
   
   public boolean monitorActive() {
     return amWatching;
+  }
+  
+  
+  
+  /**  Handling regions and large-scale distances-
+    */
+  public Region[] regions() {
+    return regions;
+  }
+  
+  
+  public Region regionFor(RegionType r) {
+    for (Region d : regions) if (d.kind() == r) return d;
+    return null;
+  }
+  
+  
+  public float distanceBetween(Region a, Region b) {
+    return Nums.abs(Nums.max(
+      a.kind().mapX - b.kind().mapX,
+      a.kind().mapY - b.kind().mapY
+    ));
+  }
+  
+  
+  public Series <Region> regionsInRange(Region a, float range) {
+    Batch <Region> matches = new Batch();
+    for (Region r : regions) if (distanceBetween(r, a) <= range) {
+      matches.add(r);
+    }
+    return matches;
   }
   
   

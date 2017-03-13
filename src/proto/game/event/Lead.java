@@ -243,18 +243,18 @@ public class Lead extends Task {
   }
   
   
-  protected Series <Clue> possibleClues(
-    Step step, int tense, Plot plot
+  protected Series <Clue> traitClues(
+    Step step, int tense, Plot plot, float resultHeat
   ) {
     Batch <Clue> possible = new Batch();
     int time = plot.base.world().timing.totalHours();
     
     for (Plot.Role role : step.between) {
-      Element contacts = plot.elementWithRole(role);
-      if (contacts == focus) continue;
+      Element involved = plot.elementWithRole(role);
+      if (involved == focus) continue;
       
-      if (contacts.isPerson()) {
-        Person p = (Person) contacts;
+      if (involved.isPerson()) {
+        Person p = (Person) involved;
         for (Trait t : Common.PERSON_TRAITS) {
           if (p.stats.levelFor(t) <= 0) continue;
           Clue clue = new Clue(plot, role);
@@ -263,8 +263,8 @@ public class Lead extends Task {
         }
       }
       
-      if (contacts.isPlace()) {
-        Place p = (Place) contacts;
+      if (involved.isPlace()) {
+        Place p = (Place) involved;
         for (Trait t : Common.VENUE_TRAITS) {
           if (! p.hasProperty(t)) continue;
           Clue clue = new Clue(plot, role);
@@ -273,9 +273,9 @@ public class Lead extends Task {
         }
       }
       
-      if (contacts.isItem()) {
-        Item p = (Item) contacts;
-        Clue clue = new Clue(plot,role);
+      if (involved.isItem()) {
+        Item p = (Item) involved;
+        Clue clue = new Clue(plot, role);
         clue.confirmMatch(p, type, time);
         possible.add(clue);
       }
@@ -284,6 +284,29 @@ public class Lead extends Task {
     return possible;
   }
   
+  
+  protected Batch <Clue> regionClues(
+    Step step, int tense, Plot plot, float resultHeat
+  ) {
+    Batch <Clue> possible = new Batch();
+    int time = plot.base.world().timing.totalHours();
+    
+    for (Plot.Role role : step.between) {
+      Element involved = plot.elementWithRole(role);
+      if (involved == focus) continue;
+      
+      Element p = (Element) involved;
+      Region at = involved.region();
+      int placeRange = Rand.index(4) == 0 ? 0 : 1;
+      Series <Region> around = base.world().regionsInRange(at, placeRange);
+      
+      Region near = (Region) Rand.pickFrom(around);
+      Clue clue = new Clue(plot, role);
+      clue.assignNearbyRegion(p, near, placeRange, type, type.confidence, time);
+    }
+    
+    return possible;
+  }
   
   
   
@@ -357,10 +380,16 @@ public class Lead extends Task {
       
     }
     else if (result <= RESULT_PARTIAL) {
-      for (Clue clue : possibleClues(step, tense, plot)) {
-        if (Rand.num() > 0.5f) continue;
-        CaseFile file = base.leads.caseFor(clue.match);
-        file.recordClue(clue);
+      Series <Clue> fromTraits = traitClues (step, tense, plot, result);
+      Series <Clue> fromRegion = regionClues(step, tense, plot, result);
+      
+      Clue gained = null;
+      if (Rand.yes()    ) gained = (Clue) Rand.pickFrom(fromTraits);
+      if (gained == null) gained = (Clue) Rand.pickFrom(fromRegion);
+      
+      if (gained != null) {
+        CaseFile file = base.leads.caseFor(gained.match);
+        file.recordClue(gained);
       }
     }
     else if (result <= RESULT_HOT) {

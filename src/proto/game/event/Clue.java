@@ -20,10 +20,11 @@ public class Clue {
   
   Trait trait;
   
-  Place near;
+  Region near;
   int nearRange;
   
   Lead.Type leadType;
+  int resultHeat;
   float confidence;
   int timeFound;
   
@@ -46,9 +47,10 @@ public class Clue {
     c.match      = s.loadObject();
     c.confirmed  = s.loadBool();
     c.trait      = (Trait) s.loadObject();
-    c.near       = (Place) s.loadObject();
+    c.near       = (Region) s.loadObject();
     c.nearRange  = s.loadInt();
     c.leadType   = Lead.LEAD_TYPES[s.loadInt()];
+    c.resultHeat = s.loadInt();
     c.confidence = s.loadFloat();
     c.timeFound  = s.loadInt();
     return c;
@@ -64,6 +66,7 @@ public class Clue {
     s.saveObject(near       );
     s.saveInt   (nearRange  );
     s.saveInt   (leadType.ID);
+    s.saveInt   (resultHeat );
     s.saveFloat (confidence );
     s.saveInt   (timeFound  );
   }
@@ -78,6 +81,19 @@ public class Clue {
   ) {
     this.match      = match     ;
     this.trait      = trait     ;
+    this.leadType   = leadType  ;
+    this.confidence = confidence;
+    this.timeFound  = timeFound ;
+  }
+  
+  
+  void assignNearbyRegion(
+    Object match, Region near, int range,
+    Lead.Type leadType, float confidence, int timeFound
+  ) {
+    this.match      = match     ;
+    this.near       = near      ;
+    this.nearRange  = range     ;
     this.leadType   = leadType  ;
     this.confidence = confidence;
     this.timeFound  = timeFound ;
@@ -119,6 +135,11 @@ public class Clue {
       if (e.isPlace()) {
         Place p = (Place) e;
         if (! p.hasProperty(trait)) return false;
+      }
+    }
+    if (near != null) {
+      if (e.world().distanceBetween(near, e.region()) > nearRange) {
+        return false;
       }
     }
     return true;

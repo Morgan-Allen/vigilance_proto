@@ -23,6 +23,7 @@ public class RegionType extends Kind {
   int     baseFunding       = 75   ;
   boolean defaultMember     = true ;
   PlaceType defaultFacilities[];
+  float mapX, mapY;
   
   
   public RegionType(String name, String ID) {
@@ -41,8 +42,14 @@ public class RegionType extends Kind {
   public void attachDefaultFacilities(PlaceType... facilities) {
     this.defaultFacilities = facilities;
   }
+  
+  
+  public void attachMapCoordinates(float mapX, float mapY) {
+    this.mapX = mapX;
+    this.mapY = mapY;
+  }
+  
 }
-
 
 
 
