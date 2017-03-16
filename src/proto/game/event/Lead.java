@@ -152,16 +152,14 @@ public class Lead extends Task {
   /**  Data fields, construction and save/load methods-
     */
   final Type type;
-  final Plot plot;
   final Element focus;
   private String lastContactID;
   
   
-  Lead(Base base, Type type, Plot plot, Element focus) {
+  Lead(Base base, Type type, Element focus) {
     super(base, Task.TIME_INDEF);
     
     this.type  = type ;
-    this.plot  = plot ;
     this.focus = focus;
     
     boolean badFocus = false;
@@ -181,7 +179,6 @@ public class Lead extends Task {
   public Lead(Session s) throws Exception {
     super(s);
     type  = LEAD_TYPES[s.loadInt()];
-    plot  = (Plot   ) s.loadObject();
     focus = (Element) s.loadObject();
     lastContactID = s.loadString();
   }
@@ -190,9 +187,13 @@ public class Lead extends Task {
   public void saveState(Session s) throws Exception {
     super.saveState(s);
     s.saveInt(type.ID);
-    s.saveObject(plot);
     s.saveObject(focus);
     s.saveString(lastContactID);
+  }
+  
+  
+  public Element targetElement(Person p) {
+    return focus;
   }
   
   
@@ -202,13 +203,8 @@ public class Lead extends Task {
   protected boolean canDetect(
     Step step, int tense, Plot plot
   ) {
-    //  TODO:  Consider splitting this off into separate sub-methods for
-    //  override by subclasses.
     //
     //  First check the tense and crime-
-    if (plot != this.plot) {
-      return false;
-    }
     if (tense != TENSE_ANY && type.tense != TENSE_ANY && tense != type.tense) {
       return false;
     }
@@ -243,6 +239,145 @@ public class Lead extends Task {
   }
   
   
+  public float followChance(Series <Person> follow) {
+    float skill = 0, obstacle = 1;
+    
+    if (type.medium == MEDIUM_SURVEIL) {
+      Person perp = (Person) focus;
+      skill = teamStatBonus(follow, SIGHT_RANGE);
+      obstacle = perp   .stats.levelFor(HIDE_RANGE );
+    }
+    
+    if (type.medium == MEDIUM_WIRE) {
+      Place site = (Place) focus;
+      skill = teamStatBonus(follow, ENGINEERING);
+      obstacle = 5;
+    }
+    
+    if (type.medium == MEDIUM_QUESTION) {
+      Person perp = (Person) focus;
+      skill = teamStatBonus(follow, QUESTION);
+      obstacle = perp.stats.levelFor(PERSUADE);
+    }
+    
+    if (type.medium == MEDIUM_COVER) {
+      Place site = (Place) focus;
+      skill = teamStatBonus(follow, PERSUADE);
+      obstacle = 5;
+    }
+    
+    return skill / (skill + obstacle);
+  }
+  
+  
+  protected float teamStatBonus(Series <Person> follow, Trait stat) {
+    float bestStat = 0, sumStats = 0;
+    for (Person p : follow) {
+      float level = p.stats.levelFor(stat);
+      sumStats += level;
+      bestStat = Nums.max(bestStat, level);
+    }
+    return bestStat + ((sumStats - bestStat) / 2);
+  }
+  
+  
+  protected float followResult(Series <Person> follow) {
+    float chance = followChance(follow);
+    chance = 1 - (Nums.sqrt(1 - chance));
+    boolean roll1 = Rand.num() < chance, roll2 = Rand.num() < chance;
+    
+    if (roll1 && roll2) return RESULT_HOT;
+    if (roll1 || roll2) return RESULT_PARTIAL;
+    return RESULT_COLD;
+  }
+  
+  
+  protected float performFollow(
+    Step step, int tense, Plot plot, Series <Person> follow
+  ) {
+    //
+    //  First, check to see whether anything has actually changed here (i.e,
+    //  avoid granting cumulative 'random' info over time.)  If it hasn't,
+    //  just return.
+    String contactID = step.ID+"_"+tense;
+    if (contactID.equals(lastContactID)) {
+      return RESULT_NONE;
+    }
+    //
+    //  Then perform the actual skill-test needed to ensure success:
+    //  TODO  There should ideally be separate skill tests for each participant
+    //        in a step.
+    float result = followResult(follow);
+    int time = base.world().timing.totalHours();
+    //
+    //  If you're on fire at the moment, you can get direct confirmation for
+    //  the identity of the participant/s, and any information or payload they
+    //  may have relayed to eachother.
+    if (result >= RESULT_HOT) {
+      for (Plot.Role role : step.between) {
+        confirmIdentity(plot, role, time);
+      }
+      if (step.infoGiven != null) {
+        confirmIdentity(plot, step.infoGiven, time);
+      }
+    }
+    //
+    //  If you're only partly successful, you might still get a glimpse of the
+    //  other parties or have a rough idea of where the meeting took place.
+    else if (result >= RESULT_PARTIAL) {
+      Series <Clue> fromTraits = traitClues (step, tense, plot, result);
+      Series <Clue> fromRegion = regionClues(step, tense, plot, result);
+      
+      Clue gained = null;
+      if (Rand.yes()    ) gained = (Clue) Rand.pickFrom(fromTraits);
+      if (gained == null) gained = (Clue) Rand.pickFrom(fromRegion);
+      
+      if (gained != null) {
+        CaseFile file = base.leads.caseFor(gained.match);
+        file.recordClue(gained);
+      }
+    }
+    //
+    //  Either way, you have to take the risk of tipping off the perps
+    //  themselves:
+    plot.takeSpooking(type.profile);
+    return result;
+  }
+  
+  
+  public boolean updateAssignment() {
+    if (! super.updateAssignment()) return false;
+    Series <Person> active = active();
+    //
+    //  Continuously monitor for events of interest connected to the current
+    //  focus of your investigation, and see if any new information pops up...
+    for (Event event : base.world().events.active()) {
+      if (! (event instanceof Plot)) continue;
+      Plot plot = (Plot) event;
+      
+      for (Step step : plot.allSteps()) {
+        int tense = plot.stepTense(step);
+        if (! canDetect(step, tense, plot)) continue;
+        performFollow(step, tense, plot, active);
+      }
+    }
+    return true;
+  }
+  
+  
+  protected void confirmIdentity(Plot plot, Plot.Role role, int time) {
+    Element subject = plot.filling(role);
+    CaseFile file = base.leads.caseFor(subject);
+    Clue clue = new Clue(plot, role);
+    clue.confirmMatch(subject, type, time);
+    file.recordClue(clue);
+  }
+  
+  
+  
+  /**  Utility methods for generating clues particular to subject (and possibly
+    *  investigation-type?)
+    */
   protected Series <Clue> traitClues(
     Step step, int tense, Plot plot, float resultHeat
   ) {
@@ -311,134 +446,11 @@ public class Lead extends Task {
   
   
   
-  public float followChance(Series <Person> follow) {
-    float skill = 0, obstacle = 1;
-    
-    if (type.medium == MEDIUM_SURVEIL) {
-      Person perp = (Person) focus;
-      skill = teamStatBonus(follow, SIGHT_RANGE);
-      obstacle = perp   .stats.levelFor(HIDE_RANGE );
-    }
-    
-    if (type.medium == MEDIUM_WIRE) {
-      Place site = (Place) focus;
-      skill = teamStatBonus(follow, ENGINEERING);
-      obstacle = 5;
-    }
-    
-    if (type.medium == MEDIUM_QUESTION) {
-      Person perp = (Person) focus;
-      skill = teamStatBonus(follow, QUESTION);
-      obstacle = perp.stats.levelFor(PERSUADE);
-    }
-    
-    if (type.medium == MEDIUM_COVER) {
-      Place site = (Place) focus;
-      skill = teamStatBonus(follow, PERSUADE);
-      obstacle = 5;
-    }
-    
-    return skill / (skill + obstacle);
-  }
-  
-  
-  protected float teamStatBonus(Series <Person> follow, Trait stat) {
-    float bestStat = 0, sumStats = 0;
-    for (Person p : follow) {
-      float level = p.stats.levelFor(stat);
-      sumStats += level;
-      bestStat = Nums.max(bestStat, level);
-    }
-    return bestStat + ((sumStats - bestStat) / 2);
-  }
-  
-  
-  protected float followResult(Series <Person> follow) {
-    float chance = followChance(follow);
-    chance = 1 - (Nums.sqrt(1 - chance));
-    boolean roll1 = Rand.num() < chance, roll2 = Rand.num() < chance;
-    
-    if (roll1 && roll2) return RESULT_HOT;
-    if (roll1 || roll2) return RESULT_PARTIAL;
-    return RESULT_COLD;
-  }
-  
-  
-  protected float performFollow(
-    Step step, int tense, Plot plot, Series <Person> follow
-  ) {
-    //
-    //  First, check to see whether anything has actually changed here:
-    String contactID = step.ID+"_"+tense;
-    if (contactID.equals(lastContactID)) {
-      return RESULT_NONE;
-    }
-    
-    float result = followResult(follow);
-    int time = base.world().timing.totalHours();
-    
-    if (result <= RESULT_COLD) {
-      
-    }
-    else if (result <= RESULT_PARTIAL) {
-      Series <Clue> fromTraits = traitClues (step, tense, plot, result);
-      Series <Clue> fromRegion = regionClues(step, tense, plot, result);
-      
-      Clue gained = null;
-      if (Rand.yes()    ) gained = (Clue) Rand.pickFrom(fromTraits);
-      if (gained == null) gained = (Clue) Rand.pickFrom(fromRegion);
-      
-      if (gained != null) {
-        CaseFile file = base.leads.caseFor(gained.match);
-        file.recordClue(gained);
-      }
-    }
-    else if (result <= RESULT_HOT) {
-      for (Plot.Role role : step.between) {
-        Element subject = plot.filling(role);
-        CaseFile file = base.leads.caseFor(subject);
-        
-        Clue clue = new Clue(plot,role);
-        clue.confirmMatch(subject, type, time);
-        file.recordClue(clue);
-      }
-    }
-    
-    plot.takeSpooking(type.profile);
-    return result;
-  }
-  
-  
-  public boolean updateAssignment() {
-    if (! super.updateAssignment()) return false;
-    Series <Person> active = active();
-    
-    for (Event event : base.world().events.active()) {
-      if (! (event instanceof Plot)) continue;
-      Plot plot = (Plot) event;
-      
-      for (Step step : plot.allSteps()) {
-        int tense = plot.stepTense(step);
-        if (! canDetect(step, tense, plot)) continue;
-        performFollow(step, tense, plot, active);
-      }
-    }
-    
-    return true;
-  }
-  
-  
-  public Place targetLocation(Person p) {
-    return focus.place();
-  }
-  
-  
-  
   /**  Rendering, debug and interface methods-
     */
   //  TODO:  Fill these out-
   public String activeInfo() {
-    return null;
+    return type.name+": "+focus;
   }
   
   
@@ -453,9 +465,14 @@ public class Lead extends Task {
   
   
   public String choiceInfo(Person p) {
-    return null;
+    return "Conduct "+type.name;
   }
 }
+
+
+
+
+
 
 
 

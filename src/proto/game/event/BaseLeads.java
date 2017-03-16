@@ -49,31 +49,31 @@ public class BaseLeads {
   }
   
   
-  Lead leadFor(Plot plot, Element focus, Lead.Type type) {
+  Lead leadFor(Element focus, Lead.Type type) {
     for (Lead lead : leads) {
-      if (lead.plot == plot && lead.focus == focus && lead.type == type) {
+      if (lead.focus == focus && lead.type == type) {
         return lead;
       }
     }
-    Lead lead = new Lead(base, type, plot, focus);
+    Lead lead = new Lead(base, type, focus);
     leads.add(lead);
     return lead;
   }
   
   
-  public Series <Lead> leadsFor(Plot plot, Element focus) {
+  public Series <Lead> leadsFor(Element focus) {
     final Batch <Lead> all = new Batch();
     if (focus.isPerson()) {
-      all.add(leadFor(plot, focus, Lead.LEAD_SURVEIL_PERSON));
-      all.add(leadFor(plot, focus, Lead.LEAD_QUESTION));
+      all.add(leadFor(focus, Lead.LEAD_SURVEIL_PERSON));
+      all.add(leadFor(focus, Lead.LEAD_QUESTION));
     }
     if (focus.isPlace()) {
-      all.add(leadFor(plot, focus, Lead.LEAD_SURVEIL_BUILDING));
-      all.add(leadFor(plot, focus, Lead.LEAD_WIRETAP));
+      all.add(leadFor(focus, Lead.LEAD_SURVEIL_BUILDING));
+      all.add(leadFor(focus, Lead.LEAD_WIRETAP));
     }
     if (focus.isRegion()) {
-      all.add(leadFor(plot, focus, Lead.LEAD_PATROL));
-      all.add(leadFor(plot, focus, Lead.LEAD_CANVAS));
+      all.add(leadFor(focus, Lead.LEAD_PATROL));
+      all.add(leadFor(focus, Lead.LEAD_CANVAS));
     }
     return all;
   }

@@ -359,8 +359,8 @@ public abstract class Plot extends Event {
   }
   
   
-  public Place targetLocation(Person p) {
-    return scene();
+  public Element targetElement(Person p) {
+    return target();
   }
   
   

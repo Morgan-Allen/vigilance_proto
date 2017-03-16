@@ -14,7 +14,7 @@ import java.awt.image.BufferedImage;
 
 
 
-public class MapInsetView extends UINode {
+public abstract class MapInsetView extends UINode {
   
   
   /**  Data fields, construction, setup and attachment-
@@ -133,7 +133,8 @@ public class MapInsetView extends UINode {
       regionHovered = n;
     }
     if (regionHovered != null && surface.mouseClicked()) {
-      this.setSelectedRegion(regionHovered);
+      setSelectedRegion(regionHovered);
+      onRegionSelect(regionHovered);
     }
     
     renderOutline(selectedRegion(), surface, g, mapWRatio, mapHRatio);
@@ -171,7 +172,7 @@ public class MapInsetView extends UINode {
     final Series <Person> roster = mainView.world().playerBase().roster();
     for (Person p : roster) {
       final Assignment a = p.topAssignment();
-      if (a != null && a.targetLocation(p).region() == located) {
+      if (a != null && a.targetElement(p).region() == located) {
         visitors.include(p);
       }
       else if (p.region() == located) {
@@ -195,6 +196,8 @@ public class MapInsetView extends UINode {
     g.drawImage(r.outline, x, y, w, h, null);
   }
   
+  
+  protected abstract void onRegionSelect(Region region);
   
   
   public void setSelectedRegion(Region region) {

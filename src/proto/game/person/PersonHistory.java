@@ -3,6 +3,7 @@
 package proto.game.person;
 import proto.common.*;
 import proto.game.world.*;
+import proto.game.event.*;
 import proto.util.*;
 
 
@@ -16,6 +17,8 @@ public class PersonHistory {
   
   static class Bond { Element other; float value; }
   Table <Element, Bond> relations = new Table();
+  
+  List <Clue> memories = new List();
   
   
   PersonHistory(Person person) {
@@ -32,6 +35,9 @@ public class PersonHistory {
       r.value = s.loadFloat();
       relations.put(r.other, r);
     }
+    for (int n = s.loadInt(); n-- > 0;) {
+      memories.add(Clue.loadClue(s));
+    }
   }
   
   
@@ -43,6 +49,8 @@ public class PersonHistory {
       s.saveObject(r.other);
       s.saveFloat (r.value);
     }
+    s.saveInt(memories.size());
+    for (Clue c : memories) c.saveClue(s);
   }
   
   

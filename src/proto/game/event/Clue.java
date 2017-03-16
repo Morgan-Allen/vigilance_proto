@@ -41,7 +41,7 @@ public class Clue {
   }
   
   
-  static Clue loadClue(Session s) throws Exception {
+  public static Clue loadClue(Session s) throws Exception {
     Clue c = new Clue();
     c.plot       = (Plot) s.loadObject();
     c.role       = (Plot.Role) s.loadObject();
@@ -58,7 +58,7 @@ public class Clue {
   }
   
   
-  void saveClue(Session s) throws Exception {
+  public void saveClue(Session s) throws Exception {
     s.saveObject(plot       );
     s.saveObject(role       );
     s.saveObject(match      );

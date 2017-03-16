@@ -79,11 +79,18 @@ public class UINode {
     for (UINode kid : kids) {
       kid.updateAndRender(surface, g);
     }
+    
+    renderAfterKids(surface, g);
   }
   
   
   protected boolean renderTo(Surface surface, Graphics2D g) {
     return true;
+  }
+  
+  
+  protected void renderAfterKids(Surface surface, Graphics2D g) {
+    return;
   }
 }
 

@@ -27,7 +27,10 @@ public class InvestingView extends UINode {
     
     mapView = new MapInsetView(this, new Box2D(
       320, 5, fullWide - 640, fullHigh - 10
-    ));
+    )) {
+      protected void onRegionSelect(Region region) {
+      }
+    };
     mapView.loadMapImages(
       MainView.MAPS_DIR+"city_map.png",
       MainView.MAPS_DIR+"city_districts_key.png"

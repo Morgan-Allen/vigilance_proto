@@ -147,7 +147,7 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   }
   
   
-  public Place targetLocation(Person p) {
+  public Element targetElement(Person p) {
     return site;
   }
   

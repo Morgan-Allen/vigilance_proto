@@ -26,7 +26,6 @@ public class DebugPlots extends RunGame {
     
     //  TODO:  Generate relationships (kin and otherwise) between persons in
     //  nearby venues!
-    
     Base crooks = world.baseFor(Crooks.THE_MADE_MEN);
     Plot kidnap = CrimeTypes.TYPE_KIDNAP.initPlot(crooks);
     
@@ -45,7 +44,6 @@ public class DebugPlots extends RunGame {
     int timeFound = world.timing.totalHours();
     tipoff.confirmMatch(organiser, Lead.LEAD_QUESTION, timeFound);
     heroes.leads.caseFor(organiser).recordClue(tipoff);
-    
     
     /*
     I.say("\nFollowing Lead...");
