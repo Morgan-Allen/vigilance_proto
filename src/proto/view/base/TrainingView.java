@@ -280,10 +280,9 @@ public class TrainingView extends UINode {
       if (slotID >= maxSlots) break;
       
       Item inSlot = person.gear.itemInSlot(slotID);
-      int slotType = PersonGear.SLOT_TYPES[slotID];
       Image  icon = inSlot == null ? null   : inSlot.icon();
       String desc = inSlot == null ? "None" : inSlot.name();
-      String slotName = PersonGear.SLOT_TYPE_NAMES[slotType];
+      String slotName = PersonGear.SLOT_NAMES[slotID];
       
       final boolean hovered = surface.tryHover(
         vx + 5 + across, vy + down, 320, 40, "Slot_"+slotID
@@ -333,17 +332,6 @@ public class TrainingView extends UINode {
   }
   
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 

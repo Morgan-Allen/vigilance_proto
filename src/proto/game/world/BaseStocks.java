@@ -47,11 +47,8 @@ public class BaseStocks {
       if (! type.availableFor(person, base)) continue;
       available.include(type);
     }
-    if (slotType == PersonGear.SLOT_TYPE_ARMOUR) {
-      available.add(Common.UNARMOURED);
-    }
-    if (slotType == PersonGear.SLOT_TYPE_WEAPON) {
-      available.add(Common.UNARMED);
+    for (ItemType common : Common.COMMON_ITEMS) {
+      if (common.slotType == slotType) available.add(common);
     }
     return available;
   }
@@ -66,8 +63,7 @@ public class BaseStocks {
   
   
   public void addItem(Item item) {
-    if (item.kind() == Common.UNARMED   ) return;
-    if (item.kind() == Common.UNARMOURED) return;
+    if (Visit.arrayIncludes(Common.COMMON_ITEMS, item.kind())) return;
     stocks.add(item);
   }
   
@@ -85,8 +81,9 @@ public class BaseStocks {
   
   
   public Item nextOfType(ItemType type) {
-    if (type == Common.UNARMED   ) return null;
-    if (type == Common.UNARMOURED) return null;
+    if (Visit.arrayIncludes(Common.COMMON_ITEMS, type)) {
+      return new Item(type, base.world());
+    }
     for (Item i : stocks) if (i.kind() == type) return i;
     return null;
   }

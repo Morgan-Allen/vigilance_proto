@@ -13,26 +13,37 @@ public class PersonGear {
   
   final public static int
     SLOT_TYPE_WEAPON = 0,
-    SLOT_TYPE_ARMOUR = 1,
-    SLOT_TYPE_ITEM   = 2,
+    SLOT_TYPE_MASK   = 1,
+    SLOT_TYPE_ARMOUR = 2,
+    SLOT_TYPE_ITEM   = 3,
     
     SLOT_WEAPON  = 0,
     SLOT_OFFHAND = 1,
-    SLOT_ARMOUR  = 2,
-    SLOT_ITEM_1  = 3,
-    SLOT_ITEM_2  = 4,
-    SLOT_ITEM_3  = 5,
-    SLOT_ITEM_4  = 6,
+    SLOT_MASK    = 2,
+    SLOT_ARMOUR  = 3,
+    SLOT_ITEM_1  = 4,
+    SLOT_ITEM_2  = 5,
+    SLOT_ITEM_3  = 6,
+    SLOT_ITEM_4  = 7,
     
     SLOT_IDS[] = {
-      0, 1, 2, 3, 4, 5
+      0, 1, 2, 3, 4, 5, 6, 7
     },
     SLOT_TYPES[] = {
-      0, 0, 1, 2, 2, 2, 2
+      0, 0, 1, 2, 3, 3, 3, 3
     },
-    DEFAULT_MAX_SLOTS = 4;
+    DEFAULT_MAX_SLOTS = 6;
   final public static String
-    SLOT_TYPE_NAMES[] = { "Weapon", "Armour", "Item" };
+    SLOT_NAMES[] = {
+      "Weapon",
+      "Off Weapon",
+      "Mask",
+      "Armour",
+      "Gadget",
+      "Gadget",
+      "Gadget",
+      "Gadget"
+    };
   
   final Person person;
   List <Item> equipped = new List();

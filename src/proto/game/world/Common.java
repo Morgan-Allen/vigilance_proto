@@ -29,17 +29,26 @@ public class Common {
       "Bare fists and moxy.",
       ICONS_DIR+null,
       SPRITE_DIR+"sprite_punch.png",
-      Kind.SUBTYPE_BLUNT, SLOT_WEAPON, 0, new Object[0],
-      IS_WEAPON | IS_MELEE | IS_KINETIC
+      Kind.SUBTYPE_BLUNT, SLOT_TYPE_WEAPON, 0, new Object[0],
+      IS_WEAPON | IS_MELEE | IS_KINETIC | IS_COMMON
     ),
     UNARMOURED = new ItemType(
       "Unarmoured", "item_unarmoured",
       "Nothin' but the clothes on your back.",
       ICONS_DIR+null,
       SPRITE_DIR+"sprite_deflect.png",
-      Kind.SUBTYPE_ARMOUR, SLOT_ARMOUR, 0, new Object[0],
-      IS_ARMOUR
-    );
+      Kind.SUBTYPE_ARMOUR, SLOT_TYPE_ARMOUR, 0, new Object[0],
+      IS_ARMOUR | IS_COMMON
+    ),
+    STANDARD_MASK = new ItemType(
+      "Standard", "item_standard_mask",
+      "Strike fear into your enemies through brand recognition!",
+      ICONS_DIR+null,
+      SPRITE_DIR+"sprite_deflect.png",
+      Kind.SUBTYPE_ARMOUR, SLOT_TYPE_MASK, 0, new Object[0],
+      IS_ARMOUR | IS_COMMON
+    ),
+    COMMON_ITEMS[] = { UNARMED, UNARMOURED, STANDARD_MASK };
   
   
   final public static Ability

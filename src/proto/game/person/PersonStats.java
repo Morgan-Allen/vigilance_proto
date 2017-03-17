@@ -293,6 +293,7 @@ public class PersonStats {
       a.applyPassiveStatsBonus(person);
     }
     for (Item i : person.gear.equipped()) {
+      if (i.slotID == PersonGear.SLOT_OFFHAND) continue;
       i.kind().applyPassiveStatsBonus(person);
     }
     for (Condition c : conditions) {

@@ -41,7 +41,8 @@ public class Heroes {
       Techniques.EVASION   , 1,
       
       Weapons.WING_BLADES,
-      Armours.KEVLAR_VEST
+      Armours.KEVLAR_VEST,
+      Common.STANDARD_MASK
     )
   ;
   
@@ -66,7 +67,8 @@ public class Heroes {
       Techniques.ENDURANCE  , 1,
       
       Weapons.REVOLVER,
-      Armours.BODY_ARMOUR
+      Armours.BODY_ARMOUR,
+      Common.STANDARD_MASK
     )
   ;
   
@@ -91,7 +93,8 @@ public class Heroes {
       Techniques.DISARM   , 1,
       
       Weapons.WING_BLADES,
-      Armours.BODY_ARMOUR
+      Armours.BODY_ARMOUR,
+      Common.STANDARD_MASK
     )
   ;
   
@@ -116,7 +119,8 @@ public class Heroes {
       Techniques.SPRINTER  , 1,
       
       Weapons.REVOLVER,
-      Armours.KEVLAR_VEST
+      Armours.KEVLAR_VEST,
+      Common.STANDARD_MASK
     )
   ;
   
