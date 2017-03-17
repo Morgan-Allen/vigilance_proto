@@ -12,9 +12,6 @@ import java.awt.Image;
 //
 //  TODO:  You could sharpen this up a little, with separate success-chance
 //  for each party involved in a step?
-//  TODO:  You might consider only giving information on the rough
-//  location of a meet or wiretap trace?
-//  ...Yeah.  Determine location and traits in a separate step.
 
 
 public class Lead extends Task {
@@ -90,18 +87,21 @@ public class Lead extends Task {
   public static class Type {
     
     String name, info, tenseVerbs[];
+    Image icon;
+    
     int ID;
     int medium, focus, tense, profile;
     float confidence;
     int cluesMedia[];
     
     Type(
-      String name, int ID, String info, String tenseVerbs[],
+      String name, int ID, String info, String iconPath, String tenseVerbs[],
       int medium, int focus, int tense, int profile, float confidence,
       int... cluesMedia
     ) {
       this.name = name;
       this.info = info;
+      this.icon = Kind.loadImage(iconPath);
       this.ID   = ID  ;
       this.tenseVerbs = tenseVerbs;
       this.medium  = medium ;
@@ -113,12 +113,14 @@ public class Lead extends Task {
       TYPE_B.add(this);
     }
   }
-
+  
+  final static String ICON_DIR = "media assets/ability icons/";
   private static Batch <Type> TYPE_B = new Batch();
   final public static Type
     LEAD_SURVEIL_PERSON = new Type(
       "Surveillance", 0,
       "Surveil a suspect for clues to their activities and who they meet with.",
+      ICON_DIR+"icon_surveil.png",
       new String[] { "Surveiled", "Surveilling", "Will Surveil" },
       MEDIUM_SURVEIL, FOCUS_PERSON, TENSE_DURING, PROFILE_LOW,
       CONFIDENCE_HIGH, MEDIUM_MEET
@@ -126,6 +128,7 @@ public class Lead extends Task {
     LEAD_SURVEIL_BUILDING = new Type(
       "Surveillance", 1,
       "Stake out a building to see who visits and who might be holed up.",
+      ICON_DIR+"icon_surveil.png",
       new String[] { "Surveiled", "Surveilling", "Will Surveil" },
       MEDIUM_SURVEIL, FOCUS_BUILDING, TENSE_DURING, PROFILE_LOW,
       CONFIDENCE_MODERATE, MEDIUM_MEET
@@ -133,6 +136,7 @@ public class Lead extends Task {
     LEAD_QUESTION = new Type(
       "Questioning", 2,
       "Question a suspect for information on past dealings or future plans.",
+      ICON_DIR+"icon_question.png",
       new String[] { "Questioned", "Questioning", "Will Question" },
       MEDIUM_QUESTION, FOCUS_PERSON, TENSE_AFTER, PROFILE_HIGH,
       CONFIDENCE_MODERATE, MEDIUM_ANY
@@ -140,6 +144,7 @@ public class Lead extends Task {
     LEAD_WIRETAP = new Type(
       "Wiretap", 3,
       "Intercept suspicious communications to or from a structure.",
+      ICON_DIR+"icon_wiretap.png",
       new String[] { "Wiretapped", "Wiretapping", "Will Wiretap" },
       MEDIUM_WIRE, FOCUS_BUILDING, TENSE_DURING, PROFILE_LOW,
       CONFIDENCE_HIGH, MEDIUM_WIRE
@@ -147,6 +152,7 @@ public class Lead extends Task {
     LEAD_PATROL = new Type(
       "Patrol", 4,
       "Patrol an area while keeping an eye out for suspicious activity.",
+      ICON_DIR+"icon_surveil.png",
       new String[] { "Patrolled", "Patrolling", "Will Patrol" },
       MEDIUM_SURVEIL, FOCUS_REGION, TENSE_DURING, PROFILE_LOW,
       CONFIDENCE_MODERATE, MEDIUM_MEET, MEDIUM_SURVEIL
@@ -154,13 +160,15 @@ public class Lead extends Task {
     LEAD_SCAN = new Type(
       "Frequency Scan", 5,
       "Scan wireless frequencies in an area for fragments of information.",
+      ICON_DIR+"icon_scan.png",
       new String[] { "Scanned", "Scanning", "Will Scan" },
       MEDIUM_WIRE, FOCUS_REGION, TENSE_DURING, PROFILE_LOW,
       CONFIDENCE_MODERATE, MEDIUM_WIRE
     ),
     LEAD_CANVASS = new Type(
       "Canvass", 6,
-      "Ask civilians or friendly contacts in area for leads they may have.",
+      "Ask civilians or friendly contacts in an area for leads.",
+      ICON_DIR+"icon_question.png",
       new String[] { "Canvassed", "Canvassing", "Will Canvass" },
       MEDIUM_QUESTION, FOCUS_REGION, TENSE_ANY, PROFILE_SUSPICIOUS,
       CONFIDENCE_LOW, MEDIUM_ANY
@@ -168,6 +176,7 @@ public class Lead extends Task {
     LEAD_SEARCH = new Type(
       "Search", 7,
       "Search a building for records or forensic evidence.",
+      ICON_DIR+"icon_search.png",
       new String[] { "Searched", "Searching", "Will Search" },
       MEDIUM_SURVEIL, FOCUS_BUILDING, TENSE_AFTER, PROFILE_LOW,
       CONFIDENCE_MODERATE, MEDIUM_WIRE, MEDIUM_MEET
@@ -175,6 +184,7 @@ public class Lead extends Task {
     LEAD_TIPOFF = new Type(
       "Tipoff", 8,
       "_",
+      ICON_DIR+"icon_wiretap.png",
       new String[] { "Tipped Off", "Tipping Off", "Will Tip Off" },
       MEDIUM_WIRE, FOCUS_ANY, TENSE_ANY, PROFILE_HIDDEN,
       CONFIDENCE_LOW
@@ -522,14 +532,13 @@ public class Lead extends Task {
   }
   
   
-  //  TODO:  Fill these out-
   public String helpInfo() {
-    return null;
+    return type.info;
   }
   
   
   public Image icon() {
-    return null;
+    return type.icon;
   }
   
   

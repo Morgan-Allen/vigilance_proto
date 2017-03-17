@@ -12,13 +12,13 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 
 
-public class MissionsViewSuspectView extends UINode {
+public class MissionsViewPerpsView extends UINode {
   
   
   final MissionsView parent;
   
   
-  public MissionsViewSuspectView(MissionsView parent, Box2D bounds) {
+  public MissionsViewPerpsView(MissionsView parent, Box2D bounds) {
     super(parent, bounds);
     this.parent = parent;
     this.clipContent = true;
@@ -120,7 +120,7 @@ public class MissionsViewSuspectView extends UINode {
         lead.assigned(), vx + across + 300, vy + down + 20, surface, g
       );
       
-      down += 40;
+      down += 45;
     }
     
     if (hovered != null) {

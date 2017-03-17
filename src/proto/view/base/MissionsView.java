@@ -25,13 +25,17 @@ public class MissionsView extends UINode {
     ALERT_IMAGE   = Kind.loadImage(IMG_DIR+"alert_symbol.png"  ),
     MYSTERY_IMAGE = Kind.loadImage(IMG_DIR+"mystery_symbol.png");
   
+  final static Object
+    ALL_CASES  = "all-cases",
+    PLOT_CLUES = "plot-clues";
   
   MapInsetView mapView;
   StringButton casesButton, backButton;
 
-  MissionsViewCasesView   casesView  ;
-  MissionsViewRolesView   rolesView  ;
-  MissionsViewSuspectView suspectView;
+  MissionsViewCasesView casesView;
+  MissionsViewRolesView rolesView;
+  MissionsViewCluesView cluesView;
+  MissionsViewPerpsView perpsView;
   UINode focusViews[], activeFocusView;
   
   Object activeFocus = null;
@@ -62,7 +66,7 @@ public class MissionsView extends UINode {
     ) {
       protected void whenClicked() {
         focusStack.clear();
-        setActiveFocus(null, false);
+        setActiveFocus(ALL_CASES, false);
       }
     };
     backButton = new StringButton(
@@ -70,18 +74,21 @@ public class MissionsView extends UINode {
     ) {
       protected void whenClicked() {
         focusStack.removeLast();
-        setActiveFocus(focusStack.last(), false);
+        Object before = focusStack.last();
+        if (before == null) before = ALL_CASES;
+        setActiveFocus(before, false);
       }
     };
     addChildren(casesButton, backButton);
     
     Box2D focusViewBound = new Box2D(0, 50, 320, fullHigh - 55);
-    casesView   = new MissionsViewCasesView  (this, focusViewBound);
-    rolesView   = new MissionsViewRolesView  (this, focusViewBound);
-    suspectView = new MissionsViewSuspectView(this, focusViewBound);
-    focusViews  = new UINode[] { casesView, rolesView, suspectView };
+    casesView  = new MissionsViewCasesView(this, focusViewBound);
+    rolesView  = new MissionsViewRolesView(this, focusViewBound);
+    cluesView  = new MissionsViewCluesView(this, focusViewBound);
+    perpsView  = new MissionsViewPerpsView(this, focusViewBound);
+    focusViews = new UINode[] { casesView, rolesView, cluesView, perpsView };
     addChildren(focusViews);
-    setActiveFocus(null, false);
+    setActiveFocus(ALL_CASES, false);
   }
   
   
@@ -124,23 +131,25 @@ public class MissionsView extends UINode {
     
     this.activeFocus = focus;
     this.activeFocusView = null;
-    backButton.valid = focusStack.size() > 0;
+    backButton.valid = focusStack.last() != ALL_CASES && ! focusStack.empty();
     
-    if (focus == null) {
+    if (focus == ALL_CASES) {
       activeFocusView = casesView;
     }
     else if (focus instanceof Plot) {
       activeFocusView = rolesView;
     }
+    else if (focus == PLOT_CLUES) {
+      activeFocusView = cluesView;
+    }
     else if (focus instanceof Plot.Role) {
-      activeFocusView = suspectView;
+      activeFocusView = perpsView;
     }
     else if (focus instanceof Element) {
-      activeFocusView = suspectView;
+      activeFocusView = perpsView;
       Element e = (Element) focus;
       mapView.setSelectedRegion(e.region());
     }
-    
     for (UINode node : focusViews) {
       node.visible = node == activeFocusView;
     }

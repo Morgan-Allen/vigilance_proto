@@ -2,9 +2,11 @@
 
 package proto.game.event;
 import proto.common.*;
-import proto.game.person.Person;
+import proto.game.person.*;
 import proto.game.world.*;
 import proto.util.*;
+
+import java.awt.Image;
 
 
 
@@ -204,6 +206,12 @@ public class Clue {
       else                return "near "+near;
     }
     return "";
+  }
+  
+  
+  public Image icon() {
+    if (source == null) return null;
+    return source.icon();
   }
   
 }

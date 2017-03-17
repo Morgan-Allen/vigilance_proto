@@ -123,12 +123,19 @@ public class MissionsViewRolesView extends UINode {
     );
     down += 100;
     
+    StringButton cluesButton = new StringButton(
+      "View All Evidence",
+      new Box2D(across, down, 150, 25), this
+    ) {
+      protected void whenClicked() {
+        mainView.missionView.setActiveFocus(MissionsView.PLOT_CLUES, true);
+      }
+    };
+    cluesButton.refers = "clues_button";
+    cluesButton.renderNow(surface, g);
     return true;
   }
 }
-
-
-
 
 
 
