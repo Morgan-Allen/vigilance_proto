@@ -73,9 +73,18 @@ public class BaseLeads {
     }
     if (focus.isRegion()) {
       all.add(leadFor(focus, Lead.LEAD_PATROL));
-      all.add(leadFor(focus, Lead.LEAD_CANVAS));
+      all.add(leadFor(focus, Lead.LEAD_CANVASS));
     }
     return all;
+  }
+  
+  
+  public CaseFile caseFor(Object subject) {
+    CaseFile match = files.get(subject);
+    if (match != null) return match;
+    final CaseFile file = new CaseFile(base, subject);
+    files.put(subject, file);
+    return file;
   }
   
   
@@ -93,23 +102,35 @@ public class BaseLeads {
   }
   
   
-  public Series <Element> knownInvolvedIn(Plot plot) {
-    Batch <Element> known = new Batch();
+  public Series <Plot.Role> knownRolesFor(Plot plot) {
+    Batch <Plot.Role> known = new Batch();
+    known.include(Plot.ROLE_HIDEOUT  );
+    known.include(Plot.ROLE_ORGANISER);
+    known.include(Plot.ROLE_TARGET   );
+    
     for (CaseFile file : files.values()) {
-      for (Clue c : file.clues) if (c.plot == plot && c.confirmed) {
-        known.include(c.match);
+      for (Clue c : file.clues) if (c.plot == plot) {
+        known.include(c.role);
       }
     }
     return known;
   }
   
   
-  public CaseFile caseFor(Object subject) {
-    CaseFile match = files.get(subject);
-    if (match != null) return match;
-    final CaseFile file = new CaseFile(base, subject);
-    files.put(subject, file);
-    return file;
+  public Series <Element> suspectsFor(Plot.Role role, Plot plot) {
+    Series <Clue> related = cluesFor(plot, null, role);
+    Batch <Element> matches = new Batch();
+    
+    for (Clue c : related) if (c.confirmed) {
+      matches.add(c.match);
+      return matches;
+    }
+    
+    search: for (Element e : base.world().inside()) {
+      for (Clue c : related) if (! c.matchesSuspect(e)) continue search;
+      matches.add(e);
+    }
+    return matches;
   }
   
   
@@ -117,13 +138,13 @@ public class BaseLeads {
     Plot plot, Object match, Plot.Role role
   ) {
     Batch <Clue> matches = new Batch();
-    CaseFile file = caseFor(match);
-    
-    for (Clue c : file.clues) {
-      if (plot  != null && plot  != c.plot ) continue;
-      if (match != null && match != c.match) continue;
-      if (role  != null && role  != c.role ) continue;
-      matches.add(c);
+    for (CaseFile file : files.values()) {
+      for (Clue c : file.clues) {
+        if (plot  != null && plot  != c.plot ) continue;
+        if (match != null && match != c.match) continue;
+        if (role  != null && role  != c.role ) continue;
+        matches.add(c);
+      }
     }
     return matches;
   }

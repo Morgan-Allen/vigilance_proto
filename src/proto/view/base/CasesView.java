@@ -16,10 +16,6 @@ import java.awt.Image;
 public class CasesView extends UINode {
   
   
-  final static Image
-    ALERT_IMAGE = Kind.loadImage("media assets/city map/alert_symbol.png");
-  
-  
   final MapInsetView mapRefers;
   
   
@@ -42,7 +38,7 @@ public class CasesView extends UINode {
     
     for (final Plot plot : player.leads.knownPlots()) {
       Image icon = plot.icon();
-      if (icon == null) icon = ALERT_IMAGE;
+      if (icon == null) icon = MissionsView.ALERT_IMAGE;
       String desc = ""+plot;
       
       g.drawImage(icon, vx + across, vy + down, 40, 40, null);

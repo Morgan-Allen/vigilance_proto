@@ -40,22 +40,33 @@ public class RolesView extends UINode {
     //  TODO:  Also iterate across all known roles, even if the perp hasn't
     //  been identified yet.
     
-    for (Element e : player.leads.knownInvolvedIn(plot)) {
-      g.setColor(Color.LIGHT_GRAY);
-      Image icon = e.icon();
-      String desc = ""+e.name();
+    for (Plot.Role role : player.leads.knownRolesFor(plot)) {
+      Series <Element> suspects = player.leads.suspectsFor(role, plot);
+      Image icon = null;
+      String desc = null;
+      Element match = suspects.size() == 1 ? suspects.first() : null;
       
+      if (match != null) {
+        icon = match.icon();
+        desc = role+": "+match.name();
+      }
+      else {
+        icon = MissionsView.MYSTERY_IMAGE;
+        desc = role+": Unknown";
+      }
+
+      g.setColor(Color.LIGHT_GRAY);
       g.drawImage(icon, vx + across, vy + down, 40, 40, null);
       ViewUtils.drawWrappedString(
         desc.toString(), g, vx + across + 60, vy + down, vw - 60, 40
       );
       
-      if (surface.tryHover(vx + across, vy + down, vw - 20, 40, e)) {
-        g.setColor(Color.GRAY);
+      if (surface.tryHover(vx + across, vy + down, vw - 20, 40, role)) {
         g.drawRect(vx + across, vy + down, vw - 20, 40);
         
         if (surface.mouseClicked()) {
-          MV.setActiveFocus(e, true);
+          if (match != null) MV.setActiveFocus(match, true);
+          else               MV.setActiveFocus(role , true);
         }
       }
       
@@ -63,8 +74,9 @@ public class RolesView extends UINode {
     }
     return true;
   }
-  
 }
+
+
 
 
 

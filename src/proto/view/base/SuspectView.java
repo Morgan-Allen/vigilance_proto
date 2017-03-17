@@ -53,7 +53,8 @@ public class SuspectView extends UINode {
         g.drawRect(vx + across, vy + down, vw - 20, 40);
         
         if (surface.mouseClicked()) {
-          agent.addAssignment(lead);
+          if (agent.assignments().includes(lead)) agent.removeAssignment(lead);
+          else agent.addAssignment(lead);
         }
       }
       

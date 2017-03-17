@@ -17,6 +17,12 @@ import java.awt.Graphics2D;
 
 public class MissionsView extends UINode {
   
+  final static String
+    IMG_DIR = "media assets/city map/";
+  final static Image
+    ALERT_IMAGE   = Kind.loadImage(IMG_DIR+"alert_symbol.png"  ),
+    MYSTERY_IMAGE = Kind.loadImage(IMG_DIR+"mystery_symbol.png");
+  
   
   MapInsetView mapView;
   StringButton casesButton, backButton;
@@ -92,12 +98,12 @@ public class MissionsView extends UINode {
     }
     
     ViewUtils.drawWrappedString(
-      person+" assignment: "+assignDesc, g,
+      person+" is "+assignDesc, g,
       vx + 330, vy + 10, 320, 45
     );
   }
-
-
+  
+  
   public void setActiveFocus(Object focus, boolean onStack) {
     if (onStack && focus != this.activeFocus) focusStack.add(focus);
     

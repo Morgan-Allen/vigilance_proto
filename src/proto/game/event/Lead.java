@@ -80,19 +80,20 @@ public class Lead extends Task {
   
   public static class Type {
     
-    String name;
+    String name, tenseVerbs[];
     int ID;
     int medium, focus, tense, profile;
     float confidence;
     int cluesMedia[];
     
     Type(
-      String name, int ID,
+      String name, int ID, String tenseVerbs[],
       int medium, int focus, int tense, int profile, float confidence,
       int... cluesMedia
     ) {
       this.name = name;
       this.ID   = ID  ;
+      this.tenseVerbs = tenseVerbs;
       this.medium  = medium ;
       this.focus   = focus  ;
       this.tense   = tense  ;
@@ -107,41 +108,49 @@ public class Lead extends Task {
   final public static Type
     LEAD_SURVEIL_PERSON = new Type(
       "Surveillance", 0,
+      new String[] { "Surveiled", "Surveilling", "Will Surveil" },
       MEDIUM_SURVEIL, FOCUS_PERSON, TENSE_DURING, PROFILE_LOW,
       CONFIDENCE_HIGH, MEDIUM_MEET
     ),
     LEAD_SURVEIL_BUILDING = new Type(
       "Surveillance", 1,
+      new String[] { "Surveiled", "Surveilling", "Will Surveil" },
       MEDIUM_SURVEIL, FOCUS_BUILDING, TENSE_DURING, PROFILE_LOW,
       CONFIDENCE_MODERATE, MEDIUM_MEET
     ),
     LEAD_QUESTION = new Type(
       "Questioning", 2,
+      new String[] { "Questioned", "Questioning", "Will Question" },
       MEDIUM_QUESTION, FOCUS_PERSON, TENSE_AFTER, PROFILE_HIGH,
       CONFIDENCE_MODERATE, MEDIUM_ANY
     ),
     LEAD_WIRETAP = new Type(
       "Wiretap", 3,
+      new String[] { "Wiretapped", "Wiretapping", "Will Wiretap" },
       MEDIUM_WIRE, FOCUS_BUILDING, TENSE_DURING, PROFILE_LOW,
       CONFIDENCE_HIGH, MEDIUM_WIRE
     ),
     LEAD_PATROL = new Type(
-      "Patrolling", 4,
+      "Patrol", 4,
+      new String[] { "Patrolled", "Patrolling", "Will Patrol" },
       MEDIUM_SURVEIL, FOCUS_REGION, TENSE_DURING, PROFILE_LOW,
       CONFIDENCE_MODERATE, MEDIUM_MEET, MEDIUM_SURVEIL
     ),
     LEAD_SCAN = new Type(
-      "Scanning", 5,
+      "Frequency Scan", 5,
+      new String[] { "Scanned", "Scanning", "Will Scan" },
       MEDIUM_WIRE, FOCUS_REGION, TENSE_DURING, PROFILE_LOW,
       CONFIDENCE_MODERATE, MEDIUM_WIRE
     ),
-    LEAD_CANVAS = new Type(
-      "Canvassing", 6,
-      MEDIUM_QUESTION, FOCUS_REGION, TENSE_AFTER, PROFILE_SUSPICIOUS,
+    LEAD_CANVASS = new Type(
+      "Canvass", 6,
+      new String[] { "Canvassed", "Canvassing", "Will Canvass" },
+      MEDIUM_QUESTION, FOCUS_REGION, TENSE_ANY, PROFILE_SUSPICIOUS,
       CONFIDENCE_LOW, MEDIUM_ANY
     ),
     LEAD_SEARCH = new Type(
       "Search", 7,
+      new String[] { "Searched", "Searching", "Will Search" },
       MEDIUM_SURVEIL, FOCUS_BUILDING, TENSE_AFTER, PROFILE_LOW,
       CONFIDENCE_MODERATE, MEDIUM_WIRE, MEDIUM_MEET
     ),
@@ -448,12 +457,12 @@ public class Lead extends Task {
   
   /**  Rendering, debug and interface methods-
     */
-  //  TODO:  Fill these out-
   public String activeInfo() {
-    return type.name+": "+focus;
+    return type.tenseVerbs[1]+" "+focus;
   }
   
   
+  //  TODO:  Fill these out-
   public String helpInfo() {
     return null;
   }
