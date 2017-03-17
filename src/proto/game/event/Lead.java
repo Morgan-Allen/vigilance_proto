@@ -243,6 +243,11 @@ public class Lead extends Task {
   }
   
   
+  public int assignmentPriority() {
+    return PRIORITY_LEAD;
+  }
+  
+  
   public Series <Person> onceAssigned() {
     return onceAssigned;
   }

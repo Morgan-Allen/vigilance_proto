@@ -186,12 +186,12 @@ public class Clue {
     }
     
     desc.append(" at "+world.timing.timeString(timeFound));
-    desc.append(" indicates ");
+    desc.append(" indicates the "+role);
     
-    if (match != null && confirmed    ) desc.append(role+" is: "+match);
-    if (trait != null                 ) desc.append(role+" has trait: "+trait);
-    if (near != null && nearRange == 0) desc.append(role+" is within: "+near);
-    if (near != null && nearRange > 0 ) desc.append(role+" is near: "+near);
+    if (match != null && confirmed    ) desc.append(" is: "+match);
+    if (trait != null                 ) desc.append(" has trait: "+trait);
+    if (near != null && nearRange == 0) desc.append(" is within: "+near);
+    if (near != null && nearRange > 0 ) desc.append(" is near: "+near);
     
     return desc.toString();
   }

@@ -85,6 +85,16 @@ public class MissionsViewSuspectView extends UINode {
     );
     down += 40;
     
+    Plot plot = parent.plotFocus();
+    Series <Clue> clues = player.leads.cluesFor(plot, suspect, null, true);
+    if (! clues.empty()) {
+      String desc = ""+clues.first();
+      ViewUtils.drawWrappedString(
+        desc.toString(), g, vx + across, vy + down, vw - (across + 10), 100
+      );
+      down += 100;
+    }
+    
     for (Lead lead : player.leads.leadsFor(suspect)) {
       g.setColor(Color.LIGHT_GRAY);
       Image icon = lead.icon();

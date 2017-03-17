@@ -28,6 +28,8 @@ public class MissionsViewRolesView extends UINode {
     
     Base player = mainView.player();
     Plot plot = (Plot) parent.activeFocus;
+    Plot.Role hovered = null;
+    boolean canFollowHovered = false;
     
     int across = 10, down = 10;
     g.setColor(Color.LIGHT_GRAY);
@@ -36,13 +38,32 @@ public class MissionsViewRolesView extends UINode {
     );
     down += 40;
     
+    class RoleView {
+      Plot.Role role;
+      Series <Clue> clues;
+      Series <Element> suspects;
+    }
+    
+    List <RoleView> roles = new List <RoleView> () {
+      protected float queuePriority(RoleView r) {
+        if (r.suspects.size() == 1) return 1;
+        return 0;
+      }
+    };
     for (Plot.Role role : player.leads.knownRolesFor(plot)) {
-      Series <Clue> clues = player.leads.cluesFor(plot, null, role, false);
-      Series <Element> suspects = player.leads.suspectsFor(role, plot);
+      RoleView r = new RoleView();
+      r.role = role;
+      r.suspects = player.leads.suspectsFor(role, plot);
+      r.clues = player.leads.cluesFor(plot, null, role, false);
+      roles.queueAdd(r);
+    }
+    
+    for (RoleView r : roles) {
+      Plot.Role role = r.role;
       Image icon = null;
       String desc = null;
-      Element match = suspects.size() == 1 ? suspects.first() : null;
-      boolean canFollow = suspects.size() <= 4 && clues.size() > 0;
+      Element match = r.suspects.size() == 1 ? r.suspects.first() : null;
+      boolean canFollow = r.suspects.size() <= 4 && r.clues.size() > 0;
       
       if (match != null) {
         icon = match.icon();
@@ -52,11 +73,11 @@ public class MissionsViewRolesView extends UINode {
         icon = MissionsView.MYSTERY_IMAGE;
         desc = role+": Unknown";
         
-        if (clues.size() > 0) {
+        if (r.clues.size() > 0) {
           desc += "\n  ";
-          for (Clue c : clues) desc += c.traitDescription()+" ";
+          for (Clue c : r.clues) desc += c.traitDescription()+" ";
           if (! canFollow) desc += "\n  (numerous suspects)";
-          else desc += "\n  ("+suspects.size()+" suspects)";
+          else desc += "\n  ("+r.suspects.size()+" suspects)";
         }
         else {
           desc += "\n  (no evidence)";
@@ -72,6 +93,8 @@ public class MissionsViewRolesView extends UINode {
       
       if (surface.tryHover(vx + across, vy + down, vw - 20, entryHigh, role)) {
         g.drawRect(vx + across, vy + down, vw - 20, entryHigh);
+        hovered = role;
+        canFollowHovered = canFollow;
         
         if (surface.mouseClicked() && canFollow) {
           if (match != null) parent.setActiveFocus(match, true);
@@ -82,16 +105,34 @@ public class MissionsViewRolesView extends UINode {
       down += entryHigh + 5;
     }
     
-    Series <Clue> clues = player.leads.cluesFor(plot, null, null, true);
-    if (! clues.empty()) {
-      String desc = "\nLatest Evidence:\n  "+clues.first();
-      ViewUtils.drawWrappedString(
-        desc.toString(), g, vx + across, vy + down, vw - (across + 10), 100
-      );
+    String hoverDesc = "";
+    if (hovered == null) {
+      hoverDesc = "Click on a role to see more information on suspects.";
     }
+    else if (canFollowHovered) {
+      Series <Clue> clues = player.leads.cluesFor(plot, null, hovered, true);
+      hoverDesc = "Latest Evidence:\n  "+clues.first();
+    }
+    else {
+      hoverDesc = "You will need to gather evidence from other suspects "+
+      "to identify this party.";
+    }
+    
+    ViewUtils.drawWrappedString(
+      hoverDesc, g, vx + across, vy + down, vw - (across + 10), 100
+    );
+    down += 100;
     
     return true;
   }
 }
+
+
+
+
+
+
+
+
 
 
