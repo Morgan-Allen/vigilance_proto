@@ -13,21 +13,20 @@ import java.awt.Image;
 
 
 
-public class CasesView extends UINode {
+public class MissionsViewCasesView extends UINode {
   
   
-  final MapInsetView mapRefers;
+  final MissionsView parent;
   
   
-  public CasesView(UINode parent, MapInsetView map, Box2D viewBounds) {
-    super(parent, viewBounds);
-    this.mapRefers = map;
+  public MissionsViewCasesView(MissionsView parent, Box2D bounds) {
+    super(parent, bounds);
+    this.parent = parent;
   }
   
   
   protected boolean renderTo(Surface surface, Graphics2D g) {
     Base player = mainView.player();
-    MissionsView MV = (MissionsView) this.parent;
     
     int across = 10, down = 10;
     g.setColor(Color.LIGHT_GRAY);
@@ -51,7 +50,7 @@ public class CasesView extends UINode {
         g.drawRect(vx + across, vy + down, vw - 20, 40);
         
         if (surface.mouseClicked()) {
-          MV.setActiveFocus(plot, true);
+          parent.setActiveFocus(plot, true);
         }
       }
       

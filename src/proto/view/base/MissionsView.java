@@ -17,6 +17,8 @@ import java.awt.Graphics2D;
 
 public class MissionsView extends UINode {
   
+  /**  Constants, data fields, construction and save/load methods-
+    */
   final static String
     IMG_DIR = "media assets/city map/";
   final static Image
@@ -27,9 +29,9 @@ public class MissionsView extends UINode {
   MapInsetView mapView;
   StringButton casesButton, backButton;
 
-  CasesView   casesView  ;
-  RolesView   rolesView  ;
-  SuspectView suspectView;
+  MissionsViewCasesView   casesView  ;
+  MissionsViewRolesView   rolesView  ;
+  MissionsViewSuspectView suspectView;
   UINode focusViews[], activeFocusView;
   
   Object activeFocus = null;
@@ -74,9 +76,9 @@ public class MissionsView extends UINode {
     addChildren(casesButton, backButton);
     
     Box2D focusViewBound = new Box2D(0, 50, 320, fullHigh - 55);
-    casesView   = new CasesView  (this, mapView, focusViewBound);
-    rolesView   = new RolesView  (this, mapView, focusViewBound);
-    suspectView = new SuspectView(this, mapView, focusViewBound);
+    casesView   = new MissionsViewCasesView  (this, focusViewBound);
+    rolesView   = new MissionsViewRolesView  (this, focusViewBound);
+    suspectView = new MissionsViewSuspectView(this, focusViewBound);
     focusViews  = new UINode[] { casesView, rolesView, suspectView };
     addChildren(focusViews);
     setActiveFocus(null, false);
@@ -104,6 +106,19 @@ public class MissionsView extends UINode {
   }
   
   
+  public Plot plotFocus() {
+    //
+    //  Works backward through the navigation stack to find the last plot
+    //  referred to.
+    for (ListEntry e = focusStack; (e = e.lastEntry()) != focusStack;) {
+      if (e.refers instanceof Plot) {
+        return (Plot) e.refers;
+      }
+    }
+    return null;
+  }
+  
+  
   public void setActiveFocus(Object focus, boolean onStack) {
     if (onStack && focus != this.activeFocus) focusStack.add(focus);
     
@@ -114,12 +129,15 @@ public class MissionsView extends UINode {
     if (focus == null) {
       activeFocusView = casesView;
     }
-    if (focus instanceof Plot) {
+    else if (focus instanceof Plot) {
       activeFocusView = rolesView;
     }
-    else if (focus instanceof Element) {
-      Element e = (Element) focus;
+    else if (focus instanceof Plot.Role) {
       activeFocusView = suspectView;
+    }
+    else if (focus instanceof Element) {
+      activeFocusView = suspectView;
+      Element e = (Element) focus;
       mapView.setSelectedRegion(e.region());
     }
     
@@ -129,4 +147,8 @@ public class MissionsView extends UINode {
   }
   
 }
+
+
+
+
 

@@ -167,6 +167,11 @@ public class Clue {
   /**  Rendering, debug and interface methods-
     */
   public String toString() {
+    return longDescription();
+  }
+  
+  
+  public String longDescription() {
     StringBuffer desc = new StringBuffer(leadType.name);
     World world = plot.world();
     
@@ -191,9 +196,17 @@ public class Clue {
     return desc.toString();
   }
   
+  
+  public String traitDescription() {
+    if (trait != null) return ""+trait;
+    if (near != null) {
+      if (nearRange == 0) return "in "+near;
+      else                return "near "+near;
+    }
+    return "";
+  }
+  
 }
-
-
 
 
 

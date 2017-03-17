@@ -12,23 +12,22 @@ import java.awt.Image;
 
 
 
-public class RolesView extends UINode {
+public class MissionsViewRolesView extends UINode {
   
   
-  final MapInsetView mapRefers;
+  final MissionsView parent;
   
   
-  public RolesView(UINode parent, MapInsetView map, Box2D viewBounds) {
-    super(parent, viewBounds);
-    this.mapRefers = map;
+  public MissionsViewRolesView(MissionsView parent, Box2D bounds) {
+    super(parent, bounds);
+    this.parent = parent;
   }
   
   
   protected boolean renderTo(Surface surface, Graphics2D g) {
     
-    MissionsView MV = (MissionsView) this.parent;
     Base player = mainView.player();
-    Plot plot = (Plot) MV.activeFocus;
+    Plot plot = (Plot) parent.activeFocus;
     
     int across = 10, down = 10;
     g.setColor(Color.LIGHT_GRAY);
@@ -38,13 +37,12 @@ public class RolesView extends UINode {
     down += 40;
     
     for (Plot.Role role : player.leads.knownRolesFor(plot)) {
+      Series <Clue> clues = player.leads.cluesFor(plot, null, role, false);
       Series <Element> suspects = player.leads.suspectsFor(role, plot);
       Image icon = null;
       String desc = null;
       Element match = suspects.size() == 1 ? suspects.first() : null;
-      
-      //  TODO:  If the match isn't exact, list any traits derived from clues
-      //  and a shortlist of potential suspects.
+      boolean canFollow = suspects.size() <= 4 && clues.size() > 0;
       
       if (match != null) {
         icon = match.icon();
@@ -53,6 +51,16 @@ public class RolesView extends UINode {
       else {
         icon = MissionsView.MYSTERY_IMAGE;
         desc = role+": Unknown";
+        
+        if (clues.size() > 0) {
+          desc += "\n  ";
+          for (Clue c : clues) desc += c.traitDescription()+" ";
+          if (! canFollow) desc += "\n  (numerous suspects)";
+          else desc += "\n  ("+suspects.size()+" suspects)";
+        }
+        else {
+          desc += "\n  No Clues";
+        }
       }
       
       int entryHigh = 40;
@@ -65,9 +73,9 @@ public class RolesView extends UINode {
       if (surface.tryHover(vx + across, vy + down, vw - 20, entryHigh, role)) {
         g.drawRect(vx + across, vy + down, vw - 20, entryHigh);
         
-        if (surface.mouseClicked()) {
-          if (match != null) MV.setActiveFocus(match, true);
-          else               MV.setActiveFocus(role , true);
+        if (surface.mouseClicked() && canFollow) {
+          if (match != null) parent.setActiveFocus(match, true);
+          else               parent.setActiveFocus(role , true);
         }
       }
       
@@ -85,12 +93,5 @@ public class RolesView extends UINode {
     return true;
   }
 }
-
-
-
-
-
-
-
 
 
