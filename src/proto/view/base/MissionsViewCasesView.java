@@ -27,34 +27,25 @@ public class MissionsViewCasesView extends UINode {
   
   protected boolean renderTo(Surface surface, Graphics2D g) {
     Base player = mainView.player();
-    
+    //
+    //  Create a list-display, and render the header plus entries for each
+    //  associate:
+    ViewUtils.ListDraw draw = new ViewUtils.ListDraw();
     int across = 10, down = 10;
-    g.setColor(Color.LIGHT_GRAY);
-    ViewUtils.drawWrappedString(
-      "OPEN CASES", g, vx + across, vy + down, vw - 20, 40
+    draw.addEntry(
+      null, "OPEN CASES", 40, null
     );
-    down += 40;
-    
-    for (final Plot plot : player.leads.knownPlots()) {
+    for (Plot plot : player.leads.knownPlots()) {
       Image icon = plot.icon();
       if (icon == null) icon = MissionsView.ALERT_IMAGE;
-      String desc = ""+plot;
-      
-      g.drawImage(icon, vx + across, vy + down, 40, 40, null);
-      ViewUtils.drawWrappedString(
-        desc.toString(), g, vx + across + 60, vy + down, vw - 60, 40
-      );
-      
-      if (surface.tryHover(vx + across, vy + down, vw - 20, 40, plot)) {
-        g.setColor(Color.GRAY);
-        g.drawRect(vx + across, vy + down, vw - 20, 40);
-        
-        if (surface.mouseClicked()) {
-          parent.setActiveFocus(plot, true);
-        }
-      }
-      
-      down += 40 + 5;
+      draw.addEntry(icon, plot.name(), 40, plot);
+    }
+    draw.performDraw(across, down, this, surface, g);
+    down = draw.down;
+    //
+    //  If one is selected, zoom to that element:
+    if (draw.clicked) {
+      parent.setActiveFocus(draw.hovered, true);
     }
     
     return true;

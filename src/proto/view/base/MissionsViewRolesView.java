@@ -25,25 +25,18 @@ public class MissionsViewRolesView extends UINode {
   
   
   protected boolean renderTo(Surface surface, Graphics2D g) {
-    
+    //
+    //  First, obtain basic references to relevant game objects-
     Base player = mainView.player();
     Plot plot = (Plot) parent.activeFocus;
-    Plot.Role hovered = null;
-    boolean canFollowHovered = false;
-    
-    int across = 10, down = 10;
-    g.setColor(Color.LIGHT_GRAY);
-    ViewUtils.drawWrappedString(
-      "CASE FILE: "+plot, g, vx + across, vy + down, vw - 20, 40
-    );
-    down += 40;
-    
+    //
+    //  Then sort of the roles involved in the crime based on quality of
+    //  information-
     class RoleView {
       Plot.Role role;
       Series <Clue> clues;
       Series <Element> suspects;
     }
-    
     List <RoleView> roles = new List <RoleView> () {
       protected float queuePriority(RoleView r) {
         if (r.suspects.size() == 1) return 1;
@@ -57,21 +50,31 @@ public class MissionsViewRolesView extends UINode {
       r.clues = player.leads.cluesFor(plot, null, role, false);
       roles.queueAdd(r);
     }
-    
+    //
+    //  Create a list-display, attach the header, add entries for each role/
+    //  confirmed suspect, and finally an option to review total evidence.
+    int across = 10, down = 10;
+    ViewUtils.ListDraw draw = new ViewUtils.ListDraw();
+    draw.addEntry(
+      null, "CASE FILE: "+plot, 40, null
+    );
     for (RoleView r : roles) {
       Plot.Role role = r.role;
       Image icon = null;
       String desc = null;
       Element match = r.suspects.size() == 1 ? r.suspects.first() : null;
       boolean canFollow = r.suspects.size() <= 4 && r.clues.size() > 0;
-      
+      Object refers = null;
+
       if (match != null) {
         icon = match.icon();
         desc = role+": "+match.name();
+        refers = match;
       }
       else {
         icon = MissionsView.MYSTERY_IMAGE;
         desc = role+": Unknown";
+        refers = canFollow ? role : null;
         
         if (r.clues.size() > 0) {
           desc += "\n  ";
@@ -83,64 +86,41 @@ public class MissionsViewRolesView extends UINode {
           desc += "\n  (no evidence)";
         }
       }
-      
-      int entryHigh = 40;
-      g.setColor(Color.LIGHT_GRAY);
-      g.drawImage(icon, vx + across, vy + down, 40, 40, null);
-      ViewUtils.drawWrappedString(
-        desc.toString(), g, vx + across + 60, vy + down, vw - 60, entryHigh
-      );
-      
-      if (surface.tryHover(vx + across, vy + down, vw - 20, entryHigh, role)) {
-        g.drawRect(vx + across, vy + down, vw - 20, entryHigh);
-        hovered = role;
-        canFollowHovered = canFollow;
-        
-        if (surface.mouseClicked() && canFollow) {
-          if (match != null) parent.setActiveFocus(match, true);
-          else               parent.setActiveFocus(role , true);
-        }
-      }
-      
-      down += entryHigh + 5;
+      draw.addEntry(icon, desc, 40, refers);
     }
-    
-    Image icon = MissionsView.FILE_IMAGE;
-    String desc = "View All Evidence";
-    boolean hoveredEvidence = false;
-    g.setColor(Color.LIGHT_GRAY);
-    
-    g.drawImage(icon, vx + across, vy + down, 40, 40, null);
-    ViewUtils.drawWrappedString(
-      desc.toString(), g, vx + across + 60, vy + down, vw - 60, 40
+    draw.addEntry(
+      MissionsView.FILE_IMAGE, "View All Evidence", 40,
+      MissionsView.PLOT_CLUES
     );
-    if (surface.tryHover(vx + across, vy + down, vw - 20, 40, "associates")) {
-      g.setColor(Color.GRAY);
-      g.drawRect(vx + across, vy + down, vw - 20, 40);
-      hoveredEvidence = true;
-      if (surface.mouseClicked()) {
+    draw.performDraw(across, down, this, surface, g);
+    down = draw.down;
+    //
+    //  Then given suitable tool-tips and click-reponses for any encountered
+    //  list-elements:
+    Object hovered = draw.hovered;
+    String hoverDesc = "";
+    if (hovered == MissionsView.PLOT_CLUES) {
+      hoverDesc = "Review all evidence assembled on this case.";
+      if (draw.clicked) {
         parent.setActiveFocus(MissionsView.PLOT_CLUES, true);
       }
     }
-    
-    down += 45;
-    
-    String hoverDesc = "";
-    if (hoveredEvidence) {
-      hoverDesc = "Review all evidence assembled on this case.";
-    }
-    else if (hovered == null) {
-      hoverDesc = "Click on a role to see more information on suspects.";
-    }
-    else if (canFollowHovered) {
-      Series <Clue> clues = player.leads.cluesFor(plot, null, hovered, true);
+    else if (hovered instanceof Plot.Role) {
+      Plot.Role role = (Plot.Role) hovered;
+      Series <Clue> clues = player.leads.cluesFor(plot, null, role, true);
       hoverDesc = "Latest Evidence:\n  "+clues.first();
+      if (draw.clicked) {
+        parent.setActiveFocus(hovered, true);
+      }
     }
-    else {
-      hoverDesc = "You will need to gather evidence from other suspects "+
-      "to identify this party.";
+    else if (hovered instanceof Element) {
+      Series <Clue> clues = player.leads.cluesFor(plot, hovered, null, true);
+      hoverDesc = "Latest Evidence:\n  "+clues.first();
+      if (draw.clicked) {
+        parent.setActiveFocus(hovered, true);
+      }
     }
-    
+    g.setColor(Color.LIGHT_GRAY);
     ViewUtils.drawWrappedString(
       hoverDesc, g, vx + across, vy + down, vw - (across + 10), 100
     );

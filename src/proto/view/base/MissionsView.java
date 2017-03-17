@@ -133,7 +133,9 @@ public class MissionsView extends UINode {
   
   
   public void setActiveFocus(Object focus, boolean onStack) {
-    if (onStack && focus != this.activeFocus) focusStack.add(focus);
+    if (onStack && focus != this.activeFocus) {
+      focusStack.add(focus);
+    }
     
     this.activeFocus = focus;
     this.activeFocusView = null;

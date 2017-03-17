@@ -9,7 +9,6 @@ import proto.util.*;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Image;
 
 
 public class MissionsViewPerpsView extends UINode {
@@ -38,130 +37,81 @@ public class MissionsViewPerpsView extends UINode {
   
   
   void renderSuspects(Plot.Role role, Surface surface, Graphics2D g) {
+    //
+    //  Extract basic game-references first:
     Base player = mainView.player();
     Plot plot = (Plot) parent.focusOfType(Plot.class);
-    
+    //
+    //  Create a list-display, and render the header plus entries for each
+    //  suspect:
+    ViewUtils.ListDraw draw = new ViewUtils.ListDraw();
     int across = 10, down = 10;
-    g.setColor(Color.LIGHT_GRAY);
-    ViewUtils.drawWrappedString(
-      "SUSPECTS FOR "+role+" IN "+plot, g, vx + across, vy + down, vw - 20, 40
+    draw.addEntry(
+      null, "SUSPECTS FOR "+role+" IN "+plot, 40, null
     );
-    down += 40;
-    
-    //  TODO:  There is a lot of content to factor out here.
-    
     for (Element e : player.leads.suspectsFor(role, plot)) {
-      g.setColor(Color.LIGHT_GRAY);
-      Image icon = e.icon();
-      String desc = ""+e;
-
-      g.drawImage(icon, vx + across, vy + down, 40, 40, null);
-      ViewUtils.drawWrappedString(
-        desc.toString(), g, vx + across + 60, vy + down, vw - 60, 40
-      );
-      
-      if (surface.tryHover(vx + across, vy + down, vw - 20, 40, e)) {
-        g.setColor(Color.GRAY);
-        g.drawRect(vx + across, vy + down, vw - 20, 40);
-        
-        if (surface.mouseClicked()) {
-          parent.setActiveFocus(e, true);
-        }
-      }
-      
-      down += 40;
+      draw.addEntry(e.icon(), e.name(), 40, e);
+    }
+    draw.performDraw(across, down, this, surface, g);
+    down = draw.down;
+    //
+    //  If one is selected, zoom to that element:
+    if (draw.clicked) {
+      parent.setActiveFocus(draw.hovered, true);
     }
   }
   
   
   void renderSuspect(Element suspect, Surface surface, Graphics2D g) {
+    //
+    //  Extract basic game-references first:
     Base player = mainView.player();
     Person agent = mainView.rosterView.selectedPerson();
     Plot plot = (Plot) parent.focusOfType(Plot.class);
-    Lead hovered = null;
-
-    int across = 10, down = 10;
-    g.setColor(Color.LIGHT_GRAY);
-    ViewUtils.drawWrappedString(
-      "CASE FILE FOR: "+suspect, g, vx + across, vy + down, vw - 20, 40
-    );
-    
-    g.setColor(Color.LIGHT_GRAY);
-    down += 40;
-    
     Series <Clue> clues = player.leads.cluesFor(plot, suspect, null, true);
-    if (! clues.empty()) {
-      String desc = ""+clues.first();
-      ViewUtils.drawWrappedString(
-        desc.toString(), g, vx + across, vy + down, vw - (across + 10), 100
-      );
-      down += 100;
-    }
-    
-    for (Lead lead : player.leads.leadsFor(suspect)) {
-      g.setColor(Color.LIGHT_GRAY);
-      Image icon = lead.icon();
-      String desc = ""+lead.choiceInfo(agent);
-      
-      g.drawImage(icon, vx + across, vy + down, 40, 40, null);
-      ViewUtils.drawWrappedString(
-        desc.toString(), g, vx + across + 60, vy + down, vw - 60, 40
-      );
-      
-      if (surface.tryHover(vx + across, vy + down, vw - 20, 40, lead)) {
-        g.setColor(Color.GRAY);
-        g.drawRect(vx + across, vy + down, vw - 20, 40);
-        hovered = lead;
-        
-        if (surface.mouseClicked()) {
-          if (agent.assignments().includes(lead)) agent.removeAssignment(lead);
-          else agent.addAssignment(lead);
-        }
-      }
-      
-      ViewUtils.renderAssigned(
-        lead.assigned(), vx + across + 300, vy + down + 20, surface, g
-      );
-      
-      down += 45;
-    }
-
-    Image icon = MissionsView.MYSTERY_IMAGE;
-    String desc = "View Associates";
-    boolean hoveredAssocs = false;
-    g.setColor(Color.LIGHT_GRAY);
-    
-    g.drawImage(icon, vx + across, vy + down, 40, 40, null);
-    ViewUtils.drawWrappedString(
-      desc.toString(), g, vx + across + 60, vy + down, vw - 60, 40
+    //
+    //  Create a list-display, and render the header, latest clue, entries for
+    //  each possible lead, and an option to view associates-
+    ViewUtils.ListDraw draw = new ViewUtils.ListDraw();
+    int across = 10, down = 10;
+    draw.addEntry(
+      null, "CASE FILE FOR: "+suspect, 40, null
     );
-    if (surface.tryHover(vx + across, vy + down, vw - 20, 40, "associates")) {
-      g.setColor(Color.GRAY);
-      g.drawRect(vx + across, vy + down, vw - 20, 40);
-      hoveredAssocs = true;
-      if (surface.mouseClicked()) {
+    if (! clues.empty()) {
+      draw.addEntry(null, clues.first().longDescription(), 100, null);
+    }
+    for (Lead lead : player.leads.leadsFor(suspect)) {
+      draw.addEntry(lead.icon(), lead.choiceInfo(agent), 40, lead);
+    }
+    draw.addEntry(
+      MissionsView.MYSTERY_IMAGE, "View Associates", 40,
+      MissionsView.PERP_LINKS
+    );
+    draw.performDraw(across, down, this, surface, g);
+    down = draw.down;
+    //
+    //  Then given suitable tool-tips and click-reponses for any encountered
+    //  list-elements:
+    String hoverDesc = "";
+    if (draw.hovered instanceof Lead) {
+      Lead lead = (Lead) draw.hovered;
+      hoverDesc = lead.testInfo(agent);
+      if (draw.clicked) {
+        if (agent.assignments().includes(lead)) agent.removeAssignment(lead);
+        else agent.addAssignment(lead);
+      }
+    }
+    else if (draw.hovered == MissionsView.PERP_LINKS) {
+      hoverDesc = "View persons and places associated with this suspect.";
+      if (draw.clicked) {
         parent.setActiveFocus(MissionsView.PERP_LINKS, true);
       }
     }
-    
-    down += 45;
-    
-    if (hovered != null) {
-      g.setColor(Color.LIGHT_GRAY);
-      ViewUtils.drawWrappedString(
-        hovered.testInfo(agent),
-        g, vx + across, vy + down, vw - (across + 10), 200
-      );
-      down += 200;
-    }
-    else if (hoveredAssocs) {
-      g.setColor(Color.LIGHT_GRAY);
-      ViewUtils.drawWrappedString(
-        "View persons and places associated with this suspect.",
-        g, vx + across, vy + down, vw - (across + 10), 200
-      );
-      down += 200;
-    }
+    g.setColor(Color.LIGHT_GRAY);
+    ViewUtils.drawWrappedString(
+      hoverDesc, g, vx + across, vy + down, vw - (across + 10), 200
+    );
+    down += 200;
   }
   
   

@@ -26,36 +26,30 @@ public class MissionsViewLinksView extends UINode {
   
   
   protected boolean renderTo(Surface surface, Graphics2D g) {
+    //
+    //  Extract basic game-references first:
     Base player = mainView.player();
     Element perp = (Element) parent.focusOfType(Element.class);
-    
+    //
+    //  Create a list-display, and render the header plus entries for each
+    //  associate:
+    ViewUtils.ListDraw draw = new ViewUtils.ListDraw();
     int across = 10, down = 10;
-    g.setColor(Color.LIGHT_GRAY);
-    ViewUtils.drawWrappedString(
-      "KNOWN ASSOCIATES FOR "+perp, g, vx + across, vy + down, vw - 20, 40
+    draw.addEntry(
+      null, "KNOWN ASSOCIATES FOR "+perp, 40, null
     );
-    down += 40;
-    
     for (AssocResult r : getAssociates(perp, player)) {
-      g.setColor(Color.LIGHT_GRAY);
-      Image icon = r.associate.icon();
-      String desc = r.associate.name()+" ("+r.label+")";
-      
-      g.drawImage(icon, vx + across, vy + down, 40, 40, null);
-      ViewUtils.drawWrappedString(
-        desc.toString(), g, vx + across + 60, vy + down, vw - 60, 40
+      draw.addEntry(
+        r.associate.icon(), r.associate.name()+" ("+r.label+")", 40,
+        r.associate
       );
-      
-      if (surface.tryHover(vx + across, vy + down, vw - 20, 40, r.associate)) {
-        g.setColor(Color.GRAY);
-        g.drawRect(vx + across, vy + down, vw - 20, 40);
-        
-        if (surface.mouseClicked()) {
-          parent.setActiveFocus(r.associate, true);
-        }
-      }
-      
-      down += 45;
+    }
+    draw.performDraw(across, down, this, surface, g);
+    down = draw.down;
+    //
+    //  If one is selected, zoom to that element:
+    if (draw.clicked) {
+      parent.setActiveFocus(draw.hovered, true);
     }
     
     return true;

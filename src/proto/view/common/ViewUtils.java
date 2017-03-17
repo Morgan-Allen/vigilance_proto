@@ -5,13 +5,11 @@ import proto.game.world.*;
 import proto.game.person.*;
 import proto.util.*;
 
+import java.awt.Image;
 import java.awt.Graphics2D;
 import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.StringTokenizer;
 
 
@@ -51,6 +49,81 @@ public class ViewUtils {
       
       down = downMore;
       g.drawString(line, x, y + down);
+    }
+  }
+  
+  
+  
+  /**  List-display utilities:
+    */
+  public static class ListDraw {
+    
+    static class Entry {
+      Image icon;
+      String label;
+      int down;
+      Object refers;
+    }
+    List <Entry> entries = new List();
+    
+    public int across, down;
+    public Object hovered;
+    public boolean clicked;
+    
+    
+    public void addEntry(Image icon, String label, int down, Object refers) {
+      Entry e = new Entry();
+      e.icon   = icon  ;
+      e.label  = label ;
+      e.down   = down  ;
+      e.refers = refers;
+      entries.add(e);
+    }
+    
+    
+    public void performDraw(
+      int across, int down, UINode within, Surface surface, Graphics2D g
+    ) {
+      int vx = within.vx, vy = within.vy, vw = within.vw;
+      
+      for (Entry e : entries) {
+        int downEach = e.down, iconSize = 0;
+        g.setColor(Color.LIGHT_GRAY);
+        
+        if (e.icon != null) {
+          iconSize = e.down;
+          g.drawImage(e.icon, vx + across, vy + down, iconSize, iconSize, null);
+        }
+        
+        if (e.label != null) ViewUtils.drawWrappedString(
+          e.label, g,
+          vx + across + iconSize + 10, vy + down,
+          vw - (iconSize + 20), downEach
+        );
+        
+        if (e.refers != null) {
+          if (surface.tryHover(
+            vx + across, vy + down, vw - (across + 10), downEach, e.refers
+          )) {
+            hovered = e.refers;
+            clicked = surface.mouseClicked(); 
+          }
+          
+          g.setColor(hovered == e.refers ? Color.YELLOW : Color.GRAY);
+          g.drawRect(vx + across, vy + down, vw - (across + 10), downEach);
+        }
+        
+        if (e.refers instanceof Assignment) renderAssigned(
+          ((Assignment) e.refers).assigned(),
+          vx + across + vw - 20, vy + down + downEach, surface, g
+        );
+        
+        down += downEach + 5;
+      }
+      
+      this.across = across;
+      this.down = down;
+      entries.clear();
     }
   }
   

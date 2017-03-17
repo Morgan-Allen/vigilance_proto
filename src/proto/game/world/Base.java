@@ -106,6 +106,7 @@ public class Base extends Place {
     */
   public void addToRoster(Person person) {
     Place.setResident(person, this, true);
+    person.setBase(this);
   }
   
   
