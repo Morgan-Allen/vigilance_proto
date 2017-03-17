@@ -210,18 +210,12 @@ public abstract class Task implements Assignment {
     active.include(p);
     
     Attempt sample = configAttempt(active);
-    //  TODO:  HAVE THE ATTEMPT DESCRIBE ODDS AND SO ON!
-    
-    /*
-    for (int n = 0; n < tested.length;) {
-      s.append(tested[n].name+" "+testDCs[n]);
-      
-      float chance = testChance(n, active);
-      s.append(" ("+((int) (chance * 100))+"% effective)");
-      
-      if (++n < tested.length) s.append(", ");
+    float chance = sample.testChance();
+    for (Attempt.Test t : sample.tests) {
+      s.append("\n  "+t.tested+" "+t.testTotal);
+      s.append(" vs. Obstacle "+t.testDC+" / "+t.testRange);
     }
-    //*/
+    s.append("\n  Overall Chance: "+((int) (chance * 100))+"%");
     
     return s.toString();
   }

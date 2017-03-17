@@ -62,6 +62,14 @@ public class Lead extends Task {
     CONFIDENCE_MODERATE = 0.66f,
     CONFIDENCE_HIGH     = 1.00f;
   
+  final static String
+    PROFILE_DESC[] = {
+      "Nil", "Low", "Moderate", "High", "100%"
+    },
+    CONFIDENCE_DESC[] = {
+      "Weak", "Fair", "Strong"
+    };
+  
   
   public static boolean isPhysical(int medium) {
     for (int m : PHYSICAL_MEDIA) if (m == medium) return true;
@@ -81,18 +89,19 @@ public class Lead extends Task {
   
   public static class Type {
     
-    String name, tenseVerbs[];
+    String name, info, tenseVerbs[];
     int ID;
     int medium, focus, tense, profile;
     float confidence;
     int cluesMedia[];
     
     Type(
-      String name, int ID, String tenseVerbs[],
+      String name, int ID, String info, String tenseVerbs[],
       int medium, int focus, int tense, int profile, float confidence,
       int... cluesMedia
     ) {
       this.name = name;
+      this.info = info;
       this.ID   = ID  ;
       this.tenseVerbs = tenseVerbs;
       this.medium  = medium ;
@@ -109,54 +118,63 @@ public class Lead extends Task {
   final public static Type
     LEAD_SURVEIL_PERSON = new Type(
       "Surveillance", 0,
+      "Surveil a suspect for clues to their activities and who they meet with.",
       new String[] { "Surveiled", "Surveilling", "Will Surveil" },
       MEDIUM_SURVEIL, FOCUS_PERSON, TENSE_DURING, PROFILE_LOW,
       CONFIDENCE_HIGH, MEDIUM_MEET
     ),
     LEAD_SURVEIL_BUILDING = new Type(
       "Surveillance", 1,
+      "Stake out a building to see who visits and who might be holed up.",
       new String[] { "Surveiled", "Surveilling", "Will Surveil" },
       MEDIUM_SURVEIL, FOCUS_BUILDING, TENSE_DURING, PROFILE_LOW,
       CONFIDENCE_MODERATE, MEDIUM_MEET
     ),
     LEAD_QUESTION = new Type(
       "Questioning", 2,
+      "Question a suspect for information on past dealings or future plans.",
       new String[] { "Questioned", "Questioning", "Will Question" },
       MEDIUM_QUESTION, FOCUS_PERSON, TENSE_AFTER, PROFILE_HIGH,
       CONFIDENCE_MODERATE, MEDIUM_ANY
     ),
     LEAD_WIRETAP = new Type(
       "Wiretap", 3,
+      "Intercept suspicious communications to or from a structure.",
       new String[] { "Wiretapped", "Wiretapping", "Will Wiretap" },
       MEDIUM_WIRE, FOCUS_BUILDING, TENSE_DURING, PROFILE_LOW,
       CONFIDENCE_HIGH, MEDIUM_WIRE
     ),
     LEAD_PATROL = new Type(
       "Patrol", 4,
+      "Patrol an area while keeping an eye out for suspicious activity.",
       new String[] { "Patrolled", "Patrolling", "Will Patrol" },
       MEDIUM_SURVEIL, FOCUS_REGION, TENSE_DURING, PROFILE_LOW,
       CONFIDENCE_MODERATE, MEDIUM_MEET, MEDIUM_SURVEIL
     ),
     LEAD_SCAN = new Type(
       "Frequency Scan", 5,
+      "Scan wireless frequencies in an area for fragments of information.",
       new String[] { "Scanned", "Scanning", "Will Scan" },
       MEDIUM_WIRE, FOCUS_REGION, TENSE_DURING, PROFILE_LOW,
       CONFIDENCE_MODERATE, MEDIUM_WIRE
     ),
     LEAD_CANVASS = new Type(
       "Canvass", 6,
+      "Ask civilians or friendly contacts in area for leads they may have.",
       new String[] { "Canvassed", "Canvassing", "Will Canvass" },
       MEDIUM_QUESTION, FOCUS_REGION, TENSE_ANY, PROFILE_SUSPICIOUS,
       CONFIDENCE_LOW, MEDIUM_ANY
     ),
     LEAD_SEARCH = new Type(
       "Search", 7,
+      "Search a building for records or forensic evidence.",
       new String[] { "Searched", "Searching", "Will Search" },
       MEDIUM_SURVEIL, FOCUS_BUILDING, TENSE_AFTER, PROFILE_LOW,
       CONFIDENCE_MODERATE, MEDIUM_WIRE, MEDIUM_MEET
     ),
     LEAD_TIPOFF = new Type(
       "Tipoff", 8,
+      "_",
       new String[] { "Tipped Off", "Tipping Off", "Will Tip Off" },
       MEDIUM_WIRE, FOCUS_ANY, TENSE_ANY, PROFILE_HIDDEN,
       CONFIDENCE_LOW
@@ -427,40 +445,47 @@ public class Lead extends Task {
   
   
   protected Attempt configAttempt(Series <Person> attempting) {
-    // TODO Auto-generated method stub
-    
     Trait skill = null;
     int range = 5, obstacle = 0;
+    Person perp = focus.isPerson() ? ((Person) focus) : null;
+    Place  site = focus.isPlace () ? ((Place ) focus) : null;
+    Region area = focus.isRegion() ? ((Region) focus) : null;
     
     if (type.medium == MEDIUM_SURVEIL) {
       skill = SIGHT_RANGE;
       range = 5;
-      Person perp = (Person) focus;
-      obstacle = perp.stats.levelFor(HIDE_RANGE);
+      
+      if (perp != null) obstacle = perp.stats.levelFor(HIDE_RANGE);
+      if (site != null) obstacle = 2;
+      if (area != null) obstacle = 4;
     }
     
     if (type.medium == MEDIUM_WIRE) {
       skill = ENGINEERING;
       range = 10;
-      Place site = (Place) focus;
-      obstacle = 5;
+      
+      if (perp != null) obstacle = perp.stats.levelFor(ENGINEERING);
+      if (site != null) obstacle = 5;
+      if (area != null) obstacle = 10;
     }
     
     if (type.medium == MEDIUM_QUESTION) {
       skill = QUESTION;
       range = 10;
-      Person perp = (Person) focus;
-      obstacle = perp.stats.levelFor(PERSUADE);
+      
+      if (perp != null) obstacle = perp.stats.levelFor(PERSUADE);
+      if (site != null) obstacle = -1;
+      if (area != null) obstacle = 10;
     }
     
     if (type.medium == MEDIUM_COVER) {
       skill = PERSUADE;
       range = 10;
-      Place site = (Place) focus;
-      obstacle = 5;
+      
+      if (perp != null) obstacle = perp.stats.levelFor(SIGHT_RANGE) * 2;
+      if (site != null) obstacle = 10;
+      if (area != null) obstacle = 10;
     }
-    
-    if (focus.isRegion()) obstacle *= 1.5f;
     
     Attempt attempt = new Attempt(this);
     attempt.addTest(skill, range, obstacle);
@@ -470,63 +495,6 @@ public class Lead extends Task {
   
   
   
-  /*
-  public float followChance(Series <Person> follow) {
-    float skill = 0, obstacle = 1;
-    
-    if (type.medium == MEDIUM_SURVEIL) {
-      Person perp = (Person) focus;
-      skill = teamStatBonus(follow, SIGHT_RANGE);
-      obstacle = perp.stats.levelFor(HIDE_RANGE);
-    }
-    
-    if (type.medium == MEDIUM_WIRE) {
-      Place site = (Place) focus;
-      skill = teamStatBonus(follow, ENGINEERING);
-      obstacle = 5;
-    }
-    
-    if (type.medium == MEDIUM_QUESTION) {
-      Person perp = (Person) focus;
-      skill = teamStatBonus(follow, QUESTION);
-      obstacle = perp.stats.levelFor(PERSUADE);
-    }
-    
-    if (type.medium == MEDIUM_COVER) {
-      Place site = (Place) focus;
-      skill = teamStatBonus(follow, PERSUADE);
-      obstacle = 5;
-    }
-    
-    if (focus.isRegion()) obstacle *= 1.5f;
-    return skill / (skill + obstacle);
-  }
-  
-  
-  protected float teamStatBonus(Series <Person> follow, Trait stat) {
-    float bestStat = 0, sumStats = 0;
-    for (Person p : follow) {
-      float level = p.stats.levelFor(stat);
-      sumStats += level;
-      bestStat = Nums.max(bestStat, level);
-    }
-    return bestStat + ((sumStats - bestStat) / 2);
-  }
-  
-  
-  protected float followResult(Series <Person> follow) {
-    float chance = followChance(follow);
-    chance = 1 - (Nums.sqrt(1 - chance));
-    boolean roll1 = Rand.num() < chance, roll2 = Rand.num() < chance;
-    
-    if (roll1 && roll2) return RESULT_HOT;
-    if (roll1 || roll2) return RESULT_PARTIAL;
-    return RESULT_COLD;
-  }
-  //*/
-  
-  
-
   /**  Rendering, debug and interface methods-
     */
   public String activeInfo() {
@@ -535,20 +503,17 @@ public class Lead extends Task {
   
   
   public String testInfo(Person agent) {
-    Batch <Person> testing = new Batch();
-    Visit.appendTo(testing, active());
-    testing.include(agent);
+    String info = super.testInfo(agent);
+    StringBuffer s = new StringBuffer(type.info+"\n");
+    s.append(info);
     
-    Attempt sample = configAttempt(testing);
-    //  TODO:  YOU NEED TO LIST:
-    //    The skill/s used
-    //    The obstacle
-    //    The odds of success
-    //    The likelihood of being noticed
-    //    The quality of evidence obtained
+    String profileDesc = PROFILE_DESC[type.profile];
+    int confIndex = (int) (type.confidence * 3);
+    String confDesc = CONFIDENCE_DESC[Nums.clamp(confIndex, 3)];
     
-    float chance = sample.testChance();
-    return "Chance: "+chance;
+    s.append("\n  Conspicuousness: "+profileDesc);
+    s.append("\n  Evidence Level: "+confDesc);
+    return s.toString();
   }
   
   

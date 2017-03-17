@@ -1,8 +1,6 @@
 
 package proto.game.person;
 import proto.common.*;
-import proto.game.scene.Volley.Modifier;
-import proto.game.scene.Volley.Stat;
 import proto.game.world.*;
 import proto.util.*;
 import static proto.game.person.PersonStats.*;
@@ -26,7 +24,7 @@ public class Attempt implements Session.Saveable {
     Trait tested;
     int testRange;
     int testDC;
-    int testResult = -1;
+    int testTotal, testResult = -1;
   }
   Batch <Test> tests = new Batch();
   float speedBonus = 0;
@@ -63,6 +61,7 @@ public class Attempt implements Session.Saveable {
       t.tested     = (Trait) s.loadObject();
       t.testRange  = s.loadInt();
       t.testDC     = s.loadInt();
+      t.testTotal  = s.loadInt();
       t.testResult = s.loadInt();
       tests.add(t);
     }
@@ -81,6 +80,7 @@ public class Attempt implements Session.Saveable {
       s.saveObject(t.tested);
       s.saveInt(t.testRange );
       s.saveInt(t.testDC    );
+      s.saveInt(t.testTotal );
       s.saveInt(t.testResult);
     }
     s.saveFloat(speedBonus);
@@ -215,6 +215,7 @@ public class Attempt implements Session.Saveable {
     float checkLevel = maxLevel + ((sumLevels - maxLevel) / 2) + testBonus;
     float winChance = Nums.clamp((checkLevel - DC) / range, 0, 1);
     
+    test.testTotal = (int) checkLevel;
     return winChance;
   }
   
@@ -248,8 +249,13 @@ public class Attempt implements Session.Saveable {
     
     return outcome;
   }
-  
 }
+
+
+
+
+
+
 
 
 
