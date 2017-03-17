@@ -27,7 +27,7 @@ public class MissionsViewCluesView extends UINode {
   
   protected boolean renderTo(Surface surface, Graphics2D g) {
     Base player = mainView.player();
-    Plot plot = parent.plotFocus();
+    Plot plot = (Plot) parent.focusOfType(Plot.class);
     
     int across = 10, down = 10;
     g.setColor(Color.LIGHT_GRAY);

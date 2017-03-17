@@ -73,6 +73,8 @@ public class DefaultGame extends RunGame {
     final Base base = new Base(Facilities.MANOR, world, owns);
     Person leader = new Person(Heroes.HERO_PHOBOS, world);
     base.setLeader(leader);
+    
+    Place.setResident(leader, base, true);
     base.addToRoster(leader);
     base.addToRoster(new Person(Heroes.HERO_NIGHT_SWIFT, world));
     base.addToRoster(new Person(Heroes.HERO_DEIMOS     , world));

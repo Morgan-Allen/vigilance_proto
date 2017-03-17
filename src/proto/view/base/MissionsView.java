@@ -23,11 +23,13 @@ public class MissionsView extends UINode {
     IMG_DIR = "media assets/city map/";
   final static Image
     ALERT_IMAGE   = Kind.loadImage(IMG_DIR+"alert_symbol.png"  ),
-    MYSTERY_IMAGE = Kind.loadImage(IMG_DIR+"mystery_symbol.png");
+    MYSTERY_IMAGE = Kind.loadImage(IMG_DIR+"mystery_symbol.png"),
+    FILE_IMAGE    = Kind.loadImage(IMG_DIR+"file_image.png"    );
   
   final static Object
     ALL_CASES  = "all-cases",
-    PLOT_CLUES = "plot-clues";
+    PLOT_CLUES = "plot-clues",
+    PERP_LINKS = "perp-links";
   
   MapInsetView mapView;
   StringButton casesButton, backButton;
@@ -36,6 +38,7 @@ public class MissionsView extends UINode {
   MissionsViewRolesView rolesView;
   MissionsViewCluesView cluesView;
   MissionsViewPerpsView perpsView;
+  MissionsViewLinksView linksView;
   UINode focusViews[], activeFocusView;
   
   Object activeFocus = null;
@@ -86,7 +89,10 @@ public class MissionsView extends UINode {
     rolesView  = new MissionsViewRolesView(this, focusViewBound);
     cluesView  = new MissionsViewCluesView(this, focusViewBound);
     perpsView  = new MissionsViewPerpsView(this, focusViewBound);
-    focusViews = new UINode[] { casesView, rolesView, cluesView, perpsView };
+    linksView  = new MissionsViewLinksView(this, focusViewBound);
+    focusViews = new UINode[] {
+      casesView, rolesView, cluesView, perpsView, linksView
+    };
     addChildren(focusViews);
     setActiveFocus(ALL_CASES, false);
   }
@@ -113,13 +119,13 @@ public class MissionsView extends UINode {
   }
   
   
-  public Plot plotFocus() {
+  public Object focusOfType(Class type) {
     //
     //  Works backward through the navigation stack to find the last plot
     //  referred to.
     for (ListEntry e = focusStack; (e = e.lastEntry()) != focusStack;) {
-      if (e.refers instanceof Plot) {
-        return (Plot) e.refers;
+      if (type.isAssignableFrom(e.refers.getClass())) {
+        return e.refers;
       }
     }
     return null;
@@ -136,11 +142,14 @@ public class MissionsView extends UINode {
     if (focus == ALL_CASES) {
       activeFocusView = casesView;
     }
-    else if (focus instanceof Plot) {
-      activeFocusView = rolesView;
-    }
     else if (focus == PLOT_CLUES) {
       activeFocusView = cluesView;
+    }
+    else if (focus == PERP_LINKS) {
+      activeFocusView = linksView;
+    }
+    else if (focus instanceof Plot) {
+      activeFocusView = rolesView;
     }
     else if (focus instanceof Plot.Role) {
       activeFocusView = perpsView;
@@ -156,8 +165,6 @@ public class MissionsView extends UINode {
   }
   
 }
-
-
 
 
 

@@ -105,8 +105,31 @@ public class MissionsViewRolesView extends UINode {
       down += entryHigh + 5;
     }
     
+    Image icon = MissionsView.FILE_IMAGE;
+    String desc = "View All Evidence";
+    boolean hoveredEvidence = false;
+    g.setColor(Color.LIGHT_GRAY);
+    
+    g.drawImage(icon, vx + across, vy + down, 40, 40, null);
+    ViewUtils.drawWrappedString(
+      desc.toString(), g, vx + across + 60, vy + down, vw - 60, 40
+    );
+    if (surface.tryHover(vx + across, vy + down, vw - 20, 40, "associates")) {
+      g.setColor(Color.GRAY);
+      g.drawRect(vx + across, vy + down, vw - 20, 40);
+      hoveredEvidence = true;
+      if (surface.mouseClicked()) {
+        parent.setActiveFocus(MissionsView.PLOT_CLUES, true);
+      }
+    }
+    
+    down += 45;
+    
     String hoverDesc = "";
-    if (hovered == null) {
+    if (hoveredEvidence) {
+      hoverDesc = "Review all evidence assembled on this case.";
+    }
+    else if (hovered == null) {
       hoverDesc = "Click on a role to see more information on suspects.";
     }
     else if (canFollowHovered) {
@@ -123,16 +146,6 @@ public class MissionsViewRolesView extends UINode {
     );
     down += 100;
     
-    StringButton cluesButton = new StringButton(
-      "View All Evidence",
-      new Box2D(across, down, 150, 25), this
-    ) {
-      protected void whenClicked() {
-        mainView.missionView.setActiveFocus(MissionsView.PLOT_CLUES, true);
-      }
-    };
-    cluesButton.refers = "clues_button";
-    cluesButton.renderNow(surface, g);
     return true;
   }
 }

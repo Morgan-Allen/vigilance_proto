@@ -19,7 +19,6 @@ public class Base extends Place {
   
   Faction faction = null;
   Person leader = null;
-  List <Person> roster = new List();
   List <PersonType> goonTypes = new List();
   
   final public BaseFinance  finance  = new BaseFinance (this);
@@ -43,7 +42,6 @@ public class Base extends Place {
     
     faction = (Faction) s.loadObject();
     leader  = (Person) s.loadObject();
-    s.loadObjects(roster);
     s.loadObjects(goonTypes);
     
     finance .loadState(s);
@@ -64,7 +62,6 @@ public class Base extends Place {
     
     s.saveObject(faction);
     s.saveObject(leader );
-    s.saveObjects(roster);
     s.saveObjects(goonTypes);
     
     finance .saveState(s);
@@ -90,7 +87,7 @@ public class Base extends Place {
   /**  Regular updates and life-cycle methods:
     */
   void updateBase() {
-    for (Person p : roster) {
+    for (Person p : residents()) {
       p.updateOnBase();
     }
     for (Place r : rooms) if (r != null) {
@@ -107,20 +104,18 @@ public class Base extends Place {
   
   /**  Roster modification-
     */
-  public Person addToRoster(Person member) {
-    roster.add(member);
-    member.setBase(this);
-    return member;
-  }
-  
-  
-  public Series <Person> roster() {
-    return roster;
+  public void addToRoster(Person person) {
+    Place.setResident(person, this, true);
   }
   
   
   public void setLeader(Person leader) {
     this.leader = leader;
+  }
+  
+  
+  public Series <Person> roster() {
+    return residents();
   }
   
   
@@ -130,7 +125,7 @@ public class Base extends Place {
   
   
   public Person firstOfKind(Kind kind) {
-    for (Person p : roster) if (p.kind() == kind) return p;
+    for (Person p : residents()) if (p.kind() == kind) return p;
     return null;
   }
   
@@ -221,17 +216,17 @@ public class Base extends Place {
   /**  Rendering and interface methods-
     */
   public int rosterIndex(Person p) {
-    return roster.indexOf(p);
+    return residents().indexOf(p);
   }
   
   
   public Person atRosterIndex(int i) {
-    return roster.atIndex(i);
+    return residents().atIndex(i);
   }
   
   
   public String name() {
-    return kind().name()+" (Base for "+faction.name+")";
+    return kind().name();
   }
 }
 
