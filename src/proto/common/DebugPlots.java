@@ -38,11 +38,10 @@ public class DebugPlots extends RunGame {
     Person organiser = kidnap.organiser();
     
     //  TODO:  You will need to generate tipoffs automatically again...
-    //
     Base heroes = world.baseFor(Heroes.JANUS_INDUSTRIES);
     Clue tipoff = new Clue(kidnap, Plot.ROLE_ORGANISER);
     int timeFound = world.timing.totalHours();
-    tipoff.confirmTipoff(organiser, Lead.LEAD_QUESTION, 0.5f, timeFound);
+    tipoff.confirmTipoff(organiser, Lead.LEAD_TIPOFF, 0.33f, timeFound);
     heroes.leads.caseFor(organiser).recordClue(tipoff);
     
     /*

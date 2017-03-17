@@ -35,81 +35,42 @@ public abstract class Task implements Assignment {
   ;
   
   final public Base base;
-  Trait   tested [];
-  int     testDCs[];
-  int     testMod[];
-  boolean results[];
   
   List <Person> assigned = new List();
   int timeTaken, initTime;
+  protected Attempt attempt;
   boolean complete, success;
   
   
   
-  protected Task(
-    Base base, int timeHours, Object... args
-  ) {
+  protected Task(Base base, int timeHours) {
     this.timeTaken = timeHours <= 0 ? -1 : timeHours;
     this.initTime  = -1;
     this.base      = base;
-    assignTestArgs(args);
   }
   
   
   public Task(Session s) throws Exception {
     s.cacheInstance(this);
     
-    final int numT = s.loadInt();
-    tested  = new Trait  [numT];
-    testDCs = new int    [numT];
-    testMod = new int    [numT];
-    results = new boolean[numT];
-    for (int n = 0; n < numT; n++) {
-      tested [n] = (Trait) s.loadObject();
-      testDCs[n] = s.loadInt ();
-      testMod[n] = s.loadInt ();
-      results[n] = s.loadBool();
-    }
-    
     s.loadObjects(assigned);
     base      = (Base) s.loadObject();
     timeTaken = s.loadInt ();
     initTime  = s.loadInt ();
+    attempt   = (Attempt) s.loadObject();
     complete  = s.loadBool();
     success   = s.loadBool();
   }
   
   
   public void saveState(Session s) throws Exception {
-    
-    s.saveInt(tested.length);
-    for (int n = 0; n < tested.length; n++) {
-      s.saveObject(tested [n]);
-      s.saveInt   (testDCs[n]);
-      s.saveInt   (testMod[n]);
-      s.saveBool  (results[n]);
-    }
-    
     s.saveObjects(assigned);
     s.saveObject(base);
-    s.saveInt (timeTaken);
-    s.saveInt (initTime );
-    s.saveBool(complete );
-    s.saveBool(success  );
-  }
-  
-  
-  protected void assignTestArgs(Object... args) {
-    final int numT = args.length / 2;
-    tested  = new Trait  [numT];
-    testDCs = new int    [numT];
-    testMod = new int    [numT];
-    results = new boolean[numT];
-    
-    for (int n = 0; n < numT; n++) {
-      tested [n] = (Trait  ) args[ n * 2     ];
-      testDCs[n] = (Integer) args[(n * 2) + 1];
-    }
+    s.saveInt   (timeTaken);
+    s.saveInt   (initTime );
+    s.saveObject(attempt  );
+    s.saveBool  (complete );
+    s.saveBool  (success  );
   }
   
   
@@ -163,43 +124,6 @@ public abstract class Task implements Assignment {
   
   
   
-  /**  Skill and type requirements-
-    */
-  public boolean setModifier(Trait skill, int mod) {
-    int index = Visit.indexOf(skill, tested);
-    if (index == -1) return false;
-    testMod[index] = mod;
-    return true;
-  }
-  
-  
-  public boolean physical() {
-    for (Trait t : tested) for (Trait s : t.roots()) {
-      if (s == REFLEXES || s == MUSCLE) return true;
-    }
-    return false;
-  }
-  
-  
-  public boolean mental() {
-    for (Trait t : tested) for (Trait s : t.roots()) {
-      if (s == WILL || s == BRAINS) return true;
-    }
-    return false;
-  }
-  
-  
-  public Trait[] tested() {
-    return tested;
-  }
-  
-  
-  public boolean needsSkill(Trait s) {
-    return Visit.arrayIncludes(tested, s);
-  }
-  
-  
-  
   /**  Task performance and completion-
     */
   public boolean updateAssignment() {
@@ -224,7 +148,10 @@ public abstract class Task implements Assignment {
   
   
   public boolean attemptTask() {
-    setCompleted(performTest(active()));
+    if (attempt == null || attempt.complete()) {
+      attempt = configAttempt(active());
+    }
+    setCompleted(attempt.performAttempt(1) == 1);
     return success;
   }
   
@@ -245,63 +172,6 @@ public abstract class Task implements Assignment {
   
   protected void onCompletion() {
     for (Person p : assigned) p.removeAssignment(this);
-  }
-  
-  
-  public float testChance(int testIndex, Series <Person> active) {
-    Trait stat = tested [testIndex];
-    int   mod  = testMod[testIndex];
-    int   DC   = testDCs[testIndex] + Nums.max(0, -mod);
-    
-    float maxLevel = 0, sumLevels = 0;
-    for (Person p : active) {
-      float level = p.stats.levelFor(stat) + Nums.max(0, mod);
-      maxLevel  = Nums.max(level, maxLevel);
-      sumLevels += level;
-    }
-    
-    float checkLevel = maxLevel + ((sumLevels - maxLevel) / 2);
-    float winChance = Nums.clamp((checkLevel - (DC - 5)) / 10f, 0, 1);
-    return winChance;
-  }
-  
-  
-  public float testChance() {
-    float chance = 1.0f;
-    for (int n = tested.length; n-- > 0;) {
-      chance *= testChance(n, active());
-    }
-    return chance;
-  }
-  
-  
-  protected boolean performTest(Series <Person> active) {
-    boolean okay = true;
-    float xpRate = timeTaken * 1f / World.MINUTES_PER_HOUR;
-    xpRate = Nums.sqrt(xpRate);
-    
-    for (int n = tested.length; n-- > 0;) {
-      Trait stat = tested[n];
-      float winChance = testChance(n, active);
-      okay &= results[n] = (Rand.num() < winChance);
-      
-      for (Person p : active) {
-        p.stats.gainXP(stat, (1 - winChance) * 2 * xpRate);
-      }
-    }
-    
-    return okay;
-  }
-  
-  
-  protected boolean performTest(Trait stat, Person p, int DC) {
-    //  TODO:  Unify with the above method/s.
-    
-    int checkLevel = p.stats.levelFor(stat);
-    float winChance = Nums.clamp((checkLevel - (DC - 5)) / 10f, 0, 1);
-    p.stats.gainXP(stat, (1 - winChance) * 2);
-    
-    return Rand.num() < winChance;
   }
   
   
@@ -326,6 +196,9 @@ public abstract class Task implements Assignment {
   }
   
   
+  protected abstract Attempt configAttempt(Series <Person> attempting);
+  
+  
   
   /**  Rendering, debug and interface methods-
     */
@@ -336,6 +209,10 @@ public abstract class Task implements Assignment {
     Visit.appendTo(active, active());
     active.include(p);
     
+    Attempt sample = configAttempt(active);
+    //  TODO:  HAVE THE ATTEMPT DESCRIBE ODDS AND SO ON!
+    
+    /*
     for (int n = 0; n < tested.length;) {
       s.append(tested[n].name+" "+testDCs[n]);
       
@@ -344,12 +221,9 @@ public abstract class Task implements Assignment {
       
       if (++n < tested.length) s.append(", ");
     }
+    //*/
+    
     return s.toString();
-  }
-  
-  
-  public TaskView createView(UINode parent) {
-    return new TaskView(this, parent);
   }
   
   
@@ -360,7 +234,6 @@ public abstract class Task implements Assignment {
     return activeInfo();
   }
 }
-
 
 
 

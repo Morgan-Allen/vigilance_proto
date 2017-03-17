@@ -79,7 +79,8 @@ public class EquipmentView extends UINode {
     else {
       down += 10;
       
-      float craftTime = selectedItem.craftingTime() * 1f / World.HOURS_PER_DAY;
+      float craftTime = selectedItem.craftingTime(person);
+      craftTime *= 1f / World.HOURS_PER_DAY;
       String desc = selectedItem.made().defaultInfo();
       desc += "\n  "+selectedItem.testInfo(person);
       desc += "\n  Cost: "+selectedItem.made().buildCost;

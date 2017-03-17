@@ -24,7 +24,7 @@ public class TaskResearch extends Task {
   
   
   public TaskResearch(Tech developed, Place room, Base base) {
-    super(base, TIME_LONG, developed.researchArgs());
+    super(base, TIME_LONG);
     this.room      = room;
     this.developed = developed;
   }
@@ -63,6 +63,14 @@ public class TaskResearch extends Task {
   }
   
   
+  protected Attempt configAttempt(Series <Person> attempting) {
+    Attempt attempt = new Attempt(this);
+    attempt.setupFromArgsList(10, developed.researchArgs());
+    attempt.setAssigned(attempting);
+    return attempt;
+  }
+  
+  
   
   /**  Rendering, debug and interface methods-
     */
@@ -90,13 +98,6 @@ public class TaskResearch extends Task {
   public String testInfo(Person p) {
     String info = super.testInfo(p);
     return info;
-  }
-  
-  
-  public TaskView createView(MainView parent) {
-    TaskView view = super.createView(parent);
-    view.showIcon = false;
-    return view;
   }
   
   

@@ -20,7 +20,7 @@ public class TaskCraft extends Task {
   
   
   public TaskCraft(ItemType made, Base base) {
-    super(base, TIME_INDEF, made.craftArgs);
+    super(base, TIME_INDEF);
     this.made = made;
   }
   
@@ -52,14 +52,11 @@ public class TaskCraft extends Task {
   
   
   protected void advanceCrafting() {
-    int craftTime = craftingTime();
+    if (progress == 0) attempt = configAttempt(active());
+    int craftTime = craftingTime(attempt);
     if (craftTime == -1) return;
     
-    if (progress == 0) {
-      base.finance.incSecretFunds(0 - made.buildCost);
-    }
-    
-    //  TODO:  Grant experience in the relevant skills!
+    if (progress == 0) base.finance.incSecretFunds(0 - made.buildCost);
     progress += base.world().timing.hoursInTick() / craftTime;
     
     if (progress >= 1) {
@@ -74,28 +71,8 @@ public class TaskCraft extends Task {
   }
   
   
-  public int craftingTime() {
-    if (active().empty()) return made.craftTime;
-    float craftChance = testChance();
-    if (craftChance <= 0) return -1;
-    int baseTime = made.craftTime;
-    baseTime *= 4 - (craftChance * 3);
-    return baseTime;
-  }
-  
-  
   public float craftingProgress() {
     return progress;
-  }
-  
-  
-  public Element targetElement(Person p) {
-    return base;
-  }
-  
-  
-  public int assignmentPriority() {
-    return PRIORITY_TRAINING;
   }
   
   
@@ -112,6 +89,49 @@ public class TaskCraft extends Task {
   
   public int numOrders() {
     return numOrders;
+  }
+  
+  
+  
+  /**  General task-method overrides-
+    */
+  protected Attempt configAttempt(Series <Person> attempting) {
+    Attempt attempt = new Attempt(this);
+    attempt.setupFromArgsList(10, made.craftArgs);
+    attempt.grantFacilityModifiers(base);
+    attempt.setAssigned(attempting);
+    return attempt;
+  }
+  
+  
+  public int craftingTime(Person... extra) {
+    final Batch <Person> all = new Batch();
+    Visit.appendTo(all, active());
+    for (Person p : extra) all.include(p);
+    Attempt sample = configAttempt(all);
+    return craftingTime(sample);
+  }
+  
+  
+  int craftingTime(Attempt attempt) {
+    if (attempt == null) return -1;
+    if (active().empty()) return made.craftTime;
+    float craftChance = attempt.testChance();
+    if (craftChance <= 0) return -1;
+    int baseTime = made.craftTime;
+    baseTime *= 4 - (craftChance * 3);
+    baseTime /= 1 + attempt.speedBonus;
+    return baseTime;
+  }
+  
+  
+  public Element targetElement(Person p) {
+    return base;
+  }
+
+
+  public int assignmentPriority() {
+    return PRIORITY_TRAINING;
   }
   
   
@@ -145,13 +165,6 @@ public class TaskCraft extends Task {
   
   public String helpInfo() {
     return made.defaultInfo()+"\n\n"+made.describeStats(null);
-  }
-  
-  
-  public TaskView createView(MainView parent) {
-    TaskView view = super.createView(parent);
-    view.showIcon = false;
-    return view;
   }
   
   

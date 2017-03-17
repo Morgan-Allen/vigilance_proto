@@ -40,8 +40,9 @@ public class Facilities {
     Common.VENUE_INDUSTRIAL,
     Common.VENUE_SLUM
   ) {
-    public float speedBonus(Task task) {
-      if (task.needsSkill(PersonStats.ENGINEERING)) return 0.1f;
+    public float speedBonus(Attempt attempt) {
+      if (! (attempt.source() instanceof TaskCraft)) return 0;
+      if (attempt.needsSkill(PersonStats.ENGINEERING)) return 0.1f;
       return 0;
     }
   };
@@ -59,8 +60,9 @@ public class Facilities {
     Common.VENUE_INDUSTRIAL,
     Common.VENUE_SLUM
   ){
-    public float speedBonus(Task task) {
-      if (task.needsSkill(PersonStats.MEDICINE)) return 0.1f;
+    public float speedBonus(Attempt attempt) {
+      if (! (attempt.source() instanceof TaskCraft)) return 0;
+      if (attempt.needsSkill(PersonStats.MEDICINE)) return 0.1f;
       return 0;
     }
   };

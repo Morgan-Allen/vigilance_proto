@@ -8,6 +8,8 @@ import proto.util.*;
 import static proto.game.person.PersonStats.*;
 
 
+//
+//  Analogous to the Attempt class, but for Actions instead of Tasks...
 
 public class Volley implements Session.Saveable {
   

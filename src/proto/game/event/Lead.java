@@ -44,6 +44,7 @@ public class Lead extends Task {
     FOCUS_PERSON    =  0,
     FOCUS_BUILDING  =  1,
     FOCUS_REGION    =  2,
+    FOCUS_ANY       = -1,
     //  How likely following a lead is to spook the perpetrator-
     PROFILE_HIDDEN     = 0,
     PROFILE_LOW        = 1,
@@ -154,6 +155,12 @@ public class Lead extends Task {
       MEDIUM_SURVEIL, FOCUS_BUILDING, TENSE_AFTER, PROFILE_LOW,
       CONFIDENCE_MODERATE, MEDIUM_WIRE, MEDIUM_MEET
     ),
+    LEAD_TIPOFF = new Type(
+      "Tipoff", 8,
+      new String[] { "Tipped Off", "Tipping Off", "Will Tip Off" },
+      MEDIUM_WIRE, FOCUS_ANY, TENSE_ANY, PROFILE_HIDDEN,
+      CONFIDENCE_LOW
+    ),
     LEAD_TYPES[] = TYPE_B.toArray(Type.class);
   
   
@@ -224,185 +231,7 @@ public class Lead extends Task {
   
   
   
-  /**  Generation and screening of clues related to the case:
-    */
-  protected boolean canDetect(
-    Step step, int tense, Plot plot
-  ) {
-    //
-    //  First check the tense and crime-
-    if (tense != TENSE_ANY && type.tense != TENSE_ANY && tense != type.tense) {
-      return false;
-    }
-    //
-    //  Then, check the medium-
-    boolean matchMedium = false;
-    for (int medium : type.cluesMedia) {
-      if (medium == MEDIUM_ANY || medium == step.medium) {
-        matchMedium = true;
-        break;
-      }
-    }
-    if (! matchMedium) return false;
-    //
-    //  Then check the focus-
-    boolean matchFocus = false;
-    for (Plot.Role role : step.between) {
-      Element contacts = plot.filling(role);
-      
-      if (type.focus == FOCUS_REGION) {
-        if (contacts.region() != focus) continue;
-      }
-      else {
-        if (contacts != focus) continue;
-      }
-      matchFocus = true;
-    }
-    if (! matchFocus) return false;
-    //
-    //  Then return true-
-    return true;
-  }
-  
-  
-  public float followChance(Series <Person> follow) {
-    float skill = 0, obstacle = 1;
-    
-    if (type.medium == MEDIUM_SURVEIL) {
-      Person perp = (Person) focus;
-      skill = teamStatBonus(follow, SIGHT_RANGE);
-      obstacle = perp   .stats.levelFor(HIDE_RANGE );
-    }
-    
-    if (type.medium == MEDIUM_WIRE) {
-      Place site = (Place) focus;
-      skill = teamStatBonus(follow, ENGINEERING);
-      obstacle = 5;
-    }
-    
-    if (type.medium == MEDIUM_QUESTION) {
-      Person perp = (Person) focus;
-      skill = teamStatBonus(follow, QUESTION);
-      obstacle = perp.stats.levelFor(PERSUADE);
-    }
-    
-    if (type.medium == MEDIUM_COVER) {
-      Place site = (Place) focus;
-      skill = teamStatBonus(follow, PERSUADE);
-      obstacle = 5;
-    }
-    
-    return skill / (skill + obstacle);
-  }
-  
-  
-  protected float teamStatBonus(Series <Person> follow, Trait stat) {
-    float bestStat = 0, sumStats = 0;
-    for (Person p : follow) {
-      float level = p.stats.levelFor(stat);
-      sumStats += level;
-      bestStat = Nums.max(bestStat, level);
-    }
-    return bestStat + ((sumStats - bestStat) / 2);
-  }
-  
-  
-  protected float followResult(Series <Person> follow) {
-    float chance = followChance(follow);
-    chance = 1 - (Nums.sqrt(1 - chance));
-    boolean roll1 = Rand.num() < chance, roll2 = Rand.num() < chance;
-    
-    if (roll1 && roll2) return RESULT_HOT;
-    if (roll1 || roll2) return RESULT_PARTIAL;
-    return RESULT_COLD;
-  }
-  
-  
-  protected float performFollow(
-    Step step, int tense, Plot plot, Series <Person> follow
-  ) {
-    //
-    //  First, check to see whether anything has actually changed here (i.e,
-    //  avoid granting cumulative 'random' info over time.)  If it hasn't,
-    //  just return.
-    String contactID = step.ID+"_"+tense;
-    if (contactID.equals(lastContactID)) {
-      return RESULT_NONE;
-    }
-    //
-    //  Then perform the actual skill-test needed to ensure success:
-    //  TODO  There should ideally be separate skill tests for each participant
-    //        in a step.
-    float result = followResult(follow);
-    int time = base.world().timing.totalHours();
-    //
-    //  If you're on fire at the moment, you can get direct confirmation for
-    //  the identity of the participant/s, and any information or payload they
-    //  may have relayed to eachother.
-    if (result >= RESULT_HOT) {
-      for (Plot.Role role : step.between) {
-        confirmIdentity(plot, role, time);
-      }
-      if (step.infoGiven != null) {
-        confirmIdentity(plot, step.infoGiven, time);
-      }
-    }
-    //
-    //  If you're only partly successful, you might still get a glimpse of the
-    //  other parties or have a rough idea of where the meeting took place.
-    else if (result >= RESULT_PARTIAL) {
-      Series <Clue> fromTraits = traitClues (step, tense, plot, result);
-      Series <Clue> fromRegion = regionClues(step, tense, plot, result);
-      
-      Clue gained = null;
-      if (Rand.yes()    ) gained = (Clue) Rand.pickFrom(fromTraits);
-      if (gained == null) gained = (Clue) Rand.pickFrom(fromRegion);
-      
-      if (gained != null) {
-        CaseFile file = base.leads.caseFor(gained.match);
-        file.recordClue(gained);
-      }
-    }
-    //
-    //  Either way, you have to take the risk of tipping off the perps
-    //  themselves:
-    plot.takeSpooking(type.profile);
-    return result;
-  }
-  
-  
-  public boolean updateAssignment() {
-    if (! super.updateAssignment()) return false;
-    Series <Person> active = active();
-    //
-    //  Continuously monitor for events of interest connected to the current
-    //  focus of your investigation, and see if any new information pops up...
-    for (Event event : base.world().events.active()) {
-      if (! (event instanceof Plot)) continue;
-      Plot plot = (Plot) event;
-      
-      for (Step step : plot.allSteps()) {
-        int tense = plot.stepTense(step);
-        if (! canDetect(step, tense, plot)) continue;
-        performFollow(step, tense, plot, active);
-      }
-    }
-    return true;
-  }
-  
-  
-  protected void confirmIdentity(Plot plot, Plot.Role role, int time) {
-    Element subject = plot.filling(role);
-    CaseFile file = base.leads.caseFor(subject);
-    Clue clue = new Clue(plot, role);
-    clue.confirmMatch(subject, this, time);
-    file.recordClue(clue);
-  }
-  
-  
-  
-  /**  Utility methods for generating clues particular to subject (and possibly
-    *  investigation-type?)
+  /**  Utility methods for generating clues particular to a given subject.
     */
   protected Series <Clue> traitClues(
     Step step, int tense, Plot plot, float resultHeat
@@ -471,11 +300,255 @@ public class Lead extends Task {
   }
   
   
+  protected void confirmIdentity(Plot plot, Plot.Role role, int time) {
+    Element subject = plot.filling(role);
+    CaseFile file = base.leads.caseFor(subject);
+    Clue clue = new Clue(plot, role);
+    clue.confirmMatch(subject, this, time);
+    file.recordClue(clue);
+  }
   
+  
+  
+  /**  Generation and screening of clues related to the case:
+    */
+  protected boolean canDetect(
+    Step step, int tense, Plot plot
+  ) {
+    //
+    //  First check the tense-
+    if (tense != TENSE_ANY && type.tense != TENSE_ANY && tense != type.tense) {
+      return false;
+    }
+    //
+    //  Then, check the medium-
+    boolean matchMedium = false;
+    for (int medium : type.cluesMedia) {
+      if (medium == MEDIUM_ANY || medium == step.medium) {
+        matchMedium = true;
+        break;
+      }
+    }
+    if (! matchMedium) return false;
+    //
+    //  Then check the focus-
+    boolean matchFocus = false;
+    for (Plot.Role role : step.between) {
+      Element contacts = plot.filling(role);
+      
+      if (focus.isRegion()) {
+        if (contacts.region() != focus) continue;
+      }
+      else {
+        if (contacts != focus) continue;
+      }
+      matchFocus = true;
+    }
+    if (! matchFocus) return false;
+    //
+    //  Then return true-
+    return true;
+  }
+  
+  
+  protected float attemptFollow(
+    Step step, int tense, Plot plot, Series <Person> follow
+  ) {
+    //
+    //  First, check to see whether anything has actually changed here (i.e,
+    //  avoid granting cumulative 'random' info over time.)  If it hasn't,
+    //  just return.
+    String contactID = step.ID+"_"+tense;
+    if (contactID.equals(lastContactID)) {
+      return RESULT_NONE;
+    }
+    //
+    //  Then perform the actual skill-test needed to ensure success:
+    //  TODO  There should ideally be separate skill tests for each participant
+    //        in a step.
+    attempt = configAttempt(follow);
+    int outcome = attempt.performAttempt(2);
+    float result = (outcome == 2) ? RESULT_HOT : RESULT_PARTIAL;
+    int time = base.world().timing.totalHours();
+    //
+    //  If you're on fire at the moment, you can get direct confirmation for
+    //  the identity of the participant/s, and any information or payload they
+    //  may have relayed to eachother.
+    if (result >= RESULT_HOT) {
+      for (Plot.Role role : step.between) {
+        confirmIdentity(plot, role, time);
+      }
+      if (step.infoGiven != null) {
+        confirmIdentity(plot, step.infoGiven, time);
+      }
+    }
+    //
+    //  If you're only partly successful, you might still get a glimpse of the
+    //  other parties or have a rough idea of where the meeting took place.
+    else if (result >= RESULT_PARTIAL) {
+      Series <Clue> fromTraits = traitClues (step, tense, plot, result);
+      Series <Clue> fromRegion = regionClues(step, tense, plot, result);
+      
+      Clue gained = null;
+      if (Rand.yes()    ) gained = (Clue) Rand.pickFrom(fromTraits);
+      if (gained == null) gained = (Clue) Rand.pickFrom(fromRegion);
+      
+      if (gained != null) {
+        CaseFile file = base.leads.caseFor(gained.match);
+        file.recordClue(gained);
+      }
+    }
+    //
+    //  Either way, you have to take the risk of tipping off the perps
+    //  themselves:
+    plot.takeSpooking(type.profile);
+    return result;
+  }
+  
+  
+  public boolean updateAssignment() {
+    if (! super.updateAssignment()) return false;
+    Series <Person> active = active();
+    //
+    //  Continuously monitor for events of interest connected to the current
+    //  focus of your investigation, and see if any new information pops up...
+    for (Event event : base.world().events.active()) {
+      if (! (event instanceof Plot)) continue;
+      Plot plot = (Plot) event;
+      
+      for (Step step : plot.allSteps()) {
+        int tense = plot.stepTense(step);
+        if (! canDetect(step, tense, plot)) continue;
+        attemptFollow(step, tense, plot, active);
+      }
+    }
+    return true;
+  }
+  
+  
+  protected Attempt configAttempt(Series <Person> attempting) {
+    // TODO Auto-generated method stub
+    
+    Trait skill = null;
+    int range = 5, obstacle = 0;
+    
+    if (type.medium == MEDIUM_SURVEIL) {
+      skill = SIGHT_RANGE;
+      range = 5;
+      Person perp = (Person) focus;
+      obstacle = perp.stats.levelFor(HIDE_RANGE);
+    }
+    
+    if (type.medium == MEDIUM_WIRE) {
+      skill = ENGINEERING;
+      range = 10;
+      Place site = (Place) focus;
+      obstacle = 5;
+    }
+    
+    if (type.medium == MEDIUM_QUESTION) {
+      skill = QUESTION;
+      range = 10;
+      Person perp = (Person) focus;
+      obstacle = perp.stats.levelFor(PERSUADE);
+    }
+    
+    if (type.medium == MEDIUM_COVER) {
+      skill = PERSUADE;
+      range = 10;
+      Place site = (Place) focus;
+      obstacle = 5;
+    }
+    
+    if (focus.isRegion()) obstacle *= 1.5f;
+    
+    Attempt attempt = new Attempt(this);
+    attempt.addTest(skill, range, obstacle);
+    attempt.setAssigned(attempting);
+    return attempt;
+  }
+  
+  
+  
+  /*
+  public float followChance(Series <Person> follow) {
+    float skill = 0, obstacle = 1;
+    
+    if (type.medium == MEDIUM_SURVEIL) {
+      Person perp = (Person) focus;
+      skill = teamStatBonus(follow, SIGHT_RANGE);
+      obstacle = perp.stats.levelFor(HIDE_RANGE);
+    }
+    
+    if (type.medium == MEDIUM_WIRE) {
+      Place site = (Place) focus;
+      skill = teamStatBonus(follow, ENGINEERING);
+      obstacle = 5;
+    }
+    
+    if (type.medium == MEDIUM_QUESTION) {
+      Person perp = (Person) focus;
+      skill = teamStatBonus(follow, QUESTION);
+      obstacle = perp.stats.levelFor(PERSUADE);
+    }
+    
+    if (type.medium == MEDIUM_COVER) {
+      Place site = (Place) focus;
+      skill = teamStatBonus(follow, PERSUADE);
+      obstacle = 5;
+    }
+    
+    if (focus.isRegion()) obstacle *= 1.5f;
+    return skill / (skill + obstacle);
+  }
+  
+  
+  protected float teamStatBonus(Series <Person> follow, Trait stat) {
+    float bestStat = 0, sumStats = 0;
+    for (Person p : follow) {
+      float level = p.stats.levelFor(stat);
+      sumStats += level;
+      bestStat = Nums.max(bestStat, level);
+    }
+    return bestStat + ((sumStats - bestStat) / 2);
+  }
+  
+  
+  protected float followResult(Series <Person> follow) {
+    float chance = followChance(follow);
+    chance = 1 - (Nums.sqrt(1 - chance));
+    boolean roll1 = Rand.num() < chance, roll2 = Rand.num() < chance;
+    
+    if (roll1 && roll2) return RESULT_HOT;
+    if (roll1 || roll2) return RESULT_PARTIAL;
+    return RESULT_COLD;
+  }
+  //*/
+  
+  
+
   /**  Rendering, debug and interface methods-
     */
   public String activeInfo() {
     return type.tenseVerbs[1]+" "+focus;
+  }
+  
+  
+  public String testInfo(Person agent) {
+    Batch <Person> testing = new Batch();
+    Visit.appendTo(testing, active());
+    testing.include(agent);
+    
+    Attempt sample = configAttempt(testing);
+    //  TODO:  YOU NEED TO LIST:
+    //    The skill/s used
+    //    The obstacle
+    //    The odds of success
+    //    The likelihood of being noticed
+    //    The quality of evidence obtained
+    
+    float chance = sample.testChance();
+    return "Chance: "+chance;
   }
   
   
@@ -494,11 +567,6 @@ public class Lead extends Task {
     return "Conduct "+type.name;
   }
 }
-
-
-
-
-
 
 
 

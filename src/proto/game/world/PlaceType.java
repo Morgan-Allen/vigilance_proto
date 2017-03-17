@@ -73,7 +73,12 @@ public class PlaceType extends Kind {
   }
   
   
-  public float speedBonus(Task task) {
+  public float traitBonus(Attempt attempt) {
+    return 0;
+  }
+  
+  
+  public float speedBonus(Attempt attempt) {
     return 0;
   }
   

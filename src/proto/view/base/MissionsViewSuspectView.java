@@ -76,6 +76,7 @@ public class MissionsViewSuspectView extends UINode {
   void renderSuspect(Element suspect, Surface surface, Graphics2D g) {
     Base player = mainView.player();
     Person agent = mainView.rosterView.selectedPerson();
+    Lead hovered = null;
 
     int across = 10, down = 10;
     g.setColor(Color.LIGHT_GRAY);
@@ -97,6 +98,7 @@ public class MissionsViewSuspectView extends UINode {
       if (surface.tryHover(vx + across, vy + down, vw - 20, 40, lead)) {
         g.setColor(Color.GRAY);
         g.drawRect(vx + across, vy + down, vw - 20, 40);
+        hovered = lead;
         
         if (surface.mouseClicked()) {
           if (agent.assignments().includes(lead)) agent.removeAssignment(lead);
@@ -110,8 +112,19 @@ public class MissionsViewSuspectView extends UINode {
       
       down += 40;
     }
+    
+    if (hovered != null) {
+      g.setColor(Color.LIGHT_GRAY);
+      ViewUtils.drawWrappedString(
+        hovered.testInfo(agent),
+        g, vx + across, vy + down, vw - (across + 10), 200
+      );
+    }
   }
 }
+
+
+
 
 
 

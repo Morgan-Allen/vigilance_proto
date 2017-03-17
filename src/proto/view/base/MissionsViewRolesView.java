@@ -59,7 +59,7 @@ public class MissionsViewRolesView extends UINode {
           else desc += "\n  ("+suspects.size()+" suspects)";
         }
         else {
-          desc += "\n  No Clues";
+          desc += "\n  (no evidence)";
         }
       }
       

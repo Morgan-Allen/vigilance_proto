@@ -81,6 +81,14 @@ public class TaskTrain extends Task {
   }
   
   
+  protected Attempt configAttempt(Series <Person> attempting) {
+    Attempt attempt = new Attempt(this);
+    attempt.setAssigned(attempting);
+    return attempt;
+  }
+  
+  
+  
   /**  Training-specific methods-
     */
   public void assignTraining(Ability goal) {
@@ -214,13 +222,6 @@ public class TaskTrain extends Task {
   
   public String testInfo() {
     return "";
-  }
-  
-  
-  public TaskView createView(MainView parent) {
-    TaskView view = super.createView(parent);
-    view.showIcon = false;
-    return view;
   }
   
   
