@@ -4,9 +4,11 @@ package proto.game.event;
 import proto.common.*;
 import proto.game.person.Person;
 import proto.game.world.*;
+import proto.util.*;
 
 
-//  TODO:  Have this extend Element as originally intended...
+
+//  TODO:  Have this extend Element as originally intended?
 
 public class Clue {
   
@@ -25,7 +27,7 @@ public class Clue {
   int nearRange;
   
   Lead.Type leadType;
-  int resultHeat;
+  Lead source;
   float confidence;
   int timeFound;
   
@@ -51,7 +53,7 @@ public class Clue {
     c.near       = (Region) s.loadObject();
     c.nearRange  = s.loadInt();
     c.leadType   = Lead.LEAD_TYPES[s.loadInt()];
-    c.resultHeat = s.loadInt();
+    c.source     = (Lead) s.loadObject();
     c.confidence = s.loadFloat();
     c.timeFound  = s.loadInt();
     return c;
@@ -67,7 +69,7 @@ public class Clue {
     s.saveObject(near       );
     s.saveInt   (nearRange  );
     s.saveInt   (leadType.ID);
-    s.saveInt   (resultHeat );
+    s.saveObject(source     );
     s.saveFloat (confidence );
     s.saveInt   (timeFound  );
   }
@@ -78,37 +80,51 @@ public class Clue {
     */
   public void assignEvidence(
     Element match, Trait trait,
-    Lead.Type leadType, float confidence, int timeFound
+    Lead source, float confidence, int timeFound
   ) {
-    this.match      = match     ;
-    this.trait      = trait     ;
-    this.leadType   = leadType  ;
-    this.confidence = confidence;
-    this.timeFound  = timeFound ;
+    this.match      = match      ;
+    this.trait      = trait      ;
+    this.source     = source     ;
+    this.leadType   = source.type;
+    this.confidence = confidence ;
+    this.timeFound  = timeFound  ;
   }
   
   
   public void assignNearbyRegion(
     Element match, Region near, int range,
-    Lead.Type leadType, float confidence, int timeFound
+    Lead source, float confidence, int timeFound
   ) {
-    this.match      = match     ;
-    this.near       = near      ;
-    this.nearRange  = range     ;
-    this.leadType   = leadType  ;
-    this.confidence = confidence;
-    this.timeFound  = timeFound ;
+    this.match      = match      ;
+    this.near       = near       ;
+    this.nearRange  = range      ;
+    this.source     = source     ;
+    this.leadType   = source.type;
+    this.confidence = confidence ;
+    this.timeFound  = timeFound  ;
   }
   
   
   public void confirmMatch(
-    Element match, Lead.Type leadType, int timeFound
+    Element match, Lead source, int timeFound
   ) {
-    this.match      = match    ;
-    this.confirmed  = true     ;
-    this.leadType   = leadType ;
-    this.confidence = 1.0f     ;
-    this.timeFound  = timeFound;
+    this.match      = match      ;
+    this.confirmed  = true       ;
+    this.source     = source     ;
+    this.leadType   = source.type;
+    this.confidence = 1.0f       ;
+    this.timeFound  = timeFound  ;
+  }
+  
+  
+  public void confirmTipoff(
+    Element match, Lead.Type type, float confidence, int timeFound
+  ) {
+    this.match      = match      ;
+    this.confirmed  = true       ;
+    this.leadType   = type       ;
+    this.confidence = confidence ;
+    this.timeFound  = timeFound  ;
   }
   
   
@@ -151,25 +167,33 @@ public class Clue {
   /**  Rendering, debug and interface methods-
     */
   public String toString() {
-    if (match != null && confirmed) return
-      leadType.name+" indicates "+
-      role+" is: "+match
-    ;
-    if (trait != null) return
-      leadType.name+" indicates "+
-      role+" has trait: "+trait
-    ;
-    if (near != null && nearRange == 0) return
-      leadType.name+" indicates "+
-      role+" is within: "+near
-    ;
-    if (near != null && nearRange > 0) return
-      leadType.name+" indicates "+
-      role+" is near: "+near
-    ;
-    return "";
+    StringBuffer desc = new StringBuffer(leadType.name);
+    World world = plot.world();
+    
+    if (source != null) {
+      desc.append(" by ");
+      Series <Person> did = source.onceAssigned();
+      for (Person p : did) {
+        if (p == did.first()) desc.append(""+p);
+        else if (p == did.last()) desc.append(" and "+p);
+        else desc.append(", "+p);
+      }
+    }
+    
+    desc.append(" at "+world.timing.timeString(timeFound));
+    desc.append(" indicates ");
+    
+    if (match != null && confirmed    ) desc.append(role+" is: "+match);
+    if (trait != null                 ) desc.append(role+" has trait: "+trait);
+    if (near != null && nearRange == 0) desc.append(role+" is within: "+near);
+    if (near != null && nearRange > 0 ) desc.append(role+" is near: "+near);
+    
+    return desc.toString();
   }
+  
 }
+
+
 
 
 

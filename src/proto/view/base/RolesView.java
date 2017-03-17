@@ -37,14 +37,14 @@ public class RolesView extends UINode {
     );
     down += 40;
     
-    //  TODO:  Also iterate across all known roles, even if the perp hasn't
-    //  been identified yet.
-    
     for (Plot.Role role : player.leads.knownRolesFor(plot)) {
       Series <Element> suspects = player.leads.suspectsFor(role, plot);
       Image icon = null;
       String desc = null;
       Element match = suspects.size() == 1 ? suspects.first() : null;
+      
+      //  TODO:  If the match isn't exact, list any traits derived from clues
+      //  and a shortlist of potential suspects.
       
       if (match != null) {
         icon = match.icon();
@@ -54,15 +54,16 @@ public class RolesView extends UINode {
         icon = MissionsView.MYSTERY_IMAGE;
         desc = role+": Unknown";
       }
-
+      
+      int entryHigh = 40;
       g.setColor(Color.LIGHT_GRAY);
       g.drawImage(icon, vx + across, vy + down, 40, 40, null);
       ViewUtils.drawWrappedString(
-        desc.toString(), g, vx + across + 60, vy + down, vw - 60, 40
+        desc.toString(), g, vx + across + 60, vy + down, vw - 60, entryHigh
       );
       
-      if (surface.tryHover(vx + across, vy + down, vw - 20, 40, role)) {
-        g.drawRect(vx + across, vy + down, vw - 20, 40);
+      if (surface.tryHover(vx + across, vy + down, vw - 20, entryHigh, role)) {
+        g.drawRect(vx + across, vy + down, vw - 20, entryHigh);
         
         if (surface.mouseClicked()) {
           if (match != null) MV.setActiveFocus(match, true);
@@ -70,11 +71,24 @@ public class RolesView extends UINode {
         }
       }
       
-      down += 40;
+      down += entryHigh + 5;
     }
+    
+    Series <Clue> clues = player.leads.cluesFor(plot, null, null, true);
+    if (! clues.empty()) {
+      String desc = "\nLatest Evidence:\n  "+clues.first();
+      ViewUtils.drawWrappedString(
+        desc.toString(), g, vx + across, vy + down, vw - (across + 10), 100
+      );
+    }
+    
     return true;
   }
 }
+
+
+
+
 
 
 

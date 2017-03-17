@@ -42,7 +42,7 @@ public class DebugPlots extends RunGame {
     Base heroes = world.baseFor(Heroes.JANUS_INDUSTRIES);
     Clue tipoff = new Clue(kidnap, Plot.ROLE_ORGANISER);
     int timeFound = world.timing.totalHours();
-    tipoff.confirmMatch(organiser, Lead.LEAD_QUESTION, timeFound);
+    tipoff.confirmTipoff(organiser, Lead.LEAD_QUESTION, 0.5f, timeFound);
     heroes.leads.caseFor(organiser).recordClue(tipoff);
     
     /*

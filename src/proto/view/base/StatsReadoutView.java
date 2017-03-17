@@ -24,7 +24,7 @@ public class StatsReadoutView extends UINode {
     final Base  base  = world.playerBase();
     
     g.setColor(Color.WHITE);
-    String timeString = "Time: "+ViewUtils.getTimeString(world);
+    String timeString = "Time: "+world.timing.currentTimeString();
     g.drawString(timeString, vx + 10, vy + 25);
     
     String cashString = "";

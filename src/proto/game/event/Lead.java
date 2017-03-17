@@ -163,6 +163,7 @@ public class Lead extends Task {
   final Type type;
   final Element focus;
   private String lastContactID;
+  private List <Person> onceAssigned = new List();
   
   
   Lead(Base base, Type type, Element focus) {
@@ -190,6 +191,7 @@ public class Lead extends Task {
     type  = LEAD_TYPES[s.loadInt()];
     focus = (Element) s.loadObject();
     lastContactID = s.loadString();
+    s.loadObjects(onceAssigned);
   }
   
   
@@ -198,11 +200,26 @@ public class Lead extends Task {
     s.saveInt(type.ID);
     s.saveObject(focus);
     s.saveString(lastContactID);
+    s.saveObjects(onceAssigned);
   }
   
   
+  
+  /**  Task-associated methods-
+    */
   public Element targetElement(Person p) {
     return focus;
+  }
+  
+  
+  public void setAssigned(Person p, boolean is) {
+    super.setAssigned(p, is);
+    if (is) onceAssigned.include(p);
+  }
+  
+  
+  public Series <Person> onceAssigned() {
+    return onceAssigned;
   }
   
   
@@ -378,7 +395,7 @@ public class Lead extends Task {
     Element subject = plot.filling(role);
     CaseFile file = base.leads.caseFor(subject);
     Clue clue = new Clue(plot, role);
-    clue.confirmMatch(subject, type, time);
+    clue.confirmMatch(subject, this, time);
     file.recordClue(clue);
   }
   
@@ -402,7 +419,7 @@ public class Lead extends Task {
         for (Trait t : Common.PERSON_TRAITS) {
           if (p.stats.levelFor(t) <= 0) continue;
           Clue clue = new Clue(plot, role);
-          clue.assignEvidence(p, t, type, type.confidence, time);
+          clue.assignEvidence(p, t, this, type.confidence, time);
           possible.add(clue);
         }
       }
@@ -412,7 +429,7 @@ public class Lead extends Task {
         for (Trait t : Common.VENUE_TRAITS) {
           if (! p.hasProperty(t)) continue;
           Clue clue = new Clue(plot, role);
-          clue.assignEvidence(p, t, type, type.confidence, time);
+          clue.assignEvidence(p, t, this, type.confidence, time);
           possible.add(clue);
         }
       }
@@ -420,7 +437,7 @@ public class Lead extends Task {
       if (involved.isItem()) {
         Item p = (Item) involved;
         Clue clue = new Clue(plot, role);
-        clue.confirmMatch(p, type, time);
+        clue.confirmMatch(p, this, time);
         possible.add(clue);
       }
     }
@@ -446,7 +463,7 @@ public class Lead extends Task {
       
       Region near = (Region) Rand.pickFrom(around);
       Clue clue = new Clue(plot, role);
-      clue.assignNearbyRegion(p, near, placeRange, type, type.confidence, time);
+      clue.assignNearbyRegion(p, near, placeRange, this, type.confidence, time);
       possible.add(clue);
     }
     

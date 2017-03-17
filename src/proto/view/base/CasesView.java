@@ -55,7 +55,7 @@ public class CasesView extends UINode {
         }
       }
       
-      across += 45;
+      down += 40 + 5;
     }
     
     return true;

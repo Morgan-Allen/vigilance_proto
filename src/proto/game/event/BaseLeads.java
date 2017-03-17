@@ -118,7 +118,7 @@ public class BaseLeads {
   
   
   public Series <Element> suspectsFor(Plot.Role role, Plot plot) {
-    Series <Clue> related = cluesFor(plot, null, role);
+    Series <Clue> related = cluesFor(plot, null, role, false);
     Batch <Element> matches = new Batch();
     
     for (Clue c : related) if (c.confirmed) {
@@ -135,9 +135,14 @@ public class BaseLeads {
   
   
   public Series <Clue> cluesFor(
-    Plot plot, Object match, Plot.Role role
+    Plot plot, Object match, Plot.Role role, boolean sort
   ) {
-    Batch <Clue> matches = new Batch();
+    List <Clue> matches = new List <Clue> () {
+      protected float queuePriority(Clue r) {
+        return r.timeFound;
+      }
+    };
+    
     for (CaseFile file : files.values()) {
       for (Clue c : file.clues) {
         if (plot  != null && plot  != c.plot ) continue;
@@ -146,6 +151,8 @@ public class BaseLeads {
         matches.add(c);
       }
     }
+    
+    if (sort) matches.queueSort();
     return matches;
   }
   

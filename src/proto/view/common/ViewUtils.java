@@ -105,22 +105,6 @@ public class ViewUtils {
       g.fillRect(x, y, barW, h);
     }
   }
-  
-  
-  
-  /**  Time and date utilities-
-    */
-  public static String getTimeString(World world) {
-    int minutes = world.timing.timeMinutes();
-    int hours   = world.timing.timeHours  ();
-    int day     = world.timing.dayInMonth ();
-    int month   = world.timing.monthInYear();
-    int year    = world.timing.timeYears  ();
-    String hourString = ""+I.lengthen(hours  , 2, true);
-    String minsString = ""+I.lengthen(minutes, 2, true);
-    String monthName = Timing.MONTH_NAMES[month];
-    return hourString+":"+minsString+", "+monthName+" "+day+", "+year;
-  }
 }
 
 

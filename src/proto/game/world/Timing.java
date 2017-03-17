@@ -2,10 +2,12 @@
 
 package proto.game.world;
 import proto.common.*;
+import proto.util.*;
 
 
 
 public class Timing {
+  
   
   final static int MONTH_LENGTHS[] = {
     31,  //  January
@@ -164,10 +166,29 @@ public class Timing {
   }
   
   
+  
+  /**  Rendering, debug and interface methods-
+    */
+  public String currentTimeString() {
+    int minutes = timeMinutes();
+    int hours   = timeHours  ();
+    int day     = dayInMonth ();
+    int month   = monthInYear();
+    int year    = timeYears  ();
+    String hourString = ""+I.lengthen(hours  , 2, true);
+    String minsString = ""+I.lengthen(minutes, 2, true);
+    String monthName = Timing.MONTH_NAMES[month];
+    return hourString+":"+minsString+", "+monthName+" "+day+", "+year;
+  }
+  
+  
+  public String timeString(int totalHours) {
+    int totalDays = totalHours / 24;
+    int hours = totalHours % 24;
+    String hourString = ""+I.lengthen(hours, 2, true);
+    return hourString+":00 on Day "+totalDays;
+  }
 }
-
-
-
 
 
 
