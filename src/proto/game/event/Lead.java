@@ -290,7 +290,6 @@ public class Lead extends Task {
     Batch <Clue> possible = new Batch();
     int time = plot.base.world().timing.totalHours();
     Place place = focus.place();
-    float confidence = type.confidence;
     
     for (Plot.Role role : step.involved) {
       Element involved = plot.filling(role);
@@ -301,7 +300,7 @@ public class Lead extends Task {
         for (Trait t : Common.PERSON_TRAITS) {
           if (p.stats.levelFor(t) <= 0) continue;
           Clue clue = new Clue(plot, role);
-          clue.assignEvidence(p, t, this, confidence, time, place);
+          clue.assignEvidence(p, t, this, time, place);
           possible.add(clue);
         }
       }
@@ -311,7 +310,7 @@ public class Lead extends Task {
         for (Trait t : Common.VENUE_TRAITS) {
           if (! p.hasProperty(t)) continue;
           Clue clue = new Clue(plot, role);
-          clue.assignEvidence(p, t, this, confidence, time, place);
+          clue.assignEvidence(p, t, this, time, place);
           possible.add(clue);
         }
       }
@@ -334,7 +333,6 @@ public class Lead extends Task {
     Batch <Clue> possible = new Batch();
     int time = plot.base.world().timing.totalHours();
     Place place = focus.place();
-    float confidence = type.confidence;
     
     for (Plot.Role role : step.involved) {
       Element involved = plot.filling(role);
@@ -347,9 +345,32 @@ public class Lead extends Task {
       
       Region near = (Region) Rand.pickFrom(around);
       Clue clue = new Clue(plot, role);
-      clue.assignNearbyRegion(p, near, range, this, confidence, time, place);
+      clue.assignNearbyRegion(p, near, range, this, time, place);
       possible.add(clue);
     }
+    
+    return possible;
+  }
+  
+  
+  protected Batch <Clue> intentClues(
+    Plot plot
+  ) {
+    Batch <Clue> possible = new Batch();
+    int time = plot.base.world().timing.totalHours();
+    Place place = focus.place();
+    
+    Step heist = plot.heistStep();
+    int heistTime = plot.stepTimeScheduled(heist);
+    PlotType heistType = (PlotType) plot.type;
+
+    Clue forTime = new Clue(plot, Plot.ROLE_TIME);
+    forTime.confirmHeistTime(heistTime, this, time, place);
+    possible.add(forTime);
+    
+    Clue forType = new Clue(plot, Plot.ROLE_OBJECTIVE);
+    forTime.confirmHeistType(heistType, this, time, place);
+    possible.add(forType);
     
     return possible;
   }
@@ -363,6 +384,11 @@ public class Lead extends Task {
     Clue clue = new Clue(plot, role);
     clue.confirmMatch(subject, this, time, place);
     file.recordClue(clue);
+    
+    if (role == Plot.ROLE_TARGET) {
+      CaseFile forPlot = base.leads.caseFor(plot);
+      for (Clue intent : intentClues(plot)) forPlot.recordClue(intent);
+    }
   }
   
   

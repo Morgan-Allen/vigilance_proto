@@ -19,7 +19,16 @@ public class Clue implements Session.Saveable {
     */
   final public Plot plot;
   final public Plot.Role role;
-
+  
+  Lead.Type leadType;
+  Lead source;
+  float confidence;
+  Place placeFound;
+  int timeFound;
+  
+  //
+  //  TODO:  Split off these various information types into separate classes of
+  //  Clue?
   Element match;
   boolean confirmed;
   
@@ -28,11 +37,8 @@ public class Clue implements Session.Saveable {
   Region near;
   int nearRange;
   
-  Lead.Type leadType;
-  Lead source;
-  float confidence;
-  Place placeFound;
-  int timeFound;
+  int heistTime;
+  PlotType heistType;
   
   
   
@@ -80,51 +86,66 @@ public class Clue implements Session.Saveable {
     */
   public void assignEvidence(
     Element match, Trait trait,
-    Lead source, float confidence, int time, Place place
+    Lead source, int time, Place place
   ) {
-    this.match      = match      ;
-    this.trait      = trait      ;
-    this.source     = source     ;
-    this.leadType   = source.type;
-    this.confidence = confidence ;
-    this.timeFound  = time       ;
-    this.placeFound = place      ;
+    confirmDetails(source.type, time, place);
+    this.match  = match ;
+    this.trait  = trait ;
+    this.source = source;
   }
   
   
   public void assignNearbyRegion(
     Element match, Region near, int range,
-    Lead source, float confidence, int time, Place place
+    Lead source, int time, Place place
   ) {
-    this.match      = match      ;
-    this.near       = near       ;
-    this.nearRange  = range      ;
-    this.source     = source     ;
-    this.leadType   = source.type;
-    this.confidence = confidence ;
-    this.timeFound  = time       ;
-    this.placeFound = place      ;
+    confirmDetails(source.type, time, place);
+    this.match     = match ;
+    this.near      = near  ;
+    this.nearRange = range ;
+    this.source    = source;
   }
   
   
   public void confirmMatch(
     Element match, Lead source, int time, Place place
   ) {
-    this.match      = match      ;
-    this.confirmed  = true       ;
-    this.source     = source     ;
-    this.leadType   = source.type;
-    this.confidence = 1.0f       ;
-    this.timeFound  = time       ;
-    this.placeFound = place      ;
+    confirmDetails(source.type, time, place);
+    this.match      = match ;
+    this.confirmed  = true  ;
+    this.source     = source;
+    this.confidence = 1.0f  ;
+  }
+  
+  
+  public void confirmHeistTime(
+    int heistTime, Lead source, int time, Place place
+  ) {
+    confirmDetails(source.type, time, place);
+    this.heistTime = heistTime;
+    this.source    = source   ;
+  }
+  
+  
+  public void confirmHeistType(
+    PlotType heistType, Lead source, int time, Place place
+  ) {
+    confirmDetails(source.type, time, place);
+    this.heistType = heistType;
+    this.source    = source   ;
   }
   
   
   public void confirmTipoff(
     Element match, Lead.Type type, int time, Place place
   ) {
+    confirmDetails(type, time, place);
     this.match      = match;
     this.confirmed  = true ;
+  }
+  
+  
+  private void confirmDetails(Lead.Type type, int time, Place place) {
     this.leadType   = type ;
     this.timeFound  = time ;
     this.placeFound = place;

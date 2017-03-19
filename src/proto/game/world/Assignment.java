@@ -24,7 +24,6 @@ public interface Assignment extends Session.Saveable {
     PRIORITY_NONE      = 0;
   
   String activeInfo();
-  String helpInfo();
   Image icon();
   
   boolean allowsAssignment(Person p);

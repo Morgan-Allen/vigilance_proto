@@ -41,6 +41,8 @@ public abstract class Plot extends Event {
   }
   
   final public static Role
+    ROLE_TIME      = new Role("role_time"     , "Time"     ),
+    ROLE_OBJECTIVE = new Role("role_objective", "Objective"),
     ROLE_BASE      = new Role("role_base"     , "Base"     ),
     ROLE_HIDEOUT   = new Role("role_hideout"  , "Hideout"  ),
     ROLE_ORGANISER = new Role("role_organiser", "Organiser"),
@@ -56,6 +58,8 @@ public abstract class Plot extends Event {
   int spookLevel = 0, nextContactID = 0;
   List <RoleEntry> entries = new List();
   List <Step     > steps   = new List();
+  
+  String caseLabel;
   
   
   
@@ -144,6 +148,18 @@ public abstract class Plot extends Event {
   }
   
   
+  public int stepTimeScheduled(Step step) {
+    if (currentStep() == null) return -1;
+    int time = -1;
+    for (Step s : steps) {
+      if (time == -1) time = s.timeStart;
+      time += s.timeTaken;
+      if (s == step) break;
+    }
+    return time;
+  }
+  
+  
   public int stepTense(Step step) {
     int time = base.world().timing.totalHours();
     int start = step.timeStart, tense = Lead.TENSE_BEFORE;
@@ -156,6 +172,12 @@ public abstract class Plot extends Event {
   
   public Step currentStep() {
     for (Step s : steps) if (stepBegun(s) && ! stepComplete(s)) return s;
+    return null;
+  }
+  
+  
+  public Step heistStep() {
+    for (Step s : steps) if (s.medium == Lead.MEDIUM_HEIST) return s;
     return null;
   }
   
@@ -422,17 +444,42 @@ public abstract class Plot extends Event {
     */
   public void printRoles() {
     I.say("\n\nRoles are: ");
-    
-    //  TODO:  print steps as well!
-    
     for (Plot.RoleEntry entry : entries) {
       I.say("  "+entry);
     }
+    I.say("\nSteps are: ");
+    for (Step step : steps) {
+      I.say("  "+step);
+    }
   }
   
+  
+  public String name() {
+    return type.name+": "+target();
+  }
+  
+  
+  public String nameForCase(Base base) {
+    CaseFile file = base.leads.caseFor(this);
+    CaseFile forTarget = base.leads.caseFor(target());
+    boolean targetKnown = false, typeKnown = false;
+    
+    for (Clue clue : file.clues) if (clue.heistType == this.type) {
+      typeKnown = true;
+    }
+    for (Clue clue : forTarget.clues) if (clue.confirmed) {
+      targetKnown = true;
+    }
+    
+    String name = caseLabel;
+    if (targetKnown && typeKnown) name += type.name+": "+target();
+    else if (targetKnown) name += " (target: "+target()+")";
+    else if (typeKnown  ) name += " ("+type.name+")";
+    return name;
+  }
+  
+  
 }
-
-
 
 
 

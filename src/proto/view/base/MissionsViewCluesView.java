@@ -34,7 +34,7 @@ public class MissionsViewCluesView extends UINode {
     ViewUtils.ListDraw draw = new ViewUtils.ListDraw();
     int across = 10, down = 10;
     draw.addEntry(
-      null, "EVIDENCE FOR "+plot, 40, null
+      null, "EVIDENCE FOR "+plot.nameForCase(player), 40, null
     );
     for (Clue clue : player.leads.cluesFor(plot, null, null, true)) {
       Image icon = clue.icon();

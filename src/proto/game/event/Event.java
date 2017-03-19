@@ -143,12 +143,7 @@ public abstract class Event implements Session.Saveable, Assignment {
   /**  Rendering, debug and interface methods-
     */
   public String name() {
-    return type.nameFor(this);
-  }
-  
-  
-  public String info() {
-    return type.infoFor(this);
+    return type.name;
   }
   
   
@@ -162,13 +157,8 @@ public abstract class Event implements Session.Saveable, Assignment {
   }
   
   
-  public String helpInfo() {
-    return type.infoFor(this);
-  }
-  
-  
   public Image icon() {
-    return type.iconFor(this);
+    return type.icon;
   }
   
   

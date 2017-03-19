@@ -34,16 +34,6 @@ public abstract class EventType extends Index.Entry implements
   public void saveState(Session s) throws Exception {
     INDEX.saveEntry(this, s.output());
   }
-  
-  
-  
-  /**  Rendering, interface and debug methods-
-    */
-  protected abstract String nameFor(Event event);
-  protected abstract String infoFor(Event event);
-  
-  public String toString() { return name; }
-  public Image iconFor(Event event) { return icon; }
 }
 
 

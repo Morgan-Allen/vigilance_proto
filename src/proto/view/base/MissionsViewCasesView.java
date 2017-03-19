@@ -38,7 +38,7 @@ public class MissionsViewCasesView extends UINode {
     for (Plot plot : player.leads.knownPlots()) {
       Image icon = plot.icon();
       if (icon == null) icon = MissionsView.ALERT_IMAGE;
-      draw.addEntry(icon, plot.name(), 40, plot);
+      draw.addEntry(icon, plot.nameForCase(player), 40, plot);
     }
     draw.performDraw(across, down, this, surface, g);
     down = draw.down;
@@ -52,8 +52,6 @@ public class MissionsViewCasesView extends UINode {
   }
   
 }
-
-
 
 
 

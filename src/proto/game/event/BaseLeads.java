@@ -16,6 +16,7 @@ public class BaseLeads {
   final Base base;
   Table <Object, CaseFile> files = new Table();
   List <Lead> leads = new List();
+  int nextCaseID = 0;
   
   
   public BaseLeads(Base base) {
@@ -26,12 +27,14 @@ public class BaseLeads {
   public void loadState(Session s) throws Exception {
     s.loadTable(files);
     s.loadObjects(leads);
+    nextCaseID = s.loadInt();
   }
   
   
   public void saveState(Session s) throws Exception {
     s.saveTable(files);
     s.saveObjects(leads);
+    s.saveInt(nextCaseID);
   }
   
   
@@ -84,6 +87,11 @@ public class BaseLeads {
     if (match != null) return match;
     final CaseFile file = new CaseFile(base, subject);
     files.put(subject, file);
+    
+    if (subject instanceof Plot) {
+      Plot plot = (Plot) subject;
+      plot.caseLabel = "Case No. "+nextCaseID++;
+    }
     return file;
   }
   

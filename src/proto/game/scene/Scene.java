@@ -574,17 +574,10 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   }
   
   
-  public String helpInfo() {
-    if (playerTask == null) return "On Scene";
-    return playerTask.helpInfo();
-  }
-  
-  
   public Image icon() {
     if (playerTask == null) return null;
     return playerTask.icon();
   }
-  
   
 }
 
