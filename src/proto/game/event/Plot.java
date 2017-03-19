@@ -6,6 +6,7 @@ import proto.game.world.*;
 import proto.game.person.*;
 import proto.game.scene.*;
 import proto.util.*;
+import proto.view.base.MessageUtils;
 import proto.view.common.*;
 
 
@@ -166,7 +167,14 @@ public abstract class Plot extends Event {
   
   public void takeSpooking(int spookAmount) {
     spookLevel += spookAmount;
-    //  TODO:  Abort the heist if you're too spooked!
+    float abortFactor = spookLevel * 1f / Lead.PROFILE_SUSPICIOUS;
+    abortFactor = (abortFactor / entries.size()) - 1;
+    //
+    //  If the perps get too spooked, the plot may be cancelled, and any
+    //  further investigation will be wasting it's time...
+    if (Rand.num() < abortFactor) {
+      completeEvent();
+    }
   }
   
   
@@ -254,72 +262,6 @@ public abstract class Plot extends Event {
     return null;
   }
   
-  
-  //  TODO:  Move this out to a 'PlotUtils' class...
-  protected void fillExpertRole(
-    Trait trait, Series <Person> candidates, Role role
-  ) {
-    Pick <Person> pick = new Pick();
-    for (Person p : candidates) {
-      if (roleFor(p, null) != null) continue;
-      pick.compare(p, p.stats.levelFor(trait));
-    }
-    if (pick.empty()) return;
-    assignRole(pick.result(), role);
-  }
-  
-  
-  //  TODO:  Move this out to a 'PlotUtils' class...
-  protected void fillInsideRole(
-    Place target, Plot.Role role
-  ) {
-    Pick <Person> pick = new Pick();
-    for (Person p : target.residents()) {
-      if (roleFor(p, null) != null) continue;
-      pick.compare(p, 0 - p.history.valueFor(target.owner()));
-    }
-    if (pick.empty()) return;
-    assignRole(pick.result(), role);
-  }
-  
-  
-  //  TODO:  Move this out to a 'PlotUtils' class...
-  protected void fillItemRole(
-    ItemType type, World world, Role role
-  ) {
-    assignRole(new Item(type, world), role);
-  }
-  
-  
-  //  TODO:  Move this out to a 'PlotUtils' class...
-  protected Series <Person> goonsOnRoster() {
-    Batch <Person> goons = new Batch();
-    for (Person p : base.roster()) {
-      if (p == base.leader()) continue;
-      goons.add(p);
-    }
-    return goons;
-  }
-  
-  
-  //  TODO:  Move this out to a 'PlotUtils' class...
-  protected Series <Person> expertsWith(Trait trait, int minLevel) {
-    final Batch <Person> experts = new Batch();
-    for (Element e : base.world().inside()) if (e.isPerson()) {
-      Person p = (Person) e;
-      if (p.stats.levelFor(trait) < minLevel) continue;
-      experts.add(p);
-    }
-    return experts;
-  }
-  
-  
-  //  TODO:  Move this out to a 'PlotUtils' class...
-  protected Series <Place> venuesNearby(Place target, int maxDist) {
-    final Batch <Place> venues = new Batch();
-    return venues;
-  }
-  
 
   
   /**  Life cycle and execution:
@@ -400,25 +342,33 @@ public abstract class Plot extends Event {
     
     Role    focusRole = (Role) Rand.pickFrom(step.involved);
     Element focus     = filling(focusRole);
-    Region  from      = focus.region();
-    float   trust     = from.currentValue(Region.TRUST);
+    Place   site      = focus.place();
+    float   trust     = site.region().currentValue(Region.TRUST);
     float   tipChance = trust / 10f;
     Base    player    = world.playerBase();
     int     time      = world.timing.totalHours();
     
     if (begins && Rand.num() < tipChance) {
       Clue tipoff = new Clue(this, focusRole);
-      tipoff.confirmTipoff(focus, Lead.LEAD_TIPOFF, 0.33f, time);
+      tipoff.confirmTipoff(focus, Lead.LEAD_TIPOFF, time, site);
       CaseFile file = player.leads.caseFor(focus);
       file.recordClue(tipoff);
     }
     
     if (ends && step.medium == Lead.MEDIUM_HEIST) {
-      Clue report = new Clue(this, ROLE_TARGET);
-      report.confirmTipoff(target(), Lead.LEAD_REPORT, 1, time);
+      EventReport report = generateReport(step);
+      Clue clue = new Clue(this, ROLE_TARGET);
+      clue.confirmTipoff(target(), Lead.LEAD_REPORT, time, site);
       CaseFile file = player.leads.caseFor(target());
-      file.recordClue(report);
+      file.recordClue(clue, report);
     }
+  }
+  
+  
+  protected EventReport generateReport(Step step) {
+    EventReport report = new EventReport();
+    report.composeFromEvent(this, 0, 1);
+    return report;
   }
   
   
@@ -479,35 +429,6 @@ public abstract class Plot extends Event {
       I.say("  "+entry);
     }
   }
-  
-  
-  /*
-  protected void presentTipoffMessage(
-    String header, String mainText,
-    CaseFile file, Role role, EventReport report
-  ) {
-    if (file == null || role == null) return;
-    StringBuffer s = new StringBuffer(mainText);
-    if (mainText.length() > 0) s.append("\n\n");
-    file.shortDescription(role, s);
-    
-    if (report != null) {
-      Region region = target().region();
-      float trust = report.trustEffect, deter = report.deterEffect;
-      s.append("\n"+region+" Trust "     +I.signNum((int) trust)+"%");
-      s.append("\n"+region+" Deterrence "+I.signNum((int) deter)+"%");
-    }
-    
-    final MainView view = world.view();
-    view.queueMessage(new MessageView(
-      view, icon(), header, s.toString(), "Dismiss"
-    ) {
-      protected void whenClicked(String option, int optionID) {
-        view.dismissMessage(this);
-      }
-    });
-  }
-  //*/
   
 }
 

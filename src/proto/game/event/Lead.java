@@ -289,6 +289,8 @@ public class Lead extends Task {
   ) {
     Batch <Clue> possible = new Batch();
     int time = plot.base.world().timing.totalHours();
+    Place place = focus.place();
+    float confidence = type.confidence;
     
     for (Plot.Role role : step.involved) {
       Element involved = plot.filling(role);
@@ -299,7 +301,7 @@ public class Lead extends Task {
         for (Trait t : Common.PERSON_TRAITS) {
           if (p.stats.levelFor(t) <= 0) continue;
           Clue clue = new Clue(plot, role);
-          clue.assignEvidence(p, t, this, type.confidence, time);
+          clue.assignEvidence(p, t, this, confidence, time, place);
           possible.add(clue);
         }
       }
@@ -309,7 +311,7 @@ public class Lead extends Task {
         for (Trait t : Common.VENUE_TRAITS) {
           if (! p.hasProperty(t)) continue;
           Clue clue = new Clue(plot, role);
-          clue.assignEvidence(p, t, this, type.confidence, time);
+          clue.assignEvidence(p, t, this, confidence, time, place);
           possible.add(clue);
         }
       }
@@ -317,7 +319,7 @@ public class Lead extends Task {
       if (involved.isItem()) {
         Item p = (Item) involved;
         Clue clue = new Clue(plot, role);
-        clue.confirmMatch(p, this, time);
+        clue.confirmMatch(p, this, time, place);
         possible.add(clue);
       }
     }
@@ -331,6 +333,8 @@ public class Lead extends Task {
   ) {
     Batch <Clue> possible = new Batch();
     int time = plot.base.world().timing.totalHours();
+    Place place = focus.place();
+    float confidence = type.confidence;
     
     for (Plot.Role role : step.involved) {
       Element involved = plot.filling(role);
@@ -338,12 +342,12 @@ public class Lead extends Task {
       
       Element p = (Element) involved;
       Region at = involved.region();
-      int placeRange = Rand.yes() ? 0 : 1;
-      Series <Region> around = base.world().regionsInRange(at, placeRange);
+      int range = Rand.yes() ? 0 : 1;
+      Series <Region> around = base.world().regionsInRange(at, range);
       
       Region near = (Region) Rand.pickFrom(around);
       Clue clue = new Clue(plot, role);
-      clue.assignNearbyRegion(p, near, placeRange, this, type.confidence, time);
+      clue.assignNearbyRegion(p, near, range, this, confidence, time, place);
       possible.add(clue);
     }
     
@@ -351,11 +355,13 @@ public class Lead extends Task {
   }
   
   
-  protected void confirmIdentity(Plot plot, Plot.Role role, int time) {
+  protected void confirmIdentity(
+    Plot plot, Plot.Role role, int time, Place place
+  ) {
     Element subject = plot.filling(role);
     CaseFile file = base.leads.caseFor(subject);
     Clue clue = new Clue(plot, role);
-    clue.confirmMatch(subject, this, time);
+    clue.confirmMatch(subject, this, time, place);
     file.recordClue(clue);
   }
   
@@ -421,16 +427,17 @@ public class Lead extends Task {
     int outcome = attempt.performAttempt(2);
     float result = (outcome == 2) ? RESULT_HOT : RESULT_PARTIAL;
     int time = base.world().timing.totalHours();
+    Place place = focus.place();
     //
     //  If you're on fire at the moment, you can get direct confirmation for
     //  the identity of the participant/s, and any information or payload they
     //  may have relayed to eachother.
     if (result >= RESULT_HOT) {
       for (Plot.Role role : step.involved) {
-        confirmIdentity(plot, role, time);
+        confirmIdentity(plot, role, time, place);
       }
       if (step.infoGiven != null) {
-        confirmIdentity(plot, step.infoGiven, time);
+        confirmIdentity(plot, step.infoGiven, time, place);
       }
     }
     //

@@ -56,6 +56,9 @@ public class BasePlots {
   
   
   public void updatePlanning() {
+    if (rootPlot.complete()) {
+      rootPlot = null;
+    }
     if (rootPlot != null) {
       //  TODO:  Add a delay here!
       
@@ -66,6 +69,9 @@ public class BasePlots {
   }
   
 }
+
+
+
 
 
 

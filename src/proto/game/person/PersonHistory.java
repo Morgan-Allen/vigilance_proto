@@ -35,9 +35,7 @@ public class PersonHistory {
       r.value = s.loadFloat();
       relations.put(r.other, r);
     }
-    for (int n = s.loadInt(); n-- > 0;) {
-      memories.add(Clue.loadClue(s));
-    }
+    s.loadObjects(memories);
   }
   
   
@@ -49,8 +47,7 @@ public class PersonHistory {
       s.saveObject(r.other);
       s.saveFloat (r.value);
     }
-    s.saveInt(memories.size());
-    for (Clue c : memories) c.saveClue(s);
+    s.saveObjects(memories);
   }
   
   

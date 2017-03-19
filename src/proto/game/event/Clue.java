@@ -12,13 +12,13 @@ import java.awt.Image;
 
 //  TODO:  Have this extend Element as originally intended?
 
-public class Clue {
+public class Clue implements Session.Saveable {
   
   
   /**  Data fields, construction and save/load methods-
     */
-  Plot plot;
-  Plot.Role role;
+  final public Plot plot;
+  final public Plot.Role role;
 
   Element match;
   boolean confirmed;
@@ -31,12 +31,9 @@ public class Clue {
   Lead.Type leadType;
   Lead source;
   float confidence;
+  Place placeFound;
   int timeFound;
   
-  
-  Clue() {
-    return;
-  }
   
   
   public Clue(Plot plot, Plot.Role role) {
@@ -45,24 +42,24 @@ public class Clue {
   }
   
   
-  public static Clue loadClue(Session s) throws Exception {
-    Clue c = new Clue();
-    c.plot       = (Plot) s.loadObject();
-    c.role       = (Plot.Role) s.loadObject();
-    c.match      = (Element) s.loadObject();
-    c.confirmed  = s.loadBool();
-    c.trait      = (Trait) s.loadObject();
-    c.near       = (Region) s.loadObject();
-    c.nearRange  = s.loadInt();
-    c.leadType   = Lead.LEAD_TYPES[s.loadInt()];
-    c.source     = (Lead) s.loadObject();
-    c.confidence = s.loadFloat();
-    c.timeFound  = s.loadInt();
-    return c;
+  public Clue(Session s) throws Exception {
+    s.cacheInstance(this);
+    plot       = (Plot) s.loadObject();
+    role       = (Plot.Role) s.loadObject();
+    match      = (Element) s.loadObject();
+    confirmed  = s.loadBool();
+    trait      = (Trait) s.loadObject();
+    near       = (Region) s.loadObject();
+    nearRange  = s.loadInt();
+    leadType   = Lead.LEAD_TYPES[s.loadInt()];
+    source     = (Lead) s.loadObject();
+    confidence = s.loadFloat();
+    placeFound = (Place) s.loadObject();
+    timeFound  = s.loadInt();
   }
   
   
-  public void saveClue(Session s) throws Exception {
+  public void saveState(Session s) throws Exception {
     s.saveObject(plot       );
     s.saveObject(role       );
     s.saveObject(match      );
@@ -73,6 +70,7 @@ public class Clue {
     s.saveInt   (leadType.ID);
     s.saveObject(source     );
     s.saveFloat (confidence );
+    s.saveObject(placeFound );
     s.saveInt   (timeFound  );
   }
   
@@ -82,20 +80,21 @@ public class Clue {
     */
   public void assignEvidence(
     Element match, Trait trait,
-    Lead source, float confidence, int timeFound
+    Lead source, float confidence, int time, Place place
   ) {
     this.match      = match      ;
     this.trait      = trait      ;
     this.source     = source     ;
     this.leadType   = source.type;
     this.confidence = confidence ;
-    this.timeFound  = timeFound  ;
+    this.timeFound  = time       ;
+    this.placeFound = place      ;
   }
   
   
   public void assignNearbyRegion(
     Element match, Region near, int range,
-    Lead source, float confidence, int timeFound
+    Lead source, float confidence, int time, Place place
   ) {
     this.match      = match      ;
     this.near       = near       ;
@@ -103,30 +102,33 @@ public class Clue {
     this.source     = source     ;
     this.leadType   = source.type;
     this.confidence = confidence ;
-    this.timeFound  = timeFound  ;
+    this.timeFound  = time       ;
+    this.placeFound = place      ;
   }
   
   
   public void confirmMatch(
-    Element match, Lead source, int timeFound
+    Element match, Lead source, int time, Place place
   ) {
     this.match      = match      ;
     this.confirmed  = true       ;
     this.source     = source     ;
     this.leadType   = source.type;
     this.confidence = 1.0f       ;
-    this.timeFound  = timeFound  ;
+    this.timeFound  = time       ;
+    this.placeFound = place      ;
   }
   
   
   public void confirmTipoff(
-    Element match, Lead.Type type, float confidence, int timeFound
+    Element match, Lead.Type type, int time, Place place
   ) {
-    this.match      = match      ;
-    this.confirmed  = true       ;
-    this.leadType   = type       ;
-    this.confidence = confidence ;
-    this.timeFound  = timeFound  ;
+    this.match      = match;
+    this.confirmed  = true ;
+    this.leadType   = type ;
+    this.timeFound  = time ;
+    this.placeFound = place;
+    this.confidence = type.confidence;
   }
   
   
@@ -136,6 +138,39 @@ public class Clue {
     if (trait != other.trait) return false;
     if (match != other.match) return false;
     return true;
+  }
+  
+  
+  
+  /**  Other basic access methods-
+    */
+  public Lead.Type leadType() {
+    return leadType;
+  }
+  
+  
+  public boolean isReport() {
+    return leadType == Lead.LEAD_REPORT;
+  }
+  
+  
+  public boolean isTipoff() {
+    return leadType == Lead.LEAD_TIPOFF;
+  }
+  
+  
+  public boolean isEvidence() {
+    return ! (isReport() || isTipoff());
+  }
+  
+  
+  public int time() {
+    return timeFound;
+  }
+  
+  
+  public Place place() {
+    return placeFound;
   }
   
   

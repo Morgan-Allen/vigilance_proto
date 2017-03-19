@@ -55,13 +55,13 @@ public class PlotKidnap extends Plot {
     
     Person target = pickT.result();
     Place hideout = pickH.result();
-    Series <Person> goons = goonsOnRoster();
+    Series <Person> goons = PlotUtils.goonsOnRoster(this);
     
     assignTarget   (target, target.resides());
     assignOrganiser(base().leader(), hideout);
-    fillExpertRole(SIGHT_RANGE, goons, ROLE_TAILS);
-    fillExpertRole(MEDICINE   , goons, ROLE_DRUGS);
-    fillExpertRole(MUSCLE     , goons, ROLE_GRABS);
+    PlotUtils.fillExpertRole(this, SIGHT_RANGE, goons, ROLE_TAILS);
+    PlotUtils.fillExpertRole(this, MEDICINE   , goons, ROLE_DRUGS);
+    PlotUtils.fillExpertRole(this, MUSCLE     , goons, ROLE_GRABS);
     assignRole(filling(ROLE_GRABS), Plot.ROLE_ENFORCER);
     
     queueSteps(
@@ -97,6 +97,9 @@ public class PlotKidnap extends Plot {
   protected void onCompletion(Step step) {
     
   }
+  
+  
+  
   
 }
 

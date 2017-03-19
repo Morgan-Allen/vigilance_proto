@@ -37,11 +37,11 @@ public class DebugPlots extends RunGame {
     crooks.plots.assignRootPlot(kidnap);
     Person organiser = kidnap.organiser();
     
-    //  TODO:  You will need to generate tipoffs automatically again...
     Base heroes = world.baseFor(Heroes.JANUS_INDUSTRIES);
     Clue tipoff = new Clue(kidnap, Plot.ROLE_ORGANISER);
     int timeFound = world.timing.totalHours();
-    tipoff.confirmTipoff(organiser, Lead.LEAD_TIPOFF, 0.33f, timeFound);
+    Place placeFound = kidnap.hideout();
+    tipoff.confirmTipoff(organiser, Lead.LEAD_TIPOFF, timeFound, placeFound);
     heroes.leads.caseFor(organiser).recordClue(tipoff);
     
     /*
