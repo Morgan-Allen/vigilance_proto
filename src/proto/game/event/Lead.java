@@ -4,8 +4,10 @@ package proto.game.event;
 import proto.common.*;
 import proto.game.world.*;
 import proto.game.person.*;
+import proto.game.scene.*;
 import proto.util.*;
 import static proto.game.person.PersonStats.*;
+
 import java.awt.Image;
 
 
@@ -123,7 +125,7 @@ public class Lead extends Task {
       ICON_DIR+"icon_surveil.png",
       new String[] { "Surveiled", "Surveilling", "Will Surveil" },
       MEDIUM_SURVEIL, FOCUS_PERSON, TENSE_DURING, PROFILE_LOW,
-      CONFIDENCE_HIGH, MEDIUM_MEET
+      CONFIDENCE_HIGH, MEDIUM_MEET, MEDIUM_HEIST
     ),
     LEAD_SURVEIL_BUILDING = new Type(
       "Surveillance", 1,
@@ -131,7 +133,7 @@ public class Lead extends Task {
       ICON_DIR+"icon_surveil.png",
       new String[] { "Surveiled", "Surveilling", "Will Surveil" },
       MEDIUM_SURVEIL, FOCUS_BUILDING, TENSE_DURING, PROFILE_LOW,
-      CONFIDENCE_MODERATE, MEDIUM_MEET
+      CONFIDENCE_MODERATE, MEDIUM_MEET, MEDIUM_HEIST
     ),
     LEAD_QUESTION = new Type(
       "Questioning", 2,
@@ -179,7 +181,7 @@ public class Lead extends Task {
       ICON_DIR+"icon_search.png",
       new String[] { "Searched", "Searching", "Will Search" },
       MEDIUM_SURVEIL, FOCUS_BUILDING, TENSE_AFTER, PROFILE_LOW,
-      CONFIDENCE_MODERATE, MEDIUM_WIRE, MEDIUM_MEET
+      CONFIDENCE_MODERATE, MEDIUM_WIRE, MEDIUM_MEET, MEDIUM_HEIST
     ),
     LEAD_TIPOFF = new Type(
       "Tipoff", 8,
@@ -188,6 +190,22 @@ public class Lead extends Task {
       new String[] { "Tipped Off", "Tipping Off", "Will Tip Off" },
       MEDIUM_WIRE, FOCUS_ANY, TENSE_ANY, PROFILE_HIDDEN,
       CONFIDENCE_LOW
+    ),
+    LEAD_REPORT = new Type(
+      "Report", 9,
+      "_",
+      ICON_DIR+"icon_database.png",
+      new String[] { "Reported", "Reporting", "Will Report" },
+      MEDIUM_WIRE, FOCUS_ANY, TENSE_ANY, PROFILE_OBVIOUS,
+      CONFIDENCE_HIGH
+    ),
+    LEAD_GUARD = new Type(
+      "Guard", 10,
+      "Guard this suspect against criminal activity.",
+      ICON_DIR+"icon_guard_lead.png",
+      new String[] { "Guarded", "Guarding", "Will Guard" },
+      MEDIUM_SURVEIL, FOCUS_ANY, TENSE_DURING, PROFILE_OBVIOUS,
+      CONFIDENCE_HIGH, MEDIUM_MEET, MEDIUM_HEIST
     ),
     LEAD_TYPES[] = TYPE_B.toArray(Type.class);
   
@@ -272,7 +290,7 @@ public class Lead extends Task {
     Batch <Clue> possible = new Batch();
     int time = plot.base.world().timing.totalHours();
     
-    for (Plot.Role role : step.between) {
+    for (Plot.Role role : step.involved) {
       Element involved = plot.filling(role);
       if (involved == focus) continue;
       
@@ -314,7 +332,7 @@ public class Lead extends Task {
     Batch <Clue> possible = new Batch();
     int time = plot.base.world().timing.totalHours();
     
-    for (Plot.Role role : step.between) {
+    for (Plot.Role role : step.involved) {
       Element involved = plot.filling(role);
       if (involved == focus) continue;
       
@@ -366,7 +384,7 @@ public class Lead extends Task {
     //
     //  Then check the focus-
     boolean matchFocus = false;
-    for (Plot.Role role : step.between) {
+    for (Plot.Role role : step.involved) {
       Element contacts = plot.filling(role);
       
       if (focus.isRegion()) {
@@ -408,7 +426,7 @@ public class Lead extends Task {
     //  the identity of the participant/s, and any information or payload they
     //  may have relayed to eachother.
     if (result >= RESULT_HOT) {
-      for (Plot.Role role : step.between) {
+      for (Plot.Role role : step.involved) {
         confirmIdentity(plot, role, time);
       }
       if (step.infoGiven != null) {
@@ -436,26 +454,6 @@ public class Lead extends Task {
     //  themselves:
     plot.takeSpooking(type.profile);
     return result;
-  }
-  
-  
-  public boolean updateAssignment() {
-    if (! super.updateAssignment()) return false;
-    Series <Person> active = active();
-    //
-    //  Continuously monitor for events of interest connected to the current
-    //  focus of your investigation, and see if any new information pops up...
-    for (Event event : base.world().events.active()) {
-      if (! (event instanceof Plot)) continue;
-      Plot plot = (Plot) event;
-      
-      for (Step step : plot.allSteps()) {
-        int tense = plot.stepTense(step);
-        if (! canDetect(step, tense, plot)) continue;
-        attemptFollow(step, tense, plot, active);
-      }
-    }
-    return true;
   }
   
   
@@ -506,6 +504,32 @@ public class Lead extends Task {
     attempt.addTest(skill, range, obstacle);
     attempt.setAssigned(attempting);
     return attempt;
+  }
+  
+  
+  public boolean updateAssignment() {
+    if (! super.updateAssignment()) return false;
+    Series <Person> active = active();
+    //
+    //  Continuously monitor for events of interest connected to the current
+    //  focus of your investigation, and see if any new information pops up...
+    for (Event event : base.world().events.active()) {
+      if (! (event instanceof Plot)) continue;
+      Plot plot = (Plot) event;
+      
+      for (Step step : plot.allSteps()) {
+        int tense = plot.stepTense(step);
+        
+        if (tense == TENSE_DURING && step.medium == MEDIUM_HEIST) {
+          Scene scene = plot.generateScene(step, focus, this);
+          base.world().enterScene(scene);
+        }
+        else if (canDetect(step, tense, plot)) {
+          attemptFollow(step, tense, plot, active);
+        }
+      }
+    }
+    return true;
   }
   
   

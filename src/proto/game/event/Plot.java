@@ -4,7 +4,9 @@ package proto.game.event;
 import proto.common.*;
 import proto.game.world.*;
 import proto.game.person.*;
+import proto.game.scene.*;
 import proto.util.*;
+import proto.view.common.*;
 
 
 
@@ -52,7 +54,7 @@ public abstract class Plot extends Event {
   final Base base;
   int spookLevel = 0, nextContactID = 0;
   List <RoleEntry> entries = new List();
-  List <Step  > steps   = new List();
+  List <Step     > steps   = new List();
   
   
   
@@ -105,13 +107,13 @@ public abstract class Plot extends Event {
   /**  Queueing and executing sub-events and generating clues for
     *  investigation-
     */
-  protected Step queueStep(int medium, int timeTaken, Role... involved) {
+  protected Step queueStep(int medium, int timeTaken, Role... involves) {
     Step s = new Step();
-    s.between   = involved ;
+    s.involved  = involves ;
     s.medium    = medium   ;
     s.timeTaken = timeTaken;
     s.ID        = nextContactID++;
-    if (Lead.isPhysical(medium)) s.setMeetsAt(involved[0]);
+    if (Lead.isPhysical(medium)) s.setMeetsAt(involves[0]);
     steps.add(s);
     return s;
   }
@@ -134,6 +136,13 @@ public abstract class Plot extends Event {
   }
   
   
+  public Series <Element> involved(Step step) {
+    Batch <Element> all = new Batch();
+    for (Role role : step.involved) all.include(filling(role));
+    return all;
+  }
+  
+  
   public int stepTense(Step step) {
     int time = base.world().timing.totalHours();
     int start = step.timeStart, tense = Lead.TENSE_BEFORE;
@@ -141,6 +150,12 @@ public abstract class Plot extends Event {
     boolean done = time > (step.timeStart + step.timeTaken);
     if (begun) tense = done ? Lead.TENSE_AFTER : Lead.TENSE_DURING;
     return tense;
+  }
+  
+  
+  public Step currentStep() {
+    for (Step s : steps) if (stepBegun(s) && ! stepComplete(s)) return s;
+    return null;
   }
   
   
@@ -240,6 +255,7 @@ public abstract class Plot extends Event {
   }
   
   
+  //  TODO:  Move this out to a 'PlotUtils' class...
   protected void fillExpertRole(
     Trait trait, Series <Person> candidates, Role role
   ) {
@@ -253,6 +269,7 @@ public abstract class Plot extends Event {
   }
   
   
+  //  TODO:  Move this out to a 'PlotUtils' class...
   protected void fillInsideRole(
     Place target, Plot.Role role
   ) {
@@ -266,6 +283,7 @@ public abstract class Plot extends Event {
   }
   
   
+  //  TODO:  Move this out to a 'PlotUtils' class...
   protected void fillItemRole(
     ItemType type, World world, Role role
   ) {
@@ -273,6 +291,7 @@ public abstract class Plot extends Event {
   }
   
   
+  //  TODO:  Move this out to a 'PlotUtils' class...
   protected Series <Person> goonsOnRoster() {
     Batch <Person> goons = new Batch();
     for (Person p : base.roster()) {
@@ -283,6 +302,7 @@ public abstract class Plot extends Event {
   }
   
   
+  //  TODO:  Move this out to a 'PlotUtils' class...
   protected Series <Person> expertsWith(Trait trait, int minLevel) {
     final Batch <Person> experts = new Batch();
     for (Element e : base.world().inside()) if (e.isPerson()) {
@@ -294,6 +314,7 @@ public abstract class Plot extends Event {
   }
   
   
+  //  TODO:  Move this out to a 'PlotUtils' class...
   protected Series <Place> venuesNearby(Place target, int maxDist) {
     final Batch <Place> venues = new Batch();
     return venues;
@@ -328,22 +349,25 @@ public abstract class Plot extends Event {
         world.events.scheduleEvent(entry.supplies);
       }
     }
-    
     //  TODO:  Re-satisfy needs as and when required.
     if (! possible()) return;
     
     int time = world.timing.totalHours();
     Step current = null, next = null;
-    
     for (Step c : steps) {
       if (next    == null && ! stepBegun(c)) next    = c;
       if (current == null &&   stepBegun(c)) current = c;
     }
-    if ((current == null || stepComplete(current)) && next != null) {
-      next.timeStart = time;
-    }
     
-    if (current == steps.last() && stepComplete(current)) {
+    boolean currentEnds = current == null || stepComplete(current);
+    if (currentEnds && current != null) {
+      checkForTipoffs(current, false, true);
+    }
+    if (currentEnds && next != null) {
+      next.timeStart = time;
+      checkForTipoffs(next, true, false);
+    }
+    if (currentEnds && current == steps.last()) {
       //  TODO:  Execute the actual crime.
       completeEvent();
     }
@@ -364,19 +388,128 @@ public abstract class Plot extends Event {
   }
   
   
+  public void completeEvent() {
+    super.completeEvent();
+  }
+  
+  
+  
+  /**  Generating reports and tipoffs:
+    */
+  protected void checkForTipoffs(Step step, boolean begins, boolean ends) {
+    
+    Role    focusRole = (Role) Rand.pickFrom(step.involved);
+    Element focus     = filling(focusRole);
+    Region  from      = focus.region();
+    float   trust     = from.currentValue(Region.TRUST);
+    float   tipChance = trust / 10f;
+    Base    player    = world.playerBase();
+    int     time      = world.timing.totalHours();
+    
+    if (begins && Rand.num() < tipChance) {
+      Clue tipoff = new Clue(this, focusRole);
+      tipoff.confirmTipoff(focus, Lead.LEAD_TIPOFF, 0.33f, time);
+      CaseFile file = player.leads.caseFor(focus);
+      file.recordClue(tipoff);
+    }
+    
+    if (ends && step.medium == Lead.MEDIUM_HEIST) {
+      Clue report = new Clue(this, ROLE_TARGET);
+      report.confirmTipoff(target(), Lead.LEAD_REPORT, 1, time);
+      CaseFile file = player.leads.caseFor(target());
+      file.recordClue(report);
+    }
+  }
+  
+  
+  
+  /**  Dealing with scene-population:
+    */
+  public Scene generateScene(Step step, Element focus, Lead player) {
+    Series <Element> involved = involved(step);
+    
+    if (! involved.includes(focus)) {
+      I.complain("Step: "+step+" does not involve: "+focus);
+      return null;
+    }
+    
+    World world = base.world();
+    Place place = focus.place();
+    Scene scene = place.kind().sceneType().generateScene(world);
+    
+    final List <Person> forces = new List();
+    for (Element e : involved) {
+      if (e == null || e.type != Kind.TYPE_PERSON) continue;
+      forces.add((Person) e);
+    }
+    
+    final float dangerLevel = 0.5f;
+    final PersonType GOONS[] = base.goonTypes().toArray(PersonType.class);
+    float forceLimit = dangerLevel * 10;
+    float forceSum   = 0;
+    
+    while (forceSum < forceLimit) {
+      PersonType ofGoon = (PersonType) Rand.pickFrom(GOONS);
+      Person goon = Person.randomOfKind(ofGoon, base.world());
+      forceSum += goon.stats.powerLevel();
+      forces.add(goon);
+    }
+    
+    scene.entry.provideInProgressEntry(forces);
+    scene.entry.provideBorderEntry(player.assigned());
+    
+    return scene;
+  }
+  
+  
+  public void completeAfterScene(Scene scene, EventReport report) {
+    super.completeAfterScene(scene, report);
+  }
+  
+  
   
   /**  Rendering, debug and interface methods-
     */
   public void printRoles() {
     I.say("\n\nRoles are: ");
+    
+    //  TODO:  print steps as well!
+    
     for (Plot.RoleEntry entry : entries) {
       I.say("  "+entry);
     }
   }
+  
+  
+  /*
+  protected void presentTipoffMessage(
+    String header, String mainText,
+    CaseFile file, Role role, EventReport report
+  ) {
+    if (file == null || role == null) return;
+    StringBuffer s = new StringBuffer(mainText);
+    if (mainText.length() > 0) s.append("\n\n");
+    file.shortDescription(role, s);
+    
+    if (report != null) {
+      Region region = target().region();
+      float trust = report.trustEffect, deter = report.deterEffect;
+      s.append("\n"+region+" Trust "     +I.signNum((int) trust)+"%");
+      s.append("\n"+region+" Deterrence "+I.signNum((int) deter)+"%");
+    }
+    
+    final MainView view = world.view();
+    view.queueMessage(new MessageView(
+      view, icon(), header, s.toString(), "Dismiss"
+    ) {
+      protected void whenClicked(String option, int optionID) {
+        view.dismissMessage(this);
+      }
+    });
+  }
+  //*/
+  
 }
-
-
-
 
 
 

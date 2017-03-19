@@ -37,14 +37,6 @@ public abstract class EventType extends Index.Entry implements
   
   
   
-  /**  Generating clues and tipoffs-
-    */
-  public boolean isDangerous(Event event) {
-    return false;
-  }
-  
-  
-  
   /**  Rendering, interface and debug methods-
     */
   protected abstract String nameFor(Event event);

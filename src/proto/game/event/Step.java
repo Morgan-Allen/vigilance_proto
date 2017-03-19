@@ -14,7 +14,7 @@ public class Step {
   
   /**  Data fields and save/load methods-
     */
-  Plot.Role between[];
+  Plot.Role involved[];
   int medium;
   int timeTaken;
   int ID;
@@ -28,7 +28,7 @@ public class Step {
   
   
   void saveStep(Session s) throws Exception {
-    s.saveObjectArray(between);
+    s.saveObjectArray(involved);
     s.saveInt (medium   );
     s.saveInt (timeTaken);
     s.saveInt (ID       );
@@ -43,7 +43,7 @@ public class Step {
   
   static Step loadStep(Session s) throws Exception {
     Step step = new Step();
-    step.between   = (Plot.Role[]) s.loadObjectArray(Plot.Role.class);
+    step.involved  = (Plot.Role[]) s.loadObjectArray(Plot.Role.class);
     step.medium    = s.loadInt();
     step.timeTaken = s.loadInt();
     step.ID        = s.loadInt();
@@ -74,7 +74,7 @@ public class Step {
   /**  Rendering, debug and interface methods-
     */
   public String toString() {
-    return "Step involving "+I.list(between);
+    return "Step involving "+I.list(involved);
   }
 }
 

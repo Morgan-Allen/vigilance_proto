@@ -1,10 +1,10 @@
-
+ 
 
 package proto.game.event;
 import proto.common.*;
-import proto.game.person.*;
 import proto.game.world.*;
 import proto.util.*;
+import proto.view.base.*;
 
 
 
@@ -14,9 +14,6 @@ public class CaseFile implements Session.Saveable {
   /**  Data fields, construction and save/load methods-
     */
   final Base base;
-  
-  //  TODO:  Consider making this specific to Crimes, rather than arbitrary
-  //  objects?
   final public Object subject;
   List <Clue> clues = new List();
   
@@ -49,32 +46,24 @@ public class CaseFile implements Session.Saveable {
   
   
   
-  /**  Resolving possible suspects:
+  /**  Recording and transferring evidence-
     */
   public void recordClue(Clue clue) {
     for (Clue prior : clues) {
       if (prior.matchesType(clue)) return;
     }
     clues.add(clue);
+    MessageUtils.presentMessageFor(clue, base.world().view());
   }
   
   
-  
-  /**  Extraction methods for use in sentencing-
-    */
   public void updateEvidenceFrom(CaseFile other) {
-    //  TODO:  Restore this!
-    /*
-    for (Role role : other.roles) for (Lead lead : role.evidence) {
-      recordRole(role.event, role.roleID, lead);
+    for (Clue clue : clues) {
+      other.clues.include(clue);
     }
-    //*/
   }
-  
   
 }
-
-
 
 
 
