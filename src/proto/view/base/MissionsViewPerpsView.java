@@ -47,7 +47,7 @@ public class MissionsViewPerpsView extends UINode {
     ViewUtils.ListDraw draw = new ViewUtils.ListDraw();
     int across = 10, down = 10;
     draw.addEntry(
-      null, "SUSPECTS FOR "+role+" IN "+plot, 40, null
+      null, "SUSPECTS FOR "+role+" IN "+plot.nameForCase(player), 40, null
     );
     for (Element e : player.leads.suspectsFor(role, plot)) {
       draw.addEntry(e.icon(), e.name(), 40, e);
@@ -75,10 +75,10 @@ public class MissionsViewPerpsView extends UINode {
     ViewUtils.ListDraw draw = new ViewUtils.ListDraw();
     int across = 10, down = 10;
     draw.addEntry(
-      null, "CASE FILE FOR: "+suspect, 40, null
+      suspect.icon(), "CASE FILE FOR: "+suspect, 40, null
     );
     if (! clues.empty()) {
-      draw.addEntry(null, clues.first().longDescription(), 100, null);
+      draw.addEntry(null, clues.first().longDescription(player), 100, null);
     }
     for (Lead lead : player.leads.leadsFor(suspect)) {
       draw.addEntry(lead.icon(), lead.choiceInfo(agent), 40, lead);

@@ -472,7 +472,7 @@ public abstract class Plot extends Event {
     }
     
     String name = caseLabel;
-    if (targetKnown && typeKnown) name += type.name+": "+target();
+    if (targetKnown && typeKnown) name = type.name+": "+target();
     else if (targetKnown) name += " (target: "+target()+")";
     else if (typeKnown  ) name += " ("+type.name+")";
     return name;

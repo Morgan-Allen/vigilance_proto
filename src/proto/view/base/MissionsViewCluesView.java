@@ -39,7 +39,7 @@ public class MissionsViewCluesView extends UINode {
     for (Clue clue : player.leads.cluesFor(plot, null, null, true)) {
       Image icon = clue.icon();
       if (icon == null) icon = MissionsView.MYSTERY_IMAGE;
-      draw.addEntry(icon, clue.longDescription(), 40, null);
+      draw.addEntry(icon, clue.longDescription(player), 40, null);
     }
     draw.performDraw(across, down, this, surface, g);
     down = draw.down;

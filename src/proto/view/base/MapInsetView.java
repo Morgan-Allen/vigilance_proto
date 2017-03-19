@@ -8,6 +8,7 @@ import proto.game.person.*;
 import proto.util.*;
 import proto.view.common.*;
 
+import java.awt.Image;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -153,12 +154,15 @@ public abstract class MapInsetView extends UINode {
         Color.RED, Color.BLACK, crimeLevel, false, g
       );
       
-      /*
-      Series <CaseFile> files = played.leads.casesForRegion(n);
-      if (! files.empty()) {
-        g.drawImage(mainView.alertMarker, x - 25, y - 25, 50, 50, null);
+      Series <Plot> plots = played.leads.knownPlotsForRegion(n);
+      if (! plots.empty()) {
+        Image alertImage = MissionsView.MYSTERY_IMAGE;
+        for (Plot p : plots) if (played.leads.plotIsUrgent(p)) {
+          alertImage = MissionsView.ALERT_IMAGE;
+          break;
+        }
+        g.drawImage(alertImage, x - 25, y - 25, 50, 50, null);
       }
-      //*/
       
       ViewUtils.renderAssigned(visitors(n), x + 25, y + 25, surface, g);
     }

@@ -56,7 +56,7 @@ public class MissionsViewRolesView extends UINode {
     int across = 10, down = 10;
     ViewUtils.ListDraw draw = new ViewUtils.ListDraw();
     draw.addEntry(
-      null, "CASE FILE: "+plot, 40, null
+      null, "CASE FILE: "+plot.nameForCase(player), 40, null
     );
     for (RoleView r : roles) {
       Plot.Role role = r.role;
@@ -114,7 +114,8 @@ public class MissionsViewRolesView extends UINode {
       }
     }
     else if (hovered instanceof Element) {
-      Series <Clue> clues = player.leads.cluesFor(plot, hovered, null, true);
+      Element element = (Element) hovered;
+      Series <Clue> clues = player.leads.cluesFor(plot, element, null, true);
       hoverDesc = "Latest Evidence:\n  "+clues.first();
       if (draw.clicked) {
         parent.setActiveFocus(hovered, true);

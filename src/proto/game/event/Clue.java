@@ -225,11 +225,11 @@ public class Clue implements Session.Saveable {
   /**  Rendering, debug and interface methods-
     */
   public String toString() {
-    return longDescription();
+    return traitDescription();
   }
   
   
-  public String longDescription() {
+  public String longDescription(Base base) {
     StringBuffer desc = new StringBuffer(leadType.name);
     World world = plot.world();
     
@@ -244,7 +244,7 @@ public class Clue implements Session.Saveable {
     }
     
     desc.append(" at "+world.timing.timeString(timeFound));
-    desc.append(" indicates the "+role);
+    desc.append(" indicates that "+plot.nameForCase(base)+"'s "+role);
     
     if (match != null && confirmed    ) desc.append(" is: "+match);
     if (trait != null                 ) desc.append(" has trait: "+trait);

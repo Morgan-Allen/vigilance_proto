@@ -174,7 +174,7 @@ public class Council {
     
     for (Person p : t.accused) {
       float sumEvidence = 0;
-      for (Plot plot : mainHall.leads.involvedIn(p)) {
+      for (Plot plot : mainHall.leads.involvedIn(p, true)) {
         sumEvidence += mainHall.leads.evidenceForInvolvement(plot, p);
       }
       

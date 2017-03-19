@@ -110,6 +110,19 @@ public class BaseLeads {
   }
   
   
+  public Series <Plot> knownPlotsForRegion(Region r) {
+    Batch <Plot> known = new Batch();
+    for (CaseFile file : files.values()) {
+      for (Clue c : file.clues) if (! c.plot.complete()) {
+        if (! c.confirmed        ) continue;
+        if (c.match.region() != r) continue;
+        known.include(c.plot);
+      }
+    }
+    return known;
+  }
+  
+  
   public Series <Plot.Role> knownRolesFor(Plot plot) {
     Batch <Plot.Role> known = new Batch();
     known.include(Plot.ROLE_HIDEOUT  );
@@ -143,7 +156,7 @@ public class BaseLeads {
   
   
   public Series <Clue> cluesFor(
-    Plot plot, Object match, Plot.Role role, boolean sort
+    Plot plot, Element match, Plot.Role role, boolean sort
   ) {
     List <Clue> matches = new List <Clue> () {
       protected float queuePriority(Clue r) {
@@ -165,18 +178,19 @@ public class BaseLeads {
   }
   
   
-  public Series <Plot> involvedIn(Object subject) {
+  public Series <Plot> involvedIn(Element subject, boolean confirmedOnly) {
     Batch <Plot> matches = new Batch();
     CaseFile file = caseFor(subject);
     
     for (Clue c : file.clues) {
+      if (confirmedOnly && ! c.confirmed) continue;
       matches.include(c.plot);
     }
     return matches;
   }
   
   
-  public float evidenceForInvolvement(Plot plot, Object subject) {
+  public float evidenceForInvolvement(Plot plot, Element subject) {
     CaseFile file = caseFor(subject);
     float evidence = 0;
     
@@ -184,6 +198,11 @@ public class BaseLeads {
       evidence += c.confidence;
     }
     return evidence;
+  }
+  
+  
+  public boolean plotIsUrgent(Plot plot) {
+    return involvedIn(plot.target(), true).includes(plot);
   }
   
   

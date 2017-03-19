@@ -15,19 +15,20 @@ public class MessageUtils {
   public static void presentClueMessage(
     Clue clue, MainView view, EventReport report
   ) {
+    Base player = view.player();
     StringBuffer header = new StringBuffer(), desc = new StringBuffer();
     
     if (clue.isReport()) {
       header.append("CRIME REPORT: "+clue.plot.name());
-      desc.append(clue.longDescription());
+      desc.append(clue.longDescription(player));
     }
     else if (clue.isTipoff()) {
       header.append("TIPOFF");
-      desc.append(clue.longDescription());
+      desc.append(clue.longDescription(player));
     }
     else {
       header.append("EVIDENCE FOUND");
-      desc.append(clue.longDescription());
+      desc.append(clue.longDescription(player));
     }
     if (report != null) {
       Region region = clue.place().region();

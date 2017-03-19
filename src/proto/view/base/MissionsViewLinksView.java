@@ -1,15 +1,13 @@
 
 
 package proto.view.base;
-import proto.common.*;
 import proto.game.person.*;
 import proto.game.world.*;
+import proto.game.event.*;
 import proto.view.common.*;
 import proto.util.*;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Image;
 
 
 
@@ -39,9 +37,13 @@ public class MissionsViewLinksView extends UINode {
       null, "KNOWN ASSOCIATES FOR "+perp, 40, null
     );
     for (AssocResult r : getAssociates(perp, player)) {
-      draw.addEntry(
+      if (r.associate != null) draw.addEntry(
         r.associate.icon(), r.associate.name()+" ("+r.label+")", 40,
         r.associate
+      );
+      if (r.plot != null) draw.addEntry(
+        r.plot.icon(), r.label+" "+r.plot.nameForCase(player), 40,
+        r.plot
       );
     }
     draw.performDraw(across, down, this, surface, g);
@@ -51,22 +53,23 @@ public class MissionsViewLinksView extends UINode {
     if (draw.clicked) {
       parent.setActiveFocus(draw.hovered, true);
     }
-    
     return true;
   }
   
   
   static class AssocResult {
     Element associate;
-    String label;
+    Plot    plot;
+    String  label;
   }
   
   
-  private boolean addAssociate(List list, Element a, String label) {
-    if (a == null) return false;
+  private boolean addAssociate(List list, Element a, Plot p, String label) {
+    if (a == null && p == null) return false;
     AssocResult r = new AssocResult();
     r.associate = a;
-    r.label = label;
+    r.plot      = p;
+    r.label     = label;
     list.add(r);
     return true;
   }
@@ -77,23 +80,34 @@ public class MissionsViewLinksView extends UINode {
     
     if (suspect.isPerson()) {
       Person perp = (Person) suspect;
-      if (addAssociate(list, perp.resides(), "Residence")) {
+      if (addAssociate(list, perp.resides(), null, "Residence")) {
         for (Person p : perp.resides().residents()) if (p != perp) {
-          addAssociate(list, p, "Colleague");
+          addAssociate(list, p, null, "Colleague");
         }
       }
-    }
-    if (suspect.isPlace()) {
-      Place site = (Place) suspect;
-      addAssociate(list, site.region(), "Region");
-      for (Person p : site.residents()) {
-        addAssociate(list, p, "Resident");
+      for (Plot plot : player.leads.involvedIn(suspect, true)) {
+        addAssociate(list, null, plot, "Suspect In");
       }
     }
+    
+    if (suspect.isPlace()) {
+      Place site = (Place) suspect;
+      addAssociate(list, site.region(), null, "Region");
+      for (Person p : site.residents()) {
+        addAssociate(list, p, null, "Resident");
+      }
+      for (Plot plot : player.leads.involvedIn(suspect, true)) {
+        addAssociate(list, null, plot, "Scene For");
+      }
+    }
+    
     if (suspect.isRegion()) {
       Region area = (Region) suspect;
       for (Place p : area.buildSlots()) {
-        addAssociate(list, p, "Address");
+        addAssociate(list, p, null, "Address");
+      }
+      for (Plot plot : player.leads.knownPlotsForRegion(area)) {
+        addAssociate(list, null, plot, "Area For");
       }
     }
     

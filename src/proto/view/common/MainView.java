@@ -42,7 +42,7 @@ public class MainView extends UINode {
   final public ProgressOptionsView progOptions;
   final public StatsReadoutView mainReadout;
   
-  final public Image alertMarker, selectCircle, selectSquare;
+  final public Image selectCircle, selectSquare;
   
   UINode messageShown = null;
   List <UINode> messageQueue = new List();
@@ -114,7 +114,6 @@ public class MainView extends UINode {
     ));
     mainUI.addChildren(progOptions, mainReadout);
     
-    alertMarker   = Kind.loadImage(MAPS_DIR+"alert_symbol.png" );
     selectCircle  = Kind.loadImage(ACTS_DIR+"select_circle.png");
     selectSquare  = Kind.loadImage(MNUI_DIR+"select_square.png");
   }
