@@ -83,9 +83,7 @@ public abstract class Plot extends Event {
       entry.supplies = (Plot     ) s.loadObject();
       entries.add(entry);
     }
-    for (int n = s.loadInt(); n-- > 0;) {
-      steps.add(Step.loadStep(s));
-    }
+    s.loadObjects(steps);
   }
   
   
@@ -101,10 +99,7 @@ public abstract class Plot extends Event {
       s.saveObject(entry.element );
       s.saveObject(entry.supplies);
     }
-    s.saveInt(steps.size());
-    for (Step step : steps) {
-      step.saveStep(s);
-    }
+    s.saveObjects(steps);
   }
   
   
@@ -124,8 +119,32 @@ public abstract class Plot extends Event {
   }
   
   
-  protected void queueSteps(int medium, int timeTaken, Role from, Role... to) {
-    for (Role r : to) queueStep(medium, timeTaken, from, r);
+  protected Step queueStep(int medium, Role... involves) {
+    return queueStep(medium, World.HOURS_PER_DAY, involves);
+  }
+  
+  
+  protected Step queueMeeting(Role... involves) {
+    return queueStep(Lead.MEDIUM_MEET, World.HOURS_PER_DAY, involves);
+  }
+  
+  
+  protected void queueMeetings(Role from, Role... to) {
+    for (Role r : to) {
+      queueStep(Lead.MEDIUM_MEET, World.HOURS_PER_DAY, from, r);
+    }
+  }
+  
+  
+  protected Step queueMessage(Role sends, Role receives, Role info) {
+    Step s = queueStep(Lead.MEDIUM_WIRE, World.HOURS_PER_DAY, sends, receives);
+    if (info != null) s.setInfoGiven(info);
+    return s;
+  }
+  
+  
+  protected Step queueHeist(Role... involved) {
+    return queueStep(Lead.MEDIUM_HEIST, World.HOURS_PER_DAY, involved);
   }
   
   
@@ -286,8 +305,9 @@ public abstract class Plot extends Event {
   
   
   protected abstract boolean fillRoles();
-  protected abstract void onCompletion(Step step);
   protected abstract float ratePlotFor(Person mastermind);
+  protected abstract boolean checkSuccess(Step step);
+  protected abstract void onCompletion(Step step, boolean success);
   
 
   
@@ -327,6 +347,8 @@ public abstract class Plot extends Event {
     boolean currentEnds = current == null || stepComplete(current);
     if (currentEnds && current != null) {
       checkForTipoffs(current, false, true);
+      boolean success = checkSuccess(current);
+      onCompletion(current, success);
     }
     if (currentEnds && next != null) {
       next.timeStart = time;

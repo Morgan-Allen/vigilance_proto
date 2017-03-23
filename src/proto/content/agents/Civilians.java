@@ -87,7 +87,8 @@ public class Civilians {
       WILL    , 5 ,
       MUSCLE  , 2 ,
       
-      MEDICINE, 7
+      MEDICINE, 7,
+      QUESTION, 2
     ),
     INVENTOR = new PersonType(
       "Inventor", "person_kind_inventor", IMG_DIR+"icon_inventor.png",
@@ -98,7 +99,8 @@ public class Civilians {
       WILL    , 5 ,
       MUSCLE  , 2 ,
       
-      ENGINEERING, 7
+      ENGINEERING, 7,
+      INVESTMENT, 2
     ),
     BROKER = new PersonType(
       "Broker", "person_kind_broker", IMG_DIR+"icon_broker.png",
@@ -109,7 +111,8 @@ public class Civilians {
       WILL    , 5 ,
       MUSCLE  , 2 ,
       
-      PERSUADE, 7
+      PERSUADE, 7,
+      INVESTMENT, 4
     ),
     POLICE = new PersonType(
       "Police", "person_kind_police", IMG_DIR+"icon_police.png",
@@ -135,7 +138,8 @@ public class Civilians {
       MUSCLE  , 2 ,
       
       PERSUADE, 5,
-      QUESTION, 5
+      QUESTION, 5,
+      INVESTMENT, 4
     ),
     GENTRY = new PersonType(
       "Gentry", "person_kind_gentry", IMG_DIR+"icon_gentry.png",
@@ -148,7 +152,8 @@ public class Civilians {
       MUSCLE  , 3 ,
       
       PERSUADE, 3,
-      QUESTION, 3
+      QUESTION, 3,
+      INVESTMENT, 7
     ),
     CIVIC_TYPES[] = { POLICE, OFFICIAL, GENTRY }
   ;

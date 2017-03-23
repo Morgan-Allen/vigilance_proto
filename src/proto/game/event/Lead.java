@@ -11,10 +11,6 @@ import static proto.game.person.PersonStats.*;
 import java.awt.Image;
 
 
-//
-//  TODO:  You could sharpen this up a little, with separate success-chance
-//  for each party involved in a step?
-
 
 public class Lead extends Task {
   
@@ -27,12 +23,12 @@ public class Lead extends Task {
     MEDIUM_MEET     =  1,
     MEDIUM_WIRE     =  2,
     MEDIUM_SURVEIL  =  3,
-    MEDIUM_QUESTION =  4,
-    MEDIUM_COVER    =  5,
-    MEDIUM_HEIST    =  6,
+    MEDIUM_HEIST    =  4,
+    MEDIUM_QUESTION =  5,
+    MEDIUM_COVER    =  6,
     MEDIUM_ANY      = -1,
     PHYSICAL_MEDIA[] = { 1, 3, 4, 5, 6 },
-    SOCIAL_MEDIA  [] = { 1, 4 },
+    SOCIAL_MEDIA  [] = { 1, 5 },
     WIRED_MEDIA   [] = { 2 },
     //  Whether this lead can pick up on past/present/future contacts-
     TENSE_BEFORE    =  0,
@@ -60,6 +56,8 @@ public class Lead extends Task {
     CONFIDENCE_LOW      = 0.33f,
     CONFIDENCE_MODERATE = 0.66f,
     CONFIDENCE_HIGH     = 1.00f;
+  final public static int
+    CLUE_EXPIRATION_TIME = World.HOURS_PER_DAY * World.DAYS_PER_WEEK;
   
   final static String
     PROFILE_DESC[] = {
@@ -403,6 +401,11 @@ public class Lead extends Task {
     if (tense != TENSE_ANY && type.tense != TENSE_ANY && tense != type.tense) {
       return false;
     }
+    if (tense == TENSE_AFTER) {
+      int timeFromEnd = step.timeStart + step.timeTaken;
+      timeFromEnd -= base.world().timing.totalHours();
+      if (timeFromEnd >= CLUE_EXPIRATION_TIME) return false;
+    }
     //
     //  Then, check the medium-
     boolean matchMedium = false;
@@ -447,8 +450,6 @@ public class Lead extends Task {
     }
     //
     //  Then perform the actual skill-test needed to ensure success:
-    //  TODO  There should ideally be separate skill tests for each participant
-    //        in a step.
     attempt = configAttempt(follow);
     int outcome = attempt.performAttempt(2);
     float result = (outcome == 2) ? RESULT_HOT : RESULT_PARTIAL;
@@ -543,22 +544,30 @@ public class Lead extends Task {
   public boolean updateAssignment() {
     if (! super.updateAssignment()) return false;
     Series <Person> active = active();
+    World world = base.world();
     //
     //  Continuously monitor for events of interest connected to the current
     //  focus of your investigation, and see if any new information pops up...
-    for (Event event : base.world().events.active()) {
-      if (! (event instanceof Plot)) continue;
+    for (Event event : world.events.active()) if (event.isPlot()) {
       Plot plot = (Plot) event;
-      
       for (Step step : plot.allSteps()) {
         int tense = plot.stepTense(step);
-        
         if (tense == TENSE_DURING && step.medium == MEDIUM_HEIST) {
           Scene scene = plot.generateScene(step, focus, this);
           base.world().enterScene(scene);
         }
         else if (canDetect(step, tense, plot)) {
           attemptFollow(step, tense, plot, active);
+        }
+      }
+    }
+    //
+    //  Including past events (up to a certain expiration date)-
+    for (Event event : world.events.past()) if (event.isPlot()) {
+      Plot plot = (Plot) event;
+      for (Step step : plot.allSteps()) {
+        if (canDetect(step, TENSE_AFTER, plot)) {
+          attemptFollow(step, TENSE_AFTER, plot, active);
         }
       }
     }

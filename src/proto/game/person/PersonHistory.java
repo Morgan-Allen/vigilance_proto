@@ -52,7 +52,7 @@ public class PersonHistory {
   
   
   
-  public float valueFor(Element other) {
+  public float bondWith(Element other) {
     Bond r = relations.get(other);
     return r == null ? 0 : r.value;
   }
@@ -67,14 +67,14 @@ public class PersonHistory {
   
   
   public void incBond(Element other, float inc) {
-    setBond(other, valueFor(other) + inc);
+    setBond(other, bondWith(other) + inc);
   }
   
   
   public Series <Element> sortedBonds() {
     final List <Element> all = new List <Element> () {
       protected float queuePriority(Element p) {
-        return Nums.abs(valueFor(p));
+        return bondWith(p);
       }
     };
     for (Element p : relations.keySet()) all.add(p);

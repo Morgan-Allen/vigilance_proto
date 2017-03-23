@@ -22,6 +22,7 @@ public class Events {
   final World world;
   List <Event> coming = new List();
   List <Event> active = new List();
+  List <Event> past   = new List();
   
   Assignment currentAction = null;
   static class LogEntry { String info; Assignment action; int priority; }
@@ -36,12 +37,14 @@ public class Events {
   void loadState(Session s) throws Exception {
     s.loadObjects(coming);
     s.loadObjects(active);
+    s.loadObjects(past  );
   }
   
   
   void saveState(Session s) throws Exception {
     s.saveObjects(coming);
     s.saveObjects(active);
+    s.saveObjects(past  );
   }
   
   
@@ -50,6 +53,7 @@ public class Events {
     */
   public Series <Event> active() { return active; }
   public Series <Event> coming() { return coming; }
+  public Series <Event> past  () { return past  ; }
   
   
   
@@ -95,6 +99,7 @@ public class Events {
   public void closeEvent(Event event) {
     coming.remove(event);
     active.remove(event);
+    if (! past.includes(event)) past.addFirst(event);
   }
   
   

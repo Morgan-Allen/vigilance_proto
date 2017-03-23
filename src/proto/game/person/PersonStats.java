@@ -92,8 +92,19 @@ public class PersonStats {
       "without resorting to force.",
       WILL
     ),
-    SKILL_STATS[] = { ENGINEERING, MEDICINE, QUESTION, PERSUADE },
-    
+    INVESTMENT = new Trait(
+      "Investment", "skill_investment", ICON_PATH+"icon_invest.png",
+      "",
+      BRAINS
+    ),
+    MYTH_AND_RELIGION = new Trait(
+      "Myth and Religion", "skill_myth_and_religion", ICON_PATH+"icon_myth.png",
+      "",
+      BRAINS
+    ),
+    SKILL_STATS[] = {
+      ENGINEERING, MEDICINE, QUESTION, PERSUADE, INVESTMENT, MYTH_AND_RELIGION
+    },
     ALL_STATS[] = (Trait[]) Visit.compose(
       Trait.class, BASE_STATS, COMBAT_STATS, SKILL_STATS
     );

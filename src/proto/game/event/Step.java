@@ -9,7 +9,7 @@ import proto.util.*;
 
 //  TODO:  Have this extend Task?
 
-public class Step {
+public class Step implements Session.Saveable {
   
   
   /**  Data fields and save/load methods-
@@ -26,8 +26,26 @@ public class Step {
   boolean spooked = false;
   
   
+  Step() {
+    return;
+  }
   
-  void saveStep(Session s) throws Exception {
+  
+  public Step(Session s) throws Exception {
+    involved  = (Plot.Role[]) s.loadObjectArray(Plot.Role.class);
+    medium    = s.loadInt();
+    timeTaken = s.loadInt();
+    ID        = s.loadInt();
+    
+    meetsAt   = (Plot.Role) s.loadObject();
+    infoGiven = (Plot.Role) s.loadObject();
+    
+    timeStart = s.loadInt();
+    spooked   = s.loadBool();
+  }
+  
+  
+  public void saveState(Session s) throws Exception {
     s.saveObjectArray(involved);
     s.saveInt (medium   );
     s.saveInt (timeTaken);
@@ -41,19 +59,26 @@ public class Step {
   }
   
   
-  static Step loadStep(Session s) throws Exception {
-    Step step = new Step();
-    step.involved  = (Plot.Role[]) s.loadObjectArray(Plot.Role.class);
-    step.medium    = s.loadInt();
-    step.timeTaken = s.loadInt();
-    step.ID        = s.loadInt();
-    
-    step.meetsAt   = (Plot.Role) s.loadObject();
-    step.infoGiven = (Plot.Role) s.loadObject();
-    
-    step.timeStart = s.loadInt();
-    step.spooked   = s.loadBool();
-    return step;
+  
+  /**  Assorted no-brainer access methods-
+    */
+  public boolean isHeist() {
+    return medium == Lead.MEDIUM_HEIST;
+  }
+  
+  
+  public boolean isPhysical() {
+    return Lead.isPhysical(medium);
+  }
+  
+  
+  public boolean isMeeting() {
+    return Lead.isSocial(medium);
+  }
+  
+  
+  public boolean isWired() {
+    return Lead.isWired(medium);
   }
   
   

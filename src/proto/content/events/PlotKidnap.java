@@ -14,9 +14,14 @@ public class PlotKidnap extends Plot {
   
   
   final static Plot.Role
-    ROLE_TAILS = new Plot.Role("role_tails", "Tails"),
-    ROLE_GRABS = new Plot.Role("role_grabs", "Grabs"),
-    ROLE_DRUGS = new Plot.Role("role_drugs", "Drugs");
+    ROLE_TAILS   = new Plot.Role("role_tails"  , "Tails"  ),
+    ROLE_GRABS   = new Plot.Role("role_grabs"  , "Grabs"  ),
+    ROLE_DRUGS   = new Plot.Role("role_drugs"  , "Drugs"  ),
+    ROLE_RANSOMS = new Plot.Role("role_ransoms", "Ransoms");
+  
+  
+  Step ransomStep;
+  boolean returnedHostage;
   
   
   public PlotKidnap(PlotType type, Base base) {
@@ -26,85 +31,115 @@ public class PlotKidnap extends Plot {
   
   public PlotKidnap(Session s) throws Exception {
     super(s);
+    ransomStep = (Step) s.loadObject();
+    returnedHostage = s.loadBool();
   }
   
   
   public void saveState(Session s) throws Exception {
     super.saveState(s);
+    s.saveObject(ransomStep);
+    s.saveBool(returnedHostage);
   }
   
   
   protected boolean fillRoles() {
-    
     World world = base().world();
-    Pick <Person> pickT = new Pick();
-    Pick <Place > pickH = new Pick();
+    Pick <Person> pickR = new Pick();
     
     for (Region r : world.regions()) for (Place b : r.buildSlots()) {
       if (b == null || b.isBase()) continue;
-      
       for (Person p : b.residents()) {
-        //  TODO:  Use closeness to another, wealthy person here...
-        pickT.compare(p, Rand.num());
+        pickR.compare(p, p.stats.levelFor(INVESTMENT));
       }
-      //  TODO:  Use anonymity or something (?) to select a hideout here...
-      pickH.compare(b, Rand.num());
     }
-    if (pickT.empty() || pickH.empty()) return false;
+    if (pickR.empty()) return false;
+    Person ransoms = pickR.result();
     
-    
-    Person target = pickT.result();
+    Person target = null;
+    for (Element e : ransoms.history.sortedBonds()) if (e.isPerson()) {
+      target = (Person) e;
+      break;
+    }
+    if (target == null) return false;
+
+    Pick <Place > pickH = new Pick();
+    for (Region r : world.regionsInRange(target.region(), 1)) {
+      for (Place b : r.buildSlots()) {
+        if (b == null || b.isBase()) continue;
+        pickH.compare(b, Rand.num());
+      }
+    }
+    if (pickH.empty()) return false;
     Place hideout = pickH.result();
-    Series <Person> goons = PlotUtils.goonsOnRoster(this);
     
+    Series <Person> goons = PlotUtils.goonsOnRoster(this);
     assignTarget   (target, target.resides());
     assignOrganiser(base().leader(), hideout);
+    assignRole(ransoms, ROLE_RANSOMS);
     PlotUtils.fillExpertRole(this, SIGHT_RANGE, goons, ROLE_TAILS);
     PlotUtils.fillExpertRole(this, MEDICINE   , goons, ROLE_DRUGS);
     PlotUtils.fillExpertRole(this, MUSCLE     , goons, ROLE_GRABS);
     assignRole(filling(ROLE_GRABS), Plot.ROLE_ENFORCER);
     
-    queueSteps(
-      Lead.MEDIUM_MEET, World.HOURS_PER_DAY, Plot.ROLE_ORGANISER,
+    queueMeetings(
+      Plot.ROLE_ORGANISER,
       ROLE_TAILS, ROLE_DRUGS
     );
-    queueStep(
-      Lead.MEDIUM_MEET,
-      World.HOURS_PER_DAY,
-      Plot.ROLE_ORGANISER, Plot.ROLE_ENFORCER
-    ).setInfoGiven(Plot.ROLE_TARGET);
-    
+    queueMessage(
+      Plot.ROLE_ORGANISER,
+      Plot.ROLE_ENFORCER,
+      Plot.ROLE_TARGET
+    );
     queueStep(
       Lead.MEDIUM_SURVEIL,
-      World.HOURS_PER_DAY,
       ROLE_TAILS, Plot.ROLE_TARGET
     );
-    queueStep(
-      Lead.MEDIUM_MEET,
-      World.HOURS_PER_DAY,
+    queueMeeting(
       ROLE_TAILS, ROLE_DRUGS, ROLE_GRABS
     );
-    queueStep(
-      Lead.MEDIUM_HEIST,
-      World.HOURS_PER_DAY,
+    queueHeist(
       Plot.ROLE_TARGET, ROLE_TAILS, ROLE_GRABS, Plot.ROLE_ENFORCER
     );
-    
+    ransomStep = queueStep(
+      Lead.MEDIUM_WIRE,
+      World.HOURS_PER_DAY,
+      Plot.ROLE_ORGANISER, ROLE_RANSOMS
+    );
     return false;
   }
   
   
+  protected boolean checkSuccess(Step step) {
+    return true;
+  }
+  
+  
+  protected void onCompletion(Step step, boolean success) {
+    Person target = (Person) target();
+    if (step.isHeist()) {
+      hideout().setAttached(target, true);
+    }
+    else if (step == ransomStep) {
+      target.resides().setAttached(target, true);
+      Person ransomed = (Person) filling(ROLE_RANSOMS);
+      float cashGained = ransomed.stats.levelFor(INVESTMENT) * 50;
+      base().finance.incPublicFunds((int) cashGained);
+    }
+  }
+  
+  
   protected float ratePlotFor(Person mastermind) {
-    return 1;
+    Person ransomed = (Person) filling(ROLE_RANSOMS);
+    float cashGained = ransomed.stats.levelFor(INVESTMENT) * 50;
+    float baseFunds = base().finance.publicFunds();
+    return cashGained / (100 + baseFunds);
   }
-  
-  
-  protected void onCompletion(Step step) {
-    
-  }
-  
-  
 }
+
+
+
+
 
 
 

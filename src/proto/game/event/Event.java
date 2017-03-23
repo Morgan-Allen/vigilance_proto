@@ -64,6 +64,11 @@ public abstract class Event implements Session.Saveable, Assignment {
   }
   
   
+  public boolean isPlot() {
+    return this instanceof Plot;
+  }
+  
+  
   
   /**  Assigning perps-
     */
