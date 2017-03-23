@@ -74,7 +74,7 @@ public class PersonHistory {
   public Series <Element> sortedBonds() {
     final List <Element> all = new List <Element> () {
       protected float queuePriority(Element p) {
-        return bondWith(p);
+        return 0 - bondWith(p);
       }
     };
     for (Element p : relations.keySet()) all.add(p);

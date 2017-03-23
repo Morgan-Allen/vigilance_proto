@@ -335,7 +335,7 @@ public class Person extends Element {
   
   
   public boolean isCivilian() {
-    return kind.type() == Kind.SUBTYPE_CIVILIAN;
+    return kind.subtype() == Kind.SUBTYPE_CIVILIAN;
   }
   
   

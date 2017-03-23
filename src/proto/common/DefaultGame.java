@@ -42,19 +42,35 @@ public class DefaultGame extends RunGame {
   
   
   public static void initDefaultRegions(World world) {
-    int numN = Regions.ALL_REGIONS.length;
+    boolean report = GameSettings.reportWorldInit;
+    if (report) I.say("\nInitialising Regions...");
     
+    int numN = Regions.ALL_REGIONS.length;
     Region[] regions = new Region[numN];
     for (int n = 0; n < numN; n++) {
       regions[n] = new Region(Regions.ALL_REGIONS[n], world);
-      regions[n].initialiseRegion();
     }
     world.attachRegions(regions);
+    for (Region region : regions) {
+      region.initialiseRegion();
+      if (report) {
+        I.say("  "+region);
+        for (Place p : region.buildSlots()) if (p != null) {
+          I.say("    "+p+" residents:");
+          for (Person r : p.residents()) {
+            I.say("      "+r);
+          }
+        }
+      }
+    }
   }
   
   
   public static void initDefaultBase(World world) {
+    boolean report = GameSettings.reportWorldInit;
+    if (report) I.say("\nInitialising Base...");
     
+    //  TODO:  Move this out to the region-types definitions!
     final Faction city = Civilians.THE_CITY_COUNCIL;
     final Base cityHall = new Base(Facilities.UNION_OFFICE, world, city);
     world.regionFor(Regions.SECTOR05).setAttached(cityHall, true);
@@ -64,6 +80,8 @@ public class DefaultGame extends RunGame {
     Place prison = at.setupFacility(Facilities.HIDEOUT, 2, cityHall, true);
     world.council.assignPrison(prison);
     
+    //
+    //  
     final Faction owns = Heroes.JANUS_INDUSTRIES;
     final Base base = new Base(Facilities.MANOR, world, owns);
     Person leader = new Person(Heroes.HERO_PHOBOS, world);
@@ -123,10 +141,23 @@ public class DefaultGame extends RunGame {
     base.finance.incSecretFunds(200);
     base.finance.updateFinance();
     world.addBase(base, true);
+    
+    if (report) {
+      I.say("  Roster for "+owns);
+      for (Person p : base.roster()) I.say("    "+p);
+      I.say("  Known technologies:");
+      for (Object o : base.knownTech()) I.say("    "+o);
+      I.say("  Current stocks:");
+      for (ItemType t : base.stocks.availableItemTypes()) {
+        I.say("    "+t+" ("+base.stocks.numStored(t)+")");
+      }
+    }
   }
   
   
   public static void initDefaultCrime(World world) {
+    boolean report = GameSettings.reportWorldInit;
+    if (report) I.say("\nInitialising Crime...");
     
     final PersonType goonTypes[] = {
       Crooks.BRUISER, Crooks.BRUISER, Crooks.GANGSTER
@@ -170,19 +201,24 @@ public class DefaultGame extends RunGame {
         base.setAttached(p, true);
       }
       
-      Plot initPlot = base.plots.generateNextPlot();
-      base.plots.assignRootPlot(initPlot);
+      if (report) {
+        I.say("  Roster for "+base.faction());
+        for (Person p : base.roster()) I.say("    "+p);
+      }
     }
   }
   
   
   public static void initDefaultBonds(World world) {
+    boolean report = GameSettings.reportWorldInit;
+    Series <Person> civilians = world.civilians();
+    if (report) I.say("\nInitialising Bonds...");
     //
     //  Establish random positive relationships between civilians in
     //  neighbouring sectors:
-    for (Person p : civilians(world)) {
+    for (Person p : civilians) {
       Batch <Person> neighbours = new Batch();
-      for (Person o : civilians(world)) {
+      for (Person o : civilians) {
         if (world.distanceBetween(p.region(), o.region()) > 1) continue;
         neighbours.add(o);
       }
@@ -196,11 +232,12 @@ public class DefaultGame extends RunGame {
     }
     //
     //  And establish some grudges between crime bosses and prominent citizens-
-    for (Base base : world.bases()) if (base.faction().criminal) {
+    for (Base base : world.bases()) {
+      if (! base.faction().criminal) continue;
       Person boss = base.leader();
       
       Batch <Person> enemies = new Batch();
-      for (Person p : civilians(world)) {
+      for (Person p : civilians) {
         if (Visit.arrayIncludes(Civilians.CIVIC_TYPES, p.kind())) {
           enemies.add(p);
         }
@@ -213,19 +250,28 @@ public class DefaultGame extends RunGame {
         mark.history.setBond(boss, -1);
       }
     }
-  }
-  
-  
-  static Series <Person> civilians(final World world) {
-    Batch <Person> all = new Batch();
-    for (Element e : world.inside()) if (e.isPerson()) {
-      Person p = (Person) e;
-      if (p.isHero() || p.resides() == null) continue;
-      all.add(p);
+    //
+    //  
+    if (report) {
+      for (Person p : civilians) {
+        I.say("  Civilian "+p+" has Bonds:");
+        for (Element o : p.history.sortedBonds()) {
+          I.say("    "+o+" ("+p.history.bondWith(o)+")");
+        }
+      }
+      for (Base b : world.bases()) if (b.faction().criminal) {
+        Person p = b.leader();
+        I.say("  Boss "+p+" has Grudges:");
+        for (Element o : p.history.sortedBonds()) {
+          I.say("    "+o+" ("+p.history.bondWith(o)+")");
+        }
+      }
     }
-    return all;
   }
 }
+
+
+
 
 
 

@@ -36,7 +36,7 @@ public class Facilities {
     EMPLOYMENT, 3,
     HEALTH, -2,
     INCOME, 200,
-    Civilians.CIVILIAN, 2,
+    Civilians.WORKER, 2,
     Common.VENUE_INDUSTRIAL,
     Common.VENUE_SLUM
   ) {
@@ -56,7 +56,7 @@ public class Facilities {
     EMPLOYMENT, 3,
     HEALTH, -2,
     INCOME, 200,
-    Civilians.CIVILIAN, 2,
+    Civilians.WORKER, 2,
     Common.VENUE_INDUSTRIAL,
     Common.VENUE_SLUM
   ){
@@ -78,7 +78,7 @@ public class Facilities {
     EDUCATION, -1,
     DETERRENCE, 10,
     INCOME, -100,
-    Civilians.CIVILIAN, 1,
+    Civilians.WORKER, 1,
     Common.VENUE_OFFICE,
     Common.VENUE_INDUSTRIAL
   );

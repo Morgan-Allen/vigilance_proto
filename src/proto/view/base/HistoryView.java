@@ -38,7 +38,7 @@ public class HistoryView extends UINode {
     
     for (Element b : person.history.sortedBonds()) if (b.isPerson()) {
       Person other = (Person) b;
-      float value = person.history.valueFor(other);
+      float value = person.history.bondWith(other);
       
       g.drawImage(other.kind().sprite(), vx + 5, vy + down + 5, 40, 40, null);
       boolean hoverP = surface.tryHover(vx + 5, vy + down + 5, 40, 40, other);

@@ -30,7 +30,7 @@ public class PlotUtils {
     Pick <Person> pick = new Pick();
     for (Person p : target.residents()) {
       if (plot.roleFor(p, null) != null) continue;
-      pick.compare(p, 0 - p.history.valueFor(target.owner()));
+      pick.compare(p, 0 - p.history.bondWith(target.owner()));
     }
     if (pick.empty()) return;
     plot.assignRole(pick.result(), role);

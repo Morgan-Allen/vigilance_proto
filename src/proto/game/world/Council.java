@@ -6,6 +6,14 @@ import proto.game.person.*;
 import proto.game.event.*;
 import proto.util.*;
 
+//
+//  TODO:  Make Trials into a kind of Event themselves, so they can be
+//  disrupted by crooks.
+//
+//  TODO:  Assign officials to preside over/prosecute/defend during a trial, so
+//  they can earn grudges from crime bosses.
+//
+//  TODO:  Construct a report for trials being scheduled or sentence passed!
 
 
 public class Council {
@@ -18,8 +26,6 @@ public class Council {
   List <Place> courts  = new List();
   List <Place> prisons = new List();
   
-  //  TODO:  Make Trials into a kind of Event themselves, so they can be
-  //  disrupted by crooks.
   static class Trial {
     List <Person> accused = new List();
     int timeStarts, timeEnds;
@@ -169,9 +175,6 @@ public class Council {
   
   
   private void concludeTrial(Trial t) {
-    //
-    //  TODO:  Construct a report for this!
-    
     for (Person p : t.accused) {
       float sumEvidence = 0;
       for (Plot plot : mainHall.leads.involvedIn(p, true)) {

@@ -32,6 +32,7 @@ public class Step implements Session.Saveable {
   
   
   public Step(Session s) throws Exception {
+    s.cacheInstance(this);
     involved  = (Plot.Role[]) s.loadObjectArray(Plot.Role.class);
     medium    = s.loadInt();
     timeTaken = s.loadInt();

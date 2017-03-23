@@ -180,7 +180,10 @@ public class Kind extends Index.Entry implements Session.Saveable {
   public static Image loadImage(String imgPath) {
     if (imgPath == null) return null;
     try { return ImageIO.read(new File(imgPath)); }
-    catch (Exception e) { I.say("Could not load: "+imgPath); return null; }
+    catch (Exception e) {
+      if (GameSettings.reportMediaMiss) I.say("Could not load: "+imgPath);
+      return null;
+    }
   }
   
   

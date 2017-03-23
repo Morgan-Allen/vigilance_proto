@@ -2,7 +2,6 @@
 
 package proto.game.world;
 import proto.common.*;
-import proto.game.event.*;
 import proto.game.person.*;
 import proto.util.*;
 import java.awt.Image;
@@ -103,8 +102,9 @@ public class Place extends Element {
     for (Kind type : hired) if (type.type() == Kind.TYPE_PERSON) {
       final int max = kind.baseLevel(type);
       int count = 0;
-      for (Person p : residents) if (p.kind() == type) count++;
-      
+      for (Person p : residents) {
+        if (p.kind() == type) count++;
+      }
       while (count++ < max) {
         Person resides = Person.randomOfKind((PersonType) type, world);
         world.setInside(resides, true);

@@ -2,6 +2,7 @@
 
 package proto.game.world;
 import proto.common.*;
+import proto.game.person.Person;
 import proto.game.scene.*;
 import proto.util.*;
 import proto.view.common.MainView;
@@ -192,6 +193,16 @@ public class World implements Session.Saveable {
       matches.add(r);
     }
     return matches;
+  }
+  
+  
+  public Series <Person> civilians() {
+    Batch <Person> all = new Batch();
+    for (Element e : inside()) if (e.isPerson()) {
+      Person p = (Person) e;
+      if (p.isCivilian()) all.add(p);
+    }
+    return all;
   }
   
   

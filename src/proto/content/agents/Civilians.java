@@ -19,34 +19,6 @@ public class Civilians {
     "The City Council", "faction_the_city_council", false
   );
   
-  final public static PlaceType CITY_HALL = new PlaceType(
-    "City Hall", "facility_city_hall",
-    "media assets/tech icons/icon_city_hall.png",
-    "",
-    0, BUILD_TIME_LONG, URBAN_SCENE,
-    EMPLOYMENT, 2,
-    EDUCATION, 1,
-    DETERRENCE, 5,
-    INCOME, 0,
-    Civilians.OFFICIAL, 3,
-    Common.VENUE_OFFICE,
-    Common.VENUE_CIVIC,
-    Common.VENUE_SECURITY
-  );
-  
-  final public static PlaceType PENTHOUSE = new PlaceType(
-    "City Hall", "facility_city_hall",
-    "media assets/tech icons/icon_city_hall.png",
-    "",
-    0, BUILD_TIME_MEDIUM, URBAN_SCENE,
-    EMPLOYMENT, 1,
-    DIVERSION, 1,
-    INCOME, 100,
-    Civilians.GENTRY, 2,
-    Common.VENUE_RITZY,
-    Common.VENUE_DOMESTIC
-  );
-  
   
   final public static String
     COMMON_FIRST_NAMES[] = {
@@ -158,9 +130,35 @@ public class Civilians {
     CIVIC_TYPES[] = { POLICE, OFFICIAL, GENTRY }
   ;
   
+  
+  final public static PlaceType CITY_HALL = new PlaceType(
+    "City Hall", "facility_city_hall",
+    "media assets/tech icons/icon_city_hall.png",
+    "",
+    0, BUILD_TIME_LONG, URBAN_SCENE,
+    EMPLOYMENT, 2,
+    EDUCATION, 1,
+    DETERRENCE, 5,
+    INCOME, 0,
+    Civilians.OFFICIAL, 3,
+    Common.VENUE_OFFICE,
+    Common.VENUE_CIVIC,
+    Common.VENUE_SECURITY
+  );
+  
+  final public static PlaceType PENTHOUSE = new PlaceType(
+    "Penthouse", "facility_penthouse",
+    "media assets/tech icons/icon_penthouse.png",
+    "",
+    0, BUILD_TIME_MEDIUM, URBAN_SCENE,
+    EMPLOYMENT, 1,
+    DIVERSION, 1,
+    INCOME, 100,
+    Civilians.GENTRY, 2,
+    Common.VENUE_RITZY,
+    Common.VENUE_DOMESTIC
+  );
 }
-
-
 
 
 

@@ -23,6 +23,7 @@ public class DebugPlots extends RunGame {
     DefaultGame.initDefaultRegions(world);
     DefaultGame.initDefaultBase   (world);
     DefaultGame.initDefaultCrime  (world);
+    DefaultGame.initDefaultBonds  (world);
     
     //  TODO:  Generate relationships (kin and otherwise) between persons in
     //  nearby venues!

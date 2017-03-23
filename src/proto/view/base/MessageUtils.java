@@ -46,6 +46,23 @@ public class MessageUtils {
     });
   }
   
+  
+  public static void presentSentenceMessage() {
+    
+  }
+  
+  
+  public static void presentReleaseMessage() {
+    
+  }
+  
 }
+
+
+
+
+
+
+
 
 

@@ -21,10 +21,12 @@ public abstract class Plot extends Event {
   public static class Role extends Index.Entry implements Session.Saveable {
     
     final String name;
+    final boolean victim;
     
-    public Role(String ID, String name) {
+    public Role(String ID, String name, boolean victim) {
       super(ROLES_INDEX, ID);
       this.name = name;
+      this.victim = victim;
     }
     
     public static Role loadConstant(Session s) throws Exception {
@@ -41,14 +43,14 @@ public abstract class Plot extends Event {
   }
   
   final public static Role
-    ROLE_TIME      = new Role("role_time"     , "Time"     ),
-    ROLE_OBJECTIVE = new Role("role_objective", "Objective"),
-    ROLE_BASE      = new Role("role_base"     , "Base"     ),
-    ROLE_HIDEOUT   = new Role("role_hideout"  , "Hideout"  ),
-    ROLE_ORGANISER = new Role("role_organiser", "Organiser"),
-    ROLE_ENFORCER  = new Role("role_enforcer" , "Enforcer" ),
-    ROLE_TARGET    = new Role("role_target"   , "Target"   ),
-    ROLE_SCENE     = new Role("role_scene"    , "Scene"    )
+    ROLE_TIME      = new Role("role_time"     , "Time"     , false),
+    ROLE_OBJECTIVE = new Role("role_objective", "Objective", false),
+    ROLE_BASE      = new Role("role_base"     , "Base"     , false),
+    ROLE_HIDEOUT   = new Role("role_hideout"  , "Hideout"  , false),
+    ROLE_ORGANISER = new Role("role_organiser", "Organiser", false),
+    ROLE_ENFORCER  = new Role("role_enforcer" , "Enforcer" , false),
+    ROLE_TARGET    = new Role("role_target"   , "Target"   , true ),
+    ROLE_SCENE     = new Role("role_scene"    , "Scene"    , true )
   ;
   
   
@@ -281,7 +283,8 @@ public abstract class Plot extends Event {
   
   
   public Element filling(Role role) {
-    return roleFor(null, role).element;
+    RoleEntry entry = roleFor(null, role);
+    return entry == null ? null : entry.element;
   }
   
   

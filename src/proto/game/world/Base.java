@@ -161,6 +161,11 @@ public class Base extends Place {
   }
   
   
+  public Series <Object> knownTech() {
+    return knownTech;
+  }
+  
+  
   
   /**  Construction and salvage-
     */

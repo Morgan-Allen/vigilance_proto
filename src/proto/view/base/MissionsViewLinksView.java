@@ -87,7 +87,7 @@ public class MissionsViewLinksView extends UINode {
       }
       for (Element e : perp.history.sortedBonds()) if (e.isPerson()) {
         float bond = perp.history.bondWith(e);
-        addAssociate(list, e, null, bond > 0 ? "Friend" : "Enemy");
+        addAssociate(list, e, null, (bond > 0 ? "Friend " : "Enemy ")+bond);
       }
       for (Plot plot : player.leads.involvedIn(suspect, true)) {
         addAssociate(list, null, plot, "Suspect In");

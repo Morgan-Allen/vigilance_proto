@@ -54,6 +54,13 @@ public class BaseStocks {
   }
   
   
+  public Series <ItemType> availableItemTypes() {
+    Batch <ItemType> available = new Batch();
+    for (Item item : stocks) available.include(item.kind());
+    return available;
+  }
+  
+  
   public boolean incStock(ItemType type, int amount) {
     while (amount-- > 0) {
       stocks.add(new Item(type, base.world));

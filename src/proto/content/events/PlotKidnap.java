@@ -14,10 +14,10 @@ public class PlotKidnap extends Plot {
   
   
   final static Plot.Role
-    ROLE_TAILS   = new Plot.Role("role_tails"  , "Tails"  ),
-    ROLE_GRABS   = new Plot.Role("role_grabs"  , "Grabs"  ),
-    ROLE_DRUGS   = new Plot.Role("role_drugs"  , "Drugs"  ),
-    ROLE_RANSOMS = new Plot.Role("role_ransoms", "Ransoms");
+    ROLE_TAILS   = new Plot.Role("role_tails"  , "Tails"  , false),
+    ROLE_GRABS   = new Plot.Role("role_grabs"  , "Grabs"  , false),
+    ROLE_DRUGS   = new Plot.Role("role_drugs"  , "Drugs"  , false),
+    ROLE_RANSOMS = new Plot.Role("role_ransoms", "Ransoms", true );
   
   
   Step ransomStep;
@@ -47,21 +47,19 @@ public class PlotKidnap extends Plot {
     World world = base().world();
     Pick <Person> pickR = new Pick();
     
-    for (Region r : world.regions()) for (Place b : r.buildSlots()) {
-      if (b == null || b.isBase()) continue;
-      for (Person p : b.residents()) {
-        pickR.compare(p, p.stats.levelFor(INVESTMENT));
-      }
+    for (Person p : world.civilians()) {
+      if (p.resides() == null) continue;
+      pickR.compare(p, p.stats.levelFor(INVESTMENT));
     }
     if (pickR.empty()) return false;
     Person ransoms = pickR.result();
     
-    Person target = null;
+    Pick <Person> pickT = new Pick(0);
     for (Element e : ransoms.history.sortedBonds()) if (e.isPerson()) {
-      target = (Person) e;
-      break;
+      pickT.compare((Person) e, ransoms.history.bondWith(e));
     }
-    if (target == null) return false;
+    if (pickT.empty()) return false;
+    Person target = pickT.result();
 
     Pick <Place > pickH = new Pick();
     for (Region r : world.regionsInRange(target.region(), 1)) {
@@ -74,9 +72,9 @@ public class PlotKidnap extends Plot {
     Place hideout = pickH.result();
     
     Series <Person> goons = PlotUtils.goonsOnRoster(this);
+    assignRole(ransoms, ROLE_RANSOMS);
     assignTarget   (target, target.resides());
     assignOrganiser(base().leader(), hideout);
-    assignRole(ransoms, ROLE_RANSOMS);
     PlotUtils.fillExpertRole(this, SIGHT_RANGE, goons, ROLE_TAILS);
     PlotUtils.fillExpertRole(this, MEDICINE   , goons, ROLE_DRUGS);
     PlotUtils.fillExpertRole(this, MUSCLE     , goons, ROLE_GRABS);
