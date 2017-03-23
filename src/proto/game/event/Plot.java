@@ -284,6 +284,11 @@ public abstract class Plot extends Event {
     return null;
   }
   
+  
+  protected abstract boolean fillRoles();
+  protected abstract void onCompletion(Step step);
+  protected abstract float ratePlotFor(Person mastermind);
+  
 
   
   /**  Life cycle and execution:
@@ -291,10 +296,6 @@ public abstract class Plot extends Event {
   public void fillAndExpand() {
     fillRoles();
   }
-  
-  
-  protected abstract boolean fillRoles();
-  protected abstract void onCompletion(Step step);
   
   
   public boolean possible() {
@@ -477,7 +478,6 @@ public abstract class Plot extends Event {
     else if (typeKnown  ) name += " ("+type.name+")";
     return name;
   }
-  
   
 }
 

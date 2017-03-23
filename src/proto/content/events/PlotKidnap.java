@@ -94,11 +94,14 @@ public class PlotKidnap extends Plot {
   }
   
   
-  protected void onCompletion(Step step) {
-    
+  protected float ratePlotFor(Person mastermind) {
+    return 1;
   }
   
   
+  protected void onCompletion(Step step) {
+    
+  }
   
   
 }

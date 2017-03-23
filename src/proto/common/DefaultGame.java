@@ -9,7 +9,6 @@ import proto.game.person.*;
 import proto.game.world.*;
 import proto.game.event.*;
 import proto.util.*;
-
 import java.awt.EventQueue;
 
 
@@ -32,11 +31,7 @@ public class DefaultGame extends RunGame {
     initDefaultRegions(world);
     initDefaultBase   (world);
     initDefaultCrime  (world);
-    
-    for (Base base : world.bases()) if (base.faction().criminal) {
-      Plot initPlot = base.plots.generateNextPlot();
-      base.plots.assignRootPlot(initPlot);
-    }
+    initDefaultBonds  (world);
     return world;
   }
   
@@ -174,10 +169,63 @@ public class DefaultGame extends RunGame {
         world.setInside(p, true);
         base.setAttached(p, true);
       }
+      
+      Plot initPlot = base.plots.generateNextPlot();
+      base.plots.assignRootPlot(initPlot);
     }
   }
+  
+  
+  public static void initDefaultBonds(World world) {
+    //
+    //  Establish random positive relationships between civilians in
+    //  neighbouring sectors:
+    for (Person p : civilians(world)) {
+      Batch <Person> neighbours = new Batch();
+      for (Person o : civilians(world)) {
+        if (world.distanceBetween(p.region(), o.region()) > 1) continue;
+        neighbours.add(o);
+      }
+      
+      int numBonds = Nums.min(5, neighbours.size());
+      while (numBonds-- > 0) {
+        Person o = (Person) Rand.pickFrom(neighbours);
+        p.history.incBond(o, 0.33f);
+        o.history.incBond(p, 0.33f);
+      }
+    }
+    //
+    //  And establish some grudges between crime bosses and prominent citizens-
+    for (Base base : world.bases()) if (base.faction().criminal) {
+      Person boss = base.leader();
+      
+      Batch <Person> enemies = new Batch();
+      for (Person p : civilians(world)) {
+        if (Visit.arrayIncludes(Civilians.CIVIC_TYPES, p.kind())) {
+          enemies.add(p);
+        }
+      }
+      
+      int numGrudges = Nums.min(5, enemies.size());
+      while (numGrudges-- > 0) {
+        Person mark = (Person) Rand.pickFrom(enemies);
+        boss.history.setBond(mark, -1);
+        mark.history.setBond(boss, -1);
+      }
+    }
+  }
+  
+  
+  static Series <Person> civilians(final World world) {
+    Batch <Person> all = new Batch();
+    for (Element e : world.inside()) if (e.isPerson()) {
+      Person p = (Person) e;
+      if (p.isHero() || p.resides() == null) continue;
+      all.add(p);
+    }
+    return all;
+  }
 }
-
 
 
 

@@ -3,6 +3,7 @@
 package proto.content.places;
 import static proto.content.places.Facilities.*;
 
+import proto.content.agents.Civilians;
 import proto.game.world.*;
 
 
@@ -53,7 +54,7 @@ public class Regions {
 
     final RegionType r5 = SECTOR05;
     r5.view.attachColourKey(-486371, "05");
-    r5.attachDefaultFacilities(CITY_PARK);
+    r5.attachDefaultFacilities(CITY_PARK, Civilians.CITY_HALL);
     r1.attachMapCoordinates(1, 1);
 
     final RegionType r6 = SECTOR06;
@@ -64,7 +65,7 @@ public class Regions {
     
     final RegionType r7 = SECTOR07;
     r7.view.attachColourKey(-4628394, "07");
-    r7.attachDefaultFacilities();
+    r7.attachDefaultFacilities(Civilians.PENTHOUSE);
     r1.attachMapCoordinates(0, 2);
     
     final RegionType r8 = SECTOR08;

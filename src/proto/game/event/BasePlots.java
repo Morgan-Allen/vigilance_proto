@@ -44,9 +44,16 @@ public class BasePlots {
   
   
   public Plot generateNextPlot() {
-    //  TODO:  You need to iterate across possible plot-types here, and come up
-    //  with a promising candidate...
-    return null;
+    Pick <Plot> pick = new Pick(0);
+    
+    for (PlotType type : plotTypes) {
+      Plot sample = type.initPlot(base);
+      sample.fillAndExpand();
+      float rating = sample.ratePlotFor(base.leader());
+      pick.compare(sample, rating * (0.5f + Rand.num()));
+    }
+    
+    return pick.result();
   }
   
   
@@ -56,22 +63,19 @@ public class BasePlots {
   
   
   public void updatePlanning() {
-    if (rootPlot.complete()) {
-      rootPlot = null;
+    if (rootPlot == null || rootPlot.complete()) {
+      rootPlot = generateNextPlot();
     }
-    if (rootPlot != null) {
-      //  TODO:  Add a delay here!
-      
-      if (! rootPlot.scheduled()) {
-        base.world().events.scheduleEvent(rootPlot);
-      }
+    if (rootPlot != null && ! rootPlot.scheduled()) {
+      int delay = (int) Rand.range(
+        GameSettings.MIN_PLOT_THINKING_TIME,
+        GameSettings.MAX_PLOT_THINKING_TIME
+      );
+      base.world().events.scheduleEvent(rootPlot, delay);
     }
   }
   
 }
-
-
-
 
 
 
