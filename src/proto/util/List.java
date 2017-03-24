@@ -413,9 +413,10 @@ public class List <T> extends ListEntry <T> implements Series <T> {
     */
   final public String toString() {
     final StringBuffer sB = new StringBuffer("( ");
+    int i = 0;
     for (T t : this) {
       sB.append(t);
-      if (t != last.refers) sB.append(", ");
+      if (++i != size) sB.append(", ");
     }
     sB.append(" )");
     return sB.toString();
@@ -446,7 +447,6 @@ public class List <T> extends ListEntry <T> implements Series <T> {
     
     
     for (int i : list) {
-      //if (i == 4) list.remove(i);
       I.say("Entry is: "+i);
     }
     I.say("  List contents: " + list);

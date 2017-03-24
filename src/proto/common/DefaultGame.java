@@ -246,8 +246,8 @@ public class DefaultGame extends RunGame {
       int numGrudges = Nums.min(5, enemies.size());
       while (numGrudges-- > 0) {
         Person mark = (Person) Rand.pickFrom(enemies);
-        boss.history.setBond(mark, -1);
-        mark.history.setBond(boss, -1);
+        boss.history.setBond(mark, -1 * Rand.num());
+        mark.history.setBond(boss, -1 * Rand.num());
       }
     }
     //

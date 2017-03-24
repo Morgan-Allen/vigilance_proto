@@ -24,22 +24,46 @@ public class MissionsViewCluesView extends UINode {
     //  Extract basic game-references first:
     Base player = mainView.player();
     MissionsView parent = mainView.missionView;
-    Plot plot = (Plot) parent.focusOfType(Plot.class);
+    Object focus = parent.priorFocus();
+    boolean forPlot = false, forSuspect = false;
+    //
+    //  We need to assemble/present clues a little differently, depending on
+    //  the source:
+    String header = "";
+    Series <Clue> clues = null;
+    if (focus instanceof Plot) {
+      Plot plot = (Plot) focus;
+      header = "EVIDENCE FOR "+plot.nameForCase(player);
+      clues = player.leads.cluesFor(plot, true);
+      forPlot = true;
+    }
+    if (focus instanceof Element) {
+      Element suspect = (Element) focus;
+      header = "EVIDENCE ON "+suspect.name();
+      clues = player.leads.cluesFor(suspect, true);
+      forSuspect = true;
+    }
+    if (clues == null) return false;
     //
     //  Create a list-display, and render the header plus entries for each
     //  associate:
     ViewUtils.ListDraw draw = new ViewUtils.ListDraw();
     int across = 10, down = 10;
     draw.addEntry(
-      null, "EVIDENCE FOR "+plot.nameForCase(player), 40, null
+      null, header, 25, null
     );
-    for (Clue clue : player.leads.cluesFor(plot, true)) {
-      Image icon = clue.icon();
-      if (icon == null) icon = MissionsView.MYSTERY_IMAGE;
-      draw.addEntry(icon, clue.longDescription(player), 40, null);
+    for (Clue clue : clues) {
+      draw.addEntry(null, clue.longDescription(player), 100, clue);
     }
     draw.performDraw(across, down, this, surface, g);
     down = draw.down;
+    
+    if (draw.hovered != null) {
+      Clue picked = (Clue) draw.hovered;
+      if (draw.clicked) {
+        parent.setActiveFocus(picked.plot, false);
+      }
+    }
     
     parent.casesArea.setScrollheight(down);
     return true;

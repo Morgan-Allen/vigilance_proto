@@ -101,10 +101,8 @@ public class BaseLeads {
     */
   public Series <Plot> knownPlots() {
     Batch <Plot> known = new Batch();
-    for (CaseFile file : files.values()) {
-      for (Clue c : file.clues) if (! c.plot.complete()) {
-        known.include(c.plot);
-      }
+    for (Clue c : cluesFor(null, null, null, null, false)) {
+      known.include(c.plot);
     }
     return known;
   }
@@ -112,34 +110,73 @@ public class BaseLeads {
   
   public Series <Plot> knownPlotsForRegion(Region r) {
     Batch <Plot> known = new Batch();
-    for (CaseFile file : files.values()) {
-      for (Clue c : file.clues) if (! c.plot.complete()) {
-        if (! c.confirmed        ) continue;
-        if (c.match.region() != r) continue;
-        known.include(c.plot);
-      }
+    for (Clue c : cluesFor(null, null, null, r, false)) if (c.confirmed) {
+      known.include(c.plot);
     }
     return known;
   }
   
   
-  public Series <Plot.Role> knownRolesFor(Plot plot) {
-    Batch <Plot.Role> known = new Batch();
-    known.include(Plot.ROLE_HIDEOUT  );
-    known.include(Plot.ROLE_ORGANISER);
-    known.include(Plot.ROLE_TARGET   );
-    
-    for (CaseFile file : files.values()) {
-      for (Clue c : file.clues) if (c.plot == plot) {
-        known.include(c.role);
-      }
+  public Series <Element> knownSuspectsForRegion(Region r) {
+    Batch <Element> known = new Batch();
+    for (Clue c : cluesFor(null, null, null, r, false)) if (c.confirmed) {
+      known.include(c.match);
     }
     return known;
+  }
+  
+  
+  public Series <Clue> cluesFor(Plot plot, Element match, boolean sort) {
+    return cluesFor(plot, match, null, null, sort);
+  }
+  
+  
+  public Series <Clue> cluesFor(Plot plot, Plot.Role role, boolean sort) {
+    return cluesFor(plot, null, role, null, sort);
+  }
+  
+  
+  public Series <Clue> cluesFor(Element match, boolean sort) {
+    if (match.isRegion()) {
+      return cluesFor(null, null, null, (Region) match, sort);
+    }
+    else return cluesFor(null, match, null, null, sort);
+  }
+  
+  
+  public Series <Clue> cluesFor(Plot plot, boolean sort) {
+    return cluesFor(plot, null, null, null, sort);
+  }
+  
+  
+  public Series <Clue> cluesFor(
+    Plot plot, Element match, Plot.Role role, Region area, boolean sort
+  ) {
+    List <Clue> matches = new List <Clue> () {
+      protected float queuePriority(Clue r) {
+        return r.timeFound;
+      }
+    };
+    for (CaseFile file : files.values()) {
+      for (Clue c : file.clues) {
+        if (plot  != null && plot  != c.plot ) continue;
+        if (match != null && match != c.match) continue;
+        if (role  != null && role  != c.role ) continue;
+        if (area  != null) {
+          if (c.match == null         ) continue;
+          if (c.match.region() != area) continue;
+        }
+        matches.add(c);
+      }
+    }
+    
+    if (sort) matches.queueSort();
+    return matches;
   }
   
   
   public Series <Element> suspectsFor(Plot.Role role, Plot plot) {
-    Series <Clue> related = cluesFor(plot, null, role, false);
+    Series <Clue> related = cluesFor(plot, null, role, null, false);
     Batch <Element> matches = new Batch();
     
     for (Clue c : related) if (c.confirmed) {
@@ -155,29 +192,6 @@ public class BaseLeads {
   }
   
   
-  public Series <Clue> cluesFor(
-    Plot plot, Element match, Plot.Role role, boolean sort
-  ) {
-    List <Clue> matches = new List <Clue> () {
-      protected float queuePriority(Clue r) {
-        return r.timeFound;
-      }
-    };
-    
-    for (CaseFile file : files.values()) {
-      for (Clue c : file.clues) {
-        if (plot  != null && plot  != c.plot ) continue;
-        if (match != null && match != c.match) continue;
-        if (role  != null && role  != c.role ) continue;
-        matches.add(c);
-      }
-    }
-    
-    if (sort) matches.queueSort();
-    return matches;
-  }
-  
-  
   public Series <Plot> involvedIn(Element subject, boolean confirmedOnly) {
     Batch <Plot> matches = new Batch();
     CaseFile file = caseFor(subject);
@@ -187,6 +201,21 @@ public class BaseLeads {
       matches.include(c.plot);
     }
     return matches;
+  }
+  
+  
+  public Series <Plot.Role> knownRolesFor(Plot plot) {
+    Batch <Plot.Role> known = new Batch();
+    known.include(Plot.ROLE_HIDEOUT  );
+    known.include(Plot.ROLE_ORGANISER);
+    known.include(Plot.ROLE_TARGET   );
+    
+    for (CaseFile file : files.values()) {
+      for (Clue c : file.clues) if (c.plot == plot) {
+        known.include(c.role);
+      }
+    }
+    return known;
   }
   
   
@@ -206,8 +235,15 @@ public class BaseLeads {
   }
   
   
+  public boolean suspectIsUrgent(Element suspect) {
+    for (Plot plot : involvedIn(suspect, true)) {
+      if (suspect == plot.target()) return true;
+    }
+    return false;
+  }
   
 }
+
 
 
 

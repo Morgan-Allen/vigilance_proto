@@ -86,7 +86,7 @@ public class MissionsViewRolesView extends UINode {
       draw.addEntry(icon, desc, 40, refers);
     }
     draw.addEntry(
-      MissionsView.FILE_IMAGE, "View All Evidence", 40,
+      MissionsView.FILE_IMAGE, "View All Evidence", 25,
       MissionsView.PLOT_CLUES
     );
     draw.performDraw(across, down, this, surface, g);
@@ -99,7 +99,7 @@ public class MissionsViewRolesView extends UINode {
     if (hovered == MissionsView.PLOT_CLUES) {
       hoverDesc = "Review all evidence assembled on this case.";
       if (draw.clicked) {
-        parent.setActiveFocus(MissionsView.PLOT_CLUES, true);
+        parent.setActiveFocus(MissionsView.PLOT_CLUES, false);
       }
     }
     else if (hovered instanceof Plot.Role) {
@@ -107,7 +107,7 @@ public class MissionsViewRolesView extends UINode {
       Series <Clue> clues = player.leads.cluesFor(plot, role, true);
       hoverDesc = "Latest Evidence:\n  "+clues.first();
       if (draw.clicked) {
-        parent.setActiveFocus(hovered, true);
+        parent.setActiveFocus(hovered, false);
       }
     }
     else if (hovered instanceof Element) {
@@ -121,7 +121,7 @@ public class MissionsViewRolesView extends UINode {
         hoverDesc = "No Evidence";
       }
       if (draw.clicked) {
-        parent.setActiveFocus(hovered, true);
+        parent.setActiveFocus(hovered, false);
       }
     }
     g.setColor(Color.LIGHT_GRAY);

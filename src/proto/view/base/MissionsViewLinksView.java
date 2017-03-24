@@ -24,22 +24,24 @@ public class MissionsViewLinksView extends UINode {
     //  Extract basic game-references first:
     Base player = mainView.player();
     MissionsView parent = mainView.missionView;
-    Element perp = (Element) parent.focusOfType(Element.class);
+    Object focus = parent.priorFocus();
+    if (! (focus instanceof Element)) return false;
+    Element suspect = (Element) focus;
     //
     //  Create a list-display, and render the header plus entries for each
     //  associate:
     ViewUtils.ListDraw draw = new ViewUtils.ListDraw();
     int across = 10, down = 10;
     draw.addEntry(
-      null, "KNOWN ASSOCIATES FOR "+perp, 40, null
+      null, "KNOWN ASSOCIATES FOR "+suspect, 40, null
     );
-    for (AssocResult r : getAssociates(perp, player)) {
+    for (AssocResult r : getAssociates(suspect, player)) {
       if (r.associate != null) draw.addEntry(
-        r.associate.icon(), r.associate.name()+" ("+r.label+")", 40,
+        r.associate.icon(), r.associate.name()+" ("+r.label+")", 25,
         r.associate
       );
       if (r.plot != null) draw.addEntry(
-        r.plot.icon(), r.label+" "+r.plot.nameForCase(player), 40,
+        r.plot.icon(), r.label+" "+r.plot.nameForCase(player), 25,
         r.plot
       );
     }
@@ -49,7 +51,7 @@ public class MissionsViewLinksView extends UINode {
     //
     //  If one is selected, zoom to that element:
     if (draw.clicked) {
-      parent.setActiveFocus(draw.hovered, true);
+      parent.setActiveFocus(draw.hovered, false);
     }
     
     parent.casesArea.setScrollheight(down);
@@ -80,38 +82,37 @@ public class MissionsViewLinksView extends UINode {
     
     if (suspect.isPerson()) {
       Person perp = (Person) suspect;
+      for (Plot plot : player.leads.involvedIn(suspect, true)) {
+        addAssociate(list, null, plot, "Suspect In");
+      }
       if (addAssociate(list, perp.resides(), null, "Residence")) {
         for (Person p : perp.resides().residents()) if (p != perp) {
-          addAssociate(list, p, null, "Colleague");
+          addAssociate(list, p, null, HistoryView.bondDescription(perp, p));
         }
       }
       for (Element e : perp.history.sortedBonds()) if (e.isPerson()) {
-        float bond = perp.history.bondWith(e);
-        addAssociate(list, e, null, (bond > 0 ? "Friend " : "Enemy ")+bond);
-      }
-      for (Plot plot : player.leads.involvedIn(suspect, true)) {
-        addAssociate(list, null, plot, "Suspect In");
+        addAssociate(list, e, null, HistoryView.bondDescription(perp, e));
       }
     }
     
     if (suspect.isPlace()) {
       Place site = (Place) suspect;
+      for (Plot plot : player.leads.involvedIn(suspect, true)) {
+        addAssociate(list, null, plot, "Scene For");
+      }
       addAssociate(list, site.region(), null, "Region");
       for (Person p : site.residents()) {
         addAssociate(list, p, null, "Resident");
-      }
-      for (Plot plot : player.leads.involvedIn(suspect, true)) {
-        addAssociate(list, null, plot, "Scene For");
       }
     }
     
     if (suspect.isRegion()) {
       Region area = (Region) suspect;
-      for (Place p : area.buildSlots()) {
-        addAssociate(list, p, null, "Address");
-      }
       for (Plot plot : player.leads.knownPlotsForRegion(area)) {
         addAssociate(list, null, plot, "Area For");
+      }
+      for (Place p : area.buildSlots()) {
+        addAssociate(list, p, null, "Address");
       }
     }
     

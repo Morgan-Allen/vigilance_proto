@@ -11,7 +11,7 @@ import static proto.game.person.PersonStats.*;
 
 public class Villains {
   
-  final static String IMG_DIR = "media assets/character icons/";
+  final static String IMG_DIR = "media assets/character icons/villains/";
   
   final public static PersonType
     MORETTI  = new PersonType(

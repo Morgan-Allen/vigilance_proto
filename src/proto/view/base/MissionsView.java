@@ -5,7 +5,6 @@ import proto.common.*;
 import proto.game.world.*;
 import proto.game.person.*;
 import proto.game.event.*;
-
 import proto.util.*;
 import proto.view.common.*;
 
@@ -32,15 +31,13 @@ public class MissionsView extends UINode {
     PERP_LINKS = "perp-links";
   
   MapInsetView mapView;
-  StringButton casesButton, backButton;
-  
   ScrollArea casesArea;
-  MissionsViewCasesView casesView;
   MissionsViewRolesView rolesView;
   MissionsViewCluesView cluesView;
   MissionsViewPerpsView perpsView;
   MissionsViewLinksView linksView;
   UINode focusViews[], activeFocusView;
+  StringButton backButton;
   
   Object activeFocus = null;
   List <Object> focusStack = new List();
@@ -65,42 +62,29 @@ public class MissionsView extends UINode {
     mapView.resizeToFitAspectRatio();
     addChildren(mapView);
     
-    casesButton = new StringButton(
-      "View Open Cases", new Box2D(0, 10, 200, 25), this
-    ) {
-      protected void whenClicked() {
-        focusStack.clear();
-        setActiveFocus(ALL_CASES, false);
-      }
-    };
-    backButton = new StringButton(
-      "Back", new Box2D(200, 10, 120, 25), this
-    ) {
-      protected void whenClicked() {
-        focusStack.removeLast();
-        Object before = focusStack.last();
-        if (before == null) before = ALL_CASES;
-        setActiveFocus(before, false);
-      }
-    };
-    addChildren(casesButton, backButton);
-    
-    Box2D casesBound  = new Box2D(0, 50, 340, fullHigh - 100);
-    Box2D scrollBound = new Box2D(0, 0 , 320, fullHigh - 100);
+    Box2D casesBound  = new Box2D(0, 0, 340, fullHigh - 50);
+    Box2D scrollBound = new Box2D(0, 0, 320, fullHigh - 50);
     casesArea = new ScrollArea(this, casesBound);
     addChildren(casesArea);
     UINode scrollKid = new UINode(casesArea, scrollBound) {};
     casesArea.attachScrollPane(scrollKid, (int) scrollBound.ydim());
     
-    casesView  = new MissionsViewCasesView(scrollKid, scrollBound);
     rolesView  = new MissionsViewRolesView(scrollKid, scrollBound);
     cluesView  = new MissionsViewCluesView(scrollKid, scrollBound);
     perpsView  = new MissionsViewPerpsView(scrollKid, scrollBound);
     linksView  = new MissionsViewLinksView(scrollKid, scrollBound);
-    focusViews = new UINode[] {
-      casesView, rolesView, cluesView, perpsView, linksView
-    };
+    focusViews = new UINode[] { rolesView, cluesView, perpsView, linksView };
     scrollKid.addChildren(focusViews);
+    
+    backButton = new StringButton(
+      "Back", new Box2D(250, 10, 60, 25), this
+    ) {
+      protected void whenClicked() {
+        navigateFocusBack();
+      }
+    };
+    addChildren(backButton);
+    
     setActiveFocus(ALL_CASES, false);
   }
   
@@ -123,9 +107,39 @@ public class MissionsView extends UINode {
       person+" is "+assignDesc, g,
       vx + 330, vy + 10, 320, 45
     );
+    
+    renderCases(surface, g);
+  }
+  
+
+  protected void renderCases(Surface surface, Graphics2D g) {
+    //
+    //  Create a list-display, and render the header plus entries for each
+    //  associate:
+    Base player = mainView.player();
+    ViewUtils.ListDraw draw = new ViewUtils.ListDraw();
+    int across = vw - 320, down = 10;
+    draw.addEntry(
+      null, "OPEN CASES", 40, null
+    );
+    for (Plot plot : player.leads.knownPlots()) {
+      Image icon = plot.icon();
+      if (icon == null) icon = MissionsView.ALERT_IMAGE;
+      draw.addEntry(icon, plot.nameForCase(player), 40, plot);
+    }
+    draw.performDraw(across, down, this, surface, g);
+    down = draw.down;
+    //
+    //  If one is selected, zoom to that element:
+    if (draw.clicked) {
+      setActiveFocus(draw.hovered, true);
+    }
   }
   
   
+  /**  Helper methods for navigation related to case-files:
+    */
+  /*
   public Object focusOfType(Class type) {
     //
     //  Works backward through the navigation stack to find the last plot
@@ -137,19 +151,29 @@ public class MissionsView extends UINode {
     }
     return null;
   }
+  //*/
   
   
-  public void setActiveFocus(Object focus, boolean onStack) {
-    if (onStack && focus != this.activeFocus) {
+  public Object priorFocus() {
+    return focusStack.atIndex(focusStack.size() - 2);
+  }
+  
+  
+  public void setActiveFocus(Object focus, boolean wipeStack) {
+    if (wipeStack) {
+      focusStack.clear();
+      focusStack.add(focus);
+    }
+    else if (focus != this.activeFocus) {
       focusStack.add(focus);
     }
     
     this.activeFocus = focus;
     this.activeFocusView = null;
-    backButton.valid = focusStack.last() != ALL_CASES && ! focusStack.empty();
+    backButton.visible = focusStack.size() > 1;
     
     if (focus == ALL_CASES) {
-      activeFocusView = casesView;
+      activeFocusView = null;
     }
     else if (focus == PLOT_CLUES) {
       activeFocusView = cluesView;
@@ -171,6 +195,15 @@ public class MissionsView extends UINode {
     for (UINode node : focusViews) {
       node.visible = node == activeFocusView;
     }
+  }
+  
+  
+  public void navigateFocusBack() {
+    focusStack.removeLast();
+    Object before = focusStack.last();
+    if (before == null) before = ALL_CASES;
+    this.activeFocus = before;
+    setActiveFocus(before, false);
   }
   
 }

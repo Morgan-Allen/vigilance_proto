@@ -13,10 +13,27 @@ import java.awt.Color;
 
 
 public class HistoryView extends UINode {
+
+  
+  final static String friendDescs[] = {
+    "Civil", "Friendly", "Close", "Soulmate"
+  };
+  final static String enemyDescs[] = {
+    "Tense", "Unfriendly", "Hostile", "Nemesis"
+  };
   
   
   public HistoryView(UINode parent, Box2D bounds) {
     super(parent, bounds);
+  }
+  
+  
+  public static String bondDescription(Person person, Element other) {
+    float value = person.history.bondWith(other);
+    String desc = "";
+    if (value > 0) desc += friendDescs[Nums.clamp((int) (value *  4), 4)];
+    else           desc += enemyDescs [Nums.clamp((int) (value * -4), 4)];
+    return desc;
   }
   
   
@@ -28,13 +45,6 @@ public class HistoryView extends UINode {
 
     g.setColor(Color.WHITE);
     int down = 10;
-    
-    final String friendDescs[] = {
-      "Civil", "Friendly", "Close", "Soulmate"
-    };
-    final String enemyDescs[] = {
-      "Tense", "Unfriendly", "Hostile", "Nemesis"
-    };
     
     for (Element b : person.history.sortedBonds()) if (b.isPerson()) {
       Person other = (Person) b;
@@ -51,11 +61,7 @@ public class HistoryView extends UINode {
       }
       
       g.setColor(Color.WHITE);
-      String desc = other.name();
-      desc += " "+((int) (value * 100))+"% (";
-      if (value > 0) desc += friendDescs[(int) (value *  4)];
-      else           desc += enemyDescs [(int) (value * -4)];
-      desc += ")";
+      String desc = other.name() + bondDescription(person, other);
       g.drawString(desc, vx + 5 + 40 + 4, vy + down + 5 + 15);
       
       Color tint = Color.BLUE, back = Color.DARK_GRAY;

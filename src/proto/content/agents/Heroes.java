@@ -109,7 +109,7 @@ public class Heroes {
       WILL    , 6 ,
       MUSCLE  , 5 ,
       
-      ENGINEERING  , 6,
+      ENGINEERING  , 8,
       MEDICINE     , 6,
       QUESTION     , 8,
       PERSUADE     , 5,

@@ -81,6 +81,13 @@ public class ViewUtils {
     }
     
     
+    public void clearEntries() {
+      entries.clear();
+      clicked = false;
+      hovered = null;
+    }
+    
+    
     public void performDraw(
       int across, int down, UINode within, Surface surface, Graphics2D g
     ) {
@@ -89,6 +96,7 @@ public class ViewUtils {
       for (Entry e : entries) {
         int downEach = e.down, iconSize = 0;
         g.setColor(Color.LIGHT_GRAY);
+        if (e.refers == null) g.setColor(Color.WHITE);
         
         if (e.icon != null) {
           iconSize = e.down;
@@ -109,7 +117,7 @@ public class ViewUtils {
             clicked = surface.mouseClicked(); 
           }
           
-          g.setColor(hovered == e.refers ? Color.YELLOW : Color.GRAY);
+          g.setColor(hovered == e.refers ? Color.BLUE : Color.GRAY);
           g.drawRect(vx + across, vy + down, vw - (across + 10), downEach);
         }
         

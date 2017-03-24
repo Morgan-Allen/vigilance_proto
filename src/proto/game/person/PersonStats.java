@@ -291,6 +291,8 @@ public class PersonStats {
     updateStat(ACCURACY   , accLevel, true);
     updateStat(DEFENCE    , defLevel, true);
     
+    for (Trait skill : SKILL_STATS) updateStat(skill, -1, true);
+    /*
     float levelQuestion = (will + brains       ) / 2;
     float levelSuasion  = (10 + will + reflexes) / 2;
     float levelTechs    = brains / 2;
@@ -298,6 +300,7 @@ public class PersonStats {
     updateStat(PERSUADE   , levelSuasion , true);
     updateStat(ENGINEERING, levelTechs   , true);
     updateStat(MEDICINE   , levelTechs   , true);
+    //*/
     
     Series <Ability> abilities = person.actions.listAbilities();
     for (Ability a : abilities) if (a.passive()) {

@@ -22,22 +22,25 @@ public class MissionsViewPerpsView extends UINode {
   
   protected boolean renderTo(Surface surface, Graphics2D g) {
     MissionsView parent = mainView.missionView;
-    if (parent.activeFocus instanceof Plot.Role) {
-      renderSuspects((Plot.Role) parent.activeFocus, surface, g);
+    Object focus = parent.activeFocus;
+    if (focus instanceof Plot.Role) {
+      return renderSuspects((Plot.Role) focus, surface, g);
     }
-    if (parent.activeFocus instanceof Element) {
-      renderSuspect((Element) parent.activeFocus, surface, g);
+    else if (parent.activeFocus instanceof Element) {
+      return renderSuspect((Element) focus, surface, g);
     }
     return true;
   }
   
   
-  void renderSuspects(Plot.Role role, Surface surface, Graphics2D g) {
+  boolean renderSuspects(Plot.Role role, Surface surface, Graphics2D g) {
     //
     //  Extract basic game-references first:
     Base player = mainView.player();
     MissionsView parent = mainView.missionView;
-    Plot plot = (Plot) parent.focusOfType(Plot.class);
+    Object focus = parent.priorFocus();
+    if (! (focus instanceof Plot)) return false;
+    Plot plot = (Plot) focus;
     //
     //  Create a list-display, and render the header plus entries for each
     //  suspect:
@@ -54,14 +57,15 @@ public class MissionsViewPerpsView extends UINode {
     //
     //  If one is selected, zoom to that element:
     if (draw.clicked) {
-      parent.setActiveFocus(draw.hovered, true);
+      parent.setActiveFocus(draw.hovered, false);
     }
     
     parent.casesArea.setScrollheight(down);
+    return true;
   }
   
   
-  void renderSuspect(Element suspect, Surface surface, Graphics2D g) {
+  boolean renderSuspect(Element suspect, Surface surface, Graphics2D g) {
     //
     //  Extract basic game-references first:
     Base player = mainView.player();
@@ -74,29 +78,25 @@ public class MissionsViewPerpsView extends UINode {
     ViewUtils.ListDraw draw = new ViewUtils.ListDraw();
     int across = 10, down = 10;
     draw.addEntry(
-      suspect.icon(), "CASE FILE FOR: "+suspect, 40, null
+      suspect.icon(), suspect.name(), 40, null
     );
-    if (! clues.empty()) {
-      draw.addEntry(null, clues.first().longDescription(player), 100, null);
+    if (clues.empty()) {
+      draw.addEntry(null, "No current leads on this suspect.", 100, "");
+    }
+    else {
+      Clue first = clues.first();
+      draw.addEntry(null, first.longDescription(player), 100, first.plot);
     }
     for (Lead lead : player.leads.leadsFor(suspect)) {
-      draw.addEntry(lead.icon(), lead.choiceInfo(agent), 40, lead);
+      draw.addEntry(lead.icon(), lead.choiceInfo(agent), 20, lead);
     }
-    if (suspect.isRegion()) {
-      Region area = (Region) suspect;
-      boolean noCrimes = true;
-      draw.addEntry(null, "Ongoing Crimes: ", 25, null);
-      for (Plot plot : player.leads.knownPlotsForRegion(area)) {
-        draw.addEntry(plot.icon(), plot.nameForCase(player), 40, plot);
-        noCrimes = false;
-      }
-      if (noCrimes) {
-        draw.addEntry(null, "  No known leads", 25, null);
-      }
-    }
-    else draw.addEntry(
-      MissionsView.MYSTERY_IMAGE, "View Associates", 40,
+    draw.addEntry(
+      MissionsView.MYSTERY_IMAGE, "View Associates", 20,
       MissionsView.PERP_LINKS
+    );
+    draw.addEntry(
+      MissionsView.FILE_IMAGE, "View All Evidence", 20,
+      MissionsView.PLOT_CLUES
     );
     draw.performDraw(across, down, this, surface, g);
     down = draw.down;
@@ -114,22 +114,21 @@ public class MissionsViewPerpsView extends UINode {
     }
     else if (draw.hovered instanceof Plot) {
       Plot plot = (Plot) draw.hovered;
-      Series <Clue> forPlot = player.leads.cluesFor(plot, true);
-      Clue top = forPlot.first();
-      if (top != null) {
-        hoverDesc = "Latest Evidence:\n  "+top.longDescription(player);
-      }
-      else {
-        hoverDesc = "No Evidence";
-      }
+      hoverDesc = "Click to see more information on this plot.";
       if (draw.clicked) {
-        parent.setActiveFocus(plot, true);
+        parent.setActiveFocus(plot, false);
       }
     }
     else if (draw.hovered == MissionsView.PERP_LINKS) {
       hoverDesc = "View persons and places associated with this suspect.";
       if (draw.clicked) {
-        parent.setActiveFocus(MissionsView.PERP_LINKS, true);
+        parent.setActiveFocus(MissionsView.PERP_LINKS, false);
+      }
+    }
+    else if (draw.hovered == MissionsView.PLOT_CLUES) {
+      hoverDesc = "Review all evidence assembled on this suspect.";
+      if (draw.clicked) {
+        parent.setActiveFocus(MissionsView.PLOT_CLUES, false);
       }
     }
     g.setColor(Color.LIGHT_GRAY);
@@ -139,8 +138,8 @@ public class MissionsViewPerpsView extends UINode {
     down += 200;
     
     parent.casesArea.setScrollheight(down);
+    return true;
   }
-  
   
 }
 

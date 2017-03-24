@@ -86,6 +86,8 @@ public abstract class Plot extends Event {
       entries.add(entry);
     }
     s.loadObjects(steps);
+    
+    caseLabel = s.loadString();
   }
   
   
@@ -102,6 +104,8 @@ public abstract class Plot extends Event {
       s.saveObject(entry.supplies);
     }
     s.saveObjects(steps);
+    
+    s.saveString(caseLabel);
   }
   
   
@@ -340,6 +344,8 @@ public abstract class Plot extends Event {
     //  TODO:  Re-satisfy needs as and when required.
     if (! possible()) return;
     
+    I.say("Updating plot: "+this);
+    
     int time = world.timing.totalHours();
     Step current = null, next = null;
     for (Step c : steps) {
@@ -349,6 +355,7 @@ public abstract class Plot extends Event {
     
     boolean currentEnds = current == null || stepComplete(current);
     if (currentEnds && current != null) {
+      I.say("  Ended step: "+current);
       checkForTipoffs(current, false, true);
       boolean success = checkSuccess(current);
       onCompletion(current, success);
@@ -356,9 +363,9 @@ public abstract class Plot extends Event {
     if (currentEnds && next != null) {
       next.timeStart = time;
       checkForTipoffs(next, true, false);
+      I.say("  Began step: "+next);
     }
     if (currentEnds && current == steps.last()) {
-      //  TODO:  Execute the actual crime.
       completeEvent();
     }
   }
