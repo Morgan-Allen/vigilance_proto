@@ -14,12 +14,8 @@ import java.awt.Graphics2D;
 public class MissionsViewLinksView extends UINode {
   
   
-  final MissionsView parent;
-  
-  
-  public MissionsViewLinksView(MissionsView parent, Box2D bounds) {
+  public MissionsViewLinksView(UINode parent, Box2D bounds) {
     super(parent, bounds);
-    this.parent = parent;
   }
   
   
@@ -27,6 +23,7 @@ public class MissionsViewLinksView extends UINode {
     //
     //  Extract basic game-references first:
     Base player = mainView.player();
+    MissionsView parent = mainView.missionView;
     Element perp = (Element) parent.focusOfType(Element.class);
     //
     //  Create a list-display, and render the header plus entries for each
@@ -48,11 +45,14 @@ public class MissionsViewLinksView extends UINode {
     }
     draw.performDraw(across, down, this, surface, g);
     down = draw.down;
+    
     //
     //  If one is selected, zoom to that element:
     if (draw.clicked) {
       parent.setActiveFocus(draw.hovered, true);
     }
+    
+    parent.casesArea.setScrollheight(down);
     return true;
   }
   

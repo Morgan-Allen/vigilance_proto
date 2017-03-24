@@ -16,17 +16,16 @@ import java.awt.Image;
 public class MissionsViewCasesView extends UINode {
   
   
-  final MissionsView parent;
-  
-  
-  public MissionsViewCasesView(MissionsView parent, Box2D bounds) {
-    super(parent, bounds);
-    this.parent = parent;
+  public MissionsViewCasesView(UINode parent, Box2D bound) {
+    super(parent, bound);
   }
   
   
   protected boolean renderTo(Surface surface, Graphics2D g) {
+    //
+    //  Extract basic game-references first:
     Base player = mainView.player();
+    MissionsView parent = mainView.missionView;
     //
     //  Create a list-display, and render the header plus entries for each
     //  associate:
@@ -48,6 +47,7 @@ public class MissionsViewCasesView extends UINode {
       parent.setActiveFocus(draw.hovered, true);
     }
     
+    parent.casesArea.setScrollheight(down);
     return true;
   }
   

@@ -38,14 +38,14 @@ public class UINode {
   }
   
   
-  protected void setChild(UINode kid, boolean is) {
+  public void setChild(UINode kid, boolean is) {
     if (kid.parent != this) kid.parent.setChild(kid, false);
     kids.toggleMember(kid, is);
     kid.parent = this;
   }
   
   
-  protected void addChildren(UINode... kids) {
+  public void addChildren(UINode... kids) {
     for (UINode k : kids) setChild(k, true);
   }
   

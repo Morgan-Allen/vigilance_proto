@@ -155,16 +155,26 @@ public abstract class MapInsetView extends UINode {
       );
       
       Series <Plot> plots = played.leads.knownPlotsForRegion(n);
-      if (! plots.empty()) {
+      int off = (plots.size() * 50) / 2;
+      for (final Plot plot : plots) {
         Image alertImage = MissionsView.MYSTERY_IMAGE;
-        for (Plot p : plots) if (played.leads.plotIsUrgent(p)) {
+        if (played.leads.plotIsUrgent(plot)) {
           alertImage = MissionsView.ALERT_IMAGE;
-          break;
         }
-        g.drawImage(alertImage, x - 25, y - 25, 50, 50, null);
+        ImageButton button = new ImageButton(
+          alertImage, new Box2D(x - (off + vx), y - (25 + vy), 50, 50), this
+        ) {
+          protected void whenClicked() {
+            mainView.switchToTab(mainView.missionView);
+            mainView.missionView.setActiveFocus(plot, true);
+          }
+        };
+        button.toggled = plot == mainView.missionView.activeFocus;
+        button.refers = plot;
+        button.renderNow(surface, g);
       }
       
-      ViewUtils.renderAssigned(visitors(n), x + 25, y + 25, surface, g);
+      ViewUtils.renderAssigned(visitors(n), x + 25, y + 75, surface, g);
     }
     
     return true;

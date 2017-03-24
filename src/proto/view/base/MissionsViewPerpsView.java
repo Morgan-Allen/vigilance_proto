@@ -11,21 +11,17 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 
 
+
 public class MissionsViewPerpsView extends UINode {
   
   
-  final MissionsView parent;
-  
-  
-  
-  public MissionsViewPerpsView(MissionsView parent, Box2D bounds) {
+  public MissionsViewPerpsView(UINode parent, Box2D bounds) {
     super(parent, bounds);
-    this.parent = parent;
-    this.clipContent = true;
   }
   
   
   protected boolean renderTo(Surface surface, Graphics2D g) {
+    MissionsView parent = mainView.missionView;
     if (parent.activeFocus instanceof Plot.Role) {
       renderSuspects((Plot.Role) parent.activeFocus, surface, g);
     }
@@ -40,6 +36,7 @@ public class MissionsViewPerpsView extends UINode {
     //
     //  Extract basic game-references first:
     Base player = mainView.player();
+    MissionsView parent = mainView.missionView;
     Plot plot = (Plot) parent.focusOfType(Plot.class);
     //
     //  Create a list-display, and render the header plus entries for each
@@ -59,6 +56,8 @@ public class MissionsViewPerpsView extends UINode {
     if (draw.clicked) {
       parent.setActiveFocus(draw.hovered, true);
     }
+    
+    parent.casesArea.setScrollheight(down);
   }
   
   
@@ -66,9 +65,9 @@ public class MissionsViewPerpsView extends UINode {
     //
     //  Extract basic game-references first:
     Base player = mainView.player();
+    MissionsView parent = mainView.missionView;
     Person agent = mainView.rosterView.selectedPerson();
-    Plot plot = (Plot) parent.focusOfType(Plot.class);
-    Series <Clue> clues = player.leads.cluesFor(plot, suspect, null, true);
+    Series <Clue> clues = player.leads.cluesFor(suspect, true);
     //
     //  Create a list-display, and render the header, latest clue, entries for
     //  each possible lead, and an option to view associates-
@@ -83,7 +82,19 @@ public class MissionsViewPerpsView extends UINode {
     for (Lead lead : player.leads.leadsFor(suspect)) {
       draw.addEntry(lead.icon(), lead.choiceInfo(agent), 40, lead);
     }
-    draw.addEntry(
+    if (suspect.isRegion()) {
+      Region area = (Region) suspect;
+      boolean noCrimes = true;
+      draw.addEntry(null, "Ongoing Crimes: ", 25, null);
+      for (Plot plot : player.leads.knownPlotsForRegion(area)) {
+        draw.addEntry(plot.icon(), plot.nameForCase(player), 40, plot);
+        noCrimes = false;
+      }
+      if (noCrimes) {
+        draw.addEntry(null, "  No known leads", 25, null);
+      }
+    }
+    else draw.addEntry(
       MissionsView.MYSTERY_IMAGE, "View Associates", 40,
       MissionsView.PERP_LINKS
     );
@@ -101,6 +112,20 @@ public class MissionsViewPerpsView extends UINode {
         else agent.addAssignment(lead);
       }
     }
+    else if (draw.hovered instanceof Plot) {
+      Plot plot = (Plot) draw.hovered;
+      Series <Clue> forPlot = player.leads.cluesFor(plot, true);
+      Clue top = forPlot.first();
+      if (top != null) {
+        hoverDesc = "Latest Evidence:\n  "+top.longDescription(player);
+      }
+      else {
+        hoverDesc = "No Evidence";
+      }
+      if (draw.clicked) {
+        parent.setActiveFocus(plot, true);
+      }
+    }
     else if (draw.hovered == MissionsView.PERP_LINKS) {
       hoverDesc = "View persons and places associated with this suspect.";
       if (draw.clicked) {
@@ -112,6 +137,8 @@ public class MissionsViewPerpsView extends UINode {
       hoverDesc, g, vx + across, vy + down, vw - (across + 10), 200
     );
     down += 200;
+    
+    parent.casesArea.setScrollheight(down);
   }
   
   

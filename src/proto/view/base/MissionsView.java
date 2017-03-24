@@ -33,7 +33,8 @@ public class MissionsView extends UINode {
   
   MapInsetView mapView;
   StringButton casesButton, backButton;
-
+  
+  ScrollArea casesArea;
   MissionsViewCasesView casesView;
   MissionsViewRolesView rolesView;
   MissionsViewCluesView cluesView;
@@ -84,16 +85,22 @@ public class MissionsView extends UINode {
     };
     addChildren(casesButton, backButton);
     
-    Box2D focusViewBound = new Box2D(0, 50, 320, fullHigh - 55);
-    casesView  = new MissionsViewCasesView(this, focusViewBound);
-    rolesView  = new MissionsViewRolesView(this, focusViewBound);
-    cluesView  = new MissionsViewCluesView(this, focusViewBound);
-    perpsView  = new MissionsViewPerpsView(this, focusViewBound);
-    linksView  = new MissionsViewLinksView(this, focusViewBound);
+    Box2D casesBound  = new Box2D(0, 50, 340, fullHigh - 100);
+    Box2D scrollBound = new Box2D(0, 0 , 320, fullHigh - 100);
+    casesArea = new ScrollArea(this, casesBound);
+    addChildren(casesArea);
+    UINode scrollKid = new UINode(casesArea, scrollBound) {};
+    casesArea.attachScrollPane(scrollKid, (int) scrollBound.ydim());
+    
+    casesView  = new MissionsViewCasesView(scrollKid, scrollBound);
+    rolesView  = new MissionsViewRolesView(scrollKid, scrollBound);
+    cluesView  = new MissionsViewCluesView(scrollKid, scrollBound);
+    perpsView  = new MissionsViewPerpsView(scrollKid, scrollBound);
+    linksView  = new MissionsViewLinksView(scrollKid, scrollBound);
     focusViews = new UINode[] {
       casesView, rolesView, cluesView, perpsView, linksView
     };
-    addChildren(focusViews);
+    scrollKid.addChildren(focusViews);
     setActiveFocus(ALL_CASES, false);
   }
   

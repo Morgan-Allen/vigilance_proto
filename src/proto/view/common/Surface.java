@@ -20,7 +20,7 @@ public class Surface extends JPanel implements
   final RunGame game;
   
   private boolean mouseDown, mouseClick, mouseClicked;
-  private int mouseX, mouseY;
+  private int mouseX = -1, mouseY = -1, lastX, lastY, moveX, moveY;
   private Object mouseFocus = null, lastFocus = null;
   
   private Batch <Character> pressed = new Batch();
@@ -39,6 +39,8 @@ public class Surface extends JPanel implements
     */
   public int mouseX() { return mouseX; }
   public int mouseY() { return mouseY; }
+  public int moveX() { return moveX; }
+  public int moveY() { return moveY; }
   public boolean mouseDown() { return mouseDown; }
   public boolean mouseClicked() { return mouseClicked; }
   
@@ -102,16 +104,20 @@ public class Surface extends JPanel implements
     g2d.setRenderingHints(hints);
     I.used60Frames = (numPaints++ % 60) == 0;
     
+    this.moveX = (mouseX == -1) ? 0 : (lastX - mouseX);
+    this.moveY = (mouseY == -1) ? 0 : (lastY - mouseY);
+    
     if (world != null) {
       MainView view = world.view();
       this.lastFocus  = mouseFocus;
       this.mouseFocus = null;
       view.updateAndRender(this, g2d);
-      ///if (I.used60Frames) I.say("  Last focus was: "+lastFocus);
     }
     
     this.mouseClicked = this.mouseClick;
     this.mouseClick = false;
+    this.lastX = mouseX;
+    this.lastY = mouseY;
     pressed.clear();
   }
   

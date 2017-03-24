@@ -15,12 +15,8 @@ import java.awt.Image;
 public class MissionsViewRolesView extends UINode {
   
   
-  final MissionsView parent;
-  
-  
-  public MissionsViewRolesView(MissionsView parent, Box2D bounds) {
+  public MissionsViewRolesView(UINode parent, Box2D bounds) {
     super(parent, bounds);
-    this.parent = parent;
   }
   
   
@@ -28,6 +24,7 @@ public class MissionsViewRolesView extends UINode {
     //
     //  First, obtain basic references to relevant game objects-
     Base player = mainView.player();
+    MissionsView parent = mainView.missionView;
     Plot plot = (Plot) parent.activeFocus;
     //
     //  Then sort of the roles involved in the crime based on quality of
@@ -47,7 +44,7 @@ public class MissionsViewRolesView extends UINode {
       RoleView r = new RoleView();
       r.role = role;
       r.suspects = player.leads.suspectsFor(role, plot);
-      r.clues = player.leads.cluesFor(plot, null, role, false);
+      r.clues = player.leads.cluesFor(plot, role, false);
       roles.queueAdd(r);
     }
     //
@@ -65,7 +62,7 @@ public class MissionsViewRolesView extends UINode {
       Element match = r.suspects.size() == 1 ? r.suspects.first() : null;
       boolean canFollow = r.suspects.size() <= 4 && r.clues.size() > 0;
       Object refers = null;
-
+      
       if (match != null) {
         icon = match.icon();
         desc = role+": "+match.name();
@@ -107,7 +104,7 @@ public class MissionsViewRolesView extends UINode {
     }
     else if (hovered instanceof Plot.Role) {
       Plot.Role role = (Plot.Role) hovered;
-      Series <Clue> clues = player.leads.cluesFor(plot, null, role, true);
+      Series <Clue> clues = player.leads.cluesFor(plot, role, true);
       hoverDesc = "Latest Evidence:\n  "+clues.first();
       if (draw.clicked) {
         parent.setActiveFocus(hovered, true);
@@ -115,8 +112,14 @@ public class MissionsViewRolesView extends UINode {
     }
     else if (hovered instanceof Element) {
       Element element = (Element) hovered;
-      Series <Clue> clues = player.leads.cluesFor(plot, element, null, true);
-      hoverDesc = "Latest Evidence:\n  "+clues.first();
+      Series <Clue> clues = player.leads.cluesFor(plot, element, true);
+      Clue top = clues.first();
+      if (top != null) {
+        hoverDesc = "Latest Evidence:\n  "+top.longDescription(player);
+      }
+      else {
+        hoverDesc = "No Evidence";
+      }
       if (draw.clicked) {
         parent.setActiveFocus(hovered, true);
       }
@@ -127,6 +130,7 @@ public class MissionsViewRolesView extends UINode {
     );
     down += 100;
     
+    parent.casesArea.setScrollheight(down);
     return true;
   }
 }

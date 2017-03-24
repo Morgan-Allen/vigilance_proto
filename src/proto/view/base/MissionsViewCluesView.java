@@ -14,12 +14,8 @@ import java.awt.Image;
 public class MissionsViewCluesView extends UINode {
   
   
-  final MissionsView parent;
-  
-  
-  public MissionsViewCluesView(MissionsView parent, Box2D bounds) {
+  public MissionsViewCluesView(UINode parent, Box2D bounds) {
     super(parent, bounds);
-    this.parent = parent;
   }
   
   
@@ -27,6 +23,7 @@ public class MissionsViewCluesView extends UINode {
     //
     //  Extract basic game-references first:
     Base player = mainView.player();
+    MissionsView parent = mainView.missionView;
     Plot plot = (Plot) parent.focusOfType(Plot.class);
     //
     //  Create a list-display, and render the header plus entries for each
@@ -36,7 +33,7 @@ public class MissionsViewCluesView extends UINode {
     draw.addEntry(
       null, "EVIDENCE FOR "+plot.nameForCase(player), 40, null
     );
-    for (Clue clue : player.leads.cluesFor(plot, null, null, true)) {
+    for (Clue clue : player.leads.cluesFor(plot, true)) {
       Image icon = clue.icon();
       if (icon == null) icon = MissionsView.MYSTERY_IMAGE;
       draw.addEntry(icon, clue.longDescription(player), 40, null);
@@ -44,6 +41,7 @@ public class MissionsViewCluesView extends UINode {
     draw.performDraw(across, down, this, surface, g);
     down = draw.down;
     
+    parent.casesArea.setScrollheight(down);
     return true;
   }
   
