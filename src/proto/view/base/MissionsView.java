@@ -139,21 +139,6 @@ public class MissionsView extends UINode {
   
   /**  Helper methods for navigation related to case-files:
     */
-  /*
-  public Object focusOfType(Class type) {
-    //
-    //  Works backward through the navigation stack to find the last plot
-    //  referred to.
-    for (ListEntry e = focusStack; (e = e.lastEntry()) != focusStack;) {
-      if (type.isAssignableFrom(e.refers.getClass())) {
-        return e.refers;
-      }
-    }
-    return null;
-  }
-  //*/
-  
-  
   public Object priorFocus() {
     return focusStack.atIndex(focusStack.size() - 2);
   }

@@ -111,7 +111,8 @@ public class ViewUtils {
         
         if (e.refers != null) {
           if (surface.tryHover(
-            vx + across, vy + down, vw - (across + 10), downEach, e.refers
+            vx + across, vy + down, vw - (across + 10), downEach,
+            e.refers, within
           )) {
             hovered = e.refers;
             clicked = surface.mouseClicked(); 
@@ -123,7 +124,8 @@ public class ViewUtils {
         
         if (e.refers instanceof Assignment) renderAssigned(
           ((Assignment) e.refers).assigned(),
-          vx + across + vw - 20, vy + down + downEach, surface, g
+          vx + across + vw - 20, vy + down + downEach,
+          within, surface, g
         );
         
         down += downEach + 5;
@@ -141,7 +143,7 @@ public class ViewUtils {
     */
   public static void renderAssigned(
     Series <Person> assigned, int atX, int atY,
-    Surface surface, Graphics2D g
+    UINode within, Surface surface, Graphics2D g
   ) {
     int x = atX - 20, y = atY - 20;
     g.setColor(Color.YELLOW);
@@ -153,7 +155,7 @@ public class ViewUtils {
     }
     
     for (Person p : assigned) {
-      boolean hovered = surface.tryHover(x, y, 20, 20, p);
+      boolean hovered = surface.tryHover(x, y, 20, 20, p, within);
       g.drawImage(p.kind().sprite(), x, y, 20, 20, null);
       
       if (hovered) {

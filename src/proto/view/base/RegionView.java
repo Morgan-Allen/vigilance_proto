@@ -52,7 +52,7 @@ public class RegionView extends UINode {
     
     int down = 50;
     for (Region.Stat stat : Region.CIVIC_STATS) {
-      if (surface.tryHover(vx, vy + down - 10, 120, 20, stat)) {
+      if (surface.tryHover(vx, vy + down - 10, 120, 20, stat, this)) {
         hovered = stat;
         g.setColor(Color.YELLOW);
       }
@@ -65,7 +65,7 @@ public class RegionView extends UINode {
     
     down = 50;
     for (Region.Stat stat : Region.SOCIAL_STATS) {
-      if (surface.tryHover(vx + 160, vy + down - 10, 120, 20, stat)) {
+      if (surface.tryHover(vx + 160, vy + down - 10, 120, 20, stat, this)) {
         hovered = stat;
         g.setColor(Color.YELLOW);
       }

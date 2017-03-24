@@ -51,8 +51,9 @@ public class HistoryView extends UINode {
       float value = person.history.bondWith(other);
       
       g.drawImage(other.kind().sprite(), vx + 5, vy + down + 5, 40, 40, null);
-      boolean hoverP = surface.tryHover(vx + 5, vy + down + 5, 40, 40, other);
-      
+      boolean hoverP = surface.tryHover(
+        vx + 5, vy + down + 5, 40, 40, other, this
+      );
       if (hoverP) {
         g.drawImage(mainView.selectCircle, vx + 5, vy + down + 5, 40, 40, null);
         if (surface.mouseClicked()) {

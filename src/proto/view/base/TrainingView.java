@@ -214,7 +214,7 @@ public class TrainingView extends UINode {
       y *= 20;
       Color forT = Color.LIGHT_GRAY;
       
-      if (surface.tryHover(vx + x + across, vy + y + down, 150, 20, t)) {
+      if (surface.tryHover(vx + x + across, vy + y + down, 150, 20, t, this)) {
         hovered = t;
         forT = Color.YELLOW;
       }
@@ -285,7 +285,7 @@ public class TrainingView extends UINode {
       String slotName = PersonGear.SLOT_NAMES[slotID];
       
       final boolean hovered = surface.tryHover(
-        vx + 5 + across, vy + down, 320, 40, "Slot_"+slotID
+        vx + 5 + across, vy + down, 320, 40, "Slot_"+slotID, this
       );
       if (hovered) g.setColor(Color.YELLOW);
       else         g.setColor(Color.WHITE );

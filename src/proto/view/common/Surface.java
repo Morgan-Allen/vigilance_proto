@@ -19,7 +19,7 @@ public class Surface extends JPanel implements
   
   final RunGame game;
   
-  private boolean mouseDown, mouseClick, mouseClicked;
+  private boolean mouseDown, lastClick, mouseClicked;
   private int mouseX = -1, mouseY = -1, lastX, lastY, moveX, moveY;
   private Object mouseFocus = null, lastFocus = null;
   
@@ -45,13 +45,26 @@ public class Surface extends JPanel implements
   public boolean mouseClicked() { return mouseClicked; }
   
   
-  public boolean recordHover(int x, int y, int w, int h, Object hovered) {
-    if (hovered == null) return false;
+  public boolean recordHover(
+    int x, int y, int w, int h, Object hovered, UINode bounds
+  ) {
+    if (hovered == null || ! checkMouseInBound(bounds)) return false;
     if (mouseX > x && mouseX <= x + w && mouseY > y && mouseY <= y + h) {
       mouseFocus = hovered;
       return true;
     }
     return false;
+  }
+  
+  
+  private boolean checkMouseInBound(UINode from) {
+    boolean okay = true;
+    for (UINode node = from; node != null && okay; node = node.parent) {
+      if (! node.clipContent) continue;
+      if (mouseX < node.vx || mouseX > node.vx + node.vw) okay = false;
+      if (mouseY < node.vy || mouseY > node.vy + node.vh) okay = false;
+    }
+    return okay;
   }
   
   
@@ -67,12 +80,21 @@ public class Surface extends JPanel implements
   
   
   public boolean tryHover(UINode node, Object hovered) {
-    return tryHover(node.vx, node.vy, node.vw, node.vh, hovered);
+    return tryHover(node.vx, node.vy, node.vw, node.vh, hovered, node);
   }
   
   
-  public boolean tryHover(int x, int y, int w, int h, Object hovered) {
-    if (! recordHover(x, y, w, h, hovered)) return false;
+  public boolean tryHover(
+    int x, int y, int w, int h, UINode bounds
+  ) {
+    return tryHover(x, y, w, h, bounds, bounds);
+  }
+  
+  
+  public boolean tryHover(
+    int x, int y, int w, int h, Object hovered, UINode bounds
+  ) {
+    if (! recordHover(x, y, w, h, hovered, bounds)) return false;
     return wasHovered(hovered);
   }
   
@@ -114,8 +136,8 @@ public class Surface extends JPanel implements
       view.updateAndRender(this, g2d);
     }
     
-    this.mouseClicked = this.mouseClick;
-    this.mouseClick = false;
+    this.mouseClicked = this.lastClick;
+    this.lastClick   = false;
     this.lastX = mouseX;
     this.lastY = mouseY;
     pressed.clear();
@@ -138,7 +160,7 @@ public class Surface extends JPanel implements
   
   
   public void mouseClicked(MouseEvent e) {
-    this.mouseClick = true;
+    this.lastClick = true;
   }
   
   

@@ -60,7 +60,7 @@ public abstract class ClickMenu <T> extends UINode {
     //  here and the rooms-view, et cetera.
     
     final boolean hoverMenu = surface.tryHover(
-      0, 0, surface.getWidth(), surface.getHeight(), this
+      0, 0, surface.getWidth(), surface.getHeight(), this, this
     );
     
     for (i = 0; i < options.size(); i++) {
@@ -71,13 +71,13 @@ public abstract class ClickMenu <T> extends UINode {
       g.setColor(Color.WHITE);
       
       if (image == null) {
-        hovered = surface.tryHover(x, y, maxWide, 20, option);
+        hovered = surface.tryHover(x, y, maxWide, 20, option, this);
         if (hovered) g.setColor(Color.YELLOW);
         g.drawString(label, x + 5, y + 15);
         y += 20;
       }
       else {
-        hovered = surface.tryHover(x, y, maxWide, 40, option);
+        hovered = surface.tryHover(x, y, maxWide, 40, option, this);
         if (hovered) g.setColor(Color.YELLOW);
         g.drawImage(image, x, y, 40, 40, null);
         g.drawString(label, x + 40 + 5, y + 15);

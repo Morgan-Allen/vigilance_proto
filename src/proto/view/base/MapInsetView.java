@@ -177,7 +177,7 @@ public abstract class MapInsetView extends UINode {
         off += 50;
       }
       
-      ViewUtils.renderAssigned(visitors(n), x + 25, y + 75, surface, g);
+      ViewUtils.renderAssigned(visitors(n), x + 25, y + 75, this, surface, g);
     }
     
     return true;

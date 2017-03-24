@@ -64,7 +64,7 @@ public class EquipmentView extends UINode {
       pickOption.renderNow(surface, g);
       
       ViewUtils.renderAssigned(
-        option.assigned(), vx + across + 300, vy + down + 20, surface, g
+        option.assigned(), vx + across + 300, vy + down + 20, this, surface, g
       );
       down += 25;
     }

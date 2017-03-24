@@ -59,7 +59,7 @@ public class ScrollArea extends UINode {
     g.setColor(Color.BLUE);
     g.drawRect(x, y, barWidth, barHigh);
     
-    if (surface.tryHover(x, y, barWidth, barHigh, "scroll_bar_"+this)) {
+    if (surface.tryHover(x, y, barWidth, barHigh, "scroll_bar_"+this, this)) {
       g.setColor(Color.YELLOW);
       g.drawRect(x, y, barWidth, barHigh);
       

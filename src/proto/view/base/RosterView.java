@@ -65,8 +65,6 @@ public class RosterView extends UINode {
     if (selectedPerson == null) setSelectedPerson(base.roster().first());
     
     for (Person p : base.roster()) {
-      ///if (p == selectedPerson) continue;
-      
       int nextAcross = across + size + pad;
       if (nextAcross >= vw) {
         across = 0;
@@ -82,7 +80,7 @@ public class RosterView extends UINode {
       g.setColor(Color.LIGHT_GRAY);
       g.drawString(p.name(), x, y - 5);
       
-      if (surface.tryHover(x, y, size, size, p)) {
+      if (surface.tryHover(x, y, size, size, p, this)) {
         personHovered = p;
         g.drawImage(selectCircle, x, y, size, size, null);
       }

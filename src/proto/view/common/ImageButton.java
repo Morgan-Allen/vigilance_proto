@@ -31,7 +31,7 @@ public abstract class ImageButton extends UINode {
   
   
   protected boolean renderTo(Surface surface, Graphics2D g) {
-    final boolean hovered = surface.tryHover(vx, vy, vw, vh, refers) && valid;
+    boolean hovered = surface.tryHover(vx, vy, vw, vh, refers, this) && valid;
     
     g.drawImage(icon, vx, vy, vw, vh, null);
     if (overlay != null) for (Image over : overlay) {
