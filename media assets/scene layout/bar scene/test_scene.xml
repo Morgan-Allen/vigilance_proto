@@ -1,0 +1,38 @@
+
+
+<prop
+  name="Thick Wall"
+  ID="prop_thick_wall_test"
+  spritePath="media assets/scene layout/bar scene/sprite_wall.png"
+  wide="1"
+  high="1"
+  subtype="SUBTYPE_WALLING"
+  blockLevel="BLOCK_FULL"
+  blockSight="true"
+/>
+
+<prop
+  name="Floor"
+  ID="prop_floor_test"
+  spritePath="media assets/scene layout/bar scene/sprite_floor.png"
+  wide="1"
+  high="1"
+  subtype="SUBTYPE_WALLING"
+  blockLevel="BLOCK_NONE"
+  blockSight="false"
+/>
+
+
+<scene
+  name="Test Scene"
+  ID="scene_type_test"
+  wide="4"
+  high="4"
+  floor="prop_floor_test"
+>
+  1 2 2 1
+  2 2 2 2
+  2 2 2 2
+  1 2 2 1
+</scene>
+

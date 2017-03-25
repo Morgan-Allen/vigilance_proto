@@ -1,6 +1,8 @@
 
 
 package proto.game.scene;
+import java.util.StringTokenizer;
+
 import proto.common.*;
 import proto.game.world.*;
 import proto.util.*;
@@ -15,6 +17,49 @@ public class SceneTypeFixed extends SceneType {
   final PropType fixedPropTypes[];
   final int wide, high;
   final byte fixedLayoutGrid[][];
+  
+  
+  public static SceneTypeFixed fromXML(String xmlPath) {
+    XML file = XML.load(xmlPath);
+    
+    Batch <PropType> propTypes = new Batch();
+    for (XML child : file.allChildrenMatching("prop")) {
+      //  TODO:  Load a numeric index-ID here as well.
+      PropType type = PropType.fromXML(child);
+      if (type != null) propTypes.add(type);
+    }
+    
+    XML sceneNode = file.child("scene");
+    String name = sceneNode.value("name");
+    String ID = sceneNode.value("ID");
+    int wide = sceneNode.getInt("wide");
+    int high = sceneNode.getInt("high");
+    String floorID = sceneNode.value("floor");
+    String rawGrid = sceneNode.content();
+    
+    byte typeGrid[][] = new byte[wide][high];
+    StringTokenizer t = new StringTokenizer(rawGrid, " \n", false);
+    final List <String> tokens = new List();
+    while (t.hasMoreTokens()) tokens.add(t.nextToken());
+    
+    for (Coord c : Visit.grid(0, 0, wide, high, 1)) try {
+      typeGrid[c.x][c.y] = (byte) Integer.parseInt(tokens.removeFirst());
+    }
+    catch (Exception e) { I.report(e); break; }
+    
+    PropType floor = null;
+    for (PropType type : propTypes) {
+      if (type.entryKey().equals(floorID)) {
+        floor = type;
+        break;
+      }
+    }
+    
+    return new SceneTypeFixed(
+      name, ID,
+      floor, propTypes.toArray(PropType.class), wide, high, typeGrid
+    );
+  }
   
   
   

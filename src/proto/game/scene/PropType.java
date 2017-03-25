@@ -3,11 +3,32 @@
 package proto.game.scene;
 import proto.game.person.*;
 import proto.common.*;
+import proto.util.*;
 
 
 
 
 public class PropType extends Kind {
+
+  
+  public static PropType fromXML(String xmlPath) {
+    return fromXML(XML.load(xmlPath));
+  }
+  
+  
+  public static PropType fromXML(XML node) {
+    try { return new PropType(
+      node.value("name"),
+      node.value("ID"),
+      node.value("spritePath"),
+      loadField(node.value("subtype")),
+      node.getInt("wide"),
+      node.getInt("high"),
+      loadField(node.value("blockLevel")),
+      node.getBool("blockSight")
+    ); }
+    catch (Exception e) { I.report(e); return null; }
+  }
   
   
   public PropType(

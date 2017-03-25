@@ -30,7 +30,7 @@ public class PersonGear {
     SLOT_TYPES[] = {
       0, 0, 1, 2, 2, 2, 2
     },
-    DEFAULT_MAX_SLOTS = 4;
+    DEFAULT_MAX_SLOTS = 5;
   final public static String
     SLOT_TYPE_NAMES[] = { "Weapon", "Armour", "Item" };
   

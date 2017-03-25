@@ -107,7 +107,11 @@ public abstract class SceneType extends Index.Entry implements
   public Scene generateScene(World world) {
     int size = 64;
     if (minSize > 0 && maxSize > 0) {
-      size = minSize + Nums.round(1 + Rand.index(maxSize - minSize), 16, false);
+      int minMaxGap = maxSize - minSize;
+      size = minSize;
+      if (minMaxGap > 0) size += Nums.round(
+        1 + Rand.index(minMaxGap + 1), 16, false
+      );
     }
     else if (minSize > 0 && minSize > size) size = minSize;
     else if (maxSize > 0 && maxSize < size) size = maxSize;

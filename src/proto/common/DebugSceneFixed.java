@@ -11,7 +11,7 @@ import static proto.content.places.UrbanScenes.*;
 
 
 
-public class DebugFixedScene extends RunGame {
+public class DebugSceneFixed extends RunGame {
   
   
   final public static SceneType FIXED_TEST_SCENE = new SceneTypeFixed(
@@ -43,7 +43,7 @@ public class DebugFixedScene extends RunGame {
     GameSettings.debugScene      = true;
     //GameSettings.viewSceneBlocks = true;
     //GameSettings.debugLineSight  = true;
-    runGame(new DebugFixedScene(), "saves/debug_fixed_scene");
+    runGame(new DebugSceneFixed(), "saves/debug_scene_fixed");
   }
   
   
@@ -93,7 +93,6 @@ public class DebugFixedScene extends RunGame {
     hero.actions.assignAction(Common.GUARD.configAction(
       hero, hero.currentTile(), hero, mission, null, null
     ));
-    //  TODO:  Health-bars need to be non-centred again!
     
     //
     //  And a random goon-
