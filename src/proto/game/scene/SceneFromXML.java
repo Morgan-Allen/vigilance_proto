@@ -24,18 +24,25 @@ public class SceneFromXML implements TileConstants {
       if (type != null) allTypes.add(type);
     }
     XML sceneNode = file.child("scene");
-    String name    = sceneNode.value ("name" );
-    String ID      = sceneNode.value ("ID"   );
-    int    wide    = sceneNode.getInt("wide" );
-    int    high    = sceneNode.getInt("high" );
-    String floorID = sceneNode.value ("floor");
-    XML    gridXML = sceneNode.child ("grid" );
+    String name     = sceneNode.value ("name"  );
+    String ID       = sceneNode.value ("ID"    );
+    int    wide     = sceneNode.getInt("wide"  );
+    int    high     = sceneNode.getInt("high"  );
+    String floorID  = sceneNode.value ("floor" );
+    String wallID   = sceneNode.value ("wall"  );
+    String doorID   = sceneNode.value ("door"  );
+    String windowID = sceneNode.value ("window");
+    XML    gridXML  = sceneNode.child ("grid"  );
     //
     //  The arguments for the grid node are assumed to map numbers to
     //  prop-types, so we extract those into an indexed array.
     String gridArgs[] = gridXML.args();
     PropType types[] = new PropType[gridArgs.length];
-    PropType floor = propWithID(floorID, allTypes, filePath);
+    PropType
+      floor  = propWithID(floorID , allTypes, filePath),
+      wall   = propWithID(wallID  , allTypes, filePath),
+      door   = propWithID(doorID  , allTypes, filePath),
+      window = propWithID(windowID, allTypes, filePath);
     for (int i = types.length; i-- > 0;) {
       int index = Integer.parseInt(gridArgs[i]) - 1;
       types[index] = propWithID(gridXML.value(gridArgs[i]), allTypes, filePath);
@@ -47,39 +54,76 @@ public class SceneFromXML implements TileConstants {
     final List <String> tokens = new List();
     while (t.hasMoreTokens()) tokens.add(t.nextToken());
     //
-    //  Then populate the grid-
-    char dU[] = {'N','E','S','W'}, dL[] = {'n','e','s','w'};
-    byte typeGrid[][] = new byte[wide][high];
-    byte dirsGrid[][] = new byte[wide][high];
-    
+    //  Then populate the scene while iterating over possible grid positions-
+    SceneTypeFixed sceneType = new SceneTypeFixed(name, ID, wide, high);
+    sceneType.floors  = floor ;
+    sceneType.borders = wall  ;
+    sceneType.door    = door  ;
+    sceneType.window  = window;
     for (Coord c : Visit.grid(0, 0, wide, high, 1)) try {
-      int direction = N;
-      String token = tokens.removeFirst();
-      char last = token.charAt(token.length() - 1);
-      
-      for (int i = 4; i-- > 0;) if (last == dU[i] || last == dL[i]) {
-        direction = T_ADJACENT[i];
-        token = token.substring(0, token.length() - 1);
-        I.say("Direction at "+c+" is "+direction+", token: "+token);
-        break;
+      //
+      //  We skip over any empty positions, and check to see if there's a
+      //  numeric type index present, along with markers for doors and windows:
+      if (tokens.empty()) break;
+      String token = tokens.removeFirst().toLowerCase();
+      int portI = matchIndex(token, '/', '.');
+      char wallChars[] = {'‾',']','_','['};
+      int typeIndex = parseIndex(token) - 1;
+      PropType placed = null;
+      //
+      //  For each wall-marker present, we generate a wall-prop with the
+      //  correct facing (and as a door or window if appropriate):
+      for (int i = 4; i-- > 0;) {
+        if (matchIndex(token, wallChars[i]) == -1) continue;
+        int dir = T_ADJACENT[i];
+        PropType type = wall;
+        if (portI == 0) type = door;
+        if (portI == 1) type = window;
+        sceneType.attachPlacing(type, c.y, c.x, dir);
       }
-      
-      typeGrid[c.x][c.y] = (byte) Integer.parseInt(token);
-      dirsGrid[c.x][c.y] = (byte) direction;
+      //
+      //  If a numeric type-index was detected, we check if a particular facing
+      //  was specified, and add that to the scene-
+      if (typeIndex >= 0) {
+        int dir = matchIndex(token, 'n','e','s','w');
+        if (dir == -1) dir = N;
+        else dir = T_ADJACENT[dir];
+        placed = types[typeIndex];
+        sceneType.attachPlacing(placed, c.y, c.x, dir);
+      }
+      //
+      //  Finally, include flooring (if you haven't already):
+      if (placed == null || placed != floor) {
+        sceneType.attachPlacing(floor, c.y, c.x, N);
+      }
     }
     catch (Exception e) { I.report(e); break; }
     //
     //  And finallly, return the initialised type:
-    return new SceneTypeFixed(
-      name, ID,
-      floor, types, wide, high,
-      typeGrid, dirsGrid
-    );
+    return sceneType;
   }
   
   
-  public static PropType propFrom(String xmlPath) {
-    return propFrom(XML.load(xmlPath), xmlPath);
+  private static int matchIndex(String token, char... match) {
+    for (int i = token.length(); i-- > 0;) {
+      char t = token.charAt(i);
+      for (int c = match.length; c-- > 0;) {
+        if (match[c] == t) return c;
+      }
+    }
+    return -1;
+  }
+  
+  
+  private static int parseIndex(String token) {
+    StringBuffer s = new StringBuffer();
+    for (char c : token.toCharArray()) {
+      if (c < '0' || c > '9') continue;
+      s.append(c);
+    }
+    token = s.toString();
+    if (s.length() == 0) return -1;
+    return Integer.parseInt(token);
   }
   
   
@@ -89,6 +133,11 @@ public class SceneFromXML implements TileConstants {
     String key = basePath+"_"+ID;
     for (PropType p : from) if (p.entryKey().equals(key)) return p;
     return null;
+  }
+  
+  
+  public static PropType propFrom(String xmlPath) {
+    return propFrom(XML.load(xmlPath), xmlPath);
   }
   
   

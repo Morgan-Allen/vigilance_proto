@@ -100,7 +100,7 @@ public class UrbanScenes {
       { 8, 8, 8, 0, 8, 8, 8, 0 },
       { 4, 3, 0, 0, 0, 0, 3, 0 },
       { 2, 2, 0, 2, 2, 0, 2, 2 },
-    }, new byte[8][8]
+    }
   );
   final public static SceneTypeFixed ROOM_POOL_AREA = new SceneTypeFixed(
     "pool area", "type_pool_area_urban",
@@ -114,7 +114,7 @@ public class UrbanScenes {
       { 0, 1, 1, 1, 0, 3, 3, 0 },
       { 0, 1, 1, 1, 0, 0, 8, 0 },
       { 0, 0, 0, 0, 0, 0, 7, 0 },
-    }, new byte[8][8]
+    }
   );
   final public static SceneTypeFixed ROOM_SEATING = new SceneTypeFixed(
     "seating", "type_seating_urban",
@@ -128,7 +128,7 @@ public class UrbanScenes {
       { 2, 2, 0, 0, 8, 0, 4, 3 },
       { 3, 0, 0, 0, 7, 0, 0, 0 },
       { 0, 0, 0, 0, 0, 0, 0, 0 },
-    }, new byte[8][8]
+    }
   );
   
   
@@ -167,7 +167,7 @@ public class UrbanScenes {
       { 3, 0, 1, 1, 3, 2, 0, 2 },
       { 2, 0, 1, 1, 3, 0, 0, 0 },
       { 0, 0, 0, 0, 3, 0, 0, 0 },
-    }, new byte[8][8]
+    }
   );
   
   final public static SceneType URBAN_SCENE = new SceneTypeGrid(

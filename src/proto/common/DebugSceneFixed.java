@@ -35,7 +35,7 @@ public class DebugSceneFixed extends RunGame {
       { 1, 0, 6, 6, 0, 5, 5, 0 },
       { 7, 0, 5, 5, 0, 6, 6, 0 },
       { 0, 0, 6, 6, 0, 0, 0, 0 },
-    }, new byte[8][8]
+    }
   );
   
   

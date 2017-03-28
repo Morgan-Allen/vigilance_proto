@@ -12,30 +12,55 @@ public class SceneTypeFixed extends SceneType {
   
   /**  Data fields and construction-
     */
-  final PropType fixedPropTypes[];
   final int wide, high;
-  final byte fixedLayoutGrid[][], fixedDirsGrid[][];
   
+  static class Placing {
+    PropType type;
+    int x, y, facing;
+  }
+  List <Placing> placings = new List();
   
   
   public SceneTypeFixed(
     String name, String ID,
-    PropType floor, PropType propTypes[], int wide, int high,
-    byte typeGrid[][], byte dirsGrid[][]
+    int wide, int high
   ) {
     super(
       name, ID,
       MIN_SIZE, Nums.max(wide, high),
       MAX_SIZE, Nums.max(wide, high)
     );
-    fixedPropTypes  = propTypes;
-    fixedLayoutGrid = typeGrid;
-    fixedDirsGrid   = dirsGrid;
-    this.floors     = floor;
-    this.wide       = wide;
-    this.high       = high;
+    this.wide = wide;
+    this.high = high;
+  }
+  
+  
+  public void attachPlacing(PropType type, int x, int y, int facing) {
+    if (type == null) return;
+    Placing p = new Placing();
+    p.type = type;
+    p.x = x;
+    p.y = y;
+    p.facing = facing;
+    placings.add(p);
+  }
+  
+  
+  public SceneTypeFixed(
+    String name, String ID,
+    PropType floor, PropType propTypes[],
+    int wide, int high, byte typeGrid[][]
+  ) {
+    this(name, ID, wide, high);
     if (wide != typeGrid[0].length) I.complain("WRONG WIDTH" );
     if (high != typeGrid   .length) I.complain("WRONG HEIGHT");
+    
+    for (Coord c : Visit.grid(0, 0, wide, high, 1)) {
+      int index = typeGrid[c.x][c.y];
+      PropType type = index == 0 ? floor : propTypes[index - 1];
+      if (type != floor && floor != null) attachPlacing(floor, c.y, c.x, N);
+      if (type != null                  ) attachPlacing(type , c.y, c.x, N);
+    }
   }
   
   
@@ -64,29 +89,14 @@ public class SceneTypeFixed extends SceneType {
   
   
   boolean checkBorderAt(int gx, int gy, Scene scene, int tx, int ty) {
-    Kind type = propType(gx, gy);
-    Tile at = scene.tileAt(tx, ty);
-    boolean blockG = type == null ? false : type.blockLevel() > 0;
-    boolean blockT = at   == null ? true  : at.blocked();
+    //Kind type = propType(gx, gy);
+    //Tile at = scene.tileAt(tx, ty);
+    //boolean blockG = type == null ? false : type.blockLevel() > 0;
+    //boolean blockT = at   == null ? true  : at.blocked();
     
     //  TODO:  FIX THIS!
     return true;
     //return blockG == blockT;
-  }
-  
-  
-  PropType propType(int gx, int gy) {
-    try {
-      byte index = fixedLayoutGrid[gy][gx];
-      return index > 0 ? fixedPropTypes[index - 1] : null;
-    }
-    catch(ArrayIndexOutOfBoundsException e) { return null; }
-  }
-  
-  
-  int propFacing(int gx, int gy) {
-    try { return fixedDirsGrid[gy][gx]; }
-    catch(ArrayIndexOutOfBoundsException e) { return N; }
   }
   
   
@@ -97,24 +107,19 @@ public class SceneTypeFixed extends SceneType {
     offX -= (wide - resolution) / 2;
     offY -= (high - resolution) / 2;
     Mat2D rot = new Mat2D().setIdentity().rotateAndRound(facing * -45);
+    
     if (facing == E) { offX += high - 1; }
     if (facing == W) { offY += wide - 1; }
     if (facing == S) { offX += wide - 1; offY += high - 1; }
     Vec2D temp = new Vec2D();
     
-    for (Coord c : Visit.grid(0, 0, wide, high, 1)) {
-      rot.transform(temp.set(c.x, c.y));
+    for (Placing p : placings) {
+      rot.transform(temp.set(p.x, p.y));
       int sx = (int) (temp.x + offX), sy = (int) (temp.y + offY);
-      if (scene.tileAt(sx, sy) == null) continue;
-      
-      scene.addProp(floors, sx, sy, facing);
-      
-      PropType type = propType(c.x, c.y);
-      int propDir = (propFacing(c.x, c.y) + facing) % 8;
-      if (type == null || ! Prop.hasSpace(scene, type, sx, sy, propDir)) {
-        continue;
+      int propDir = (p.facing + facing) % 8;
+      if (Prop.hasSpace(scene, p.type, sx, sy, propDir)) {
+        scene.addProp(p.type, sx, sy, propDir);
       }
-      scene.addProp(type, sx, sy, propDir);
     }
   }
   

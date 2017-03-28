@@ -1,59 +1,127 @@
 
 
 <prop
-  name="Floor"
-  ID="civic_floor"
-  sprite="floor_1.png"
-  wide="1"
-  high="1"
-  subtype="SUBTYPE_WALLING"
-  blockLevel="BLOCK_NONE"
-  blockSight="false"
+  name       = "Floor"
+  ID         = "civic_floor"
+  sprite     = "floor_1.png"
+  wide       = "1"
+  high       = "1"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+  blockSight = "false"
 />
 
 <prop
-  name="Jewel Case"
-  ID="civic_jewel_case"
-  sprite="jeweller_case_1.png"
-  wide="1"
-  high="1"
-  subtype="SUBTYPE_FURNISH"
-  blockLevel="BLOCK_PARTIAL"
-  blockSight="false"
+  name       = "Wall"
+  ID         = "civic_wall"
+  sprite     = "wall_thin.png"
+  wide       = "1"
+  high       = "0"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "true"
 />
 
 <prop
-  name="Jewel Case"
-  ID="civic_jewel_case_long"
-  sprite="jeweller_case_long.png"
-  wide="1"
-  high="2"
-  subtype="SUBTYPE_FURNISH"
-  blockLevel="BLOCK_PARTIAL"
-  blockSight="false"
+  name       = "Door"
+  ID         = "civic_door"
+  sprite     = "wall_thin_door.png"
+  wide       = "1"
+  high       = "0"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+  blockSight = "true"
 />
+
+<prop
+  name       = "Window"
+  ID         = "civic_window"
+  sprite     = "wall_thin_window.png"
+  wide       = "1"
+  high       = "0"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_PARTIAL"
+  blockSight = "false"
+/>
+
+
+
+<prop
+  name       = "Jewel Case"
+  ID         = "civic_jewel_case"
+  sprite     = "jeweller_case_1.png"
+  wide       = "1"
+  high       = "1"
+  subtype    = "SUBTYPE_FURNISH"
+  blockLevel = "BLOCK_PARTIAL"
+  blockSight = "false"
+/>
+
+<prop
+  name       = "Jewel Case"
+  ID         = "civic_jewel_case_long"
+  sprite     = "jeweller_case_long.png"
+  wide       = "1"
+  high       = "2"
+  subtype    = "SUBTYPE_FURNISH"
+  blockLevel = "BLOCK_PARTIAL"
+  blockSight = "false"
+/>
+
+
+<comment>
+  Refer to the object at a given space by it's index.  Use n(orth), e(ast),
+  s(outh) and w(est) to rotate an object by 0, 90, 180 or 270 degrees.
+  
+  Note:  For objects more than 1 tile wide or high, you only need to mark the
+  top-left corner of the object BEFORE rotation.  Other spaces the object might
+  fill can be blank.
+  
+  Use these characters to add walls/doors/windows to a particular space:
+  Wall Left:    [
+  Wall Bottom:  _
+  Wall Right:   ]
+  Wall Top:     ‾
+  Window:       . (also represents blank tiles, filled by the floor)
+  Door:         /
+  
+  Example:
+    [‾ ‾  ‾  ‾]
+    [  1  .   ].
+    [  .  2e  ]/
+    [_ _  _  _]
+  
+    This will create a walled-in 4x4 area with an object of type 1 toward the
+    top-left corner, one of type 2 toward the bottom-right rotated by 90
+    degrees, and a door and window on the right wall.
+  
+</comment>
 
 
 <scene
-  type  = "fixed"
-  name  = "Jeweller Scene"
-  ID    = "civic_scene_jeweller"
-  wide  = "6"
-  high  = "6"
-  floor = "civic_floor"
+  name   = "Jeweller Scene"
+  ID     = "civic_scene_jeweller"
+  wide   = "6"
+  high   = "6"
+  floor  = "civic_floor"
+  wall   = "civic_wall"
+  door   = "civic_door"              
+  window = "civic_window"
 >
   <grid
     1 = "civic_jewel_case"
     2 = "civic_jewel_case_long"
   >
-    0  0  0  0  0  0
-    0  1  2w 0  1  0
-    0  2  0  0  2  0
-    0  0  0  0  0  0
-    0  1  2w 0  1  0
-    0  0  0  0  0  0
+    [‾ ‾. ‾/ ‾  ‾ ‾]
+    [  1s 2w .  1w ]
+    [. 2  .  .  2  ]/
+    [  .  .  .  .  ]
+    [/ 1e 2w .  1n ].
+    [_ _/ _  _. _ _]
   </grid>
 </scene>
+
+
 
 
 
