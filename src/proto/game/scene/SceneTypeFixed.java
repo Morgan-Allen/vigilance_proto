@@ -14,13 +14,14 @@ public class SceneTypeFixed extends SceneType {
     */
   final PropType fixedPropTypes[];
   final int wide, high;
-  final byte fixedLayoutGrid[][];
+  final byte fixedLayoutGrid[][], fixedDirsGrid[][];
   
   
   
   public SceneTypeFixed(
     String name, String ID,
-    PropType floor, PropType propTypes[], int wide, int high, byte typeGrid[][]
+    PropType floor, PropType propTypes[], int wide, int high,
+    byte typeGrid[][], byte dirsGrid[][]
   ) {
     super(
       name, ID,
@@ -29,6 +30,7 @@ public class SceneTypeFixed extends SceneType {
     );
     fixedPropTypes  = propTypes;
     fixedLayoutGrid = typeGrid;
+    fixedDirsGrid   = dirsGrid;
     this.floors     = floor;
     this.wide       = wide;
     this.high       = high;
@@ -82,6 +84,12 @@ public class SceneTypeFixed extends SceneType {
   }
   
   
+  int propFacing(int gx, int gy) {
+    try { return fixedDirsGrid[gy][gx]; }
+    catch(ArrayIndexOutOfBoundsException e) { return N; }
+  }
+  
+  
   public void applyToScene(
     Scene scene, int offX, int offY, int facing, int resolution,
     boolean forTesting
@@ -100,11 +108,13 @@ public class SceneTypeFixed extends SceneType {
       if (scene.tileAt(sx, sy) == null) continue;
       
       scene.addProp(floors, sx, sy, facing);
+      
       PropType type = propType(c.x, c.y);
-      if (type == null || ! Prop.hasSpace(scene, type, sx, sy, facing)) {
+      int propDir = (propFacing(c.x, c.y) + facing) % 8;
+      if (type == null || ! Prop.hasSpace(scene, type, sx, sy, propDir)) {
         continue;
       }
-      scene.addProp(type, sx, sy, facing);
+      scene.addProp(type, sx, sy, propDir);
     }
   }
   

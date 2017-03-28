@@ -8,7 +8,7 @@ import java.util.StringTokenizer;
 
 
 
-public class SceneFromXML {
+public class SceneFromXML implements TileConstants {
   
   
   public static SceneTypeFixed fixedSceneFrom(
@@ -48,16 +48,32 @@ public class SceneFromXML {
     while (t.hasMoreTokens()) tokens.add(t.nextToken());
     //
     //  Then populate the grid-
+    char dU[] = {'N','E','S','W'}, dL[] = {'n','e','s','w'};
     byte typeGrid[][] = new byte[wide][high];
+    byte dirsGrid[][] = new byte[wide][high];
+    
     for (Coord c : Visit.grid(0, 0, wide, high, 1)) try {
-      typeGrid[c.x][c.y] = (byte) Integer.parseInt(tokens.removeFirst());
+      int direction = N;
+      String token = tokens.removeFirst();
+      char last = token.charAt(token.length() - 1);
+      
+      for (int i = 4; i-- > 0;) if (last == dU[i] || last == dL[i]) {
+        direction = T_ADJACENT[i];
+        token = token.substring(0, token.length() - 1);
+        I.say("Direction at "+c+" is "+direction+", token: "+token);
+        break;
+      }
+      
+      typeGrid[c.x][c.y] = (byte) Integer.parseInt(token);
+      dirsGrid[c.x][c.y] = (byte) direction;
     }
     catch (Exception e) { I.report(e); break; }
     //
     //  And finallly, return the initialised type:
     return new SceneTypeFixed(
       name, ID,
-      floor, types, wide, high, typeGrid
+      floor, types, wide, high,
+      typeGrid, dirsGrid
     );
   }
   

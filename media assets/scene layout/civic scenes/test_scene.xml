@@ -23,7 +23,7 @@
 />
 
 <prop
-  name="Jewel Case Long"
+  name="Jewel Case"
   ID="civic_jewel_case_long"
   sprite="jeweller_case_long.png"
   wide="1"
@@ -35,26 +35,29 @@
 
 
 <scene
-  type="fixed"
-  name="Civic Test Scene"
-  ID="civic_test_scene"
-  wide="6"
-  high="6"
-  floor="civic_floor"
+  type  = "fixed"
+  name  = "Jeweller Scene"
+  ID    = "civic_scene_jeweller"
+  wide  = "6"
+  high  = "6"
+  floor = "civic_floor"
 >
   <grid
-    1="civic_floor"
-    2="civic_jewel_case"
-    3="civic_jewel_case_long"
+    1 = "civic_jewel_case"
+    2 = "civic_jewel_case_long"
   >
-    1 1 1 1 1 1
-    1 2 1 1 2 1
-    1 3 1 1 3 1
-    1 0 1 1 0 1
-    1 2 1 1 2 1
-    1 1 1 1 1 1
+    0  0  0  0  0  0
+    0  1  2w 0  1  0
+    0  2  0  0  2  0
+    0  0  0  0  0  0
+    0  1  2w 0  1  0
+    0  0  0  0  0  0
   </grid>
 </scene>
+
+
+
+
 
 
 
