@@ -8,8 +8,8 @@ import proto.game.world.World;
 public class DebugSceneFile extends RunGame {
   
   
-  final public static SceneType FILE_TEST_SCENE = SceneTypeFixed.fromXML(
-    "media assets/scene layout/bar scene/test_scene.xml"
+  final static SceneType FILE_TEST_SCENE = SceneFromXML.fixedSceneFrom(
+    "media assets/scene layout/civic scenes/", "test_scene.xml"
   );
   
   

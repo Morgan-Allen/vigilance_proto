@@ -44,6 +44,7 @@ public class XML {
   public XML child(int n)   { return children[n]; }
   public XML[] children()   { return children; }
   public XML parent()       { return parent; }
+  public String[] args()    { return attributes; }
   
   
   /**  Returns the first child matching the given tag.
