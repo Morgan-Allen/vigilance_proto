@@ -85,6 +85,28 @@
   blockSight = "false"
 />
 
+<prop
+  name       = "Table"
+  ID         = "civic_table"
+  sprite     = "desk.png"
+  wide       = "2"
+  high       = "1"
+  subtype    = "SUBTYPE_FURNISH"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "false"
+/>
+
+<prop
+  name       = "Chair"
+  ID         = "civic_chair"
+  sprite     = "black_chair_2.png"
+  wide       = "1"
+  high       = "1"
+  subtype    = "SUBTYPE_FURNISH"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "false"
+/>
+
 
 <comment>
   A scene is defined by it's name, ID, width, height (which are required) and
@@ -173,12 +195,14 @@
   window = "civic_window"
 >
   <grid
+    1 = "civic_table"
+    2 = "civic_chair"
   >
     .  .  .  .  .  .
-    .  .  .  .  .  .
-    .  .  .  .  .  .
-    .  .  .  .  .  .
-    .  .  .  .  .  .
+    .  2s 2s .  2s .
+    .  1  .  .  1e .
+    .  2  2  .  .  .
+    .  .  .  .  2  .
     .  .  .  .  .  .
   </grid>
 </scene>

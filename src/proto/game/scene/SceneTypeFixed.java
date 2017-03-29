@@ -79,18 +79,45 @@ public class SceneTypeFixed extends SceneType {
   
   /**  Utility methods for either scene-generation or scene-insertion.
     */
+  private void rotateCoord(Coord c, int facing) {
+    int offH = wide - 1, offV = high - 1, x, y;
+    if (facing == N) {
+      x = c.x;
+      y = c.y;
+    }
+    else if (facing == E) {
+      x = offV - c.y;
+      y = c.x;
+    }
+    else if (facing == W) {
+      x = c.y;
+      y = offH - c.x;
+    }
+    else {
+      x = offH - c.x;
+      y = offV - c.y;
+    }
+    c.x = x;
+    c.y = y;
+  }
+  
+  
   boolean checkBordering(
-    Scene scene, int offX, int offY, int resolution
+    Scene scene, int offX, int offY, int facing,
+    int resolution
   ) {
-    int offGX = (wide - resolution) / 2;
-    int offGY = (high - resolution) / 2;
+    offX -= (wide - resolution) / 2;
+    offY -= (high - resolution) / 2;
+    Coord temp = new Coord();
     
-    for (Coord c : Visit.perimeter(offGX, offGY, resolution, resolution)) {
-      int tx = c.x + offX, ty = c.y + offY, gx = c.x, gy = c.y, dir = 0;
-      if (c.x < 0          ) { gx++; dir = 0; }
-      if (c.y < 0          ) { gy++; dir = 1; }
-      if (c.x >= resolution) { gx--; dir = 2; }
-      if (c.y >= resolution) { gy--; dir = 3; }
+    for (Coord c : Visit.perimeter(0, 0, wide, high)) {
+      temp.setTo(c);
+      rotateCoord(temp, facing);
+      int tx = temp.x + offX, ty = temp.y + offY, gx = c.x, gy = c.y, dir = 0;
+      if (c.x < 0          ) { gx++; dir = W; }
+      if (c.y < 0          ) { gy++; dir = S; }
+      if (c.x >= resolution) { gx--; dir = E; }
+      if (c.y >= resolution) { gy--; dir = N; }
       if (c.x != gx && c.y != gy) {
         continue;
       }
@@ -116,19 +143,18 @@ public class SceneTypeFixed extends SceneType {
   ) {
     offX -= (wide - resolution) / 2;
     offY -= (high - resolution) / 2;
-    Mat2D rot = new Mat2D().setIdentity().rotateAndRound(facing * -45);
-    
-    if (facing == E) { offX += high - 1; }
-    if (facing == W) { offY += wide - 1; }
-    if (facing == S) { offX += wide - 1; offY += high - 1; }
-    Vec2D temp = new Vec2D();
+    Coord temp = new Coord();
     
     for (Placing p : placings) {
-      rot.transform(temp.set(p.x, p.y));
-      int sx = (int) (temp.x + offX), sy = (int) (temp.y + offY);
+      temp.x = p.x;
+      temp.y = p.y;
+      rotateCoord(temp, facing);
+      temp.x += offX;
+      temp.y += offY;
+      
       int propDir = (p.facing + facing) % 8;
-      if (Prop.hasSpace(scene, p.type, sx, sy, propDir)) {
-        scene.addProp(p.type, sx, sy, propDir);
+      if (Prop.hasSpace(scene, p.type, temp.x, temp.y, propDir)) {
+        scene.addProp(p.type, temp.x, temp.y, propDir);
       }
     }
   }
