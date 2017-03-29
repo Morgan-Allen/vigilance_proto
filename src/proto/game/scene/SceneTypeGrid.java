@@ -7,6 +7,9 @@ import proto.util.*;
 import static proto.game.scene.SceneGen.*;
 
 
+//  TODO:  Now you have to perform proper checks for wall-exclusion and other
+//  forms of border-compatibility.
+
 
 public class SceneTypeGrid extends SceneType {
   
@@ -201,12 +204,13 @@ public class SceneTypeGrid extends SceneType {
     //  actual wall-objects accordingly, and punctuate with doors and windows.
     for (Wall wall : g.walls) {
       for (WallPiece p : wall.pieces) {
+        if (! Prop.hasSpace(scene, borders, p.x, p.y, p.facing)) continue;
         p.wall = scene.addProp(borders, p.x, p.y, p.facing);
       }
     }
     for (Wall wall : g.walls) {
       Batch <WallPiece> canDoor = new Batch();
-      for (WallPiece p : wall.pieces) {
+      for (WallPiece p : wall.pieces) if (p.wall != null) {
         if (canInsertDoor(p.x, p.y, 1, 0, scene)) canDoor.add(p);
         if (canInsertDoor(p.x, p.y, 0, 1, scene)) canDoor.add(p);
       }

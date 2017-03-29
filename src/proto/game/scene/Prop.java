@@ -102,7 +102,15 @@ public class Prop extends Element implements TileConstants {
   ) {
     for (Tile under : tilesUnder(kind, scene, x, y, facing, 0)) {
       if (under == null) return false;
-      for (Element e : under.inside()) if (e.isProp()) {
+      if (kind.thin()) {
+        
+        //  TODO:  This is a bit of kluge.  Remove later.
+        int rotFace = (facing + 6) % 8;
+        if (under.blockageVal(rotFace) > 0 || under.opacityVal(rotFace) > 0) {
+          return false;
+        }
+      }
+      else for (Element e : under.inside()) if (e.isProp()) {
         final Prop p = (Prop) e;
         if (p.wouldBlock(kind, x, y, facing)) return false;
       }
@@ -111,11 +119,14 @@ public class Prop extends Element implements TileConstants {
   }
   
   
-  public boolean wouldBlock(PropType type, int x, int y, int facing) {
+  //  TODO:  You need to make sure that walls are deleted as well, this way.
+  //*
+  private boolean wouldBlock(PropType type, int x, int y, int facing) {
     if (kind().thin  () || type.thin  ()) return false;
     if (kind().effect() || type.effect()) return false;
     return kind().blockLevel() > 0 == type.blockLevel() > 0;
   }
+  //*/
   
   
   public boolean enterScene(Scene scene, int x, int y, int facing) {
@@ -150,9 +161,6 @@ public class Prop extends Element implements TileConstants {
     final Scene scene = origin.scene;
     final Tile at = origin;
     
-    //  TODO:  Check this to see what happens immediately after removal, under
-    //  a specific tile.
-
     final PropType kind = kind();
     for (Tile under : tilesUnder(kind, scene, at.x, at.y, facing, 0)) {
       if (under == null) continue;

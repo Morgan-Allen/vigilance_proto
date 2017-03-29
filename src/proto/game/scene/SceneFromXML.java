@@ -216,8 +216,10 @@ public class SceneFromXML implements TileConstants {
   
   
   private static int getInt(XML node, String tag, int defaultVal) {
-    if (node.value(tag) == null) return defaultVal;
-    else return node.getInt(tag);
+    String value = node.value(tag);
+    if (value != null) try { return Integer.parseInt(value); }
+    catch (Exception e) {}
+    return defaultVal;
   }
   
   

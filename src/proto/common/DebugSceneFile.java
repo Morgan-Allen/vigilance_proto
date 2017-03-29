@@ -27,7 +27,7 @@ public class DebugSceneFile extends RunGame {
     
     Scene scene = FILE_TEST_SCENE.generateScene(world);
     world.enterScene(scene);
-    scene.view().setZoomPoint(scene.tileAt(2, 2));
+    scene.view().setZoomPoint(scene.tileAt(8, 8));
     
     return world;
   }

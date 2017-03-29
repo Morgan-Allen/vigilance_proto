@@ -180,7 +180,7 @@ public class SceneView extends UINode implements TileConstants {
     //  the enemy is visible themselves.
     for (Person p : scene.othersTeam()) {
       float fog = scene.vision.fogAt(p.currentTile(), Person.Side.HEROES);
-      if (fog <= 0 && ! GameSettings.debugScene) continue;
+      if (fog <= 0 && ! GameSettings.debugScene   ) continue;
       if (p.isCivilian() || ! p.health.conscious()) continue;
       
       Vec3D exactPos = p.exactPosition();
