@@ -1,4 +1,21 @@
 
+<comment>
+  The various prop (object) definitions are pretty self-explanatory, but a
+  couple of notes:
+  
+  Allowable subtypes are:
+    SUBTYPE_WALLING and SUBTYPE_FURNISH
+    (Walls are usually for partitions/exteriors, furniture for interiors.)
+  
+  Allowable blockLevels are:
+    BLOCK_NONE, BLOCK_PARTIAL and BLOCK_FULL
+    (How easily a character can move through the object.)
+  
+  Allowable blockSights are:
+    true and false
+    (Whether this blocks a character's vision.)
+</comment>
+
 
 <prop
   name       = "Floor"
@@ -70,24 +87,47 @@
 
 
 <comment>
-  Refer to the object at a given space by it's index.  Use n(orth), e(ast),
+  A scene is defined by it's name, ID, width, height (which are required) and
+  object-types for the floor, wall, door and windows.
+  
+  Note:  walls, doors, windows and even the floor-type are optional (though you
+  might get a crash if you try to add walls without a wall-type?)
+  
+  Fixed scenes define a grid, including a map between index-numbers and object-
+  types for furniture.  The grid then specifies contents for each x/y point
+  within it's width and height.  (Each point should be separated by whitespace,
+  but the amount doesn't matter.)
+  
+  
+  Refer to an object in a given space by it's index.  Use n(orth), e(ast),
   s(outh) and w(est) to rotate an object by 0, 90, 180 or 270 degrees.
   
+  If you want to leave a space blank, just leave a period (.)
+  
   Note:  For objects more than 1 tile wide or high, you only need to mark the
-  top-left corner of the object BEFORE rotation.  Other spaces the object might
+  top-left corner of the object before rotation.  Other spaces the object might
   fill can be blank.
+  
+  Example 1:
+    .  .  .
+    .  2s 1
+    .  .  .
+    
+    This will create a 3x3 area with an object of type 1 on the right and an
+    object of type 2, rotated 180 degrees, in the middle.
+  
   
   Use these characters to add walls/doors/windows to a particular space:
   Wall Left:    [
   Wall Bottom:  _
   Wall Right:   ]
   Wall Top:     ‾
-  Window:       . (also represents blank tiles, filled by the floor)
+  Window:       '
   Door:         /
   
-  Example:
+  Example 2:
     [‾ ‾  ‾  ‾]
-    [  1  .   ].
+    [  1  .   ]'
     [  .  2e  ]/
     [_ _  _  _]
   
@@ -99,8 +139,8 @@
 
 
 <scene
-  name   = "Jeweller Scene"
-  ID     = "civic_scene_jeweller"
+  name   = "Jewelry Vault"
+  ID     = "civic_scene_jewelry_vault"
   wide   = "6"
   high   = "6"
   floor  = "civic_floor"
@@ -112,19 +152,63 @@
     1 = "civic_jewel_case"
     2 = "civic_jewel_case_long"
   >
-    [‾ ‾. ‾/ ‾  ‾ ‾]
-    [  1s 2w .  1w ]
-    [. 2  .  .  2  ]/
-    [  .  .  .  .  ]
-    [/ 1e 2w .  1n ].
-    [_ _/ _  _. _ _]
+    [‾ ‾' ‾/ ‾  ‾  ‾]
+    [  1s 2w .  1w  ]
+    [' 2  .  .  2   ]/
+    [  .  .  .  .   ]
+    [/ 1e 2w .  1n  ]'
+    [_ _/ _  _' _  _]
   </grid>
 </scene>
 
 
+<scene
+  name   = "General Seating"
+  ID     = "civic_scene_general_seating"
+  wide   = "6"
+  high   = "6"
+  floor  = "civic_floor"
+  wall   = "civic_wall"
+  door   = "civic_door"              
+  window = "civic_window"
+>
+  <grid
+  >
+    .  .  .  .  .  .
+    .  .  .  .  .  .
+    .  .  .  .  .  .
+    .  .  .  .  .  .
+    .  .  .  .  .  .
+    .  .  .  .  .  .
+  </grid>
+</scene>
 
 
-
+<scene
+  name           = "Civic Test Structure"
+  ID             = "civic_test_structure"
+  unitSize       = "6"
+  maxUnitsAcross = "2"
+  floor          = "civic_floor"
+  wall           = "civic_wall"
+  door           = "civic_door"              
+  window         = "civic_window"
+>
+  <unit
+    typeID   = "civic_scene_jewelry_vault"
+    wall     = "WALL_INTERIOR"
+    priority = "PRIORITY_HIGH"
+    minCount = "1"
+    maxCount = "2"
+    percent  = "20"
+  />
+  <unit
+    typeID   = "civic_scene_general_seating"
+    wall     = "WALL_EXTERIOR"
+    priority = "PRIORITY_LOW"
+    percent  = "100"
+  />
+</scene>
 
 
 

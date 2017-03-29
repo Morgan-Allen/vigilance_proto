@@ -1,15 +1,17 @@
 
+
 package proto.common;
 import proto.game.scene.*;
-import proto.game.world.World;
+import proto.game.world.*;
 
 
 
 public class DebugSceneFile extends RunGame {
   
   
-  final static SceneType FILE_TEST_SCENE = SceneFromXML.fixedSceneFrom(
-    "media assets/scene layout/civic scenes/", "test_scene.xml"
+  final static SceneType FILE_TEST_SCENE = SceneFromXML.sceneWithID(
+    "civic_test_structure", "test_scene.xml",
+    "media assets/scene layout/civic scenes/"
   );
   
   
@@ -29,5 +31,5 @@ public class DebugSceneFile extends RunGame {
     
     return world;
   }
-
+  
 }

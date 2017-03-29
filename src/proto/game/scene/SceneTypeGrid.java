@@ -50,10 +50,10 @@ public class SceneTypeGrid extends SceneType {
     );
     this.resolution = resolution;
     this.units      = units;
-    this.borders = wallType;
-    this.door    = doorType;
-    this.window  = windowType;
-    this.floors  = floorType;
+    this.borders    = wallType;
+    this.door       = doorType;
+    this.window     = windowType;
+    this.floors     = floorType;
     int unitID = 0;
     for (GridUnit unit : units) unit.ID = unitID++;
   }
@@ -217,7 +217,7 @@ public class SceneTypeGrid extends SceneType {
           if (d.wall != null) d.wall.exitScene();
           d.wall = scene.addProp(door, d.x, d.y, d.facing);
         }
-        if (w != d && ! wall.indoor) {
+        if (w != d && this.window != null && ! wall.indoor) {
           if (w.wall != null) w.wall.exitScene();
           w.wall = scene.addProp(window, w.x, w.y, w.facing);
         }
@@ -235,6 +235,7 @@ public class SceneTypeGrid extends SceneType {
   boolean tryRecordingWall(
     Coord p, int facing, Room from, Room other, SceneGenGrid g
   ) {
+    if (this.borders == null) return false;
     int forO = other == null ? WALL_NONE : ((GridUnit) other.unit).wallType;
     int forF = from  == null ? WALL_NONE : ((GridUnit) from .unit).wallType;
     
@@ -271,6 +272,7 @@ public class SceneTypeGrid extends SceneType {
   
   
   boolean canInsertDoor(int x, int y, int dx, int dy, Scene s) {
+    if (this.door == null) return false;
     if (sceneBlocked(x + dx, y + dy, s)) return false;
     if (sceneBlocked(x - dx, y - dy, s)) return false;
     return true;

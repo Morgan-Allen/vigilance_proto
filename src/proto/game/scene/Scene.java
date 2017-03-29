@@ -328,6 +328,7 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   
   
   public Prop addProp(PropType type, int x, int y, int facing) {
+    if (type == null) { I.complain("NULL PROP TYPE SUPPLIED!"); return null; }
     final Prop prop = new Prop(type, world);
     return prop.enterScene(this, x, y, facing) ? prop : null;
   }

@@ -192,21 +192,20 @@ public class Kind extends Index.Entry implements Session.Saveable {
   }
   
   
-  public static int loadField(String label) {
-    try {
-      Field field = Kind.class.getField(label);
-      return field.getInt(null);
-    }
+  public static int loadField(String label, Class from) {
+    try { return from.getField(label).getInt(null); }
     catch (Exception e) {}
-    return Integer.parseInt(label);
+    try { return Integer.parseInt(label); }
+    catch (Exception e) {}
+    return -1;
+  }
+  
+  
+  public static int loadField(String label) {
+    return loadField(label, Kind.class);
   }
   
 }
-
-
-
-
-
 
 
 

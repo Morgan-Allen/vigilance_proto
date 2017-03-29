@@ -11,21 +11,132 @@ import java.util.StringTokenizer;
 public class SceneFromXML implements TileConstants {
   
   
-  public static SceneTypeFixed fixedSceneFrom(
-    String filePath, String fileName
-  ) {
-    XML file = XML.load(filePath+""+fileName);
-    //
-    //  Scoop up the prop-definitions first, then load up the basic stats for
-    //  the scene-type:
-    Batch <PropType> allTypes = new Batch();
-    for (XML child : file.allChildrenMatching("prop")) {
-      PropType type = propFrom(child, filePath);
-      if (type != null) allTypes.add(type);
+  public static PropType propWithID(String ID, String file, String basePath) {
+    return propWithID(ID, getCachedXML(basePath+file), basePath);
+  }
+  
+  
+  public static SceneType sceneWithID(String ID, String file, String basePath) {
+    return sceneWithID(ID, getCachedXML(basePath+file), basePath);
+  }
+  
+  
+  public static XML getCachedXML(String xmlPath) {
+    XML cached = (XML) Assets.getResource(xmlPath);
+    if (cached == null) {
+      Assets.cacheResource(cached = XML.load(xmlPath), xmlPath);
     }
-    XML sceneNode = file.child("scene");
+    return cached;
+  }
+  
+  
+  static PropType propWithID(String ID, XML file, String basePath) {
+    String key = basePath.toLowerCase()+"_"+ID;
+    PropType cached = (PropType) Assets.getResource(key);
+    if (cached != null) return cached;
+
+    for (XML node : file.allChildrenMatching("prop")) {
+      String propKey = basePath.toLowerCase()+"_"+node.value("ID");
+      if (Assets.getResource(propKey) != null) continue;
+      Assets.cacheResource("PROP_HOLDER", propKey);
+      
+      PropType type = new PropType(
+        node.value("name"), propKey,
+        basePath+node.value("sprite"),
+        Kind.loadField(node.value("subtype")),
+        node.getInt("wide"),
+        node.getInt("high"),
+        Kind.loadField(node.value("blockLevel")),
+        node.getBool("blockSight")
+      );
+      Assets.cacheResource(type, propKey);
+    }
+    
+    Object match = Assets.getResource(key);
+    if (match instanceof PropType) return (PropType) match;
+    
+    return null;
+  }
+  
+  
+  public static SceneType sceneWithID(String ID, XML file, String basePath) {
+    String key = basePath.toLowerCase()+"_"+ID;
+    Object cached = Assets.getResource(key);
+    if (cached instanceof SceneType) return (SceneType) cached;
+    
+    for (XML node : file.allChildrenMatching("scene")) {
+      String sceneKey = basePath.toLowerCase()+"_"+node.value("ID");
+      if (Assets.getResource(sceneKey) != null) continue;
+      Assets.cacheResource("SCENE_HOLDER", sceneKey);
+      
+      if (! node.child("unit").isNull()) {
+        SceneType type = gridSceneFrom(node, basePath, sceneKey);
+        Assets.cacheResource(type, sceneKey);
+      }
+      else if (! node.child("grid").isNull()) {
+        SceneType type = fixedSceneFrom(node, basePath, sceneKey);
+        Assets.cacheResource(type, sceneKey);
+      }
+    }
+    
+    cached = Assets.getResource(key);
+    if (cached instanceof SceneType) return (SceneType) cached;
+    return null;
+  }
+  
+  
+  static SceneTypeGrid gridSceneFrom(
+    XML sceneNode, String filePath, String ID
+  ) {
+    XML    file     = sceneNode.parent();
+    String name     = sceneNode.value("name"  );
+    String floorID  = sceneNode.value("floor" );
+    String wallID   = sceneNode.value("wall"  );
+    String doorID   = sceneNode.value("door"  );
+    String windowID = sceneNode.value("window");
+    
+    XML unitXML[] = sceneNode.allChildrenMatching("unit");
+    Batch <SceneTypeGrid.GridUnit> units = new Batch();
+    
+    for (XML u : unitXML) {
+      SceneType type = sceneWithID(u.value("typeID"), file, filePath);
+      int wallType = Kind.loadField(u.value("wall"    ), SceneTypeGrid.class);
+      int priority = Kind.loadField(u.value("priority"), SceneTypeGrid.class);
+      int percent  = getInt(u, "percent" , -1);
+      int minCount = getInt(u, "minCount", -1);
+      int maxCount = getInt(u, "maxCount", -1);
+      
+      SceneTypeGrid.GridUnit unit = SceneTypeGrid.unit(
+        (SceneTypeFixed) type, wallType,
+        priority, percent, minCount, maxCount
+      );
+      if (unit != null) units.add(unit);
+    }
+    
+    int unitSize = sceneNode.getInt("unitSize"      );
+    int maxUA    = sceneNode.getInt("maxUnitsAcross");
+    PropType
+      floor  = propWithID(floorID , file, filePath),
+      wall   = propWithID(wallID  , file, filePath),
+      door   = propWithID(doorID  , file, filePath),
+      window = propWithID(windowID, file, filePath);
+    
+    SceneTypeGrid sceneType = new SceneTypeGrid(
+      name, ID, unitSize, maxUA,
+      wall, door, window, floor,
+      units.toArray(SceneTypeGrid.GridUnit.class)
+    );
+    return sceneType;
+  }
+  
+  
+  static SceneTypeFixed fixedSceneFrom(
+    XML sceneNode, String filePath, String ID
+  ) {
+    //
+    //  First load up the basic stats for this scene-type:
+    XML    file     = sceneNode.parent();
     String name     = sceneNode.value ("name"  );
-    String ID       = sceneNode.value ("ID"    );
     int    wide     = sceneNode.getInt("wide"  );
     int    high     = sceneNode.getInt("high"  );
     String floorID  = sceneNode.value ("floor" );
@@ -39,13 +150,13 @@ public class SceneFromXML implements TileConstants {
     String gridArgs[] = gridXML.args();
     PropType types[] = new PropType[gridArgs.length];
     PropType
-      floor  = propWithID(floorID , allTypes, filePath),
-      wall   = propWithID(wallID  , allTypes, filePath),
-      door   = propWithID(doorID  , allTypes, filePath),
-      window = propWithID(windowID, allTypes, filePath);
+      floor  = propWithID(floorID , file, filePath),
+      wall   = propWithID(wallID  , file, filePath),
+      door   = propWithID(doorID  , file, filePath),
+      window = propWithID(windowID, file, filePath);
     for (int i = types.length; i-- > 0;) {
       int index = Integer.parseInt(gridArgs[i]) - 1;
-      types[index] = propWithID(gridXML.value(gridArgs[i]), allTypes, filePath);
+      types[index] = propWithID(gridXML.value(gridArgs[i]), file, filePath);
     }
     //
     //  The content of the grid node represent the x/y position of those props,
@@ -66,7 +177,7 @@ public class SceneFromXML implements TileConstants {
       //  numeric type index present, along with markers for doors and windows:
       if (tokens.empty()) break;
       String token = tokens.removeFirst().toLowerCase();
-      int portI = matchIndex(token, '/', '.');
+      int portI = matchIndex(token, '/', '\'');
       char wallChars[] = {'‾',']','_','['};
       int typeIndex = parseIndex(token) - 1;
       PropType placed = null;
@@ -99,8 +210,14 @@ public class SceneFromXML implements TileConstants {
     }
     catch (Exception e) { I.report(e); break; }
     //
-    //  And finallly, return the initialised type:
+    //  And finally, return the initialised type:
     return sceneType;
+  }
+  
+  
+  private static int getInt(XML node, String tag, int defaultVal) {
+    if (node.value(tag) == null) return defaultVal;
+    else return node.getInt(tag);
   }
   
   
@@ -125,36 +242,10 @@ public class SceneFromXML implements TileConstants {
     if (s.length() == 0) return -1;
     return Integer.parseInt(token);
   }
-  
-  
-  private static PropType propWithID(
-    String ID, Series <PropType> from, String basePath
-  ) {
-    String key = basePath+"_"+ID;
-    for (PropType p : from) if (p.entryKey().equals(key)) return p;
-    return null;
-  }
-  
-  
-  public static PropType propFrom(String xmlPath) {
-    return propFrom(XML.load(xmlPath), xmlPath);
-  }
-  
-  
-  public static PropType propFrom(XML node, String basePath) {
-    try { return new PropType(
-      node.value("name"),
-      basePath.toLowerCase()+"_"+node.value("ID"),
-      basePath+node.value("sprite"),
-      Kind.loadField(node.value("subtype")),
-      node.getInt("wide"),
-      node.getInt("high"),
-      Kind.loadField(node.value("blockLevel")),
-      node.getBool("blockSight")
-    ); }
-    catch (Exception e) { I.report(e); return null; }
-  }
 }
+
+
+
 
 
 
