@@ -14,6 +14,7 @@ public class SceneTypeFixed extends SceneType {
     */
   final int wide, high;
   
+  byte fillMask[][];
   static class Placing {
     PropType type;
     int x, y, facing;
@@ -32,6 +33,7 @@ public class SceneTypeFixed extends SceneType {
     );
     this.wide = wide;
     this.high = high;
+    this.fillMask = new byte[wide][high];
   }
   
   
@@ -43,6 +45,16 @@ public class SceneTypeFixed extends SceneType {
     p.y = y;
     p.facing = facing;
     placings.add(p);
+    //
+    //  We use the fill-mask to check for border-compatibility later on (see
+    //  below.)
+    int mask = 1;
+    if (type.thin() && type.blockLevel() == Kind.BLOCK_NONE) mask = -1;
+    if (type.thin() && type.blockSight() == false          ) mask = -1;
+    for (Coord c : Prop.coordsUnder(type, x, y, facing)) try {
+      fillMask[c.x][c.y] = (byte) mask;
+    }
+    catch (ArrayIndexOutOfBoundsException e) {}
   }
   
   
@@ -74,29 +86,27 @@ public class SceneTypeFixed extends SceneType {
     int offGY = (high - resolution) / 2;
     
     for (Coord c : Visit.perimeter(offGX, offGY, resolution, resolution)) {
-      int tx = c.x + offX, ty = c.y + offY, gx = c.x, gy = c.y;
-      if (c.x < 0) gx--; if (c.x >= resolution) gx++;
-      if (c.y < 0) gy--; if (c.y >= resolution) gy++;
-      if (c.x != gx) {
-        if (! checkBorderAt(gx, c.y, scene, tx, ty)) return false;
+      int tx = c.x + offX, ty = c.y + offY, gx = c.x, gy = c.y, dir = 0;
+      if (c.x < 0          ) { gx++; dir = 0; }
+      if (c.y < 0          ) { gy++; dir = 1; }
+      if (c.x >= resolution) { gx--; dir = 2; }
+      if (c.y >= resolution) { gy--; dir = 3; }
+      if (c.x != gx && c.y != gy) {
+        continue;
       }
-      if (c.y < gy) {
-        if (! checkBorderAt(c.x, gy, scene, tx, ty)) return false;
-      }
+      //
+      //  Check to ensure that no doors or windows are blocked.
+      //boolean blockG = fillMask[gx][gy] >   0;
+      //
+      //  TODO:  In future, you may want to implement a more jigsaw-esque
+      //  approach, depending on the wall-types specs for a grid-unit.
+      boolean isDoor = fillMask[gx][gy] == -1;
+      Tile    at     = scene.tileAt(tx, ty);
+      boolean blockT = at == null ? true  : (at.blocked() || at.opaque());
+      if (isDoor && blockT) return false;
     }
-    return true;
-  }
-  
-  
-  boolean checkBorderAt(int gx, int gy, Scene scene, int tx, int ty) {
-    //Kind type = propType(gx, gy);
-    //Tile at = scene.tileAt(tx, ty);
-    //boolean blockG = type == null ? false : type.blockLevel() > 0;
-    //boolean blockT = at   == null ? true  : at.blocked();
     
-    //  TODO:  FIX THIS!
     return true;
-    //return blockG == blockT;
   }
   
   

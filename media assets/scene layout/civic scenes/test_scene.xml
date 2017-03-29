@@ -70,7 +70,7 @@
   wide       = "1"
   high       = "1"
   subtype    = "SUBTYPE_FURNISH"
-  blockLevel = "BLOCK_PARTIAL"
+  blockLevel = "BLOCK_FULL"
   blockSight = "false"
 />
 
@@ -81,7 +81,7 @@
   wide       = "1"
   high       = "2"
   subtype    = "SUBTYPE_FURNISH"
-  blockLevel = "BLOCK_PARTIAL"
+  blockLevel = "BLOCK_FULL"
   blockSight = "false"
 />
 
