@@ -3,9 +3,11 @@
 package proto.common;
 import proto.game.person.*;
 import proto.util.*;
+
 import java.awt.*;
 import java.io.File;
 import javax.imageio.ImageIO;
+import java.lang.reflect.*;
 
 
 
@@ -195,12 +197,29 @@ public class Kind extends Index.Entry implements Session.Saveable {
     return images;
   }
   
+  
+  public static int loadField(String label, Class from) {
+    try { return from.getField(label).getInt(null); }
+    catch (Exception e) {}
+    try { return Integer.parseInt(label); }
+    catch (Exception e) {}
+    return -1;
+  }
+  
+  
+  public static int loadField(String label) {
+    return loadField(label, Kind.class);
+  }
+  
+  
+  public static Kind kindWithID(String ID) {
+    for (Kind k : INDEX.allEntries(Kind.class)) {
+      if (k.entryKey().equals(ID)) return k;
+    }
+    return null;
+  }
+  
 }
-
-
-
-
-
 
 
 

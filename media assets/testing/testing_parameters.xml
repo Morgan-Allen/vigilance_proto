@@ -1,0 +1,19 @@
+
+
+<comment>
+  Note:  See under src/proto/content/agents/ for definitions of the various
+  agents that can be added to a scene.
+</comment>
+
+<sceneTest
+  basePath = "media assets/scene layout/civic scenes/"
+  fileName = "test_scene.xml"
+  sceneID  = "civic_test_structure"
+  size     = "12"
+>
+  <agent
+    ID     = "hero_kind_phobos"
+    startX = "0"
+    startY = "8"
+  />
+</sceneTest>

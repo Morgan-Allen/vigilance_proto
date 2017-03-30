@@ -111,7 +111,7 @@ public class I {
   
   
   public static void report(Exception e) {
-    say("\nERROR:  "+e.getMessage());
+    say("\nERROR:  "+e);
     reportStackTrace(e);
   }
   

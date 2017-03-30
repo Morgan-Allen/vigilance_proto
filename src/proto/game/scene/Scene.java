@@ -330,6 +330,7 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   
   
   public Prop addProp(PropType type, int x, int y, int facing) {
+    if (type == null) { I.complain("NULL PROP TYPE SUPPLIED!"); return null; }
     final Prop prop = new Prop(type, world);
     return prop.enterScene(this, x, y, facing) ? prop : null;
   }
@@ -399,11 +400,12 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   
   
   public void updateScene() {
-    if (GameSettings.pauseScene) return;
+    boolean skipUpdate = playerTeam.empty() && othersTeam.empty();
+    if (skipUpdate || GameSettings.pauseScene) return;
     
     Action nextAction = currentAction();
     Person nextActing = currentActing();
-
+    
     if (nextActing != null && ! nextAction.complete()) {
       
       for (Person p : playerTeam) if (p != nextActing) {
@@ -419,7 +421,7 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     }
     else moveToNextPersonsTurn();
     
-    int nextState = checkCompletionStatus();
+    int nextState = GameSettings.debugScene ? state : checkCompletionStatus();
     if (nextState > STATE_BEGUN && ! complete()) {
       this.state = nextState;
       onSceneCompletion();

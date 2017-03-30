@@ -1,7 +1,6 @@
 
 
 package proto.game.scene;
-import proto.common.*;
 import proto.game.world.*;
 import proto.util.*;
 import static proto.game.scene.SceneGen.*;
@@ -50,10 +49,10 @@ public class SceneTypeGrid extends SceneType {
     );
     this.resolution = resolution;
     this.units      = units;
-    this.borders = wallType;
-    this.door    = doorType;
-    this.window  = windowType;
-    this.floors  = floorType;
+    this.borders    = wallType;
+    this.door       = doorType;
+    this.window     = windowType;
+    this.floors     = floorType;
     int unitID = 0;
     for (GridUnit unit : units) unit.ID = unitID++;
   }
@@ -132,48 +131,70 @@ public class SceneTypeGrid extends SceneType {
   
   
   void populateWithAreas(Scene scene, SceneGenGrid g) {
-    int counts[] = new int[units.length];
-    
-    //  TODO:  You need to select optimal facings as well- and iterate over
-    //  types before you iterate over locations.
-    
+    //
+    //  First, we compile a list of all available spaces, and set up a tally
+    //  of total placements for each unit-type:
+    List <Coord> allSpaces = new List();
     for (Coord c : Visit.grid(0, 0, g.gridSize, g.gridSize, 1)) {
       int atX = g.offX + (c.x * resolution);
       int atY = g.offY + (c.y * resolution);
+      allSpaces.add(new Coord(atX, atY));
+    }
+    int counts[] = new int[units.length];
+    class SpacePick { GridUnit unit; Coord at; int facing; }
+    //
+    //  While there's space left, we iterate over all possible combinations of
+    //  location, unit-type and facing, toss in a little random weighting, and
+    //  see which looks most promising.  (Note that we skip over any unit types
+    //  already past their placement quotas.)
+    while (! allSpaces.empty()) {
+      Pick <SpacePick> pick = new Pick();
       
-      Pick <GridUnit> pick = new Pick();
       for (GridUnit unit : units) {
         int count = counts[unit.ID];
         int percent = (count * 100) / (g.gridSize * g.gridSize);
-        
         if (unit.maxCount > 0 && count   >= unit.maxCount) continue;
         if (unit.percent  > 0 && percent >= unit.percent ) continue;
-        if (! unit.type.checkBordering(scene, atX, atY, resolution)) continue;
         
-        float rating = unit.priority * 1f / PRIORITY_MEDIUM;
-        rating += Nums.max(0, unit.minCount - count);
-        rating += Rand.num() / 2;
-        pick.compare(unit, rating);
+        for (Coord c : allSpaces) for (int face : T_ADJACENT) {
+          if (unit.type.checkBordering(scene, c.x, c.y, face, resolution)) {
+            float rating = unit.priority * 1f / PRIORITY_MEDIUM;
+            rating += Nums.max(0, unit.minCount - count);
+            rating += Rand.num() / 2;
+            
+            SpacePick s = new SpacePick();
+            s.at     = c   ;
+            s.unit   = unit;
+            s.facing = face;
+            pick.compare(s, rating);
+          }
+        }
       }
-      GridUnit picked = pick.result();
-      
-      if (picked == null) continue;
-      I.say("PICKED GRID UNIT "+picked.type+" AT "+atX+" "+atY);
-      int pickFace = T_ADJACENT[Rand.index(4)];
-      picked.type.applyToScene(scene, atX, atY, pickFace, resolution, g.verbose);
+      if (pick.empty()) break;
       //
-      //  
+      //  Having pick the most promising option, we apply the furnishings to
+      //  the scene:
+      SpacePick s    = pick.result();
+      Coord     at   = s.at;
+      SceneType type = s.unit.type;
+      I.say("PICKED GRID UNIT "+type+" AT "+at+", FACE: "+s.facing);
+      type.applyToScene(scene, at.x, at.y, s.facing, resolution, g.verbose);
+      //
+      //  And mark out a room within the grid with the appropriate attributes,
+      //  before increment the type's placement counter and removing the
+      //  location used:
       Room area = new Room();
-      area.unit = picked;
+      area.unit = s.unit;
       area.ID   = g.rooms.size();
-      area.minX = atX;
-      area.minY = atY;
+      area.minX = at.x;
+      area.minY = at.y;
       area.wide = area.high = resolution;
       g.rooms.add(area);
-      for (Coord m : Visit.grid(atX, atY, resolution, resolution, 1)) {
+      for (Coord m : Visit.grid(at.x, at.y, resolution, resolution, 1)) {
         g.areaMarkup[m.x - g.offX][m.y - g.offY] = area;
       }
-      counts[picked.ID]++;
+      counts[s.unit.ID]++;
+      allSpaces.remove(at);
     }
   }
   
@@ -201,12 +222,13 @@ public class SceneTypeGrid extends SceneType {
     //  actual wall-objects accordingly, and punctuate with doors and windows.
     for (Wall wall : g.walls) {
       for (WallPiece p : wall.pieces) {
+        if (! Prop.hasSpace(scene, borders, p.x, p.y, p.facing)) continue;
         p.wall = scene.addProp(borders, p.x, p.y, p.facing);
       }
     }
     for (Wall wall : g.walls) {
       Batch <WallPiece> canDoor = new Batch();
-      for (WallPiece p : wall.pieces) {
+      for (WallPiece p : wall.pieces) if (p.wall != null) {
         if (canInsertDoor(p.x, p.y, 1, 0, scene)) canDoor.add(p);
         if (canInsertDoor(p.x, p.y, 0, 1, scene)) canDoor.add(p);
       }
@@ -217,7 +239,7 @@ public class SceneTypeGrid extends SceneType {
           if (d.wall != null) d.wall.exitScene();
           d.wall = scene.addProp(door, d.x, d.y, d.facing);
         }
-        if (w != d && ! wall.indoor) {
+        if (w != d && this.window != null && ! wall.indoor) {
           if (w.wall != null) w.wall.exitScene();
           w.wall = scene.addProp(window, w.x, w.y, w.facing);
         }
@@ -235,6 +257,7 @@ public class SceneTypeGrid extends SceneType {
   boolean tryRecordingWall(
     Coord p, int facing, Room from, Room other, SceneGenGrid g
   ) {
+    if (this.borders == null) return false;
     int forO = other == null ? WALL_NONE : ((GridUnit) other.unit).wallType;
     int forF = from  == null ? WALL_NONE : ((GridUnit) from .unit).wallType;
     
@@ -271,6 +294,7 @@ public class SceneTypeGrid extends SceneType {
   
   
   boolean canInsertDoor(int x, int y, int dx, int dy, Scene s) {
+    if (this.door == null) return false;
     if (sceneBlocked(x + dx, y + dy, s)) return false;
     if (sceneBlocked(x - dx, y - dy, s)) return false;
     return true;

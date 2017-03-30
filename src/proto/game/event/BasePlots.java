@@ -63,13 +63,16 @@ public class BasePlots {
   
   
   public void updatePlanning() {
+    if (Visit.empty(plotTypes)) {
+      return;
+    }
     if (rootPlot == null || rootPlot.complete()) {
       rootPlot = generateNextPlot();
-      int delay = (int) Rand.range(
+      int time = base.world().timing.totalHours(), delay = (int) Rand.range(
         GameSettings.MIN_PLOT_THINKING_TIME,
         GameSettings.MAX_PLOT_THINKING_TIME
       );
-      rootPlot.setBeginTime(base.world().timing.totalHours() + delay);
+      if (rootPlot != null) rootPlot.setBeginTime(time + delay);
     }
     if (rootPlot != null && ! rootPlot.scheduled()) {
       base.world().events.scheduleEvent(rootPlot);

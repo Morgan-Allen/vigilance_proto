@@ -3,6 +3,7 @@
 package proto.game.scene;
 import proto.game.person.*;
 import proto.common.*;
+import proto.util.*;
 
 
 

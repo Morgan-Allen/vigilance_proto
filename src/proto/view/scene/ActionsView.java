@@ -188,6 +188,17 @@ public class ActionsView extends UINode {
     if (surface.isPressed('s')) world.performSave();
     if (surface.isPressed('r')) world.reloadFromSave();
     
+    if (GameSettings.debugScene) {
+      if (GameSettings.pauseScene) {
+        s.append("\n  Press P to unpause.");
+        if (surface.isPressed('p')) GameSettings.pauseScene = false;
+      }
+      else {
+        s.append("\n  Press P to pause.");
+        if (surface.isPressed('p')) GameSettings.pauseScene = true;
+      }
+    }
+    
     return s.toString();
   }
   
