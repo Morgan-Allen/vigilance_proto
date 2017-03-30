@@ -205,6 +205,14 @@ public class Kind extends Index.Entry implements Session.Saveable {
     return loadField(label, Kind.class);
   }
   
+  
+  public static Kind kindWithID(String ID) {
+    for (Kind k : INDEX.allEntries(Kind.class)) {
+      if (k.entryKey().equals(ID)) return k;
+    }
+    return null;
+  }
+  
 }
 
 

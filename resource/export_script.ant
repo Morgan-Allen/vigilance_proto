@@ -23,6 +23,12 @@
       </manifest>
     </jar>
     
+    <jar destfile="${output}/test_scenes.jar" basedir="bin">
+      <manifest>
+        <attribute name="Main-Class" value="proto.common.DebugSceneFile"/>
+      </manifest>
+    </jar>
+    
     <zip destfile="${outZip}">
       <zipfileset dir="${output}" filemode="755"/>
     </zip>

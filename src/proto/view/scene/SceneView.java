@@ -232,6 +232,7 @@ public class SceneView extends UINode implements TileConstants {
       Tile t = scene.tileAt(c.x, c.y);
       float fogAlpha = 1f - tileVisibilityKluge(t, Person.Side.HEROES);
       if (GameSettings.debugScene) fogAlpha /= 2;
+      if (GameSettings.pauseScene) fogAlpha  = 0;
       Color black = SCALE[Nums.clamp((int) (fogAlpha * 10), 10)];
       renderColor(c.x, c.y, 1, 1, true, black, g);
     }
