@@ -361,14 +361,10 @@ public class Lead extends Task {
     Step heist = plot.heistStep();
     int heistTime = plot.stepTimeScheduled(heist);
     PlotType heistType = (PlotType) plot.type;
-
-    Clue forTime = new Clue(plot, Plot.ROLE_TIME);
-    forTime.confirmHeistTime(heistTime, this, time, place);
-    possible.add(forTime);
     
-    Clue forType = new Clue(plot, Plot.ROLE_OBJECTIVE);
-    forTime.confirmHeistType(heistType, this, time, place);
-    possible.add(forType);
+    Clue forHeist = new Clue(plot, Plot.ROLE_OBJECTIVE);
+    forHeist.confirmHeistDetails(heistType, heistTime, this, time, place);
+    possible.add(forHeist);
     
     return possible;
   }
@@ -394,7 +390,7 @@ public class Lead extends Task {
   /**  Generation and screening of clues related to the case:
     */
   protected boolean canDetect(
-    Step step, int tense, Plot plot
+    Step step, int tense, Plot plot, int time
   ) {
     //
     //  First check the tense-
@@ -402,8 +398,8 @@ public class Lead extends Task {
       return false;
     }
     if (tense == TENSE_AFTER) {
-      int timeFromEnd = step.timeStart + step.timeTaken;
-      timeFromEnd -= base.world().timing.totalHours();
+      if (step.timeStart < 0) return false;
+      int timeFromEnd = step.timeStart + step.timeTaken - time;
       if (timeFromEnd >= CLUE_EXPIRATION_TIME) return false;
     }
     //
@@ -438,22 +434,23 @@ public class Lead extends Task {
   
   
   protected float attemptFollow(
-    Step step, int tense, Plot plot, Series <Person> follow
+    Step step, int tense, Plot plot, Series <Person> follow, int time
   ) {
     //
     //  First, check to see whether anything has actually changed here (i.e,
     //  avoid granting cumulative 'random' info over time.)  If it hasn't,
     //  just return.
-    String contactID = step.ID+"_"+tense;
+    String contactID = plot.caseID+"_"+step.ID+"_"+tense;
     if (contactID.equals(lastContactID)) {
       return RESULT_NONE;
     }
+    I.say("\nNew contact: "+contactID);
+    this.lastContactID = contactID;
     //
     //  Then perform the actual skill-test needed to ensure success:
     attempt = configAttempt(follow);
     int outcome = attempt.performAttempt(2);
     float result = (outcome == 2) ? RESULT_HOT : RESULT_PARTIAL;
-    int time = base.world().timing.totalHours();
     Place place = focus.place();
     //
     //  If you're on fire at the moment, you can get direct confirmation for
@@ -545,6 +542,7 @@ public class Lead extends Task {
     if (! super.updateAssignment()) return false;
     Series <Person> active = active();
     World world = base.world();
+    int time = world.timing.totalHours();
     //
     //  Continuously monitor for events of interest connected to the current
     //  focus of your investigation, and see if any new information pops up...
@@ -552,12 +550,12 @@ public class Lead extends Task {
       Plot plot = (Plot) event;
       for (Step step : plot.allSteps()) {
         int tense = plot.stepTense(step);
-        if (tense == TENSE_DURING && step.medium == MEDIUM_HEIST) {
-          Scene scene = plot.generateScene(step, focus, this);
-          base.world().enterScene(scene);
-        }
-        else if (canDetect(step, tense, plot)) {
-          attemptFollow(step, tense, plot, active);
+        if (canDetect(step, tense, plot, time)) {
+          if (tense == TENSE_DURING && step.medium == MEDIUM_HEIST) {
+            Scene scene = plot.generateScene(step, focus, this);
+            base.world().enterScene(scene);
+          }
+          attemptFollow(step, tense, plot, active, time);
         }
       }
     }
@@ -566,8 +564,8 @@ public class Lead extends Task {
     for (Event event : world.events.past()) if (event.isPlot()) {
       Plot plot = (Plot) event;
       for (Step step : plot.allSteps()) {
-        if (canDetect(step, TENSE_AFTER, plot)) {
-          attemptFollow(step, TENSE_AFTER, plot, active);
+        if (canDetect(step, TENSE_AFTER, plot, time)) {
+          attemptFollow(step, TENSE_AFTER, plot, active, time);
         }
       }
     }

@@ -90,7 +90,7 @@ public class BaseLeads {
     
     if (subject instanceof Plot) {
       Plot plot = (Plot) subject;
-      plot.caseLabel = "Case No. "+nextCaseID++;
+      plot.caseID = nextCaseID++;
     }
     return file;
   }

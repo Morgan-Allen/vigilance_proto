@@ -50,8 +50,9 @@ public class CaseFile implements Session.Saveable {
   
   
   public void recordClue(Clue clue, EventReport report) {
-    for (Clue prior : clues) {
-      if (prior.matchesType(clue)) return;
+    for (Clue prior : clues) if (prior.makesRedundant(clue)) {
+      ///I.say("\nClue was redundant: "+clue.longDescription(base));
+      return;
     }
     clues.add(clue);
     MessageUtils.presentClueMessage(clue, base.world().view(), report);

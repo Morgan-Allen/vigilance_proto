@@ -57,12 +57,12 @@ public abstract class Plot extends Event {
   /**  Data fields, construction and save/load methods-
     */
   final Base base;
-  int spookLevel = 0, nextContactID = 0;
+  int caseID = -1;
+  
+  int spookLevel = 0, nextStepID = 0;
   List <RoleEntry> entries = new List();
   List <Step     > steps   = new List();
-  
-  String caseLabel;
-  
+  Step current = null;
   
   
   protected Plot(PlotType type, Base base) {
@@ -74,9 +74,10 @@ public abstract class Plot extends Event {
   
   public Plot(Session s) throws Exception {
     super(s);
-    base = (Base) s.loadObject();
-    spookLevel    = s.loadInt();
-    nextContactID = s.loadInt();
+    base       = (Base) s.loadObject();
+    caseID     = s.loadInt();
+    spookLevel = s.loadInt();
+    nextStepID = s.loadInt();
     
     for (int n = s.loadInt(); n-- > 0;) {
       RoleEntry entry = new RoleEntry();
@@ -86,16 +87,16 @@ public abstract class Plot extends Event {
       entries.add(entry);
     }
     s.loadObjects(steps);
-    
-    caseLabel = s.loadString();
+    current = (Step) s.loadObject();
   }
   
   
   public void saveState(Session s) throws Exception {
     super.saveState(s);
     s.saveObject(base);
-    s.saveInt(spookLevel   );
-    s.saveInt(nextContactID);
+    s.saveInt(caseID    );
+    s.saveInt(spookLevel);
+    s.saveInt(nextStepID);
     
     s.saveInt(entries.size());
     for (RoleEntry entry : entries) {
@@ -104,8 +105,7 @@ public abstract class Plot extends Event {
       s.saveObject(entry.supplies);
     }
     s.saveObjects(steps);
-    
-    s.saveString(caseLabel);
+    s.saveObject(current);
   }
   
   
@@ -118,7 +118,7 @@ public abstract class Plot extends Event {
     s.involved  = involves ;
     s.medium    = medium   ;
     s.timeTaken = timeTaken;
-    s.ID        = nextContactID++;
+    s.ID        = nextStepID++;
     if (Lead.isPhysical(medium)) s.setMeetsAt(involves[0]);
     steps.add(s);
     return s;
@@ -216,12 +216,61 @@ public abstract class Plot extends Event {
     spookLevel += spookAmount;
     float abortFactor = spookLevel * 1f / Lead.PROFILE_SUSPICIOUS;
     abortFactor = (abortFactor / entries.size()) - 1;
+    I.say("Abort factor is: "+abortFactor);
     //
     //  If the perps get too spooked, the plot may be cancelled, and any
     //  further investigation will be wasting it's time...
     if (Rand.num() < abortFactor) {
+      I.say("Participants were too spooked!  Cancelling plot: "+this);
       completeEvent();
     }
+  }
+  
+  
+  public void updateEvent() {
+    for (RoleEntry entry : entries) if (entry.supplies != null) {
+      if (! entry.supplies.hasBegun()) {
+        world.events.scheduleEvent(entry.supplies);
+      }
+    }
+    if (! possible()) return;
+    
+    if (current == null || stepComplete(current)) {
+      int time = world.timing.totalHours();
+      
+      if (current != null) {
+        I.say("  Ended step: "+current);
+        checkForTipoffs(current, false, true);
+        boolean success = checkSuccess(current);
+        onCompletion(current, success);
+      }
+      if (current != steps.last()) {
+        int nextIndex = current == null ? 0 : (steps.indexOf(current) + 1);
+        current = steps.atIndex(nextIndex);
+        current.timeStart = time;
+        checkForTipoffs(current, true, false);
+        I.say("  Began step: "+current);
+      }
+      else {
+        I.say("  Plot completed.");
+        completeEvent();
+      }
+      
+      I.say("\nUpdated plot: "+this);
+      I.say("  Current Time: "+time);
+      I.say("  Current Step: "+current.ID);
+      for (Step c : steps) I.say("  "+c+" ["+c.timeStart+"]");
+    }
+  }
+  
+  
+  public void completeEvent() {
+    super.completeEvent();
+  }
+  
+  
+  public Element targetElement(Person p) {
+    return target();
   }
   
   
@@ -318,7 +367,7 @@ public abstract class Plot extends Event {
   
 
   
-  /**  Life cycle and execution:
+  /**  Supplementary methods for setting up other plots as sub-steps:
     */
   public void fillAndExpand() {
     fillRoles();
@@ -335,58 +384,12 @@ public abstract class Plot extends Event {
   }
   
   
-  public void updateEvent() {
-    for (RoleEntry entry : entries) if (entry.supplies != null) {
-      if (! entry.supplies.hasBegun()) {
-        world.events.scheduleEvent(entry.supplies);
-      }
-    }
-    //  TODO:  Re-satisfy needs as and when required.
-    if (! possible()) return;
-    
-    I.say("Updating plot: "+this);
-    
-    int time = world.timing.totalHours();
-    Step current = null, next = null;
-    for (Step c : steps) {
-      if (next    == null && ! stepBegun(c)) next    = c;
-      if (current == null &&   stepBegun(c)) current = c;
-    }
-    
-    boolean currentEnds = current == null || stepComplete(current);
-    if (currentEnds && current != null) {
-      I.say("  Ended step: "+current);
-      checkForTipoffs(current, false, true);
-      boolean success = checkSuccess(current);
-      onCompletion(current, success);
-    }
-    if (currentEnds && next != null) {
-      next.timeStart = time;
-      checkForTipoffs(next, true, false);
-      I.say("  Began step: "+next);
-    }
-    if (currentEnds && current == steps.last()) {
-      completeEvent();
-    }
-  }
-  
-  
   protected boolean rolePossible(Role role, Element element, Plot supplies) {
     if (supplies != null) {
       if (! supplies.possible()) return false;
       if (! supplies.complete()) return false;
     }
     return true;
-  }
-  
-  
-  public Element targetElement(Person p) {
-    return target();
-  }
-  
-  
-  public void completeEvent() {
-    super.completeEvent();
   }
   
   
@@ -504,7 +507,7 @@ public abstract class Plot extends Event {
       targetKnown = true;
     }
     
-    String name = caseLabel;
+    String name = "Case No. "+caseID;
     if (targetKnown && typeKnown) name = type.name+": "+target();
     else if (targetKnown) name += " (target: "+target()+")";
     else if (typeKnown  ) name += " ("+type.name+")";

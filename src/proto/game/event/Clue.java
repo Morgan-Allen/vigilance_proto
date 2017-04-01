@@ -118,20 +118,12 @@ public class Clue implements Session.Saveable {
   }
   
   
-  public void confirmHeistTime(
-    int heistTime, Lead source, int time, Place place
-  ) {
-    confirmDetails(source.type, time, place);
-    this.heistTime = heistTime;
-    this.source    = source   ;
-  }
-  
-  
-  public void confirmHeistType(
-    PlotType heistType, Lead source, int time, Place place
+  public void confirmHeistDetails(
+    PlotType heistType, int heistTime, Lead source, int time, Place place
   ) {
     confirmDetails(source.type, time, place);
     this.heistType = heistType;
+    this.heistTime = heistTime;
     this.source    = source   ;
   }
   
@@ -153,12 +145,32 @@ public class Clue implements Session.Saveable {
   }
   
   
-  public boolean matchesType(Clue other) {
-    if (plot  != other.plot ) return false;
-    if (role  != other.role ) return false;
-    if (trait != other.trait) return false;
-    if (match != other.match) return false;
-    return true;
+  public boolean makesRedundant(Clue other) {
+    if (plot != other.plot) return false;
+    if (role != other.role) return false;
+    
+    if (isConfirmation()) {
+      return true;
+    }
+    
+    if (isTraitClue() && other.isTraitClue()) {
+      if (trait != other.trait) return false;
+      return true;
+    }
+    
+    if (isRegionClue() && other.isRegionClue()) {
+      if (near != other.near) return false;
+      if (nearRange > other.nearRange) return false;
+      return true;
+    }
+    
+    if (isObjectiveClue() && other.isObjectiveClue()) {
+      if (heistType != other.heistType) return false;
+      if (heistTime != other.heistTime) return false;
+      return true;
+    }
+    
+    return false;
   }
   
   
@@ -167,6 +179,26 @@ public class Clue implements Session.Saveable {
     */
   public Lead.Type leadType() {
     return leadType;
+  }
+  
+  
+  public boolean isConfirmation() {
+    return match != null && confirmed;
+  }
+  
+  
+  public boolean isTraitClue() {
+    return trait != null;
+  }
+  
+  
+  public boolean isRegionClue() {
+    return near != null;
+  }
+  
+  
+  public boolean isObjectiveClue() {
+    return heistType != null;
   }
   
   
@@ -256,7 +288,9 @@ public class Clue implements Session.Saveable {
   
   
   public String traitDescription() {
-    if (trait != null) return ""+trait;
+    if (trait != null) {
+      return ""+trait;
+    }
     if (near != null) {
       if (nearRange == 0) return "in "+near;
       else                return "near "+near;
