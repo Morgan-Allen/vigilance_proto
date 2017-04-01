@@ -43,7 +43,7 @@ public class BaseLeads {
     */
   public void updateLeads() {
     for (Lead lead : leads) {
-      if (lead.assigned().empty()) {
+      if (lead.assigned().empty() || lead.complete()) {
         leads.remove(lead);
         continue;
       }
@@ -52,7 +52,7 @@ public class BaseLeads {
   }
   
   
-  Lead leadFor(Element focus, Lead.Type type) {
+  public Lead leadFor(Element focus, Lead.Type type) {
     for (Lead lead : leads) {
       if (lead.focus == focus && lead.type == type) {
         return lead;
@@ -61,6 +61,11 @@ public class BaseLeads {
     Lead lead = new Lead(base, type, focus);
     leads.add(lead);
     return lead;
+  }
+  
+  
+  public void closeLead(Lead lead) {
+    leads.remove(lead);
   }
   
   

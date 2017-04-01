@@ -49,9 +49,7 @@ public class DebugSceneFixed extends RunGame {
   
   protected World setupWorld() {
     this.world = new World(this, savePath);
-    DefaultGame.initDefaultRegions(world);
-    DefaultGame.initDefaultBase   (world);
-    DefaultGame.initDefaultCrime  (world);
+    DefaultGame.initDefaultWorld(world);
     //
     //  Generate the scene-
     final Scene mission = new Scene(world, 12);

@@ -15,12 +15,13 @@ public class Step implements Session.Saveable {
   /**  Data fields and save/load methods-
     */
   Plot.Role involved[];
-  int medium;
-  int timeTaken;
-  int ID;
-  
   Plot.Role meetsAt;
   Plot.Role infoGiven;
+  
+  String label;
+  int ID;
+  int medium;
+  int timeTaken;
   
   int timeStart = -1;
   boolean spooked = false;
@@ -34,12 +35,13 @@ public class Step implements Session.Saveable {
   public Step(Session s) throws Exception {
     s.cacheInstance(this);
     involved  = (Plot.Role[]) s.loadObjectArray(Plot.Role.class);
-    medium    = s.loadInt();
-    timeTaken = s.loadInt();
-    ID        = s.loadInt();
-    
     meetsAt   = (Plot.Role) s.loadObject();
     infoGiven = (Plot.Role) s.loadObject();
+    
+    label     = s.loadString();
+    ID        = s.loadInt();
+    medium    = s.loadInt();
+    timeTaken = s.loadInt();
     
     timeStart = s.loadInt();
     spooked   = s.loadBool();
@@ -48,12 +50,13 @@ public class Step implements Session.Saveable {
   
   public void saveState(Session s) throws Exception {
     s.saveObjectArray(involved);
-    s.saveInt (medium   );
-    s.saveInt (timeTaken);
-    s.saveInt (ID       );
-    
     s.saveObject(meetsAt  );
     s.saveObject(infoGiven);
+    
+    s.saveString(label);
+    s.saveInt (ID       );
+    s.saveInt (medium   );
+    s.saveInt (timeTaken);
     
     s.saveInt (timeStart);
     s.saveBool(spooked  );
@@ -100,7 +103,7 @@ public class Step implements Session.Saveable {
   /**  Rendering, debug and interface methods-
     */
   public String toString() {
-    return "Step involving "+I.list(involved);
+    return label+": "+I.list(involved);
   }
 }
 

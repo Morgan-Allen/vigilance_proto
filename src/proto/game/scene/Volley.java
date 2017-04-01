@@ -221,13 +221,14 @@ public class Volley implements Session.Saveable {
     }
     if (ranged) {
       selfAccuracy.inc(self.stats.levelFor(ACCURACY), ACCURACY);
-      float normRange  = self.stats.sightRange();
+      float normRange  = self.stats.sightRange() + 1;
       float distance   = scene.distance(self.currentTile(), hits.currentTile());
       float coverBonus = coverBonus(self, targ, scene);
       float rangeMod   = 100 * ((distance - 1) - normRange) / normRange;
       selfAccuracy.inc(0 - (int) rangeMod, RANGE);
       hitsDefence.inc(hits.stats.levelFor(DEFENCE), DEFENCE);
       hitsDefence.inc((int) coverBonus, COVER);
+      if (coverBonus <= 0) selfAccuracy.inc(25, "Target Exposed");
     }
     
     calcMargins();

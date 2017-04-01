@@ -20,10 +20,7 @@ public class DebugPlots extends RunGame {
   
   protected World setupWorld() {
     World world = new World(this, savePath);
-    DefaultGame.initDefaultRegions(world);
-    DefaultGame.initDefaultBase   (world);
-    DefaultGame.initDefaultCrime  (world);
-    DefaultGame.initDefaultBonds  (world);
+    DefaultGame.initDefaultWorld(world);
     
     Base crooks = world.baseFor(Crooks.THE_MADE_MEN);
     Plot kidnap = CrimeTypes.TYPE_KIDNAP.initPlot(crooks);
@@ -44,6 +41,7 @@ public class DebugPlots extends RunGame {
   }
   
 }
+
 
 
 

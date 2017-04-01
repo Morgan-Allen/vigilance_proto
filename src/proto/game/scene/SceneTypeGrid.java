@@ -101,7 +101,7 @@ public class SceneTypeGrid extends SceneType {
   /**  Actual scene generation-
     */
   public Scene generateScene(World world, int size, boolean forTesting) {
-    I.say("GENERATING GRID SCENE "+this);
+    I.say("\n\nGENERATING GRID SCENE "+this);
     
     final int gridSize = size / resolution;
     size = (gridSize * resolution) + 4;

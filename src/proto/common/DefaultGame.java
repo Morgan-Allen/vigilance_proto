@@ -27,12 +27,17 @@ public class DefaultGame extends RunGame {
   
   protected World setupWorld() {
     this.world = new World(this, savePath);
-    initDefaultTime   (world);
-    initDefaultRegions(world);
-    initDefaultBase   (world);
-    initDefaultCrime  (world);
-    initDefaultBonds  (world);
+    initDefaultWorld(world);
     return world;
+  }
+  
+  
+  public static void initDefaultWorld(World world) {
+    DefaultGame.initDefaultTime   (world);
+    DefaultGame.initDefaultRegions(world);
+    DefaultGame.initDefaultBase   (world);
+    DefaultGame.initDefaultCrime  (world);
+    DefaultGame.initDefaultBonds  (world);
   }
   
   

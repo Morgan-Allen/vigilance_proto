@@ -119,8 +119,12 @@ public class Prop extends Element implements TileConstants {
       if (under == null) return false;
       if (kind.thin()) {
         
+        //  This is creating a problem.  Walls need to be blocked by other
+        //  walls, but not by other furnishings.
+        
         //  TODO:  This is a bit of kluge.  Remove later.
-        int rotFace = (facing + 6) % 8;
+        
+        int rotFace = (facing + 8 - 2) % 8;
         if (under.blockageVal(rotFace) > 0 || under.opacityVal(rotFace) > 0) {
           return false;
         }

@@ -538,6 +538,15 @@ public class Lead extends Task {
   }
   
   
+  protected Scene tryInterruptHeist(
+    Step step, int tense, Plot plot, int time
+  ) {
+    if (tense       != TENSE_DURING) return null;
+    if (step.medium != MEDIUM_HEIST) return null;
+    return plot.generateScene(step, focus, this);
+  }
+  
+  
   public boolean updateAssignment() {
     if (! super.updateAssignment()) return false;
     Series <Person> active = active();
@@ -551,11 +560,13 @@ public class Lead extends Task {
       for (Step step : plot.allSteps()) {
         int tense = plot.stepTense(step);
         if (canDetect(step, tense, plot, time)) {
-          if (tense == TENSE_DURING && step.medium == MEDIUM_HEIST) {
-            Scene scene = plot.generateScene(step, focus, this);
+          Scene scene = tryInterruptHeist(step, tense, plot, time);
+          if (scene != null) {
             base.world().enterScene(scene);
           }
-          attemptFollow(step, tense, plot, active, time);
+          else {
+            attemptFollow(step, tense, plot, active, time);
+          }
         }
       }
     }
@@ -570,6 +581,17 @@ public class Lead extends Task {
       }
     }
     return true;
+  }
+  
+  
+  public void onSceneExit(Scene scene, EventReport report) {
+    setCompleted(report.playerWon());
+  }
+  
+  
+  protected void onCompletion() {
+    super.onCompletion();
+    base.leads.closeLead(this);
   }
   
   

@@ -18,15 +18,21 @@ public abstract class Plot extends Event {
     */
   final static Index <Role> ROLES_INDEX = new Index <Role> ();
   
+  final public static String
+    ASPECT = "Aspect",
+    PERP   = "Perp"  ,
+    VICTIM = "Victim",
+    STEP   = "Step"  ;
+  
   public static class Role extends Index.Entry implements Session.Saveable {
     
     final String name;
-    final boolean victim;
+    final String category;
     
-    public Role(String ID, String name, boolean victim) {
+    public Role(String ID, String name, String category) {
       super(ROLES_INDEX, ID);
       this.name = name;
-      this.victim = victim;
+      this.category = category;
     }
     
     public static Role loadConstant(Session s) throws Exception {
@@ -43,14 +49,14 @@ public abstract class Plot extends Event {
   }
   
   final public static Role
-    ROLE_TIME      = new Role("role_time"     , "Time"     , false),
-    ROLE_OBJECTIVE = new Role("role_objective", "Objective", false),
-    ROLE_BASE      = new Role("role_base"     , "Base"     , false),
-    ROLE_HIDEOUT   = new Role("role_hideout"  , "Hideout"  , false),
-    ROLE_ORGANISER = new Role("role_organiser", "Organiser", false),
-    ROLE_ENFORCER  = new Role("role_enforcer" , "Enforcer" , false),
-    ROLE_TARGET    = new Role("role_target"   , "Target"   , true ),
-    ROLE_SCENE     = new Role("role_scene"    , "Scene"    , true )
+    ROLE_TIME      = new Role("role_time"     , "Time"     , ASPECT),
+    ROLE_OBJECTIVE = new Role("role_objective", "Objective", ASPECT),
+    ROLE_BASE      = new Role("role_base"     , "Base"     , PERP  ),
+    ROLE_HIDEOUT   = new Role("role_hideout"  , "Hideout"  , PERP  ),
+    ROLE_ORGANISER = new Role("role_organiser", "Organiser", PERP  ),
+    ROLE_ENFORCER  = new Role("role_enforcer" , "Enforcer" , PERP  ),
+    ROLE_TARGET    = new Role("role_target"   , "Target"   , VICTIM),
+    ROLE_SCENE     = new Role("role_scene"    , "Scene"    , VICTIM)
   ;
   
   
@@ -59,7 +65,7 @@ public abstract class Plot extends Event {
   final Base base;
   int caseID = -1;
   
-  int spookLevel = 0, nextStepID = 0;
+  int spookLevel = 0;
   List <RoleEntry> entries = new List();
   List <Step     > steps   = new List();
   Step current = null;
@@ -77,7 +83,6 @@ public abstract class Plot extends Event {
     base       = (Base) s.loadObject();
     caseID     = s.loadInt();
     spookLevel = s.loadInt();
-    nextStepID = s.loadInt();
     
     for (int n = s.loadInt(); n-- > 0;) {
       RoleEntry entry = new RoleEntry();
@@ -96,7 +101,6 @@ public abstract class Plot extends Event {
     s.saveObject(base);
     s.saveInt(caseID    );
     s.saveInt(spookLevel);
-    s.saveInt(nextStepID);
     
     s.saveInt(entries.size());
     for (RoleEntry entry : entries) {
@@ -113,44 +117,35 @@ public abstract class Plot extends Event {
   /**  Queueing and executing sub-events and generating clues for
     *  investigation-
     */
-  protected Step queueStep(int medium, int timeTaken, Role... involves) {
+  protected Step queueStep(
+    String label, int medium, int timeTaken, Role... involves
+  ) {
     Step s = new Step();
+    s.label     = label;
+    s.ID        = steps.size();
     s.involved  = involves ;
     s.medium    = medium   ;
     s.timeTaken = timeTaken;
-    s.ID        = nextStepID++;
     if (Lead.isPhysical(medium)) s.setMeetsAt(involves[0]);
     steps.add(s);
     return s;
   }
   
   
-  protected Step queueStep(int medium, Role... involves) {
-    return queueStep(medium, World.HOURS_PER_DAY, involves);
+  protected Step queueMeeting(String label, Role... involves) {
+    return queueStep(label, Lead.MEDIUM_MEET, World.HOURS_PER_DAY, involves);
   }
   
   
-  protected Step queueMeeting(Role... involves) {
-    return queueStep(Lead.MEDIUM_MEET, World.HOURS_PER_DAY, involves);
-  }
-  
-  
-  protected void queueMeetings(Role from, Role... to) {
-    for (Role r : to) {
-      queueStep(Lead.MEDIUM_MEET, World.HOURS_PER_DAY, from, r);
-    }
-  }
-  
-  
-  protected Step queueMessage(Role sends, Role receives, Role info) {
-    Step s = queueStep(Lead.MEDIUM_WIRE, World.HOURS_PER_DAY, sends, receives);
+  protected Step queueMessage(String label, Role sends, Role gets, Role info) {
+    Step s = queueStep(label, Lead.MEDIUM_WIRE, World.HOURS_PER_DAY, sends, gets);
     if (info != null) s.setInfoGiven(info);
     return s;
   }
   
   
-  protected Step queueHeist(Role... involved) {
-    return queueStep(Lead.MEDIUM_HEIST, World.HOURS_PER_DAY, involved);
+  protected Step queueHeist(String label, Role... involved) {
+    return queueStep(label, Lead.MEDIUM_HEIST, World.HOURS_PER_DAY, involved);
   }
   
   
@@ -207,8 +202,21 @@ public abstract class Plot extends Event {
   }
   
   
+  public Step stepWithLabel(String label) {
+    for (Step s : steps) if (label.equals(s.label)) return s;
+    return null;
+  }
+  
+  
   public Series <Step> allSteps() {
     return steps;
+  }
+  
+  
+  public void advanceToStep(Step step) {
+    current = step;
+    current.timeStart = world.timing.totalHours();
+    printSteps();
   }
   
   
@@ -259,7 +267,7 @@ public abstract class Plot extends Event {
       I.say("\nUpdated plot: "+this);
       I.say("  Current Time: "+time);
       I.say("  Current Step: "+current.ID);
-      for (Step c : steps) I.say("  "+c+" ["+c.timeStart+"]");
+      printSteps();
     }
   }
   
@@ -437,7 +445,7 @@ public abstract class Plot extends Event {
     Series <Element> involved = involved(step);
     
     if (! involved.includes(focus)) {
-      I.complain("Step: "+step+" does not involve: "+focus);
+      I.say("Step: "+step+" does not involve: "+focus);
       return null;
     }
     
@@ -465,6 +473,7 @@ public abstract class Plot extends Event {
     
     scene.entry.provideInProgressEntry(forces);
     scene.entry.provideBorderEntry(player.assigned());
+    scene.assignMissionParameters(place, player, this);
     
     return scene;
   }
@@ -483,9 +492,15 @@ public abstract class Plot extends Event {
     for (Plot.RoleEntry entry : entries) {
       I.say("  "+entry);
     }
-    I.say("\nSteps are: ");
-    for (Step step : steps) {
-      I.say("  "+step);
+  }
+  
+  
+  public void printSteps() {
+    I.say("\nSteps are:");
+    for (Step c : steps) {
+      int timeEnd = c.timeStart + c.timeTaken;
+      if (c.timeStart == -1) I.say("  "+c+" ["+c.timeStart+"]");
+      else I.say("  "+c+" ["+c.timeStart+"-"+timeEnd+"]");
     }
   }
   

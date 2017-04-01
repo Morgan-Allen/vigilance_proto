@@ -535,20 +535,26 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   
   public void onSceneCompletion() {
     
-    final EventReport report = new EventReport();
-    report.composeFromScene(this);
-    
-    if (triggerEvent != null) {
-      triggerEvent.completeAfterScene(this, report);
+    if (site == null) {
+      I.say("SITE WAS NEVER SPECIFIED FOR SCENE");
     }
-    if (playerTask != null) {
-      playerTask.onSceneExit(this, report);
+    else {
+      final EventReport report = new EventReport();
+      report.composeFromScene(this);
+      
+      if (triggerEvent != null) {
+        triggerEvent.completeAfterScene(this, report);
+      }
+      if (playerTask != null) {
+        playerTask.onSceneExit(this, report);
+      }
+      //
+      //  TODO:  Decide whether personnel are left injured, hospitalised or
+      //  dead.
+      report.applyOutcomeEffects(site);
+      report.presentMessageForScene(this);
     }
     
-    report.applyOutcomeEffects(site);
-    report.presentMessageForScene(this);
-    
-    //  TODO:  Decide whether personnel are left injured, hospitalised or dead.
     for (Person p : didEnter) {
       removePerson(p);
     }

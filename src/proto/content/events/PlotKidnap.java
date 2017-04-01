@@ -1,5 +1,4 @@
 
-
 package proto.content.events;
 import proto.common.*;
 import proto.game.event.*;
@@ -13,11 +12,11 @@ import static proto.game.person.PersonStats.*;
 public class PlotKidnap extends Plot {
   
   
-  final static Plot.Role
-    ROLE_TAILS   = new Plot.Role("role_tails"  , "Tails"  , false),
-    ROLE_GRABS   = new Plot.Role("role_grabs"  , "Grabs"  , false),
-    ROLE_DRUGS   = new Plot.Role("role_drugs"  , "Drugs"  , false),
-    ROLE_RANSOMS = new Plot.Role("role_ransoms", "Ransoms", true );
+  final public Plot.Role
+    ROLE_TAILS   = new Plot.Role("role_tails"  , "Tails"  , PERP  ),
+    ROLE_GRABS   = new Plot.Role("role_grabs"  , "Grabs"  , PERP  ),
+    ROLE_DRUGS   = new Plot.Role("role_drugs"  , "Drugs"  , PERP  ),
+    ROLE_RANSOMS = new Plot.Role("role_ransoms", "Ransoms", VICTIM);
   
   
   Step ransomStep;
@@ -80,26 +79,32 @@ public class PlotKidnap extends Plot {
     PlotUtils.fillExpertRole(this, MUSCLE     , goons, ROLE_GRABS);
     assignRole(filling(ROLE_GRABS), Plot.ROLE_ENFORCER);
     
-    queueMeetings(
-      Plot.ROLE_ORGANISER,
-      ROLE_TAILS, ROLE_DRUGS
+    queueMeeting(
+      "initial meeting",
+      Plot.ROLE_ORGANISER, ROLE_TAILS, ROLE_DRUGS
     );
     queueMessage(
+      "gives info",
       Plot.ROLE_ORGANISER,
       Plot.ROLE_ENFORCER,
       Plot.ROLE_TARGET
     );
     queueStep(
+      "tails victim",
       Lead.MEDIUM_SURVEIL,
+      World.HOURS_PER_DAY,
       ROLE_TAILS, Plot.ROLE_TARGET
     );
     queueMeeting(
+      "measures dose",
       ROLE_TAILS, ROLE_DRUGS, ROLE_GRABS
     );
     queueHeist(
+      "heist",
       Plot.ROLE_TARGET, ROLE_TAILS, ROLE_GRABS, Plot.ROLE_ENFORCER
     );
     ransomStep = queueStep(
+      "ransom",
       Lead.MEDIUM_WIRE,
       World.HOURS_PER_DAY,
       Plot.ROLE_ORGANISER, ROLE_RANSOMS
