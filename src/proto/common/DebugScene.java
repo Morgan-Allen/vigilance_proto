@@ -17,7 +17,7 @@ public class DebugScene extends RunGame {
   
   public static void main(String args[]) {
     //GameSettings.freeTipoffs = true;
-    //GameSettings.debugScene  = true;
+    GameSettings.debugScene = true;
     runGame(new DebugScene(), "saves/debug_scene");
   }
   

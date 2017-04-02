@@ -40,7 +40,8 @@ public class DebugSceneFixed extends RunGame {
   
   
   public static void main(String args[]) {
-    GameSettings.debugScene      = true;
+    GameSettings.debugScene      = true ;
+    GameSettings.reportWorldInit = false;
     //GameSettings.viewSceneBlocks = true;
     //GameSettings.debugLineSight  = true;
     runGame(new DebugSceneFixed(), "saves/debug_scene_fixed");

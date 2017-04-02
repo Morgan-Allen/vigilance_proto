@@ -40,8 +40,7 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   int size;
   int time;
   Tile tiles[][] = new Tile[0][0];
-  byte wallM[][] = new byte[1][2];
-  byte opacM[][] = new byte[1][2];
+  Prop fills[][] = new Prop[1][2];
   List <Prop> props = new List();
   List <PropEffect> effectProps = new List();
   
@@ -79,8 +78,10 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     for (Coord c : Visit.grid(0, 0, tS, tS, 1)) {
       tiles[c.x][c.y] = (Tile) s.loadObject();
     }
-    s.loadByteArray(wallM);
-    s.loadByteArray(opacM);
+    int fS = fills.length;
+    for (Coord c : Visit.grid(0, 0, fS, fS, 1)) {
+      fills[c.x][c.y] = (Prop) s.loadObject();
+    }
     s.loadObjects(props);
     s.loadObjects(effectProps);
     
@@ -108,13 +109,14 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     
     s.saveInt(size);
     s.saveInt(time);
-    int tS = tiles.length;
+    int tS = tiles.length, fS = fills.length;
     s.saveInt(tS);
     for (Coord c : Visit.grid(0, 0, tS, tS, 1)) {
       s.saveObject(tiles[c.x][c.y]);
     }
-    s.saveByteArray(wallM);
-    s.saveByteArray(opacM);
+    for (Coord c : Visit.grid(0, 0, fS, fS, 1)) {
+      s.saveObject(fills[c.x][c.y]);
+    }
     s.saveObjects(props);
     s.saveObjects(effectProps);
     
@@ -183,13 +185,6 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   public Event triggerEvent() {
     return triggerEvent;
   }
-  
-  
-  /*
-  public PlanStep triggerEventPlanStep() {
-    return triggerEvent == null ? null : triggerEvent.planStep();
-  }
-  //*/
   
   
   public boolean begun() {
@@ -313,8 +308,7 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   private void initArrays(int size) {
     tiles = new Tile[size][size];
     int wallS = (size * 2) + 1;
-    wallM = new byte[wallS][wallS];
-    opacM = new byte[wallS][wallS];
+    fills = new Prop[wallS][wallS];
     vision.setupFog(size);
   }
   

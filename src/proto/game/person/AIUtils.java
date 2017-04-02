@@ -20,7 +20,7 @@ public class AIUtils implements TileConstants {
     float baseFear = 0.25f + Nums.clamp(1 - p.mind.confidence(), 0, 0.75f);
     
     for (int dir : T_ADJACENT) {
-      float cover = at.coverVal(dir) * 1f / Kind.BLOCK_FULL;
+      float cover = at.coverLevel(dir) * 1f / Kind.BLOCK_FULL;
       int oppDir = dir + 4 % 8, threatFromDir = 1;
       for (Person f : foes) {
         if (scene.direction(at, f.currentTile()) == oppDir) threatFromDir++;

@@ -19,7 +19,6 @@ public class Tile implements Session.Saveable {
   
   private Stack <Element> inside  = new Stack();
   private Stack <Person > persons = new Stack();
-  private boolean blocked, opaque;
   
   Object flag;
   
@@ -38,8 +37,6 @@ public class Tile implements Session.Saveable {
     y     = s.loadInt();
     s.loadObjects(inside );
     s.loadObjects(persons);
-    blocked = s.loadBool();
-    opaque  = s.loadBool();
   }
   
   
@@ -49,8 +46,6 @@ public class Tile implements Session.Saveable {
     s.saveInt(y);
     s.saveObjects(inside );
     s.saveObjects(persons);
-    s.saveBool(blocked);
-    s.saveBool(opaque );
   }
   
   
@@ -75,7 +70,7 @@ public class Tile implements Session.Saveable {
   
   /**  Methods related to wall-blockage and opacity-
     */
-  final static int OP_VAL = 0, BL_VAL = 1, CV_VAL = 2;
+  final static int OP_VAL = 0, BL_VAL = 1;
   final static int CHECK_DIRS[] = { N, E, S, W, CENTRE };
   final static float NO_LINE = Float.NEGATIVE_INFINITY;
   
@@ -87,72 +82,32 @@ public class Tile implements Session.Saveable {
     return (y * 2) + 1 + T_Y[dir];
   }
   
-  void setBlockage(int dir, byte val) {
-    scene.wallM[wallMaskX(x, dir)][wallMaskY(y, dir)] = val;
+  void setFills(int dir, Prop prop) {
+    scene.fills[wallMaskX(x, dir)][wallMaskY(y, dir)] = prop;
   }
   
-  void setOpacity(int dir, byte val) {
-    scene.opacM[wallMaskX(x, dir)][wallMaskY(y, dir)] = val;
+  Prop filling(int dir) {
+    return scene.fills[wallMaskX(x, dir)][wallMaskY(y, dir)];
   }
   
   public int blockageVal(int dir) {
-    return scene.wallM[wallMaskX(x, dir)][wallMaskY(y, dir)];
+    Prop fills = filling(dir);
+    return fills == null ? Kind.BLOCK_NONE : fills.kind().blockLevel();
   }
   
   public int opacityVal(int dir) {
-    return scene.opacM[wallMaskX(x, dir)][wallMaskY(y, dir)];
+    Prop fills = filling(dir);
+    return fills == null ? 0 : (fills.kind().blockSight() ? 1 : 0);
   }
   
-  public int coverVal(int dir) {
-    int block = blockageVal(dir), opaque = opacityVal(dir);
-    if (opaque == 0 && block > 0) block--;
-    return block;
-  }
-  
-  int wallVal(int dir, int valID) {
+  private int wallVal(int dir, int valID) {
     switch (valID) {
       case(OP_VAL): return opacityVal (dir);
       case(BL_VAL): return blockageVal(dir);
-      case(CV_VAL): return coverVal   (dir);
     }
     return 0;
   }
-
   
-  void wipePathing() {
-    for (int dir : T_ADJACENT) {
-      setBlockage(dir, (byte) 0);
-      setOpacity (dir, (byte) 0);
-    }
-  }
-  
-  
-  void updatePathing() {
-    blocked = false;
-    opaque  = false;
-    
-    for (Element e : inside()) if (e.isProp()) {
-      final Prop prop = (Prop) e;
-      final Tile o = prop.origin();
-      
-      for (int dir : CHECK_DIRS) {
-        final boolean occupies = prop.occupies(x - o.x, y - o.y, dir);
-        final int
-          blocks  = occupies ? prop.blockLevel() : 0,
-          opacity = (prop.blockSight() && occupies) ? 1 : 0
-        ;
-        
-        if (dir == CENTRE) {
-          if (blocks == Kind.BLOCK_FULL) blocked = true;
-          if (opacity > 0              ) opaque  = true;
-        }
-        else {
-          setBlockage(dir, (byte) Nums.max(blocks , blockageVal(dir)));
-          setOpacity (dir, (byte) Nums.max(opacity, opacityVal (dir)));
-        }
-      }
-    }
-  }
   
   
   public Tile[] tilesAdjacent(Tile temp[]) {
@@ -183,8 +138,24 @@ public class Tile implements Session.Saveable {
   }
   
   
+  public int coverLevel(int dir) {
+    Tile other = scene.tileAt(x + T_X[dir], y + T_Y[dir]);
+    int block  = blockageVal(dir);
+    int opaque = opacityVal (dir);
+    if (other != null) {
+      block  = Nums.max(block , other.blockageVal(CENTRE));
+      opaque = Nums.max(opaque, other.opacityVal (CENTRE));
+    }
+    if (opaque == 0 && block > 0) block--;
+    return block;
+  }
+  
+  
   public int coverLevel(Vec2D origin, Vec2D line, boolean report) {
-    return wallVal(origin, line, CV_VAL, report);
+    int block  = wallVal(origin, line, BL_VAL, report);
+    int opaque = wallVal(origin, line, OP_VAL, report);
+    if (opaque == 0 && block > 0) block--;
+    return block;
   }
   
   
@@ -198,9 +169,8 @@ public class Tile implements Session.Saveable {
   ) {
     int maxVal = 0, fillVal = 0;
     switch (valID) {
-      case(OP_VAL): fillVal = blocked ? Kind.BLOCK_FULL : 0;
-      case(BL_VAL): fillVal = opaque ? 1 : 0;
-      case(CV_VAL): fillVal = 0;
+      case(OP_VAL): fillVal = blocked() ? Kind.BLOCK_FULL : 0;
+      case(BL_VAL): fillVal = opaque() ? 1 : 0;
     }
     //
     //  TODO:  North/south/east/west values aren't being handled consistently
@@ -263,12 +233,12 @@ public class Tile implements Session.Saveable {
   
   
   public boolean blocked() {
-    return blocked;
+    return blockageVal(CENTRE) == Kind.BLOCK_FULL;
   }
   
   
   public boolean opaque() {
-    return opaque;
+    return opacityVal(CENTRE) > 0;
   }
   
   
@@ -313,36 +283,29 @@ public class Tile implements Session.Saveable {
   public static void printWallsMask(Scene scene) {
     int size = scene.size(), span = (size * 2) + 1;
     I.say("\nPRINTING WALLS FOR SCENE");
-
+    
     for (int y = 0; y < span; y++) {
       I.add("\n  ");
-      boolean centY = y % 2 == 0;
       
       for (int x = 0; x < span; x++) {
-        boolean centX = x % 2 == 0;
-        byte val = scene.wallM[x][y];
+        boolean bordY = y % 2 == 0;
+        boolean bordX = x % 2 == 0;
+        Prop fills = scene.fills[x][y];
+        int val = fills == null ? 0 : fills.blockLevel();
         
         if (val > 0) {
-          if (centY) I.add("_");
+          if (! (bordY || bordX)) I.add("*");
+          else if (bordY) I.add("_");
           else I.add("|");
         }
         else {
-          if (centX && centY) I.add(".");
+          if (bordX && bordY) I.add(".");
           else I.add(" ");
         }
       }
     }
   }
 }
-
-
-
-
-
-
-
-
-
 
 
 

@@ -172,7 +172,7 @@ public class SceneVision implements TileConstants {
     for (int dir : T_ADJACENT) {
       Tile near = scene.tileAt(orig.x + T_X[dir], orig.y + T_Y[dir]);
       if (near == null) continue;
-      if (orig.coverVal(dir) >= Kind.BLOCK_FULL) {
+      if (orig.coverLevel(dir) >= Kind.BLOCK_FULL) {
         nextToWall = true;
       }
       else vantage.add(near);

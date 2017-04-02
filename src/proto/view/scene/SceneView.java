@@ -331,7 +331,7 @@ public class SceneView extends UINode implements TileConstants {
   void renderCoverIndicators(Tile t, Scene s, Surface surface, Graphics2D g) {
     for (int dir : T_ADJACENT) {
       Image img = null;
-      int coverLevel = t.coverVal(dir);
+      int coverLevel = t.coverLevel(dir);
       if (coverLevel == Kind.BLOCK_PARTIAL) img = COVER_PARTIAL;
       if (coverLevel == Kind.BLOCK_FULL   ) img = COVER_FULL   ;
       if (img == null) continue;

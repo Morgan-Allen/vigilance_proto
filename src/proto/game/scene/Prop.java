@@ -112,40 +112,27 @@ public class Prop extends Element implements TileConstants {
   }
   
   
+  private static boolean trumpedBy(PropType type, Prop other) {
+    if (type.effect()) return true;
+    if (other == null) return false;
+    if (other.kind().blockLevel() > 0) return true;
+    return false;
+  }
+  
+  
   public static boolean hasSpace(
     Scene scene, PropType kind, int x, int y, int facing
   ) {
+    boolean thin = kind.thin(), blocks = kind.blockLevel() > 0;
+    int faceAt = thin ? ((facing + 6) % 8) : CENTRE;
+    
     for (Tile under : tilesUnder(kind, scene, x, y, facing, 0)) {
       if (under == null) return false;
-      if (kind.thin()) {
-        
-        //  This is creating a problem.  Walls need to be blocked by other
-        //  walls, but not by other furnishings.
-        
-        //  TODO:  This is a bit of kluge.  Remove later.
-        
-        int rotFace = (facing + 8 - 2) % 8;
-        if (under.blockageVal(rotFace) > 0 || under.opacityVal(rotFace) > 0) {
-          return false;
-        }
-      }
-      else for (Element e : under.inside()) if (e.isProp()) {
-        final Prop p = (Prop) e;
-        if (p.wouldBlock(kind, x, y, facing)) return false;
-      }
+      Prop other = under.filling(faceAt);
+      if (blocks && trumpedBy(kind, other)) return false;
     }
     return true;
   }
-  
-  
-  //  TODO:  You need to make sure that walls are deleted as well, this way.
-  //*
-  private boolean wouldBlock(PropType type, int x, int y, int facing) {
-    if (kind().thin  () || type.thin  ()) return false;
-    if (kind().effect() || type.effect()) return false;
-    return kind().blockLevel() > 0 == type.blockLevel() > 0;
-  }
-  //*/
   
   
   public boolean enterScene(Scene scene, int x, int y, int facing) {
@@ -155,19 +142,18 @@ public class Prop extends Element implements TileConstants {
     if (origin == null) I.complain("Origin outside bounds!");
     
     final PropType kind = kind();
+    final boolean thin = kind.thin(), blocks = kind.blockLevel() > 0;
+    int faceAt = thin ? ((facing + 6) % 8) : CENTRE;
+    
     for (Tile under : tilesUnder(kind, scene, x, y, facing, 0)) {
       if (under == null) continue;
-      for (Element e : under.inside()) if (e.isProp()) {
-        final Prop p = (Prop) e;
-        if (p.wouldBlock(kind, x, y, facing)) p.exitScene();
-      }
+      Prop other = under.filling(faceAt);
       
+      if (blocks && ! trumpedBy(kind, other)) {
+        if (other != null) other.exitScene();
+        under.setFills(faceAt, this);
+      }
       under.setInside(this, true);
-      under.wipePathing();
-    }
-    
-    for (Tile under : tilesUnder(kind, scene, x, y, facing, 1)) {
-      if (under != null) under.updatePathing();
     }
     
     scene.props.add(this);
@@ -181,35 +167,22 @@ public class Prop extends Element implements TileConstants {
     final Tile at = origin;
     
     final PropType kind = kind();
+    final boolean  thin = kind.thin();
+    
     for (Tile under : tilesUnder(kind, scene, at.x, at.y, facing, 0)) {
       if (under == null) continue;
+
+      int faceAt = thin ? facing : CENTRE;
+      Prop other = under.filling(faceAt);
+      if (other == this) under.setFills(faceAt, null);
+      
       under.setInside(this, false);
-      under.wipePathing();
-    }
-    
-    for (Tile under : tilesUnder(kind, scene, at.x, at.y, facing, 1)) {
-      if (under != null) under.updatePathing();
     }
     
     this.origin = null;
     this.facing = -1;
     scene.props.remove(this);
     return true;
-  }
-  
-  
-  public boolean occupies(int relX, int relY, int facing) {
-    PropType type = kind();
-    Coord c = rotate(new Coord(relX, relY), this.facing, true);
-    relX = c.x;
-    relY = c.y;
-    if (facing != CENTRE) facing = (facing + 8 - this.facing) % 8;
-    int w = type.wide(), h = type.high();
-    
-    if (h == 0 && relY == 0 && facing == W) return true;
-    if (w == 0 && relX == 0 && facing == N) return true;
-    if (relX >= 0 && relX < w && relY >= 0 && relY < h) return true;
-    return false;
   }
   
   
