@@ -4,11 +4,10 @@
   <target name="build">
     <jar
     	destfile="test_scenes.jar"
-      includes="proto/common/RunAsTest*"
     	basedir="bin"
     >
       <manifest>
-        <attribute name="Main-Class" value="proto.common.RunAsTest"/>
+        <attribute name="Main-Class" value="proto.common.DebugSceneFile"/>
       </manifest>
     </jar>
   </target>
