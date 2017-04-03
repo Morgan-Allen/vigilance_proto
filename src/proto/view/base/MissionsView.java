@@ -129,7 +129,7 @@ public class MissionsView extends UINode {
       null, "OPEN CASES", 40, null
     );
     
-    for (Plot plot : player.leads.knownPlots()) {
+    for (Plot plot : player.leads.activePlots()) {
       if (plot.complete()) continue;
       Image icon = plot.icon();
       if (icon == null) icon = MissionsView.ALERT_IMAGE;

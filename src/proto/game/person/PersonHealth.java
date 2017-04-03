@@ -33,12 +33,14 @@ public class PersonHealth {
   }
   
   final Person person;
-  
-  int luck = INIT_LUCK, stress = INIT_STRESS;
-  float injury, stun, totalHarm;
-  boolean bleed, conscious;
-  State state;
-  
+  int     luck      = INIT_LUCK;
+  int     stress    = INIT_STRESS;
+  float   injury    = 0;
+  float   stun      = 0;
+  float   totalHarm = 0;
+  boolean bleed     = false;
+  boolean conscious = true;
+  State   state     = State.HEALTHY;
   
   
   PersonHealth(Person person) {

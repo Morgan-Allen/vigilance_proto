@@ -108,7 +108,7 @@ public class MissionsViewLinksView extends UINode {
     
     if (suspect.isRegion()) {
       Region area = (Region) suspect;
-      for (Plot plot : player.leads.knownPlotsForRegion(area)) {
+      for (Plot plot : player.leads.activePlotsForRegion(area)) {
         addAssociate(list, null, plot, "Area For");
       }
       for (Place p : area.buildSlots()) {

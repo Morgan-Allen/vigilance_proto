@@ -57,7 +57,7 @@ public class CaseFile implements Session.Saveable {
     clues.add(clue);
     
     if (display) {
-      MessageUtils.presentClueMessage(clue, base.world().view(), effects);
+      MessageUtils.presentClueMessage(base.world().view(), clue, effects);
     }
   }
   

@@ -15,13 +15,13 @@ public class DebugSceneEffects extends RunGame {
   
   
   public static void main(String args[]) {
-    GameSettings.freeTipoffs = true;
+    GameSettings.freeTipoffs     = true ;
+    GameSettings.reportWorldInit = false;
     runGame(new DebugSceneEffects(), "saves/debug_scene_effects");
   }
   
   
   protected World setupWorld() {
-    
     World world = new World(this, savePath);
     DefaultGame.initDefaultWorld(world);
     
@@ -33,9 +33,9 @@ public class DebugSceneEffects extends RunGame {
     Element target = kidnap.target();
     Step heist = kidnap.stepWithLabel("heist");
     
-    Base heroes = world.baseFor(Heroes.JANUS_INDUSTRIES);
-    Lead guard = heroes.leads.leadFor(target, Lead.LEAD_SURVEIL_PERSON);
-    Scene scene = kidnap.generateScene(heist, target, guard);
+    Base  heroes = world.baseFor(Heroes.JANUS_INDUSTRIES);
+    Lead  guard  = heroes.leads.leadFor(target, Lead.LEAD_SURVEIL_PERSON);
+    Scene scene  = kidnap.generateScene(heist, target, guard);
     
     world.enterScene(scene);
     scene.onSceneCompletion(Scene.STATE_WON);
@@ -45,12 +45,7 @@ public class DebugSceneEffects extends RunGame {
     
     return world;
   }
-  
 }
-
-
-
-
 
 
 

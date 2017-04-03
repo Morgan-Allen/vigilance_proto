@@ -104,27 +104,30 @@ public class BaseLeads {
   
   /**  Assorted utility methods-
     */
-  public Series <Plot> knownPlots() {
+  public Series <Plot> activePlots() {
     Batch <Plot> known = new Batch();
     for (Clue c : cluesFor(null, null, null, null, false)) {
+      if (c.plot.complete()) continue;
       known.include(c.plot);
     }
     return known;
   }
   
   
-  public Series <Plot> knownPlotsForRegion(Region r) {
+  public Series <Plot> activePlotsForRegion(Region r) {
     Batch <Plot> known = new Batch();
-    for (Clue c : cluesFor(null, null, null, r, false)) if (c.confirmed) {
+    for (Clue c : cluesFor(null, null, null, r, false)) {
+      if (c.plot.complete() || ! c.confirmed) continue;
       known.include(c.plot);
     }
     return known;
   }
   
   
-  public Series <Element> knownSuspectsForRegion(Region r) {
+  public Series <Element> activeSuspectsForRegion(Region r) {
     Batch <Element> known = new Batch();
-    for (Clue c : cluesFor(null, null, null, r, false)) if (c.confirmed) {
+    for (Clue c : cluesFor(null, null, null, r, false)) {
+      if (c.plot.complete() || ! c.confirmed) continue;
       known.include(c.match);
     }
     return known;

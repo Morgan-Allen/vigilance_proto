@@ -5,6 +5,7 @@ import proto.game.world.*;
 import proto.common.*;
 import proto.game.person.*;
 import proto.util.*;
+import proto.view.base.*;
 
 
 
@@ -66,6 +67,8 @@ public class Trial extends Event {
         world.council.releasePrisoner(p);
       }
     }
+    
+    MessageUtils.presentSentenceMessage(world.view(), this);
   }
   
   

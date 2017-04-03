@@ -5,12 +5,12 @@ import proto.common.*;
 import proto.game.event.*;
 import proto.game.person.*;
 import proto.util.*;
+import proto.view.base.*;
+
 
 
 //  TODO:  Assign officials to preside over/prosecute/defend during a trial, so
 //  they can earn grudges from crime bosses.
-//
-//  TODO:  Construct a report for trials being scheduled or sentence passed!
 
 public class Council {
   
@@ -93,9 +93,12 @@ public class Council {
     int time = world.timing.totalHours();
     
     for (Object p : sentences.keySet().toArray()) {
+      Person convict = (Person) p;
       Sentence s = sentences.get(p);
+      
       if (time >= s.timeEnds) {
-        releasePrisoner((Person) p);
+        releasePrisoner(convict);
+        MessageUtils.presentReleaseMessage(world.view(), convict);
       }
     }
   }
@@ -120,6 +123,10 @@ public class Council {
       I.say("NO MAIN HALL ASSIGNED TO COUNCIL, CANNOT SCHEDULE TRIAL!");
       return null;
     }
+    if (captive.empty() || evidence.empty()) {
+      I.say("NO CAPTIVES OR EVIDENCE, CANNOT SCHEDULE TRIAL!");
+      return null;
+    }
     
     for (CaseFile f : evidence) {
       CaseFile m = mainHall.leads.caseFor(f.subject);
@@ -132,10 +139,12 @@ public class Council {
       Place.setResident(p, prison, true);
     }
     
-    Trial t = new Trial(world, mainHall);
-    t.assignAccused(plot, captive);
-    world.events.scheduleEvent(t, daysDelay * World.HOURS_PER_DAY);
-    return t;
+    Trial trial = new Trial(world, mainHall);
+    trial.assignAccused(plot, captive);
+    world.events.scheduleEvent(trial, daysDelay * World.HOURS_PER_DAY);
+    
+    MessageUtils.presentTrialMessage(world.view(), trial);
+    return trial;
   }
   
   
@@ -190,6 +199,13 @@ public class Council {
     Place.setResident(p, p.resides(), false);
     //  TODO:  They'll need to re-enter the workforce now?
     sentences.remove(p);
+  }
+  
+  
+  public int sentenceDuration(Person p) {
+    Sentence s = sentences.get(p);
+    if (s == null) return -1;
+    return (s.timeEnds - s.timeStarts) / World.HOURS_PER_DAY;
   }
   
 }

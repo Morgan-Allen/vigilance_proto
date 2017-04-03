@@ -154,7 +154,7 @@ public abstract class MapInsetView extends UINode {
         Color.RED, Color.BLACK, crimeLevel, false, g
       );
       
-      Series <Element> suspects = played.leads.knownSuspectsForRegion(n);
+      Series <Element> suspects = played.leads.activeSuspectsForRegion(n);
       int off = (suspects.size() * 50) / -2;
       for (final Element suspect : suspects) {
         Image alertImage = MissionsView.FILE_IMAGE;
@@ -218,6 +218,7 @@ public abstract class MapInsetView extends UINode {
   
   
   public void setSelectedRegion(Region region) {
+    if (region == null) return;
     lastRegionType = region.kind();
   }
   
