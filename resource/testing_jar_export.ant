@@ -1,0 +1,15 @@
+
+
+<project name="Testing Jar Build" basedir=".." default="build">
+  <target name="build">
+    <jar
+    	destfile="test_scenes.jar"
+      includes="proto/common/RunAsTest*"
+    	basedir="bin"
+    >
+      <manifest>
+        <attribute name="Main-Class" value="proto.common.RunAsTest"/>
+      </manifest>
+    </jar>
+  </target>
+</project>

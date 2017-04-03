@@ -57,7 +57,7 @@
   wide       = "1"
   high       = "0"
   subtype    = "SUBTYPE_WALLING"
-  blockLevel = "BLOCK_PARTIAL"
+  blockLevel = "BLOCK_FULL"
   blockSight = "false"
 />
 
