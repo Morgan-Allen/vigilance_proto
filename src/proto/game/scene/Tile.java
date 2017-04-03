@@ -124,17 +124,25 @@ public class Tile implements Session.Saveable {
       
       dirA = (n + 1) % 8;
       dirB = (n + 7) % 8;
-      block = Nums.max(blockageVal(dirA), blockageVal(dirB));
+      block = Nums.max(pathBlockVal(dirA), pathBlockVal(dirB));
       if (block == Kind.BLOCK_FULL) continue;
       
       dirA = (n + 3) % 8;
       dirB = (n + 5) % 8;
-      block = Nums.max(d.blockageVal(dirA), d.blockageVal(dirB));
+      block = Nums.max(d.pathBlockVal(dirA), d.pathBlockVal(dirB));
       if (block == Kind.BLOCK_FULL) continue;
       
       temp[n] = d;
     }
     return temp;
+  }
+  
+  
+  private int pathBlockVal(int dir) {
+    Tile d = scene.tileAt(x + T_X[dir], y + T_Y[dir]);
+    int block = blockageVal(dir);
+    if (d == null) return block;
+    return Nums.max(block, d.blockageVal(CENTRE));
   }
   
   

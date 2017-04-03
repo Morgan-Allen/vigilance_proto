@@ -116,6 +116,15 @@ public class ActionsView extends UINode {
         s.append("\n  Last action: "+PA.nextAction().used);
       }
       
+      ItemType weapon = p.gear.weaponType();
+      if (weapon == null) weapon = Common.UNARMED;
+      if (weapon != null) {
+        s.append("\n  Current weapon: "+weapon);
+        int minDmg = p.stats.levelFor(PersonStats.MIN_DAMAGE);
+        int rngDmg = p.stats.levelFor(PersonStats.RNG_DAMAGE);
+        s.append(" ("+minDmg+"-"+(minDmg + rngDmg)+")");
+      }
+      
       Series <Item> equipped = p.gear.equipped();
       if (equipped.size() > 0) {
         s.append("\n  Equipment:");
@@ -190,13 +199,15 @@ public class ActionsView extends UINode {
     
     if (GameSettings.debugScene) {
       if (GameSettings.pauseScene) {
-        s.append("\n  Press P to unpause.");
+        s.append("\n  Press P to unpause");
         if (surface.isPressed('p')) GameSettings.pauseScene = false;
       }
       else {
-        s.append("\n  Press P to pause.");
+        s.append("\n  Press P to pause");
         if (surface.isPressed('p')) GameSettings.pauseScene = true;
       }
+      s.append(", E to exit debug mode.");
+      if (surface.isPressed('e')) GameSettings.debugScene = false;
     }
     
     return s.toString();

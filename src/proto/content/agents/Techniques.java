@@ -241,7 +241,7 @@ public class Techniques {
       Ability.IS_RANGED, 1, Ability.REAL_HARM, Ability.MINOR_POWER
     ) {
       
-      public boolean allowsUse(Person acting, StringBuffer failLog) {
+      public boolean allowsUse(Person acting) {
         final ItemType weapon = acting.gear.weaponType();
         int subtype = weapon.subtype();
         if (subtype == Kind.SUBTYPE_BLADE      ) return true;

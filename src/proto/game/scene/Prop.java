@@ -112,14 +112,6 @@ public class Prop extends Element implements TileConstants {
   }
   
   
-  private static boolean trumpedBy(PropType type, Prop other) {
-    if (type.effect()) return true;
-    if (other == null) return false;
-    if (other.kind().blockLevel() > 0) return true;
-    return false;
-  }
-  
-  
   public static boolean hasSpace(
     Scene scene, PropType kind, int x, int y, int facing
   ) {
@@ -129,7 +121,7 @@ public class Prop extends Element implements TileConstants {
     for (Tile under : tilesUnder(kind, scene, x, y, facing, 0)) {
       if (under == null) return false;
       Prop other = under.filling(faceAt);
-      if (blocks && trumpedBy(kind, other)) return false;
+      if (blocks && other != null) return false;
     }
     return true;
   }
@@ -147,9 +139,9 @@ public class Prop extends Element implements TileConstants {
     
     for (Tile under : tilesUnder(kind, scene, x, y, facing, 0)) {
       if (under == null) continue;
-      Prop other = under.filling(faceAt);
       
-      if (blocks && ! trumpedBy(kind, other)) {
+      if (blocks) {
+        Prop other = under.filling(faceAt);
         if (other != null) other.exitScene();
         under.setFills(faceAt, this);
       }
@@ -168,11 +160,11 @@ public class Prop extends Element implements TileConstants {
     
     final PropType kind = kind();
     final boolean  thin = kind.thin();
+    int faceAt = thin ? ((facing + 6) % 8) : CENTRE;
     
     for (Tile under : tilesUnder(kind, scene, at.x, at.y, facing, 0)) {
       if (under == null) continue;
-
-      int faceAt = thin ? facing : CENTRE;
+      
       Prop other = under.filling(faceAt);
       if (other == this) under.setFills(faceAt, null);
       

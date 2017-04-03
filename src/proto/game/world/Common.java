@@ -202,7 +202,7 @@ public class Common {
       "Switch Weapon", "ability_switch",
       ICONS_DIR+"icon_switch.png",
       "Switches your current weapon.",
-      Ability.IS_SELF_ONLY, 1,
+      Ability.IS_SELF_ONLY, 0,
       Ability.NO_HARM, Ability.NO_POWER
     ) {
       public void applyOnActionAssigned(Action use) {

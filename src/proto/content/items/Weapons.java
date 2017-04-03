@@ -82,7 +82,8 @@ public class Weapons {
   ) {
     public void modifyAttackVolley(Volley volley) {
       int cover = volley.modifierFor(volley.hitsDefence, Volley.COVER);
-      int bypass = (int) Nums.clamp(Nums.round(cover / 2, 5, true), 20, cover);
+      int bypass = Nums.round(cover / 2, 5, true);
+      bypass = Nums.min(cover, Nums.max(20, bypass));
       volley.selfAccuracy.inc(bypass, "Wing Blade vs. Cover");
       super.modifyAttackVolley(volley);
     }

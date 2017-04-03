@@ -12,7 +12,7 @@ import static proto.game.person.PersonStats.*;
 public class PlotKidnap extends Plot {
   
   
-  final public Plot.Role
+  final public static Plot.Role
     ROLE_TAILS   = new Plot.Role("role_tails"  , "Tails"  , PERP  ),
     ROLE_GRABS   = new Plot.Role("role_grabs"  , "Grabs"  , PERP  ),
     ROLE_DRUGS   = new Plot.Role("role_drugs"  , "Drugs"  , PERP  ),

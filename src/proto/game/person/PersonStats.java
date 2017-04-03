@@ -1,6 +1,7 @@
 
 
 package proto.game.person;
+import proto.game.scene.*;
 import proto.game.world.*;
 import proto.common.*;
 import proto.util.*;
@@ -257,8 +258,6 @@ public class PersonStats {
     updateStat(WILL    , -1, true );
     float muscle   = levelFor(MUSCLE  );
     float reflexes = levelFor(REFLEXES);
-    float brains   = levelFor(BRAINS  );
-    float will     = levelFor(WILL    );
     
     //  Average hit point total is 9.  Damage and armour start at 0.
     float maxHP = 4 + (muscle * 1);
@@ -280,7 +279,7 @@ public class PersonStats {
     updateStat(HIDE_RANGE , hideRange , true);
     
     //  Average action points is 4.  Average move speed is 11.
-    float actPoints = 2 + 2;//(reflexes / 3);
+    float actPoints = 2 + 2;
     float moveSpeed = 6 + (reflexes / 1);
     updateStat(ACT_POINTS , actPoints, true);
     updateStat(MOVE_SPEED , moveSpeed, true);
@@ -291,23 +290,17 @@ public class PersonStats {
     updateStat(ACCURACY   , accLevel, true);
     updateStat(DEFENCE    , defLevel, true);
     
+    //  Skill stats are initialised independently.
     for (Trait skill : SKILL_STATS) updateStat(skill, -1, true);
-    /*
-    float levelQuestion = (will + brains       ) / 2;
-    float levelSuasion  = (10 + will + reflexes) / 2;
-    float levelTechs    = brains / 2;
-    updateStat(QUESTION   , levelQuestion, true);
-    updateStat(PERSUADE   , levelSuasion , true);
-    updateStat(ENGINEERING, levelTechs   , true);
-    updateStat(MEDICINE   , levelTechs   , true);
-    //*/
     
     Series <Ability> abilities = person.actions.listAbilities();
     for (Ability a : abilities) if (a.passive()) {
       a.applyPassiveStatsBonus(person);
     }
     for (Item i : person.gear.equipped()) {
-      if (i.slotID == PersonGear.SLOT_OFFHAND) continue;
+      if (i.kind().slotType == PersonGear.SLOT_TYPE_WEAPON) {
+        if (i != person.gear.weaponPicked) continue;
+      }
       i.kind().applyPassiveStatsBonus(person);
     }
     for (Condition c : conditions) {
@@ -398,7 +391,13 @@ public class PersonStats {
   
   public Series <Ability> allConditions() {
     Batch <Ability> all = new Batch();
-    for (Condition c : conditions) all.add(c.basis);
+    for (Condition c : conditions) {
+      all.add(c.basis);
+    }
+    Action taken = person.actions.nextAction();
+    if (taken != null && (taken.used.delayed() || ! taken.complete())) {
+      all.add(taken.used);
+    }
     return all;
   }
   

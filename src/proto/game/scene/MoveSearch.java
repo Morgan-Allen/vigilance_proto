@@ -28,7 +28,7 @@ public class MoveSearch extends Search <Tile> {
   
   
   protected boolean endSearch(Tile best) {
-    if (getNear) return dest.scene.distance(best, dest) < 2;
+    if (getNear) return Visit.arrayIncludes(adjacent(best), dest);
     return best == dest;
   }
   

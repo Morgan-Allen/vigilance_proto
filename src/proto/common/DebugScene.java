@@ -16,8 +16,8 @@ public class DebugScene extends RunGame {
   
   
   public static void main(String args[]) {
-    //GameSettings.freeTipoffs = true;
-    GameSettings.debugScene = true;
+    GameSettings.reportWorldInit = false;
+    GameSettings.debugScene      = true ;
     runGame(new DebugScene(), "saves/debug_scene");
   }
   
@@ -36,12 +36,20 @@ public class DebugScene extends RunGame {
     Lead guarding = heroes.leads.leadFor(
       kidnap.target(), Lead.LEAD_SURVEIL_PERSON
     );
+    
+    int ID = 0;
     for (Person p : heroes.roster()) {
+      ItemType gadget1 = ID % 2 == 0 ? Gadgets.MED_KIT     : Gadgets.BOLAS   ;
+      ItemType gadget2 = ID % 2 == 0 ? Gadgets.SONIC_PROBE : Gadgets.TEAR_GAS;
+      p.gear.equipItem(gadget1, PersonGear.SLOT_ITEM_1);
+      p.gear.equipItem(gadget2, PersonGear.SLOT_ITEM_2);
+      p.updateOnBase();
       p.addAssignment(guarding);
+      ID++;
     }
+    
     Step heist = kidnap.stepWithLabel("heist");
     kidnap.advanceToStep(heist);
-    
     Scene scene = kidnap.generateScene(heist, kidnap.target(), guarding);
     world.enterScene(scene);
     
