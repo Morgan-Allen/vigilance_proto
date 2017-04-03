@@ -45,17 +45,20 @@ public class CaseFile implements Session.Saveable {
   /**  Recording and transferring evidence-
     */
   public void recordClue(Clue clue) {
-    recordClue(clue, null);
+    recordClue(clue, null, true);
   }
   
   
-  public void recordClue(Clue clue, EventEffects effects) {
+  public void recordClue(Clue clue, EventEffects effects, boolean display) {
     for (Clue prior : clues) if (prior.makesRedundant(clue)) {
       ///I.say("\nClue was redundant: "+clue.longDescription(base));
       return;
     }
     clues.add(clue);
-    MessageUtils.presentClueMessage(clue, base.world().view(), effects);
+    
+    if (display) {
+      MessageUtils.presentClueMessage(clue, base.world().view(), effects);
+    }
   }
   
   

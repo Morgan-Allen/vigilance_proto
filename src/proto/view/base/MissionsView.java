@@ -120,7 +120,8 @@ public class MissionsView extends UINode {
     //  associate:
     World world = mainView.world();
     Base player = mainView.player();
-    String caseDesc[] = { "weak", "fair", "strong" };
+    String caseDesc[] = { "Weak", "Fair", "Strong" };
+    int time = world.timing.totalHours();
     
     ViewUtils.ListDraw draw = new ViewUtils.ListDraw();
     int across = vw - 320, down = 10;
@@ -129,17 +130,20 @@ public class MissionsView extends UINode {
     );
     
     for (Plot plot : player.leads.knownPlots()) {
+      if (plot.complete()) continue;
       Image icon = plot.icon();
       if (icon == null) icon = MissionsView.ALERT_IMAGE;
       draw.addEntry(icon, plot.nameForCase(player), 40, plot);
     }
     
-    for (Council.Trial trial : world.council.upcomingTrials()) {
+    for (Trial trial : world.council.upcomingTrials()) {
       Image icon = MissionsView.TRIAL_IMAGE;
       String desc = trial.toString();
-      float evidence = world.council.rateEvidence(trial);
-      desc += " ("+caseDesc[Nums.clamp((int) (evidence * 3), 3)]+" case)";
-      draw.addEntry(icon, desc, 40, null);
+      float evidence = trial.rateEvidence();
+      int date = (trial.timeBegins() - time) / World.HOURS_PER_DAY;
+      desc += "\n  Date: "+date+" days";
+      desc += "  Evidence: "+caseDesc[Nums.clamp((int) (evidence * 3), 3)];
+      draw.addEntry(icon, desc, 50, trial.plot());
     }
     
     draw.performDraw(across, down, this, surface, g);

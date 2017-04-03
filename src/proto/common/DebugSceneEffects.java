@@ -40,13 +40,16 @@ public class DebugSceneEffects extends RunGame {
     world.enterScene(scene);
     scene.onSceneCompletion(Scene.STATE_WON);
     
-    Council.Trial trial = world.council.nextTrialFor(kidnap);
-    world.council.scheduleTrial(trial, 1, 1);
+    Trial trial = world.council.nextTrialFor(kidnap);
+    world.events.scheduleEvent(trial, 24);
     
     return world;
   }
   
 }
+
+
+
 
 
 

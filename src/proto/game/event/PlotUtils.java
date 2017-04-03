@@ -140,6 +140,8 @@ public class PlotUtils {
     Batch <CaseFile> evidence = new Batch();
     int time = world.timing.totalHours();
     
+    I.say("Generating scene effects after: "+plot);
+    
     for (Person p : scene.didEnter()) {
       float
         damage      = p.health.totalHarm() / p.health.maxHealth(),
@@ -169,7 +171,9 @@ public class PlotUtils {
         if (role == null) role = Plot.ROLE_GOON;
         Clue redHanded = new Clue(plot, role);
         redHanded.confirmMatch(p, lead, time, scene.site());
-        file.recordClue(redHanded);
+        file.recordClue(redHanded, null, false);
+        
+        I.say("Confirming role: "+role+" for "+p);
         
         captives.add(p);
         evidence.add(file);

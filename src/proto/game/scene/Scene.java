@@ -395,7 +395,7 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   
   public void updateScene() {
     boolean skipUpdate = playerTeam.empty() && othersTeam.empty();
-    if (skipUpdate || GameSettings.pauseScene) return;
+    if (skipUpdate || GameSettings.pauseScene || complete()) return;
     
     Action nextAction = currentAction();
     Person nextActing = currentActing();

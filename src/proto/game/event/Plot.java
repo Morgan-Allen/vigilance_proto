@@ -438,7 +438,7 @@ public abstract class Plot extends Event {
       Clue clue = new Clue(this, ROLE_TARGET);
       clue.confirmTipoff(target(), Lead.LEAD_REPORT, time, site);
       CaseFile file = player.leads.caseFor(target);
-      file.recordClue(clue, effects);
+      file.recordClue(clue, effects, true);
       
       effects.applyEffects(target.place());
     }
@@ -501,6 +501,8 @@ public abstract class Plot extends Event {
   
   
   public String nameForCase(Base base) {
+    //return ""+organiser()+" (No. "+caseID+")";
+    //*
     CaseFile file = base.leads.caseFor(this);
     CaseFile forTarget = base.leads.caseFor(target());
     boolean targetKnown = false, typeKnown = false;
@@ -517,6 +519,7 @@ public abstract class Plot extends Event {
     else if (targetKnown) name += " (target: "+target()+")";
     else if (typeKnown  ) name += " ("+type.name+")";
     return name;
+    //*/
   }
   
 }
