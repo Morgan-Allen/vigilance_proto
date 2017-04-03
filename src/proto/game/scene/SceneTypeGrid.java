@@ -258,12 +258,13 @@ public class SceneTypeGrid extends SceneType {
     Coord p, int facing, Room from, Room other, SceneGenGrid g
   ) {
     if (this.borders == null) return false;
+    Object unitO = other == null ? null : other.unit;
+    Object unitF = from  == null ? null : from .unit;
     int forO = other == null ? WALL_NONE : ((GridUnit) other.unit).wallType;
     int forF = from  == null ? WALL_NONE : ((GridUnit) from .unit).wallType;
     
-    boolean shouldWall = false;
-    if (forO != forF) shouldWall = true;
-    else if (forO == WALL_INTERIOR) shouldWall = true;
+    boolean shouldWall = forO != forF;
+    if (forO == WALL_INTERIOR && unitO != unitF) shouldWall = true;
     if (! shouldWall) return false;
     
     Wall wall = wallBetween(from, other, g);

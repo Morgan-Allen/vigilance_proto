@@ -208,6 +208,35 @@
 </scene>
 
 
+
+<comment>
+  This defines a composite scene.  Composite scenes are put together like
+  jigsaws from other, smaller scenes, in a semi-random order.  You can specify
+  units that reference another scene's ID, and add some parameters that control
+  how often that unit will be used.
+  
+  Priorities allowed are:
+    PRIORITY_HIGH, PRIORITY_MEDIUM, PRIORITY_LOW
+    Units with high priority are added before units with low priority.
+  
+  Wall-policies allowed are:
+    WALL_NONE, WALL_EXTERIOR, WALL_INTERIOR
+    A unit with 'wall none' will have no walls added.  A unit with 'wall
+    exterior' will have walls added only on the outside of the building.  And
+    a unit with 'wall interior' will be surrounded with walls, even inside the
+    building.
+  
+  'minCount' and 'maxCount' place upper/lower limits on how many of that unit
+  will appear, and 'percent' specifies how many should appear as a fraction of
+  total units.  You don't have to specify both.
+  
+  Note:  This part is still kind of experimental, so if you have any requests
+  or complaints let me know.  (We could also skip it entirely if it's causing
+  problems, and just use grid-based scenes for now.)
+  
+</comment>
+
+
 <scene
   name           = "Civic Test Structure"
   ID             = "civic_test_structure"
