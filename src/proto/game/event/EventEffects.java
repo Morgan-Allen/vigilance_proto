@@ -6,8 +6,8 @@ import proto.game.person.*;
 import proto.game.scene.*;
 import proto.game.world.*;
 import proto.util.*;
-import proto.view.common.MainView;
-import proto.view.common.MessageView;
+import proto.view.base.*;
+import proto.view.common.*;
 
 
 
@@ -151,7 +151,7 @@ public class EventEffects implements Session.Saveable {
   };
   
   
-  public void presentMessageForScene(final Scene scene) {
+  public void presentMessageForScene(final Scene scene, final Event event) {
     
     StringBuffer h = new StringBuffer();
     h.append("\nMission ");
@@ -195,6 +195,11 @@ public class EventEffects implements Session.Saveable {
         view.dismissMessage(this);
       }
     });
+    
+    if (event instanceof Plot) {
+      Trial trial = scene.world().council.nextTrialFor((Plot) event);
+      if (trial != null) MessageUtils.presentTrialMessage(view, trial);
+    }
   }
   
   

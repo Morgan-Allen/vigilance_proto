@@ -40,7 +40,7 @@ public class Person extends Element {
       return r.assignmentPriority();
     }
   };
-  
+  boolean captive = false;
   Tile location;
   Vec3D exactPos = new Vec3D();
   
@@ -87,7 +87,7 @@ public class Person extends Element {
     resides = (Place) s.loadObject();
     scene   = (Scene) s.loadObject();
     s.loadObjects(assignments);
-    
+    captive  = s.loadBool();
     location = (Tile) s.loadObject();
     exactPos.loadFrom(s.input());
   }
@@ -110,7 +110,7 @@ public class Person extends Element {
     s.saveObject(resides);
     s.saveObject(scene  );
     s.saveObjects(assignments);
-    
+    s.saveBool  (captive );
     s.saveObject(location);
     exactPos.saveTo(s.output());
   }
@@ -202,7 +202,7 @@ public class Person extends Element {
   
   
   
-  /**  Setting base, state and residence:
+  /**  Setting base, residence and captivity:
     */
   public void setBase(Base base) {
     this.base = base;
@@ -214,6 +214,11 @@ public class Person extends Element {
   }
   
   
+  public void setCaptive(boolean captive) {
+    this.captive = captive;
+  }
+  
+  
   public Base base() {
     return base;
   }
@@ -221,6 +226,11 @@ public class Person extends Element {
   
   public Place resides() {
     return resides;
+  }
+  
+  
+  public boolean isCaptive() {
+    return captive;
   }
   
   

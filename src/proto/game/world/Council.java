@@ -12,6 +12,11 @@ import proto.view.base.*;
 //  TODO:  Assign officials to preside over/prosecute/defend during a trial, so
 //  they can earn grudges from crime bosses.
 
+//  TODO:  There should be a possibility of fresh goons/lieutenants being
+//  hired after sentence is passed, unless and until you lock up the
+//  mastermind.
+
+
 public class Council {
   
   
@@ -134,16 +139,15 @@ public class Council {
     }
     
     for (Person p : captive) {
-      //  TODO:  THIS NEEDS TO BE HANDLED DIFFERENTLY
       Place prison = pickPrison(p);
       Place.setResident(p, prison, true);
+      p.setCaptive(true);
     }
     
     Trial trial = new Trial(world, mainHall);
     trial.assignAccused(plot, captive);
     world.events.scheduleEvent(trial, daysDelay * World.HOURS_PER_DAY);
     
-    MessageUtils.presentTrialMessage(world.view(), trial);
     return trial;
   }
   
@@ -197,8 +201,9 @@ public class Council {
   public void releasePrisoner(Person p) {
     if (p.resides() == null) return;
     Place.setResident(p, p.resides(), false);
-    //  TODO:  They'll need to re-enter the workforce now?
+    if (p.base() != null) Place.setResident(p, p.base(), true);
     sentences.remove(p);
+    p.setCaptive(false);
   }
   
   
@@ -209,9 +214,6 @@ public class Council {
   }
   
 }
-
-
-
 
 
 

@@ -19,7 +19,7 @@ public class PlotUtils {
   ) {
     Pick <Person> pick = new Pick();
     for (Person p : candidates) {
-      if (! p.health.conscious()) continue;
+      if (p.isCaptive() || ! p.health.conscious()) continue;
       if (plot.entryFor(p, null) != null) continue;
       pick.compare(p, p.stats.levelFor(trait));
     }
@@ -33,7 +33,7 @@ public class PlotUtils {
   ) {
     Pick <Person> pick = new Pick();
     for (Person p : target.residents()) {
-      if (! p.health.conscious()) continue;
+      if (p.isCaptive() || ! p.health.conscious()) continue;
       if (plot.entryFor(p, null) != null) continue;
       pick.compare(p, 0 - p.history.bondWith(target.owner()));
     }
@@ -54,6 +54,7 @@ public class PlotUtils {
   ) {
     Batch <Person> goons = new Batch();
     for (Person p : plot.base.roster()) {
+      if (p.isCaptive() || ! p.health.conscious()) continue;
       if (p == plot.base.leader()) continue;
       goons.add(p);
     }
@@ -67,7 +68,7 @@ public class PlotUtils {
     final Batch <Person> experts = new Batch();
     for (Element e : plot.world().inside()) if (e.isPerson()) {
       Person p = (Person) e;
-      if (! p.health.conscious()) continue;
+      if (p.isCaptive() || ! p.health.conscious()) continue;
       if (p.stats.levelFor(trait) < minLevel) continue;
       experts.add(p);
     }

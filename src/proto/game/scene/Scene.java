@@ -537,7 +537,7 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
       final EventEffects effects = triggerEvent.generateEffects(this);
       triggerEvent.completeAfterScene(this, effects);
       playerTask.onSceneExit(this, effects);
-      effects.presentMessageForScene(this);
+      effects.presentMessageForScene(this, triggerEvent);
     }
   }
   
