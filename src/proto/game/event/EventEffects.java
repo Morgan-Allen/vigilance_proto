@@ -19,8 +19,9 @@ public class EventEffects implements Session.Saveable {
   public int outcomeState = Scene.STATE_INIT;
   public float forceRating, collateralRating, getawaysRating;
   public float trustEffect, deterEffect;
-  public List <Person> involved = new List();
-  public List <Object> newLeads = new List();
+  public List <Person> involved   = new List();
+  public List <Person> captives   = new List();
+  public List <Person> casualties = new List();
   
   
   public EventEffects() {
@@ -36,8 +37,9 @@ public class EventEffects implements Session.Saveable {
     getawaysRating   = s.loadFloat();
     trustEffect      = s.loadFloat();
     deterEffect      = s.loadFloat();
-    s.loadObjects(involved);
-    s.loadObjects(newLeads);
+    s.loadObjects(involved  );
+    s.loadObjects(captives  );
+    s.loadObjects(casualties);
   }
   
   
@@ -48,8 +50,9 @@ public class EventEffects implements Session.Saveable {
     s.saveFloat(getawaysRating  );
     s.saveFloat(trustEffect     );
     s.saveFloat(deterEffect     );
-    s.saveObjects(involved);
-    s.saveObjects(newLeads);
+    s.saveObjects(involved  );
+    s.saveObjects(captives  );
+    s.saveObjects(casualties);
   }
   
   
@@ -72,7 +75,11 @@ public class EventEffects implements Session.Saveable {
       else {
         sumForce += rateDamage(p);
         if (p.currentScene() != scene || ! scene.wasWon()) sumAway++;
+        else captives.add(p);
         numCrooks++;
+      }
+      if (! p.health.healthy()) {
+        casualties.add(p);
       }
       involved.add(p);
     }
@@ -82,7 +89,7 @@ public class EventEffects implements Session.Saveable {
     collateralRating = sumHurt  * 1.0f / Nums.max(1, numCivilians);
     getawaysRating   = sumAway  * 1.5f / Nums.max(1, numCrooks   );
     
-    final boolean playerWon  = outcomeState == Scene.STATE_WON;
+    final boolean playerWon = outcomeState == Scene.STATE_WON;
     deterEffect += playerWon ? 10 : 0;
     deterEffect += (forceRating * 5 ) - (getawaysRating   * 10);
     trustEffect += playerWon ? 10 : 0;
@@ -152,29 +159,19 @@ public class EventEffects implements Session.Saveable {
     else h.append(" Failed: "+scene);
     
     StringBuffer s = new StringBuffer();
-    
-    Batch <Person> captives   = new Batch();
-    Batch <Person> casualties = new Batch();
-    for (Person p : involved) {
-      //  TODO:  You'll want a more reliable 'is okay' and 'is captive' check
-      //  for these.
-      if (! p.health.healthy()) casualties.add(p);
-      else if (p.isCriminal() && scene.wasWon()) captives.add(p);
-    }
-    
     s.append("\nCaptives:");
-    for (Person p : captives) {
+    for (Person p : captives) if (! casualties.includes(p)) {
       s.append("\n  "+p.name());
     }
     s.append("\nCasualties:");
     for (Person p : casualties) {
       s.append("\n  "+p.name());
-      String desc = "";
       
       float health = p.health.totalHarm() / p.health.maxHealth();
       health /= PersonHealth.HP_DEATH_PERCENT / 100f;
       s.append(" ("+((int) (health * 100))+"% injury)");
       
+      String desc = "";
       if (p.health.critical()) desc = " (critical condition)";
       if (p.health.crippled()) desc = " (crippled)";
       if (p.health.dead    ()) desc = " (DEAD)";

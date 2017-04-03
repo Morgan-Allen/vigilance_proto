@@ -417,8 +417,7 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     
     int nextState = GameSettings.debugScene ? state : checkCompletionStatus();
     if (nextState > STATE_BEGUN && ! complete()) {
-      this.state = nextState;
-      onSceneCompletion();
+      onSceneCompletion(nextState);
     }
   }
   
@@ -527,7 +526,9 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   }
   
   
-  public void onSceneCompletion() {
+  public void onSceneCompletion(int endState) {
+    this.state = endState;
+    
     if (site == null || triggerEvent == null || playerTask == null) {
       I.say("MISSION PARAMETERS NOT SPECIFIED FOR SCENE, WILL EXIT DIRECTLY");
       performSceneExit();

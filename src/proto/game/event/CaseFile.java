@@ -60,8 +60,8 @@ public class CaseFile implements Session.Saveable {
   
   
   public void updateEvidenceFrom(CaseFile other) {
-    for (Clue clue : clues) {
-      other.clues.include(clue);
+    for (Clue clue : other.clues) {
+      clues.include(clue);
     }
   }
   

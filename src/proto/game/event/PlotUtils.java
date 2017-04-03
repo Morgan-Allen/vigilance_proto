@@ -20,7 +20,7 @@ public class PlotUtils {
     Pick <Person> pick = new Pick();
     for (Person p : candidates) {
       if (! p.health.conscious()) continue;
-      if (plot.roleFor(p, null) != null) continue;
+      if (plot.entryFor(p, null) != null) continue;
       pick.compare(p, p.stats.levelFor(trait));
     }
     if (pick.empty()) return;
@@ -34,7 +34,7 @@ public class PlotUtils {
     Pick <Person> pick = new Pick();
     for (Person p : target.residents()) {
       if (! p.health.conscious()) continue;
-      if (plot.roleFor(p, null) != null) continue;
+      if (plot.entryFor(p, null) != null) continue;
       pick.compare(p, 0 - p.history.bondWith(target.owner()));
     }
     if (pick.empty()) return;
@@ -119,6 +119,7 @@ public class PlotUtils {
       PersonType ofGoon = (PersonType) Rand.pickFrom(GOONS);
       Person goon = Person.randomOfKind(ofGoon, base.world());
       forceSum += goon.stats.powerLevel();
+      goon.setBase(plot.base());
       forces.add(goon);
     }
     
@@ -130,11 +131,14 @@ public class PlotUtils {
   }
   
   
-  public static EventEffects generateSceneEffects(Scene scene) {
+  public static EventEffects generateSceneEffects(
+    Scene scene, Plot plot, Lead lead
+  ) {
     World world = scene.world();
     Base player = world.playerBase();
-    Batch <Person> captives = new Batch();
+    Batch <Person  > captives = new Batch();
     Batch <CaseFile> evidence = new Batch();
+    int time = world.timing.totalHours();
     
     for (Person p : scene.didEnter()) {
       float
@@ -159,12 +163,20 @@ public class PlotUtils {
       p.health.updateHealth(0);
       
       if (p.isCriminal() && p.currentScene() == scene && scene.wasWon()) {
+        
+        CaseFile file = player.leads.caseFor(p);
+        Plot.Role role = plot.roleFor(p);
+        if (role == null) role = Plot.ROLE_GOON;
+        Clue redHanded = new Clue(plot, role);
+        redHanded.confirmMatch(p, lead, time, scene.site());
+        file.recordClue(redHanded);
+        
         captives.add(p);
-        evidence.add(player.leads.caseFor(p));
+        evidence.add(file);
       }
     }
     
-    world.council.scheduleTrial(captives, evidence);
+    world.council.scheduleTrial(plot, captives, evidence);
     
     EventEffects effects = new EventEffects();
     effects.composeFromScene(scene);

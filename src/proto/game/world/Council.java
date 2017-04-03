@@ -26,12 +26,17 @@ public class Council {
   List <Place> courts  = new List();
   List <Place> prisons = new List();
   
-  static class Trial {
+  public static class Trial {
+    Plot plot;
     List <Person> accused = new List();
     int timeStarts, timeEnds;
+    
+    public String toString() {
+      return "Trial for "+plot.organiser();
+    }
   }
   
-  static class Sentence {
+  public static class Sentence {
     Person jailed;
     int timeStarts, timeEnds;
   }
@@ -52,6 +57,7 @@ public class Council {
     
     for (int n = s.loadInt(); n-- > 0;) {
       Trial t = new Trial();
+      t.plot = (Plot) s.loadObject();
       s.loadObjects(t.accused);
       t.timeStarts = s.loadInt();
       t.timeEnds   = s.loadInt();
@@ -74,6 +80,7 @@ public class Council {
     
     s.saveInt(trials.size());
     for (Trial t : trials) {
+      s.saveObject(t.plot);
       s.saveObjects(t.accused);
       s.saveInt(t.timeStarts);
       s.saveInt(t.timeEnds  );
@@ -109,14 +116,14 @@ public class Council {
     if (mainHall == null) return;
     
     int time = world.timing.totalHours();
-    for (Trial t : trials) if (t.timeEnds >= time) {
+    for (Trial t : trials) if (time >= t.timeEnds) {
       concludeTrial(t);
       trials.remove(t);
     }
     
     for (Object p : sentences.keySet().toArray()) {
       Sentence s = sentences.get(p);
-      if (s.timeEnds >= time) {
+      if (time >= s.timeEnds) {
         releasePrisoner((Person) p);
       }
     }
@@ -133,9 +140,19 @@ public class Council {
     TRIAL_SENTENCE_AVG = World.DAYS_PER_WEEK * World.WEEKS_PER_YEAR
   ;
   
+
+  public void scheduleTrial(
+    Plot plot, Series <Person> captive, Series <CaseFile> evidence
+  ) {
+    int delay    = (int) Rand.range(TRIAL_DELAY_MIN, TRIAL_DELAY_MAX);
+    int duration = (int) ((Rand.num() + 0.5f) * TRIAL_DURATION_AVG);
+    scheduleTrial(plot, captive, evidence, delay, duration);
+  }
+  
   
   public void scheduleTrial(
-    Series <Person> captive, Series <CaseFile> evidence
+    Plot plot, Series <Person> captive, Series <CaseFile> evidence,
+    int daysDelay, int daysDuration
   ) {
     if (mainHall == null) {
       I.say("NO MAIN HALL ASSIGNED TO COUNCIL, CANNOT SCHEDULE TRIAL!");
@@ -143,6 +160,7 @@ public class Council {
     }
     
     Trial t = new Trial();
+    t.plot = plot;
     Visit.appendTo(t.accused, captive);
     
     for (CaseFile f : evidence) {
@@ -150,17 +168,77 @@ public class Council {
       m.updateEvidenceFrom(f);
     }
     for (Person p : captive) {
+      //  TODO:  THIS NEEDS TO BE HANDLED DIFFERENTLY
       Place prison = pickPrison(p);
       Place.setResident(p, prison, true);
     }
     
-    t.timeStarts =  (int) Rand.range(TRIAL_DELAY_MIN, TRIAL_DELAY_MAX);
-    t.timeStarts *= World.HOURS_PER_DAY;
-    t.timeStarts += world.timing.totalHours();
-    t.timeEnds   =  (int) ((Rand.num() + 0.5f) * TRIAL_DURATION_AVG);
-    t.timeEnds   *= World.HOURS_PER_DAY;
-    t.timeEnds   += t.timeStarts;
     trials.add(t);
+    scheduleTrial(t, daysDelay, daysDuration);
+  }
+  
+  
+  public void scheduleTrial(Trial t, int daysDelay, int daysDuration) {
+    if (! trials.includes(t)) I.complain("Cannot schedule nonexistant trial!");
+    
+    t.timeStarts =  daysDelay * World.HOURS_PER_DAY;
+    t.timeStarts += world.timing.totalHours();
+    t.timeEnds   =  daysDuration * World.HOURS_PER_DAY;
+    t.timeEnds   += t.timeStarts;
+  }
+  
+  
+  public Trial nextTrialFor(Person accused) {
+    for (Trial t : trials) if (t.accused.includes(accused)) return t;
+    return null;
+  }
+  
+  
+  public Trial nextTrialFor(Plot plot) {
+    for (Trial t : trials) if (t.plot == plot) return t;
+    return null;
+  }
+  
+  
+  public Series <Trial> upcomingTrials() {
+    return trials;
+  }
+  
+  
+  public float rateEvidence(Person p, Trial t) {
+    float sumEvidence = 0;
+    for (Plot plot : mainHall.leads.involvedIn(p, true)) {
+      sumEvidence += mainHall.leads.evidenceForInvolvement(plot, p);
+    }
+    return 1 - (1f / (1 + sumEvidence));
+  }
+  
+  
+  public float rateEvidence(Trial t) {
+    float sum = 0;
+    for (Person p : t.accused) {
+      sum += rateEvidence(p, t);
+    }
+    return sum / Nums.max(1, t.accused.size());
+  }
+  
+  
+  private void concludeTrial(Trial t) {
+    for (Person p : t.accused) {
+      float evidence = rateEvidence(p, t);
+      if (Rand.num() < evidence) {
+        Sentence s = new Sentence();
+        s.jailed = p;
+        s.timeStarts = world.timing.totalHours();
+        s.timeEnds = (int) ((Rand.num() + 0.5f) + TRIAL_SENTENCE_AVG);
+        s.timeEnds *= World.HOURS_PER_DAY;
+        s.timeEnds += s.timeStarts;
+        sentences.put(p, s);
+      }
+      else {
+        releasePrisoner(p);
+      }
+    }
   }
   
   
@@ -174,36 +252,15 @@ public class Council {
   }
   
   
-  private void concludeTrial(Trial t) {
-    for (Person p : t.accused) {
-      float sumEvidence = 0;
-      for (Plot plot : mainHall.leads.involvedIn(p, true)) {
-        sumEvidence += mainHall.leads.evidenceForInvolvement(plot, p);
-      }
-      
-      float releaseChance = 1f / (1 + sumEvidence);
-      if (Rand.num() < releaseChance) {
-        releasePrisoner(p);
-      }
-      else {
-        Sentence s = new Sentence();
-        s.jailed = p;
-        s.timeStarts = world.timing.totalHours();
-        s.timeEnds = (int) ((Rand.num() + 0.5f) + TRIAL_SENTENCE_AVG);
-        s.timeEnds *= World.HOURS_PER_DAY;
-        s.timeEnds += s.timeStarts;
-        sentences.put(p, s);
-      }
-    }
-  }
-  
-  
   private void releasePrisoner(Person p) {
-    Place.setResident(p, p.base(), true);
+    if (p.resides() == null) return;
+    Place.setResident(p, p.resides(), false);
+    //  TODO:  They'll need to re-enter the workforce now!
     sentences.remove(p);
   }
   
 }
+
 
 
 

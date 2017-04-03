@@ -26,8 +26,8 @@ public abstract class Plot extends Event {
   
   public static class Role extends Index.Entry implements Session.Saveable {
     
-    final String name;
-    final String category;
+    final public String name;
+    final public String category;
     
     public Role(String ID, String name, String category) {
       super(ROLES_INDEX, ID);
@@ -55,6 +55,7 @@ public abstract class Plot extends Event {
     ROLE_HIDEOUT   = new Role("role_hideout"  , "Hideout"  , PERP  ),
     ROLE_ORGANISER = new Role("role_organiser", "Organiser", PERP  ),
     ROLE_ENFORCER  = new Role("role_enforcer" , "Enforcer" , PERP  ),
+    ROLE_GOON      = new Role("role_goon"     , "Goon"     , PERP  ),
     ROLE_TARGET    = new Role("role_target"   , "Target"   , VICTIM),
     ROLE_SCENE     = new Role("role_scene"    , "Scene"    , VICTIM)
   ;
@@ -138,7 +139,8 @@ public abstract class Plot extends Event {
   
   
   protected Step queueMessage(String label, Role sends, Role gets, Role info) {
-    Step s = queueStep(label, Lead.MEDIUM_WIRE, World.HOURS_PER_DAY, sends, gets);
+    Step s;
+    s = queueStep(label, Lead.MEDIUM_WIRE, World.HOURS_PER_DAY, sends, gets);
     if (info != null) s.setInfoGiven(info);
     return s;
   }
@@ -289,7 +291,7 @@ public abstract class Plot extends Event {
   
   
   public void assignRole(Element element, Role role) {
-    RoleEntry match = roleFor(element, role);
+    RoleEntry match = entryFor(element, role);
     if (match == null) entries.add(match = new RoleEntry());
     match.role    = role   ;
     match.element = element;
@@ -339,7 +341,7 @@ public abstract class Plot extends Event {
   
   
   public Element filling(Role role) {
-    RoleEntry entry = roleFor(null, role);
+    RoleEntry entry = entryFor(null, role);
     return entry == null ? null : entry.element;
   }
   
@@ -353,13 +355,26 @@ public abstract class Plot extends Event {
   }
   
   
-  protected RoleEntry roleFor(Element element, Role role) {
+  protected RoleEntry entryFor(Element element, Role role) {
     for (RoleEntry entry : entries) {
       if (element != null && element != entry.element) continue;
       if (role    != null && role    != entry.role   ) continue;
       return entry;
     }
     return null;
+  }
+  
+  
+  public Batch <Element> allInvolved() {
+    Batch <Element> involved = new Batch();
+    for (RoleEntry entry : entries) involved.include(entry.element);
+    return involved;
+  }
+  
+  
+  public Role roleFor(Element element) {
+    RoleEntry entry = entryFor(element, null);
+    return entry == null ? null : entry.role;
   }
   
   
@@ -448,7 +463,8 @@ public abstract class Plot extends Event {
   
   
   public EventEffects generateEffects(Scene scene) {
-    return PlotUtils.generateSceneEffects(scene);
+    Lead lead = (Lead) scene.playerTask();
+    return PlotUtils.generateSceneEffects(scene, this, lead);
   }
   
   
