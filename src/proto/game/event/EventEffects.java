@@ -53,6 +53,9 @@ public class EventEffects implements Session.Saveable {
   }
   
   
+  
+  /**  Report compositions for scenes and events-
+    */
   public void composeFromScene(Scene scene) {
     if (outcomeState != Scene.STATE_INIT) I.complain("Already composed!");
     
@@ -68,34 +71,22 @@ public class EventEffects implements Session.Saveable {
       }
       else {
         sumForce += rateDamage(p);
-        if (p.health.conscious() || p.currentScene() != scene) sumAway++;
+        if (p.currentScene() != scene || ! scene.wasWon()) sumAway++;
         numCrooks++;
       }
       involved.add(p);
     }
     
     outcomeState = scene.wasWon() ? Scene.STATE_WON : Scene.STATE_LOST;
-    forceRating      = sumForce / Nums.max(1, numCrooks   );
-    collateralRating = sumHurt  / Nums.max(1, numCivilians);
-    getawaysRating   = sumAway  / Nums.max(1, numCrooks   );
+    forceRating      = sumForce * 0.5f / Nums.max(1, numCrooks   );
+    collateralRating = sumHurt  * 1.0f / Nums.max(1, numCivilians);
+    getawaysRating   = sumAway  * 1.5f / Nums.max(1, numCrooks   );
     
     final boolean playerWon  = outcomeState == Scene.STATE_WON;
     deterEffect += playerWon ? 10 : 0;
-    deterEffect += (forceRating * 5) - (getawaysRating * 20);
+    deterEffect += (forceRating * 5 ) - (getawaysRating   * 10);
     trustEffect += playerWon ? 10 : 0;
     trustEffect -= (forceRating * 20) + (collateralRating * 40);
-  }
-  
-  
-  float rateDamage(Person p) {
-    float damage = p.health.injury() / p.health.maxHealth();
-    
-    if (p.health.dead    ()) damage += 4.0f;
-    if (p.health.critical()) damage += 1.0f;
-    if (p.health.bruised ()) damage += 0.5f;
-    
-    damage -= 0.5f;
-    return Nums.clamp((damage - 0.5f) / 2, 0, 4);
   }
   
   
@@ -112,6 +103,20 @@ public class EventEffects implements Session.Saveable {
   }
   
   
+  float rateDamage(Person p) {
+    float damage = p.health.injury() / p.health.maxHealth();
+    
+    if      (p.health.dead    ()) damage *= 4.00f;
+    else if (p.health.critical()) damage *= 2.00f;
+    else if (p.health.crippled()) damage *= 2.00f;
+    else                          damage -= 0.50f;
+    return Nums.clamp(damage, 0, 4);
+  }
+  
+  
+  
+  /**  Applying and querying after-effects:
+    */
   public void applyEffects(Place place) {
     final Region region = place.region();
     region.incLevel(Region.DETERRENCE, deterEffect, true);
@@ -145,21 +150,34 @@ public class EventEffects implements Session.Saveable {
     h.append("\nMission ");
     if (playerWon()) h.append(" Successful: "+scene);
     else h.append(" Failed: "+scene);
-
+    
     StringBuffer s = new StringBuffer();
     
-    s.append("\nPersonnel Status:");
+    Batch <Person> captives   = new Batch();
+    Batch <Person> casualties = new Batch();
     for (Person p : involved) {
+      //  TODO:  You'll want a more reliable 'is okay' and 'is captive' check
+      //  for these.
+      if (! p.health.healthy()) casualties.add(p);
+      else if (p.isCriminal() && scene.wasWon()) captives.add(p);
+    }
+    
+    s.append("\nCaptives:");
+    for (Person p : captives) {
       s.append("\n  "+p.name());
-      
-      if (p.isHero    ()) s.append(" (agent)"   );
-      if (p.isCivilian()) s.append(" (civilian)");
-      if (p.isCriminal()) s.append(" (criminal)");
-      
+    }
+    s.append("\nCasualties:");
+    for (Person p : casualties) {
+      s.append("\n  "+p.name());
       String desc = "";
-      if (p.health.bruised ()) desc = " (bruised)" ;
-      if (p.health.critical()) desc = " (critical)";
-      if (p.health.dead    ()) desc = " (DEAD)"    ;
+      
+      float health = p.health.totalHarm() / p.health.maxHealth();
+      health /= PersonHealth.HP_DEATH_PERCENT / 100f;
+      s.append(" ("+((int) (health * 100))+"% injury)");
+      
+      if (p.health.critical()) desc = " (critical condition)";
+      if (p.health.crippled()) desc = " (crippled)";
+      if (p.health.dead    ()) desc = " (DEAD)";
       s.append(desc);
     }
     

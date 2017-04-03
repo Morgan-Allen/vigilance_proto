@@ -119,12 +119,12 @@ public class PersonHealth {
   
   
   public boolean healthy() {
-    return state == State.HEALTHY;
+    return state == State.HEALTHY || state == State.BRUISED;
   }
   
   
-  public boolean bruised() {
-    return state == State.BRUISED;
+  public boolean crippled() {
+    return state == State.CRIPPLED;
   }
   
   
@@ -250,13 +250,14 @@ public class PersonHealth {
     //
     //  Note:  This is called regularly outside of Scenes, when an agent is
     //  back at base.
-    if (! alive()) return;
-    if (conscious()) stun = 0;
+    if (state == State.DECEASED) {
+      return;
+    }
     
     numWeeks /= World.DAYS_PER_WEEK * World.HOURS_PER_DAY;
     int maxHealth = maxHealth();
-    float wakeLevel   = maxHealth * 100f / WAKEUP_PERCENT   ;
-    float bruiseLevel = maxHealth * 100f / HP_BRUISE_PERCENT;
+    float wakeLevel   = maxHealth * WAKEUP_PERCENT    / 100f;
+    float bruiseLevel = maxHealth * HP_BRUISE_PERCENT / 100f;
     float regen = maxHealth * numWeeks * 2f / FULL_HEAL_WEEKS;
     
     if (totalHarm > 0) {
@@ -265,10 +266,7 @@ public class PersonHealth {
     }
     else injury = Nums.max(0, injury - regen);
     
-    if (conscious()) {
-      stress = Nums.max(0, stress - (int) (WEEK_STRESS_DECAY * numWeeks));
-    }
-    else if (state == State.CRITICAL || state == State.CRIPPLED) {
+    if (state == State.CRITICAL || state == State.CRIPPLED) {
       conscious = false;
       if (totalHarm == 0) {
         setState(State.BRUISED);
@@ -279,9 +277,13 @@ public class PersonHealth {
       if (injury < bruiseLevel) {
         setState(State.HEALTHY);
       }
-      else if (injury < wakeLevel) {
+      else {
         setState(State.BRUISED);
       }
+    }
+    if (conscious()) {
+      stun = 0;
+      stress = Nums.max(0, stress - (int) (WEEK_STRESS_DECAY * numWeeks));
     }
   }
   
