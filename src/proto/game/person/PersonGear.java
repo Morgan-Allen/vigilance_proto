@@ -152,7 +152,7 @@ public class PersonGear {
     //
     //  And update stats (which might to due to change thanks to new passive
     //  bonuses.)
-    person.stats.updateStats();
+    person.stats.updateStats(0);
   }
   
   

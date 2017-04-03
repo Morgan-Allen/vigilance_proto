@@ -584,7 +584,7 @@ public class Lead extends Task {
   }
   
   
-  public void onSceneExit(Scene scene, EventReport report) {
+  public void onSceneExit(Scene scene, EventEffects report) {
     setCompleted(report.playerWon());
   }
   

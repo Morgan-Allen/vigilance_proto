@@ -272,16 +272,6 @@ public abstract class Plot extends Event {
   }
   
   
-  public void completeEvent() {
-    super.completeEvent();
-  }
-  
-  
-  public Element targetElement(Person p) {
-    return target();
-  }
-  
-  
   
   /**  Utility methods for assigning roles, fulfilling needs and evaluating
     *  possible targets-
@@ -320,6 +310,11 @@ public abstract class Plot extends Event {
   
   public Base base() {
     return base;
+  }
+  
+  
+  public Element targetElement(Person p) {
+    return target();
   }
   
   
@@ -402,7 +397,7 @@ public abstract class Plot extends Event {
   
   
   
-  /**  Generating reports and tipoffs:
+  /**  Generating reports, tipoffs, actual scenes, and other after-effects:
     */
   protected void checkForTipoffs(Step step, boolean begins, boolean ends) {
     
@@ -422,65 +417,44 @@ public abstract class Plot extends Event {
     }
     
     if (ends && step.medium == Lead.MEDIUM_HEIST) {
-      EventReport report = generateReport(step);
+      EventEffects effects = generateEffects(step);
+      Element target = target();
+      
       Clue clue = new Clue(this, ROLE_TARGET);
       clue.confirmTipoff(target(), Lead.LEAD_REPORT, time, site);
-      CaseFile file = player.leads.caseFor(target());
-      file.recordClue(clue, report);
+      CaseFile file = player.leads.caseFor(target);
+      file.recordClue(clue, effects);
+      
+      effects.applyEffects(target.place());
     }
   }
   
   
-  protected EventReport generateReport(Step step) {
-    EventReport report = new EventReport();
-    report.composeFromEvent(this, 0, 1);
-    return report;
+  public EventEffects generateEffects(Step step) {
+    EventEffects effects = new EventEffects();
+    effects.composeFromEvent(this, 0, 1);
+    return effects;
   }
   
   
-  
-  /**  Dealing with scene-population:
-    */
-  public Scene generateScene(Step step, Element focus, Lead player) {
-    Series <Element> involved = involved(step);
-    
-    if (! involved.includes(focus)) {
-      I.say("Step: "+step+" does not involve: "+focus);
-      return null;
-    }
-    
-    World world = base.world();
-    Place place = focus.place();
-    Scene scene = place.kind().sceneType().generateScene(world);
-    
-    final List <Person> forces = new List();
-    for (Element e : involved) {
-      if (e == null || e.type != Kind.TYPE_PERSON) continue;
-      forces.add((Person) e);
-    }
-    
-    final float dangerLevel = 0.5f;
-    final PersonType GOONS[] = base.goonTypes().toArray(PersonType.class);
-    float forceLimit = dangerLevel * 10;
-    float forceSum   = 0;
-    
-    while (forceSum < forceLimit) {
-      PersonType ofGoon = (PersonType) Rand.pickFrom(GOONS);
-      Person goon = Person.randomOfKind(ofGoon, base.world());
-      forceSum += goon.stats.powerLevel();
-      forces.add(goon);
-    }
-    
-    scene.entry.provideInProgressEntry(forces);
-    scene.entry.provideBorderEntry(player.assigned());
-    scene.assignMissionParameters(place, player, this);
-    
-    return scene;
+  public void completeEvent() {
+    super.completeEvent();
   }
   
   
-  public void completeAfterScene(Scene scene, EventReport report) {
+  public Scene generateScene(Step step, Element focus, Lead lead) {
+    return PlotUtils.generateScene(this, step, focus, lead);
+  }
+  
+  
+  public EventEffects generateEffects(Scene scene) {
+    return PlotUtils.generateSceneEffects(scene);
+  }
+  
+  
+  public void completeAfterScene(Scene scene, EventEffects report) {
     super.completeAfterScene(scene, report);
+    report.applyEffects(scene.site());
   }
   
   

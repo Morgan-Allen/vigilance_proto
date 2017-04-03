@@ -3,6 +3,7 @@
 package proto.game.event;
 import proto.common.*;
 import proto.game.person.*;
+import proto.game.scene.*;
 import proto.game.world.*;
 import proto.util.*;
 
@@ -11,11 +12,14 @@ import proto.util.*;
 public class PlotUtils {
   
   
+  /**  Helper methods for filling Roles:
+    */
   public static void fillExpertRole(
     Plot plot, Trait trait, Series <Person> candidates, Plot.Role role
   ) {
     Pick <Person> pick = new Pick();
     for (Person p : candidates) {
+      if (! p.health.conscious()) continue;
       if (plot.roleFor(p, null) != null) continue;
       pick.compare(p, p.stats.levelFor(trait));
     }
@@ -29,6 +33,7 @@ public class PlotUtils {
   ) {
     Pick <Person> pick = new Pick();
     for (Person p : target.residents()) {
+      if (! p.health.conscious()) continue;
       if (plot.roleFor(p, null) != null) continue;
       pick.compare(p, 0 - p.history.bondWith(target.owner()));
     }
@@ -62,6 +67,7 @@ public class PlotUtils {
     final Batch <Person> experts = new Batch();
     for (Element e : plot.world().inside()) if (e.isPerson()) {
       Person p = (Person) e;
+      if (! p.health.conscious()) continue;
       if (p.stats.levelFor(trait) < minLevel) continue;
       experts.add(p);
     }
@@ -78,8 +84,93 @@ public class PlotUtils {
     }
     return venues;
   }
+  
+  
+  
+  /**  Helper methods for dealing with perps before and after a scene:
+    */
+  public static Scene generateScene(
+    Plot plot, Step step, Element focus, Task lead
+  ) {
+    Series <Element> involved = plot.involved(step);
+    
+    if (! involved.includes(focus)) {
+      I.say("Step: "+step+" does not involve: "+focus);
+      return null;
+    }
+    
+    Base  base  = plot.base();
+    World world = base.world();
+    Place place = focus.place();
+    Scene scene = place.kind().sceneType().generateScene(world);
+    
+    final float dangerLevel = 0.5f;
+    final PersonType GOONS[] = base.goonTypes().toArray(PersonType.class);
+    float forceLimit = dangerLevel * 10, forceSum = 0;
+    
+    final List <Person> forces = new List();
+    for (Element e : involved) if (e != null && e.isPerson()) {
+      Person perp = (Person) e;
+      forces.add(perp);
+      forceSum += perp.stats.powerLevel();
+    }
+    
+    while (forceSum < forceLimit) {
+      PersonType ofGoon = (PersonType) Rand.pickFrom(GOONS);
+      Person goon = Person.randomOfKind(ofGoon, base.world());
+      forceSum += goon.stats.powerLevel();
+      forces.add(goon);
+    }
+    
+    scene.entry.provideInProgressEntry(forces);
+    scene.entry.provideBorderEntry(lead.assigned());
+    scene.assignMissionParameters(place, lead, plot);
+    
+    return scene;
+  }
+  
+  
+  public static EventEffects generateSceneEffects(Scene scene) {
+    World world = scene.world();
+    Base player = world.playerBase();
+    Batch <Person> captives = new Batch();
+    Batch <CaseFile> evidence = new Batch();
+    
+    for (Person p : scene.didEnter()) {
+      float
+        damage      = p.health.totalHarm() / p.health.maxHealth(),
+        bruiseLevel = PersonHealth.HP_BRUISE_PERCENT / 100f,
+        deathLevel  = 100 / 100f;
+      
+      float critRisk = Nums.clamp(damage - bruiseLevel, 0, 1);
+      float diesRisk = Nums.clamp(damage - deathLevel , 0, 1);
+      critRisk *= critRisk;
+      diesRisk *= diesRisk;
+      
+      if (Rand.num() < diesRisk) {
+        p.health.setState(PersonHealth.State.DECEASED);
+      }
+      else if (Rand.num() < critRisk) {
+        p.health.setState(PersonHealth.State.CRITICAL);
+      }
+      else if (damage > bruiseLevel) {
+        p.health.setState(PersonHealth.State.BRUISED);
+      }
+      p.health.updateHealth(0);
+      
+      if (p.isCriminal() && p.currentScene() == scene && scene.wasWon()) {
+        captives.add(p);
+        evidence.add(player.leads.caseFor(p));
+      }
+    }
+    
+    world.council.scheduleTrial(captives, evidence);
+    
+    EventEffects effects = new EventEffects();
+    effects.composeFromScene(scene);
+    return effects;
+  }
+  
 }
-
-
 
 

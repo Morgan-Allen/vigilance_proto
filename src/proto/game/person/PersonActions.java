@@ -145,7 +145,7 @@ public class PersonActions {
     nextAction   = null;
     turnDone     = false;
     turnMoveRoll = Rand.avgNums(2);
-    person.stats.updateStats();
+    person.stats.updateStats(0);
     person.mind.assessConfidence();
     return true;
   }

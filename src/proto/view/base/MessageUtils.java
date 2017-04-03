@@ -13,7 +13,7 @@ public class MessageUtils {
   
   
   public static void presentClueMessage(
-    Clue clue, MainView view, EventReport report
+    Clue clue, MainView view, EventEffects effects
   ) {
     Base player = view.player();
     StringBuffer header = new StringBuffer(), desc = new StringBuffer();
@@ -30,9 +30,9 @@ public class MessageUtils {
       header.append("EVIDENCE FOUND");
       desc.append(clue.longDescription(player));
     }
-    if (report != null) {
+    if (effects != null) {
       Region region = clue.place().region();
-      float trust = report.trustEffect, deter = report.deterEffect;
+      float trust = effects.trustEffect, deter = effects.deterEffect;
       desc.append("\n"+region+" Trust "     +I.signNum((int) trust)+"%");
       desc.append("\n"+region+" Deterrence "+I.signNum((int) deter)+"%");
     }

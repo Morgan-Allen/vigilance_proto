@@ -95,7 +95,7 @@ public class RosterView extends UINode {
       }
       
       int MH = p.health.maxHealth(), MS = p.health.maxStress();
-      int inj = (int) p.health.injury();
+      int inj = (int) p.health.totalHarm();
       int str = (int) p.health.stress();
       float injLevel = (MH - inj) * 1f / MH, strLevel = str * 1f / MS;
       

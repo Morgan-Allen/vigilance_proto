@@ -1,30 +1,21 @@
 
 
-package proto.game.scene;
+package proto.game.event;
 import proto.common.*;
 import proto.game.person.*;
+import proto.game.scene.*;
 import proto.game.world.*;
-import proto.game.event.*;
 import proto.util.*;
 import proto.view.common.MainView;
 import proto.view.common.MessageView;
 
 
 
-public class EventReport implements Session.Saveable {
+public class EventEffects implements Session.Saveable {
   
   
-  final static String FORCE_DESC[] = {
-    "None", "Minimal", "Moderate", "Heavy", "EXCESSIVE"
-  };
-  final static String COLLATERAL_DESC[] = {
-    "None", "Minimal", "Medium", "Heavy", "TOTAL"
-  };
-  final static String GETAWAYS_DESC[] = {
-    "None", "Few", "Some", "Many", "ALL"
-  };
-  
-  
+  /**  Data fields, construction and save/load methods-
+    */
   public int outcomeState = Scene.STATE_INIT;
   public float forceRating, collateralRating, getawaysRating;
   public float trustEffect, deterEffect;
@@ -32,12 +23,12 @@ public class EventReport implements Session.Saveable {
   public List <Object> newLeads = new List();
   
   
-  public EventReport() {
+  public EventEffects() {
     return;
   }
   
   
-  public EventReport(Session s) throws Exception {
+  public EventEffects(Session s) throws Exception {
     s.cacheInstance(this);
     outcomeState = s.loadInt();
     forceRating      = s.loadFloat();
@@ -98,8 +89,13 @@ public class EventReport implements Session.Saveable {
   
   float rateDamage(Person p) {
     float damage = p.health.injury() / p.health.maxHealth();
-    if (! p.health.alive()) damage += 3;
-    return damage / 2f;
+    
+    if (p.health.dead    ()) damage += 4.0f;
+    if (p.health.critical()) damage += 1.0f;
+    if (p.health.bruised ()) damage += 0.5f;
+    
+    damage -= 0.5f;
+    return Nums.clamp((damage - 0.5f) / 2, 0, 4);
   }
   
   
@@ -116,7 +112,7 @@ public class EventReport implements Session.Saveable {
   }
   
   
-  public void applyOutcomeEffects(Place place) {
+  public void applyEffects(Place place) {
     final Region region = place.region();
     region.incLevel(Region.DETERRENCE, deterEffect, true);
     region.incLevel(Region.TRUST     , trustEffect, true);
@@ -129,7 +125,21 @@ public class EventReport implements Session.Saveable {
   
   
   
-  void presentMessageForScene(Scene scene) {
+  /**  Rendering, debug and interface methods:
+    *  TODO:  Move this out to the view package...
+    */
+  final static String FORCE_DESC[] = {
+    "None", "Minimal", "Moderate", "Heavy", "EXCESSIVE"
+  };
+  final static String COLLATERAL_DESC[] = {
+    "None", "Minimal", "Medium", "Heavy", "TOTAL"
+  };
+  final static String GETAWAYS_DESC[] = {
+    "None", "Few", "Some", "Many", "ALL"
+  };
+  
+  
+  public void presentMessageForScene(final Scene scene) {
     
     StringBuffer h = new StringBuffer();
     h.append("\nMission ");
@@ -138,42 +148,26 @@ public class EventReport implements Session.Saveable {
 
     StringBuffer s = new StringBuffer();
     
-    //  TODO:  You need to report on injured or hospitalised subjects as well.
     s.append("\nPersonnel Status:");
     for (Person p : involved) {
-      if (p.isHero()) {
-        if (! p.health.alive()) {
-          s.append("\n  "+p.name());
-          s.append(" (dead)");
-        }
-        else if (! p.health.conscious()) {
-          s.append("\n  "+p.name());
-          s.append(playerWon() ? " (unconscious)" : " (captive)");
-        }
-      }
-      else {
-        if (p.currentScene() != scene) {
-          s.append("\n  "+p.name());
-          s.append(" (escaped)");
-        }
-        else if (! p.health.alive()) {
-          s.append("\n  "+p.name());
-          s.append(" (dead)");
-        }
-        else if (! p.health.conscious()) {
-          s.append("\n  "+p.name());
-          s.append(playerWon() ? " (captive)" : " (unconscious)");
-          int inj = (int) p.health.injury(), maxH = p.health.maxHealth();
-          s.append(" (injury "+inj+"/"+maxH+")");
-        }
-      }
+      s.append("\n  "+p.name());
+      
+      if (p.isHero    ()) s.append(" (agent)"   );
+      if (p.isCivilian()) s.append(" (civilian)");
+      if (p.isCriminal()) s.append(" (criminal)");
+      
+      String desc = "";
+      if (p.health.bruised ()) desc = " (bruised)" ;
+      if (p.health.critical()) desc = " (critical)";
+      if (p.health.dead    ()) desc = " (DEAD)"    ;
+      s.append(desc);
     }
     
     s.append("\n\n");
     s.append("\nUse of Force: "+descFrom(forceRating     , FORCE_DESC     ));
     s.append("\nCollateral: "  +descFrom(collateralRating, COLLATERAL_DESC));
     s.append("\nGetaways: "    +descFrom(getawaysRating  , GETAWAYS_DESC  ));
-    Region region = scene.site.region();
+    Region region = scene.site().region();
     s.append("\n"+region+" Trust "     +I.signNum((int) trustEffect)+"%");
     s.append("\n"+region+" Deterrence "+I.signNum((int) deterEffect)+"%");
     
@@ -182,6 +176,7 @@ public class EventReport implements Session.Saveable {
       view, scene.icon(), h.toString(), s.toString(), "Dismiss"
     ) {
       protected void whenClicked(String option, int optionID) {
+        scene.performSceneExit();
         view.dismissMessage(this);
       }
     });

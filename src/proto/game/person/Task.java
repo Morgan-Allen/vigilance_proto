@@ -3,16 +3,13 @@
 package proto.game.person;
 import proto.game.world.*;
 import proto.common.*;
+import proto.game.event.*;
 import proto.game.scene.*;
 import proto.util.*;
-import proto.view.*;
-import proto.view.common.*;
-import static proto.game.person.PersonStats.*;
 
 
 
 //  TODO:  Consider merging Tasks with Events, or having one extend the other?
-
 
 public abstract class Task implements Assignment {
   
@@ -191,7 +188,7 @@ public abstract class Task implements Assignment {
   }
   
   
-  public void onSceneExit(Scene scene, EventReport report) {
+  public void onSceneExit(Scene scene, EventEffects effects) {
     return;
   }
   

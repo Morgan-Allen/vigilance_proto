@@ -19,19 +19,25 @@ public class PersonHealth {
     INIT_STRESS = 0,
     MAX_STRESS  = 100;
   final public static int
-    FULL_HEAL_WEEKS   = 8   ,
-    WAKEUP_PERCENT    = 50  ,
-    WEEK_STRESS_DECAY = 2   ,
-    WEEK_TRAINING_XP  = 250 ,
-    MIN_LEVEL_XP      = 1000;
+    HP_BRUISE_PERCENT  = 25  ,
+    STOP_BLEED_PERCENT = 25  ,
+    HP_DEATH_PERCENT   = 150 ,
+    FULL_HEAL_WEEKS    = 8   ,
+    WAKEUP_PERCENT     = 50  ,
+    WEEK_STRESS_DECAY  = 2   ,
+    WEEK_TRAINING_XP   = 250 ,
+    MIN_LEVEL_XP       = 1000;
+  
+  public static enum State {
+    HEALTHY, BRUISED, CRIPPLED, CRITICAL, DECEASED
+  }
   
   final Person person;
   
   int luck = INIT_LUCK, stress = INIT_STRESS;
   float injury, stun, totalHarm;
-  
-  //  TODO:  Make alive/conscious into States (see Person class.)
-  boolean bleed = false, alive = true, conscious = true;
+  boolean bleed, conscious;
+  State state;
   
   
   
@@ -47,8 +53,8 @@ public class PersonHealth {
     stun      = s.loadFloat();
     totalHarm = s.loadFloat();
     bleed     = s.loadBool();
-    alive     = s.loadBool();
     conscious = s.loadBool();
+    state     = (State) s.loadEnum(State.values());
   }
   
   
@@ -59,8 +65,8 @@ public class PersonHealth {
     s.saveFloat(stun     );
     s.saveFloat(totalHarm);
     s.saveBool (bleed    );
-    s.saveBool (alive    );
     s.saveBool (conscious);
+    s.saveEnum (state    );
   }
   
   
@@ -85,6 +91,16 @@ public class PersonHealth {
   }
   
   
+  public float totalHarm() {
+    return totalHarm;
+  }
+  
+  
+  public boolean bleeding() {
+    return bleed;
+  }
+  
+  
   public float stress() {
     return stress;
   }
@@ -102,8 +118,33 @@ public class PersonHealth {
   }
   
   
+  public boolean healthy() {
+    return state == State.HEALTHY;
+  }
+  
+  
+  public boolean bruised() {
+    return state == State.BRUISED;
+  }
+  
+  
+  public boolean critical() {
+    return state == State.CRITICAL;
+  }
+  
+  
   public boolean alive() {
-    return alive;
+    return state != State.DECEASED;
+  }
+  
+  
+  public boolean dead() {
+    return state == State.DECEASED;
+  }
+  
+  
+  public boolean conscious() {
+    return conscious && alive();
   }
   
   
@@ -112,8 +153,13 @@ public class PersonHealth {
   }
   
   
-  public boolean conscious() {
-    return conscious && alive;
+  public State state() {
+    return state;
+  }
+  
+  
+  public void setState(State state) {
+    this.state = state;
   }
   
   
@@ -135,10 +181,10 @@ public class PersonHealth {
   }
   
   
-  public void receiveTrauma(float trauma) {
+  public void incTotalHarm(float harm) {
     this.totalHarm += injury;
     checkState();
-    person.world().events.log(person+" suffered "+trauma+" trauma.");
+    person.world().events.log(person+" suffered "+harm+" total harm.");
   }
   
   
@@ -148,6 +194,7 @@ public class PersonHealth {
       receiveStun  (attack.stunDamage  .value());
     }
     float bleedRisk = totalHarm / maxHealth();
+    bleedRisk *= 1 - (attack.stunPercent.value() / 100f);
     if (Rand.num() < bleedRisk) {
       bleed = true;
       person.world().events.log(person+" began bleeding.");
@@ -183,35 +230,77 @@ public class PersonHealth {
   
   /**  Regular updates-
     */
-  void updateHealth() {
+  void onTurnStart() {
+    float stanchChance = healthLevel() + (STOP_BLEED_PERCENT / 100f);
+    if (bleed && Rand.num() < stanchChance) {
+      bleed = false;
+      person.world().events.log(person+" stopped bleeding.");
+    }
+  }
+  
+  
+  void onTurnEnd() {
+    if (bleed) {
+      receiveInjury(1);
+    }
+  }
+  
+  
+  public void updateHealth(float numWeeks) {
+    //
+    //  Note:  This is called regularly outside of Scenes, when an agent is
+    //  back at base.
     if (! alive()) return;
     if (conscious()) stun = 0;
     
-    float numWeeks = person.world().timing.hoursInTick();
     numWeeks /= World.DAYS_PER_WEEK * World.HOURS_PER_DAY;
-    
     int maxHealth = maxHealth();
-    float regen = maxHealth * numWeeks / FULL_HEAL_WEEKS;
-    injury = Nums.max(0, injury - regen);
+    float wakeLevel   = maxHealth * 100f / WAKEUP_PERCENT   ;
+    float bruiseLevel = maxHealth * 100f / HP_BRUISE_PERCENT;
+    float regen = maxHealth * numWeeks * 2f / FULL_HEAL_WEEKS;
     
-    if (conscious) {
+    if (totalHarm > 0) {
+      totalHarm = Nums.max(0, totalHarm - regen);
+      injury    = Nums.max(injury, totalHarm);
+    }
+    else injury = Nums.max(0, injury - regen);
+    
+    if (conscious()) {
       stress = Nums.max(0, stress - (int) (WEEK_STRESS_DECAY * numWeeks));
     }
+    else if (state == State.CRITICAL || state == State.CRIPPLED) {
+      conscious = false;
+      if (totalHarm == 0) {
+        setState(State.BRUISED);
+      }
+    }
     else {
-      float wakeUp = maxHealth * 100f / WAKEUP_PERCENT;
-      if (injury < wakeUp) conscious = true;
+      conscious = injury < wakeLevel;
+      if (injury < bruiseLevel) {
+        setState(State.HEALTHY);
+      }
+      else if (injury < wakeLevel) {
+        setState(State.BRUISED);
+      }
     }
   }
   
   
   void checkState() {
+    //
+    //  Note this is called during Scenes, after taking injuries, for example.
     int maxHealth = maxHealth();
+    
     if (conscious && injury + stun > maxHealth) {
       this.conscious = false;
       person.world().events.log(person+" fell unconscious!");
     }
-    if (alive && injury > maxHealth * 1.5f) {
-      this.alive = false;
+    if (healthy() && totalHarm > (maxHealth * HP_BRUISE_PERCENT / 100f)) {
+      setState(State.BRUISED);
+      person.world().events.log(person+" takes a beating!");
+    }
+    if (alive() && injury > (maxHealth * HP_DEATH_PERCENT / 100f)) {
+      setState(State.DECEASED);
       person.world().events.log(person+" was killed!");
     }
   }

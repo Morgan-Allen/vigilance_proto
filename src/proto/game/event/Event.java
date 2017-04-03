@@ -136,11 +136,21 @@ public abstract class Event implements Session.Saveable, Assignment {
   }
   
   
-  public void completeAfterScene(Scene scene, EventReport report) {
+  public void completeAfterScene(Scene scene, EventEffects effects) {
     for (Person perp : involved) perp.removeAssignment(this);
     involved.clear();
     complete = true;
     world.events.closeEvent(this);
+  }
+  
+  
+  public EventEffects generateEffects(Step step) {
+    return new EventEffects();
+  }
+  
+  
+  public EventEffects generateEffects(Scene scene) {
+    return new EventEffects();
   }
   
   

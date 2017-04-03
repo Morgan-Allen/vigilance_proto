@@ -315,7 +315,7 @@ public class SceneView extends UINode implements TileConstants {
     //
     //  And indicators for current conditions:
     float offC = 0;
-    for (Ability c : p.stats.allConditions()) {
+    for (Trait c : p.stats.allConditions()) {
       renderSprite(pos.x - 0.5f + offC, pos.y - 0.5f, 0.2f, 0.2f, 0, c.icon, g);
       offC += 0.2f;
     }

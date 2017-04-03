@@ -21,11 +21,6 @@ public class Person extends Element {
     HEROES, CIVILIANS, VILLAINS
   };
   
-  public static enum State {
-    HEALTHY, HOSPITALISED, CAPTIVE, DECEASED
-  }
-  
-  
   String name;
   
   final public PersonMind    mind    = new PersonMind   (this);
@@ -36,7 +31,6 @@ public class Person extends Element {
   final public PersonGear    gear    = new PersonGear   (this);
 
   Side side;
-  State state;
   Base base;
   Place resides;
   Scene scene;
@@ -89,7 +83,6 @@ public class Person extends Element {
     gear   .loadState(s);
 
     side    = (Side ) s.loadEnum(Side .values());
-    state   = (State) s.loadEnum(State.values());
     base    = (Base ) s.loadObject();
     resides = (Place) s.loadObject();
     scene   = (Scene) s.loadObject();
@@ -113,7 +106,6 @@ public class Person extends Element {
     gear   .saveState(s);
 
     s.saveEnum  (side   );
-    s.saveEnum  (state  );
     s.saveObject(base   );
     s.saveObject(resides);
     s.saveObject(scene  );
@@ -222,11 +214,6 @@ public class Person extends Element {
   }
   
   
-  public void setState(State state) {
-    this.state = state;
-  }
-  
-  
   public Base base() {
     return base;
   }
@@ -234,11 +221,6 @@ public class Person extends Element {
   
   public Place resides() {
     return resides;
-  }
-  
-  
-  public State state() {
-    return state;
   }
   
   
@@ -280,22 +262,24 @@ public class Person extends Element {
   public void updateInScene(boolean duringOwnTurn, Action doing) {
     if (duringOwnTurn) {
       actions.updateDuringTurn(doing);
-      stats.updateStats();
+      stats.updateStats(0);
     }
     else {
-      stats.updateStats();
+      stats.updateStats(0);
     }
   }
   
   
   public void onTurnStart() {
     actions.onTurnStart();
+    health .onTurnStart();
     stats  .onTurnStart();
   }
   
   
   public void onTurnEnd() {
     actions.onTurnEnd();
+    health .onTurnEnd();
     stats  .onTurnEnd();
   }
   
@@ -307,10 +291,11 @@ public class Person extends Element {
     for (Assignment a : assignments) {
       if (a.complete()) { removeAssignment(a); continue; }
     }
-    
-    health.updateHealth();
+
+    float numWeeks = world().timing.hoursInTick();
+    health.updateHealth(numWeeks);
     if (health.alive()) {
-      stats.updateStats();
+      stats.updateStats(numWeeks);
     }
   }
   

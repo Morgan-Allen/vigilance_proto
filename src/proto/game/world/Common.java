@@ -51,6 +51,12 @@ public class Common {
     COMMON_ITEMS[] = { UNARMED, UNARMOURED, STANDARD_MASK };
   
   
+  final public static Trait
+    BLEEDING = new Trait(
+      "Bleeding", "trait_bleeding", null, "Bleeding"
+    );
+  
+  
   final public static Ability
     
     MOVE = new Ability(

@@ -182,7 +182,7 @@ public class PersonStats {
       float base = person.kind().baseLevel(s);
       setLevel(s, base, true);
     }
-    updateStats();
+    updateStats(0);
   }
   
   
@@ -249,7 +249,7 @@ public class PersonStats {
   
   /**  Regular updates-
     */
-  void updateStats() {
+  void updateStats(float numWeeks) {
     
     //  These are all assumed to have averages of 5, ranging from 0 to 10.
     updateStat(MUSCLE  , -1, false);
@@ -389,14 +389,17 @@ public class PersonStats {
   }
   
   
-  public Series <Ability> allConditions() {
-    Batch <Ability> all = new Batch();
+  public Series <Trait> allConditions() {
+    Batch <Trait> all = new Batch();
     for (Condition c : conditions) {
       all.add(c.basis);
     }
     Action taken = person.actions.nextAction();
     if (taken != null && (taken.used.delayed() || ! taken.complete())) {
       all.add(taken.used);
+    }
+    if (person.health.bleeding()) {
+      all.add(Common.BLEEDING);
     }
     return all;
   }

@@ -63,7 +63,7 @@ public class Weapons {
       if (subtype() == SUBTYPE_HEAVY_GUN || subtype() == SUBTYPE_PRECISE_GUN) {
         Person mark = volley.targAsPerson();
         float trauma = minDamage + Rand.index(rangeDamage + 1);
-        mark.health.receiveTrauma(trauma / 2);
+        mark.health.incTotalHarm(trauma / 2);
         mark.health.toggleBleeding(true);
       }
       return;

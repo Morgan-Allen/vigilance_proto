@@ -72,7 +72,7 @@ public class TaskTrain extends Task {
       advanceTraining(p, timeHours);
       final int newLevel = p.stats.levelFor(trainNow);
       if (newLevel > oldLevel) {
-        p.stats.updateStats();
+        p.stats.updateStats(0);
         presentTrainingMessage(p);
       }
     }
