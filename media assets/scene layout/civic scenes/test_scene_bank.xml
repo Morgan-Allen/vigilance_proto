@@ -1,0 +1,376 @@
+
+<comment>
+  The various prop (object) definitions are pretty self-explanatory, but a
+  couple of notes:
+
+  Allowable subtypes are:
+    SUBTYPE_WALLING and SUBTYPE_FURNISH
+    (Walls are usually for partitions/exteriors, furniture for interiors.)
+
+  Allowable blockLevels are:
+    BLOCK_NONE, BLOCK_PARTIAL and BLOCK_FULL
+    (How easily a character can move through the object.)
+
+  Allowable blockSights are:
+    true and false
+    (Whether this blocks a character's vision.)
+</comment>
+
+
+<prop
+  name       = "Floor"
+  ID         = "civic_floor"
+  sprite     = "floor_marbel.png"
+  wide       = "1"
+  high       = "1"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+  blockSight = "false"
+/>
+
+<prop
+  name       = "Metall_floor"
+  ID         = "civic_metall_floor"
+  sprite     = "floor_metall.png"
+  wide       = "1"
+  high       = "1"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+  blockSight = "false"
+/>
+
+<prop
+  name       = "Wood_floor"
+  ID         = "civic_wood_floor"
+  sprite     = "floor_wood.png"
+  wide       = "1"
+  high       = "1"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+  blockSight = "false"
+/>
+
+
+<prop
+  name       = "Wall"
+  ID         = "civic_wall"
+  sprite     = "wall_thin.png"
+  wide       = "1"
+  high       = "0"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "true"
+/>
+
+<prop
+  name       = "Door"
+  ID         = "civic_door"
+  sprite     = "wall_thin_door.png"
+  wide       = "1"
+  high       = "0"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+  blockSight = "true"
+/>
+
+<prop
+  name       = "Window"
+  ID         = "civic_window"
+  sprite     = "wall_thin_window.png"
+  wide       = "1"
+  high       = "0"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "false"
+/>
+
+<prop
+  name       = "Safe_door"
+  ID         = "bank_safe_door"
+  sprite     = "vault_door.png"
+  wide       = "1"
+  high       = "3"
+  subtype    = "SUBTYPE_FURNISH"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "true"
+/>
+
+<prop
+  name       = "Gold_bars"
+  ID         = "bank_gold_bars"
+  sprite     = "gold_bars.png"
+  wide       = "1"
+  high       = "1"
+  subtype    = "SUBTYPE_FURNISH"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "false"
+/>
+
+<prop
+  name       = "Money_stacks"
+  ID         = "bank_money_stacks"
+  sprite     = "money_stacks.png"
+  wide       = "1"
+  high       = "1"
+  subtype    = "SUBTYPE_FURNISH"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "false"
+/>
+
+<prop
+  name       = "Teller_screen"
+  ID         = "bank_teller_screen"
+  sprite     = "teller_screen_2.png"
+  wide       = "2"
+  high       = "1"
+  subtype    = "SUBTYPE_FURNISH"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "false"
+/>
+
+<prop
+  name       = "Small table"
+  ID         = "bank_small_table"
+  sprite     = "box.png"
+  wide       = "1"
+  high       = "1"
+  subtype    = "SUBTYPE_FURNISH"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "false"
+/>
+
+<prop
+  name       = "Table"
+  ID         = "bank_table"
+  sprite     = "desk.png"
+  wide       = "2"
+  high       = "1"
+  subtype    = "SUBTYPE_FURNISH"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "false"
+/>
+
+<prop
+  name       = "Chair"
+  ID         = "bank_chair"
+  sprite     = "green_chair.png"
+  wide       = "1"
+  high       = "1"
+  subtype    = "SUBTYPE_FURNISH"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "false"
+/>
+
+<prop
+  name       = "Plant 1"
+  ID         = "bank_plant_1"
+  sprite     = "plant_1.png"
+  wide       = "1"
+  high       = "1"
+  subtype    = "SUBTYPE_FURNISH"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "false"
+/>
+
+<prop
+  name       = "Plant 2"
+  ID         = "bank_plant_2"
+  sprite     = "plant_2.png"
+  wide       = "1"
+  high       = "1"
+  subtype    = "SUBTYPE_FURNISH"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "false"
+/>
+
+<comment>
+  A scene is defined by it's name, ID, width, height (which are required) and
+  object-types for the floor, wall, door and windows.
+
+  Note:  walls, doors, windows and even the floor-type are optional (though you
+  might get a crash if you try to add walls without a wall-type?)
+
+  Fixed scenes define a grid, including a map between index-numbers and object-
+  types for furniture.  The grid then specifies contents for each x/y point
+  within it's width and height.  (Each point should be separated by whitespace,
+  but the amount doesn't matter.)
+
+
+  Refer to an object in a given space by it's index.  Use n(orth), e(ast),
+  s(outh) and w(est) to rotate an object by 0, 90, 180 or 270 degrees.
+
+  If you want to leave a space blank, just leave a period (.)
+
+  Note:  For objects more than 1 tile wide or high, you only need to mark the
+  top-left corner of the object before rotation.  Other spaces the object might
+  fill can be blank.
+
+  Example 1:
+    .  .  .
+    .  2s 1
+    .  .  .
+
+    This will create a 3x3 area with an object of type 1 on the right and an
+    object of type 2, rotated 180 degrees, in the middle.
+
+
+  Use these characters to add walls/doors/windows to a particular space:
+  Wall Left:    [
+  Wall Bottom:  _
+  Wall Right:   ]
+  Wall Top:     ‾
+  Window:       '
+  Door:         /
+
+  Example 2:
+    [‾ ‾  ‾  ‾]
+    [  1  .   ]'
+    [  .  2e  ]/
+    [_ _  _  _]
+
+    This will create a walled-in 4x4 area with an object of type 1 toward the
+    top-left corner, one of type 2 toward the bottom-right rotated by 90
+    degrees, and a door and window on the right wall.
+
+</comment>
+
+
+<scene
+  name   = "Safe vault"
+  ID     = "civic_scene_safe_vault"
+  wide   = "6"
+  high   = "6"
+  floor  = "civic_metall_floor"
+  wall   = "civic_wall"
+  door   = "civic_door"
+  window = "civic_window"
+>
+  <grid
+    1 = "bank_safe_door"
+    2 = "bank_gold_bars"
+    3 = "bank_money_stacks"
+  >
+    [‾  ‾  ‾ ‾]  .   .
+    [2  .  .  3]  .  .
+    [2  .  .  .   1  .
+    [2  .  3  .   .  .
+    [2  .  3  .   .  .
+    [_   _  _ _]  .  .
+  </grid>
+</scene>
+
+
+<scene
+  name   = "General Screens"
+  ID     = "civic_scene_general_screens"
+  wide   = "6"
+  high   = "6"
+  floor  = "civic_wood_floor"
+  wall   = "civic_wall"
+  door   = "civic_door"
+  window = "civic_window"
+>
+  <grid
+    1 = "bank_chair"
+    2 = "bank_small_table"
+    3 = "bank_plant_1"
+    4 = "bank_plant_2"
+    5 = "bank_teller_screen"
+  >
+    3  .  1  2  1  .
+    .  .  .  .  .  .
+    .  .  .  .  .  .
+    .  .  .  .  .  .
+    5s .  5s .  5s .
+    .  .  .  4  .  .
+  </grid>
+</scene>
+
+<scene
+  name   = "General Seatings"
+  ID     = "civic_scene_general_seatings"
+  wide   = "6"
+  high   = "6"
+  floor  = "civic_wood_floor"
+  wall   = "civic_wall"
+  door   = "civic_door"
+  window = "civic_window"
+>
+  <grid
+    1 = "bank_plant_1"
+    2 = "bank_plant_2"
+    3 = "bank_chair"
+    4 = "bank_table"
+    5 = "bank_small_table"
+  >
+    .  2  3  5  3  1
+    .  .  .  .  .  .
+    .  .  .  .  .  .
+    .  3  .  .  3  .
+    .  4  .  .  4  .
+    .  . 3s  .  . 3s
+  </grid>
+</scene>
+
+
+<comment>
+  This defines a composite scene.  Composite scenes are put together like
+  jigsaws from other, smaller scenes, in a semi-random order.  You can specify
+  units that reference another scene's ID, and add some parameters that control
+  how often that unit will be used.
+
+  Priorities allowed are:
+    PRIORITY_HIGH, PRIORITY_MEDIUM, PRIORITY_LOW
+    Units with high priority are added before units with low priority.
+
+  Wall-policies allowed are:
+    WALL_NONE, WALL_EXTERIOR, WALL_INTERIOR
+    A unit with 'wall none' will have no walls added.  A unit with 'wall
+    exterior' will have walls added only on the outside of the building.  And
+    a unit with 'wall interior' will be surrounded with walls, even inside the
+    building.
+
+  'minCount' and 'maxCount' place upper/lower limits on how many of that unit
+  will appear, and 'percent' specifies how many should appear as a fraction of
+  total units.  You don't have to specify both.
+
+  Note:  This part is still kind of experimental, so if you have any requests
+  or complaints let me know.  (We could also skip it entirely if it's causing
+  problems, and just use grid-based scenes for now.)
+
+</comment>
+
+
+<scene
+  name           = "Civic Test Structure"
+  ID             = "civic_test_structure"
+  unitSize       = "6"
+  maxUnitsAcross = "2"
+  floor          = "civic_floor"
+  wall           = "civic_wall"
+  door           = "civic_door"
+  window         = "civic_window"
+>
+  <unit
+    typeID   = "civic_scene_safe_vault"
+    wall     = "WALL_INTERIOR"
+    priority = "PRIORITY_HIGH"
+    minCount = "1"
+    maxCount = "2"
+    percent  = "20"
+  />
+  <unit
+    typeID   = "civic_scene_general_seatings"
+    wall     = "WALL_EXTERIOR"
+    priority = "PRIORITY_LOW"
+    percent  = "50"
+  />
+
+  <unit
+    typeID   = "civic_scene_general_screens"
+    wall     = "WALL_EXTERIOR"
+    priority = "PRIORITY_LOW"
+    percent  = "50"
+  />
+
+</scene>

@@ -7,7 +7,7 @@
 
 <sceneTest
   basePath = "media assets/scene layout/civic scenes/"
-  fileName = "test_scene.xml"
+  fileName = "test_scene_bank.xml"
   sceneID  = "civic_test_structure"
   size     = "12"
 >
