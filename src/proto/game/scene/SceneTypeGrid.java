@@ -228,10 +228,18 @@ public class SceneTypeGrid extends SceneType {
     }
     for (Wall wall : g.walls) {
       Batch <WallPiece> canDoor = new Batch();
-      for (WallPiece p : wall.pieces) if (p.wall != null) {
-        if (canInsertDoor(p.x, p.y, 1, 0, scene)) canDoor.add(p);
-        if (canInsertDoor(p.x, p.y, 0, 1, scene)) canDoor.add(p);
+      
+      wallLoop: for (WallPiece p : wall.pieces) if (p.wall != null) {
+        if (sceneBlocked(p.x, p.y, scene)) continue wallLoop;
+        for (int dir : T_ADJACENT) {
+          int nX = p.x + T_X[dir], nY = p.y + T_Y[dir];
+          if (areaUnder(nX, nY, g) != areaUnder(p.x, p.y, g)) {
+            if (sceneBlocked(nX, nY, scene)) continue wallLoop;
+          }
+        }
+        canDoor.add(p);
       }
+      
       if (! canDoor.empty()) {
         WallPiece d = (WallPiece) Rand.pickFrom(canDoor);
         WallPiece w = (WallPiece) Rand.pickFrom(canDoor);
@@ -294,21 +302,14 @@ public class SceneTypeGrid extends SceneType {
   }
   
   
-  boolean canInsertDoor(int x, int y, int dx, int dy, Scene s) {
-    if (this.door == null) return false;
-    if (sceneBlocked(x + dx, y + dy, s)) return false;
-    if (sceneBlocked(x - dx, y - dy, s)) return false;
-    return true;
-  }
-  
-  
   boolean sceneBlocked(int x, int y, Scene s) {
     Tile at = s.tileAt(x, y);
     if (at == null) return true;
-    return at.blocked() || at.opaque();
+    return at.blockageVal(CENTRE) > 0 || at.opaque();
   }
   
 }
+
 
 
 

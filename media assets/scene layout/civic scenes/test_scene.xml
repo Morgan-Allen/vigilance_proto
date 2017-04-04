@@ -4,8 +4,9 @@
   couple of notes:
   
   Allowable subtypes are:
-    SUBTYPE_WALLING and SUBTYPE_FURNISH
-    (Walls are usually for partitions/exteriors, furniture for interiors.)
+    SUBTYPE_WALLING, SUBTYPE_FURNISH and SUBTYPE_DETAIL
+    (Walls are usually for partitions/exteriors, furniture for interiors, and
+    details for small objects that you want rendered on top of furniture.)
   
   Allowable blockLevels are:
     BLOCK_NONE, BLOCK_PARTIAL and BLOCK_FULL

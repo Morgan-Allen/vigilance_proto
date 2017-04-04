@@ -37,7 +37,8 @@ public class Kind extends Index.Entry implements Session.Saveable {
     
     SUBTYPE_WALLING = 0,
     SUBTYPE_FURNISH = 1,
-    SUBTYPE_EFFECT  = 2,
+    SUBTYPE_DETAIL  = 2,
+    SUBTYPE_EFFECT  = 3,
     
     SUBTYPE_HEAVY_GUN   = 0,
     SUBTYPE_PRECISE_GUN = 1,
@@ -53,11 +54,15 @@ public class Kind extends Index.Entry implements Session.Saveable {
   final public static int
     BLOCK_NONE    = 0,
     BLOCK_PARTIAL = 1,
-    BLOCK_FULL    = 2;
+    BLOCK_FULL    = 2,
+    PRIORITY_LOW  = 0,
+    PRIORITY_NORM = 1,
+    PRIORITY_HIGH = 2;
   
   String name;
   String defaultInfo;
   Image sprite;
+  int renderPriority;
   
   int type, subtype;
   int wide, high;
@@ -91,6 +96,7 @@ public class Kind extends Index.Entry implements Session.Saveable {
     this.high = high;
     this.blockLevel = blockLevel;
     this.blockSight = blockSight;
+    this.renderPriority = blockLevel + (blockSight ? 1 : 0);
     this.type    = type   ;
     this.subtype = subtype;
     initStatsFor(this, initStats);
@@ -146,6 +152,9 @@ public class Kind extends Index.Entry implements Session.Saveable {
   }
   
   
+  
+  /**  Generic type-data access methods-
+    */
   protected static Integer numberAt(int index, Object args[]) {
     if (index < 0 || index >= args.length) return null;
     Object arg = args[index];
@@ -175,10 +184,13 @@ public class Kind extends Index.Entry implements Session.Saveable {
   
   public String name  () { return name  ; }
   public Image  sprite() { return sprite; }
+  public int renderPriority() { return renderPriority; }
   public String defaultInfo() { return defaultInfo; }
   public String toString() { return name; }
   
   
+  /*  Other setup-related helper methods-
+   */
   public static Image loadImage(String imgPath) {
     if (imgPath == null) return null;
     try { return ImageIO.read(new File(imgPath)); }

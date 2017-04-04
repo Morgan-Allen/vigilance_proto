@@ -36,6 +36,11 @@ public class PropType extends Kind {
   }
   
   
+  public boolean detail() {
+    return subtype() == Kind.SUBTYPE_DETAIL;
+  }
+  
+  
   public boolean effect() {
     return subtype() == Kind.SUBTYPE_EFFECT;
   }

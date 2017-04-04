@@ -143,72 +143,76 @@ public class SceneFromXML implements TileConstants {
     String wallID   = sceneNode.value ("wall"  );
     String doorID   = sceneNode.value ("door"  );
     String windowID = sceneNode.value ("window");
-    XML    gridXML  = sceneNode.child ("grid"  );
-    //
-    //  The arguments for the grid node are assumed to map numbers to
-    //  prop-types, so we extract those into an indexed array.
-    String gridArgs[] = gridXML.args();
-    PropType types[] = new PropType[gridArgs.length];
+    
     PropType
       floor  = propWithID(floorID , file, filePath),
       wall   = propWithID(wallID  , file, filePath),
       door   = propWithID(doorID  , file, filePath),
       window = propWithID(windowID, file, filePath);
-    for (int i = types.length; i-- > 0;) {
-      int index = Integer.parseInt(gridArgs[i]) - 1;
-      types[index] = propWithID(gridXML.value(gridArgs[i]), file, filePath);
-    }
-    //
-    //  The content of the grid node represent the x/y position of those props,
-    //  as represented by index.  First we break down the tokens-
-    StringTokenizer t = new StringTokenizer(gridXML.content(), ", \n", false);
-    final List <String> tokens = new List();
-    while (t.hasMoreTokens()) tokens.add(t.nextToken());
-    //
-    //  Then populate the scene while iterating over possible grid positions-
     SceneTypeFixed sceneType = new SceneTypeFixed(name, ID, wide, high);
     sceneType.floors  = floor ;
     sceneType.borders = wall  ;
     sceneType.door    = door  ;
     sceneType.window  = window;
-    for (Coord c : Visit.grid(0, 0, wide, high, 1)) try {
+    
+    for (XML gridXML : sceneNode.allChildrenMatching("grid")) {
       //
-      //  We skip over any empty positions, and check to see if there's a
-      //  numeric type index present, along with markers for doors and windows:
-      if (tokens.empty()) break;
-      String token = tokens.removeFirst().toLowerCase();
-      int portI = matchIndex(token, '/', '\'');
-      char wallChars[] = {'‾',']','_','['};
-      int typeIndex = parseIndex(token) - 1;
-      PropType placed = null;
-      //
-      //  For each wall-marker present, we generate a wall-prop with the
-      //  correct facing (and as a door or window if appropriate):
-      for (int i = 4; i-- > 0;) {
-        if (matchIndex(token, wallChars[i]) == -1) continue;
-        int dir = T_ADJACENT[i];
-        PropType type = wall;
-        if (portI == 0) type = door;
-        if (portI == 1) type = window;
-        sceneType.attachPlacing(type, c.y, c.x, dir);
+      //  The arguments for the grid node are assumed to map numbers to
+      //  prop-types, so we extract those into an indexed array.
+      String gridArgs[] = gridXML.args();
+      PropType types[] = new PropType[gridArgs.length];
+      for (int i = types.length; i-- > 0;) {
+        int index = Integer.parseInt(gridArgs[i]) - 1;
+        types[index] = propWithID(gridXML.value(gridArgs[i]), file, filePath);
       }
       //
-      //  If a numeric type-index was detected, we check if a particular facing
-      //  was specified, and add that to the scene-
-      if (typeIndex >= 0) {
-        int dir = matchIndex(token, 'n','e','s','w');
-        if (dir == -1) dir = N;
-        else dir = T_ADJACENT[dir];
-        placed = types[typeIndex];
-        sceneType.attachPlacing(placed, c.y, c.x, dir);
-      }
+      //  The content of the grid node represent the x/y position of those
+      //  props, as represented by index.  First we break down the tokens-
+      StringTokenizer t = new StringTokenizer(gridXML.content(), ", \n", false);
+      final List <String> tokens = new List();
+      while (t.hasMoreTokens()) tokens.add(t.nextToken());
       //
-      //  Finally, include flooring (if you haven't already):
-      if (placed == null || placed != floor) {
-        sceneType.attachPlacing(floor, c.y, c.x, N);
+      //  Then populate the scene while iterating over possible grid positions-
+      for (Coord c : Visit.grid(0, 0, wide, high, 1)) try {
+        //
+        //  We skip over any empty positions, and check to see if there's a
+        //  numeric type index present, along with markers for doors and
+        //  windows:
+        if (tokens.empty()) break;
+        String token = tokens.removeFirst().toLowerCase();
+        int portI = matchIndex(token, '/', '\'');
+        char wallChars[] = {'‾',']','_','['};
+        int typeIndex = parseIndex(token) - 1;
+        PropType placed = null;
+        //
+        //  For each wall-marker present, we generate a wall-prop with the
+        //  correct facing (and as a door or window if appropriate):
+        for (int i = 4; i-- > 0;) {
+          if (matchIndex(token, wallChars[i]) == -1) continue;
+          int dir = T_ADJACENT[i];
+          PropType type = wall;
+          if (portI == 0) type = door;
+          if (portI == 1) type = window;
+          sceneType.attachPlacing(type, c.y, c.x, dir);
+        }
+        //
+        //  If a numeric type-index was detected, we check if a particular
+        //  facing was specified, and add that to the scene-
+        if (typeIndex >= 0) {
+          int dir = matchIndex(token, 'n','e','s','w');
+          if (dir == -1) dir = N;
+          else dir = T_ADJACENT[dir];
+          placed = types[typeIndex];
+          sceneType.attachPlacing(placed, c.y, c.x, dir);
+        }
+        //
+        //  Finally, include flooring (if you haven't already):
+        if (placed == null || placed != floor) {
+          sceneType.attachPlacing(floor, c.y, c.x, N);
+        }
       }
+      catch (Exception e) { I.report(e); break; }
     }
-    catch (Exception e) { I.report(e); break; }
     //
     //  And finally, return the initialised type:
     return sceneType;

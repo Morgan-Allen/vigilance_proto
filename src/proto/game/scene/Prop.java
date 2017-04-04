@@ -222,12 +222,12 @@ public class Prop extends Element implements TileConstants {
   
   
   public int renderPriority() {
-    return blockLevel() + (kind().thin() || kind().effect() ? 5 : 0);
+    PropType kind = kind();
+    int priority = kind.renderPriority();
+    if (kind.thin() || kind.effect() || kind.detail()) priority += 5;
+    return priority;
   }
 }
-
-
-
 
 
 
