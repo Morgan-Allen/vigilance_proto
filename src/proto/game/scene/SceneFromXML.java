@@ -85,7 +85,7 @@ public class SceneFromXML implements TileConstants {
   }
   
   
-  static SceneTypeGrid gridSceneFrom(
+  static SceneTypeComp gridSceneFrom(
     XML sceneNode, String filePath, String ID
   ) {
     XML    file     = sceneNode.parent();
@@ -96,18 +96,18 @@ public class SceneFromXML implements TileConstants {
     String windowID = sceneNode.value("window");
     
     XML unitXML[] = sceneNode.allChildrenMatching("unit");
-    Batch <SceneTypeGrid.Unit> units = new Batch();
+    Batch <SceneTypeComp.Unit> units = new Batch();
     
     for (XML u : unitXML) {
       SceneType type = sceneWithID(u.value("typeID"), file, filePath);
-      int wallType = Kind.loadField(u.value("wall"    ), SceneTypeGrid.class);
-      int priority = Kind.loadField(u.value("priority"), SceneTypeGrid.class);
+      int wallType = Kind.loadField(u.value("wall"    ), SceneTypeComp.class);
+      int priority = Kind.loadField(u.value("priority"), SceneTypeComp.class);
       int percent  = getInt(u, "percent" , -1);
       int minCount = getInt(u, "minCount", -1);
       int maxCount = getInt(u, "maxCount", -1);
       
-      SceneTypeGrid.Unit unit = SceneTypeGrid.unit(
-        (SceneTypeFixed) type, wallType,
+      SceneTypeComp.Unit unit = SceneTypeComp.unit(
+        (SceneTypeGrid) type, wallType,
         priority, percent, minCount, maxCount
       );
       if (unit != null) units.add(unit);
@@ -121,16 +121,16 @@ public class SceneFromXML implements TileConstants {
       door   = propWithID(doorID  , file, filePath),
       window = propWithID(windowID, file, filePath);
     
-    SceneTypeGrid sceneType = new SceneTypeGrid(
+    SceneTypeComp sceneType = new SceneTypeComp(
       name, ID, unitSize, maxUA,
       wall, door, window, floor,
-      units.toArray(SceneTypeGrid.Unit.class)
+      units.toArray(SceneTypeComp.Unit.class)
     );
     return sceneType;
   }
   
   
-  static SceneTypeFixed fixedSceneFrom(
+  static SceneTypeGrid fixedSceneFrom(
     XML sceneNode, String filePath, String ID
   ) {
     //
@@ -149,7 +149,7 @@ public class SceneFromXML implements TileConstants {
       wall   = propWithID(wallID  , file, filePath),
       door   = propWithID(doorID  , file, filePath),
       window = propWithID(windowID, file, filePath);
-    SceneTypeFixed sceneType = new SceneTypeFixed(name, ID, wide, high);
+    SceneTypeGrid sceneType = new SceneTypeGrid(name, ID, wide, high);
     sceneType.floors  = floor ;
     sceneType.borders = wall  ;
     sceneType.door    = door  ;

@@ -14,7 +14,7 @@ import static proto.content.places.UrbanScenes.*;
 public class DebugSceneGrid extends RunGame {
   
   
-  final public static SceneType GRID_TEST_SCENE = new SceneTypeFixed(
+  final public static SceneType GRID_TEST_SCENE = new SceneTypeGrid(
     "fixed test scene", "type_urban_scene_fixed",
     KIND_FLOOR,
     new PropType[] {
