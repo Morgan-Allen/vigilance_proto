@@ -137,8 +137,6 @@ public class SceneTypeGrid extends SceneType {
     Scene scene, int offX, int offY, int facing,
     int resolution
   ) {
-    //offX -= (wide - resolution) / 2;
-    //offY -= (high - resolution) / 2;
     Coord temp = new Coord();
     if (borderBounds(scene, offX, offY, facing, resolution) == null) {
       return false;
@@ -175,10 +173,7 @@ public class SceneTypeGrid extends SceneType {
     Scene scene, int offX, int offY, int facing, int resolution,
     boolean forTesting
   ) {
-    //offX -= (wide - resolution) / 2;
-    //offY -= (high - resolution) / 2;
     Coord temp = new Coord();
-    
     for (Placing p : placings) {
       temp.x = p.x;
       temp.y = p.y;
@@ -187,6 +182,8 @@ public class SceneTypeGrid extends SceneType {
       temp.y += offY;
       
       int propDir = (p.facing + facing) % 8;
+      if (p.type == floors) propDir = N;
+      
       if (Prop.hasSpace(scene, p.type, temp.x, temp.y, propDir)) {
         scene.addProp(p.type, temp.x, temp.y, propDir);
       }

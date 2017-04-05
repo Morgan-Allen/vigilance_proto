@@ -112,10 +112,15 @@ public class Prop extends Element implements TileConstants {
   }
   
   
+  private static boolean couldBlock(PropType kind) {
+    return kind.blockSight() || kind.blockLevel() > 0;
+  }
+  
+  
   public static boolean hasSpace(
     Scene scene, PropType kind, int x, int y, int facing
   ) {
-    boolean thin = kind.thin(), blocks = kind.blockLevel() > 0;
+    boolean thin = kind.thin(), blocks = couldBlock(kind);
     int faceAt = thin ? ((facing + 6) % 8) : CENTRE;
     
     for (Tile under : tilesUnder(kind, scene, x, y, facing, 0)) {
@@ -134,7 +139,7 @@ public class Prop extends Element implements TileConstants {
     if (origin == null) I.complain("Origin outside bounds!");
     
     final PropType kind = kind();
-    final boolean thin = kind.thin(), blocks = kind.blockLevel() > 0;
+    final boolean thin = kind.thin(), blocks = couldBlock(kind);
     int faceAt = thin ? ((facing + 6) % 8) : CENTRE;
     
     for (Tile under : tilesUnder(kind, scene, x, y, facing, 0)) {

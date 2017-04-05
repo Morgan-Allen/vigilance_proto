@@ -42,6 +42,8 @@ public class DebugSceneXML extends RunGame {
     Base    player    = new Base(Facilities.MANOR, world, owns);
     world.addBase(player, true);
     
+    Tile.printWallsMask(scene);
+    
     Person toSelect = null;
     
     for (XML agentXML : SCENE_XML.allChildrenMatching("agent")) {

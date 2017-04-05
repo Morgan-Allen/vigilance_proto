@@ -282,6 +282,7 @@ public class SceneView extends UINode implements TileConstants {
     }
     //
     //  Finally, some supplementary debugging-related checks:
+    //GameSettings.debugLineSight = true;
     if (
       GameSettings.debugLineSight && I.used60Frames &&
       zoomTile != null && zoomTile == hoverTile &&

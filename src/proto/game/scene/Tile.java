@@ -190,22 +190,34 @@ public class Tile implements Session.Saveable {
     float eastY = solveY(origin, line, x + 1);
     
     if (nortX >= 0) {
-      if (report) I.say("    Intersects Y="+(y + 0)+" at "+nortX);
+      if (report) {
+        I.say("    Intersects Y="+(y + 0)+" at "+nortX);
+        I.add("  Filling is: "+filling(W));
+      }
       maxVal = Nums.max(maxVal, fillVal);
       maxVal = Nums.max(maxVal, wallVal(W, valID));
     }
     if (soutX >= 0) {
-      if (report) I.say("    Intersects Y="+(y + 1)+" at "+soutX);
+      if (report) {
+        I.say("    Intersects Y="+(y + 1)+" at "+soutX);
+        I.add("  Filling is: "+filling(E));
+      }
       maxVal = Nums.max(maxVal, fillVal);
       maxVal = Nums.max(maxVal, wallVal(E, valID));
     }
     if (westY >= 0) {
-      if (report) I.say("    Intersects X="+(x + 0)+" at "+westY);
+      if (report) {
+        I.say("    Intersects X="+(x + 0)+" at "+westY);
+        I.add("  Filling is: "+filling(S));
+      }
       maxVal = Nums.max(maxVal, fillVal);
       maxVal = Nums.max(maxVal, wallVal(S, valID));
     }
     if (eastY >= 0) {
-      if (report) I.say("    Intersects X="+(x + 1)+" at "+eastY);
+      if (report) {
+        I.say("    Intersects X="+(x + 1)+" at "+eastY);
+        I.add("  Filling is: "+filling(N));
+      }
       maxVal = Nums.max(maxVal, fillVal);
       maxVal = Nums.max(maxVal, wallVal(N, valID));
     }
