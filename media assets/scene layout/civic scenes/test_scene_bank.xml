@@ -71,7 +71,7 @@
 <prop
   name       = "Vault Door"
   ID         = "bank_vault_door"
-  sprite     = "vault_door.png"
+  sprite     = "vault_door_lighter.png"
   wide       = "1"
   high       = "3"
   subtype    = "SUBTYPE_FURNISH"
@@ -83,6 +83,17 @@
   name       = "Vault Wall"
   ID         = "bank_vault_wall"
   sprite     = "vault_wall.png"
+  wide       = "1"
+  high       = "1"
+  subtype    = "SUBTYPE_FURNISH"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "true"
+/>
+
+<prop
+  name       = "Vault Wall Corner"
+  ID         = "bank_vault_wall_corner"
+  sprite     = "vault_wall_corner.png"
   wide       = "1"
   high       = "1"
   subtype    = "SUBTYPE_FURNISH"
@@ -189,7 +200,7 @@
   subtype    = "SUBTYPE_DETAIL"
   blockLevel = "BLOCK_NONE"
   blockSight = "false"
-  
+
 />
 
 
@@ -218,13 +229,14 @@
     2 = "bank_vault_wall"
     3 = "bank_gold_bars"
     4 = "bank_money_stacks"
+    5 = "bank_vault_wall_corner"
   >
-    2   2   2   2   2e  . . 2w 2  2  2  2
+    5w  2   2   2   5   . . 5w 2  2  2  5
     2w  4   4   4   2e  . . .  .  4  4  2e
     2w  3   .   .   1   . . .  .  .  3  2e
     2w  3   .   .   .   . . 1s .  .  3  2e
-    2w  3   .   .   .   . . 2w 2s 2s 2s 2s
-    2s  2s  2s  2s  2e  . . .  .  .  .  .
+    2w  3   .   .   .   . . 5s 2s 2s 2s 5e
+    5s  2s  2s  2s  5e   . . .  .  .  .  .
   </grid>
 </scene>
 
@@ -250,9 +262,9 @@
     .  .  .  .  .  .
     .  3  1  6  1  .
     .  .  .  .  .  .
-    .  .  .  .  .  .
-    [ 5s  . 5s  ‾/ 2‾]
-    [_ _  _  _  _/  _]
+    .  .  .  .  .  4
+    [ 5s  . 5s  ‾/  ]
+    [_ _  _  _  _/ _]
   </grid>
 </scene>
 
@@ -317,4 +329,3 @@
     percent  = "50"
   />
 </scene>
-
