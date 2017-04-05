@@ -54,10 +54,7 @@ public class Kind extends Index.Entry implements Session.Saveable {
   final public static int
     BLOCK_NONE    = 0,
     BLOCK_PARTIAL = 1,
-    BLOCK_FULL    = 2,
-    PRIORITY_LOW  = 0,
-    PRIORITY_NORM = 1,
-    PRIORITY_HIGH = 2;
+    BLOCK_FULL    = 2;
   
   String name;
   String defaultInfo;

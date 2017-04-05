@@ -96,7 +96,7 @@ public class SceneFromXML implements TileConstants {
     String windowID = sceneNode.value("window");
     
     XML unitXML[] = sceneNode.allChildrenMatching("unit");
-    Batch <SceneTypeGrid.GridUnit> units = new Batch();
+    Batch <SceneTypeGrid.Unit> units = new Batch();
     
     for (XML u : unitXML) {
       SceneType type = sceneWithID(u.value("typeID"), file, filePath);
@@ -106,7 +106,7 @@ public class SceneFromXML implements TileConstants {
       int minCount = getInt(u, "minCount", -1);
       int maxCount = getInt(u, "maxCount", -1);
       
-      SceneTypeGrid.GridUnit unit = SceneTypeGrid.unit(
+      SceneTypeGrid.Unit unit = SceneTypeGrid.unit(
         (SceneTypeFixed) type, wallType,
         priority, percent, minCount, maxCount
       );
@@ -124,7 +124,7 @@ public class SceneFromXML implements TileConstants {
     SceneTypeGrid sceneType = new SceneTypeGrid(
       name, ID, unitSize, maxUA,
       wall, door, window, floor,
-      units.toArray(SceneTypeGrid.GridUnit.class)
+      units.toArray(SceneTypeGrid.Unit.class)
     );
     return sceneType;
   }
@@ -171,17 +171,17 @@ public class SceneFromXML implements TileConstants {
       StringTokenizer t = new StringTokenizer(gridXML.content(), ", \n", false);
       final List <String> tokens = new List();
       while (t.hasMoreTokens()) tokens.add(t.nextToken());
+      char wallChars[] = {'‾',']','_','['}, dirChars[] = {'n','e','s','w'};
       //
       //  Then populate the scene while iterating over possible grid positions-
-      for (Coord c : Visit.grid(0, 0, wide, high, 1)) try {
+      for (Coord c : Visit.grid(0, 0, high, wide, 1)) try {
         //
         //  We skip over any empty positions, and check to see if there's a
         //  numeric type index present, along with markers for doors and
         //  windows:
         if (tokens.empty()) break;
         String token = tokens.removeFirst().toLowerCase();
-        int portI = matchIndex(token, '/', '\'');
-        char wallChars[] = {'‾',']','_','['};
+        int portI     = matchIndex(token, '/', '\'');
         int typeIndex = parseIndex(token) - 1;
         PropType placed = null;
         //
@@ -199,7 +199,7 @@ public class SceneFromXML implements TileConstants {
         //  If a numeric type-index was detected, we check if a particular
         //  facing was specified, and add that to the scene-
         if (typeIndex >= 0) {
-          int dir = matchIndex(token, 'n','e','s','w');
+          int dir = matchIndex(token, dirChars);
           if (dir == -1) dir = N;
           else dir = T_ADJACENT[dir];
           placed = types[typeIndex];

@@ -9,7 +9,7 @@
   basePath = "media assets/scene layout/civic scenes/"
   fileName = "test_scene_bank.xml"
   sceneID  = "civic_test_structure"
-  size     = "12"
+  size     = "18"
 >
   <agent
     ID     = "hero_kind_phobos"

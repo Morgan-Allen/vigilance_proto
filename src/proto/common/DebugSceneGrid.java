@@ -11,10 +11,10 @@ import static proto.content.places.UrbanScenes.*;
 
 
 
-public class DebugSceneFixed extends RunGame {
+public class DebugSceneGrid extends RunGame {
   
   
-  final public static SceneType FIXED_TEST_SCENE = new SceneTypeFixed(
+  final public static SceneType GRID_TEST_SCENE = new SceneTypeFixed(
     "fixed test scene", "type_urban_scene_fixed",
     KIND_FLOOR,
     new PropType[] {
@@ -44,7 +44,7 @@ public class DebugSceneFixed extends RunGame {
     GameSettings.reportWorldInit = false;
     //GameSettings.viewSceneBlocks = true;
     //GameSettings.debugLineSight  = true;
-    runGame(new DebugSceneFixed(), "saves/debug_scene_fixed");
+    runGame(new DebugSceneGrid(), "saves/debug_scene_grid");
   }
   
   
@@ -56,7 +56,7 @@ public class DebugSceneFixed extends RunGame {
     final Scene mission = new Scene(world, 12);
     mission.setupScene(true);
     //*
-    SceneType sceneType = FIXED_TEST_SCENE;
+    SceneType sceneType = GRID_TEST_SCENE;
     sceneType.applyToScene(mission, 2, 2, TileConstants.E, 8, true);
     for (int y = mission.size() - 1; y-- > 1;) {
       PropType kind = y == 6 ? KIND_DOOR : KIND_WALL;

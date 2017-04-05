@@ -7,7 +7,7 @@
     	basedir="bin"
     >
       <manifest>
-        <attribute name="Main-Class" value="proto.common.DebugSceneFile"/>
+        <attribute name="Main-Class" value="proto.common.DebugSceneXML"/>
       </manifest>
     </jar>
   </target>

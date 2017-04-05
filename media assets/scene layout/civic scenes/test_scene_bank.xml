@@ -195,8 +195,8 @@
 
 <scene
   name   = "Safe Vault"
-  ID     = "civic_scene_safe_vault"
-  wide   = "6"
+  ID     = "bank_scene_safe_vault"
+  wide   = "12"
   high   = "6"
   wall   = "civic_wall"
   door   = "civic_door"
@@ -206,12 +206,12 @@
     1 = "civic_metal_floor"
     2 = "civic_floor"
   >
-    1 1 1 1 2 2
-    1 1 1 1 2 2
-    1 1 1 1 2 2
-    1 1 1 1 2 2
-    1 1 1 1 2 2
-    1 1 1 1 2 2
+    1 1 1 1 1 2  2 1 1 1 1 1
+    1 1 1 1 1 2  2 1 1 1 1 1
+    1 1 1 1 1 2  2 1 1 1 1 1
+    1 1 1 1 1 2  2 1 1 1 1 1
+    1 1 1 1 1 2  2 1 1 1 1 1
+    1 1 1 1 1 2  2 2 2 2 2 2
   </grid>
   <grid
     1 = "bank_vault_door"
@@ -219,19 +219,19 @@
     3 = "bank_gold_bars"
     4 = "bank_money_stacks"
   >
-    [2‾  2‾  2‾  2‾  2e‾ .
-    [2w  4   4   4   2e  .
-    [2w  3   .   .   1   .
-    [2w  3   .   .   .   .
-    [2w  3   .   .   .   .
-    [2s_ 2s_ 2s_ 2s_ 2e_ .
+    2   2   2   2   2e  . . 2w 2  2  2  2
+    2w  4   4   4   2e  . . .  .  4  4  2e
+    2w  3   .   .   1   . . .  .  .  3  2e
+    2w  3   .   .   .   . . 1s .  .  3  2e
+    2w  3   .   .   .   . . 2w 2s 2s 2s 2s
+    2s  2s  2s  2s  2e  . . .  .  .  .  .
   </grid>
 </scene>
 
 
 <scene
   name   = "Teller Screens"
-  ID     = "civic_scene_teller_screens"
+  ID     = "bank_scene_teller_screens"
   wide   = "6"
   high   = "6"
   floor  = "civic_floor"
@@ -252,14 +252,14 @@
     .  .  .  .  .  .
     .  .  .  .  .  .
     [ 5s  . 5s  ‾/ ‾]
-    [  .  .  .  .   ]
+    [_ _  _  _  _/ _]
   </grid>
 </scene>
 
 
 <scene
   name   = "General Seating"
-  ID     = "civic_scene_general_seating"
+  ID     = "bank_scene_general_seating"
   wide   = "6"
   high   = "6"
   floor  = "civic_floor"
@@ -290,30 +290,30 @@
   name           = "Civic Test Structure"
   ID             = "civic_test_structure"
   unitSize       = "6"
-  maxUnitsAcross = "2"
+  maxUnitsAcross = "3"
   floor          = "civic_floor"
   wall           = "civic_wall"
   door           = "civic_door"
   window         = "civic_window"
 >
   <unit
-    typeID   = "civic_scene_safe_vault"
+    typeID   = "bank_scene_safe_vault"
     wall     = "WALL_INTERIOR"
     priority = "PRIORITY_HIGH"
     minCount = "1"
     maxCount = "1"
   />
   <unit
-    typeID   = "civic_scene_general_seating"
+    typeID   = "bank_scene_teller_screens"
     wall     = "WALL_EXTERIOR"
-    priority = "PRIORITY_LOW"
+    priority = "PRIORITY_MEDIUM"
+    maxCount = "2"
     percent  = "50"
   />
   <unit
-    typeID   = "civic_scene_teller_screens"
+    typeID   = "bank_scene_general_seating"
     wall     = "WALL_EXTERIOR"
     priority = "PRIORITY_LOW"
-    maxCount = "1"
     percent  = "50"
   />
 </scene>

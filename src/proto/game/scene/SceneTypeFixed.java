@@ -102,13 +102,47 @@ public class SceneTypeFixed extends SceneType {
   }
   
   
+  Box2D borderBounds(
+    Scene scene, int offX, int offY, int facing, int resolution
+  ) {
+    Box2D bound = null;
+    int wideB = Nums.round(wide, resolution, true) - 1;
+    int highB = Nums.round(high, resolution, true) - 1;
+    
+    ///I.say("\nGetting bounds...");
+    for (Coord c : Visit.grid(0, 0, 2, 2, 1)) {
+      c.x *= wideB;
+      c.y *= highB;
+      ///I.say("  "+c);
+      rotateCoord(c, facing);
+      ///I.add(" ->"+c);
+      c.x += offX;
+      c.y += offY;
+      ///I.add(" ->"+c);
+      
+      if (scene.tileAt(c.x, c.y) == null) return null;
+      
+      if (bound == null) bound = new Box2D(c.x, c.y, 0, 0);
+      else bound.include(c.x, c.y, 0);
+    }
+    
+    bound.incHigh(1);
+    bound.incWide(1);
+    ///I.say("\nFinal bound: "+bound);
+    return bound;
+  }
+  
+  
   boolean checkBordering(
     Scene scene, int offX, int offY, int facing,
     int resolution
   ) {
-    offX -= (wide - resolution) / 2;
-    offY -= (high - resolution) / 2;
+    //offX -= (wide - resolution) / 2;
+    //offY -= (high - resolution) / 2;
     Coord temp = new Coord();
+    if (borderBounds(scene, offX, offY, facing, resolution) == null) {
+      return false;
+    }
     
     for (Coord c : Visit.perimeter(0, 0, wide, high)) {
       temp.setTo(c);
@@ -141,8 +175,8 @@ public class SceneTypeFixed extends SceneType {
     Scene scene, int offX, int offY, int facing, int resolution,
     boolean forTesting
   ) {
-    offX -= (wide - resolution) / 2;
-    offY -= (high - resolution) / 2;
+    //offX -= (wide - resolution) / 2;
+    //offY -= (high - resolution) / 2;
     Coord temp = new Coord();
     
     for (Placing p : placings) {

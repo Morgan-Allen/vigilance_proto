@@ -11,7 +11,7 @@ import proto.content.places.*;
 
 
 
-public class DebugSceneFile extends RunGame {
+public class DebugSceneXML extends RunGame {
   
   final static SceneType FILE_TEST_SCENE;
   final static XML SCENE_XML;
@@ -29,7 +29,7 @@ public class DebugSceneFile extends RunGame {
   public static void main(String args[]) {
     GameSettings.debugScene = true;
     GameSettings.pauseScene = true;
-    runGame(new DebugSceneFile(), "saves/debug_scene_file");
+    runGame(new DebugSceneXML(), "saves/debug_scene_xml");
   }
   
   
