@@ -116,10 +116,14 @@
   Note:  walls, doors, windows and even the floor-type are optional (though you
   might get a crash if you try to add walls without a wall-type?)
   
-  Fixed scenes define a grid, including a map between index-numbers and object-
+  Fixed scenes define grids, including a map between index-numbers and object-
   types for furniture.  The grid then specifies contents for each x/y point
   within it's width and height.  (Each point should be separated by whitespace,
   but the amount doesn't matter.)
+  
+  Multiple grids can be specified for a given scene, to allow for multiple
+  layers of objects.  (e.g, you could omit the default floor-type and lay out
+  a floor-pattern using a grid instead.)
   
   
   Refer to an object in a given space by it's index.  Use n(orth), e(ast),
@@ -144,12 +148,12 @@
   Wall Left:    [
   Wall Bottom:  _
   Wall Right:   ]
-  Wall Top:     ‾
+  Wall Top:     -
   Window:       '
   Door:         /
   
   Example 2:
-    [‾ ‾  ‾  ‾]
+    [- -  -  -]
     [  1  .   ]'
     [  .  2e  ]/
     [_ _  _  _]
@@ -175,7 +179,7 @@
     1 = "civic_jewel_case"
     2 = "civic_jewel_case_long"
   >
-    [‾ ‾' ‾/ ‾  ‾  ‾]
+    [- -' -/ -  -  -]
     [  1s 2w .  1w  ]'
     [  2  .  .  2   ]/
     [/ .  .  .  .   ]

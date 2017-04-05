@@ -168,10 +168,10 @@ public class SceneFromXML implements TileConstants {
       //
       //  The content of the grid node represent the x/y position of those
       //  props, as represented by index.  First we break down the tokens-
-      StringTokenizer t = new StringTokenizer(gridXML.content(), ", \n", false);
+      StringTokenizer t = new StringTokenizer(gridXML.content(), ", \n\r", false);
       final List <String> tokens = new List();
       while (t.hasMoreTokens()) tokens.add(t.nextToken());
-      char wallChars[] = {'‾',']','_','['}, dirChars[] = {'n','e','s','w'};
+      char wallChars[] = {'-',']','_','['}, dirChars[] = {'n','e','s','w'};
       //
       //  Then populate the scene while iterating over possible grid positions-
       for (Coord c : Visit.grid(0, 0, high, wide, 1)) try {
