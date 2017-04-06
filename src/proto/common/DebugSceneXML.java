@@ -36,10 +36,10 @@ public class DebugSceneXML extends RunGame {
   protected World setupWorld() {
     this.world = new World(this, savePath);
     
-    int     sceneSize = SCENE_XML.getInt("size");
-    Scene   scene     = FILE_TEST_SCENE.generateScene(world, sceneSize, true);
-    Faction owns      = Heroes.JANUS_INDUSTRIES;
-    Base    player    = new Base(Facilities.MANOR, world, owns);
+    int     pS     = SCENE_XML.getInt("prefSize");
+    Scene   scene  = FILE_TEST_SCENE.generateScene(world, pS, pS, true);
+    Faction owns   = Heroes.JANUS_INDUSTRIES;
+    Base    player = new Base(Facilities.MANOR, world, owns);
     world.addBase(player, true);
     
     Tile.printWallsMask(scene);

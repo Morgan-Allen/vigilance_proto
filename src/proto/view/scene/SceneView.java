@@ -151,7 +151,7 @@ public class SceneView extends UINode implements TileConstants {
     final Scene scene = scene();
     if (scene == null) return false;
     
-    int size = scene.size();
+    int wide = scene.wide(), high = scene.high();
     Action done = scene.currentAction();
     //
     //  Update camera information first-
@@ -228,7 +228,7 @@ public class SceneView extends UINode implements TileConstants {
     }
     //
     //  Then render our own fog on top of all objects-
-    for (Coord c : Visit.grid(0, 0, size, size, 1)) {
+    for (Coord c : Visit.grid(0, 0, wide, high, 1)) {
       Tile t = scene.tileAt(c.x, c.y);
       float fogAlpha = 1f - tileVisibilityKluge(t, Person.Side.HEROES);
       if (GameSettings.debugScene) fogAlpha /= 2;

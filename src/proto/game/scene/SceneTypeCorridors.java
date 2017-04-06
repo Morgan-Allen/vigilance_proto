@@ -20,21 +20,21 @@ public class SceneTypeCorridors extends SceneType {
   }
   
 
-  public Scene generateScene(World world, int size, boolean forTesting) {
-    final Scene scene = new Scene(world, size);
-    scene.setupScene(forTesting);
-    applyToScene(scene, 2, 2, N, size - 4, forTesting);
+  public Scene generateScene(World world, int w, int h, boolean testing) {
+    final Scene scene = new Scene(world, w, h);
+    scene.setupScene(testing);
+    applyToScene(scene, 2, 2, N, w - 4, h - 4, testing);
     return scene;
   }
   
   
   public void applyToScene(
-    Scene scene, int offX, int offY, int facing, int limit, boolean forTesting
+    Scene scene, int offX, int offY, int facing, int w, int h, boolean testing
   ) {
     final SceneGenCorridors g = new SceneGenCorridors();
-    final Box2D area = new Box2D(offX, offY, limit, limit);
+    final Box2D area = new Box2D(offX, offY, w, h);
     g.scene = scene;
-    g.verbose = forTesting;
+    g.verbose = testing;
     attemptRoomDivision(g, this, area);
     
     placeCurtainWall(g, this, area);

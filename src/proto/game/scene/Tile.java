@@ -301,13 +301,13 @@ public class Tile implements Session.Saveable {
   
   
   public static void printWallsMask(Scene scene) {
-    int size = scene.size(), span = (size * 2) + 1;
+    int spanW = scene.fills.length, spanH = scene.fills[0].length;
     I.say("\nPRINTING WALLS FOR SCENE");
     
-    for (int y = 0; y < span; y++) {
+    for (int y = 0; y < spanH; y++) {
       I.add("\n  ");
       
-      for (int x = 0; x < span; x++) {
+      for (int x = 0; x < spanW; x++) {
         boolean bordY = y % 2 == 0;
         boolean bordX = x % 2 == 0;
         Prop fills = scene.fills[x][y];

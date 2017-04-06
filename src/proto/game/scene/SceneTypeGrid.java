@@ -28,8 +28,8 @@ public class SceneTypeGrid extends SceneType {
   ) {
     super(
       name, ID,
-      MIN_SIZE, Nums.max(wide, high),
-      MAX_SIZE, Nums.max(wide, high)
+      MIN_WIDE, wide, MAX_WIDE, wide,
+      MIN_HIGH, high, MAX_HIGH, high
     );
     this.wide = wide;
     this.high = high;
@@ -170,8 +170,7 @@ public class SceneTypeGrid extends SceneType {
   
   
   public void applyToScene(
-    Scene scene, int offX, int offY, int facing, int resolution,
-    boolean forTesting
+    Scene scene, int offX, int offY, int facing, int w, int h, boolean testing
   ) {
     Coord temp = new Coord();
     for (Placing p : placings) {
@@ -194,13 +193,18 @@ public class SceneTypeGrid extends SceneType {
   
   /**  Actual scene-generation-
     */
-  public Scene generateScene(World world, int size, boolean forTesting) {
-    size = Nums.max(wide, high) + 2;
-    final Scene scene = new Scene(world, size);
-    scene.setupScene(forTesting);
-    applyToScene(scene, 0, 0, N, size, forTesting);
+  public Scene generateScene(
+    World world, int wide, int high, boolean testing
+  ) {
+    final Scene scene = new Scene(world, wide, high);
+    scene.setupScene(testing);
+    applyToScene(scene, 0, 0, N, wide, high, testing);
     return scene;
   }
 }
+
+
+
+
 
 

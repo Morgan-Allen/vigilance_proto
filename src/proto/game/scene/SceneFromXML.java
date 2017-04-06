@@ -70,11 +70,11 @@ public class SceneFromXML implements TileConstants {
       Assets.cacheResource("SCENE_HOLDER", sceneKey);
       
       if (! node.child("unit").isNull()) {
-        SceneType type = gridSceneFrom(node, basePath, sceneKey);
+        SceneType type = unitSceneFrom(node, basePath, sceneKey);
         Assets.cacheResource(type, sceneKey);
       }
       else if (! node.child("grid").isNull()) {
-        SceneType type = fixedSceneFrom(node, basePath, sceneKey);
+        SceneType type = gridSceneFrom(node, basePath, sceneKey);
         Assets.cacheResource(type, sceneKey);
       }
     }
@@ -85,7 +85,7 @@ public class SceneFromXML implements TileConstants {
   }
   
   
-  static SceneTypeComp gridSceneFrom(
+  static SceneTypeUnits unitSceneFrom(
     XML sceneNode, String filePath, String ID
   ) {
     XML    file     = sceneNode.parent();
@@ -96,41 +96,60 @@ public class SceneFromXML implements TileConstants {
     String windowID = sceneNode.value("window");
     
     XML unitXML[] = sceneNode.allChildrenMatching("unit");
-    Batch <SceneTypeComp.Unit> units = new Batch();
+    Batch <SceneTypeUnits.Unit> units = new Batch();
     
     for (XML u : unitXML) {
       SceneType type = sceneWithID(u.value("typeID"), file, filePath);
-      int wallType = Kind.loadField(u.value("wall"    ), SceneTypeComp.class);
-      int priority = Kind.loadField(u.value("priority"), SceneTypeComp.class);
+      int wallType = Kind.loadField(u.value("wall"    ), SceneTypeUnits.class);
+      int priority = Kind.loadField(u.value("priority"), SceneTypeUnits.class);
+      
+      int exactX   = getInt(u, "x", -1);
+      int exactY   = getInt(u, "y", -1);
+      int exactDir = Kind.loadField(u.value("dir"), TileConstants.class);
+      
       int percent  = getInt(u, "percent" , -1);
       int minCount = getInt(u, "minCount", -1);
       int maxCount = getInt(u, "maxCount", -1);
       
-      SceneTypeComp.Unit unit = SceneTypeComp.unit(
+      if (wallType == -1) wallType = SceneTypeUnits.WALL_EXTERIOR  ;
+      if (priority == -1) priority = SceneTypeUnits.PRIORITY_MEDIUM;
+      if (exactDir == -1) exactDir = N;
+      
+      SceneTypeUnits.Unit unit = SceneTypeUnits.unit(
         (SceneTypeGrid) type, wallType,
+        exactX, exactY, exactDir,
         priority, percent, minCount, maxCount
       );
       if (unit != null) units.add(unit);
     }
     
-    int unitSize = sceneNode.getInt("unitSize"      );
-    int maxUA    = sceneNode.getInt("maxUnitsAcross");
+    int unitSize = sceneNode.getInt("unitSize");
+    int maxUW    = getInt(sceneNode, "maxUnitsWide",  8);
+    int maxUH    = getInt(sceneNode, "maxUnitsHigh",  8);
+    int minUW    = getInt(sceneNode, "minUnitsWide",  2);
+    int minUH    = getInt(sceneNode, "minUnitsHigh",  2);
+    int unitsH   = getInt(sceneNode, "unitsHigh"   , -1);
+    int unitsW   = getInt(sceneNode, "unitsWide"   , -1);
     PropType
       floor  = propWithID(floorID , file, filePath),
       wall   = propWithID(wallID  , file, filePath),
       door   = propWithID(doorID  , file, filePath),
       window = propWithID(windowID, file, filePath);
     
-    SceneTypeComp sceneType = new SceneTypeComp(
-      name, ID, unitSize, maxUA,
+    if (unitsW != -1) maxUW = minUW = unitsW;
+    if (unitsH != -1) maxUH = minUH = unitsH;
+    
+    SceneTypeUnits sceneType = new SceneTypeUnits(
+      name, ID,
+      unitSize, minUW, maxUW, minUH, maxUH,
       wall, door, window, floor,
-      units.toArray(SceneTypeComp.Unit.class)
+      units.toArray(SceneTypeUnits.Unit.class)
     );
     return sceneType;
   }
   
   
-  static SceneTypeGrid fixedSceneFrom(
+  static SceneTypeGrid gridSceneFrom(
     XML sceneNode, String filePath, String ID
   ) {
     //

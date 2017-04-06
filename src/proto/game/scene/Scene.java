@@ -37,7 +37,7 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   List <Person> allPersons = new List();
   List <Person> didEnter   = new List();
   
-  int size;
+  int wide, high;
   int time;
   Tile tiles[][] = new Tile[0][0];
   Prop fills[][] = new Prop[1][2];
@@ -51,9 +51,10 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   Stack <Action> actionStack = new Stack();
   
   
-  public Scene(World world, int size) {
+  public Scene(World world, int wide, int high) {
     this.world = world;
-    this.size  = size;
+    this.wide  = wide ;
+    this.high  = high ;
   }
   
   
@@ -71,15 +72,15 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     s.loadObjects(allPersons);
     s.loadObjects(didEnter  );
     
-    size   = s.loadInt();
+    wide   = s.loadInt();
+    high   = s.loadInt();
     time   = s.loadInt();
-    int tS = s.loadInt();
-    initArrays(tS);
-    for (Coord c : Visit.grid(0, 0, tS, tS, 1)) {
+    
+    initArrays(wide, high);
+    for (Coord c : Visit.grid(0, 0, wide, high, 1)) {
       tiles[c.x][c.y] = (Tile) s.loadObject();
     }
-    int fS = fills.length;
-    for (Coord c : Visit.grid(0, 0, fS, fS, 1)) {
+    for (Coord c : Visit.grid(0, 0, fills.length, fills[0].length, 1)) {
       fills[c.x][c.y] = (Prop) s.loadObject();
     }
     s.loadObjects(props);
@@ -107,14 +108,14 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     s.saveObjects(allPersons);
     s.saveObjects(didEnter  );
     
-    s.saveInt(size);
+    s.saveInt(wide);
+    s.saveInt(high);
     s.saveInt(time);
-    int tS = tiles.length, fS = fills.length;
-    s.saveInt(tS);
-    for (Coord c : Visit.grid(0, 0, tS, tS, 1)) {
+    
+    for (Coord c : Visit.grid(0, 0, wide, high, 1)) {
       s.saveObject(tiles[c.x][c.y]);
     }
-    for (Coord c : Visit.grid(0, 0, fS, fS, 1)) {
+    for (Coord c : Visit.grid(0, 0, fills.length, fills[0].length, 1)) {
       s.saveObject(fills[c.x][c.y]);
     }
     s.saveObjects(props);
@@ -202,8 +203,13 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   }
   
   
-  public int size() {
-    return size;
+  public int wide() {
+    return wide;
+  }
+  
+  
+  public int high() {
+    return high;
   }
   
   
@@ -305,19 +311,19 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   
   /**  Supplementary population methods for use during initial setup-
     */
-  private void initArrays(int size) {
-    tiles = new Tile[size][size];
-    int wallS = (size * 2) + 1;
-    fills = new Prop[wallS][wallS];
-    vision.setupFog(size);
+  private void initArrays(int wide, int high) {
+    tiles = new Tile[wide][high];
+    int wallW = (wide * 2) + 1, wallH = (high * 2) + 1;
+    fills = new Prop[wallW][wallH];
+    vision.setupFog(wide, high);
   }
   
   
   public void setupScene(boolean forTesting) {
     this.state = forTesting ? STATE_TEST : STATE_SETUP;
-    initArrays(size);
+    initArrays(wide, high);
     
-    for (Coord c : Visit.grid(0, 0, size, size, 1)) {
+    for (Coord c : Visit.grid(0, 0, wide, high, 1)) {
       tiles[c.x][c.y] = new Tile(this, c.x, c.y);
     }
   }
@@ -377,15 +383,6 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     this.state = STATE_BEGUN;
     
     I.say("\nBEGINNING SCENE...");
-    int numT = playerTeam.size();
-    int x = (size - numT) / 2, y = 0;
-    view().setZoomPoint(tileAt(x, y));
-    
-    for (Person p : playerTeam) {
-      enterScene(p, x, y);
-      x += 1;
-    }
-    
     playerTurn = true;
     vision.updateFog();
     for (Person p : playerTeam) p.onTurnStart();
