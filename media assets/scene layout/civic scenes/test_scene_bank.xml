@@ -13,7 +13,7 @@
 <prop
   name       = "Metal Floor"
   ID         = "civic_metal_floor"
-  sprite     = "floor_metal.png"
+  sprite     = "floor_metal_3.png"
   wide       = "1"
   high       = "1"
   subtype    = "SUBTYPE_WALLING"
@@ -336,8 +336,8 @@
   name      = "Bank Scene Assembled"
   ID        = "bank_scene_assembled"
   unitSize  = "6"
-  unitsWide = "4"
-  unitsHigh = "3"
+  unitsWide = "1"
+  unitsHigh = "1"
   wall      = "civic_wall"
   door      = "civic_door"
   window    = "civic_window"
@@ -350,13 +350,3 @@
   <unit typeID = "bank_scene_teller_screens"  x = "1" y = "0" dir = "N"/>
   <unit typeID = "bank_scene_general_seating" x = "2" y = "0" dir = "N"/>
 </scene>
-
-
-
-
-
-
-
-
-
-
