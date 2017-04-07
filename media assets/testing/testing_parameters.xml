@@ -8,8 +8,8 @@
 <sceneTest
   basePath = "media assets/scene layout/civic scenes/"
   fileName = "test_scene_bank.xml"
-  sceneID  = "civic_test_structure"
-  size     = "18"
+  sceneID  = "bank_scene_assembled"
+  prefSize = "18"
 >
   <agent
     ID     = "hero_kind_phobos"

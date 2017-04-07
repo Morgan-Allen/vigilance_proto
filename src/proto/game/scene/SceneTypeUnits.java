@@ -7,7 +7,7 @@ import static proto.game.scene.SceneGen.*;
 
 
 
-public class SceneTypeComp extends SceneType {
+public class SceneTypeUnits extends SceneType {
   
   
   /**  Data fields, construction and save/load methods-
@@ -21,38 +21,34 @@ public class SceneTypeComp extends SceneType {
     WALL_INTERIOR = 2
   ;
   
-  static class SceneGenComp extends SceneGen {
+  static class SceneGenUnits extends SceneGen {
     Room areaMarkup[][];
-  }
-  
-  public static class Unit {
-    int ID;
-    SceneTypeGrid type;
-    int wallType = WALL_EXTERIOR;
-    int priority, percent, minCount, maxCount;
   }
   
   final int resolution;
   final Unit units[];
   
   
-  public SceneTypeComp(
+  public SceneTypeUnits(
     String name, String ID,
-    int resolution, int maxUnitSize,
+    int resolution,
+    int minUnitsW, int maxUnitsW, int minUnitsH, int maxUnitsH,
     PropType wallType, PropType doorType, PropType windowType,
     PropType floorType, Unit... units
   ) {
     super(
       name, ID,
-      MIN_SIZE, resolution * 2,
-      MAX_SIZE, (maxUnitSize > 1 ? (resolution * maxUnitSize) : -1)
+      MIN_WIDE, minUnitsW * resolution,
+      MAX_WIDE, maxUnitsW * resolution,
+      MIN_HIGH, minUnitsH * resolution,
+      MAX_HIGH, maxUnitsH * resolution
     );
     this.resolution = resolution;
-    this.units      = units;
-    this.borders    = wallType;
-    this.door       = doorType;
+    this.units      = units     ;
+    this.borders    = wallType  ;
+    this.door       = doorType  ;
     this.window     = windowType;
-    this.floors     = floorType;
+    this.floors     = floorType ;
     int unitID = 0;
     for (Unit unit : units) unit.ID = unitID++;
   }
@@ -61,18 +57,48 @@ public class SceneTypeComp extends SceneType {
   
   /**  Specifying sub-units for placement within the grid-
     */
+  public static class Unit {
+    int ID;
+    SceneTypeGrid type;
+    int wallType = WALL_EXTERIOR;
+    int exactX = -1, exactY = -1, exactDir = -1;
+    int priority, percent, minCount, maxCount;
+    
+    public String toString() { return type.toString(); }
+  }
+  
+  
   public static Unit unit(
     SceneTypeGrid type, int wallType,
+    int exactX, int exactY, int exactDir,
     int priority, int percent, int minCount, int maxCount
   ) {
     Unit unit = new Unit();
     unit.type     = type    ;
     unit.wallType = wallType;
+    
+    unit.exactX   = exactX  ;
+    unit.exactY   = exactY  ;
+    unit.exactDir = exactDir;
+    
     unit.priority = priority;
     unit.percent  = percent ;
     unit.minCount = minCount;
     unit.maxCount = maxCount;
+    
     return unit;
+  }
+  
+  
+  public static Unit unit(
+    SceneTypeGrid type, int wallType,
+    int priority, int percent, int minCount, int maxCount
+  ) {
+    return unit(
+      type, wallType,
+      -1, -1, N,
+      priority, percent, minCount, maxCount
+    );
   }
   
   
@@ -100,73 +126,86 @@ public class SceneTypeComp extends SceneType {
   
   /**  Actual scene generation-
     */
-  public Scene generateScene(World world, int size, boolean forTesting) {
+  public Scene generateScene(World world, int w, int h, boolean testing) {
     I.say("\n\nGENERATING GRID SCENE "+this);
     
-    final int gridSize = size / resolution;
-    size = (gridSize * resolution) + 4;
+    int gridW = w / resolution, gridH = h / resolution;
+    int wideS = gridW * resolution, highS = gridH * resolution;
     
-    Scene scene = new Scene(world, size);
-    scene.setupScene(forTesting);
-    applyToScene(scene, 2, 2, N, gridSize * resolution, forTesting);
+    Scene scene = new Scene(world, wideS + 4, highS + 4);
+    scene.setupScene(testing);
+    applyToScene(scene, 2, 2, N, wideS, highS, testing);
     return scene;
   }
   
   
   public void applyToScene(
-    Scene scene, int offX, int offY, int facing, int size, boolean forTesting
+    Scene scene, int offX, int offY, int facing, int w, int h, boolean testing
   ) {
-    int gridSize = size / resolution;
-    SceneGenComp gen = new SceneGenComp();
+    SceneGenUnits gen = new SceneGenUnits();
     gen.scene      = scene;
-    gen.gridSize   = gridSize;
+    gen.gridW      = w / resolution;
+    gen.gridH      = h / resolution;
     gen.offX       = offX;
     gen.offY       = offY;
-    gen.limit      = size;
-    gen.areaMarkup = new Room[size][size];
+    gen.wide       = w;
+    gen.high       = h;
+    gen.areaMarkup = new Room[w][h];
     
     populateWithAreas(scene, gen);
     insertWallsAndDoors(scene, gen);
   }
   
   
-  void populateWithAreas(Scene scene, SceneGenComp g) {
+  void populateWithAreas(Scene scene, SceneGenUnits g) {
     //
-    //  First, we compile a list of all available spaces, and set up a tally
-    //  of total placements for each unit-type:
-    List <Coord> allSpaces = new List();
-    for (Coord c : Visit.grid(0, 0, g.gridSize, g.gridSize, 1)) {
-      int atX = g.offX + (c.x * resolution);
-      int atY = g.offY + (c.y * resolution);
-      allSpaces.add(new Coord(atX, atY));
-    }
+    //  First, we set up a tally of total placements for each unit-type:
     int counts[] = new int[units.length];
-    class SpacePick { Unit unit; Coord at; int facing; }
+    class SpacePick { Unit unit; int tx; int ty; int facing; }
     //
     //  While there's space left, we iterate over all possible combinations of
     //  location, unit-type and facing, toss in a little random weighting, and
     //  see which looks most promising.  (Note that we skip over any unit types
     //  already past their placement quotas.)
-    while (! allSpaces.empty()) {
+    while (true) {
       Pick <SpacePick> pick = new Pick();
       
       for (Unit unit : units) {
+        boolean exact = unit.exactX != -1 && unit.exactY != -1;
+        SceneTypeGrid type = unit.type;
         int count = counts[unit.ID];
-        int percent = (count * 100) / (g.gridSize * g.gridSize);
-        if (unit.maxCount > 0 && count   >= unit.maxCount) continue;
-        if (unit.percent  > 0 && percent >= unit.percent ) continue;
         
-        for (Coord c : allSpaces) for (int face : T_ADJACENT) {
-          if (unit.type.checkBordering(scene, c.x, c.y, face, resolution)) {
+        if (! exact) {
+          int percent = (count * 100) / (g.gridW * g.gridH);
+          if (unit.maxCount > 0 && count   >= unit.maxCount) continue;
+          if (unit.percent  > 0 && percent >= unit.percent ) continue;
+        }
+        
+        for (Coord c : Visit.grid(0, 0, g.gridW, g.gridH, 1)) {
+          int tX = g.offX + (c.x * resolution);
+          int tY = g.offY + (c.y * resolution);
+          if (g.areaMarkup[tX][tY] != null) continue;
+          
+          for (int face : T_ADJACENT) {
             float rating = unit.priority * 1f / PRIORITY_MEDIUM;
-            rating += Nums.max(0, unit.minCount - count);
-            rating += Rand.num() / 2;
-            
-            SpacePick s = new SpacePick();
-            s.at     = c   ;
-            s.unit   = unit;
-            s.facing = face;
-            pick.compare(s, rating);
+            if (exact) {
+              if (c.x            != unit.exactX  ) continue;
+              if (c.y            != unit.exactY  ) continue;
+              if ((face + 0 % 8) != unit.exactDir) continue;
+              rating += 100;
+            }
+            else if (type.checkBordering(scene, tX, tY, face, resolution)) {
+              rating += Nums.max(0, unit.minCount - count);
+              rating += Rand.num() / 2;
+            }
+            if (rating != -1) {
+              SpacePick s = new SpacePick();
+              s.tx     = tX  ;
+              s.ty     = tY  ;
+              s.unit   = unit;
+              s.facing = face;
+              pick.compare(s, rating);
+            }
           }
         }
       }
@@ -175,10 +214,13 @@ public class SceneTypeComp extends SceneType {
       //  Having pick the most promising option, we apply the furnishings to
       //  the scene:
       SpacePick     s    = pick.result();
-      Coord         at   = s.at;
       SceneTypeGrid type = s.unit.type;
-      I.say("PICKED GRID UNIT "+type+" AT "+at+", FACE: "+s.facing);
-      type.applyToScene(scene, at.x, at.y, s.facing, resolution, g.verbose);
+      Box2D bound = type.borderBounds(scene, s.tx, s.ty, s.facing, resolution);
+      I.say("PICKED GRID UNIT "+type+" AT "+s.tx+"|"+s.ty+", FACE: "+s.facing);
+      type.applyToScene(
+        scene, s.tx, s.ty, s.facing, (int) bound.xdim(), (int) bound.ydim(),
+        g.verbose
+      );
       //
       //  And mark out a room within the grid with the appropriate attributes,
       //  before increment the type's placement counter and removing the
@@ -186,9 +228,8 @@ public class SceneTypeComp extends SceneType {
       Room area = new Room();
       area.unit = s.unit;
       area.ID   = g.rooms.size();
-      area.minX = at.x;
-      area.minY = at.y;
-      Box2D bound = type.borderBounds(scene, at.x, at.y, s.facing, resolution);
+      area.minX = s.tx;
+      area.minY = s.ty;
       area.wide = (int) bound.xdim();
       area.high = (int) bound.ydim();
       g.rooms.add(area);
@@ -198,21 +239,18 @@ public class SceneTypeComp extends SceneType {
       }
       catch (Exception e) {}
       counts[s.unit.ID]++;
-      
-      for (Coord c : allSpaces) if (g.areaMarkup[c.x][c.y] == area) {
-        allSpaces.remove(c);
-      }
     }
   }
   
   
-  void insertWallsAndDoors(Scene scene, SceneGenComp g) {
+  void insertWallsAndDoors(Scene scene, SceneGenUnits g) {
     //
     //  We visit every point in the grid, then visit all adjacent points and
     //  keep a tally of nearby outdoor points and areas.  Points that border
     //  on an area (including outside) that demand a partition will have that
     //  point recorded as a wall.
-    for (Coord p : Visit.grid(g.offX, g.offY, g.limit, g.limit, 1)) {
+    I.say("\nInserting walls and doors:");
+    for (Coord p : Visit.grid(g.offX, g.offY, g.wide, g.high, 1)) {
       Room atP = areaUnder(p.x, p.y, g);
       for (int dir : T_ADJACENT) {
         Room atN = areaUnder(p.x + T_X[dir], p.y + T_Y[dir], g);
@@ -228,7 +266,11 @@ public class SceneTypeComp extends SceneType {
     //  Once all wall-points have been recorded, we populate the area with
     //  actual wall-objects accordingly, and punctuate with doors and windows.
     for (Wall wall : g.walls) {
+      I.say("  "+DIR_NAMES[(wall.facing + 2) % 8]+" wall ");
+      I.add("between "+wall.side1+" and "+wall.side2);
+      I.say("    ");
       for (WallPiece p : wall.pieces) {
+        I.add("["+p.x+", "+p.y+"] ");
         if (! Prop.hasSpace(scene, borders, p.x, p.y, p.facing)) continue;
         p.wall = scene.addProp(borders, p.x, p.y, p.facing);
       }
@@ -263,14 +305,14 @@ public class SceneTypeComp extends SceneType {
   }
   
   
-  Room areaUnder(int x, int y, SceneGenComp g) {
+  Room areaUnder(int x, int y, SceneGenUnits g) {
     try { return g.areaMarkup[x - g.offX][y - g.offY]; }
     catch (ArrayIndexOutOfBoundsException e) { return null; }
   }
   
   
   boolean tryRecordingWall(
-    Coord p, int facing, Room from, Room other, SceneGenComp g
+    Coord p, int facing, Room from, Room other, SceneGenUnits g
   ) {
     if (this.borders == null) return false;
     Object unitO = other == null ? null : other.unit;
@@ -282,7 +324,7 @@ public class SceneTypeComp extends SceneType {
     if (forO == WALL_INTERIOR && unitO != unitF) shouldWall = true;
     if (! shouldWall) return false;
     
-    Wall wall = wallBetween(from, other, g);
+    Wall wall = wallBetween(from, other, facing, g);
     if (wall.indoor && (facing == E || facing == N)) return false;
     
     wall.pieces.add(new WallPiece(p.x, p.y, facing));
@@ -291,17 +333,19 @@ public class SceneTypeComp extends SceneType {
   }
   
   
-  Wall wallBetween(Room a, Room b, SceneGenComp g) {
+  Wall wallBetween(Room a, Room b, int facing, SceneGenUnits g) {
     Room source = a == null ? b : a;
     if (source == null) I.complain("No wall source!");
     for (Wall w : source.walls) {
+      if (w.facing != facing) continue;
       if (w.side1 == a && w.side2 == b) return w;
       if (w.side1 == b && w.side2 == a) return w;
     }
     Wall w = new Wall();
     w.indoor = a != null && b != null;
-    w.side1 = a;
-    w.side2 = b;
+    w.facing = facing;
+    w.side1  = a;
+    w.side2  = b;
     if (a != null) a.walls.add(w);
     if (b != null) b.walls.add(w);
     g.walls.add(w);

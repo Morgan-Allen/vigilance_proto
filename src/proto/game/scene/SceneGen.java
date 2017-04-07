@@ -34,7 +34,7 @@ public class SceneGen implements TileConstants {
   ;
   
   Scene scene;
-  int gridSize, offX, offY, limit;
+  int gridW, gridH, offX, offY, wide, high;
   byte markup[][];
   Tally <SceneType> frequencies = new Tally();
   
@@ -56,6 +56,7 @@ public class SceneGen implements TileConstants {
   
   static class Wall {
     boolean indoor;
+    int facing;
     Room side1, side2;
     int wallTypeDiff;
     
@@ -70,6 +71,8 @@ public class SceneGen implements TileConstants {
     
     Batch <Wall> walls = new Batch();
     Wall floor = new Wall(), ceiling = new Wall();
+    
+    public String toString() { return "R["+unit+"]"; }
   }
   
   static abstract class Tiling {
@@ -81,12 +84,14 @@ public class SceneGen implements TileConstants {
   /**  Markup methods-
     */
   boolean canFillRoom(SceneType parent, Box2D area, AreaCheck check) {
-    final int size = (int) area.maxSide();
+    final int wide = (int) area.xdim(), high = (int) area.ydim();
     
     Pick <SceneType> pick = new Pick <SceneType> () {
       public void compare(SceneType k, float rating) {
-        if (k.maxSize > 0 && size > k.maxSize) return;
-        if (k.minSize > 0 && size < k.minSize) return;
+        if (k.maxWide > 0 && wide > k.maxWide) return;
+        if (k.minWide > 0 && wide < k.minWide) return;
+        if (k.maxHigh > 0 && high > k.maxHigh) return;
+        if (k.minHigh > 0 && high < k.minHigh) return;
         
         float freq = frequencies.valueFor(k);
         rating /= 1 + freq;
@@ -150,7 +155,7 @@ public class SceneGen implements TileConstants {
     }
     //
     //  Finally, we update the frequencies for this room-type:
-    float freqInc = (room.wide * room.high) * 1f / (scene.size * scene.size);
+    float freqInc = (room.wide * room.high) * 1f / (scene.wide * scene.high);
     frequencies.add(freqInc, room.type);
     //
     //  And report and return-
@@ -272,9 +277,9 @@ public class SceneGen implements TileConstants {
   public void printMarkup() {
     I.say("\nPrinting markup for scene: "+scene);
     
-    for (int y = scene.size; y-- > 0;) {
+    for (int y = scene.high; y-- > 0;) {
       I.say("  ");
-      for (int x = 0; x < scene.size; x++) {
+      for (int x = 0; x < scene.wide; x++) {
         byte b = markup[x][y];
         I.add(b+" ");
       }
@@ -285,7 +290,7 @@ public class SceneGen implements TileConstants {
   
   public void printMarkupVisually() {
     
-    int colorVals[][] = new int[scene.size][scene.size];
+    int colorVals[][] = new int[scene.wide][scene.high];
     final int colorKeys[] = new int[MARKUP_TYPES];
     
     for (int i = MARKUP_TYPES; i-- > 0;) {
@@ -293,15 +298,15 @@ public class SceneGen implements TileConstants {
       colorKeys[i] = java.awt.Color.HSBtoRGB(hue, 1, 0.5f);
     }
     
-    for (int y = scene.size; y-- > 0;) {
-      for (int x = 0; x < scene.size; x++) {
+    for (int y = scene.high; y-- > 0;) {
+      for (int x = 0; x < scene.wide; x++) {
         byte b = markup[x][y];
         colorVals[x][y] = colorKeys[Nums.clamp(b, MARKUP_TYPES)];
       }
     }
     
-    int winSize = scene.size * 10;
-    I.present(colorVals, "Generated Scene", winSize, winSize);
+    int winW = scene.wide * 10, winH = scene.high * 10;
+    I.present(colorVals, "Generated Scene", winW, winH);
   }
 }
 

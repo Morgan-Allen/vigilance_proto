@@ -78,8 +78,8 @@ public class AIUtils implements TileConstants {
     int randX = orig.x + ((Rand.index(range) + 1) * (Rand.yes() ? 1 : -1));
     int randY = orig.y + ((Rand.index(range) + 1) * (Rand.yes() ? 1 : -1));
     Tile random = scene.tileAt(
-      Nums.clamp(randX, scene.size()),
-      Nums.clamp(randY, scene.size())
+      Nums.clamp(randX, scene.wide()),
+      Nums.clamp(randY, scene.high())
     );
     
     I.say("  "+person+" picked random tile to approach: "+random);
@@ -89,12 +89,13 @@ public class AIUtils implements TileConstants {
   
   static Action pickRetreatAction(Person person, Series <Person> foes) {
     Scene scene = person.currentScene();
-    int hS = scene.size() / 2, sD = scene.size() - 1;
+    
+    int wide = scene.wide(), high = scene.high();
     Tile exits[] = {
-      scene.tileAt(0 , hS),
-      scene.tileAt(hS, 0 ),
-      scene.tileAt(sD, hS),
-      scene.tileAt(hS, sD)
+      scene.tileAt(0       , high / 2),
+      scene.tileAt(wide / 2, 0       ),
+      scene.tileAt(wide - 1, high / 2),
+      scene.tileAt(wide / 2, high - 1)
     };
     
     final Pick <Tile> pick = new Pick();

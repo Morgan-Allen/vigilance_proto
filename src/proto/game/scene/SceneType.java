@@ -23,13 +23,15 @@ public abstract class SceneType extends Index.Entry implements
     WINDOW   = "Window"   ,
     PROP     = "Prop"     ,
     CHILD    = "Child"    ,
-    MIN_SIZE = "Min. Size",
-    MAX_SIZE = "Max. Size"
+    MIN_WIDE = "Min. Wide",
+    MAX_WIDE = "Max. Wide",
+    MIN_HIGH = "Min. High",
+    MAX_HIGH = "Max. High"
   ;
   
   final String name;
   
-  int minSize = -1, maxSize = -1;
+  int minWide = -1, maxWide = -1, minHigh = -1, maxHigh = -1;
   PropType borders, door, window, floors;
   PropType props[];
   float propWeights[];
@@ -53,8 +55,10 @@ public abstract class SceneType extends Index.Entry implements
       if (label == WINDOW  ) window  = (PropType) val;
       if (label == PROP    ) propB .add((PropType) val);
       if (label == CHILD   ) childB.add((SceneType) val);
-      if (label == MIN_SIZE) minSize = (Integer) val;
-      if (label == MAX_SIZE) maxSize = (Integer) val;
+      if (label == MIN_WIDE) minWide = (Integer) val;
+      if (label == MAX_WIDE) maxWide = (Integer) val;
+      if (label == MIN_HIGH) minHigh = (Integer) val;
+      if (label == MAX_HIGH) maxHigh = (Integer) val;
     } catch (Exception e) { I.report(e); }
     
     props    = propB .toArray(PropType.class);
@@ -105,7 +109,14 @@ public abstract class SceneType extends Index.Entry implements
   /**  Actual scene generation-
     */
   public Scene generateScene(World world) {
-    int size = 64;
+    int wide = clampSize(64, minWide, maxWide);
+    int high = clampSize(64, minHigh, maxHigh);
+    return generateScene(world, wide, high, false);
+  }
+  
+  
+  private int clampSize(int defaultSize, int minSize, int maxSize) {
+    int size = defaultSize;
     if (minSize > 0 && maxSize > 0) {
       int minMaxGap = maxSize - minSize;
       size = minSize;
@@ -115,17 +126,17 @@ public abstract class SceneType extends Index.Entry implements
     }
     else if (minSize > 0 && minSize > size) size = minSize;
     else if (maxSize > 0 && maxSize < size) size = maxSize;
-    return generateScene(world, size, false);
+    return size;
   }
   
   
   public abstract Scene generateScene(
-    World world, int size, boolean forTesting
+    World world, int wide, int high, boolean testing
   );
   
   
   public abstract void applyToScene(
-    Scene scene, int offX, int offY, int facing, int limit, boolean forTesting
+    Scene scene, int offX, int offY, int facing, int w, int h, boolean testing
   );
   
   

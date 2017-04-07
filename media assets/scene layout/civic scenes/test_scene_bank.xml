@@ -299,10 +299,11 @@
 
 
 <scene
-  name           = "Civic Test Structure"
-  ID             = "civic_test_structure"
+  name           = "Bank Scene Generated"
+  ID             = "bank_scene_generated"
   unitSize       = "6"
-  maxUnitsAcross = "3"
+  maxUnitsWide   = "3"
+  maxUnitsHigh   = "3"
   floor          = "civic_floor"
   wall           = "civic_wall"
   door           = "civic_door"
@@ -329,3 +330,33 @@
     percent  = "50"
   />
 </scene>
+
+
+<scene
+  name      = "Bank Scene Assembled"
+  ID        = "bank_scene_assembled"
+  unitSize  = "6"
+  unitsWide = "4"
+  unitsHigh = "3"
+  wall      = "civic_wall"
+  door      = "civic_door"
+  window    = "civic_window"
+>
+  <unit
+    typeID = "bank_scene_safe_vault"
+    wall   = "WALL_INTERIOR"
+    x = "1" y = "1" dir = "N"
+  />
+  <unit typeID = "bank_scene_teller_screens"  x = "1" y = "0" dir = "N"/>
+  <unit typeID = "bank_scene_general_seating" x = "2" y = "0" dir = "N"/>
+</scene>
+
+
+
+
+
+
+
+
+
+
