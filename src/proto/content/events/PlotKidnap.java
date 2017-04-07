@@ -13,13 +13,10 @@ public class PlotKidnap extends Plot {
   
   
   final public static Plot.Role
-    ROLE_TAILS   = new Plot.Role("role_tails"  , "Tails"  , PERP  ),
-    ROLE_GRABS   = new Plot.Role("role_grabs"  , "Grabs"  , PERP  ),
-    ROLE_DRUGS   = new Plot.Role("role_drugs"  , "Drugs"  , PERP  ),
-    ROLE_RANSOMS = new Plot.Role("role_ransoms", "Ransoms", VICTIM);
+    ROLE_TAILS       = new Plot.Role("role_tails"      , "Tails"      , PERP  ),
+    ROLE_RANSOMS     = new Plot.Role("role_ransoms"    , "Ransoms"    , VICTIM),
+    ROLE_RANSOM_HOME = new Plot.Role("role_ransom_home", "Ransom Home", VICTIM);
   
-  Step heistStep;
-  Step ransomStep;
   boolean returnedHostage;
   
   
@@ -30,16 +27,12 @@ public class PlotKidnap extends Plot {
   
   public PlotKidnap(Session s) throws Exception {
     super(s);
-    heistStep  = (Step) s.loadObject();
-    ransomStep = (Step) s.loadObject();
     returnedHostage = s.loadBool();
   }
   
   
   public void saveState(Session s) throws Exception {
     super.saveState(s);
-    s.saveObject(heistStep );
-    s.saveObject(ransomStep);
     s.saveBool(returnedHostage);
   }
   
@@ -62,58 +55,50 @@ public class PlotKidnap extends Plot {
     }
     if (pickT.empty()) return false;
     Person target = pickT.result();
-
-    Pick <Place > pickH = new Pick();
-    for (Region r : world.regionsInRange(target.region(), 1)) {
-      for (Place b : r.buildSlots()) {
-        if (b == null || b.isBase()) continue;
-        if (b == target.place() || b == target.resides()) continue;
-        pickH.compare(b, Rand.num());
-      }
-    }
-    if (pickH.empty()) return false;
-    Place hideout = pickH.result();
     
-    Series <Person> goons = PlotUtils.goonsOnRoster(this);
+    Series <Person> aides = PlotUtils.aidesOnRoster(this);
+    assignTarget(target, target.resides());
+    assignRole(target , ROLE_TARGET );
     assignRole(ransoms, ROLE_RANSOMS);
-    assignTarget   (target, target.resides());
-    assignOrganiser(base().leader(), hideout);
-    PlotUtils.fillExpertRole(this, SIGHT_RANGE, goons, ROLE_TAILS);
-    PlotUtils.fillExpertRole(this, MEDICINE   , goons, ROLE_DRUGS);
-    PlotUtils.fillExpertRole(this, MUSCLE     , goons, ROLE_GRABS);
-    assignRole(filling(ROLE_GRABS), Plot.ROLE_ENFORCER);
+    assignRole(ransoms.resides(), ROLE_RANSOM_HOME);
+    assignOrganiser(base().leader(), base());
     
-    queueMeeting(
-      "initial meeting",
-      Plot.ROLE_ORGANISER, ROLE_TAILS, ROLE_DRUGS
+    PlotUtils.fillHideoutRole(this, scene());
+    PlotUtils.fillExpertRole(this, BRAINS  , aides, ROLE_ENFORCER);
+    PlotUtils.fillExpertRole(this, REFLEXES, aides, ROLE_TAILS   );
+    
+    Step.queueStep(
+      "initial contacts", this,
+      ROLE_ORGANISER, ROLE_BASE, ROLE_ENFORCER, ROLE_HIDEOUT,
+      Lead.MEDIUM_WIRE, 24, ROLE_TAILS
     );
-    queueMessage(
-      "gives info",
-      Plot.ROLE_ORGANISER,
-      Plot.ROLE_ENFORCER,
-      Plot.ROLE_TARGET
+    Step.queueStep(
+      "tailing target", this,
+      ROLE_TAILS, ROLE_HIDEOUT, ROLE_TARGET, ROLE_SCENE,
+      Lead.MEDIUM_SURVEIL, 24
     );
-    queueStep(
-      "tails victim",
-      Lead.MEDIUM_SURVEIL,
-      World.HOURS_PER_DAY,
-      ROLE_TAILS, Plot.ROLE_TARGET
+    Step.queueStep(
+      "grab target", this,
+      ROLE_TAILS, ROLE_HIDEOUT, ROLE_TARGET, ROLE_SCENE,
+      Lead.MEDIUM_HEIST, 24, ROLE_ENFORCER
     );
-    queueMeeting(
-      "measures dose",
-      ROLE_TAILS, ROLE_DRUGS, ROLE_GRABS
+    Step.queueStep(
+      "deliver ransom", this,
+      ROLE_ENFORCER, ROLE_HIDEOUT, ROLE_RANSOMS, ROLE_RANSOM_HOME,
+      Lead.MEDIUM_WIRE, 24
     );
-    heistStep = queueHeist(
-      "heist",
-      Plot.ROLE_TARGET, ROLE_TAILS, ROLE_GRABS, Plot.ROLE_ENFORCER
+    Step.queueStep(
+      "ransom paid", this,
+      ROLE_RANSOMS, ROLE_RANSOM_HOME, ROLE_ENFORCER, ROLE_HIDEOUT,
+      Lead.MEDIUM_WIRE, 24
     );
-    ransomStep = queueStep(
-      "ransom",
-      Lead.MEDIUM_WIRE,
-      World.HOURS_PER_DAY,
-      Plot.ROLE_ORGANISER, ROLE_RANSOMS
+    Step.queueStep(
+      "reports and payoffs", this,
+      ROLE_ENFORCER, ROLE_HIDEOUT, ROLE_ORGANISER, ROLE_BASE,
+      Lead.MEDIUM_WIRE, 24, ROLE_TAILS
     );
-    return false;
+    
+    return true;
   }
   
   
@@ -124,14 +109,10 @@ public class PlotKidnap extends Plot {
   
   protected void onCompletion(Step step, boolean success) {
     Person target = (Person) target();
-    if (step == heistStep) {
-      I.say("Target resides: "+target.resides());
-      I.say("Target inside:  "+target.place  ());
+    if (step.hasLabel("grab target")) {
       hideout().setAttached(target, true);
-      I.say("Target resides: "+target.resides());
-      I.say("Target inside:  "+target.place  ());
     }
-    else if (step == ransomStep) {
+    else if (step.hasLabel("ransom paid")) {
       target.resides().setAttached(target, true);
       Person ransomed = (Person) filling(ROLE_RANSOMS);
       float cashGained = ransomed.stats.levelFor(INVESTMENT) * 50;
@@ -147,16 +128,5 @@ public class PlotKidnap extends Plot {
     return cashGained / (100 + baseFunds);
   }
 }
-
-
-
-
-
-
-
-
-
-
-
 
 

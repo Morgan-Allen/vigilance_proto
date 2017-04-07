@@ -10,6 +10,9 @@ import java.awt.Image;
 
 
 
+//  TODO:  Split off these various information types into separate classes of
+//  Clue?
+
 //  TODO:  Have this extend Element as originally intended?
 
 public class Clue implements Session.Saveable {
@@ -26,9 +29,9 @@ public class Clue implements Session.Saveable {
   Place placeFound;
   int timeFound;
   
-  //
-  //  TODO:  Split off these various information types into separate classes of
-  //  Clue?
+  int heistTime;
+  PlotType heistType;
+  
   Element match;
   boolean confirmed;
   
@@ -36,9 +39,6 @@ public class Clue implements Session.Saveable {
   
   Element location;
   int nearRange;
-  
-  int heistTime;
-  PlotType heistType;
   
   
   
@@ -95,7 +95,7 @@ public class Clue implements Session.Saveable {
   }
   
   
-  public void assignNearbyRegion(
+  public void assignNearbyLocation(
     Element match, Element near, int range,
     Lead source, int time, Place place
   ) {

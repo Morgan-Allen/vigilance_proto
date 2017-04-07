@@ -14,6 +14,20 @@ public class PlotUtils {
   
   /**  Helper methods for filling Roles:
     */
+  public static void fillHideoutRole(
+    Plot plot, Place crimeScene
+  ) {
+    Pick <Place > pickH = new Pick();
+    for (Place b : venuesNearby(plot, crimeScene, 1)) {
+      if (b.isBase() || b == crimeScene) continue;
+      pickH.compare(b, Rand.num());
+    }
+    if (pickH.empty()) return;
+    Place hideout = pickH.result();
+    plot.assignRole(hideout, Plot.ROLE_HIDEOUT);
+  }
+  
+  
   public static void fillExpertRole(
     Plot plot, Trait trait, Series <Person> candidates, Plot.Role role
   ) {
@@ -49,7 +63,7 @@ public class PlotUtils {
   }
   
   
-  public static Series <Person> goonsOnRoster(
+  public static Series <Person> aidesOnRoster(
     Plot plot
   ) {
     Batch <Person> goons = new Batch();
@@ -88,6 +102,12 @@ public class PlotUtils {
   
   
   
+  /**  Helper methods for queueing steps:
+    */
+  
+  
+  
+  
   /**  Helper methods for dealing with perps before and after a scene:
     */
   public static Scene generateHideoutScene(
@@ -101,9 +121,7 @@ public class PlotUtils {
   public static Scene generateHeistScene(
     Plot plot, Step step, Element focus, Task lead
   ) {
-    Series <Element> involved = plot.involved(step);
-    
-    if (! involved.includes(focus)) {
+    if (! Visit.arrayIncludes(step.involved(), focus)) {
       I.say("Step: "+step+" does not involve: "+focus);
       return null;
     }
@@ -118,7 +136,7 @@ public class PlotUtils {
     float forceLimit = dangerLevel * 10, forceSum = 0;
     
     final List <Person> forces = new List();
-    for (Element e : involved) if (e != null && e.isPerson()) {
+    for (Element e : step.involved()) if (e != null && e.isPerson()) {
       Person perp = (Person) e;
       forces.add(perp);
       forceSum += perp.stats.powerLevel();
@@ -181,8 +199,6 @@ public class PlotUtils {
         Clue redHanded = new Clue(plot, role);
         redHanded.confirmMatch(p, lead, time, scene.site());
         file.recordClue(redHanded, null, false);
-        
-        I.say("Confirming role: "+role+" for "+p);
         
         captives.add(p);
         evidence.add(file);

@@ -6,8 +6,6 @@ import proto.game.world.*;
 import proto.game.person.*;
 import proto.game.scene.*;
 import proto.util.*;
-import proto.view.base.MessageUtils;
-import proto.view.common.*;
 
 
 
@@ -118,95 +116,19 @@ public abstract class Plot extends Event {
   /**  Queueing and executing sub-events and generating clues for
     *  investigation-
     */
-  protected Step queueStep(
-    String label, int medium, int timeTaken, Role... involves
-  ) {
-    Step s = new Step();
-    s.label     = label;
-    s.ID        = steps.size();
-    s.involved  = involves ;
-    s.medium    = medium   ;
-    s.timeTaken = timeTaken;
-    if (Lead.isPhysical(medium)) s.setMeetsAt(involves[0]);
-    steps.add(s);
-    return s;
-  }
-  
-  
-  protected Step queueMeeting(String label, Role... involves) {
-    return queueStep(label, Lead.MEDIUM_MEET, World.HOURS_PER_DAY, involves);
-  }
-  
-  
-  protected Step queueMessage(String label, Role sends, Role gets, Role info) {
-    Step s;
-    s = queueStep(label, Lead.MEDIUM_WIRE, World.HOURS_PER_DAY, sends, gets);
-    if (info != null) s.setInfoGiven(info);
-    return s;
-  }
-  
-  
-  protected Step queueHeist(String label, Role... involved) {
-    return queueStep(label, Lead.MEDIUM_HEIST, World.HOURS_PER_DAY, involved);
-  }
-  
-  
-  protected boolean stepBegun(Step step) {
-    return step != null && step.timeStart >= 0;
-  }
-  
-  
-  public boolean stepComplete(Step step) {
-    if (! stepBegun(step)) return false;
-    int time = base.world().timing.totalHours();
-    return time >= step.timeStart + step.timeTaken;
-  }
-  
-  
-  public Series <Element> involved(Step step) {
-    Batch <Element> all = new Batch();
-    for (Role role : step.involved) all.include(filling(role));
-    return all;
-  }
-  
-  
-  public int stepTimeScheduled(Step step) {
-    if (currentStep() == null) return -1;
-    int time = -1;
-    for (Step s : steps) {
-      if (time == -1) time = s.timeStart;
-      time += s.timeTaken;
-      if (s == step) break;
-    }
-    return time;
-  }
-  
-  
-  public int stepTense(Step step) {
-    int start = step.timeStart, tense = Lead.TENSE_BEFORE;
-    if (start == -1) return Lead.TENSE_NONE;
-    int time = base.world().timing.totalHours();
-    boolean begun = start >= 0;
-    boolean done = time >= (step.timeStart + step.timeTaken);
-    if (begun) tense = done ? Lead.TENSE_AFTER : Lead.TENSE_DURING;
-    return tense;
-  }
-  
-  
   public Step currentStep() {
-    for (Step s : steps) if (stepBegun(s) && ! stepComplete(s)) return s;
-    return null;
-  }
-  
-  
-  public Step heistStep() {
-    for (Step s : steps) if (s.medium == Lead.MEDIUM_HEIST) return s;
-    return null;
+    return current;
   }
   
   
   public Step stepWithLabel(String label) {
     for (Step s : steps) if (label.equals(s.label)) return s;
+    return null;
+  }
+  
+  
+  public Step mainHeist() {
+    for (Step s : steps) if (s.medium == Lead.MEDIUM_HEIST) return s;
     return null;
   }
   
@@ -246,7 +168,7 @@ public abstract class Plot extends Event {
     }
     if (! possible()) return;
     
-    if (current == null || stepComplete(current)) {
+    if (current == null || current.complete()) {
       int time = world.timing.totalHours();
       
       if (current != null) {
@@ -500,7 +422,7 @@ public abstract class Plot extends Event {
   public void printSteps() {
     I.say("\nSteps are:");
     for (Step c : steps) {
-      int timeEnd = c.timeStart + c.timeTaken;
+      int timeEnd = c.timeStart + c.hoursTaken;
       if (c.timeStart == -1) I.say("  "+c+" ["+c.timeStart+"]");
       else I.say("  "+c+" ["+c.timeStart+"-"+timeEnd+"]");
     }

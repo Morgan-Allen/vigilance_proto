@@ -288,128 +288,11 @@ public class Lead extends Task {
   
   
   
-  /**  Utility methods for generating clues particular to a given subject.
-    */
-  /*
-  protected Series <Clue> traitClues(
-    Step step, int tense, Plot plot, float resultHeat
-  ) {
-    Batch <Clue> possible = new Batch();
-    int time = plot.base.world().timing.totalHours();
-    Place place = focus.place();
-    
-    for (Plot.Role role : step.involved) {
-      Element involved = plot.filling(role);
-      if (involved == focus) continue;
-      
-      if (involved.isPerson()) {
-        Person p = (Person) involved;
-        for (Trait t : Common.PERSON_TRAITS) {
-          if (p.stats.levelFor(t) <= 0) continue;
-          Clue clue = new Clue(plot, role);
-          clue.assignEvidence(p, t, this, time, place);
-          possible.add(clue);
-        }
-      }
-      
-      if (involved.isPlace()) {
-        Place p = (Place) involved;
-        for (Trait t : Common.VENUE_TRAITS) {
-          if (! p.hasProperty(t)) continue;
-          Clue clue = new Clue(plot, role);
-          clue.assignEvidence(p, t, this, time, place);
-          possible.add(clue);
-        }
-      }
-      
-      if (involved.isItem()) {
-        Item p = (Item) involved;
-        Clue clue = new Clue(plot, role);
-        clue.confirmMatch(p, this, time, place);
-        possible.add(clue);
-      }
-    }
-    
-    return possible;
-  }
-  
-  
-  protected Batch <Clue> regionClues(
-    Step step, int tense, Plot plot, float resultHeat
-  ) {
-    Batch <Clue> possible = new Batch();
-    int time = plot.base.world().timing.totalHours();
-    Place place = focus.place();
-    
-    for (Plot.Role role : step.involved) {
-      Element involved = plot.filling(role);
-      if (involved == focus) continue;
-      
-      Element p = (Element) involved;
-      Region at = involved.region();
-      int range = Rand.yes() ? 0 : 1;
-      Series <Region> around = base.world().regionsInRange(at, range);
-      
-      Region near = (Region) Rand.pickFrom(around);
-      Clue clue = new Clue(plot, role);
-      clue.assignNearbyRegion(p, near, range, this, time, place);
-      possible.add(clue);
-    }
-    
-    return possible;
-  }
-  
-  
-  protected Batch <Clue> intentClues(
-    Plot plot
-  ) {
-    Batch <Clue> possible = new Batch();
-    int time = plot.base.world().timing.totalHours();
-    Place place = focus.place();
-    
-    Step heist = plot.heistStep();
-    int heistTime = plot.stepTimeScheduled(heist);
-    PlotType heistType = (PlotType) plot.type;
-    
-    Clue forHeist = new Clue(plot, Plot.ROLE_OBJECTIVE);
-    forHeist.confirmHeistDetails(heistType, heistTime, this, time, place);
-    possible.add(forHeist);
-    
-    return possible;
-  }
-  
-  
-  protected void confirmIdentity(
-    Plot plot, Plot.Role role, int time, Place place
-  ) {
-    Element subject = plot.filling(role);
-    CaseFile file = base.leads.caseFor(subject);
-    Clue clue = new Clue(plot, role);
-    clue.confirmMatch(subject, this, time, place);
-    file.recordClue(clue);
-    
-    if (role == Plot.ROLE_TARGET) {
-      CaseFile forPlot = base.leads.caseFor(plot);
-      for (Clue intent : intentClues(plot)) forPlot.recordClue(intent);
-    }
-  }
-  //*/
-  
-  
-  
-  /**  Generation and screening of clues related to the case:
+  /**  Extraction and screening of clues related to the case:
     */
   protected boolean canDetect(
     Step step, int tense, Plot plot, int time
   ) {
-    //  TODO:  Frack.  This won't work, because the location of the focus may
-    //  have changed.
-    
-    //  The only solution is to leave clues attached to regions and persons
-    //  and places.  Frack.
-    
-    
-    /*
     //
     //  First check the tense-
     if (tense != TENSE_ANY && type.tense != TENSE_ANY && tense != type.tense) {
@@ -417,7 +300,7 @@ public class Lead extends Task {
     }
     if (tense == TENSE_AFTER) {
       if (step.timeStart < 0) return false;
-      int timeFromEnd = step.timeStart + step.timeTaken - time;
+      int timeFromEnd = step.timeStart + step.hoursTaken - time;
       if (timeFromEnd >= CLUE_EXPIRATION_TIME) return false;
     }
     //
@@ -433,17 +316,16 @@ public class Lead extends Task {
     //
     //  Then check the focus-
     boolean matchFocus = false;
-    for (Plot.Role role : step.involved) {
-      Element contacts = plot.filling(role);
-      
-      if (focus.isRegion()) {
-        if (contacts.region() != focus) continue;
-      }
-      else if (focus.isPlace()) {
-        if (contacts.place() != focus) continue;
-      }
-      else {
+    for (Element contacts : step.involved()) {
+      if (focus.isPerson()) {
         if (contacts != focus) continue;
+      }
+      if (focus.isPlace()) {
+        if (contacts != focus) continue;
+      }
+      if (focus.isRegion()) {
+        if (! contacts.isPlace()) continue;
+        if (contacts.region() != focus) continue;
       }
       matchFocus = true;
     }
@@ -451,8 +333,6 @@ public class Lead extends Task {
     //
     //  Then return true-
     return true;
-    //*/
-    return false;
   }
   
   
@@ -472,45 +352,19 @@ public class Lead extends Task {
     //
     //  Then perform the actual skill-test needed to ensure success:
     attempt = configAttempt(follow);
-    int outcome = attempt.performAttempt(2);
-    float result = (outcome == 2) ? RESULT_HOT : RESULT_PARTIAL;
-    Place place = focus.place();
+    int outcome = attempt.performAttempt(1);
+    Series <Clue> possible = step.possibleClues(focus, this);
     
-    /*
-    //
-    //  If you're on fire at the moment, you can get direct confirmation for
-    //  the identity of the participant/s, and any information or payload they
-    //  may have relayed to eachother.
-    if (result >= RESULT_HOT) {
-      for (Plot.Role role : step.involved) {
-        confirmIdentity(plot, role, time, place);
-      }
-      if (step.infoGiven != null) {
-        confirmIdentity(plot, step.infoGiven, time, place);
-      }
+    if (outcome > 0 && ! possible.empty()) {
+      Clue gained = (Clue) Rand.pickFrom(possible);
+      CaseFile file = base.leads.caseFor(focus);
+      file.recordClue(gained);
     }
-    //
-    //  If you're only partly successful, you might still get a glimpse of the
-    //  other parties or have a rough idea of where the meeting took place.
-    else if (result >= RESULT_PARTIAL) {
-      Series <Clue> fromTraits = traitClues (step, tense, plot, result);
-      Series <Clue> fromRegion = regionClues(step, tense, plot, result);
-      
-      Clue gained = null;
-      if (Rand.yes()    ) gained = (Clue) Rand.pickFrom(fromTraits);
-      if (gained == null) gained = (Clue) Rand.pickFrom(fromRegion);
-      
-      if (gained != null) {
-        CaseFile file = base.leads.caseFor(gained.match);
-        file.recordClue(gained);
-      }
-    }
-    //*/
     //
     //  Either way, you have to take the risk of tipping off the perps
     //  themselves:
     plot.takeSpooking(type.profile);
-    return result;
+    return outcome;
   }
   
   
@@ -576,21 +430,13 @@ public class Lead extends Task {
     Series <Person> active = active();
     World world = base.world();
     int time = world.timing.totalHours();
-    
-    
-    /*
     //
     //  Continuously monitor for events of interest connected to the current
     //  focus of your investigation, and see if any new information pops up...
     for (Event event : world.events.active()) if (event.isPlot()) {
       Plot plot = (Plot) event;
       for (Step step : plot.allSteps()) {
-        int tense = plot.stepTense(step);
-        
-        if (tense != TENSE_NONE) {
-          I.say("?");
-        }
-        
+        int tense = step.tense();
         if (canDetect(step, tense, plot, time)) {
           Scene scene = tryInterruptHeist(step, tense, plot, time);
           if (scene != null) {
@@ -612,8 +458,6 @@ public class Lead extends Task {
         }
       }
     }
-    //*/
-    
     return true;
   }
   
