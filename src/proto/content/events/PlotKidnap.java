@@ -18,7 +18,7 @@ public class PlotKidnap extends Plot {
     ROLE_DRUGS   = new Plot.Role("role_drugs"  , "Drugs"  , PERP  ),
     ROLE_RANSOMS = new Plot.Role("role_ransoms", "Ransoms", VICTIM);
   
-  
+  Step heistStep;
   Step ransomStep;
   boolean returnedHostage;
   
@@ -30,6 +30,7 @@ public class PlotKidnap extends Plot {
   
   public PlotKidnap(Session s) throws Exception {
     super(s);
+    heistStep  = (Step) s.loadObject();
     ransomStep = (Step) s.loadObject();
     returnedHostage = s.loadBool();
   }
@@ -37,6 +38,7 @@ public class PlotKidnap extends Plot {
   
   public void saveState(Session s) throws Exception {
     super.saveState(s);
+    s.saveObject(heistStep );
     s.saveObject(ransomStep);
     s.saveBool(returnedHostage);
   }
@@ -54,7 +56,8 @@ public class PlotKidnap extends Plot {
     Person ransoms = pickR.result();
     
     Pick <Person> pickT = new Pick(0);
-    for (Element e : ransoms.history.sortedBonds()) if (e.isPerson()) {
+    for (Element e : ransoms.history.sortedBonds()) {
+      if (e == ransoms || ! e.isPerson()) continue;
       pickT.compare((Person) e, ransoms.history.bondWith(e));
     }
     if (pickT.empty()) return false;
@@ -64,6 +67,7 @@ public class PlotKidnap extends Plot {
     for (Region r : world.regionsInRange(target.region(), 1)) {
       for (Place b : r.buildSlots()) {
         if (b == null || b.isBase()) continue;
+        if (b == target.place() || b == target.resides()) continue;
         pickH.compare(b, Rand.num());
       }
     }
@@ -99,7 +103,7 @@ public class PlotKidnap extends Plot {
       "measures dose",
       ROLE_TAILS, ROLE_DRUGS, ROLE_GRABS
     );
-    queueHeist(
+    heistStep = queueHeist(
       "heist",
       Plot.ROLE_TARGET, ROLE_TAILS, ROLE_GRABS, Plot.ROLE_ENFORCER
     );
@@ -120,8 +124,12 @@ public class PlotKidnap extends Plot {
   
   protected void onCompletion(Step step, boolean success) {
     Person target = (Person) target();
-    if (step.isHeist()) {
+    if (step == heistStep) {
+      I.say("Target resides: "+target.resides());
+      I.say("Target inside:  "+target.place  ());
       hideout().setAttached(target, true);
+      I.say("Target resides: "+target.resides());
+      I.say("Target inside:  "+target.place  ());
     }
     else if (step == ransomStep) {
       target.resides().setAttached(target, true);

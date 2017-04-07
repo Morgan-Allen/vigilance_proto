@@ -21,8 +21,8 @@ public class GameSettings {
   ;
   
   public static boolean
-    reportMediaMiss = true,
-    reportWorldInit = true,
+    reportMediaMiss = false,
+    reportWorldInit = false,
     freeTipoffs     = false || SIMPLE_EVENTS,
     freeLeads       = false || SIMPLE_EVENTS,
     debugScene      = false,

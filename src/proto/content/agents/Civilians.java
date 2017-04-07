@@ -158,8 +158,17 @@ public class Civilians {
     Common.VENUE_RITZY,
     Common.VENUE_DOMESTIC
   );
+  
+  final public static PlaceType CITY_JAIL = new PlaceType(
+    "City Jail", "facility_city_jail",
+    "media assets/tech icons/icon_city_jail.png",
+    "",
+    0, BUILD_TIME_MEDIUM, URBAN_SCENE,
+    EMPLOYMENT, 1,
+    INCOME, -100,
+    Common.VENUE_SECURITY,
+    Common.VENUE_INDUSTRIAL
+  );
 }
-
-
 
 

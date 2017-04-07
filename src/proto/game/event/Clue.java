@@ -34,7 +34,7 @@ public class Clue implements Session.Saveable {
   
   Trait trait;
   
-  Region near;
+  Element location;
   int nearRange;
   
   int heistTime;
@@ -55,7 +55,7 @@ public class Clue implements Session.Saveable {
     match      = (Element) s.loadObject();
     confirmed  = s.loadBool();
     trait      = (Trait) s.loadObject();
-    near       = (Region) s.loadObject();
+    location   = (Element) s.loadObject();
     nearRange  = s.loadInt();
     leadType   = Lead.LEAD_TYPES[s.loadInt()];
     source     = (Lead) s.loadObject();
@@ -71,7 +71,7 @@ public class Clue implements Session.Saveable {
     s.saveObject(match      );
     s.saveBool  (confirmed  );
     s.saveObject(trait      );
-    s.saveObject(near       );
+    s.saveObject(location   );
     s.saveInt   (nearRange  );
     s.saveInt   (leadType.ID);
     s.saveObject(source     );
@@ -96,12 +96,12 @@ public class Clue implements Session.Saveable {
   
   
   public void assignNearbyRegion(
-    Element match, Region near, int range,
+    Element match, Element near, int range,
     Lead source, int time, Place place
   ) {
     confirmDetails(source.type, time, place);
     this.match     = match ;
-    this.near      = near  ;
+    this.location  = near  ;
     this.nearRange = range ;
     this.source    = source;
   }
@@ -158,8 +158,8 @@ public class Clue implements Session.Saveable {
       return true;
     }
     
-    if (isRegionClue() && other.isRegionClue()) {
-      if (near != other.near) return false;
+    if (isLocationClue() && other.isLocationClue()) {
+      if (location != other.location) return false;
       if (nearRange > other.nearRange) return false;
       return true;
     }
@@ -192,8 +192,8 @@ public class Clue implements Session.Saveable {
   }
   
   
-  public boolean isRegionClue() {
-    return near != null;
+  public boolean isLocationClue() {
+    return location != null;
   }
   
   
@@ -244,8 +244,14 @@ public class Clue implements Session.Saveable {
         if (! p.hasProperty(trait)) return false;
       }
     }
-    if (near != null) {
-      if (e.world().distanceBetween(near, e.region()) > nearRange) {
+    if (location != null) {
+      Region near = location.region();
+      float dist = e.world().distanceBetween(near, e.region());
+      
+      if (location.isPlace() && nearRange == 0) {
+        if (e.place() != location) return false;
+      }
+      else if (dist > nearRange) {
         return false;
       }
     }
@@ -278,10 +284,10 @@ public class Clue implements Session.Saveable {
     desc.append(" at "+world.timing.timeString(timeFound));
     desc.append(" indicates that "+plot.nameForCase(base)+"'s "+role);
     
-    if (match != null && confirmed    ) desc.append(" is: "+match);
-    if (trait != null                 ) desc.append(" has trait: "+trait);
-    if (near != null && nearRange == 0) desc.append(" is within: "+near);
-    if (near != null && nearRange > 0 ) desc.append(" is near: "+near);
+    if (match != null && confirmed        ) desc.append(" is: "+match);
+    if (trait != null                     ) desc.append(" has trait: "+trait);
+    if (location != null && nearRange == 0) desc.append(" inisde:  "+location);
+    if (location != null && nearRange > 0 ) desc.append(" is near: "+location);
     
     return desc.toString();
   }
@@ -291,9 +297,9 @@ public class Clue implements Session.Saveable {
     if (trait != null) {
       return ""+trait;
     }
-    if (near != null) {
-      if (nearRange == 0) return "in "+near;
-      else                return "near "+near;
+    if (location != null) {
+      if (nearRange == 0) return "in "+location;
+      else                return "near "+location;
     }
     return "";
   }

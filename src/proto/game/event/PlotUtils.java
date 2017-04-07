@@ -90,7 +90,15 @@ public class PlotUtils {
   
   /**  Helper methods for dealing with perps before and after a scene:
     */
-  public static Scene generateScene(
+  public static Scene generateHideoutScene(
+    Plot plot, Step step, Element focus, Task lead
+  ) {
+    //  TODO:  This should change later!
+    return generateHeistScene(plot, step, focus, lead);
+  }
+  
+  
+  public static Scene generateHeistScene(
     Plot plot, Step step, Element focus, Task lead
   ) {
     Series <Element> involved = plot.involved(step);

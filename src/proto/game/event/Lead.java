@@ -25,12 +25,12 @@ public class Lead extends Task {
     MEDIUM_SURVEIL  =  3,
     MEDIUM_HEIST    =  4,
     MEDIUM_QUESTION =  5,
-    MEDIUM_COVER    =  6,
     MEDIUM_ANY      = -1,
     PHYSICAL_MEDIA[] = { 1, 3, 4, 5, 6 },
     SOCIAL_MEDIA  [] = { 1, 5 },
     WIRED_MEDIA   [] = { 2 },
     //  Whether this lead can pick up on past/present/future contacts-
+    TENSE_NONE      = -2,
     TENSE_BEFORE    =  0,
     TENSE_DURING    =  1,
     TENSE_AFTER     =  2,
@@ -205,6 +205,14 @@ public class Lead extends Task {
       MEDIUM_SURVEIL, FOCUS_ANY, TENSE_DURING, PROFILE_OBVIOUS,
       CONFIDENCE_HIGH, MEDIUM_MEET, MEDIUM_HEIST
     ),
+    LEAD_BUST = new Type(
+      "Bust", 11,
+      "Bust down the doors and unleash hell.",
+      ICON_DIR+"icon_guard_lead.png",
+      new String[] { "Busted", "Busting", "Will Bust" },
+      MEDIUM_HEIST, FOCUS_ANY, TENSE_DURING, PROFILE_OBVIOUS,
+      CONFIDENCE_HIGH
+    ),
     LEAD_TYPES[] = TYPE_B.toArray(Type.class);
   
   
@@ -282,6 +290,7 @@ public class Lead extends Task {
   
   /**  Utility methods for generating clues particular to a given subject.
     */
+  /*
   protected Series <Clue> traitClues(
     Step step, int tense, Plot plot, float resultHeat
   ) {
@@ -384,6 +393,7 @@ public class Lead extends Task {
       for (Clue intent : intentClues(plot)) forPlot.recordClue(intent);
     }
   }
+  //*/
   
   
   
@@ -392,6 +402,14 @@ public class Lead extends Task {
   protected boolean canDetect(
     Step step, int tense, Plot plot, int time
   ) {
+    //  TODO:  Frack.  This won't work, because the location of the focus may
+    //  have changed.
+    
+    //  The only solution is to leave clues attached to regions and persons
+    //  and places.  Frack.
+    
+    
+    /*
     //
     //  First check the tense-
     if (tense != TENSE_ANY && type.tense != TENSE_ANY && tense != type.tense) {
@@ -421,6 +439,9 @@ public class Lead extends Task {
       if (focus.isRegion()) {
         if (contacts.region() != focus) continue;
       }
+      else if (focus.isPlace()) {
+        if (contacts.place() != focus) continue;
+      }
       else {
         if (contacts != focus) continue;
       }
@@ -430,6 +451,8 @@ public class Lead extends Task {
     //
     //  Then return true-
     return true;
+    //*/
+    return false;
   }
   
   
@@ -452,6 +475,8 @@ public class Lead extends Task {
     int outcome = attempt.performAttempt(2);
     float result = (outcome == 2) ? RESULT_HOT : RESULT_PARTIAL;
     Place place = focus.place();
+    
+    /*
     //
     //  If you're on fire at the moment, you can get direct confirmation for
     //  the identity of the participant/s, and any information or payload they
@@ -480,6 +505,7 @@ public class Lead extends Task {
         file.recordClue(gained);
       }
     }
+    //*/
     //
     //  Either way, you have to take the risk of tipping off the perps
     //  themselves:
@@ -497,7 +523,7 @@ public class Lead extends Task {
     
     if (type.medium == MEDIUM_SURVEIL) {
       skill = SIGHT_RANGE;
-      range = 5;
+      range = 10;
       
       if (perp != null) obstacle = perp.stats.levelFor(HIDE_RANGE);
       if (site != null) obstacle = 2;
@@ -522,15 +548,6 @@ public class Lead extends Task {
       if (area != null) obstacle = 10;
     }
     
-    if (type.medium == MEDIUM_COVER) {
-      skill = PERSUADE;
-      range = 10;
-      
-      if (perp != null) obstacle = perp.stats.levelFor(SIGHT_RANGE) * 2;
-      if (site != null) obstacle = 10;
-      if (area != null) obstacle = 10;
-    }
-    
     Attempt attempt = new Attempt(this);
     attempt.addTest(skill, range, obstacle);
     attempt.setAssigned(attempting);
@@ -541,9 +558,16 @@ public class Lead extends Task {
   protected Scene tryInterruptHeist(
     Step step, int tense, Plot plot, int time
   ) {
-    if (tense       != TENSE_DURING) return null;
-    if (step.medium != MEDIUM_HEIST) return null;
-    return plot.generateScene(step, focus, this);
+    if (tense != TENSE_DURING) {
+      return null;
+    }
+    if (focus.place() == plot.hideout() && type.medium == MEDIUM_HEIST) {
+      return plot.generateScene(step, focus, this);
+    }
+    if (step.medium == MEDIUM_HEIST) {
+      return plot.generateScene(step, focus, this);
+    }
+    return null;
   }
   
   
@@ -552,6 +576,9 @@ public class Lead extends Task {
     Series <Person> active = active();
     World world = base.world();
     int time = world.timing.totalHours();
+    
+    
+    /*
     //
     //  Continuously monitor for events of interest connected to the current
     //  focus of your investigation, and see if any new information pops up...
@@ -559,6 +586,11 @@ public class Lead extends Task {
       Plot plot = (Plot) event;
       for (Step step : plot.allSteps()) {
         int tense = plot.stepTense(step);
+        
+        if (tense != TENSE_NONE) {
+          I.say("?");
+        }
+        
         if (canDetect(step, tense, plot, time)) {
           Scene scene = tryInterruptHeist(step, tense, plot, time);
           if (scene != null) {
@@ -580,6 +612,8 @@ public class Lead extends Task {
         }
       }
     }
+    //*/
+    
     return true;
   }
   

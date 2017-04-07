@@ -71,17 +71,23 @@ public class BaseLeads {
   
   public Series <Lead> leadsFor(Element focus) {
     final Batch <Lead> all = new Batch();
+    CaseFile file = caseFor(focus);
+    boolean canMeet = focus.canEnter(base);
+    if (! file.subjectAtKnownLocation()) return all;
+    
     if (focus.isPerson()) {
       all.add(leadFor(focus, Lead.LEAD_SURVEIL_PERSON));
-      all.add(leadFor(focus, Lead.LEAD_QUESTION));
+      if (canMeet) all.add(leadFor(focus, Lead.LEAD_QUESTION));
     }
     if (focus.isPlace()) {
       all.add(leadFor(focus, Lead.LEAD_SURVEIL_BUILDING));
       all.add(leadFor(focus, Lead.LEAD_WIRETAP));
+      if (canMeet) all.add(leadFor(focus, Lead.LEAD_SEARCH));
     }
     if (focus.isRegion()) {
       all.add(leadFor(focus, Lead.LEAD_PATROL));
-      all.add(leadFor(focus, Lead.LEAD_CANVASS));
+      all.add(leadFor(focus, Lead.LEAD_SCAN));
+      if (canMeet) all.add(leadFor(focus, Lead.LEAD_CANVASS));
     }
     return all;
   }

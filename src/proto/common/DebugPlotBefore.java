@@ -9,12 +9,12 @@ import proto.game.world.*;
 
 
 
-public class DebugPlots extends RunGame {
+public class DebugPlotBefore extends RunGame {
   
   
   public static void main(String args[]) {
     GameSettings.freeTipoffs = true;
-    runGame(new DebugPlots(), "saves/debug_plots");
+    runGame(new DebugPlotBefore(), "saves/debug_plot_before");
   }
   
   
@@ -39,9 +39,6 @@ public class DebugPlots extends RunGame {
     world.view().missionView.setActiveFocus(kidnap, true);
     return world;
   }
-  
 }
-
-
 
 

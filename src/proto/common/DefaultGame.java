@@ -223,7 +223,7 @@ public class DefaultGame extends RunGame {
     //  neighbouring sectors:
     for (Person p : civilians) {
       Batch <Person> neighbours = new Batch();
-      for (Person o : civilians) {
+      for (Person o : civilians) if (o != p) {
         if (world.distanceBetween(p.region(), o.region()) > 1) continue;
         neighbours.add(o);
       }
@@ -242,7 +242,7 @@ public class DefaultGame extends RunGame {
       Person boss = base.leader();
       
       Batch <Person> enemies = new Batch();
-      for (Person p : civilians) {
+      for (Person p : civilians) if (p != boss) {
         if (Visit.arrayIncludes(Civilians.CIVIC_TYPES, p.kind())) {
           enemies.add(p);
         }

@@ -122,6 +122,12 @@ public class Element implements Session.Saveable {
   }
   
   
+  public boolean canEnter(Base belongs) {
+    Access level = accessLevel(belongs);
+    return level == Access.GRANTED || level == Access.POSSIBLE;
+  }
+  
+  
   final static Batch NO_TRAITS = new Batch();
   
   public Series <Object> traits() {
@@ -170,6 +176,9 @@ public class Element implements Session.Saveable {
     return kind().sprite();
   }
 }
+
+
+
 
 
 

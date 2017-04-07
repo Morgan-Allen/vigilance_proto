@@ -183,10 +183,11 @@ public abstract class Plot extends Event {
   
   
   public int stepTense(Step step) {
-    int time = base.world().timing.totalHours();
     int start = step.timeStart, tense = Lead.TENSE_BEFORE;
+    if (start == -1) return Lead.TENSE_NONE;
+    int time = base.world().timing.totalHours();
     boolean begun = start >= 0;
-    boolean done = time > (step.timeStart + step.timeTaken);
+    boolean done = time >= (step.timeStart + step.timeTaken);
     if (begun) tense = done ? Lead.TENSE_AFTER : Lead.TENSE_DURING;
     return tense;
   }
@@ -433,12 +434,17 @@ public abstract class Plot extends Event {
     
     if (ends && step.medium == Lead.MEDIUM_HEIST) {
       EventEffects effects = generateEffects(step);
-      Element target = target();
+      Element target = target(), scene = scene();
       
-      Clue clue = new Clue(this, ROLE_TARGET);
-      clue.confirmTipoff(target(), Lead.LEAD_REPORT, time, site);
-      CaseFile file = player.leads.caseFor(target);
-      file.recordClue(clue, effects, true);
+      Clue repT = new Clue(this, ROLE_TARGET);
+      repT.confirmTipoff(target(), Lead.LEAD_REPORT, time, site);
+      CaseFile fileT = player.leads.caseFor(target);
+      fileT.recordClue(repT, effects, true);
+      
+      Clue repS = new Clue(this, ROLE_SCENE);
+      repS.confirmTipoff(scene, Lead.LEAD_REPORT, time, site);
+      CaseFile fileS = player.leads.caseFor(scene);
+      fileS.recordClue(repS, null, false);
       
       effects.applyEffects(target.place());
     }
@@ -458,7 +464,13 @@ public abstract class Plot extends Event {
   
   
   public Scene generateScene(Step step, Element focus, Lead lead) {
-    return PlotUtils.generateScene(this, step, focus, lead);
+    if (focus == hideout()) {
+      return PlotUtils.generateHideoutScene(this, step, focus, lead);
+    }
+    if (step.isHeist()) {
+      return PlotUtils.generateHeistScene(this, step, focus, lead);
+    }
+    return null;
   }
   
   
