@@ -2,7 +2,29 @@
 <prop
   name       = "Floor"
   ID         = "civic_floor"
-  sprite     = "floor_1.png"
+  sprite     = "floor_marble_2.png"
+  wide       = "1"
+  high       = "1"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+  blockSight = "false"
+/>
+
+<prop
+  name       = "Floor Edge"
+  ID         = "civic_floor_edge"
+  sprite     = "floor_marble_edge.png"
+  wide       = "1"
+  high       = "1"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+  blockSight = "false"
+/>
+
+<prop
+  name       = "Floor Corner"
+  ID         = "civic_floor_corner"
+  sprite     = "floor_marble_corner.png"
   wide       = "1"
   high       = "1"
   subtype    = "SUBTYPE_WALLING"
@@ -37,6 +59,17 @@
   name       = "Door"
   ID         = "civic_door"
   sprite     = "wall_thin_door.png"
+  wide       = "1"
+  high       = "0"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+  blockSight = "true"
+/>
+
+<prop
+  name       = "Glass Door"
+  ID         = "civic_glass_door"
+  sprite     = "glass_door.png"
   wide       = "1"
   high       = "0"
   subtype    = "SUBTYPE_WALLING"
@@ -200,9 +233,40 @@
   subtype    = "SUBTYPE_DETAIL"
   blockLevel = "BLOCK_NONE"
   blockSight = "false"
-
 />
 
+<prop
+  name       = "Revolving Door"
+  ID         = "revolving_door"
+  sprite     = "revolving_door.png"
+  wide       = "3"
+  high       = "2"
+  subtype    = "SUBTYPE_DETAIL"
+  blockLevel = "BLOCK_NONE"
+  blockSight = "false"
+/>
+
+<prop
+  name       = "Security Desk"
+  ID         = "security_desk"
+  sprite     = "security_desk.png"
+  wide       = "2"
+  high       = "5"
+  subtype    = "SUBTYPE_DETAIL"
+  blockLevel = "BLOCK_NONE"
+  blockSight = "false"
+/>
+
+<prop
+  name       = "elevators"
+  ID         = "elevators"
+  sprite     = "elevators.png"
+  wide       = "4"
+  high       = "2"
+  subtype    = "SUBTYPE_DETAIL"
+  blockLevel = "BLOCK_NONE"
+  blockSight = "false"
+/>
 
 <scene
   name   = "Safe Vault"
@@ -242,6 +306,56 @@
 
 
 <scene
+  name   = "General Entrance"
+  ID     = "bank_scene_general_entrance"
+  wide   = "12"
+  high   = "12"
+  floor  = "civic_floor"
+  wall   = "civic_wall"
+  door   = "civic_glass_door"
+  window = "civic_window"
+>
+<grid
+  1 = "civic_floor"
+  2 = "civic_floor_edge"
+  3 = "civic_floor_corner"
+  4 = "civic_metal_floor"
+>
+  4  4  4  4  4  4  4  4  4   4  4  4
+  4  4  4  4  4  4  4  4  4   4  4  4
+  3  2e 2e 2e 2e 2e 2e 2e 2e  2e 2e 2s
+  2  1  1  1  1  1  1  1  1   1  1  2s
+  2  1  1  1  1  1  1  1  1   1  1  2s
+  2  1  1  1  1  1  1  1  1   1  1  2s
+  2  1  1  1  1  1  1  1  1   1  1  2s
+  2  1  1  1  1  1  1  1  1   1  1  2s
+  2  1  1  1  1  1  1  1  1   1  1  2s
+  2  1  1  1  1  1  1  1  1   1  1  2s
+  2  1  1  1  1  1  1  1  1   1  1  2s
+  3w 2w 2w 2w 2w 2w 2w 2w 2w  2w 2w 3s
+</grid>
+  <grid
+    1 = "bank_plant_1"
+    2 = "revolving_door"
+    3 = "security_desk"
+    4 = "elevators"
+  >
+    .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  2  .  .  2  .  .  .  .
+    -  -  -  -/ .  .  .  .  .  . -/  -
+    .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  3  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .
+    4  .  .  .  .  .  .  .  4  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .
+  </grid>
+</scene>
+
+<scene
   name   = "Teller Screens"
   ID     = "bank_scene_teller_screens"
   wide   = "6"
@@ -251,6 +365,18 @@
   door   = "civic_door"
   window = "civic_window"
 >
+<grid
+  1 = "civic_floor"
+  2 = "civic_floor_edge"
+  3 = "civic_floor_corner"
+>
+  3 2e 2e 2e 2e 3e
+  2 1 1 1 1 2s
+  2 1 1 1 1 2s
+  2 1 1 1 1 2s
+  2 1 1 1 1 2s
+  3w 2w 2w 2w 2w 3s
+</grid>
   <grid
     1 = "bank_chair"
     2 = "bank_small_table"
@@ -301,9 +427,9 @@
 <scene
   name           = "Bank Scene Generated"
   ID             = "bank_scene_generated"
-  unitSize       = "6"
-  maxUnitsWide   = "3"
-  maxUnitsHigh   = "3"
+  unitSize       = "12"
+  maxUnitsWide   = "6"
+  maxUnitsHigh   = "6"
   floor          = "civic_floor"
   wall           = "civic_wall"
   door           = "civic_door"
@@ -320,7 +446,6 @@
     typeID   = "bank_scene_teller_screens"
     wall     = "WALL_EXTERIOR"
     priority = "PRIORITY_MEDIUM"
-    maxCount = "2"
     percent  = "50"
   />
   <unit
@@ -336,17 +461,37 @@
   name      = "Bank Scene Assembled"
   ID        = "bank_scene_assembled"
   unitSize  = "6"
-  unitsWide = "1"
-  unitsHigh = "1"
+  unitsWide = "6"
+  unitsHigh = "6"
   wall      = "civic_wall"
   door      = "civic_door"
   window    = "civic_window"
 >
+
+  <unit
+    typeID = "bank_scene_general_entrance"
+    wall   = "WALL_INTERIOR"
+    x = "0" y = "0" dir = "N"
+  />
+
   <unit
     typeID = "bank_scene_safe_vault"
     wall   = "WALL_INTERIOR"
-    x = "1" y = "1" dir = "N"
+    x = "0" y = "2" dir = "N"
   />
-  <unit typeID = "bank_scene_teller_screens"  x = "1" y = "0" dir = "N"/>
-  <unit typeID = "bank_scene_general_seating" x = "2" y = "0" dir = "N"/>
+  <unit
+    typeID = "bank_scene_general_seating"
+    wall   = "WALL_EXTERIOR"
+    x = "2" y = "0" dir = "N"
+  />
+  <unit
+    typeID = "bank_scene_general_seating"
+    wall   = "WALL_EXTERIOR"
+    x = "2" y = "1" dir = "N"
+  />
+  <unit
+    typeID = "bank_scene_teller_screens"
+    wall   = "WALL_EXTERIOR"
+    x = "2" y = "2" dir = "N"
+  />
 </scene>
