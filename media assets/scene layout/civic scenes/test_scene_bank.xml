@@ -310,7 +310,6 @@
   ID     = "bank_scene_general_entrance"
   wide   = "12"
   high   = "12"
-  floor  = "civic_floor"
   wall   = "civic_wall"
   door   = "civic_glass_door"
   window = "civic_window"
@@ -321,19 +320,19 @@
   3 = "civic_floor_corner"
   4 = "civic_metal_floor"
 >
-  4  4  4  4  4  4  4  4  4   4  4  4
-  4  4  4  4  4  4  4  4  4   4  4  4
-  3  2e 2e 2e 2e 2e 2e 2e 2e  2e 2e 2s
-  2  1  1  1  1  1  1  1  1   1  1  2s
-  2  1  1  1  1  1  1  1  1   1  1  2s
-  2  1  1  1  1  1  1  1  1   1  1  2s
-  2  1  1  1  1  1  1  1  1   1  1  2s
-  2  1  1  1  1  1  1  1  1   1  1  2s
-  2  1  1  1  1  1  1  1  1   1  1  2s
-  2  1  1  1  1  1  1  1  1   1  1  2s
-  2  1  1  1  1  1  1  1  1   1  1  2s
-  3w 2w 2w 2w 2w 2w 2w 2w 2w  2w 2w 3s
-</grid>
+  4  4  4  4  4  4  4  4  4  4  4  4
+  4  4  4  4  4  4  4  4  4  4  4  4
+  3  2e 2e 2e 2e 2e 2e 2e 2e 2e 2e 3e
+  2  1  1  1  1  1  1  1  1  1  1  2s
+  2  1  1  1  1  1  1  1  1  1  1  2s
+  2  1  1  1  1  1  1  1  1  1  1  2s
+  2  1  1  1  1  1  1  1  1  1  1  2s
+  2  1  1  1  1  1  1  1  1  1  1  2s
+  2  1  1  1  1  1  1  1  1  1  1  2s
+  3w 2w 2w 2w 2w 2w 2w 2w 2w 2w 2w 3s
+  1  1  1  1  1  1  1  1  1  1  1  1
+  1  1  1  1  1  1  1  1  1  1  1  1
+</grid
   <grid
     1 = "bank_plant_1"
     2 = "revolving_door"
@@ -360,7 +359,6 @@
   ID     = "bank_scene_teller_screens"
   wide   = "6"
   high   = "6"
-  floor  = "civic_floor"
   wall   = "civic_wall"
   door   = "civic_door"
   window = "civic_window"
@@ -370,11 +368,11 @@
   2 = "civic_floor_edge"
   3 = "civic_floor_corner"
 >
-  3 2e 2e 2e 2e 3e
-  2 1 1 1 1 2s
-  2 1 1 1 1 2s
-  2 1 1 1 1 2s
-  2 1 1 1 1 2s
+  3  2e 2e 2e 2e 3e
+  2  1  1  1  1  2s
+  2  1  1  1  1  2s
+  2  1  1  1  1  2s
+  2  1  1  1  1  2s
   3w 2w 2w 2w 2w 3s
 </grid>
   <grid
@@ -428,8 +426,8 @@
   name           = "Bank Scene Generated"
   ID             = "bank_scene_generated"
   unitSize       = "12"
-  maxUnitsWide   = "6"
-  maxUnitsHigh   = "6"
+  maxUnitsWide   = "2"
+  maxUnitsHigh   = "2"
   floor          = "civic_floor"
   wall           = "civic_wall"
   door           = "civic_door"
