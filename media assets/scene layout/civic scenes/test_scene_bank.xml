@@ -11,6 +11,17 @@
 />
 
 <prop
+  name       = "Office Floor"
+  ID         = "office_floor"
+  sprite     = "office_floor_2.png"
+  wide       = "1"
+  high       = "1"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+  blockSight = "false"
+/>
+
+<prop
   name       = "Floor Edge"
   ID         = "civic_floor_edge"
   sprite     = "floor_marble_edge.png"
@@ -227,7 +238,7 @@
 <prop
   name       = "Desk Phone"
   ID         = "bank_desk_phone"
-  sprite     = "desk_phone.png"
+  sprite     = "desk_phone_2.png"
   wide       = "1"
   high       = "1"
   subtype    = "SUBTYPE_DETAIL"
@@ -268,6 +279,16 @@
   blockSight = "true"
 />
 
+<prop
+  name       = "cubicles"
+  ID         = "cubicles"
+  sprite     = "cubicles.png"
+  wide       = "4"
+  high       = "4"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "false"
+/>
 
 <scene
   name   = "Safe Vault"
@@ -422,6 +443,49 @@
   </grid>
 </scene>
 
+<scene
+  name   = "General Office"
+  ID     = "bank_scene_general_office"
+  wide   = "12"
+  high   = "6"
+  floor  = "office_floor"
+  wall   = "civic_wall"
+  door   = "civic_door"
+  window = "civic_window"
+>
+  <grid
+    1 = "cubicles"
+
+  >
+    .  .  .  .  .  . .  .  . . . .
+    .  .  .  1  .  . .  .  . . . .
+    .  .  .  .  .  . .  .  . . . .
+    .  .  .  .  .  . .  .  . . . .
+    .  .  .  .  .  . .  .  . . 1s .
+    .  .  .  .  .  . .  .  . . . .
+
+  </grid>
+</scene>
+
+<scene
+  name           = "Bank Office Generated"
+  ID             = "bank_office_generated"
+  unitSize       = "6"
+  maxUnitsWide   = "4"
+  maxUnitsHigh   = "4"
+  floor          = "civic_floor"
+  wall           = "civic_wall"
+  door           = "civic_door"
+  window         = "civic_window"
+>
+  <unit
+    typeID   = "bank_scene_general_office"
+    wall     = "WALL_EXTERIOR"
+    priority = "PRIORITY_MEDIUM"
+    minCount = "3"
+    maxCount = "4"
+  />
+</scene>
 
 <scene
   name           = "Bank Scene Generated"
@@ -510,6 +574,10 @@
     wall   = "WALL_EXTERIOR"
     x = "2" y = "1" dir = "N"
   />
+
+  <unit
+    typeID = "bank_office_generated"
+    wall   = "WALL_EXTERIOR"
+    x = "0" y = "3" dir = "N"
+  />
 </scene>
-
-
