@@ -138,7 +138,8 @@ public abstract class Plot extends Event {
   
   
   protected Step queueMessage(String label, Role sends, Role gets, Role info) {
-    Step s = queueStep(label, Lead.MEDIUM_WIRE, World.HOURS_PER_DAY, sends, gets);
+    Step s;
+    s = queueStep(label, Lead.MEDIUM_WIRE, World.HOURS_PER_DAY, sends, gets);
     if (info != null) s.setInfoGiven(info);
     return s;
   }

@@ -83,7 +83,7 @@ public class Prop extends Element implements TileConstants {
   
   
   public static Visit <Tile> tilesUnder(
-    PropType type, final Scene scene,
+    PropType type, final Scenery scene,
     final int x, final int y, final int facing, final int margin
   ) {
     return (Visit <Tile>) allUnder(type, scene, x, y, facing, margin);
@@ -91,7 +91,7 @@ public class Prop extends Element implements TileConstants {
   
   
   private static Visit allUnder(
-    PropType type, final Scene scene,
+    PropType type, final Scenery scene,
     final int x, final int y, final int facing, final int margin
   ) {
     final int w = Nums.max(1, type.wide()), h = Nums.max(1, type.high());
@@ -118,13 +118,15 @@ public class Prop extends Element implements TileConstants {
   
   
   public static boolean hasSpace(
-    Scene scene, PropType kind, int x, int y, int facing
+    Scenery scene, PropType kind, int x, int y, int facing
   ) {
-    boolean thin = kind.thin(), blocks = couldBlock(kind);
-    int faceAt = thin ? ((facing + 6) % 8) : CENTRE;
+    boolean wall = kind.isWall(), floor = kind.isFloor();
+    boolean blocks = couldBlock(kind);
+    int faceAt = wall ? ((facing + 6) % 8) : CENTRE;
     
     for (Tile under : tilesUnder(kind, scene, x, y, facing, 0)) {
       if (under == null) return false;
+      if (floor && under.hasFloor()) return false;
       Prop other = under.filling(faceAt);
       if (blocks && other != null) return false;
     }
@@ -132,19 +134,25 @@ public class Prop extends Element implements TileConstants {
   }
   
   
-  public boolean enterScene(Scene scene, int x, int y, int facing) {
+  public boolean enterScene(Scenery scene, int x, int y, int facing) {
     if (origin != null) I.complain("Already in scene!");
     this.origin = scene.tileAt(x, y);
     this.facing = facing;
     if (origin == null) I.complain("Origin outside bounds!");
     
     final PropType kind = kind();
-    final boolean thin = kind.thin(), blocks = couldBlock(kind);
-    int faceAt = thin ? ((facing + 6) % 8) : CENTRE;
+    boolean wall = kind.isWall(), floor = kind.isFloor();
+    boolean blocks = couldBlock(kind);
+    int faceAt = wall ? ((facing + 6) % 8) : CENTRE;
     
     for (Tile under : tilesUnder(kind, scene, x, y, facing, 0)) {
       if (under == null) continue;
       
+      if (floor && under.hasFloor()) {
+        Prop other = under.floor();
+        if (other != null) other.exitScene();
+        under.setFloor(this);
+      }
       if (blocks) {
         Prop other = under.filling(faceAt);
         if (other != null) other.exitScene();
@@ -160,18 +168,19 @@ public class Prop extends Element implements TileConstants {
   
   public boolean exitScene() {
     if (origin == null) I.complain("Never entered scene!");
-    final Scene scene = origin.scene;
+    final Scenery scene = origin.scene;
     final Tile at = origin;
     
     final PropType kind = kind();
-    final boolean  thin = kind.thin();
-    int faceAt = thin ? ((facing + 6) % 8) : CENTRE;
+    boolean wall = kind.isWall();
+    int faceAt = wall ? ((facing + 6) % 8) : CENTRE;
     
     for (Tile under : tilesUnder(kind, scene, at.x, at.y, facing, 0)) {
       if (under == null) continue;
       
-      Prop other = under.filling(faceAt);
+      Prop other = under.filling(faceAt), floor = under.floor();
       if (other == this) under.setFills(faceAt, null);
+      if (floor == this) under.setFloor(null);
       
       under.setInside(this, false);
     }
@@ -229,7 +238,7 @@ public class Prop extends Element implements TileConstants {
   public int renderPriority() {
     PropType kind = kind();
     int priority = kind.renderPriority();
-    if (kind.thin() || kind.effect() || kind.detail()) priority += 5;
+    if (kind.isWall() || kind.effect() || kind.detail()) priority += 5;
     return priority;
   }
 }

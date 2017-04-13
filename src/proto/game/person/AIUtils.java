@@ -15,7 +15,7 @@ public class AIUtils implements TileConstants {
   static float rateTileDefence(
     Tile at, Person p, Series <Person> foes, float baseRange, boolean advance
   ) {
-    Scene scene = at.scene;
+    Scene scene = (Scene) at.scene;
     float rating = 0, sumProximity = 0;
     float baseFear = 0.25f + Nums.clamp(1 - p.mind.confidence(), 0, 0.75f);
     

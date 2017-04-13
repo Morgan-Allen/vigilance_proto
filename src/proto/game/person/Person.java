@@ -251,8 +251,8 @@ public class Person extends Element {
     exactPos.set(x, y, z);
     
     if (old != location) {
-      if (old      != null) old     .setInside(this, false);
-      if (location != null) location.setInside(this, true );
+      if (old      != null) old     .setOccupant(this, false);
+      if (location != null) location.setOccupant(this, true );
     }
   }
   

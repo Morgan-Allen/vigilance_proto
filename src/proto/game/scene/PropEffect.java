@@ -43,7 +43,7 @@ public class PropEffect extends Prop {
   
   
   public boolean exitScene() {
-    final Scene scene = origin.scene;
+    final Scene scene = (Scene) origin.scene;
     if (! super.exitScene()) return false;
     scene.effectProps.remove(this);
     return true;
@@ -51,13 +51,13 @@ public class PropEffect extends Prop {
   
   
   protected void onTurnStart() {
-    final Scene scene = origin.scene;
+    final Scene scene = (Scene) origin.scene;
     kind().onTurnStart(scene, this);
   }
   
   
   protected void onTurnEnd() {
-    final Scene scene = origin.scene;
+    final Scene scene = (Scene) origin.scene;
     kind().onTurnEnd(scene, this);
     if (turnsLeft > 0 && --turnsLeft == 0) {
       exitScene();

@@ -176,7 +176,7 @@ public class Techniques {
       public void applyOnDefendEnd(Volley volley) {
         Person self = volley.targAsPerson();
         Tile at = self.currentTile();
-        self.setExactPosition(at.scene, at.x, at.y, 0);
+        self.setExactPosition((Scene) at.scene, at.x, at.y, 0);
         self.actions.modifyAP(-1);
       }
     },

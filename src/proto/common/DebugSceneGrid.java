@@ -42,8 +42,6 @@ public class DebugSceneGrid extends RunGame {
   public static void main(String args[]) {
     GameSettings.debugScene      = true ;
     GameSettings.reportWorldInit = false;
-    //GameSettings.viewSceneBlocks = true;
-    //GameSettings.debugLineSight  = true;
     runGame(new DebugSceneGrid(), "saves/debug_scene_grid");
   }
   
@@ -57,10 +55,11 @@ public class DebugSceneGrid extends RunGame {
     mission.setupScene(true);
     //*
     SceneType sceneType = GRID_TEST_SCENE;
-    sceneType.applyToScene(mission, 2, 2, TileConstants.E, 8, 8, true);
+    Scenery   gen       = sceneType.generateScenery(world, 8, 8, true);
+    sceneType.applyScenery(mission, gen, 2, 2, TileConstants.E, true);
     for (int y = mission.high() - 1; y-- > 1;) {
       PropType kind = y == 6 ? KIND_DOOR : KIND_WALL;
-      mission.addProp(kind, 4, y, TileConstants.E);
+      mission.addProp(kind, 4, y, TileConstants.E, world);
     }
     //*/
     /*

@@ -14,7 +14,6 @@ public class SceneTypeGrid extends SceneType {
     */
   final int wide, high;
   
-  byte fillMask[][];
   static class Placing {
     PropType type;
     int x, y, facing;
@@ -33,7 +32,6 @@ public class SceneTypeGrid extends SceneType {
     );
     this.wide = wide;
     this.high = high;
-    this.fillMask = new byte[wide][high];
   }
   
   
@@ -45,16 +43,6 @@ public class SceneTypeGrid extends SceneType {
     p.y = y;
     p.facing = facing;
     placings.add(p);
-    //
-    //  We use the fill-mask to check for border-compatibility later on (see
-    //  below.)
-    int mask = 1;
-    if (type.thin() && type.blockLevel() == Kind.BLOCK_NONE) mask = -1;
-    if (type.thin() && type.blockSight() == false          ) mask = -1;
-    for (Coord c : Prop.coordsUnder(type, x, y, facing)) try {
-      fillMask[c.x][c.y] = (byte) mask;
-    }
-    catch (ArrayIndexOutOfBoundsException e) {}
   }
   
   
@@ -76,135 +64,28 @@ public class SceneTypeGrid extends SceneType {
   }
   
   
-  
-  /**  Utility methods for either scene-generation or scene-insertion.
-    */
-  private void rotateCoord(Coord c, int facing) {
-    int offH = wide - 1, offV = high - 1, x, y;
-    if (facing == N) {
-      x = c.x;
-      y = c.y;
-    }
-    else if (facing == E) {
-      x = offV - c.y;
-      y = c.x;
-    }
-    else if (facing == W) {
-      x = c.y;
-      y = offH - c.x;
-    }
-    else {
-      x = offH - c.x;
-      y = offV - c.y;
-    }
-    c.x = x;
-    c.y = y;
+  public Scenery generateScenery(
+    World world, int prefWide, int prefHigh, boolean testing
+  ) {
+    return generateScenery(world, testing);
   }
   
   
-  Box2D borderBounds(
-    Scene scene, int offX, int offY, int facing, int resolution
+  public Scenery generateScenery(
+    World world, boolean testing
   ) {
-    Box2D bound = null;
-    int wideB = Nums.round(wide, resolution, true) - 1;
-    int highB = Nums.round(high, resolution, true) - 1;
+    Scenery gen = new Scenery(wide, high);
+    gen.setupScene(testing);
     
-    ///I.say("\nGetting bounds...");
-    for (Coord c : Visit.grid(0, 0, 2, 2, 1)) {
-      c.x *= wideB;
-      c.y *= highB;
-      ///I.say("  "+c);
-      rotateCoord(c, facing);
-      ///I.add(" ->"+c);
-      c.x += offX;
-      c.y += offY;
-      ///I.add(" ->"+c);
-      
-      if (scene.tileAt(c.x, c.y) == null) return null;
-      
-      if (bound == null) bound = new Box2D(c.x, c.y, 0, 0);
-      else bound.include(c.x, c.y, 0);
-    }
-    
-    bound.incHigh(1);
-    bound.incWide(1);
-    ///I.say("\nFinal bound: "+bound);
-    return bound;
-  }
-  
-  
-  boolean checkBordering(
-    Scene scene, int offX, int offY, int facing,
-    int resolution
-  ) {
-    Coord temp = new Coord();
-    if (borderBounds(scene, offX, offY, facing, resolution) == null) {
-      return false;
-    }
-    
-    for (Coord c : Visit.perimeter(0, 0, wide, high)) {
-      temp.setTo(c);
-      rotateCoord(temp, facing);
-      int tx = temp.x + offX, ty = temp.y + offY, gx = c.x, gy = c.y, dir = 0;
-      if (c.x < 0          ) { gx++; dir = W; }
-      if (c.y < 0          ) { gy++; dir = S; }
-      if (c.x >= resolution) { gx--; dir = E; }
-      if (c.y >= resolution) { gy--; dir = N; }
-      if (c.x != gx && c.y != gy) {
-        continue;
-      }
-      //
-      //  Check to ensure that no doors or windows are blocked.
-      //boolean blockG = fillMask[gx][gy] >   0;
-      //
-      //  TODO:  In future, you may want to implement a more jigsaw-esque
-      //  approach, depending on the wall-types specs for a grid-unit.
-      boolean isDoor = fillMask[gx][gy] == -1;
-      Tile    at     = scene.tileAt(tx, ty);
-      boolean blockT = at == null ? true  : (at.blocked() || at.opaque());
-      if (isDoor && blockT) return false;
-    }
-    
-    return true;
-  }
-  
-  
-  public void applyToScene(
-    Scene scene, int offX, int offY, int facing, int w, int h, boolean testing
-  ) {
-    Coord temp = new Coord();
     for (Placing p : placings) {
-      temp.x = p.x;
-      temp.y = p.y;
-      rotateCoord(temp, facing);
-      temp.x += offX;
-      temp.y += offY;
-      
-      int propDir = (p.facing + facing) % 8;
+      int propDir = (p.facing + gen.facing) % 8;
       if (p.type == floors) propDir = N;
-      
-      if (Prop.hasSpace(scene, p.type, temp.x, temp.y, propDir)) {
-        scene.addProp(p.type, temp.x, temp.y, propDir);
+      if (Prop.hasSpace(gen, p.type, p.x, p.y, propDir)) {
+        gen.addProp(p.type, p.x, p.y, propDir, world);
       }
     }
-  }
-  
-  
-  
-  /**  Actual scene-generation-
-    */
-  public Scene generateScene(
-    World world, int wide, int high, boolean testing
-  ) {
-    final Scene scene = new Scene(world, wide, high);
-    scene.setupScene(testing);
-    applyToScene(scene, 0, 0, N, wide, high, testing);
-    return scene;
+    return gen;
   }
 }
-
-
-
-
 
 

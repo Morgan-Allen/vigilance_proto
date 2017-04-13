@@ -3,16 +3,17 @@
 package proto.game.scene;
 import proto.common.*;
 import proto.game.world.*;
-import static proto.game.scene.SceneGen.*;
 import proto.util.*;
 
 
 
+/*
 public class SceneTypeCorridors extends SceneType {
   
   
   /**  Public constructor definition and generation methods-
     */
+/*
   public SceneTypeCorridors(
     String name, String ID, Object... args
   ) {
@@ -50,6 +51,7 @@ public class SceneTypeCorridors extends SceneType {
   
   /**  Internal utility methods and data structures-
     */
+/*
   static class SceneGenCorridors extends SceneGen {
     int minRoomSize = 4;
     float corWideFraction = 0.125f;
@@ -152,6 +154,7 @@ public class SceneTypeCorridors extends SceneType {
   
   /**  Utility methods for checking the validity of room placement-
     */
+/*
   AreaCheck attemptAreaCheck(
     SceneGenCorridors g, SceneType parent, Box2D area
   ) {
@@ -203,6 +206,7 @@ public class SceneTypeCorridors extends SceneType {
   
   /**  Utility methods for furniture placement-
     */
+/*
   //  TODO:  In future, you might want to do a proper perimeter trace...
   void placeCurtainWall(
     SceneGenCorridors g, SceneType buildingType, Box2D area
@@ -288,7 +292,7 @@ public class SceneTypeCorridors extends SceneType {
   }
 }
 
-
+//*/
 
 
 

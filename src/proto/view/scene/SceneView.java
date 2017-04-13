@@ -354,7 +354,7 @@ public class SceneView extends UINode implements TileConstants {
     //  top, rather than as a form of tinting for specific sprites.)  Remove
     //  as soon as possible once you migrate to a proper graphics engine.
     
-    Scene scene = tile.scene;
+    Scene scene = (Scene) tile.scene;
     float maxSight = scene.vision.fogAt(tile, side);
     if (maxSight > 0 || ! tile.opaque()) return maxSight;
     
@@ -435,13 +435,14 @@ public class SceneView extends UINode implements TileConstants {
     if (at == null) return null;
     final Pick <Object> pick = new Pick();
     for (Element e : at.inside()) {
+      if (PropType.isWall(e)) continue;
       if (e.isPerson()) {
         final Person p = (Person) e;
         pick.compare(p, p.health.conscious() ? 20 : 15);
       }
       if (e.isProp()) {
         final Prop p = (Prop) e;
-        pick.compare(p, (p.blockLevel() + 1) * (p.kind().thin() ? 0 : 1));
+        pick.compare(p, (p.blockLevel() + 1));
       }
     }
     pick.compare(at, 0.1f);

@@ -164,7 +164,7 @@ public class PersonGear {
     
     Item item = itemInSlot(slotID);
     dequipSlot(slotID, null);
-    person.currentTile().setInside(item, true);
+    person.currentTile().setDropped(item, true);
   }
   
   

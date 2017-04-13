@@ -180,6 +180,7 @@ public class UrbanScenes {
     percentUnit        (ROOM_SEATING  , WALL_EXTERIOR, 67   )
   );
   
+  /*
   final public static SceneType MANSION_SCENE = new SceneTypeCorridors(
     "mansion scene", "type_mansion_scene",
     BORDERS, KIND_WALL  ,
@@ -187,6 +188,7 @@ public class UrbanScenes {
     WINDOW , KIND_WINDOW,
     FLOORS , KIND_FLOOR 
   );
+  //*/
   
 }
 

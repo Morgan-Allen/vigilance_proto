@@ -186,6 +186,7 @@ public class Kind extends Index.Entry implements Session.Saveable {
   public String toString() { return name; }
   
   
+  
   /*  Other setup-related helper methods-
    */
   public static Image loadImage(String imgPath) {

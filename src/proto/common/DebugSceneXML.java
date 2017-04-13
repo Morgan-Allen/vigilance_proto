@@ -62,7 +62,8 @@ public class DebugSceneXML extends RunGame {
     world.enterScene(scene);
     
     if (toSelect == null) {
-      scene.view().setZoomPoint(scene.tileAt(8, 8));
+      int dim = Nums.min(scene.wide() / 2, scene.high() / 2);
+      scene.view().setZoomPoint(scene.tileAt(dim, dim));
     }
     else {
       scene.view().setSelection(toSelect, false);

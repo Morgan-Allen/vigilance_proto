@@ -16,7 +16,7 @@ public class Facilities {
   final public static PlaceType MANOR = new PlaceType(
     "Manor", "base_type_manor",
     null, "",
-    0, BUILD_TIME_NONE, MANSION_SCENE
+    0, BUILD_TIME_NONE, URBAN_SCENE
   );
   
   final public static PlaceType HIDEOUT = new PlaceType(

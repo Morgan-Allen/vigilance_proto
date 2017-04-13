@@ -12,7 +12,7 @@ import java.awt.Image;
 
 
 
-public class Scene implements Session.Saveable, Assignment, TileConstants {
+public class Scene extends Scenery implements Assignment {
   
   
   /**  Data fields, constructors and save/load methods-
@@ -37,11 +37,7 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   List <Person> allPersons = new List();
   List <Person> didEnter   = new List();
   
-  int wide, high;
   int time;
-  Tile tiles[][] = new Tile[0][0];
-  Prop fills[][] = new Prop[1][2];
-  List <Prop> props = new List();
   List <PropEffect> effectProps = new List();
   
   final public SceneEntry  entry  = new SceneEntry (this);
@@ -52,43 +48,28 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   
   
   public Scene(World world, int wide, int high) {
+    super(wide, high);
     this.world = world;
-    this.wide  = wide ;
-    this.high  = high ;
   }
   
   
   public Scene(Session s) throws Exception {
-    s.cacheInstance(this);
-    
+    super(s);
     world        = (World) s.loadObject();
     site         = (Place) s.loadObject();
     playerTask   = (Task ) s.loadObject();
     triggerEvent = (Event) s.loadObject();
-    state = s.loadInt();
+    time         = s.loadInt();
+    state        = s.loadInt();
     
-    s.loadObjects(playerTeam);
-    s.loadObjects(othersTeam);
-    s.loadObjects(allPersons);
-    s.loadObjects(didEnter  );
-    
-    wide   = s.loadInt();
-    high   = s.loadInt();
-    time   = s.loadInt();
-    
-    initArrays(wide, high);
-    for (Coord c : Visit.grid(0, 0, wide, high, 1)) {
-      tiles[c.x][c.y] = (Tile) s.loadObject();
-    }
-    for (Coord c : Visit.grid(0, 0, fills.length, fills[0].length, 1)) {
-      fills[c.x][c.y] = (Prop) s.loadObject();
-    }
-    s.loadObjects(props);
+    s.loadObjects(playerTeam );
+    s.loadObjects(othersTeam );
+    s.loadObjects(allPersons );
+    s.loadObjects(didEnter   );
     s.loadObjects(effectProps);
     
     entry .loadState(s);
     vision.loadState(s);
-    
     playerTurn = s.loadBool();
     s.loadObjects(actionStack);
     
@@ -102,28 +83,16 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
     s.saveObject (playerTask  );
     s.saveObject (triggerEvent);
     s.saveInt    (state       );
+    s.saveInt    (time        );
     
-    s.saveObjects(playerTeam);
-    s.saveObjects(othersTeam);
-    s.saveObjects(allPersons);
-    s.saveObjects(didEnter  );
-    
-    s.saveInt(wide);
-    s.saveInt(high);
-    s.saveInt(time);
-    
-    for (Coord c : Visit.grid(0, 0, wide, high, 1)) {
-      s.saveObject(tiles[c.x][c.y]);
-    }
-    for (Coord c : Visit.grid(0, 0, fills.length, fills[0].length, 1)) {
-      s.saveObject(fills[c.x][c.y]);
-    }
-    s.saveObjects(props);
+    s.saveObjects(playerTeam );
+    s.saveObjects(othersTeam );
+    s.saveObjects(allPersons );
+    s.saveObjects(didEnter   );
     s.saveObjects(effectProps);
     
     entry .saveState(s);
     vision.saveState(s);
-    
     s.saveBool(playerTurn);
     s.saveObjects(actionStack);
     
@@ -203,21 +172,6 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   }
   
   
-  public int wide() {
-    return wide;
-  }
-  
-  
-  public int high() {
-    return high;
-  }
-  
-  
-  public Series <Prop> props() {
-    return props;
-  }
-  
-  
   public Series <Person> playerTeam() {
     return playerTeam;
   }
@@ -238,44 +192,6 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   }
   
   
-  public Tile tileAt(int x, int y) {
-    try { return tiles[x][y]; }
-    catch (ArrayIndexOutOfBoundsException e) { return null; }
-  }
-  
-  
-  public Tile tileAt(float x, float y) {
-    return tileAt((int) (x + 0.5f), (int) (y + 0.5f));
-  }
-  
-  
-  public Tile tileUnder(Object object) {
-    if (object instanceof Tile  ) return  (Tile  ) object;
-    if (object instanceof Person) return ((Person) object).currentTile();
-    if (object instanceof Prop  ) return ((Prop  ) object).origin;
-    return null;
-  }
-  
-  
-  public float distance(Object a, Object b) {
-    return distance(tileUnder(a), tileUnder(b));
-  }
-  
-  
-  public float distance(Tile a, Tile b) {
-    final int xd = a.x - b.x, yd = a.y - b.y;
-    return Nums.sqrt((xd * xd) + (yd * yd));
-  }
-  
-  
-  public int direction(Tile from, Tile to) {
-    float angle = new Vec2D(to.x - from.x, to.y - from.y).toAngle();
-    angle = (angle + 360 + 45) % 360;
-    int dir = 2 * (int) (angle / 90);
-    return (N + dir + 8) % 8;
-  }
-  
-  
   public Action currentAction() {
     return actionStack.first();
   }
@@ -292,47 +208,18 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   }
   
   
-  public Visit <Tile> tilesInArea(Box2D area) {
-    final Visit <Coord> base = Visit.grid(area);
-    return new Visit <Tile> () {
-      
-      public Tile next() {
-        Coord c = base.next();
-        return tileAt(c.x, c.y);
-      }
-      
-      public boolean hasNext() {
-        return base.hasNext();
-      }
-    };
-  }
-  
-  
   
   /**  Supplementary population methods for use during initial setup-
     */
-  private void initArrays(int wide, int high) {
-    tiles = new Tile[wide][high];
-    int wallW = (wide * 2) + 1, wallH = (high * 2) + 1;
-    fills = new Prop[wallW][wallH];
+  protected void initArrays(int wide, int high) {
+    super.initArrays(wide, high);
     vision.setupFog(wide, high);
   }
   
   
   public void setupScene(boolean forTesting) {
     this.state = forTesting ? STATE_TEST : STATE_SETUP;
-    initArrays(wide, high);
-    
-    for (Coord c : Visit.grid(0, 0, wide, high, 1)) {
-      tiles[c.x][c.y] = new Tile(this, c.x, c.y);
-    }
-  }
-  
-  
-  public Prop addProp(PropType type, int x, int y, int facing) {
-    if (type == null) { I.complain("NULL PROP TYPE SUPPLIED!"); return null; }
-    final Prop prop = new Prop(type, world);
-    return prop.enterScene(this, x, y, facing) ? prop : null;
+    super.setupScene(forTesting);
   }
   
   

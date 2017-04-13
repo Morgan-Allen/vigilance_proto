@@ -153,7 +153,7 @@ public class Gadgets {
     public void applyOnActionEnd(Action use) {
       use.acting.gear.useCharge(Gadgets.TEAR_GAS, 1);
       final Tile at = use.scene().tileUnder(use.target);
-      final World world = at.scene.world();
+      final World world = use.scene().world();
       use.scene().view().addTempFX(BURST_IMG, 3, at.x, at.y, 0, 1);
       
       for (Tile t : tilesInRange(use, at)) {
@@ -161,7 +161,7 @@ public class Gadgets {
         effect.enterScene(at.scene, t.x, t.y, TileConstants.N);
         effect.turnsLeft = 2;
         for (Person p : t.persons()) {
-          TEAR_GAS_EFFECT.onPersonEntry(p, at.scene, effect);
+          TEAR_GAS_EFFECT.onPersonEntry(p, use.scene(), effect);
         }
       }
     }
