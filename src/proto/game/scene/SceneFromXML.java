@@ -116,7 +116,7 @@ public class SceneFromXML implements TileConstants {
       if (exactDir == -1) exactDir = N;
       
       SceneTypeUnits.Unit unit = SceneTypeUnits.unit(
-        (SceneTypeGrid) type, wallType,
+        type, wallType,
         exactX, exactY, exactDir,
         priority, percent, minCount, maxCount
       );
@@ -187,7 +187,8 @@ public class SceneFromXML implements TileConstants {
       //
       //  The content of the grid node represent the x/y position of those
       //  props, as represented by index.  First we break down the tokens-
-      StringTokenizer t = new StringTokenizer(gridXML.content(), ", \n\r", false);
+      StringTokenizer t;
+      t = new StringTokenizer(gridXML.content(), ", \n\r", false);
       final List <String> tokens = new List();
       while (t.hasMoreTokens()) tokens.add(t.nextToken());
       char wallChars[] = {'-',']','_','['}, dirChars[] = {'n','e','s','w'};

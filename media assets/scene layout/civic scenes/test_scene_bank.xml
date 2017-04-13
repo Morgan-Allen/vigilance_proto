@@ -35,7 +35,7 @@
 <prop
   name       = "Metal Floor"
   ID         = "civic_metal_floor"
-  sprite     = "floor_metal_3.png"
+  sprite     = "floor_metal.png"
   wide       = "1"
   high       = "1"
   subtype    = "SUBTYPE_WALLING"
@@ -241,8 +241,8 @@
   sprite     = "revolving_door.png"
   wide       = "3"
   high       = "2"
-  subtype    = "SUBTYPE_DETAIL"
-  blockLevel = "BLOCK_NONE"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_FULL"
   blockSight = "false"
 />
 
@@ -252,8 +252,8 @@
   sprite     = "security_desk.png"
   wide       = "2"
   high       = "5"
-  subtype    = "SUBTYPE_DETAIL"
-  blockLevel = "BLOCK_NONE"
+  subtype    = "SUBTYPE_FURNISH"
+  blockLevel = "BLOCK_FULL"
   blockSight = "false"
 />
 
@@ -263,10 +263,11 @@
   sprite     = "elevators.png"
   wide       = "4"
   high       = "2"
-  subtype    = "SUBTYPE_DETAIL"
-  blockLevel = "BLOCK_NONE"
-  blockSight = "false"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "true"
 />
+
 
 <scene
   name   = "Safe Vault"
@@ -456,6 +457,29 @@
 
 
 <scene
+  name      = "Bank Scene Insertion"
+  ID        = "bank_scene_insertion"
+  unitSize  = "6"
+  unitsWide = "1"
+  unitsHigh = "2"
+  wall      = "civic_wall"
+  door      = "civic_door"
+  window    = "civic_window"
+>
+  <unit
+    typeID = "bank_scene_general_seating"
+    wall   = "WALL_NONE"
+    x = "0" y = "0" dir = "N"
+  />
+  <unit
+    typeID = "bank_scene_teller_screens"
+    wall   = "WALL_NONE"
+    x = "0" y = "1" dir = "N"
+  />
+</scene>
+
+
+<scene
   name      = "Bank Scene Assembled"
   ID        = "bank_scene_assembled"
   unitSize  = "6"
@@ -471,7 +495,6 @@
     wall   = "WALL_INTERIOR"
     x = "0" y = "0" dir = "N"
   />
-
   <unit
     typeID = "bank_scene_safe_vault"
     wall   = "WALL_INTERIOR"
@@ -483,14 +506,9 @@
     x = "2" y = "0" dir = "N"
   />
   <unit
-    typeID = "bank_scene_general_seating"
+    typeID = "bank_scene_insertion"
     wall   = "WALL_EXTERIOR"
     x = "2" y = "1" dir = "N"
-  />
-  <unit
-    typeID = "bank_scene_teller_screens"
-    wall   = "WALL_EXTERIOR"
-    x = "2" y = "2" dir = "N"
   />
 </scene>
 
