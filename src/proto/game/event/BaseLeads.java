@@ -69,11 +69,21 @@ public class BaseLeads {
   }
   
   
+  public CaseFile caseFor(Plot plot) {
+    CaseFile match = files.get(plot);
+    if (match != null) return match;
+    
+    final CaseFile file = new CaseFile(base, plot);
+    plot.caseID = nextCaseID++;
+    files.put(plot, file);
+    return file;
+  }
+  
+  
   public Series <Lead> leadsFor(Element focus) {
     final Batch <Lead> all = new Batch();
-    CaseFile file = caseFor(focus);
     boolean canMeet = focus.canEnter(base);
-    if (! file.subjectAtKnownLocation()) return all;
+    if (! atKnownLocation(focus)) return all;
     
     if (focus.isPerson()) {
       all.add(leadFor(focus, Lead.LEAD_SURVEIL_PERSON));
@@ -93,53 +103,9 @@ public class BaseLeads {
   }
   
   
-  public CaseFile caseFor(Object subject) {
-    CaseFile match = files.get(subject);
-    if (match != null) return match;
-    final CaseFile file = new CaseFile(base, subject);
-    files.put(subject, file);
-    
-    if (subject instanceof Plot) {
-      Plot plot = (Plot) subject;
-      plot.caseID = nextCaseID++;
-    }
-    return file;
-  }
   
-  
-  
-  /**  Assorted utility methods-
+  /**  Utility methods for getting broad sets of active clues:
     */
-  public Series <Plot> activePlots() {
-    Batch <Plot> known = new Batch();
-    for (Clue c : cluesFor(null, null, null, null, false)) {
-      if (c.plot.complete()) continue;
-      known.include(c.plot);
-    }
-    return known;
-  }
-  
-  
-  public Series <Plot> activePlotsForRegion(Region r) {
-    Batch <Plot> known = new Batch();
-    for (Clue c : cluesFor(null, null, null, r, false)) {
-      if (c.plot.complete() || ! c.confirmed) continue;
-      known.include(c.plot);
-    }
-    return known;
-  }
-  
-  
-  public Series <Element> activeSuspectsForRegion(Region r) {
-    Batch <Element> known = new Batch();
-    for (Clue c : cluesFor(null, null, null, r, false)) {
-      if (c.plot.complete() || ! c.confirmed) continue;
-      known.include(c.match);
-    }
-    return known;
-  }
-  
-  
   public Series <Clue> cluesFor(Plot plot, Element match, boolean sort) {
     return cluesFor(plot, match, null, null, sort);
   }
@@ -189,40 +155,25 @@ public class BaseLeads {
   }
   
   
-  public Series <Element> suspectsFor(Plot.Role role, Plot plot) {
-    Series <Clue> related = cluesFor(plot, null, role, null, false);
-    Batch <Element> matches = new Batch();
-    
-    for (Clue c : related) if (c.confirmed) {
-      matches.add(c.match);
-      return matches;
-    }
-    
-    search: for (Element e : base.world().inside()) {
-      for (Clue c : related) if (! c.matchesSuspect(e)) continue search;
-      matches.add(e);
-    }
-    return matches;
-  }
   
-  
-  public Series <Plot> involvedIn(Element subject, boolean confirmedOnly) {
-    Batch <Plot> matches = new Batch();
-    CaseFile file = caseFor(subject);
-    
-    for (Clue c : file.clues) {
-      if (confirmedOnly && ! c.confirmed) continue;
-      matches.include(c.plot);
+  /**  Helper methods for determining which plots and suspects should be tailed
+    *  most urgently-
+    */
+  public Series <Plot> activePlots() {
+    Batch <Plot> known = new Batch();
+    for (Clue c : cluesFor(null, null, null, null, false)) {
+      if (c.plot.complete()) continue;
+      known.include(c.plot);
     }
-    return matches;
+    return known;
   }
   
   
   public Series <Plot.Role> knownRolesFor(Plot plot) {
     Batch <Plot.Role> known = new Batch();
-    known.include(Plot.ROLE_HIDEOUT  );
-    known.include(Plot.ROLE_ORGANISER);
-    known.include(Plot.ROLE_TARGET   );
+    known.include(Plot.ROLE_MASTERMIND);
+    known.include(Plot.ROLE_ORGANISER );
+    known.include(Plot.ROLE_TARGET    );
     
     for (CaseFile file : files.values()) {
       for (Clue c : file.clues) if (c.plot == plot) {
@@ -233,14 +184,23 @@ public class BaseLeads {
   }
   
   
-  public float evidenceForInvolvement(Plot plot, Element subject) {
-    CaseFile file = caseFor(subject);
-    float evidence = 0;
-    
-    for (Clue c : file.clues) if (c.plot == plot) {
-      evidence += c.confidence;
+  public Series <Plot> activePlotsForRegion(Region r) {
+    Batch <Plot> known = new Batch();
+    for (Clue c : cluesFor(null, null, null, r, false)) {
+      if (c.plot.complete() || ! c.isConfirmation()) continue;
+      known.include(c.plot);
     }
-    return evidence;
+    return known;
+  }
+  
+  
+  public Series <Element> activeSuspectsForRegion(Region r) {
+    Batch <Element> known = new Batch();
+    for (Clue c : cluesFor(null, null, null, r, false)) {
+      if (c.plot.complete() || ! c.isConfirmation()) continue;
+      known.include(c.match);
+    }
+    return known;
   }
   
   
@@ -255,6 +215,91 @@ public class BaseLeads {
     }
     return false;
   }
+  
+  
+  
+  /**  Helper methods specific to individual suspects...
+    */
+  public Series <Plot> involvedIn(Element subject, boolean confirmedOnly) {
+    Batch <Plot> matches = new Batch();
+    for (Clue c : cluesFor(null, subject, null, null, false)) {
+      if (confirmedOnly && ! c.isConfirmation()) continue;
+      matches.include(c.plot);
+    }
+    return matches;
+  }
+  
+  
+  public Series <Element> suspectsFor(Plot.Role role, Plot plot) {
+    Series <Clue> related = cluesFor(plot, null, role, null, false);
+    Batch <Element> matches = new Batch();
+    
+    for (Clue c : related) if (c.isConfirmation()) {
+      matches.add(c.match);
+      return matches;
+    }
+    
+    search: for (Element e : base.world().inside()) {
+      for (Clue c : related) if (! c.matchesSuspect(e)) continue search;
+      matches.add(e);
+    }
+    return matches;
+  }
+  
+  
+  public float evidenceForInvolvement(Plot plot, Element subject) {
+    CaseFile file = caseFor(plot);
+    float evidence = 0;
+    for (Clue c : file.clues) if (c.match == subject) {
+      evidence += c.leadType.confidence;
+    }
+    return evidence;
+  }
+  
+  
+  
+  /**  ...and to their known locations:
+    */
+  public Series <Element> possibleLocations(Plot.Role role, Plot plot) {
+    //  TODO:  Return these values!
+    Batch <Element> matches = new Batch();
+    return matches;
+  }
+  
+  
+  public boolean atKnownLocation(Element suspect) {
+    //  TODO:  RETURN A VALUE HERE
+    return true;
+  }
+  
+  /*
+  public Element knownLocation() {
+    Element subject = subjectAsElement();
+    if (subject == null) return null;
+    
+    if (subject.isPlace() || subject.isRegion()) {
+      return subject;
+    }
+    for (Clue clue : clues) if (clue.isLocationClue()) {
+      if (clue.location.isPlace() && clue.nearRange == 0) {
+        return (Place) clue.location;
+      }
+    }
+    if (subject.isPerson()) {
+      return ((Person) subject).resides();
+    }
+    return null;
+  }
+  
+  
+  public boolean subjectAtKnownLocation() {
+    Element subject = subjectAsElement();
+    if (subject == null) return false;
+    
+    if (subject.isPlace() || subject.isRegion()) return true;
+    return knownLocation() == subject.place();
+  }
+  //*/
   
 }
 

@@ -357,8 +357,8 @@ public class Lead extends Task {
     
     if (outcome > 0 && ! possible.empty()) {
       Clue gained = (Clue) Rand.pickFrom(possible);
-      CaseFile file = base.leads.caseFor(focus);
-      file.recordClue(gained);
+      CaseFile file = base.leads.caseFor(gained.plot);
+      file.recordClue(gained, this, time, focus.place());
     }
     //
     //  Either way, you have to take the risk of tipping off the perps

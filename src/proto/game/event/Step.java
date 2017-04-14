@@ -67,8 +67,7 @@ public class Step implements Session.Saveable {
     */
   public static Step queueStep(
     String label, Plot plot,
-    Plot.Role acting, Plot.Role fromPlace,
-    Plot.Role subject, Plot.Role goesPlace,
+    Plot.Role acting, Plot.Role subject,
     int medium, int hoursTaken, Plot.Role... others
   ) {
     Step s = new Step();
@@ -79,10 +78,10 @@ public class Step implements Session.Saveable {
     s.hoursTaken = hoursTaken;
     
     Batch <Element> involved = new Batch();
-    involved.include(plot.filling(acting   ));
-    involved.include(plot.filling(fromPlace));
-    involved.include(plot.filling(subject  ));;
-    involved.include(plot.filling(goesPlace));
+    involved.include(plot.filling (acting ));
+    involved.include(plot.location(acting ));
+    involved.include(plot.filling (subject));
+    involved.include(plot.location(subject));
     for (Plot.Role role : others) involved.include(plot.filling(role));
     s.involved = involved.toArray(Element.class);
     
@@ -168,10 +167,6 @@ public class Step implements Session.Saveable {
   protected Series <Clue> addTraitClues(
     Element focus, Lead lead, Batch <Clue> possible
   ) {
-    World world = plot.base.world();
-    int time = world.timing.totalHours();
-    Place place = focus.place();
-    
     for (Element involved : this.involved()) {
       Plot.Role role = plot.roleFor(involved);
       if (role == null || involved == focus) continue;
@@ -180,9 +175,8 @@ public class Step implements Session.Saveable {
         Person p = (Person) involved;
         for (Trait t : Common.PERSON_TRAITS) {
           if (p.stats.levelFor(t) <= 0) continue;
-          Clue clue = new Clue(plot, role);
-          clue.assignEvidence(p, t, lead, time, place);
-          possible.add(clue);
+          Clue forTrait = Clue.traitClue(plot, role, t);
+          possible.add(forTrait);
         }
       }
       
@@ -190,17 +184,15 @@ public class Step implements Session.Saveable {
         Place p = (Place) involved;
         for (Trait t : Common.VENUE_TRAITS) {
           if (! p.hasProperty(t)) continue;
-          Clue clue = new Clue(plot, role);
-          clue.assignEvidence(p, t, lead, time, place);
-          possible.add(clue);
+          Clue forTrait = Clue.traitClue(plot, role, t);
+          possible.add(forTrait);
         }
       }
       
       if (involved.isItem()) {
         Item p = (Item) involved;
-        Clue clue = new Clue(plot, role);
-        clue.confirmMatch(p, lead, time, place);
-        possible.add(clue);
+        Clue match = Clue.confirmSuspect(plot, role, p);
+        possible.add(match);
       }
     }
     
@@ -211,25 +203,19 @@ public class Step implements Session.Saveable {
   protected Batch <Clue> addLocationClues(
     Element focus, Lead lead, Batch <Clue> possible
   ) {
-    World world = plot.base.world();
-    int time = world.timing.totalHours();
-    Place place = focus.place();
-
     for (Element involved : this.involved()) {
       Plot.Role role = plot.roleFor(involved);
       if (involved == focus || role == null) continue;
       
-      Element p = (Element) involved;
+      World world = plot.base.world();
       Region at = involved.region();
       int range = Rand.yes() ? 0 : 1;
       Series <Region> around = world.regionsInRange(at, range);
       
       Region near = (Region) Rand.pickFrom(around);
-      Clue clue = new Clue(plot, role);
-      clue.assignNearbyLocation(p, near, range, lead, time, place);
+      Clue clue = Clue.locationClue(plot, role, near, range);
       possible.add(clue);
     }
-    
     return possible;
   }
   
@@ -237,6 +223,8 @@ public class Step implements Session.Saveable {
   protected Batch <Clue> addIntentClues(
     Element focus, Lead lead, Batch <Clue> possible
   ) {
+    //  TODO:  Restore later.
+    /*
     World world = plot.base.world();
     int time = world.timing.totalHours();
     Place place = focus.place();
@@ -248,7 +236,7 @@ public class Step implements Session.Saveable {
     Clue forHeist = new Clue(plot, Plot.ROLE_OBJECTIVE);
     forHeist.confirmHeistDetails(heistType, heistTime, lead, time, place);
     possible.add(forHeist);
-    
+    //*/
     return possible;
   }
   

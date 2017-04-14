@@ -135,7 +135,7 @@ public class Council {
     
     for (CaseFile f : evidence) {
       CaseFile m = mainHall.leads.caseFor(f.subject);
-      m.updateEvidenceFrom(f);
+      m.updateCluesFrom(f);
     }
     
     for (Person p : captive) {

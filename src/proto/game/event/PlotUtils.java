@@ -14,7 +14,7 @@ public class PlotUtils {
   
   /**  Helper methods for filling Roles:
     */
-  public static void fillHideoutRole(
+  public static Place chooseHideout(
     Plot plot, Place crimeScene
   ) {
     Pick <Place > pickH = new Pick();
@@ -22,14 +22,13 @@ public class PlotUtils {
       if (b.isBase() || b == crimeScene) continue;
       pickH.compare(b, Rand.num());
     }
-    if (pickH.empty()) return;
-    Place hideout = pickH.result();
-    plot.assignRole(hideout, Plot.ROLE_HIDEOUT);
+    return pickH.result();
   }
   
   
   public static void fillExpertRole(
-    Plot plot, Trait trait, Series <Person> candidates, Plot.Role role
+    Plot plot, Trait trait, Series <Person> candidates,
+    Plot.Role role, Place operates
   ) {
     Pick <Person> pick = new Pick();
     for (Person p : candidates) {
@@ -38,7 +37,7 @@ public class PlotUtils {
       pick.compare(p, p.stats.levelFor(trait));
     }
     if (pick.empty()) return;
-    plot.assignRole(pick.result(), role);
+    plot.assignRole(pick.result(), operates, role);
   }
   
   
@@ -52,14 +51,15 @@ public class PlotUtils {
       pick.compare(p, 0 - p.history.bondWith(target.owner()));
     }
     if (pick.empty()) return;
-    plot.assignRole(pick.result(), role);
+    plot.assignRole(pick.result(), target, role);
   }
   
   
   public static void fillItemRole(
-    Plot plot, ItemType type, World world, Plot.Role role
+    Plot plot, ItemType type, World world,
+    Plot.Role role, Place kept
   ) {
-    plot.assignRole(new Item(type, world), role);
+    plot.assignRole(new Item(type, world), kept, role);
   }
   
   
@@ -192,14 +192,10 @@ public class PlotUtils {
       p.health.updateHealth(0);
       
       if (p.isCriminal() && p.currentScene() == scene && scene.wasWon()) {
-        
-        CaseFile file = player.leads.caseFor(p);
+        CaseFile  file = player.leads.caseFor(plot);
         Plot.Role role = plot.roleFor(p);
-        if (role == null) role = Plot.ROLE_GOON;
-        Clue redHanded = new Clue(plot, role);
-        redHanded.confirmMatch(p, lead, time, scene.site());
-        file.recordClue(redHanded, null, false);
-        
+        Clue redHanded = Clue.confirmSuspect(plot, role, p);
+        file.recordClue(redHanded, lead, time, scene.site(), false);
         captives.add(p);
         evidence.add(file);
       }

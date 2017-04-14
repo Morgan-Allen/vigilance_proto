@@ -5,13 +5,9 @@ import proto.common.*;
 import proto.game.person.*;
 import proto.game.world.*;
 import proto.util.*;
-
 import java.awt.Image;
 
 
-
-//  TODO:  Split off these various information types into separate classes of
-//  Clue?
 
 //  TODO:  Have this extend Element as originally intended?
 
@@ -20,20 +16,21 @@ public class Clue implements Session.Saveable {
   
   /**  Data fields, construction and save/load methods-
     */
-  final public Plot plot;
-  final public Plot.Role role;
+  final public static int
+    TYPE_MATCH    = 0,
+    TYPE_TRAIT    = 1,
+    TYPE_LOCATION = 2;
   
   Lead.Type leadType;
   Lead source;
-  float confidence;
   Place placeFound;
   int timeFound;
   
-  int heistTime;
-  PlotType heistType;
+  Plot plot;
+  Plot.Role role;
+  int clueType;
   
   Element match;
-  boolean confirmed;
   
   Trait trait;
   
@@ -42,131 +39,114 @@ public class Clue implements Session.Saveable {
   
   
   
-  public Clue(Plot plot, Plot.Role role) {
-    this.plot = plot;
-    this.role = role;
-  }
+  private Clue() {}
   
   
   public Clue(Session s) throws Exception {
     s.cacheInstance(this);
-    plot       = (Plot) s.loadObject();
-    role       = (Plot.Role) s.loadObject();
-    match      = (Element) s.loadObject();
-    confirmed  = s.loadBool();
-    trait      = (Trait) s.loadObject();
-    location   = (Element) s.loadObject();
-    nearRange  = s.loadInt();
+    
     leadType   = Lead.LEAD_TYPES[s.loadInt()];
     source     = (Lead) s.loadObject();
-    confidence = s.loadFloat();
     placeFound = (Place) s.loadObject();
     timeFound  = s.loadInt();
+
+    plot       = (Plot     ) s.loadObject();
+    role       = (Plot.Role) s.loadObject();
+    clueType   = s.loadInt();
+    match      = (Element) s.loadObject();
+    trait      = (Trait  ) s.loadObject();
+    location   = (Element) s.loadObject();
+    nearRange  = s.loadInt();
   }
   
   
   public void saveState(Session s) throws Exception {
+    
+    s.saveInt   (leadType.ID);
+    s.saveObject(source     );
+    s.saveObject(placeFound );
+    s.saveInt   (timeFound  );
+    
     s.saveObject(plot       );
     s.saveObject(role       );
+    s.saveInt   (clueType   );
     s.saveObject(match      );
-    s.saveBool  (confirmed  );
     s.saveObject(trait      );
     s.saveObject(location   );
     s.saveInt   (nearRange  );
-    s.saveInt   (leadType.ID);
-    s.saveObject(source     );
-    s.saveFloat (confidence );
-    s.saveObject(placeFound );
-    s.saveInt   (timeFound  );
   }
   
   
   
   /**  Assignment of evidence & matches-
     */
-  public void assignEvidence(
-    Element match, Trait trait,
-    Lead source, int time, Place place
+  public static Clue traitClue(
+    Plot plot, Plot.Role role, Trait trait
   ) {
-    confirmDetails(source.type, time, place);
-    this.match  = match ;
-    this.trait  = trait ;
+    Clue c = new Clue();
+    c.plot     = plot;
+    c.role     = role;
+    c.clueType = TYPE_TRAIT;
+    c.trait    = trait;
+    return c;
+  }
+  
+  
+  public static Clue locationClue(
+    Plot plot, Plot.Role role, Element location, int nearRange
+  ) {
+    Clue c = new Clue();
+    c.plot      = plot;
+    c.role      = role;
+    c.clueType  = TYPE_LOCATION;
+    c.location  = location;
+    c.nearRange = nearRange;
+    return c;
+  }
+  
+  
+  public static Clue confirmSuspect(
+    Plot plot, Plot.Role role, Element match
+  ) {
+    Clue c = new Clue();
+    c.plot     = plot;
+    c.role     = role;
+    c.clueType = TYPE_MATCH;
+    c.match    = match;
+    return c;
+  }
+  
+  
+  public void confirmSource(Lead source, int time, Place place) {
     this.source = source;
+    confirmSource(source.type, time, place);
   }
   
   
-  public void assignNearbyLocation(
-    Element match, Element near, int range,
-    Lead source, int time, Place place
-  ) {
-    confirmDetails(source.type, time, place);
-    this.match     = match ;
-    this.location  = near  ;
-    this.nearRange = range ;
-    this.source    = source;
-  }
-  
-  
-  public void confirmMatch(
-    Element match, Lead source, int time, Place place
-  ) {
-    confirmDetails(source.type, time, place);
-    this.match      = match ;
-    this.confirmed  = true  ;
-    this.source     = source;
-    this.confidence = 1.0f  ;
-  }
-  
-  
-  public void confirmHeistDetails(
-    PlotType heistType, int heistTime, Lead source, int time, Place place
-  ) {
-    confirmDetails(source.type, time, place);
-    this.heistType = heistType;
-    this.heistTime = heistTime;
-    this.source    = source   ;
-  }
-  
-  
-  public void confirmTipoff(
-    Element match, Lead.Type type, int time, Place place
-  ) {
-    confirmDetails(type, time, place);
-    this.match      = match;
-    this.confirmed  = true ;
-  }
-  
-  
-  private void confirmDetails(Lead.Type type, int time, Place place) {
+  public void confirmSource(Lead.Type type, int time, Place place) {
     this.leadType   = type ;
     this.timeFound  = time ;
     this.placeFound = place;
-    this.confidence = type.confidence;
   }
   
   
   public boolean makesRedundant(Clue other) {
-    if (plot != other.plot) return false;
-    if (role != other.role) return false;
+    if (plot     != other.plot    ) return false;
+    if (role     != other.role    ) return false;
+    if (clueType != other.clueType) return false;
     
     if (isConfirmation()) {
       return true;
     }
     
-    if (isTraitClue() && other.isTraitClue()) {
+    if (isTraitClue()) {
       if (trait != other.trait) return false;
       return true;
     }
     
-    if (isLocationClue() && other.isLocationClue()) {
+    if (isLocationClue()) {
       if (location != other.location) return false;
       if (nearRange > other.nearRange) return false;
-      return true;
-    }
-    
-    if (isObjectiveClue() && other.isObjectiveClue()) {
-      if (heistType != other.heistType) return false;
-      if (heistTime != other.heistTime) return false;
       return true;
     }
     
@@ -182,23 +162,33 @@ public class Clue implements Session.Saveable {
   }
   
   
+  public int clueType() {
+    return clueType;
+  }
+  
+  
+  public Plot plot() {
+    return plot;
+  }
+  
+  
+  public Plot.Role role() {
+    return role;
+  }
+  
+  
   public boolean isConfirmation() {
-    return match != null && confirmed;
+    return clueType == TYPE_MATCH;
   }
   
   
   public boolean isTraitClue() {
-    return trait != null;
+    return clueType == TYPE_TRAIT;
   }
   
   
   public boolean isLocationClue() {
-    return location != null;
-  }
-  
-  
-  public boolean isObjectiveClue() {
-    return heistType != null;
+    return clueType == TYPE_LOCATION;
   }
   
   
@@ -231,10 +221,10 @@ public class Clue implements Session.Saveable {
   /**  Evaluation of possible suspects-
     */
   protected boolean matchesSuspect(Element e) {
-    if (match != null && confirmed && match != e) {
+    if (isConfirmation() && match != e) {
       return false;
     }
-    if (trait != null) {
+    if (isTraitClue()) {
       if (e.isPerson()) {
         Person p = (Person) e;
         if (p.stats.levelFor(trait) <= 0) return false;
@@ -244,7 +234,7 @@ public class Clue implements Session.Saveable {
         if (! p.hasProperty(trait)) return false;
       }
     }
-    if (location != null) {
+    if (isLocationClue()) {
       Region near = location.region();
       float dist = e.world().distanceBetween(near, e.region());
       
@@ -284,10 +274,10 @@ public class Clue implements Session.Saveable {
     desc.append(" at "+world.timing.timeString(timeFound));
     desc.append(" indicates that "+plot.nameForCase(base)+"'s "+role);
     
-    if (match != null && confirmed        ) desc.append(" is: "+match);
-    if (trait != null                     ) desc.append(" has trait: "+trait);
-    if (location != null && nearRange == 0) desc.append(" inisde:  "+location);
-    if (location != null && nearRange > 0 ) desc.append(" is near: "+location);
+    if (isConfirmation()                  ) desc.append(" is: "+match);
+    if (isTraitClue()                     ) desc.append(" has trait: "+trait);
+    if (isLocationClue() && nearRange == 0) desc.append(" inside:  "+location);
+    if (isLocationClue() && nearRange > 0 ) desc.append(" is near: "+location);
     
     return desc.toString();
   }

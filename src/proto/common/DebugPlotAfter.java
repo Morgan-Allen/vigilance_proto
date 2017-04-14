@@ -34,4 +34,3 @@ public class DebugPlotAfter extends RunGame {
   }
   
 }
-

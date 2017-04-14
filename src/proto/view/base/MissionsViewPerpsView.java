@@ -72,7 +72,6 @@ public class MissionsViewPerpsView extends UINode {
     MissionsView parent = mainView.missionView;
     Person agent = mainView.rosterView.selectedPerson();
     Series <Clue> clues = player.leads.cluesFor(suspect, true);
-    CaseFile file = player.leads.caseFor(suspect);
     //
     //  Create a list-display, and render the header, latest clue, entries for
     //  each possible lead, and an option to view associates-
@@ -86,9 +85,9 @@ public class MissionsViewPerpsView extends UINode {
     }
     else {
       Clue first = clues.first();
-      draw.addEntry(null, first.longDescription(player), 100, first.plot);
+      draw.addEntry(null, first.longDescription(player), 100, first.plot());
     }
-    if (! file.subjectAtKnownLocation()) {
+    if (! player.leads.atKnownLocation(suspect)) {
       String desc = "This suspect's location is unknown.";
       draw.addEntry(MissionsView.MYSTERY_IMAGE, desc, 40, null);
     }

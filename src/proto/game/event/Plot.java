@@ -46,17 +46,12 @@ public abstract class Plot extends Event {
     }
   }
   
+  
   final public static Role
-    ROLE_TIME      = new Role("role_time"     , "Time"     , ASPECT),
-    ROLE_OBJECTIVE = new Role("role_objective", "Objective", ASPECT),
-    ROLE_BASE      = new Role("role_base"     , "Base"     , PERP  ),
-    ROLE_HIDEOUT   = new Role("role_hideout"  , "Hideout"  , PERP  ),
-    ROLE_ORGANISER = new Role("role_organiser", "Organiser", PERP  ),
-    ROLE_ENFORCER  = new Role("role_enforcer" , "Enforcer" , PERP  ),
-    ROLE_GOON      = new Role("role_goon"     , "Goon"     , PERP  ),
-    ROLE_TARGET    = new Role("role_target"   , "Target"   , VICTIM),
-    ROLE_SCENE     = new Role("role_scene"    , "Scene"    , VICTIM)
-  ;
+    ROLE_MASTERMIND = new Role("role_mastermind", "Mastermind", PERP  ),
+    ROLE_ORGANISER  = new Role("role_organiser" , "Organiser" , PERP  ),
+    ROLE_TARGET     = new Role("role_target"    , "Target"    , VICTIM);
+  
   
   
   /**  Data fields, construction and save/load methods-
@@ -73,7 +68,6 @@ public abstract class Plot extends Event {
   protected Plot(PlotType type, Base base) {
     super(type, base.world());
     this.base = base;
-    assignRole(base, ROLE_BASE);
   }
   
   
@@ -87,6 +81,7 @@ public abstract class Plot extends Event {
       RoleEntry entry = new RoleEntry();
       entry.role     = (Plot.Role) s.loadObject();
       entry.element  = (Element  ) s.loadObject();
+      entry.location = (Place    ) s.loadObject();
       entry.supplies = (Plot     ) s.loadObject();
       entries.add(entry);
     }
@@ -105,6 +100,7 @@ public abstract class Plot extends Event {
     for (RoleEntry entry : entries) {
       s.saveObject(entry.role    );
       s.saveObject(entry.element );
+      s.saveObject(entry.location);
       s.saveObject(entry.supplies);
     }
     s.saveObjects(steps);
@@ -205,6 +201,7 @@ public abstract class Plot extends Event {
     
     Role role;
     Element element;
+    Place location;
     Plot supplies;
     
     public String toString() {
@@ -213,23 +210,27 @@ public abstract class Plot extends Event {
   }
   
   
-  public void assignRole(Element element, Role role) {
+  public void assignRole(Element element, Place location, Role role) {
     RoleEntry match = entryFor(element, role);
     if (match == null) entries.add(match = new RoleEntry());
-    match.role    = role   ;
-    match.element = element;
+    match.role     = role    ;
+    match.element  = element ;
+    match.location = location;
   }
   
   
   public void assignTarget(Element target, Place scene) {
-    assignRole(target, ROLE_TARGET);
-    assignRole(scene , ROLE_SCENE );
+    assignRole(target, scene, ROLE_TARGET);
   }
   
   
   public void assignOrganiser(Person organiser, Place hideout) {
-    assignRole(organiser, ROLE_ORGANISER);
-    assignRole(hideout  , ROLE_HIDEOUT  );
+    assignRole(organiser, hideout, ROLE_ORGANISER);
+  }
+  
+  
+  public void assignMastermind(Person mastermind, Place based) {
+    assignRole(mastermind, based, ROLE_MASTERMIND);
   }
   
   
@@ -243,13 +244,23 @@ public abstract class Plot extends Event {
   }
   
   
+  public Person mastermind() {
+    return (Person) filling(ROLE_MASTERMIND);
+  }
+  
+  
+  public Place based() {
+    return (Place) location(ROLE_MASTERMIND);
+  }
+  
+  
   public Person organiser() {
     return (Person) filling(ROLE_ORGANISER);
   }
   
   
   public Place hideout() {
-    return (Place) filling(ROLE_HIDEOUT);
+    return (Place) location(ROLE_ORGANISER);
   }
   
   
@@ -259,13 +270,19 @@ public abstract class Plot extends Event {
   
   
   public Place scene() {
-    return (Place) filling(ROLE_SCENE);
+    return (Place) location(ROLE_TARGET);
   }
   
   
   public Element filling(Role role) {
     RoleEntry entry = entryFor(null, role);
     return entry == null ? null : entry.element;
+  }
+  
+  
+  public Place location(Role role) {
+    RoleEntry entry = entryFor(null, role);
+    return entry == null ? null : entry.location;
   }
   
   
@@ -341,33 +358,25 @@ public abstract class Plot extends Event {
     
     Role    focusRole = (Role) Rand.pickFrom(step.involved);
     Element focus     = filling(focusRole);
-    Place   site      = focus.place();
-    float   trust     = site.region().currentValue(Region.TRUST);
+    Place   location  = location(focusRole);
+    float   trust     = location.region().currentValue(Region.TRUST);
     float   tipChance = trust / 10f;
     Base    player    = world.playerBase();
     int     time      = world.timing.totalHours();
     
     if (begins && Rand.num() < tipChance) {
-      Clue tipoff = new Clue(this, focusRole);
-      tipoff.confirmTipoff(focus, Lead.LEAD_TIPOFF, time, site);
-      CaseFile file = player.leads.caseFor(focus);
-      file.recordClue(tipoff);
+      Clue tipoff = Clue.confirmSuspect(this, focusRole, focus);
+      CaseFile file = player.leads.caseFor(this);
+      file.recordClue(tipoff, Lead.LEAD_TIPOFF, time, location);
     }
     
     if (ends && step.medium == Lead.MEDIUM_HEIST) {
       EventEffects effects = generateEffects(step);
-      Element target = target(), scene = scene();
-      
-      Clue repT = new Clue(this, ROLE_TARGET);
-      repT.confirmTipoff(target(), Lead.LEAD_REPORT, time, site);
-      CaseFile fileT = player.leads.caseFor(target);
-      fileT.recordClue(repT, effects, true);
-      
-      Clue repS = new Clue(this, ROLE_SCENE);
-      repS.confirmTipoff(scene, Lead.LEAD_REPORT, time, site);
-      CaseFile fileS = player.leads.caseFor(scene);
-      fileS.recordClue(repS, null, false);
-      
+      Element  target = target();
+      Place    scene  = scene ();
+      Clue     report = Clue.confirmSuspect(this, ROLE_TARGET, target);
+      CaseFile file   = player.leads.caseFor(this);
+      file.recordClue(report, Lead.LEAD_REPORT, time, scene);
       effects.applyEffects(target.place());
     }
   }
@@ -437,16 +446,18 @@ public abstract class Plot extends Event {
   public String nameForCase(Base base) {
     //return ""+organiser()+" (No. "+caseID+")";
     //*
-    CaseFile file = base.leads.caseFor(this);
-    CaseFile forTarget = base.leads.caseFor(target());
+    //CaseFile file = base.leads.caseFor(this);
+    //CaseFile forTarget = base.leads.caseFor(target());
     boolean targetKnown = false, typeKnown = false;
     
+    /*
     for (Clue clue : file.clues) if (clue.heistType == this.type) {
       typeKnown = true;
     }
     for (Clue clue : forTarget.clues) if (clue.confirmed) {
       targetKnown = true;
     }
+    //*/
     
     String name = "Case No. "+caseID;
     if (targetKnown && typeKnown) name = type.name+": "+target();

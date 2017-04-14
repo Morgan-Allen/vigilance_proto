@@ -16,12 +16,12 @@ public class CaseFile implements Session.Saveable {
   /**  Data fields, construction and save/load methods-
     */
   final Base base;
-  final public Object subject;
+  final public Plot subject;
   List <Clue> clues = new List();
   
   
   
-  CaseFile(Base base, Object subject) {
+  CaseFile(Base base, Plot subject) {
     this.base    = base   ;
     this.subject = subject;
   }
@@ -29,8 +29,8 @@ public class CaseFile implements Session.Saveable {
   
   public CaseFile(Session s) throws Exception {
     s.cacheInstance(this);
-    base    = (Base  ) s.loadObject();
-    subject = (Object) s.loadObject();
+    base    = (Base) s.loadObject();
+    subject = (Plot) s.loadObject();
     s.loadObjects(clues);
   }
   
@@ -45,16 +45,31 @@ public class CaseFile implements Session.Saveable {
   
   /**  Recording and transferring evidence-
     */
-  public void recordClue(Clue clue) {
-    recordClue(clue, null, true);
+  public void recordClue(Clue clue, Lead source, int time, Place place) {
+    recordClue(clue, source, null, time, place, null, true);
   }
   
   
-  public void recordClue(Clue clue, EventEffects effects, boolean display) {
-    for (Clue prior : clues) if (prior.makesRedundant(clue)) {
-      ///I.say("\nClue was redundant: "+clue.longDescription(base));
-      return;
-    }
+  public void recordClue(Clue clue, Lead.Type type, int time, Place place) {
+    recordClue(clue, null, type, time, place, null, true);
+  }
+  
+  
+  public void recordClue(
+    Clue clue, Lead source, int time, Place place, boolean report
+  ) {
+    recordClue(clue, source, null, time, place, null, report);
+  }
+  
+  
+  public void recordClue(
+    Clue clue, Lead source, Lead.Type type, int time, Place place,
+    EventEffects effects, boolean display
+  ) {
+    for (Clue prior : clues) if (prior.makesRedundant(clue)) return;
+    
+    if (source != null) clue.confirmSource(source, time, place);
+    else                clue.confirmSource(type  , time, place);
     clues.add(clue);
     
     if (display) {
@@ -63,58 +78,17 @@ public class CaseFile implements Session.Saveable {
   }
   
   
-  public void updateEvidenceFrom(CaseFile other) {
+  public void updateCluesFrom(CaseFile other) {
     for (Clue clue : other.clues) {
       clues.include(clue);
     }
   }
-  
-  
-  
-  /**  Determining location (which constrains whether leads can be followed.)
-    */
-  public Element subjectAsElement() {
-    if (! (subject instanceof Element)) return null;
-    return (Element) subject;
-  }
-  
-  
-  public Element knownLocation() {
-    Element subject = subjectAsElement();
-    if (subject == null) return null;
-    
-    if (subject.isPlace() || subject.isRegion()) {
-      return subject;
-    }
-    for (Clue clue : clues) if (clue.isLocationClue()) {
-      if (clue.location.isPlace() && clue.nearRange == 0) {
-        return (Place) clue.location;
-      }
-    }
-    if (subject.isPerson()) {
-      return ((Person) subject).resides();
-    }
-    return null;
-  }
-  
-  
-  public boolean subjectAtKnownLocation() {
-    Element subject = subjectAsElement();
-    if (subject == null) return false;
-    
-    if (subject.isPlace() || subject.isRegion()) return true;
-    return knownLocation() == subject.place();
-  }
-  
-  
-  public boolean subjectIsHideout() {
-    for (Clue clue : clues) {
-      if (clue.plot.complete()) continue;
-      if (clue.confirmed && clue.role == Plot.ROLE_HIDEOUT) return true;
-    }
-    return false;
-  }
 }
+
+
+
+
+
 
 
 

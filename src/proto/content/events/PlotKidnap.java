@@ -13,9 +13,8 @@ public class PlotKidnap extends Plot {
   
   
   final public static Plot.Role
-    ROLE_TAILS       = new Plot.Role("role_tails"      , "Tails"      , PERP  ),
-    ROLE_RANSOMS     = new Plot.Role("role_ransoms"    , "Ransoms"    , VICTIM),
-    ROLE_RANSOM_HOME = new Plot.Role("role_ransom_home", "Ransom Home", VICTIM);
+    ROLE_TAILS       = new Plot.Role("role_tails"  , "Tails"  , PERP  ),
+    ROLE_RANSOMS     = new Plot.Role("role_ransoms", "Ransoms", VICTIM);
   
   boolean returnedHostage;
   
@@ -58,43 +57,41 @@ public class PlotKidnap extends Plot {
     
     Series <Person> aides = PlotUtils.aidesOnRoster(this);
     assignTarget(target, target.resides());
-    assignRole(target , ROLE_TARGET );
-    assignRole(ransoms, ROLE_RANSOMS);
-    assignRole(ransoms.resides(), ROLE_RANSOM_HOME);
-    assignOrganiser(base().leader(), base());
+    assignRole(ransoms, ransoms.resides(), ROLE_RANSOMS);
+    assignMastermind(base().leader(), base());
     
-    PlotUtils.fillHideoutRole(this, scene());
-    PlotUtils.fillExpertRole(this, BRAINS  , aides, ROLE_ENFORCER);
-    PlotUtils.fillExpertRole(this, REFLEXES, aides, ROLE_TAILS   );
+    Place hideout = PlotUtils.chooseHideout(this, scene());
+    PlotUtils.fillExpertRole(this, BRAINS  , aides, ROLE_ORGANISER, hideout);
+    PlotUtils.fillExpertRole(this, REFLEXES, aides, ROLE_TAILS    , hideout);
     
     Step.queueStep(
       "initial contacts", this,
-      ROLE_ORGANISER, ROLE_BASE, ROLE_ENFORCER, ROLE_HIDEOUT,
+      ROLE_MASTERMIND, ROLE_ORGANISER,
       Lead.MEDIUM_WIRE, 24, ROLE_TAILS
     );
     Step.queueStep(
       "tailing target", this,
-      ROLE_TAILS, ROLE_HIDEOUT, ROLE_TARGET, ROLE_SCENE,
+      ROLE_TAILS, ROLE_TARGET,
       Lead.MEDIUM_SURVEIL, 24
     );
     Step.queueStep(
       "grab target", this,
-      ROLE_TAILS, ROLE_HIDEOUT, ROLE_TARGET, ROLE_SCENE,
-      Lead.MEDIUM_HEIST, 24, ROLE_ENFORCER
+      ROLE_TAILS, ROLE_TARGET,
+      Lead.MEDIUM_HEIST, 24, ROLE_ORGANISER
     );
     Step.queueStep(
       "deliver ransom", this,
-      ROLE_ENFORCER, ROLE_HIDEOUT, ROLE_RANSOMS, ROLE_RANSOM_HOME,
+      ROLE_ORGANISER, ROLE_RANSOMS,
       Lead.MEDIUM_WIRE, 24
     );
     Step.queueStep(
       "ransom paid", this,
-      ROLE_RANSOMS, ROLE_RANSOM_HOME, ROLE_ENFORCER, ROLE_HIDEOUT,
+      ROLE_RANSOMS, ROLE_ORGANISER,
       Lead.MEDIUM_WIRE, 24
     );
     Step.queueStep(
       "reports and payoffs", this,
-      ROLE_ENFORCER, ROLE_HIDEOUT, ROLE_ORGANISER, ROLE_BASE,
+      ROLE_ORGANISER, ROLE_MASTERMIND,
       Lead.MEDIUM_WIRE, 24, ROLE_TAILS
     );
     

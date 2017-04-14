@@ -61,7 +61,7 @@ public class MissionsViewCluesView extends UINode {
     if (draw.hovered != null) {
       Clue picked = (Clue) draw.hovered;
       if (draw.clicked) {
-        parent.setActiveFocus(picked.plot, false);
+        parent.setActiveFocus(picked.plot(), false);
       }
     }
     

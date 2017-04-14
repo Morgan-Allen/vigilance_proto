@@ -19,7 +19,7 @@ public class MessageUtils {
     StringBuffer header = new StringBuffer(), desc = new StringBuffer();
     
     if (clue.isReport()) {
-      header.append("CRIME REPORT: "+clue.plot.name());
+      header.append("CRIME REPORT: "+clue.plot().name());
       desc.append(clue.longDescription(player));
     }
     else if (clue.isTipoff()) {

@@ -30,15 +30,18 @@ public class DebugPlotBefore extends RunGame {
     Person organiser = kidnap.organiser();
     
     Base heroes = world.baseFor(Heroes.JANUS_INDUSTRIES);
-    Clue tipoff = new Clue(kidnap, Plot.ROLE_ORGANISER);
+    Clue tipoff = Clue.confirmSuspect(kidnap, Plot.ROLE_ORGANISER, organiser);
     int timeFound = world.timing.totalHours();
     Place placeFound = kidnap.hideout();
-    tipoff.confirmTipoff(organiser, Lead.LEAD_TIPOFF, timeFound, placeFound);
-    heroes.leads.caseFor(organiser).recordClue(tipoff);
+    CaseFile file = heroes.leads.caseFor(kidnap);
+    file.recordClue(tipoff, Lead.LEAD_TIPOFF, timeFound, placeFound);
     
     world.view().missionView.setActiveFocus(kidnap, true);
     return world;
   }
 }
+
+
+
 
 
