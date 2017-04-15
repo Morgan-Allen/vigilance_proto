@@ -112,6 +112,10 @@ public class Lead extends Task {
       this.cluesMedia = cluesMedia;
       TYPE_B.add(this);
     }
+    
+    public String toString() {
+      return name;
+    }
   }
   
   final static String ICON_DIR = "media assets/ability icons/";
@@ -219,10 +223,13 @@ public class Lead extends Task {
   
   /**  Data fields, construction and save/load methods-
     */
-  final Type type;
-  final Element focus;
+  final public Type type;
+  final public Element focus;
   private String lastContactID;
   private List <Person> onceAssigned = new List();
+  
+  public float leadRating;
+  public boolean autoWin;
   
   
   Lead(Base base, Type type, Element focus) {
@@ -290,7 +297,7 @@ public class Lead extends Task {
   
   /**  Extraction and screening of clues related to the case:
     */
-  protected boolean canDetect(
+  public boolean canDetect(
     Step step, int tense, Plot plot, int time
   ) {
     //
@@ -352,7 +359,7 @@ public class Lead extends Task {
     //
     //  Then perform the actual skill-test needed to ensure success:
     attempt = configAttempt(follow);
-    int outcome = attempt.performAttempt(1);
+    int outcome = autoWin ? 1 : attempt.performAttempt(1);
     Series <Clue> possible = step.possibleClues(focus, this);
     
     if (outcome > 0 && ! possible.empty()) {
@@ -363,7 +370,7 @@ public class Lead extends Task {
     //
     //  Either way, you have to take the risk of tipping off the perps
     //  themselves:
-    plot.takeSpooking(type.profile);
+    plot.takeSpooking(autoWin ? 0 : type.profile);
     return outcome;
   }
   

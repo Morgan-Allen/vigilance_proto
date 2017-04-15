@@ -27,9 +27,10 @@ public abstract class RunGame extends JFrame implements ActionListener {
         game.savePath = savePath;
         game.setupAssets();
         game.initUI();
-
+        
         if (! game.attemptReload(game.savePath)) {
           game.world = game.setupWorld();
+          game.runWorldTests(game.world);
         }
         
         Timer timer = new Timer(1000 / FRAME_RATE, game);
@@ -58,7 +59,8 @@ public abstract class RunGame extends JFrame implements ActionListener {
   
   
   public void actionPerformed(ActionEvent e) {
-    if (world   != null) world.updateWorld();
+    float hoursGap = World.GAME_HOURS_PER_REAL_SECOND * 1f / FRAME_RATE;
+    if (world   != null) world.updateWorld(hoursGap);
     if (surface != null) surface.repaint();
   }
   
@@ -79,6 +81,12 @@ public abstract class RunGame extends JFrame implements ActionListener {
   /**  Actual world setup for the first run (not when saving/loading)-
     */
   protected abstract World setupWorld();
+  
+  
+  protected void runWorldTests(World world) {
+    return;
+  }
+  
   
   public World world() {
     return world;

@@ -221,9 +221,16 @@ public class Clue implements Session.Saveable {
   /**  Evaluation of possible suspects-
     */
   protected boolean matchesSuspect(Element e) {
+    
+    //  TODO:  This will have to do separate eliminations for locations and
+    //  their suspects now!
+    Element trueSuspect  = plot.filling (role);
+    Place   trueLocation = plot.location(role);
+    
     if (isConfirmation() && match != e) {
       return false;
     }
+    
     if (isTraitClue()) {
       if (e.isPerson()) {
         Person p = (Person) e;
@@ -234,6 +241,7 @@ public class Clue implements Session.Saveable {
         if (! p.hasProperty(trait)) return false;
       }
     }
+    
     if (isLocationClue()) {
       Region near = location.region();
       float dist = e.world().distanceBetween(near, e.region());
@@ -245,6 +253,7 @@ public class Clue implements Session.Saveable {
         return false;
       }
     }
+    
     return true;
   }
   
@@ -284,10 +293,13 @@ public class Clue implements Session.Saveable {
   
   
   public String traitDescription() {
-    if (trait != null) {
+    if (isConfirmation()) {
+      return "is "+match;
+    }
+    if (isTraitClue()) {
       return ""+trait;
     }
-    if (location != null) {
+    if (isLocationClue()) {
       if (nearRange == 0) return "in "+location;
       else                return "near "+location;
     }

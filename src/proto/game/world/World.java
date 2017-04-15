@@ -209,13 +209,13 @@ public class World implements Session.Saveable {
   
   /**  Regular updates and activity cycle:
     */
-  public void updateWorld() {
+  public void updateWorld(float hoursGone) {
     
     if (activeScene != null) {
       activeScene.updateScene();
     }
     else if (amWatching) {
-      timing .updateTiming ();
+      timing.updateTiming(hoursGone);
       events .updateEvents ();
       council.updateCouncil();
       

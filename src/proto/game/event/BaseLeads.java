@@ -239,6 +239,10 @@ public class BaseLeads {
       return matches;
     }
     
+    //  TODO:  This will have to do separate eliminations for locations and
+    //  their suspects now- either that, or have the 'cluesFor' method include
+    //  associated locations...?
+    
     search: for (Element e : base.world().inside()) {
       for (Clue c : related) if (! c.matchesSuspect(e)) continue search;
       matches.add(e);
@@ -247,7 +251,7 @@ public class BaseLeads {
   }
   
   
-  public float evidenceForInvolvement(Plot plot, Element subject) {
+  public float evidenceAgainst(Element subject, Plot plot) {
     CaseFile file = caseFor(plot);
     float evidence = 0;
     for (Clue c : file.clues) if (c.match == subject) {
@@ -268,39 +272,31 @@ public class BaseLeads {
   
   
   public boolean atKnownLocation(Element suspect) {
-    //  TODO:  RETURN A VALUE HERE
-    return true;
+    return suspect.place() == lastKnownLocation(suspect);
   }
   
-  /*
-  public Element knownLocation() {
-    Element subject = subjectAsElement();
-    if (subject == null) return null;
+  
+  public Place lastKnownLocation(Element suspect) {
     
-    if (subject.isPlace() || subject.isRegion()) {
-      return subject;
+    if (suspect.isPerson()) {
+      Person p = (Person) suspect;
+      if (p.isCaptive()) return p.place();
     }
-    for (Clue clue : clues) if (clue.isLocationClue()) {
-      if (clue.location.isPlace() && clue.nearRange == 0) {
-        return (Place) clue.location;
-      }
+    else if (suspect.isPlace()) {
+      return (Place) suspect;
     }
-    if (subject.isPerson()) {
-      return ((Person) subject).resides();
+    else if (suspect.isRegion()) {
+      return null;
+    }
+    
+    Series <Clue> clues = cluesFor(suspect, true);
+    for (Clue c : clues) {
+      if (! c.isLocationClue()) continue;
+      if (c.nearRange != 0 || ! c.location.isPlace()) continue;
+      return (Place) c.location;
     }
     return null;
   }
-  
-  
-  public boolean subjectAtKnownLocation() {
-    Element subject = subjectAsElement();
-    if (subject == null) return false;
-    
-    if (subject.isPlace() || subject.isRegion()) return true;
-    return knownLocation() == subject.place();
-  }
-  //*/
-  
 }
 
 

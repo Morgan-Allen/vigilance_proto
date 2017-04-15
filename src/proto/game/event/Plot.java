@@ -297,8 +297,12 @@ public abstract class Plot extends Event {
   
   protected RoleEntry entryFor(Element element, Role role) {
     for (RoleEntry entry : entries) {
-      if (element != null && element != entry.element) continue;
-      if (role    != null && role    != entry.role   ) continue;
+      if (element != null) {
+        if (element != entry.element && element != entry.location) continue;
+      }
+      if (role != null) {
+        if (role != entry.role) continue;
+      }
       return entry;
     }
     return null;
@@ -307,7 +311,10 @@ public abstract class Plot extends Event {
   
   public Batch <Element> allInvolved() {
     Batch <Element> involved = new Batch();
-    for (RoleEntry entry : entries) involved.include(entry.element);
+    for (RoleEntry entry : entries) {
+      involved.include(entry.element );
+      involved.include(entry.location);
+    }
     return involved;
   }
   

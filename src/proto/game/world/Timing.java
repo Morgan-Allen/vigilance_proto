@@ -79,7 +79,7 @@ public class Timing {
   }
   
   
-  public void advanceTime(float hoursGone) {
+  public void updateTiming(float hoursGone) {
     hoursInTick = hoursGone;
     timeHours += hoursInTick;
     dayIsUp = monthIsUp = false;
@@ -101,12 +101,6 @@ public class Timing {
         timeYears++;
       }
     }
-  }
-  
-  
-  void updateTiming() {
-    final float realGap = 1f / RunGame.FRAME_RATE;
-    advanceTime(realGap * World.GAME_HOURS_PER_REAL_SECOND);
   }
   
   
