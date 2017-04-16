@@ -22,9 +22,20 @@
 />
 
 <prop
-  name       = "Floor Edge"
-  ID         = "civic_floor_edge"
-  sprite     = "floor_marble_edge.png"
+  name       = "Floor Edge Horizontal"
+  ID         = "civic_floor_edge_horizontal"
+  sprite     = "floor_marble_edge_horizontal.png"
+  wide       = "1"
+  high       = "1"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+  blockSight = "false"
+/>
+
+<prop
+  name       = "Floor Edge Vertical"
+  ID         = "civic_floor_edge_vertical"
+  sprite     = "floor_marble_edge_vertical.png"
   wide       = "1"
   high       = "1"
   subtype    = "SUBTYPE_WALLING"
@@ -269,7 +280,7 @@
 />
 
 <prop
-  name       = "elevators"
+  name       = "Elevators"
   ID         = "elevators"
   sprite     = "elevators.png"
   wide       = "4"
@@ -280,11 +291,33 @@
 />
 
 <prop
-  name       = "cubicles"
+  name       = "Cubicles"
   ID         = "cubicles"
   sprite     = "cubicles.png"
   wide       = "4"
   high       = "4"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "false"
+/>
+
+<prop
+  name       = "Water"
+  ID         = "water"
+  sprite     = "water.png"
+  wide       = "1"
+  high       = "1"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "false"
+/>
+
+<prop
+  name       = "Printer"
+  ID         = "printer"
+  sprite     = "printer.png"
+  wide       = "1"
+  high       = "1"
   subtype    = "SUBTYPE_WALLING"
   blockLevel = "BLOCK_FULL"
   blockSight = "false"
@@ -338,19 +371,20 @@
 >
 <grid
   1 = "civic_floor"
-  2 = "civic_floor_edge"
+  2 = "civic_floor_edge_horizontal"
   3 = "civic_floor_corner"
   4 = "civic_metal_floor"
+  5 = "civic_floor_edge_vertical"
 >
   4  4  4  4  4  4  4  4  4  4  4  4
   4  4  4  4  4  4  4  4  4  4  4  4
   3  2e 2e 2e 2e 2e 2e 2e 2e 2e 2e 3e
-  2  1  1  1  1  1  1  1  1  1  1  2s
-  2  1  1  1  1  1  1  1  1  1  1  2s
-  2  1  1  1  1  1  1  1  1  1  1  2s
-  2  1  1  1  1  1  1  1  1  1  1  2s
-  2  1  1  1  1  1  1  1  1  1  1  2s
-  2  1  1  1  1  1  1  1  1  1  1  2s
+  5  1  1  1  1  1  1  1  1  1  1  5s
+  5  1  1  1  1  1  1  1  1  1  1  5s
+  5  1  1  1  1  1  1  1  1  1  1  5s
+  5  1  1  1  1  1  1  1  1  1  1  5s
+  5  1  1  1  1  1  1  1  1  1  1  5s
+  5  1  1  1  1  1  1  1  1  1  1  5s
   3w 2w 2w 2w 2w 2w 2w 2w 2w 2w 2w 3s
   1  1  1  1  1  1  1  1  1  1  1  1
   1  1  1  1  1  1  1  1  1  1  1  1
@@ -387,14 +421,15 @@
 >
 <grid
   1 = "civic_floor"
-  2 = "civic_floor_edge"
+  2 = "civic_floor_edge_horizontal"
   3 = "civic_floor_corner"
+  4 = "civic_floor_edge_vertical"
 >
   3  2e 2e 2e 2e 3e
-  2  1  1  1  1  2s
-  2  1  1  1  1  2s
-  2  1  1  1  1  2s
-  2  1  1  1  1  2s
+  4  1  1  1  1  4s
+  4  1  1  1  1  4s
+  4  1  1  1  1  4s
+  4  1  1  1  1  4s
   3w 2w 2w 2w 2w 3s
 </grid>
   <grid
@@ -455,13 +490,16 @@
 >
   <grid
     1 = "cubicles"
+    2 = "water"
+    3 = "printer"
+    4 = "bank_plant_1"
 
   >
-    .  .  .  .  .  . .  .  . . . .
+    4  3  .  .  .  . .  .  . . . .
     .  .  .  1  .  . .  .  . . . .
     .  .  .  .  .  . .  .  . . . .
     .  .  .  .  .  . .  .  . . . .
-    .  .  .  .  .  . .  .  . . 1s .
+    2w .  .  .  .  . .  .  . . 1s .
     .  .  .  .  .  . .  .  . . . .
 
   </grid>
