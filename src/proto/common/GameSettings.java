@@ -7,7 +7,6 @@ import proto.game.world.World;
 public class GameSettings {
   
   final public static boolean
-    SIMPLE_EVENTS = true,
     EASY_MODE     = true
   ;
   
@@ -23,8 +22,8 @@ public class GameSettings {
   public static boolean
     reportMediaMiss = false,
     reportWorldInit = false,
-    freeTipoffs     = false || SIMPLE_EVENTS,
-    freeLeads       = false || SIMPLE_EVENTS,
+    freeTipoffs     = false,
+    noTipoffs       = false,
     debugScene      = false,
     pauseScene      = false,
     debugLineSight  = false,

@@ -178,7 +178,7 @@ public class Person extends Element {
     assigned.setAssigned(this, true);
     if (assigned instanceof Scene) scene = (Scene) assigned;
     
-    I.say(this+" assigned to "+assigned);
+    ///I.say(this+" assigned to "+assigned);
     return true;
   }
   
@@ -190,7 +190,7 @@ public class Person extends Element {
     assigned.setAssigned(this, false);
     if (scene == assigned) scene = null;
     
-    I.say(this+" removed from assignment "+assigned);
+    ///I.say(this+" removed from assignment "+assigned);
     return true;
   }
   
@@ -320,16 +320,18 @@ public class Person extends Element {
   
   
   public boolean isVillain() {
-    return side == Side.VILLAINS && kind().subtype() == Kind.SUBTYPE_BOSS;
+    return isCriminal() && kind().subtype() == Kind.SUBTYPE_BOSS;
   }
   
   
   public boolean isCriminal() {
-    return side == Side.VILLAINS && ! isCivilian();
+    if (side == Side.VILLAINS) return true;
+    return base != null && base.faction().criminal;
   }
   
   
   public boolean isCivilian() {
+    if (isCriminal()) return false;
     return kind.subtype() == Kind.SUBTYPE_CIVILIAN;
   }
   

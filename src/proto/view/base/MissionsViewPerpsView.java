@@ -72,6 +72,8 @@ public class MissionsViewPerpsView extends UINode {
     MissionsView parent = mainView.missionView;
     Person agent = mainView.rosterView.selectedPerson();
     Series <Clue> clues = player.leads.cluesFor(suspect, true);
+    Place lastSeen = player.leads.lastKnownLocation(suspect);
+    boolean atSeen = player.leads.atKnownLocation(suspect);
     //
     //  Create a list-display, and render the header, latest clue, entries for
     //  each possible lead, and an option to view associates-
@@ -87,10 +89,19 @@ public class MissionsViewPerpsView extends UINode {
       Clue first = clues.first();
       draw.addEntry(null, first.longDescription(player), 100, first.plot());
     }
-    if (! player.leads.atKnownLocation(suspect)) {
-      String desc = "This suspect's location is unknown.";
-      draw.addEntry(MissionsView.MYSTERY_IMAGE, desc, 40, null);
+    
+    String descAt = null;
+    if (atSeen && lastSeen != null && lastSeen != suspect) {
+      descAt = "Currently At: "+lastSeen;
     }
+    else if (! atSeen) {
+      descAt = "Whereabouts unknown.";
+      if (lastSeen != null) descAt += " Last Seen: "+lastSeen;
+    }
+    if (descAt != null) {
+      draw.addEntry(MissionsView.MYSTERY_IMAGE, descAt, 40, null);
+    }
+    
     for (Lead lead : player.leads.leadsFor(suspect)) {
       draw.addEntry(lead.icon(), lead.choiceInfo(agent), 20, lead);
     }
@@ -137,9 +148,9 @@ public class MissionsViewPerpsView extends UINode {
     }
     g.setColor(Color.LIGHT_GRAY);
     ViewUtils.drawWrappedString(
-      hoverDesc, g, vx + across, vy + down, vw - (across + 10), 200
+      hoverDesc, g, vx + across, vy + down, vw - (across + 10), 150
     );
-    down += 200;
+    down += 150;
     
     parent.casesArea.setScrollheight(down);
     return true;

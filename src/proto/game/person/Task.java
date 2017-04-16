@@ -200,7 +200,7 @@ public abstract class Task implements Assignment {
   /**  Rendering, debug and interface methods-
     */
   public String testInfo(Person p) {
-    StringBuffer s = new StringBuffer("Requires: ");
+    StringBuffer s = new StringBuffer("");
     
     Batch <Person> active = new Batch();
     Visit.appendTo(active, active());

@@ -16,9 +16,14 @@ public abstract class RunGame extends JFrame implements ActionListener {
   
   /**  Setup and construction-
     */
+  final public static int
+    FRAME_RATE                 = 25,
+    GAME_HOURS_PER_REAL_SECOND = 8 ;
+  
   String savePath;
   Surface surface;
   World world;
+  boolean paused = true;
   
   
   protected static void runGame(final RunGame game, final String savePath) {
@@ -59,9 +64,26 @@ public abstract class RunGame extends JFrame implements ActionListener {
   
   
   public void actionPerformed(ActionEvent e) {
-    float hoursGap = World.GAME_HOURS_PER_REAL_SECOND * 1f / FRAME_RATE;
-    if (world   != null) world.updateWorld(hoursGap);
-    if (surface != null) surface.repaint();
+    if (world != null && world.activeScene() != null) {
+      world.activeScene().updateScene();
+    }
+    else if (world != null && ! paused) {
+      float hoursGap = GAME_HOURS_PER_REAL_SECOND * 1f / FRAME_RATE;
+      world.updateWorld(hoursGap);
+    }
+    if (surface != null) {
+      surface.repaint();
+    }
+  }
+  
+  
+  public boolean paused() {
+    return paused;
+  }
+  
+  
+  public void setPaused(boolean paused) {
+    this.paused = paused;
   }
   
   
@@ -96,10 +118,6 @@ public abstract class RunGame extends JFrame implements ActionListener {
   
   /**  Support methods for the UI-
     */
-  final public static int
-    FRAME_RATE = 25;
-  
-  
   public Surface surface() {
     return surface;
   }

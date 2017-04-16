@@ -2,11 +2,8 @@
 
 package proto.game.world;
 import proto.common.*;
-import proto.game.event.*;
-import proto.game.scene.*;
 import proto.util.*;
-import proto.view.*;
-import proto.view.base.RegionAssets;
+import proto.view.base.*;
 
 
 
@@ -47,6 +44,11 @@ public class RegionType extends Kind {
   public void attachMapCoordinates(float mapX, float mapY) {
     this.mapX = mapX;
     this.mapY = mapY;
+  }
+  
+  
+  public Vec2D mapCoords() {
+    return new Vec2D(mapX, mapY);
   }
   
 }

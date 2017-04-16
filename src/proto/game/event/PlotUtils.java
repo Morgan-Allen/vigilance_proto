@@ -129,27 +129,30 @@ public class PlotUtils {
     Base  base  = plot.base();
     World world = base.world();
     Place place = focus.place();
-    Scene scene = place.kind().sceneType().generateScene(world);
     
     final float dangerLevel = 0.5f;
     final PersonType GOONS[] = base.goonTypes().toArray(PersonType.class);
     float forceLimit = dangerLevel * 10, forceSum = 0;
     
     final List <Person> forces = new List();
-    for (Element e : step.involved()) if (e != null && e.isPerson()) {
+    for (Element e : step.involved()) {
+      if (e == null || e.place() != place || ! e.isPerson()) continue;
       Person perp = (Person) e;
       forces.add(perp);
-      forceSum += perp.stats.powerLevel();
+      if (perp.isCriminal()) forceSum += perp.stats.powerLevel();
     }
+    if (forces.empty()) return null;
     
-    while (forceSum < forceLimit) {
+    while (forceSum < forceLimit && forces.size() < (forceLimit * 2)) {
       PersonType ofGoon = (PersonType) Rand.pickFrom(GOONS);
       Person goon = Person.randomOfKind(ofGoon, base.world());
-      forceSum += goon.stats.powerLevel();
       goon.setBase(plot.base());
+      float power = goon.stats.powerLevel();
+      forceSum += power;
       forces.add(goon);
     }
     
+    Scene scene = place.kind().sceneType().generateScene(world);
     scene.entry.provideInProgressEntry(forces);
     scene.entry.provideBorderEntry(lead.assigned());
     scene.assignMissionParameters(place, lead, plot);
@@ -194,8 +197,9 @@ public class PlotUtils {
       if (p.isCriminal() && p.currentScene() == scene && scene.wasWon()) {
         CaseFile  file = player.leads.caseFor(plot);
         Plot.Role role = plot.roleFor(p);
-        Clue redHanded = Clue.confirmSuspect(plot, role, p);
-        file.recordClue(redHanded, lead, time, scene.site(), false);
+        Place     site = scene.site();
+        Clue redHanded = Clue.confirmSuspect(plot, role, p, site);
+        file.recordClue(redHanded, lead, time, site, false);
         captives.add(p);
         evidence.add(file);
       }

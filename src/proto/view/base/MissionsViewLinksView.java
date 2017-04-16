@@ -112,7 +112,11 @@ public class MissionsViewLinksView extends UINode {
         addAssociate(list, null, plot, "Area For");
       }
       for (Place p : area.buildSlots()) {
-        addAssociate(list, p, null, "Address");
+        if (addAssociate(list, p, null, "Address")) {
+          for (Person r : p.residents()) {
+            addAssociate(list, r, null, "Resident");
+          }
+        }
       }
     }
     

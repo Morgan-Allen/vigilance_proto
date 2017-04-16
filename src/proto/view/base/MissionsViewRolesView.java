@@ -60,7 +60,7 @@ public class MissionsViewRolesView extends UINode {
       Image icon = null;
       String desc = null;
       Element match = r.suspects.size() == 1 ? r.suspects.first() : null;
-      boolean canFollow = r.suspects.size() <= 4 && r.clues.size() > 0;
+      boolean canFollow = r.clues.size() > 0;
       Object refers = null;
       
       if (match != null) {
@@ -105,7 +105,15 @@ public class MissionsViewRolesView extends UINode {
     else if (hovered instanceof Plot.Role) {
       Plot.Role role = (Plot.Role) hovered;
       Series <Clue> clues = player.leads.cluesFor(plot, role, true);
-      hoverDesc = "Latest Evidence:\n  "+clues.first();
+      Clue top = clues.first();
+      if (top != null) {
+        hoverDesc = "\nLatest Evidence:  "+top.longDescription(player);
+      }
+      else {
+        hoverDesc = "\nNo Evidence";
+      }
+      hoverDesc += "\nClick to view suspects.";
+      
       if (draw.clicked) {
         parent.setActiveFocus(hovered, false);
       }
@@ -115,10 +123,10 @@ public class MissionsViewRolesView extends UINode {
       Series <Clue> clues = player.leads.cluesFor(plot, element, true);
       Clue top = clues.first();
       if (top != null) {
-        hoverDesc = "Latest Evidence:\n  "+top.longDescription(player);
+        hoverDesc = "\nLatest Evidence:  "+top.longDescription(player);
       }
       else {
-        hoverDesc = "No Evidence";
+        hoverDesc = "\nNo Evidence";
       }
       if (draw.clicked) {
         parent.setActiveFocus(hovered, false);
@@ -126,9 +134,9 @@ public class MissionsViewRolesView extends UINode {
     }
     g.setColor(Color.LIGHT_GRAY);
     ViewUtils.drawWrappedString(
-      hoverDesc, g, vx + across, vy + down, vw - (across + 10), 100
+      hoverDesc, g, vx + across, vy + down, vw - (across + 10), 150
     );
-    down += 100;
+    down += 150;
     
     parent.casesArea.setScrollheight(down);
     return true;

@@ -1,12 +1,11 @@
 
 
 package proto.view.base;
-import java.awt.Color;
-import java.awt.Graphics2D;
-
-import proto.game.world.*;
+import proto.common.*;
 import proto.util.*;
 import proto.view.common.*;
+
+import java.awt.Graphics2D;
 
 
 
@@ -25,13 +24,13 @@ public class ProgressOptionsView extends UINode {
       "", new Box2D(across + 5, down, 200 - 10, 20), this
     ) {
       protected void whenClicked() {
-        final World world = mainView.world();
-        if (world.monitorActive()) world.pauseMonitoring();
-        else                       world.beginMonitoring();
+        RunGame game = mainView.game();
+        if (game.paused()) game.setPaused(false);
+        else               game.setPaused(true );
       }
       protected void updateAndRender(Surface surface, Graphics2D g) {
-        final boolean active = mainView.world().monitorActive();
-        this.label = active ? "Pause Monitoring" : "Resume Monitoring";
+        final boolean paused = mainView.game().paused();
+        this.label = paused ? "Resume Monitoring" : "Pause Monitoring";
         super.updateAndRender(surface, g);
       }
     };

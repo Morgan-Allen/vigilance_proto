@@ -23,7 +23,6 @@ public class MainView extends UINode {
   ;
   
   private World world;
-  
   SceneView  sceneView ;
   UINode     mainUI    ;
   final public RosterView rosterView;
@@ -52,6 +51,7 @@ public class MainView extends UINode {
   
   
   public MainView(World world) {
+    
     super();
     this.world = world;
     
@@ -124,6 +124,11 @@ public class MainView extends UINode {
   }
   
   
+  public RunGame game() {
+    return world.game();
+  }
+  
+  
   public World world() {
     return world;
   }
@@ -153,7 +158,7 @@ public class MainView extends UINode {
     */
   public void queueMessage(UINode message) {
     messageQueue.add(message);
-    world.pauseMonitoring();
+    game().setPaused(true);
   }
   
   

@@ -17,16 +17,13 @@ public class World implements Session.Saveable {
     MINUTES_PER_HOUR   = 60,
     HOURS_PER_DAY      = 24,
     MINUTES_PER_DAY    = 60 * 24,
-    HOURS_PER_SHIFT    = 8,
-    SHIFTS_PER_DAY     = 3,
-    DAYS_PER_WEEK      = 7,
-    WEEKS_PER_YEAR     = 52,
-    
-    GAME_HOURS_PER_REAL_SECOND = 8
+    HOURS_PER_SHIFT    = 8 ,
+    SHIFTS_PER_DAY     = 3 ,
+    DAYS_PER_WEEK      = 7 ,
+    WEEKS_PER_YEAR     = 52
   ;
   
   MainView view = new MainView(this);
-  
   RunGame game;
   String savePath;
   
@@ -39,7 +36,6 @@ public class World implements Session.Saveable {
   final public Events  events  = new Events (this);
   final public Council council = new Council(this);
   
-  boolean amWatching = false;
   Scene activeScene = null;
   
   
@@ -70,7 +66,6 @@ public class World implements Session.Saveable {
     timing .loadState(s);
     council.loadState(s);
     
-    amWatching = s.loadBool ();
     activeScene = (Scene) s.loadObject();
   }
   
@@ -86,7 +81,6 @@ public class World implements Session.Saveable {
     timing .saveState(s);
     council.saveState(s);
     
-    s.saveBool (amWatching);
     s.saveObject(activeScene);
   }
   
@@ -160,11 +154,6 @@ public class World implements Session.Saveable {
   }
   
   
-  public boolean monitorActive() {
-    return amWatching;
-  }
-  
-  
   
   /**  Handling regions and large-scale distances-
     */
@@ -210,32 +199,15 @@ public class World implements Session.Saveable {
   /**  Regular updates and activity cycle:
     */
   public void updateWorld(float hoursGone) {
-    
-    if (activeScene != null) {
-      activeScene.updateScene();
+    timing.updateTiming(hoursGone);
+    for (Region d : regions) {
+      d.updateRegion();
     }
-    else if (amWatching) {
-      timing.updateTiming(hoursGone);
-      events .updateEvents ();
-      council.updateCouncil();
-      
-      for (Region d : regions) {
-        d.updateRegion();
-      }
-      for (Base base : bases) {
-        base.updateBase();
-      }
+    for (Base base : bases) {
+      base.updateBase();
     }
-  }
-  
-  
-  public void beginMonitoring() {
-    this.amWatching = true;
-  }
-  
-  
-  public void pauseMonitoring() {
-    this.amWatching = false;
+    events .updateEvents ();
+    council.updateCouncil();
   }
   
   

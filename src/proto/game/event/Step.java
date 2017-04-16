@@ -1,31 +1,27 @@
 
-
 package proto.game.event;
 import proto.common.*;
 import proto.game.person.*;
-import proto.game.event.*;
 import proto.game.world.*;
 import proto.util.*;
 
 
 
-//  TODO:  Have this extend Task?
-
 public class Step implements Session.Saveable {
-  
   
   /**  Data fields and save/load methods-
     */
   Plot plot;
-  Element involved[];
-  
   String label;
   int ID;
+  
+  Element involved[];
+  Element mentions;
+  Place from;
+  Place goes;
   int medium;
   int hoursTaken;
-  
   int timeStart = -1;
-  boolean spooked = false;
   
   
   private Step() {
@@ -40,25 +36,27 @@ public class Step implements Session.Saveable {
     ID         = s.loadInt();
 
     involved   = (Element[]) s.loadObjectArray(Element.class);
+    mentions   = (Element) s.loadObject();
+    from       = (Place  ) s.loadObject();
+    goes       = (Place  ) s.loadObject();
     medium     = s.loadInt();
     hoursTaken = s.loadInt();
-    
-    timeStart = s.loadInt();
-    spooked   = s.loadBool();
+    timeStart  = s.loadInt();
   }
   
   
   public void saveState(Session s) throws Exception {
-    s.saveObject(plot);
+    s.saveObject(plot );
     s.saveString(label);
-    s.saveInt(ID);
+    s.saveInt   (ID   );
     
     s.saveObjectArray(involved);
-    s.saveInt(medium    );
-    s.saveInt(hoursTaken);
-    
-    s.saveInt (timeStart);
-    s.saveBool(spooked  );
+    s.saveObject(mentions  );
+    s.saveObject(from      );
+    s.saveObject(goes      );
+    s.saveInt   (medium    );
+    s.saveInt   (hoursTaken);
+    s.saveInt   (timeStart );
   }
   
   
@@ -67,7 +65,7 @@ public class Step implements Session.Saveable {
     */
   public static Step queueStep(
     String label, Plot plot,
-    Plot.Role acting, Plot.Role subject,
+    Plot.Role acting, Plot.Role subject, Plot.Role mentions,
     int medium, int hoursTaken, Plot.Role... others
   ) {
     Step s = new Step();
@@ -78,13 +76,14 @@ public class Step implements Session.Saveable {
     s.hoursTaken = hoursTaken;
     
     Batch <Element> involved = new Batch();
-    involved.include(plot.filling (acting ));
-    involved.include(plot.location(acting ));
-    involved.include(plot.filling (subject));
-    involved.include(plot.location(subject));
+    involved.include(         plot.filling (acting ));
+    involved.include(s.from = plot.location(acting ));
+    involved.include(         plot.filling (subject));
+    involved.include(s.goes = plot.location(subject));
     for (Plot.Role role : others) involved.include(plot.filling(role));
-    s.involved = involved.toArray(Element.class);
     
+    s.involved = involved.toArray(Element.class);
+    s.mentions = plot.filling(mentions);
     plot.steps.add(s);
     return s;
   }
@@ -94,7 +93,7 @@ public class Step implements Session.Saveable {
   /**  Assorted no-brainer access methods-
     */
   public boolean isHeist() {
-    return medium == Lead.MEDIUM_HEIST;
+    return medium == Lead.MEDIUM_ASSAULT;
   }
   
   
@@ -160,40 +159,53 @@ public class Step implements Session.Saveable {
   }
   
   
+  public Place goes(Element e) {
+    if (e.isRegion() || e.isPlace()) return null;
+    if (Lead.isWired(medium)) {
+      Plot.Role role = plot.roleFor(e);
+      return plot.location(role);
+    }
+    else return goes;
+  }
+  
+  
   
   /**  Generating potential Clues-
     */
   //*
   protected Series <Clue> addTraitClues(
-    Element focus, Lead lead, Batch <Clue> possible
+    Element involved, Lead lead, Batch <Clue> possible
   ) {
-    for (Element involved : this.involved()) {
-      Plot.Role role = plot.roleFor(involved);
-      if (role == null || involved == focus) continue;
-      
-      if (involved.isPerson()) {
-        Person p = (Person) involved;
-        for (Trait t : Common.PERSON_TRAITS) {
-          if (p.stats.levelFor(t) <= 0) continue;
-          Clue forTrait = Clue.traitClue(plot, role, t);
-          possible.add(forTrait);
-        }
+    //
+    //  Wiretaps and mentions can't reliably reveal any descriptive features
+    //  of the suspects involved.
+    Plot.Role role = plot.roleFor(involved);
+    if (role == null || medium == Lead.MEDIUM_WIRE) {
+      return possible;
+    }
+    
+    if (involved.isPerson()) {
+      Person p = (Person) involved;
+      for (Trait t : Common.PERSON_TRAITS) {
+        if (p.stats.levelFor(t) <= 0) continue;
+        Clue forTrait = Clue.traitClue(plot, role, t);
+        possible.add(forTrait);
       }
-      
-      if (involved.isPlace()) {
-        Place p = (Place) involved;
-        for (Trait t : Common.VENUE_TRAITS) {
-          if (! p.hasProperty(t)) continue;
-          Clue forTrait = Clue.traitClue(plot, role, t);
-          possible.add(forTrait);
-        }
+    }
+    
+    if (involved.isPlace()) {
+      Place p = (Place) involved;
+      for (Trait t : Common.VENUE_TRAITS) {
+        if (! p.hasProperty(t)) continue;
+        Clue forTrait = Clue.traitClue(plot, role, t);
+        possible.add(forTrait);
       }
-      
-      if (involved.isItem()) {
-        Item p = (Item) involved;
-        Clue match = Clue.confirmSuspect(plot, role, p);
-        possible.add(match);
-      }
+    }
+    
+    if (involved.isItem()) {
+      Item p = (Item) involved;
+      Clue match = Clue.confirmSuspect(plot, role, p, p.place());
+      possible.add(match);
     }
     
     return possible;
@@ -201,21 +213,22 @@ public class Step implements Session.Saveable {
   
   
   protected Batch <Clue> addLocationClues(
-    Element focus, Lead lead, Batch <Clue> possible
+    Element involved, Lead lead, Batch <Clue> possible
   ) {
-    for (Element involved : this.involved()) {
-      Plot.Role role = plot.roleFor(involved);
-      if (involved == focus || role == null) continue;
-      
-      World world = plot.base.world();
-      Region at = involved.region();
-      int range = Rand.yes() ? 0 : 1;
-      Series <Region> around = world.regionsInRange(at, range);
-      
-      Region near = (Region) Rand.pickFrom(around);
-      Clue clue = Clue.locationClue(plot, role, near, range);
-      possible.add(clue);
-    }
+    //  TODO:  You might also add a location clue for the venue of an involved
+    //  element.
+    Plot.Role role = plot.roleFor(involved);
+    if (role == null) return possible;
+    
+    World world = plot.base.world();
+    Region at = involved.region();
+    int range = Rand.yes() ? 0 : 1;
+    Series <Region> around = world.regionsInRange(at, range);
+    
+    Region near = (Region) Rand.pickFrom(around);
+    Clue clue = Clue.locationClue(plot, role, near, range);
+    possible.add(clue);
+    
     return possible;
   }
   
@@ -249,6 +262,11 @@ public class Step implements Session.Saveable {
     addTraitClues   (focus, lead, possible);
     addLocationClues(focus, lead, possible);
     addIntentClues  (focus, lead, possible);
+    
+    //  TODO:  If you're directly surveilling the main focus, or if you're
+    //  really hot, or if an element is mentioned explicitly, you might get
+    //  a direct confirmation of a suspect's involvement.
+    
     return possible;
   }
   
@@ -279,12 +297,24 @@ public class Step implements Session.Saveable {
   /**  Rendering, debug and interface methods-
     */
   public String toString() {
-    return label+": "+I.list(involved);
+    StringBuffer s = new StringBuffer();
+    s.append(label);
+    if (timeStart == -1) s.append(" [T=?]");
+    else s.append(" [T="+timeStart+"-"+(timeStart + hoursTaken)+"]");
+    s.append(" ["+Lead.MEDIUM_DESC[medium]+"]");
+    
+    s.append(" [");
+    for (Element e : involved) {
+      if (e.isPlace() || e.isRegion()) continue;
+      Place goes = goes(e);
+      s.append("\n  "+e);
+      if (goes != null) s.append(" -> "+goes);
+    }
+    s.append("\n]");
+    
+    return s.toString();
   }
 }
-
-
-
 
 
 

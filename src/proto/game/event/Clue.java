@@ -31,9 +31,7 @@ public class Clue implements Session.Saveable {
   int clueType;
   
   Element match;
-  
   Trait trait;
-  
   Element location;
   int nearRange;
   
@@ -53,6 +51,7 @@ public class Clue implements Session.Saveable {
     plot       = (Plot     ) s.loadObject();
     role       = (Plot.Role) s.loadObject();
     clueType   = s.loadInt();
+    
     match      = (Element) s.loadObject();
     trait      = (Trait  ) s.loadObject();
     location   = (Element) s.loadObject();
@@ -70,6 +69,7 @@ public class Clue implements Session.Saveable {
     s.saveObject(plot       );
     s.saveObject(role       );
     s.saveInt   (clueType   );
+    
     s.saveObject(match      );
     s.saveObject(trait      );
     s.saveObject(location   );
@@ -106,13 +106,15 @@ public class Clue implements Session.Saveable {
   
   
   public static Clue confirmSuspect(
-    Plot plot, Plot.Role role, Element match
+    Plot plot, Plot.Role role, Element match, Place location
   ) {
     Clue c = new Clue();
-    c.plot     = plot;
-    c.role     = role;
-    c.clueType = TYPE_MATCH;
-    c.match    = match;
+    c.plot      = plot;
+    c.role      = role;
+    c.clueType  = TYPE_MATCH;
+    c.match     = match;
+    c.location  = location;
+    c.nearRange = 0;
     return c;
   }
   
@@ -131,12 +133,15 @@ public class Clue implements Session.Saveable {
   
   
   public boolean makesRedundant(Clue other) {
-    if (plot     != other.plot    ) return false;
-    if (role     != other.role    ) return false;
-    if (clueType != other.clueType) return false;
+    if (plot != other.plot) return false;
+    if (role != other.role) return false;
     
     if (isConfirmation()) {
-      return true;
+      if (location == other.location) return true;
+    }
+    
+    if (clueType != other.clueType) {
+      return false;
     }
     
     if (isTraitClue()) {
@@ -145,7 +150,7 @@ public class Clue implements Session.Saveable {
     }
     
     if (isLocationClue()) {
-      if (location != other.location) return false;
+      if (location != other.location ) return false;
       if (nearRange > other.nearRange) return false;
       return true;
     }
@@ -222,11 +227,6 @@ public class Clue implements Session.Saveable {
     */
   protected boolean matchesSuspect(Element e) {
     
-    //  TODO:  This will have to do separate eliminations for locations and
-    //  their suspects now!
-    Element trueSuspect  = plot.filling (role);
-    Place   trueLocation = plot.location(role);
-    
     if (isConfirmation() && match != e) {
       return false;
     }
@@ -258,6 +258,14 @@ public class Clue implements Session.Saveable {
   }
   
   
+  protected Place locationGiven() {
+    return (
+      (isLocationClue() || isConfirmation()) &&
+      (nearRange == 0 && location.isPlace())
+    ) ? (Place) location : null;
+  }
+  
+  
   
   /**  Rendering, debug and interface methods-
     */
@@ -283,10 +291,10 @@ public class Clue implements Session.Saveable {
     desc.append(" at "+world.timing.timeString(timeFound));
     desc.append(" indicates that "+plot.nameForCase(base)+"'s "+role);
     
-    if (isConfirmation()                  ) desc.append(" is: "+match);
-    if (isTraitClue()                     ) desc.append(" has trait: "+trait);
-    if (isLocationClue() && nearRange == 0) desc.append(" inside:  "+location);
-    if (isLocationClue() && nearRange > 0 ) desc.append(" is near: "+location);
+    if (isConfirmation()                  ) desc.append(" is "+match);
+    if (isTraitClue()                     ) desc.append(" has "+trait);
+    if (isLocationClue() && nearRange == 0) desc.append(" is at "+location);
+    if (isLocationClue() && nearRange > 0 ) desc.append(" is near "+location);
     
     return desc.toString();
   }

@@ -39,71 +39,6 @@ public class BaseLeads {
   
   
   
-  /**  Providing and updating Leads-
-    */
-  public void updateLeads() {
-    for (Lead lead : leads) {
-      if (lead.assigned().empty() || lead.complete()) {
-        leads.remove(lead);
-        continue;
-      }
-      lead.updateAssignment();
-    }
-  }
-  
-  
-  public Lead leadFor(Element focus, Lead.Type type) {
-    for (Lead lead : leads) {
-      if (lead.focus == focus && lead.type == type) {
-        return lead;
-      }
-    }
-    Lead lead = new Lead(base, type, focus);
-    leads.add(lead);
-    return lead;
-  }
-  
-  
-  public void closeLead(Lead lead) {
-    leads.remove(lead);
-  }
-  
-  
-  public CaseFile caseFor(Plot plot) {
-    CaseFile match = files.get(plot);
-    if (match != null) return match;
-    
-    final CaseFile file = new CaseFile(base, plot);
-    plot.caseID = nextCaseID++;
-    files.put(plot, file);
-    return file;
-  }
-  
-  
-  public Series <Lead> leadsFor(Element focus) {
-    final Batch <Lead> all = new Batch();
-    boolean canMeet = focus.canEnter(base);
-    if (! atKnownLocation(focus)) return all;
-    
-    if (focus.isPerson()) {
-      all.add(leadFor(focus, Lead.LEAD_SURVEIL_PERSON));
-      if (canMeet) all.add(leadFor(focus, Lead.LEAD_QUESTION));
-    }
-    if (focus.isPlace()) {
-      all.add(leadFor(focus, Lead.LEAD_SURVEIL_BUILDING));
-      all.add(leadFor(focus, Lead.LEAD_WIRETAP));
-      if (canMeet) all.add(leadFor(focus, Lead.LEAD_SEARCH));
-    }
-    if (focus.isRegion()) {
-      all.add(leadFor(focus, Lead.LEAD_PATROL));
-      all.add(leadFor(focus, Lead.LEAD_SCAN));
-      if (canMeet) all.add(leadFor(focus, Lead.LEAD_CANVASS));
-    }
-    return all;
-  }
-  
-  
-  
   /**  Utility methods for getting broad sets of active clues:
     */
   public Series <Clue> cluesFor(Plot plot, Element match, boolean sort) {
@@ -134,7 +69,7 @@ public class BaseLeads {
   ) {
     List <Clue> matches = new List <Clue> () {
       protected float queuePriority(Clue r) {
-        return r.timeFound;
+        return 0 - r.timeFound;
       }
     };
     for (CaseFile file : files.values()) {
@@ -152,6 +87,17 @@ public class BaseLeads {
     
     if (sort) matches.queueSort();
     return matches;
+  }
+  
+  
+  public CaseFile caseFor(Plot plot) {
+    CaseFile match = files.get(plot);
+    if (match != null) return match;
+    
+    final CaseFile file = new CaseFile(base, plot);
+    plot.caseID = nextCaseID++;
+    files.put(plot, file);
+    return file;
   }
   
   
@@ -204,19 +150,6 @@ public class BaseLeads {
   }
   
   
-  public boolean plotIsUrgent(Plot plot) {
-    return involvedIn(plot.target(), true).includes(plot);
-  }
-  
-  
-  public boolean suspectIsUrgent(Element suspect) {
-    for (Plot plot : involvedIn(suspect, true)) {
-      if (suspect == plot.target()) return true;
-    }
-    return false;
-  }
-  
-  
   
   /**  Helper methods specific to individual suspects...
     */
@@ -239,10 +172,6 @@ public class BaseLeads {
       return matches;
     }
     
-    //  TODO:  This will have to do separate eliminations for locations and
-    //  their suspects now- either that, or have the 'cluesFor' method include
-    //  associated locations...?
-    
     search: for (Element e : base.world().inside()) {
       for (Clue c : related) if (! c.matchesSuspect(e)) continue search;
       matches.add(e);
@@ -251,11 +180,23 @@ public class BaseLeads {
   }
   
   
-  public float evidenceAgainst(Element subject, Plot plot) {
+  public float evidenceAgainst(
+    Element subject, Plot plot, boolean confirmedOnly
+  ) {
     CaseFile file = caseFor(plot);
+    Plot.Role role = plot.roleFor(subject);
     float evidence = 0;
-    for (Clue c : file.clues) if (c.match == subject) {
-      evidence += c.leadType.confidence;
+    
+    for (Clue c : file.clues) {
+      if (confirmedOnly && ! c.isConfirmation()) {
+        continue;
+      }
+      if (c.isConfirmation() && c.match == subject) {
+        evidence += c.leadType.confidence;
+      }
+      if (c.role == role) {
+        evidence += c.leadType.confidence / 2;
+      }
     }
     return evidence;
   }
@@ -272,15 +213,26 @@ public class BaseLeads {
   
   
   public boolean atKnownLocation(Element suspect) {
-    return suspect.place() == lastKnownLocation(suspect);
+    Place last = lastKnownLocation(suspect);
+    Place at = suspect.place();
+    return at == last;
   }
   
   
   public Place lastKnownLocation(Element suspect) {
-    
     if (suspect.isPerson()) {
-      Person p = (Person) suspect;
-      if (p.isCaptive()) return p.place();
+      Person person = (Person) suspect;
+      Pick <Place> pickL = new Pick();
+      
+      for (Clue c : cluesFor(person, false)) {
+        Place given = c.locationGiven();
+        if (given != null) pickL.compare(given, c.timeFound);
+      }
+      if (! pickL.empty()) return pickL.result();
+      
+      if (! person.isCriminal()) {
+        return person.resides();
+      }
     }
     else if (suspect.isPlace()) {
       return (Place) suspect;
@@ -288,16 +240,112 @@ public class BaseLeads {
     else if (suspect.isRegion()) {
       return null;
     }
-    
-    Series <Clue> clues = cluesFor(suspect, true);
-    for (Clue c : clues) {
-      if (! c.isLocationClue()) continue;
-      if (c.nearRange != 0 || ! c.location.isPlace()) continue;
-      return (Place) c.location;
-    }
     return null;
   }
+  
+  
+  
+  /**  And finally, for obtaining and updating Leads to acquire more
+    *  information-
+    */
+  public void updateLeads() {
+    for (Lead lead : leads) {
+      if (lead.assigned().empty() || lead.complete()) {
+        leads.remove(lead);
+        continue;
+      }
+      lead.updateAssignment();
+    }
+  }
+  
+  
+  public Lead leadFor(Element focus, Lead.Type type) {
+    for (Lead lead : leads) {
+      if (lead.focus == focus && lead.type == type) {
+        return lead;
+      }
+    }
+    Lead lead = new Lead(base, type, focus);
+    leads.add(lead);
+    return lead;
+  }
+  
+  
+  public void closeLead(Lead lead) {
+    leads.remove(lead);
+  }
+  
+  
+  public Series <Lead> leadsFor(Element focus) {
+    final Batch <Lead> all = new Batch();
+    Place   scene    = lastKnownLocation(focus);
+    boolean canFind  = scene == focus.place();
+    boolean canEnter = scene != null && scene.canEnter(base);
+    
+    if (focus.isPerson() && canFind) {
+      Person suspect = (Person) focus;
+      boolean victim = suspect.isCivilian();
+      boolean perp   = suspect.isCriminal();
+      
+      all.add(leadFor(suspect, Lead.LEAD_SURVEIL_PERSON));
+      if (canEnter) all.add(leadFor(suspect, Lead.LEAD_QUESTION));
+      if (victim  ) all.add(leadFor(suspect, Lead.LEAD_GUARD   ));
+      if (perp    ) all.add(leadFor(suspect, Lead.LEAD_BUST    ));
+    }
+    
+    if (focus.isPerson() && canEnter) {
+      all.add(leadFor(scene, Lead.LEAD_SURVEIL_BUILDING));
+      all.add(leadFor(scene, Lead.LEAD_WIRETAP         ));
+      all.add(leadFor(scene, Lead.LEAD_SEARCH          ));
+    }
+    
+    if (focus.isPlace()) {
+      all.add(leadFor(focus, Lead.LEAD_SURVEIL_BUILDING));
+      all.add(leadFor(focus, Lead.LEAD_WIRETAP         ));
+      if (canEnter) all.add(leadFor(focus, Lead.LEAD_SEARCH));
+    }
+    
+    if (focus.isRegion()) {
+      all.add(leadFor(focus, Lead.LEAD_PATROL ));
+      all.add(leadFor(focus, Lead.LEAD_SCAN   ));
+      all.add(leadFor(focus, Lead.LEAD_CANVASS));
+    }
+    
+    return all;
+  }
+  
+  
+  public boolean suspectIsVictim(Element suspect) {
+    return suspectHasRole(suspect, Plot.ROLE_TARGET);
+  }
+  
+  
+  public boolean suspectIsBoss(Element suspect) {
+    return suspectHasRole(suspect, Plot.ROLE_ORGANISER, Plot.ROLE_MASTERMIND);
+  }
+  
+  
+  public boolean suspectIsUrgent(Element suspect) {
+    return suspectIsVictim(suspect) || suspectIsBoss(suspect);
+  }
+  
+  
+  private boolean suspectHasRole(Element suspect, Plot.Role... roles) {
+    for (Clue clue : this.cluesFor(suspect, true)) {
+      Plot plot = clue.plot();
+      if (plot.complete()) continue;
+      
+      for (Plot.Role r : roles) {
+        Element fills = plot.filling(r), at = plot.location(r);
+        if (suspect == fills                    ) return true;
+        if (suspect == at && fills.place() == at) return true;
+      }
+    }
+    return false;
+
+  }
 }
+
 
 
 

@@ -93,11 +93,11 @@ public class Base extends Place {
     for (Place r : rooms) if (r != null) {
       r.updatePlace();
     }
-    finance.updateFinance();
-    stocks.updateCrafting();
+    finance .updateFinance ();
+    stocks  .updateCrafting();
     training.updateTraining();
-    leads.updateLeads();
-    plots.updatePlanning();
+    leads   .updateLeads   ();
+    plots   .updatePlanning();
   }
   
   
@@ -112,6 +112,14 @@ public class Base extends Place {
   
   public void setLeader(Person leader) {
     this.leader = leader;
+  }
+  
+  
+  public float organisationRank(Element p) {
+    if (p == leader || p == this) return 2;
+    if (p.isPerson() && ((Person) p).resides() == this) return 1;
+    if (p.isPlace () && ((Place ) p).owner  () == this) return 1;
+    return 0;
   }
   
   

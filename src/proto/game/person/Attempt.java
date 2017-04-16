@@ -105,6 +105,7 @@ public class Attempt implements Session.Saveable {
   
   
   public void addTest(Trait trait, int range, int DC) {
+    if (trait == null) return;
     Test test = testFor(trait);
     if (test == null) tests.add(test = new Test());
     

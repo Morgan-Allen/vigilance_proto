@@ -107,7 +107,7 @@ public class MissionsView extends UINode {
     
     ViewUtils.drawWrappedString(
       person+" is "+assignDesc, g,
-      vx + 330, vy + 10, 320, 45
+      vx + 360, vy + 10, 320, 45
     );
     
     renderCases(surface, g);

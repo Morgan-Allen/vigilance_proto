@@ -13,7 +13,6 @@ public class DebugPlotAfter extends RunGame {
   
   
   public static void main(String args[]) {
-    GameSettings.freeTipoffs = true;
     runGame(new DebugPlotAfter(), "saves/debug_plot_after");
   }
   
@@ -27,10 +26,22 @@ public class DebugPlotAfter extends RunGame {
     kidnap.fillAndExpand();
     kidnap.printRoles();
     crooks.plots.assignRootPlot(kidnap);
-    Step heist = kidnap.stepWithLabel("heist");
+    Step heist = kidnap.stepWithLabel("grab target");
     kidnap.advanceToStep(heist);
+    
+    GameSettings.noTipoffs = true;
+    DebugPlotUtils.enterPlotDebugLoop(
+      world, kidnap, true,
+      kidnap.scene(), kidnap.organiser()
+    );
     
     return world;
   }
-  
 }
+
+
+
+
+
+
+

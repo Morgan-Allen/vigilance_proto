@@ -39,44 +39,44 @@ public class Regions {
     final RegionType r2 = SECTOR02;
     r2.view.attachColourKey(-3584, "02");
     r2.attachDefaultFacilities(UNION_OFFICE);
-    r1.attachMapCoordinates(1, 0);
-
+    r2.attachMapCoordinates(1, 0);
+    
     final RegionType r3 = SECTOR03;
     r3.view.attachColourKey(-65354, "03");
     r3.attachDefaultFacilities(SOUP_KITCHEN);
-    r1.attachMapCoordinates(2, 0);
-
+    r3.attachMapCoordinates(2, 0);
+    
     
     final RegionType r4 = SECTOR04;
     r4.view.attachColourKey(-14812949, "04");
     r4.attachDefaultFacilities(COMMUNITY_COLLEGE);
-    r1.attachMapCoordinates(0, 1);
+    r4.attachMapCoordinates(0, 1);
 
     final RegionType r5 = SECTOR05;
     r5.view.attachColourKey(-486371, "05");
     r5.attachDefaultFacilities(CITY_PARK, Civilians.CITY_HALL);
-    r1.attachMapCoordinates(1, 1);
+    r5.attachMapCoordinates(1, 1);
 
     final RegionType r6 = SECTOR06;
     r6.view.attachColourKey(-2286088, "06");
     r6.attachDefaultFacilities(BUSINESS_PARK);
-    r1.attachMapCoordinates(2, 1);
-
+    r6.attachMapCoordinates(2, 1);
+    
     
     final RegionType r7 = SECTOR07;
     r7.view.attachColourKey(-4628394, "07");
     r7.attachDefaultFacilities(Civilians.PENTHOUSE);
-    r1.attachMapCoordinates(0, 2);
+    r7.attachMapCoordinates(0, 2);
     
     final RegionType r8 = SECTOR08;
     r8.view.attachColourKey(-11111239, "08");
     r8.attachDefaultFacilities();
-    r1.attachMapCoordinates(1, 2);
+    r8.attachMapCoordinates(1, 2);
 
     final RegionType r9 = SECTOR09;
     r9.view.attachColourKey(-11093671, "09");
     r9.attachDefaultFacilities(TECH_STARTUP, CHEMICAL_PLANT);
-    r1.attachMapCoordinates(2, 2);
+    r9.attachMapCoordinates(2, 2);
     
   }
 }

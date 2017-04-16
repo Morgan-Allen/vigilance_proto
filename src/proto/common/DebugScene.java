@@ -48,7 +48,7 @@ public class DebugScene extends RunGame {
       ID++;
     }
     
-    Step heist = kidnap.stepWithLabel("heist");
+    Step heist = kidnap.stepWithLabel("grab target");
     kidnap.advanceToStep(heist);
     Scene scene = kidnap.generateScene(heist, kidnap.target(), guarding);
     world.enterScene(scene);

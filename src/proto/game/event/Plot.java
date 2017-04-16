@@ -124,7 +124,7 @@ public abstract class Plot extends Event {
   
   
   public Step mainHeist() {
-    for (Step s : steps) if (s.medium == Lead.MEDIUM_HEIST) return s;
+    for (Step s : steps) if (s.medium == Lead.MEDIUM_ASSAULT) return s;
     return null;
   }
   
@@ -145,12 +145,14 @@ public abstract class Plot extends Event {
     spookLevel += spookAmount;
     float abortFactor = spookLevel * 1f / Lead.PROFILE_SUSPICIOUS;
     abortFactor = (abortFactor / entries.size()) - 1;
-    I.say("Abort factor is: "+abortFactor);
+    float roll = Rand.num();
     //
     //  If the perps get too spooked, the plot may be cancelled, and any
     //  further investigation will be wasting it's time...
-    if (Rand.num() < abortFactor) {
-      I.say("Participants were too spooked!  Cancelling plot: "+this);
+    if (roll < abortFactor) {
+      I.say("\nParticipants were too spooked!  Cancelling plot: "+this);
+      I.say("  Spook Level: "+spookLevel);
+      I.say("  Roll vs. Abort factor was: "+roll+" vs. "+abortFactor);
       completeEvent();
     }
   }
@@ -166,9 +168,10 @@ public abstract class Plot extends Event {
     
     if (current == null || current.complete()) {
       int time = world.timing.totalHours();
+      I.say("\n\n\nUpdating plot: "+this);
       
       if (current != null) {
-        I.say("  Ended step: "+current);
+        I.say("  Ended step: "+current.label);
         checkForTipoffs(current, false, true);
         boolean success = checkSuccess(current);
         onCompletion(current, success);
@@ -178,17 +181,21 @@ public abstract class Plot extends Event {
         current = steps.atIndex(nextIndex);
         current.timeStart = time;
         checkForTipoffs(current, true, false);
-        I.say("  Began step: "+current);
+        I.say("  Began step: "+current.label);
       }
       else {
         I.say("  Plot completed.");
         completeEvent();
       }
       
-      I.say("\nUpdated plot: "+this);
       I.say("  Current Time: "+time);
-      I.say("  Current Step: "+current.ID);
-      printSteps();
+      I.say("Current Step: "+current);
+      
+      for (Element e : current.involved()) {
+        Place goes = current.goes(e);
+        if (goes != null) goes.setAttached(e, true);
+      }
+      printLocations();
     }
   }
   
@@ -205,7 +212,7 @@ public abstract class Plot extends Event {
     Plot supplies;
     
     public String toString() {
-      return role.name+" ("+element+")";
+      return element+" at "+location+" ("+role+")";
     }
   }
   
@@ -296,6 +303,9 @@ public abstract class Plot extends Event {
   
   
   protected RoleEntry entryFor(Element element, Role role) {
+    if (role == null && element == null) {
+      return null;
+    }
     for (RoleEntry entry : entries) {
       if (element != null) {
         if (element != entry.element && element != entry.location) continue;
@@ -363,25 +373,28 @@ public abstract class Plot extends Event {
     */
   protected void checkForTipoffs(Step step, boolean begins, boolean ends) {
     
-    Role    focusRole = (Role) Rand.pickFrom(step.involved);
-    Element focus     = filling(focusRole);
-    Place   location  = location(focusRole);
-    float   trust     = location.region().currentValue(Region.TRUST);
-    float   tipChance = trust / 10f;
+    Element focus     = (Element) Rand.pickFrom(step.involved());
+    Role    focusRole = roleFor(focus);
+    Place   at        = location(focusRole);
+    float   trust     = at.region().currentValue(Region.TRUST);
+    float   tipChance = trust / (10f * (1 + base.organisationRank(focus)));
     Base    player    = world.playerBase();
     int     time      = world.timing.totalHours();
     
+    if (GameSettings.freeTipoffs) tipChance = 1;
+    if (GameSettings.noTipoffs  ) tipChance = 0;
+    
     if (begins && Rand.num() < tipChance) {
-      Clue tipoff = Clue.confirmSuspect(this, focusRole, focus);
+      Clue tipoff = Clue.confirmSuspect(this, focusRole, focus, at);
       CaseFile file = player.leads.caseFor(this);
-      file.recordClue(tipoff, Lead.LEAD_TIPOFF, time, location);
+      file.recordClue(tipoff, Lead.LEAD_TIPOFF, time, at);
     }
     
-    if (ends && step.medium == Lead.MEDIUM_HEIST) {
+    if (ends && step.medium == Lead.MEDIUM_ASSAULT) {
       EventEffects effects = generateEffects(step);
       Element  target = target();
       Place    scene  = scene ();
-      Clue     report = Clue.confirmSuspect(this, ROLE_TARGET, target);
+      Clue     report = Clue.confirmSuspect(this, ROLE_TARGET, target, scene);
       CaseFile file   = player.leads.caseFor(this);
       file.recordClue(report, Lead.LEAD_REPORT, time, scene);
       effects.applyEffects(target.place());
@@ -402,10 +415,10 @@ public abstract class Plot extends Event {
   
   
   public Scene generateScene(Step step, Element focus, Lead lead) {
-    if (focus == hideout()) {
+    if (lead.type == Lead.LEAD_BUST) {
       return PlotUtils.generateHideoutScene(this, step, focus, lead);
     }
-    if (step.isHeist()) {
+    if (lead.type == Lead.LEAD_GUARD) {
       return PlotUtils.generateHeistScene(this, step, focus, lead);
     }
     return null;
@@ -428,7 +441,7 @@ public abstract class Plot extends Event {
   /**  Rendering, debug and interface methods-
     */
   public void printRoles() {
-    I.say("\n\nRoles are: ");
+    I.say("\nRoles are: ");
     for (Plot.RoleEntry entry : entries) {
       I.say("  "+entry);
     }
@@ -438,9 +451,15 @@ public abstract class Plot extends Event {
   public void printSteps() {
     I.say("\nSteps are:");
     for (Step c : steps) {
-      int timeEnd = c.timeStart + c.hoursTaken;
-      if (c.timeStart == -1) I.say("  "+c+" ["+c.timeStart+"]");
-      else I.say("  "+c+" ["+c.timeStart+"-"+timeEnd+"]");
+      I.say(c.toString());
+    }
+  }
+  
+  
+  public void printLocations() {
+    I.say("\nLocations: ");
+    for (Plot.RoleEntry entry : entries) {
+      I.say("  "+entry.element+" ("+entry.role+") -> "+entry.element.place());
     }
   }
   

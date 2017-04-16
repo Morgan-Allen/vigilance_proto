@@ -23,12 +23,13 @@ public class Lead extends Task {
     MEDIUM_MEET     =  1,
     MEDIUM_WIRE     =  2,
     MEDIUM_SURVEIL  =  3,
-    MEDIUM_HEIST    =  4,
+    MEDIUM_ASSAULT  =  4,
     MEDIUM_QUESTION =  5,
     MEDIUM_ANY      = -1,
-    PHYSICAL_MEDIA[] = { 1, 3, 4, 5, 6 },
+    PHYSICAL_MEDIA[] = { 1, 3, 4, 5 },
     SOCIAL_MEDIA  [] = { 1, 5 },
     WIRED_MEDIA   [] = { 2 },
+    FORENSIC_MEDIA[] = { 1, 2, 4, 5 },
     //  Whether this lead can pick up on past/present/future contacts-
     TENSE_NONE      = -2,
     TENSE_BEFORE    =  0,
@@ -59,9 +60,15 @@ public class Lead extends Task {
   final public static int
     CLUE_EXPIRATION_TIME = World.HOURS_PER_DAY * World.DAYS_PER_WEEK;
   
-  final static String
+  final public static String
+    MEDIUM_DESC[] = {null,
+      "Meet", "Wire", "Surveil", "Heist", "Question"
+    },
+    TENSE_DESC[] = {
+      "Before", "During", "After"
+    },
     PROFILE_DESC[] = {
-      "Nil", "Low", "Moderate", "High", "100%"
+      "Nil", "Low", "Moderate", "High", "BLATANT"
     },
     CONFIDENCE_DESC[] = {
       "Weak", "Fair", "Strong"
@@ -86,13 +93,13 @@ public class Lead extends Task {
   
   public static class Type {
     
-    String name, info, tenseVerbs[];
-    Image icon;
+    final public String name, info, tenseVerbs[];
+    final public Image icon;
     
-    int ID;
-    int medium, focus, tense, profile;
-    float confidence;
-    int cluesMedia[];
+    final public int ID;
+    final public int medium, focus, tense, profile;
+    final public float confidence;
+    final public int cluesMedia[];
     
     Type(
       String name, int ID, String info, String iconPath, String tenseVerbs[],
@@ -127,7 +134,7 @@ public class Lead extends Task {
       ICON_DIR+"icon_surveil.png",
       new String[] { "Surveiled", "Surveilling", "Will Surveil" },
       MEDIUM_SURVEIL, FOCUS_PERSON, TENSE_DURING, PROFILE_LOW,
-      CONFIDENCE_HIGH, MEDIUM_MEET, MEDIUM_HEIST
+      CONFIDENCE_HIGH, PHYSICAL_MEDIA
     ),
     LEAD_SURVEIL_BUILDING = new Type(
       "Surveillance", 1,
@@ -135,7 +142,7 @@ public class Lead extends Task {
       ICON_DIR+"icon_surveil.png",
       new String[] { "Surveiled", "Surveilling", "Will Surveil" },
       MEDIUM_SURVEIL, FOCUS_BUILDING, TENSE_DURING, PROFILE_LOW,
-      CONFIDENCE_MODERATE, MEDIUM_MEET, MEDIUM_HEIST
+      CONFIDENCE_MODERATE, PHYSICAL_MEDIA
     ),
     LEAD_QUESTION = new Type(
       "Questioning", 2,
@@ -151,7 +158,7 @@ public class Lead extends Task {
       ICON_DIR+"icon_wiretap.png",
       new String[] { "Wiretapped", "Wiretapping", "Will Wiretap" },
       MEDIUM_WIRE, FOCUS_BUILDING, TENSE_DURING, PROFILE_LOW,
-      CONFIDENCE_HIGH, MEDIUM_WIRE
+      CONFIDENCE_HIGH, WIRED_MEDIA
     ),
     LEAD_PATROL = new Type(
       "Patrol", 4,
@@ -159,7 +166,7 @@ public class Lead extends Task {
       ICON_DIR+"icon_surveil.png",
       new String[] { "Patrolled", "Patrolling", "Will Patrol" },
       MEDIUM_SURVEIL, FOCUS_REGION, TENSE_DURING, PROFILE_LOW,
-      CONFIDENCE_MODERATE, MEDIUM_MEET, MEDIUM_SURVEIL
+      CONFIDENCE_MODERATE, PHYSICAL_MEDIA
     ),
     LEAD_SCAN = new Type(
       "Frequency Scan", 5,
@@ -167,7 +174,7 @@ public class Lead extends Task {
       ICON_DIR+"icon_scan.png",
       new String[] { "Scanned", "Scanning", "Will Scan" },
       MEDIUM_WIRE, FOCUS_REGION, TENSE_DURING, PROFILE_LOW,
-      CONFIDENCE_MODERATE, MEDIUM_WIRE
+      CONFIDENCE_MODERATE, WIRED_MEDIA
     ),
     LEAD_CANVASS = new Type(
       "Canvass", 6,
@@ -179,11 +186,11 @@ public class Lead extends Task {
     ),
     LEAD_SEARCH = new Type(
       "Search", 7,
-      "Search a building for records or forensic evidence.",
+      "Search a building for logs, records or forensic evidence.",
       ICON_DIR+"icon_search.png",
       new String[] { "Searched", "Searching", "Will Search" },
-      MEDIUM_SURVEIL, FOCUS_BUILDING, TENSE_AFTER, PROFILE_LOW,
-      CONFIDENCE_MODERATE, MEDIUM_WIRE, MEDIUM_MEET, MEDIUM_HEIST
+      MEDIUM_SURVEIL, FOCUS_BUILDING, TENSE_AFTER, PROFILE_SUSPICIOUS,
+      CONFIDENCE_MODERATE, FORENSIC_MEDIA
     ),
     LEAD_TIPOFF = new Type(
       "Tipoff", 8,
@@ -206,16 +213,16 @@ public class Lead extends Task {
       "Guard this suspect against criminal activity.",
       ICON_DIR+"icon_guard_lead.png",
       new String[] { "Guarded", "Guarding", "Will Guard" },
-      MEDIUM_SURVEIL, FOCUS_ANY, TENSE_DURING, PROFILE_OBVIOUS,
-      CONFIDENCE_HIGH, MEDIUM_MEET, MEDIUM_HEIST
+      MEDIUM_ASSAULT, FOCUS_ANY, TENSE_DURING, PROFILE_OBVIOUS,
+      CONFIDENCE_HIGH, PHYSICAL_MEDIA
     ),
     LEAD_BUST = new Type(
       "Bust", 11,
       "Bust down the doors and unleash hell.",
       ICON_DIR+"icon_guard_lead.png",
       new String[] { "Busted", "Busting", "Will Bust" },
-      MEDIUM_HEIST, FOCUS_ANY, TENSE_DURING, PROFILE_OBVIOUS,
-      CONFIDENCE_HIGH
+      MEDIUM_ASSAULT, FOCUS_ANY, TENSE_DURING, PROFILE_OBVIOUS,
+      CONFIDENCE_HIGH, MEDIUM_ANY
     ),
     LEAD_TYPES[] = TYPE_B.toArray(Type.class);
   
@@ -354,23 +361,39 @@ public class Lead extends Task {
     if (contactID.equals(lastContactID)) {
       return RESULT_NONE;
     }
-    I.say("\nNew contact: "+contactID);
     this.lastContactID = contactID;
     //
     //  Then perform the actual skill-test needed to ensure success:
+    CaseFile file = base.leads.caseFor(plot);
+    Place scene = focus.place();
     attempt = configAttempt(follow);
     int outcome = autoWin ? 1 : attempt.performAttempt(1);
-    Series <Clue> possible = step.possibleClues(focus, this);
     
-    if (outcome > 0 && ! possible.empty()) {
-      Clue gained = (Clue) Rand.pickFrom(possible);
-      CaseFile file = base.leads.caseFor(gained.plot);
-      file.recordClue(gained, this, time, focus.place());
+    I.say("\nNew contact: "+contactID+" ("+plot+")");
+    if (autoWin) {
+      //  TODO:  Have a canDetect() method here for individual elements...?
+      
+      //  You can't reliably use 'goes'.  Instead, you need to give a bonus to
+      //  confirm the role of anyone present at the scene.
+      
+      for (Element e : step.involved()) if (step.goes(e) == scene) {
+        Plot.Role role = plot.roleFor(e);
+        Clue confirms = Clue.confirmSuspect(plot, role, e, scene);
+        file.recordClue(confirms, this, time, scene);
+      }
+    }
+    else if (outcome > 0) {
+      //  TODO:  Try selecting a couple of distinct, non-redundant clues?
+      for (Element e : step.involved()) {
+        Series <Clue> possible = step.possibleClues(e, this);
+        Clue gained = (Clue) Rand.pickFrom(possible);
+        file.recordClue(gained, this, time, scene);
+      }
     }
     //
     //  Either way, you have to take the risk of tipping off the perps
     //  themselves:
-    plot.takeSpooking(autoWin ? 0 : type.profile);
+    if (! autoWin) plot.takeSpooking(type.profile);
     return outcome;
   }
   
@@ -419,13 +442,15 @@ public class Lead extends Task {
   protected Scene tryInterruptHeist(
     Step step, int tense, Plot plot, int time
   ) {
-    if (tense != TENSE_DURING) {
-      return null;
-    }
-    if (focus.place() == plot.hideout() && type.medium == MEDIUM_HEIST) {
+    //
+    //  TODO:  Afford the player the option to intercept the goons, rather than
+    //  simply dumping them in directly...
+    
+    Place place = focus.place(), hideout = plot.hideout(), based = plot.based();
+    if (type == LEAD_GUARD && step.medium == MEDIUM_ASSAULT) {
       return plot.generateScene(step, focus, this);
     }
-    if (step.medium == MEDIUM_HEIST) {
+    if (type == LEAD_BUST && (place == hideout || place == based)) {
       return plot.generateScene(step, focus, this);
     }
     return null;
@@ -498,7 +523,7 @@ public class Lead extends Task {
     String confDesc = CONFIDENCE_DESC[Nums.clamp(confIndex, 3)];
     
     s.append("\n  Conspicuousness: "+profileDesc);
-    s.append("\n  Evidence Level: "+confDesc);
+    s.append("\n  Evidence Level:  "+confDesc   );
     return s.toString();
   }
   
@@ -514,7 +539,7 @@ public class Lead extends Task {
   
   
   public String choiceInfo(Person p) {
-    return "Conduct "+type.name;
+    return type.name+" ("+focus+")";
   }
 }
 

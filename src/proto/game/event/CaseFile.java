@@ -66,7 +66,11 @@ public class CaseFile implements Session.Saveable {
     Clue clue, Lead source, Lead.Type type, int time, Place place,
     EventEffects effects, boolean display
   ) {
-    for (Clue prior : clues) if (prior.makesRedundant(clue)) return;
+    for (Clue prior : clues) {
+      if (! prior.makesRedundant(clue)) continue;
+      if (display) I.say("Clue was redundant: "+clue+" vs. "+prior);
+      return;
+    }
     
     if (source != null) clue.confirmSource(source, time, place);
     else                clue.confirmSource(type  , time, place);
