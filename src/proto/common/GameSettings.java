@@ -27,7 +27,8 @@ public class GameSettings {
     debugScene      = false,
     pauseScene      = false,
     debugLineSight  = false,
-    viewSceneBlocks = false
+    viewSceneBlocks = false,
+    eventsVerbose   = false
   ;
   
 }

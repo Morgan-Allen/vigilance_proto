@@ -28,14 +28,20 @@ public class DebugPlotAfter extends RunGame {
     crooks.plots.assignRootPlot(kidnap);
     Step heist = kidnap.stepWithLabel("grab target");
     kidnap.advanceToStep(heist);
-    
+
     GameSettings.noTipoffs = true;
-    DebugPlotUtils.enterPlotDebugLoop(
-      world, kidnap, true,
-      kidnap.scene(), kidnap.organiser()
-    );
-    
+    world.updateWorld(24);
+    world.updateWorld(0);
     return world;
+  }
+  
+  
+  protected void runWorldTests(World world, boolean afterLoad) {
+    GameSettings.noTipoffs = true;
+    Plot plot = world.events.latestPlot();
+    if (plot != null) DebugPlotUtils.enterPlotDebugLoop(
+      world, plot, true, true, plot.scene(), plot.organiser()
+    );
   }
 }
 

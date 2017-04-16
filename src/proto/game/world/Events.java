@@ -103,6 +103,12 @@ public class Events {
   }
   
   
+  public Plot latestPlot() {
+    for (Event e : active) if (e.isPlot()) return (Plot) e;
+    return null;
+  }
+  
+  
   
   /**  Logging background events-
     */

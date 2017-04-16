@@ -560,7 +560,7 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   
   public String toString() {
     if (playerTask == null) return "Scene";
-    return playerTask.toString();
+    return playerTask+" during "+triggerEvent;
   }
   
   

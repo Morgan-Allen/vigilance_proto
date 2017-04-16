@@ -150,9 +150,11 @@ public abstract class Plot extends Event {
     //  If the perps get too spooked, the plot may be cancelled, and any
     //  further investigation will be wasting it's time...
     if (roll < abortFactor) {
-      I.say("\nParticipants were too spooked!  Cancelling plot: "+this);
-      I.say("  Spook Level: "+spookLevel);
-      I.say("  Roll vs. Abort factor was: "+roll+" vs. "+abortFactor);
+      if (GameSettings.eventsVerbose) {
+        I.say("\nParticipants were too spooked!  Cancelling plot: "+this);
+        I.say("  Spook Level: "+spookLevel);
+        I.say("  Roll vs. Abort factor was: "+roll+" vs. "+abortFactor);
+      }
       completeEvent();
     }
   }
@@ -166,12 +168,18 @@ public abstract class Plot extends Event {
     }
     if (! possible()) return;
     
+    boolean verbose = GameSettings.eventsVerbose;
+    
     if (current == null || current.complete()) {
       int time = world.timing.totalHours();
-      I.say("\n\n\nUpdating plot: "+this);
+      if (verbose) {
+        I.say("\n\n\nUpdating plot: "+this);
+      }
       
       if (current != null) {
-        I.say("  Ended step: "+current.label);
+        if (verbose) {
+          I.say("  Ended step: "+current.label);
+        }
         checkForTipoffs(current, false, true);
         boolean success = checkSuccess(current);
         onCompletion(current, success);
@@ -181,21 +189,27 @@ public abstract class Plot extends Event {
         current = steps.atIndex(nextIndex);
         current.timeStart = time;
         checkForTipoffs(current, true, false);
-        I.say("  Began step: "+current.label);
+        if (verbose) {
+          I.say("  Began step: "+current.label);
+        }
       }
       else {
-        I.say("  Plot completed.");
+        if (verbose) {
+          I.say("  Plot completed.");
+        }
         completeEvent();
       }
-      
-      I.say("  Current Time: "+time);
-      I.say("Current Step: "+current);
       
       for (Element e : current.involved()) {
         Place goes = current.goes(e);
         if (goes != null) goes.setAttached(e, true);
       }
-      printLocations();
+      
+      if (verbose) {
+        I.say("  Current Time: "+time);
+        I.say("Current Step: "+current);
+        printLocations();
+      }
     }
   }
   
@@ -415,13 +429,13 @@ public abstract class Plot extends Event {
   
   
   public Scene generateScene(Step step, Element focus, Lead lead) {
-    if (lead.type == Lead.LEAD_BUST) {
-      return PlotUtils.generateHideoutScene(this, step, focus, lead);
-    }
-    if (lead.type == Lead.LEAD_GUARD) {
+    if (step.isAssault()) {
       return PlotUtils.generateHeistScene(this, step, focus, lead);
     }
-    return null;
+    if (focus.place() == hideout() || focus.place() == based()) {
+      return PlotUtils.generateHideoutScene(this, step, focus, lead);
+    }
+    return PlotUtils.generateSideScene(this, step, focus, lead);
   }
   
   
@@ -459,7 +473,8 @@ public abstract class Plot extends Event {
   public void printLocations() {
     I.say("\nLocations: ");
     for (Plot.RoleEntry entry : entries) {
-      I.say("  "+entry.element+" ("+entry.role+") -> "+entry.element.place());
+      I.say("  "+entry.element+" ("+entry.role+") -> ");
+      I.say("    "+entry.element.place()+" (default: "+entry.location+")");
     }
   }
   

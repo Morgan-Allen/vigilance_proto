@@ -128,6 +128,11 @@ public class Element implements Session.Saveable {
   }
   
   
+  public Place resides() {
+    return null;
+  }
+  
+  
   final static Batch NO_TRAITS = new Batch();
   
   public Series <Object> traits() {

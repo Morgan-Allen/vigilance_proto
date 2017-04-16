@@ -237,6 +237,8 @@ public class Lead extends Task {
   
   public float leadRating;
   public boolean autoWin;
+  public boolean noScene;
+  
   
   
   Lead(Base base, Type type, Element focus) {
@@ -368,26 +370,33 @@ public class Lead extends Task {
     Place scene = focus.place();
     attempt = configAttempt(follow);
     int outcome = autoWin ? 1 : attempt.performAttempt(1);
-    
-    I.say("\nNew contact: "+contactID+" ("+plot+")");
-    if (autoWin) {
-      //  TODO:  Have a canDetect() method here for individual elements...?
-      
-      //  You can't reliably use 'goes'.  Instead, you need to give a bonus to
-      //  confirm the role of anyone present at the scene.
-      
-      for (Element e : step.involved()) if (step.goes(e) == scene) {
-        Plot.Role role = plot.roleFor(e);
-        Clue confirms = Clue.confirmSuspect(plot, role, e, scene);
+    //
+    //  And iterate over over all the elements involved to generate suitable
+    //  clues:
+    for (Element e : step.involved()) {
+      //
+      //  We assign a higher probability of recognition if the suspect is
+      //  present on-site, if the skill-test went well, and based on a random
+      //  roll.
+      float recognition = step.goes(e) == scene ? 0.5f : -0.5f;
+      recognition = (recognition + outcome + Rand.num()) / 3;
+      if (autoWin) recognition = 1;
+      Plot.Role role = plot.roleFor(e);
+      //
+      //  If recognition is strong, we get an exact confirmation of the role of
+      //  the suspect and their current location.  If it's weaker, we get a
+      //  partial clue, and if it's weaker still, we get no clue at all.
+      if (recognition >= 0.66f) {
+        Clue confirms = Clue.confirmSuspect(plot, role, e, e.place());
         file.recordClue(confirms, this, time, scene);
       }
-    }
-    else if (outcome > 0) {
-      //  TODO:  Try selecting a couple of distinct, non-redundant clues?
-      for (Element e : step.involved()) {
+      else if (recognition >= 0.33f) {
         Series <Clue> possible = step.possibleClues(e, this);
         Clue gained = (Clue) Rand.pickFrom(possible);
         file.recordClue(gained, this, time, scene);
+      }
+      else {
+        continue;
       }
     }
     //
@@ -439,21 +448,14 @@ public class Lead extends Task {
   }
   
   
-  protected Scene tryInterruptHeist(
-    Step step, int tense, Plot plot, int time
-  ) {
-    //
-    //  TODO:  Afford the player the option to intercept the goons, rather than
-    //  simply dumping them in directly...
-    
-    Place place = focus.place(), hideout = plot.hideout(), based = plot.based();
-    if (type == LEAD_GUARD && step.medium == MEDIUM_ASSAULT) {
-      return plot.generateScene(step, focus, this);
+  protected Scene enteredScene(Step step, int tense, Plot plot, int time) {
+    if (tense != TENSE_DURING || noScene) {
+      return null;
     }
-    if (type == LEAD_BUST && (place == hideout || place == based)) {
-      return plot.generateScene(step, focus, this);
+    if (step.medium != MEDIUM_ASSAULT && type.medium != MEDIUM_ASSAULT) {
+      return null;
     }
-    return null;
+    return plot.generateScene(step, focus, this);
   }
   
   
@@ -470,7 +472,7 @@ public class Lead extends Task {
       for (Step step : plot.allSteps()) {
         int tense = step.tense();
         if (canDetect(step, tense, plot, time)) {
-          Scene scene = tryInterruptHeist(step, tense, plot, time);
+          Scene scene = enteredScene(step, tense, plot, time);
           if (scene != null) {
             base.world().enterScene(scene);
           }

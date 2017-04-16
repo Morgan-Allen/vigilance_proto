@@ -68,13 +68,13 @@ public class CaseFile implements Session.Saveable {
   ) {
     for (Clue prior : clues) {
       if (! prior.makesRedundant(clue)) continue;
-      if (display) I.say("Clue was redundant: "+clue+" vs. "+prior);
       return;
     }
     
     if (source != null) clue.confirmSource(source, time, place);
     else                clue.confirmSource(type  , time, place);
     clues.add(clue);
+    base.leads.newClues.add(clue);
     
     if (display) {
       MessageUtils.presentClueMessage(base.world().view(), clue, effects);
@@ -88,10 +88,6 @@ public class CaseFile implements Session.Saveable {
     }
   }
 }
-
-
-
-
 
 
 

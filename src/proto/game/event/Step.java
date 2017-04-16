@@ -92,7 +92,7 @@ public class Step implements Session.Saveable {
   
   /**  Assorted no-brainer access methods-
     */
-  public boolean isHeist() {
+  public boolean isAssault() {
     return medium == Lead.MEDIUM_ASSAULT;
   }
   

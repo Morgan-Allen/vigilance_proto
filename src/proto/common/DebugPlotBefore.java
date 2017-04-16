@@ -28,7 +28,7 @@ public class DebugPlotBefore extends RunGame {
     kidnap.printRoles();
     crooks.plots.assignRootPlot(kidnap);
     Person organiser = kidnap.organiser();
-    Place  hideout   = kidnap.hideout();
+    Place  hideout   = kidnap.hideout  ();
     
     Base played = world.playerBase();
     Clue tipoff = Clue.confirmSuspect(
@@ -40,15 +40,22 @@ public class DebugPlotBefore extends RunGame {
     file.recordClue(tipoff, Lead.LEAD_TIPOFF, timeFound, placeFound);
 
     GameSettings.noTipoffs = true;
-    DebugPlotUtils.enterPlotDebugLoop(
-      world, kidnap, true,
-      organiser, kidnap.target()
-    );
-    
+    world.updateWorld(0);
     return world;
   }
   
+  
+  protected void runWorldTests(World world, boolean afterLoad) {
+    GameSettings.noTipoffs = true;
+    Plot plot = world.events.latestPlot();
+    if (plot != null) DebugPlotUtils.enterPlotDebugLoop(
+      world, plot, true, true, plot.organiser(), plot.target()
+    );
+  }
+  
 }
+
+
 
 
 

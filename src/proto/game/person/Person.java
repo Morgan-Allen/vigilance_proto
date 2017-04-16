@@ -195,6 +195,11 @@ public class Person extends Element {
   }
   
   
+  public void clearAssignments() {
+    for (Assignment a : assignments) removeAssignment(a);
+  }
+  
+  
   public Scene currentScene() {
     return scene;
   }

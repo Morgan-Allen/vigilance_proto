@@ -18,6 +18,8 @@ public class BaseLeads {
   List <Lead> leads = new List();
   int nextCaseID = 0;
   
+  List <Clue> newClues = new List();
+  
   
   public BaseLeads(Base base) {
     this.base = base;
@@ -28,6 +30,7 @@ public class BaseLeads {
     s.loadTable(files);
     s.loadObjects(leads);
     nextCaseID = s.loadInt();
+    s.loadObjects(newClues);
   }
   
   
@@ -35,6 +38,18 @@ public class BaseLeads {
     s.saveTable(files);
     s.saveObjects(leads);
     s.saveInt(nextCaseID);
+    s.saveObjects(newClues);
+  }
+  
+  
+  
+  /**  Extracting any new clues accumulated (mostly for UI/debug purposes)-
+    */
+  public Series <Clue> extractNewClues() {
+    final Batch <Clue> extracts = new Batch();
+    Visit.appendTo(extracts, newClues);
+    newClues.clear();
+    return extracts;
   }
   
   
@@ -220,27 +235,31 @@ public class BaseLeads {
   
   
   public Place lastKnownLocation(Element suspect) {
-    if (suspect.isPerson()) {
-      Person person = (Person) suspect;
-      Pick <Place> pickL = new Pick();
-      
-      for (Clue c : cluesFor(person, false)) {
-        Place given = c.locationGiven();
-        if (given != null) pickL.compare(given, c.timeFound);
-      }
-      if (! pickL.empty()) return pickL.result();
-      
-      if (! person.isCriminal()) {
-        return person.resides();
-      }
-    }
-    else if (suspect.isPlace()) {
+    if (suspect.isPlace()) {
       return (Place) suspect;
     }
-    else if (suspect.isRegion()) {
+    if (suspect.isRegion()) {
       return null;
     }
-    return null;
+    
+    Place address = null;
+    
+    if (suspect.isPerson()) {
+      Person p = (Person) suspect;
+      address = p.isCivilian() ? p.resides() : null;
+      if (p.place() == address) return address;
+    }
+    
+    Pick <Place> pickL = new Pick();
+    for (Clue c : cluesFor(suspect, false)) {
+      Place given = c.locationGiven();
+      if (given != null) pickL.compare(given, c.timeFound);
+    }
+    if (! pickL.empty()) {
+      return pickL.result();
+    }
+    
+    return address;
   }
   
   
@@ -249,6 +268,8 @@ public class BaseLeads {
     *  information-
     */
   public void updateLeads() {
+    newClues.clear();
+    
     for (Lead lead : leads) {
       if (lead.assigned().empty() || lead.complete()) {
         leads.remove(lead);

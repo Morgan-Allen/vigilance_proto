@@ -102,15 +102,17 @@ public class PlotUtils {
   
   
   
-  /**  Helper methods for queueing steps:
-    */
-  
-  
-  
-  
   /**  Helper methods for dealing with perps before and after a scene:
     */
   public static Scene generateHideoutScene(
+    Plot plot, Step step, Element focus, Task lead
+  ) {
+    //  TODO:  This should change later!
+    return generateHeistScene(plot, step, focus, lead);
+  }
+  
+  
+  public static Scene generateSideScene(
     Plot plot, Step step, Element focus, Task lead
   ) {
     //  TODO:  This should change later!
