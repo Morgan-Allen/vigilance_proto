@@ -82,6 +82,7 @@ public class DebugPlotUtils {
       recordCorrect = false;
     }
     file.wipeRecord();
+    played.leads.extractNewClues();
     if (! recordCorrect) return false;
     I.say("  Clue was recorded correctly.");
     I.say("  Current step is: "+current);
@@ -117,7 +118,7 @@ public class DebugPlotUtils {
     I.say("Agents assigned: "+followed.assigned());
     
     while (! plot.complete()) {
-      world.updateWorld(12);
+      world.updateWorld(6);
       
       Series <Clue> extracted = played.leads.extractNewClues();
       if (extracted.empty()) continue;
@@ -301,11 +302,10 @@ public class DebugPlotUtils {
           if      (response.equals("F")) { askToLoop = false; break; }
           else if (response.equals("R")) continue loop;
           else if (response.equals("Y")) break;
-          else continue;
         }
       }
       
-      world.updateWorld(12);
+      world.updateWorld(6);
       
       if (world.activeScene() != null) {
         bust = world.activeScene();

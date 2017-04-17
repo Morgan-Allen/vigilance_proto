@@ -282,7 +282,7 @@ public class Clue implements Session.Saveable {
     
     if (source != null) {
       desc.append(" by ");
-      Series <Person> did = source.onceAssigned();
+      Series <Person> did = source.onceActive();
       for (Person p : did) {
         if (p == did.first()) desc.append(""+p);
         else if (p == did.last()) desc.append(" and "+p);

@@ -1,5 +1,4 @@
 
-
 package proto.game.person;
 import proto.game.world.*;
 import proto.common.*;

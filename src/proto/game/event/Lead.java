@@ -58,6 +58,11 @@ public class Lead extends Task {
     CONFIDENCE_MODERATE = 0.66f,
     CONFIDENCE_HIGH     = 1.00f;
   final public static int
+    //  Time taken to gather information-
+    TIME_NONE            = 0,
+    TIME_SHORT           = World.HOURS_PER_DAY / 8,
+    TIME_MEDIUM          = World.HOURS_PER_DAY / 2,
+    TIME_LONG            = World.HOURS_PER_DAY * 2,
     CLUE_EXPIRATION_TIME = World.HOURS_PER_DAY * World.DAYS_PER_WEEK;
   
   final public static String
@@ -97,24 +102,26 @@ public class Lead extends Task {
     final public Image icon;
     
     final public int ID;
+    final public int minHours;
     final public int medium, focus, tense, profile;
     final public float confidence;
     final public int cluesMedia[];
     
     Type(
       String name, int ID, String info, String iconPath, String tenseVerbs[],
-      int medium, int focus, int tense, int profile, float confidence,
-      int... cluesMedia
+      int minHours, int medium, int focus, int tense, int profile,
+      float confidence, int... cluesMedia
     ) {
       this.name = name;
       this.info = info;
       this.icon = Kind.loadImage(iconPath);
       this.ID   = ID  ;
       this.tenseVerbs = tenseVerbs;
-      this.medium  = medium ;
-      this.focus   = focus  ;
-      this.tense   = tense  ;
-      this.profile = profile;
+      this.minHours   = minHours  ;
+      this.medium     = medium    ;
+      this.focus      = focus     ;
+      this.tense      = tense     ;
+      this.profile    = profile   ;
       this.confidence = confidence;
       this.cluesMedia = cluesMedia;
       TYPE_B.add(this);
@@ -133,6 +140,7 @@ public class Lead extends Task {
       "Surveil a suspect for clues to their activities and who they meet with.",
       ICON_DIR+"icon_surveil.png",
       new String[] { "Surveiled", "Surveilling", "Will Surveil" },
+      TIME_SHORT,
       MEDIUM_SURVEIL, FOCUS_PERSON, TENSE_DURING, PROFILE_LOW,
       CONFIDENCE_HIGH, PHYSICAL_MEDIA
     ),
@@ -141,6 +149,7 @@ public class Lead extends Task {
       "Stake out a building to see who visits and who might be holed up.",
       ICON_DIR+"icon_surveil.png",
       new String[] { "Surveiled", "Surveilling", "Will Surveil" },
+      TIME_SHORT,
       MEDIUM_SURVEIL, FOCUS_BUILDING, TENSE_DURING, PROFILE_LOW,
       CONFIDENCE_MODERATE, PHYSICAL_MEDIA
     ),
@@ -149,6 +158,7 @@ public class Lead extends Task {
       "Question a suspect for information on past dealings or future plans.",
       ICON_DIR+"icon_question.png",
       new String[] { "Questioned", "Questioning", "Will Question" },
+      TIME_SHORT,
       MEDIUM_QUESTION, FOCUS_PERSON, TENSE_AFTER, PROFILE_HIGH,
       CONFIDENCE_MODERATE, MEDIUM_ANY
     ),
@@ -157,6 +167,7 @@ public class Lead extends Task {
       "Intercept suspicious communications to or from a structure.",
       ICON_DIR+"icon_wiretap.png",
       new String[] { "Wiretapped", "Wiretapping", "Will Wiretap" },
+      TIME_MEDIUM,
       MEDIUM_WIRE, FOCUS_BUILDING, TENSE_DURING, PROFILE_LOW,
       CONFIDENCE_HIGH, WIRED_MEDIA
     ),
@@ -165,6 +176,7 @@ public class Lead extends Task {
       "Patrol an area while keeping an eye out for suspicious activity.",
       ICON_DIR+"icon_surveil.png",
       new String[] { "Patrolled", "Patrolling", "Will Patrol" },
+      TIME_MEDIUM,
       MEDIUM_SURVEIL, FOCUS_REGION, TENSE_DURING, PROFILE_LOW,
       CONFIDENCE_MODERATE, PHYSICAL_MEDIA
     ),
@@ -173,6 +185,7 @@ public class Lead extends Task {
       "Scan wireless frequencies in an area for fragments of information.",
       ICON_DIR+"icon_scan.png",
       new String[] { "Scanned", "Scanning", "Will Scan" },
+      TIME_MEDIUM,
       MEDIUM_WIRE, FOCUS_REGION, TENSE_DURING, PROFILE_LOW,
       CONFIDENCE_MODERATE, WIRED_MEDIA
     ),
@@ -181,6 +194,7 @@ public class Lead extends Task {
       "Ask civilians or friendly contacts in an area for leads.",
       ICON_DIR+"icon_question.png",
       new String[] { "Canvassed", "Canvassing", "Will Canvass" },
+      TIME_LONG,
       MEDIUM_QUESTION, FOCUS_REGION, TENSE_ANY, PROFILE_SUSPICIOUS,
       CONFIDENCE_LOW, MEDIUM_ANY
     ),
@@ -189,6 +203,7 @@ public class Lead extends Task {
       "Search a building for logs, records or forensic evidence.",
       ICON_DIR+"icon_search.png",
       new String[] { "Searched", "Searching", "Will Search" },
+      TIME_SHORT,
       MEDIUM_SURVEIL, FOCUS_BUILDING, TENSE_AFTER, PROFILE_SUSPICIOUS,
       CONFIDENCE_MODERATE, FORENSIC_MEDIA
     ),
@@ -197,6 +212,7 @@ public class Lead extends Task {
       "_",
       ICON_DIR+"icon_wiretap.png",
       new String[] { "Tipped Off", "Tipping Off", "Will Tip Off" },
+      TIME_NONE,
       MEDIUM_WIRE, FOCUS_ANY, TENSE_ANY, PROFILE_HIDDEN,
       CONFIDENCE_LOW
     ),
@@ -205,6 +221,7 @@ public class Lead extends Task {
       "_",
       ICON_DIR+"icon_database.png",
       new String[] { "Reported", "Reporting", "Will Report" },
+      TIME_NONE,
       MEDIUM_WIRE, FOCUS_ANY, TENSE_ANY, PROFILE_OBVIOUS,
       CONFIDENCE_HIGH
     ),
@@ -213,6 +230,7 @@ public class Lead extends Task {
       "Guard this suspect against criminal activity.",
       ICON_DIR+"icon_guard_lead.png",
       new String[] { "Guarded", "Guarding", "Will Guard" },
+      TIME_SHORT,
       MEDIUM_ASSAULT, FOCUS_ANY, TENSE_DURING, PROFILE_OBVIOUS,
       CONFIDENCE_HIGH, PHYSICAL_MEDIA
     ),
@@ -221,6 +239,7 @@ public class Lead extends Task {
       "Bust down the doors and unleash hell.",
       ICON_DIR+"icon_guard_lead.png",
       new String[] { "Busted", "Busting", "Will Bust" },
+      TIME_SHORT,
       MEDIUM_ASSAULT, FOCUS_ANY, TENSE_DURING, PROFILE_OBVIOUS,
       CONFIDENCE_HIGH, MEDIUM_ANY
     ),
@@ -232,8 +251,10 @@ public class Lead extends Task {
     */
   final public Type type;
   final public Element focus;
-  private String lastContactID;
-  private List <Person> onceAssigned = new List();
+  
+  private String lastContactID = "___";
+  private int contactTime = -1;
+  private List <Person> onceActive = new List();
   
   public float leadRating = 0;
   public float setResult = -1;
@@ -263,19 +284,21 @@ public class Lead extends Task {
   
   public Lead(Session s) throws Exception {
     super(s);
-    type  = LEAD_TYPES[s.loadInt()];
-    focus = (Element) s.loadObject();
+    type          = LEAD_TYPES[s.loadInt()];
+    focus         = (Element) s.loadObject();
     lastContactID = s.loadString();
-    s.loadObjects(onceAssigned);
+    contactTime   = s.loadInt();
+    s.loadObjects(onceActive);
   }
   
   
   public void saveState(Session s) throws Exception {
     super.saveState(s);
-    s.saveInt(type.ID);
-    s.saveObject(focus);
+    s.saveInt   (type.ID      );
+    s.saveObject(focus        );
     s.saveString(lastContactID);
-    s.saveObjects(onceAssigned);
+    s.saveInt   (contactTime  );
+    s.saveObjects(onceActive);
   }
   
   
@@ -289,7 +312,7 @@ public class Lead extends Task {
   
   public void setAssigned(Person p, boolean is) {
     super.setAssigned(p, is);
-    if (is) onceAssigned.include(p);
+    onceActive.include(p);
   }
   
   
@@ -298,8 +321,8 @@ public class Lead extends Task {
   }
   
   
-  public Series <Person> onceAssigned() {
-    return onceAssigned;
+  public Series <Person> onceActive() {
+    return onceActive;
   }
   
   
@@ -360,10 +383,13 @@ public class Lead extends Task {
     //  avoid granting cumulative 'random' info over time.)  If it hasn't,
     //  just return.
     String contactID = plot.caseID+"_"+step.ID+"_"+tense;
-    if (contactID.equals(lastContactID)) {
+    if (contactTime == -1 && ! contactID.equals(lastContactID)) {
+      lastContactID = contactID;
+      contactTime   = time;
+    }
+    if (contactTime == -1 || (time - contactTime) < type.minHours) {
       return RESULT_NONE;
     }
-    this.lastContactID = contactID;
     //
     //  Then perform the actual skill-test needed to ensure success:
     CaseFile file    = base.leads.caseFor(plot);
@@ -406,6 +432,9 @@ public class Lead extends Task {
     //  Either way, you have to take the risk of tipping off the perps
     //  themselves:
     if (setResult == -1) plot.takeSpooking(type.profile);
+    //
+    //  Reset for the next contact and return your result.
+    contactTime = -1;
     return outcome;
   }
   
@@ -467,6 +496,7 @@ public class Lead extends Task {
     Series <Person> active = active();
     World world = base.world();
     int time = world.timing.totalHours();
+    float result = RESULT_NONE;
     //
     //  Continuously monitor for events of interest connected to the current
     //  focus of your investigation, and see if any new information pops up...
@@ -480,7 +510,7 @@ public class Lead extends Task {
             base.world().enterScene(scene);
           }
           else {
-            attemptFollow(step, tense, plot, active, time);
+            result = attemptFollow(step, tense, plot, active, time);
           }
         }
       }
@@ -491,10 +521,13 @@ public class Lead extends Task {
       Plot plot = (Plot) event;
       for (Step step : plot.allSteps()) {
         if (canDetect(step, TENSE_AFTER, plot, time)) {
-          attemptFollow(step, TENSE_AFTER, plot, active, time);
+          result = attemptFollow(step, TENSE_AFTER, plot, active, time);
         }
       }
     }
+    //
+    //  Remember to close the lead once one or more clues have been extracted.
+    if (result != RESULT_NONE) setCompleted(result > RESULT_COLD);
     return true;
   }
   
