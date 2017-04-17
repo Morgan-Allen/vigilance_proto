@@ -169,10 +169,8 @@ public class World implements Session.Saveable {
   
   
   public float distanceBetween(Region a, Region b) {
-    return Nums.abs(Nums.max(
-      a.kind().mapX - b.kind().mapX,
-      a.kind().mapY - b.kind().mapY
-    ));
+    RegionType ka = a.kind(), kb = b.kind();
+    return Nums.max(Nums.abs(ka.mapX - kb.mapX), Nums.abs(ka.mapY - kb.mapY));
   }
   
   

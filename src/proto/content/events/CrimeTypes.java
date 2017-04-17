@@ -15,7 +15,6 @@ public class CrimeTypes {
     types.add(type);
     return type;
   }
-
   
   /*
   HEIST    = register(new TypeHeist()),

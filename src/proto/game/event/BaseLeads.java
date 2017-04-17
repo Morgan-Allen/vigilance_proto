@@ -132,9 +132,8 @@ public class BaseLeads {
   
   public Series <Plot.Role> knownRolesFor(Plot plot) {
     Batch <Plot.Role> known = new Batch();
-    known.include(Plot.ROLE_MASTERMIND);
-    known.include(Plot.ROLE_ORGANISER );
-    known.include(Plot.ROLE_TARGET    );
+    known.include(Plot.ROLE_ORGANISER);
+    known.include(Plot.ROLE_TARGET   );
     
     for (CaseFile file : files.values()) {
       for (Clue c : file.clues) if (c.plot == plot) {
@@ -323,7 +322,11 @@ public class BaseLeads {
     if (focus.isPlace()) {
       all.add(leadFor(focus, Lead.LEAD_SURVEIL_BUILDING));
       all.add(leadFor(focus, Lead.LEAD_WIRETAP         ));
-      if (canEnter) all.add(leadFor(focus, Lead.LEAD_SEARCH));
+      all.add(leadFor(focus, Lead.LEAD_BUST            ));
+      if (canEnter) {
+        all.add(leadFor(focus, Lead.LEAD_SEARCH));
+        all.add(leadFor(focus, Lead.LEAD_GUARD ));
+      }
     }
     
     if (focus.isRegion()) {
@@ -357,9 +360,8 @@ public class BaseLeads {
       if (plot.complete()) continue;
       
       for (Plot.Role r : roles) {
-        Element fills = plot.filling(r), at = plot.location(r);
-        if (suspect == fills                    ) return true;
-        if (suspect == at && fills.place() == at) return true;
+        Element fills = plot.filling(r);
+        if (suspect == fills) return true;
       }
     }
     return false;

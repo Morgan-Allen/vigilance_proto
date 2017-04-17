@@ -19,10 +19,10 @@ public class Facilities {
     0, BUILD_TIME_NONE, MANSION_SCENE
   );
   
-  final public static PlaceType HIDEOUT = new PlaceType(
-    "Hideout", "base_type_hideout",
+  final public static PlaceType LOUNGE = new PlaceType(
+    "Lounge", "base_type_lounge",
     null, "",
-    0, BUILD_TIME_NONE, URBAN_SCENE
+    0, BUILD_TIME_NONE, MANSION_SCENE
   );
   
   

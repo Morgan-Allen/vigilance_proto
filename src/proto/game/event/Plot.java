@@ -44,14 +44,23 @@ public abstract class Plot extends Event {
     public String toString() {
       return name;
     }
+    
+    public boolean isPerp() {
+      return category == PERP;
+    }
+    
+    public boolean isVictim() {
+      return category == VICTIM;
+    }
   }
-  
   
   final public static Role
     ROLE_MASTERMIND = new Role("role_mastermind", "Mastermind", PERP  ),
+    ROLE_BASED      = new Role("role_based"     , "Based"     , PERP  ),
     ROLE_ORGANISER  = new Role("role_organiser" , "Organiser" , PERP  ),
-    ROLE_TARGET     = new Role("role_target"    , "Target"    , VICTIM);
-  
+    ROLE_HIDEOUT    = new Role("role_hideout"   , "Hideout"   , PERP  ),
+    ROLE_TARGET     = new Role("role_target"    , "Target"    , VICTIM),
+    ROLE_SCENE      = new Role("role_scene"     , "Scene"     , VICTIM);
   
   
   /**  Data fields, construction and save/load methods-
@@ -80,8 +89,8 @@ public abstract class Plot extends Event {
     for (int n = s.loadInt(); n-- > 0;) {
       RoleEntry entry = new RoleEntry();
       entry.role     = (Plot.Role) s.loadObject();
+      entry.placing  = (Plot.Role) s.loadObject();
       entry.element  = (Element  ) s.loadObject();
-      entry.location = (Place    ) s.loadObject();
       entry.supplies = (Plot     ) s.loadObject();
       entries.add(entry);
     }
@@ -99,8 +108,8 @@ public abstract class Plot extends Event {
     s.saveInt(entries.size());
     for (RoleEntry entry : entries) {
       s.saveObject(entry.role    );
+      s.saveObject(entry.placing );
       s.saveObject(entry.element );
-      s.saveObject(entry.location);
       s.saveObject(entry.supplies);
     }
     s.saveObjects(steps);
@@ -199,10 +208,13 @@ public abstract class Plot extends Event {
         }
         completeEvent();
       }
-      
-      for (Element e : current.involved()) {
-        Place goes = current.goes(e);
-        if (goes != null) goes.setAttached(e, true);
+
+      for (Element e : current.involved()) if (e.isPerson()) {
+        ((Person) e).addAssignment(this);
+      }
+      for (Person p : assigned()) {
+        Place goes = goes(p);
+        if (goes != null) goes.setAttached(p, true);
       }
       
       if (verbose) {
@@ -214,44 +226,75 @@ public abstract class Plot extends Event {
   }
   
   
+  public Place goes(Person p) {
+    if (current != null && Visit.arrayIncludes(current.involved(), p)) {
+      if (Lead.isWired(current.medium)) {
+        if (p == current.subject) return current.goes;
+        else                      return current.from;
+      }
+      else {
+        return current.goes;
+      }
+    }
+    
+    RoleEntry entry = entryFor(p, null);
+    return entry == null ? null : (Place) filling(entry.placing);
+  }
+  
+  
   
   /**  Utility methods for assigning roles, fulfilling needs and evaluating
     *  possible targets-
     */
-  protected class RoleEntry {
+  private class RoleEntry {
     
-    Role role;
+    Role role, placing;
     Element element;
-    Place location;
     Plot supplies;
     
     public String toString() {
-      return element+" at "+location+" ("+role+")";
+      return element+" ("+role+")";
     }
   }
   
   
-  public void assignRole(Element element, Place location, Role role) {
+  public void assignRole(
+    Element element, Role role, Role placing
+  ) {
     RoleEntry match = entryFor(element, role);
     if (match == null) entries.add(match = new RoleEntry());
-    match.role     = role    ;
-    match.element  = element ;
-    match.location = location;
+    
+    match.role     = role   ;
+    match.placing  = placing;
+    match.element  = element;
   }
   
   
-  public void assignTarget(Element target, Place scene) {
-    assignRole(target, scene, ROLE_TARGET);
+  public void assignRole(Place location, Role role) {
+    assignRole(location, role, role);
+  }
+  
+  
+  public void assignRole(Person person, Role role) {
+    assignRole(person, role, ROLE_HIDEOUT);
+  }
+  
+  
+  public void assignTarget(Element target, Place scene, Role stays) {
+    assignRole(scene , ROLE_SCENE        );
+    assignRole(target, ROLE_TARGET, stays);
   }
   
   
   public void assignOrganiser(Person organiser, Place hideout) {
-    assignRole(organiser, hideout, ROLE_ORGANISER);
+    assignRole(hideout  , ROLE_HIDEOUT                );
+    assignRole(organiser, ROLE_ORGANISER, ROLE_HIDEOUT);
   }
   
   
   public void assignMastermind(Person mastermind, Place based) {
-    assignRole(mastermind, based, ROLE_MASTERMIND);
+    assignRole(based     , ROLE_BASED                 );
+    assignRole(mastermind, ROLE_MASTERMIND, ROLE_BASED);
   }
   
   
@@ -261,7 +304,7 @@ public abstract class Plot extends Event {
   
   
   public Element targetElement(Person p) {
-    return target();
+    return goes(p);
   }
   
   
@@ -271,7 +314,7 @@ public abstract class Plot extends Event {
   
   
   public Place based() {
-    return (Place) location(ROLE_MASTERMIND);
+    return (Place) filling(ROLE_BASED);
   }
   
   
@@ -281,29 +324,23 @@ public abstract class Plot extends Event {
   
   
   public Place hideout() {
-    return (Place) location(ROLE_ORGANISER);
+    return (Place) filling(ROLE_HIDEOUT);
   }
   
   
-  public Person target() {
-    return (Person) filling(ROLE_TARGET);
+  public Element target() {
+    return filling(ROLE_TARGET);
   }
   
   
   public Place scene() {
-    return (Place) location(ROLE_TARGET);
+    return (Place) filling(ROLE_SCENE);
   }
   
   
   public Element filling(Role role) {
     RoleEntry entry = entryFor(null, role);
     return entry == null ? null : entry.element;
-  }
-  
-  
-  public Place location(Role role) {
-    RoleEntry entry = entryFor(null, role);
-    return entry == null ? null : entry.location;
   }
   
   
@@ -322,7 +359,7 @@ public abstract class Plot extends Event {
     }
     for (RoleEntry entry : entries) {
       if (element != null) {
-        if (element != entry.element && element != entry.location) continue;
+        if (element != entry.element) continue;
       }
       if (role != null) {
         if (role != entry.role) continue;
@@ -336,8 +373,7 @@ public abstract class Plot extends Event {
   public Batch <Element> allInvolved() {
     Batch <Element> involved = new Batch();
     for (RoleEntry entry : entries) {
-      involved.include(entry.element );
-      involved.include(entry.location);
+      involved.include(entry.element);
     }
     return involved;
   }
@@ -389,7 +425,7 @@ public abstract class Plot extends Event {
     
     Element focus     = (Element) Rand.pickFrom(step.involved());
     Role    focusRole = roleFor(focus);
-    Place   at        = location(focusRole);
+    Place   at        = focus.place();
     float   trust     = at.region().currentValue(Region.TRUST);
     float   tipChance = trust / (10f * (1 + base.organisationRank(focus)));
     Base    player    = world.playerBase();
@@ -407,18 +443,20 @@ public abstract class Plot extends Event {
     if (ends && step.medium == Lead.MEDIUM_ASSAULT) {
       EventEffects effects = generateEffects(step);
       Element  target = target();
-      Place    scene  = scene ();
+      Place    scene  = target.place();
       Clue     report = Clue.confirmSuspect(this, ROLE_TARGET, target, scene);
       CaseFile file   = player.leads.caseFor(this);
       file.recordClue(report, Lead.LEAD_REPORT, time, scene);
       effects.applyEffects(target.place());
+      recordEffects(effects);
     }
   }
   
   
   public EventEffects generateEffects(Step step) {
     EventEffects effects = new EventEffects();
-    effects.composeFromEvent(this, 0, 1);
+    float roughs = Rand.num() / 2, losses = Rand.num() / 2;
+    effects.composeFromEvent(this, 0 + roughs, 1 - losses);
     return effects;
   }
   
@@ -465,7 +503,7 @@ public abstract class Plot extends Event {
   public void printSteps() {
     I.say("\nSteps are:");
     for (Step c : steps) {
-      I.say(c.toString());
+      I.say("  "+c);
     }
   }
   
@@ -473,8 +511,7 @@ public abstract class Plot extends Event {
   public void printLocations() {
     I.say("\nLocations: ");
     for (Plot.RoleEntry entry : entries) {
-      I.say("  "+entry.element+" ("+entry.role+") -> ");
-      I.say("    "+entry.element.place()+" (default: "+entry.location+")");
+      I.say("  "+entry.element+" ("+entry.role+") -> "+entry.element.place());
     }
   }
   

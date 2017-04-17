@@ -27,8 +27,15 @@ public class PlotUtils {
   
   
   public static void fillExpertRole(
+    Plot plot, Trait trait, Series <Person> candidates, Plot.Role role
+  ) {
+    fillExpertRole(plot, trait, candidates, role, Plot.ROLE_HIDEOUT);
+  }
+  
+  
+  public static void fillExpertRole(
     Plot plot, Trait trait, Series <Person> candidates,
-    Plot.Role role, Place operates
+    Plot.Role role, Plot.Role placing
   ) {
     Pick <Person> pick = new Pick();
     for (Person p : candidates) {
@@ -37,12 +44,13 @@ public class PlotUtils {
       pick.compare(p, p.stats.levelFor(trait));
     }
     if (pick.empty()) return;
-    plot.assignRole(pick.result(), operates, role);
+    plot.assignRole(pick.result(), role, placing);
   }
   
   
   public static void fillInsideRole(
-    Plot plot, Place target, Plot.Role role
+    Plot plot, Place target,
+    Plot.Role role, Plot.Role placing
   ) {
     Pick <Person> pick = new Pick();
     for (Person p : target.residents()) {
@@ -51,15 +59,15 @@ public class PlotUtils {
       pick.compare(p, 0 - p.history.bondWith(target.owner()));
     }
     if (pick.empty()) return;
-    plot.assignRole(pick.result(), target, role);
+    plot.assignRole(pick.result(), role, placing);
   }
   
   
   public static void fillItemRole(
     Plot plot, ItemType type, World world,
-    Plot.Role role, Place kept
+    Plot.Role role, Plot.Role placing
   ) {
-    plot.assignRole(new Item(type, world), kept, role);
+    plot.assignRole(new Item(type, world), role, placing);
   }
   
   

@@ -6,7 +6,6 @@ import proto.game.world.*;
 import proto.game.scene.*;
 import proto.game.person.*;
 import proto.util.*;
-import proto.view.common.*;
 
 import java.awt.Image;
 
@@ -24,6 +23,7 @@ public abstract class Event implements Session.Saveable, Assignment {
   boolean complete;
   
   List <Person> involved = new List();
+  List <EventEffects> allEffects = new List();
   
   
   protected Event(EventType type, World world) {
@@ -38,7 +38,8 @@ public abstract class Event implements Session.Saveable, Assignment {
     world      = (World    ) s.loadObject();
     timeBegins = s.loadInt ();
     complete   = s.loadBool();
-    s.loadObjects(involved);
+    s.loadObjects(involved  );
+    s.loadObjects(allEffects);
   }
   
   
@@ -47,7 +48,8 @@ public abstract class Event implements Session.Saveable, Assignment {
     s.saveObject(world     );
     s.saveInt   (timeBegins);
     s.saveBool  (complete  );
-    s.saveObjects(involved);
+    s.saveObjects(involved  );
+    s.saveObjects(allEffects);
   }
   
   
@@ -151,6 +153,16 @@ public abstract class Event implements Session.Saveable, Assignment {
   
   public EventEffects generateEffects(Scene scene) {
     return new EventEffects();
+  }
+  
+  
+  protected void recordEffects(EventEffects effects) {
+    allEffects.add(effects);
+  }
+  
+  
+  public Series <EventEffects> allEffects() {
+    return allEffects;
   }
   
   

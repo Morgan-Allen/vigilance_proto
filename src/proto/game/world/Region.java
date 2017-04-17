@@ -366,8 +366,12 @@ public class Region extends Element {
     corruption = (corruption + crimeFactor) / 2;
     
     float driftRep = numDays / REPUTE_DRIFT_TIME;
-    deterrence = driftValue(deterrence, 0            , driftRep);
-    trust      = driftValue(trust     , DEFAULT_TRUST, driftRep);
+    if (! GameSettings.noDeterDecay) {
+      deterrence = driftValue(deterrence, 0, driftRep);
+    }
+    if (! GameSettings.noTrustDecay) {
+      trust = driftValue(trust, DEFAULT_TRUST, driftRep);
+    }
     
     setLevel(DETERRENCE, (int) deterrence , true);
     setLevel(TRUST     , (int) trust      , true);

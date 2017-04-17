@@ -20,10 +20,15 @@ public class GameSettings {
   ;
   
   public static boolean
-    reportMediaMiss = false,
-    reportWorldInit = false,
     freeTipoffs     = false,
     noTipoffs       = false,
+    noTrustDecay    = false,
+    noDeterDecay    = false
+  ;
+  
+  public static boolean
+    reportMediaMiss = false,
+    reportWorldInit = false,
     debugScene      = false,
     pauseScene      = false,
     debugLineSight  = false,

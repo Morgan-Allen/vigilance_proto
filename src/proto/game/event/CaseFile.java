@@ -87,6 +87,16 @@ public class CaseFile implements Session.Saveable {
       clues.include(clue);
     }
   }
+  
+  
+  public Series <Clue> clues() {
+    return clues;
+  }
+  
+  
+  public void wipeRecord() {
+    clues.clear();
+  }
 }
 
 

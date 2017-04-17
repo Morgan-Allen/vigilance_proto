@@ -235,9 +235,9 @@ public class Lead extends Task {
   private String lastContactID;
   private List <Person> onceAssigned = new List();
   
-  public float leadRating;
-  public boolean autoWin;
-  public boolean noScene;
+  public float leadRating = 0;
+  public float setResult = -1;
+  public boolean noScene = false;
   
   
   
@@ -366,10 +366,10 @@ public class Lead extends Task {
     this.lastContactID = contactID;
     //
     //  Then perform the actual skill-test needed to ensure success:
-    CaseFile file = base.leads.caseFor(plot);
-    Place scene = focus.place();
-    attempt = configAttempt(follow);
-    int outcome = autoWin ? 1 : attempt.performAttempt(1);
+    CaseFile file    = base.leads.caseFor(plot);
+    Place    scene   = focus.place();
+             attempt = configAttempt(follow);
+    int      outcome = setResult > 0 ? 1 : attempt.performAttempt(1);
     //
     //  And iterate over over all the elements involved to generate suitable
     //  clues:
@@ -378,9 +378,12 @@ public class Lead extends Task {
       //  We assign a higher probability of recognition if the suspect is
       //  present on-site, if the skill-test went well, and based on a random
       //  roll.
-      float recognition = step.goes(e) == scene ? 0.5f : -0.5f;
-      recognition = (recognition + outcome + Rand.num()) / 3;
-      if (autoWin) recognition = 1;
+      float recognition;
+      if (setResult > 0) recognition = setResult;
+      else {
+        recognition = e.place() == scene ? 0.5f : -0.5f;
+        recognition = (recognition + outcome + Rand.num()) / 3;
+      }
       Plot.Role role = plot.roleFor(e);
       //
       //  If recognition is strong, we get an exact confirmation of the role of
@@ -393,7 +396,7 @@ public class Lead extends Task {
       else if (recognition >= 0.33f) {
         Series <Clue> possible = step.possibleClues(e, this);
         Clue gained = (Clue) Rand.pickFrom(possible);
-        file.recordClue(gained, this, time, scene);
+        if (gained != null) file.recordClue(gained, this, time, scene);
       }
       else {
         continue;
@@ -402,7 +405,7 @@ public class Lead extends Task {
     //
     //  Either way, you have to take the risk of tipping off the perps
     //  themselves:
-    if (! autoWin) plot.takeSpooking(type.profile);
+    if (setResult == -1) plot.takeSpooking(type.profile);
     return outcome;
   }
   

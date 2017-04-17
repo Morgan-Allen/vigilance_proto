@@ -16,7 +16,10 @@ public class Step implements Session.Saveable {
   int ID;
   
   Element involved[];
+  Element acting  ;
+  Element subject ;
   Element mentions;
+  Element brings  ;
   Place from;
   Place goes;
   int medium;
@@ -36,7 +39,10 @@ public class Step implements Session.Saveable {
     ID         = s.loadInt();
 
     involved   = (Element[]) s.loadObjectArray(Element.class);
+    acting     = (Element) s.loadObject();
+    subject    = (Element) s.loadObject();
     mentions   = (Element) s.loadObject();
+    brings     = (Element) s.loadObject();
     from       = (Place  ) s.loadObject();
     goes       = (Place  ) s.loadObject();
     medium     = s.loadInt();
@@ -51,7 +57,10 @@ public class Step implements Session.Saveable {
     s.saveInt   (ID   );
     
     s.saveObjectArray(involved);
+    s.saveObject(acting    );
+    s.saveObject(subject   );
     s.saveObject(mentions  );
+    s.saveObject(brings    );
     s.saveObject(from      );
     s.saveObject(goes      );
     s.saveInt   (medium    );
@@ -65,8 +74,8 @@ public class Step implements Session.Saveable {
     */
   public static Step queueStep(
     String label, Plot plot,
-    Plot.Role acting, Plot.Role subject, Plot.Role mentions,
-    int medium, int hoursTaken, Plot.Role... others
+    Plot.Role acting, Plot.Role from, Plot.Role subject, Plot.Role goes,
+    Plot.Role mentions, int medium, int hoursTaken, Plot.Role... others
   ) {
     Step s = new Step();
     s.label      = label;
@@ -76,10 +85,10 @@ public class Step implements Session.Saveable {
     s.hoursTaken = hoursTaken;
     
     Batch <Element> involved = new Batch();
-    involved.include(         plot.filling (acting ));
-    involved.include(s.from = plot.location(acting ));
-    involved.include(         plot.filling (subject));
-    involved.include(s.goes = plot.location(subject));
+    involved.include(s.acting =       plot.filling(acting ));
+    involved.include(s.from = (Place) plot.filling(from   ));
+    involved.include(s.subject =      plot.filling(subject));
+    involved.include(s.goes = (Place) plot.filling(goes   ));
     for (Plot.Role role : others) involved.include(plot.filling(role));
     
     s.involved = involved.toArray(Element.class);
@@ -122,6 +131,26 @@ public class Step implements Session.Saveable {
   }
   
   
+  public Element acting() {
+    return acting;
+  }
+  
+  
+  public Element subject() {
+    return subject;
+  }
+  
+  
+  public Place from() {
+    return from;
+  }
+  
+  
+  public Place goes() {
+    return goes;
+  }
+  
+  
   
   /**  Life cycle, timing and updates:
     */
@@ -156,16 +185,6 @@ public class Step implements Session.Saveable {
     boolean done = time >= (timeStart + hoursTaken);
     if (begun) return done ? Lead.TENSE_AFTER : Lead.TENSE_DURING;
     return Lead.TENSE_BEFORE;
-  }
-  
-  
-  public Place goes(Element e) {
-    if (e.isRegion() || e.isPlace()) return null;
-    if (Lead.isWired(medium)) {
-      Plot.Role role = plot.roleFor(e);
-      return plot.location(role);
-    }
-    else return goes;
   }
   
   
@@ -215,19 +234,18 @@ public class Step implements Session.Saveable {
   protected Batch <Clue> addLocationClues(
     Element involved, Lead lead, Batch <Clue> possible
   ) {
-    //  TODO:  You might also add a location clue for the venue of an involved
-    //  element.
     Plot.Role role = plot.roleFor(involved);
-    if (role == null) return possible;
+    if (role == null || ! involved.isPlace()) return possible;
     
     World world = plot.base.world();
     Region at = involved.region();
-    int range = Rand.yes() ? 0 : 1;
-    Series <Region> around = world.regionsInRange(at, range);
+    Series <Region> around = world.regionsInRange(at, 1);
     
-    Region near = (Region) Rand.pickFrom(around);
-    Clue clue = Clue.locationClue(plot, role, near, range);
-    possible.add(clue);
+    for (Region near : around) {
+      int range = (int) world.distanceBetween(at, near);
+      Clue clue = Clue.locationClue(plot, role, near, range);
+      possible.add(clue);
+    }
     
     return possible;
   }
@@ -255,62 +273,37 @@ public class Step implements Session.Saveable {
   
   
   
-  protected Series <Clue> possibleClues(
+  public Series <Clue> possibleClues(
     Element focus, Lead lead
   ) {
     Batch <Clue> possible = new Batch();
     addTraitClues   (focus, lead, possible);
     addLocationClues(focus, lead, possible);
     addIntentClues  (focus, lead, possible);
-    
-    //  TODO:  If you're directly surveilling the main focus, or if you're
-    //  really hot, or if an element is mentioned explicitly, you might get
-    //  a direct confirmation of a suspect's involvement.
-    
     return possible;
   }
-  
-  
-  /*
-  protected void confirmIdentity(
-    Element focus, Lead lead, Element subject
-  ) {
-    World world = plot.base.world();
-    int time = world.timing.totalHours();
-    Place place = focus.place();
-    
-    Plot.Role role = plot.roleFor(subject);
-    CaseFile file = lead.base.leads.caseFor(subject);
-    Clue clue = new Clue(plot, role);
-    clue.confirmMatch(subject, lead, time, place);
-    file.recordClue(clue);
-    
-    if (role == Plot.ROLE_TARGET) {
-      CaseFile forPlot = lead.base.leads.caseFor(plot);
-      for (Clue intent : intentClues(focus, lead)) forPlot.recordClue(intent);
-    }
-  }
-  //*/
   
   
   
   /**  Rendering, debug and interface methods-
     */
+  public String label() {
+    return label;
+  }
+  
+  
   public String toString() {
     StringBuffer s = new StringBuffer();
     s.append(label);
     if (timeStart == -1) s.append(" [T=?]");
     else s.append(" [T="+timeStart+"-"+(timeStart + hoursTaken)+"]");
     s.append(" ["+Lead.MEDIUM_DESC[medium]+"]");
-    
-    s.append(" [");
+    s.append(" ["+from+" -> "+goes+"] [");
     for (Element e : involved) {
       if (e.isPlace() || e.isRegion()) continue;
-      Place goes = goes(e);
-      s.append("\n  "+e);
-      if (goes != null) s.append(" -> "+goes);
+      s.append("\n    "+e);
     }
-    s.append("\n]");
+    s.append("\n  ]");
     
     return s.toString();
   }

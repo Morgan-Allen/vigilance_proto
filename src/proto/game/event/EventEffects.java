@@ -105,7 +105,7 @@ public class EventEffects implements Session.Saveable {
     this.forceRating      = 0;
     this.collateralRating = collateral;
     this.getawaysRating   = getaways;
-    deterEffect -= 5;
+    deterEffect -= getaways   * 5 ;
     trustEffect -= collateral * 10;
   }
   

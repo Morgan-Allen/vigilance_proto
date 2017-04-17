@@ -82,7 +82,7 @@ public class DefaultGame extends RunGame {
     world.council.bindToFaction(cityHall);
     
     Region at = world.regionFor(Regions.SECTOR09);
-    Place prison = at.setupFacility(Facilities.HIDEOUT, 2, cityHall, true);
+    Place prison = at.setupFacility(Facilities.LOUNGE, 2, cityHall, true);
     world.council.assignPrison(prison);
     
     //
@@ -175,7 +175,7 @@ public class DefaultGame extends RunGame {
     final Faction owns = Crooks.THE_MADE_MEN;
     final Batch <Base> hideouts = new Batch();
     final Person boss1 = new Person(Villains.MORETTI, world);
-    final Base base1 = new Base(Facilities.HIDEOUT, world, owns);
+    final Base base1 = new Base(Facilities.LOUNGE, world, owns);
     world.regionFor(Regions.SECTOR04).setAttached(base1, true);
     base1.setLeader(boss1);
     base1.finance.setSecretPercent(0);

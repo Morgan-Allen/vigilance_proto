@@ -192,7 +192,7 @@ public abstract class MapInsetView extends UINode {
       if (a != null && a.targetElement(p).region() == located) {
         visitors.include(p);
       }
-      else if (p.region() == located) {
+      else if (a == null && p.region() == located) {
         visitors.include(p);
       }
     }

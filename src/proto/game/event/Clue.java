@@ -243,11 +243,13 @@ public class Clue implements Session.Saveable {
     }
     
     if (isLocationClue()) {
+      if (! e.isPlace()) return false;
+      
       Region near = location.region();
       float dist = e.world().distanceBetween(near, e.region());
       
       if (location.isPlace() && nearRange == 0) {
-        if (e.place() != location) return false;
+        if (e != location) return false;
       }
       else if (dist > nearRange) {
         return false;

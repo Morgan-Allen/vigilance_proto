@@ -24,24 +24,23 @@ public class DebugPlotAfter extends RunGame {
     Base crooks = world.baseFor(Crooks.THE_MADE_MEN);
     Plot kidnap = CrimeTypes.TYPE_KIDNAP.initPlot(crooks);
     kidnap.fillAndExpand();
-    kidnap.printRoles();
     crooks.plots.assignRootPlot(kidnap);
     Step heist = kidnap.stepWithLabel("grab target");
     kidnap.advanceToStep(heist);
-
+    
     GameSettings.noTipoffs = true;
-    world.updateWorld(24);
     world.updateWorld(0);
     return world;
   }
   
   
-  protected void runWorldTests(World world, boolean afterLoad) {
+  protected boolean runTests(World world, boolean afterLoad, boolean suite) {
     GameSettings.noTipoffs = true;
     Plot plot = world.events.latestPlot();
-    if (plot != null) DebugPlotUtils.enterPlotDebugLoop(
-      world, plot, true, true, plot.scene(), plot.organiser()
+    if (plot != null) return DebugPlotUtils.enterPlotDebugLoop(
+      world, plot, ! suite, suite, plot.scene(), plot.organiser()
     );
+    return false;
   }
 }
 

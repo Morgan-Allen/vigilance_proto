@@ -35,7 +35,7 @@ public abstract class RunGame extends JFrame implements ActionListener {
         
         if (! game.attemptReload(game.savePath)) {
           game.world = game.setupWorld();
-          game.runWorldTests(game.world, false);
+          game.runTests(game.world, false, false);
         }
         
         Timer timer = new Timer(1000 / FRAME_RATE, game);
@@ -60,7 +60,7 @@ public abstract class RunGame extends JFrame implements ActionListener {
     this.world = (World) s.loaded()[0];
     if (world != null) {
       world.attachToGame(this, savePath);
-      this.runWorldTests(world, true);
+      this.runTests(world, true, false);
     }
     return true;
   }
@@ -108,8 +108,8 @@ public abstract class RunGame extends JFrame implements ActionListener {
   protected abstract World setupWorld();
   
   
-  protected void runWorldTests(World world, boolean afterLoad) {
-    return;
+  protected boolean runTests(World world, boolean afterLoad, boolean suite) {
+    return true;
   }
   
   

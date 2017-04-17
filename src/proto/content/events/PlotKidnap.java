@@ -6,6 +6,7 @@ import proto.game.person.*;
 import proto.game.world.*;
 import proto.util.*;
 import static proto.game.person.PersonStats.*;
+import static proto.game.event.PlotUtils.*;
 
 
 
@@ -13,8 +14,10 @@ public class PlotKidnap extends Plot {
   
   
   final public static Plot.Role
-    ROLE_TAILS       = new Plot.Role("role_tails"  , "Tails"  , PERP  ),
-    ROLE_RANSOMS     = new Plot.Role("role_ransoms", "Ransoms", VICTIM);
+    ROLE_TAILS   = new Plot.Role("role_tails"  , "Tails"  , PERP  ),
+    ROLE_GRABS   = new Plot.Role("role_grabs"  , "Grabs"  , PERP  ),
+    ROLE_RANSOMS = new Plot.Role("role_ransoms", "Ransoms", VICTIM),
+    ROLE_HOME    = new Plot.Role("role_home"   , "Home"   , VICTIM);
   
   boolean returnedHostage;
   
@@ -62,44 +65,47 @@ public class PlotKidnap extends Plot {
     //  Assign these elements their appropriate roles, along with the
     //  mastermind, hideout, organiser and tail:
     Series <Person> aides = PlotUtils.aidesOnRoster(this);
-    assignTarget(target, target.resides());
-    assignRole(ransoms, ransoms.resides(), ROLE_RANSOMS);
+    fillExpertRole(this, BRAINS  , aides, ROLE_ORGANISER);
+    fillExpertRole(this, REFLEXES, aides, ROLE_TAILS    );
+    fillExpertRole(this, MUSCLE  , aides, ROLE_GRABS    );
+    Place hideout = PlotUtils.chooseHideout(this, target.resides());
+    assignRole(ransoms.resides(), ROLE_HOME              );
+    assignRole(ransoms          , ROLE_RANSOMS, ROLE_HOME);
+    assignRole(hideout          , ROLE_HIDEOUT           );
+    assignTarget(target, target.resides(), ROLE_HIDEOUT);
     assignMastermind(base().leader(), base());
-    Place hideout = PlotUtils.chooseHideout(this, scene());
-    PlotUtils.fillExpertRole(this, BRAINS  , aides, ROLE_ORGANISER, hideout);
-    PlotUtils.fillExpertRole(this, REFLEXES, aides, ROLE_TAILS    , hideout);
     //
     //  Finally, queue up a sequence of steps to model preparation and
     //  communication among all the involved parties:
     Step.queueStep(
       "initial contacts", this,
-      ROLE_MASTERMIND, ROLE_ORGANISER, ROLE_TARGET,
-      Lead.MEDIUM_WIRE, 24, ROLE_TAILS
+      ROLE_MASTERMIND, ROLE_BASED, ROLE_ORGANISER, ROLE_HIDEOUT, ROLE_TARGET,
+      Lead.MEDIUM_WIRE, 24
     );
     Step.queueStep(
       "tailing target", this,
-      ROLE_TAILS, ROLE_TARGET, null,
+      ROLE_TAILS, ROLE_HIDEOUT, ROLE_TARGET, ROLE_SCENE, null,
       Lead.MEDIUM_SURVEIL, 24
     );
     Step.queueStep(
       "grab target", this,
-      ROLE_TAILS, ROLE_TARGET, null,
-      Lead.MEDIUM_ASSAULT, 24, ROLE_ORGANISER
+      ROLE_TAILS, ROLE_HIDEOUT, ROLE_TARGET, ROLE_SCENE, null,
+      Lead.MEDIUM_ASSAULT, 24, ROLE_GRABS
     );
     Step.queueStep(
       "deliver ransom", this,
-      ROLE_ORGANISER, ROLE_RANSOMS, ROLE_TARGET,
+      ROLE_ORGANISER, ROLE_HIDEOUT, ROLE_RANSOMS, ROLE_HOME, ROLE_TARGET,
       Lead.MEDIUM_WIRE, 24
     );
     Step.queueStep(
       "ransom paid", this,
-      ROLE_RANSOMS, ROLE_ORGANISER, ROLE_TARGET,
+      ROLE_RANSOMS, ROLE_HOME, ROLE_ORGANISER, ROLE_HIDEOUT, ROLE_TARGET,
       Lead.MEDIUM_WIRE, 24
     );
     Step.queueStep(
       "reports and payoffs", this,
-      ROLE_ORGANISER, ROLE_MASTERMIND, null,
-      Lead.MEDIUM_WIRE, 24, ROLE_TAILS
+      ROLE_ORGANISER, ROLE_HIDEOUT, ROLE_MASTERMIND, ROLE_BASED, null,
+      Lead.MEDIUM_WIRE, 24
     );
     return true;
   }
@@ -121,6 +127,7 @@ public class PlotKidnap extends Plot {
     //
     //  And once the ransom is paid, release them close to home:
     else if (step.hasLabel("ransom paid")) {
+      target.removeAssignment(this);
       target.resides().setAttached(target, true);
       target.setCaptive(false);
       Person ransomed = (Person) filling(ROLE_RANSOMS);
