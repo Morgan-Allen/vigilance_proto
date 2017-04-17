@@ -65,6 +65,16 @@
   blockSight = "false"
 />
 
+<prop
+  name       = "Blue Tile Floor"
+  ID         = "civic_blue_tile_floor"
+  sprite     = "floor_blue_tile.png"
+  wide       = "1"
+  high       = "1"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+  blockSight = "false"
+/>
 
 <prop
   name       = "Wall"
@@ -322,6 +332,86 @@
   blockLevel = "BLOCK_FULL"
   blockSight = "false"
 />
+
+<prop
+  name       = "Toilet"
+  ID         = "toilet"
+  sprite     = "toilet.png"
+  wide       = "1"
+  high       = "1"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "false"
+/>
+<prop
+  name       = "Pissoit"
+  ID         = "pissoir"
+  sprite     = "pissoir.png"
+  wide       = "1"
+  high       = "1"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "false"
+/>
+<prop
+  name       = "Sink"
+  ID         = "sink"
+  sprite     = "sink.png"
+  wide       = "3"
+  high       = "1"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "false"
+/>
+<prop
+  name       = "Sink With Towels"
+  ID         = "sink_with_towels"
+  sprite     = "sink_with_towels.png"
+  wide       = "4"
+  high       = "1"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "false"
+/>
+<prop
+  name       = "Papper towels"
+  ID         = "papper_towels"
+  sprite     = "papper_towels.png"
+  wide       = "1"
+  high       = "1"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "false"
+/>
+
+<scene
+  name   = "Toilets"
+  ID     = "bank_scene_toilets"
+  wide   = "6"
+  high   = "6"
+  wall   = "civic_wall"
+  door   = "civic_door"
+  window = "civic_window"
+  floor = "civic_blue_tile_floor"
+>
+  <grid
+    1 = "toilet"
+    2 = "pissoir"
+    3 = "sink"
+    4 = "sink_with_towels"
+    5 = "papper_towels"
+    6 = "bank_plant_1"
+  >
+    [-4   -   -   -   [-]_/1   -]_/1
+    [   .   .   .   .    ]
+    [_   _   _6   []_-/1s   ]_-/1s   _]-/1s
+    [3   .   .   []_/1   ]_/1    ]_/1
+    [   .   .   .   .    ]
+    [_6   _5s   _   _[]2   _]2   ]2
+
+  </grid>
+</scene>
+
 
 <scene
   name   = "Safe Vault"
@@ -617,5 +707,11 @@
     typeID = "bank_office_generated"
     wall   = "WALL_EXTERIOR"
     x = "0" y = "3" dir = "N"
+  />
+
+  <unit
+    typeID = "bank_scene_toilets"
+    wall   = "WALL_INTERIOR"
+    x = "3" y = "3" dir = "N"
   />
 </scene>
