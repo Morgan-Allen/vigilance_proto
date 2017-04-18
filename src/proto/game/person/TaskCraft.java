@@ -171,20 +171,14 @@ public class TaskCraft extends Task {
   protected void presentMessage() {
     final World world = base.world();
     final Task craftTask = this;
-    final Series <String> logs = world.events.extractLogInfo(this);
     StringBuffer s = new StringBuffer();
-
+    
     final Series <Person> active = active();
     for (Person p : active) {
       s.append(p.name());
       if (p != active.last()) s.append(" and ");
     }
     s.append(" crafted "+made+".");
-    
-    for (String info : logs) {
-      s.append("\n");
-      s.append(info);
-    }
 
     final MainView view = world.view();
     view.queueMessage(new MessageView(

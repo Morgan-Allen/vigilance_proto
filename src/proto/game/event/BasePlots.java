@@ -57,8 +57,9 @@ public class BasePlots {
   }
   
   
-  public void assignRootPlot(Plot master) {
+  public void assignRootPlot(Plot master, int delayHours) {
     this.rootPlot = master;
+    base.world().events.scheduleEvent(rootPlot, delayHours);
   }
   
   
@@ -68,14 +69,11 @@ public class BasePlots {
     }
     if (rootPlot == null || rootPlot.complete()) {
       rootPlot = generateNextPlot();
-      int time = base.world().timing.totalHours(), delay = (int) Rand.range(
+      int delay = (int) Rand.range(
         GameSettings.MIN_PLOT_THINKING_TIME,
         GameSettings.MAX_PLOT_THINKING_TIME
       );
-      if (rootPlot != null) rootPlot.setBeginTime(time + delay);
-    }
-    if (rootPlot != null && ! rootPlot.scheduled()) {
-      base.world().events.scheduleEvent(rootPlot);
+      if (rootPlot != null) assignRootPlot(rootPlot, delay);
     }
   }
   

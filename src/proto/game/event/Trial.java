@@ -69,6 +69,7 @@ public class Trial extends Event {
     }
     
     MessageUtils.presentSentenceMessage(world.view(), this);
+    completeEvent();
   }
   
   

@@ -171,7 +171,7 @@ public class PersonHealth {
   public void receiveStun(float stun) {
     this.stun += stun;
     checkState();
-    person.world().events.log(person+" suffered "+stun+" stun.");
+    person.log(person+" suffered "+stun+" stun.");
   }
   
   
@@ -179,14 +179,14 @@ public class PersonHealth {
     this.injury    += injury;
     this.totalHarm += injury;
     checkState();
-    person.world().events.log(person+" suffered "+injury+" injury.");
+    person.log(person+" suffered "+injury+" injury.");
   }
   
   
   public void incTotalHarm(float harm) {
     this.totalHarm += injury;
     checkState();
-    person.world().events.log(person+" suffered "+harm+" total harm.");
+    person.log(person+" suffered "+harm+" total harm.");
   }
   
   
@@ -199,7 +199,7 @@ public class PersonHealth {
     bleedRisk *= 1 - (attack.stunPercent.value() / 100f);
     if (Rand.num() < bleedRisk) {
       bleed = true;
-      person.world().events.log(person+" began bleeding.");
+      person.log(person+" began bleeding.");
     }
   }
   
@@ -236,7 +236,7 @@ public class PersonHealth {
     float stanchChance = healthLevel() + (STOP_BLEED_PERCENT / 100f);
     if (bleed && Rand.num() < stanchChance) {
       bleed = false;
-      person.world().events.log(person+" stopped bleeding.");
+      person.log(person+" stopped bleeding.");
     }
   }
   
@@ -297,15 +297,15 @@ public class PersonHealth {
     
     if (conscious && injury + stun > maxHealth) {
       this.conscious = false;
-      person.world().events.log(person+" fell unconscious!");
+      person.log(person+" fell unconscious!");
     }
     if (healthy() && totalHarm > (maxHealth * HP_BRUISE_PERCENT / 100f)) {
       setState(State.BRUISED);
-      person.world().events.log(person+" takes a beating!");
+      person.log(person+" takes a beating!");
     }
     if (alive() && injury > (maxHealth * HP_DEATH_PERCENT / 100f)) {
       setState(State.DECEASED);
-      person.world().events.log(person+" was killed!");
+      person.log(person+" was killed!");
     }
   }
   

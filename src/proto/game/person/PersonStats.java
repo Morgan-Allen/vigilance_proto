@@ -440,7 +440,7 @@ public class PersonStats {
       if (l.xpGained < xpNeed) break;
       l.xpGained -= xpNeed;
       setLevel(stat, l.level + 1, true);
-      person.world().events.log(person+" reached level "+l.level+" in "+stat);
+      person.log(person+" reached level "+l.level+" in "+stat);
     }
   }
 }

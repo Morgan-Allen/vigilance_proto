@@ -166,9 +166,7 @@ public class Region extends Element {
     */
   public void incLevel(Stat stat, float inc, boolean asCurrent) {
     Level l = this.statLevels[stat.ID];
-    final float oldL = l.level;
     setLevel(stat, l.level + inc, asCurrent);
-    if (oldL != l.current) recordChange(stat, oldL, l.current);
   }
   
   
@@ -401,17 +399,6 @@ public class Region extends Element {
     */
   public String toString() {
     return kind().name();
-  }
-  
-  
-  public void recordChange(Stat stat, float oldLevel, float newLevel) {
-    float inc = newLevel - oldLevel;
-    String desc = "";
-    if (inc > 0) desc += stat.name+" +"+inc;
-    else if (stat.oppName != null) desc += stat.oppName+" +"+(0 - inc);
-    else desc += stat.name+" -"+(0 - inc);
-    desc += ": "+kind();
-    world.events.log(desc, Events.EVENT_MAJOR);
   }
 }
 

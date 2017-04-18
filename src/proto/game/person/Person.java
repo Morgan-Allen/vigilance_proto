@@ -400,7 +400,15 @@ public class Person extends Element {
     Vec3D pos = exactPosition();
     view.renderSprite(pos.x + 0, pos.y + 0, 1, 1, 0, kind().sprite(), g);
   }
+  
+  
+  protected void log(String message) {
+    //  TODO:  Pipe this output to the view/debug window?
+    return;
+  }
 }
+
+
 
 
 

@@ -29,9 +29,9 @@ public class DebugSceneEffects extends RunGame {
     Plot kidnap = CrimeTypes.TYPE_KIDNAP.initPlot(crooks);
     kidnap.fillAndExpand();
     kidnap.printRoles();
-    crooks.plots.assignRootPlot(kidnap);
+    crooks.plots.assignRootPlot(kidnap, 0);
     Element target = kidnap.target();
-    Step heist = kidnap.stepWithLabel("heist");
+    Step heist = kidnap.stepWithLabel("grab target");
     
     Base  heroes = world.baseFor(Heroes.JANUS_INDUSTRIES);
     Lead  guard  = heroes.leads.leadFor(target, Lead.LEAD_SURVEIL_PERSON);
@@ -40,12 +40,50 @@ public class DebugSceneEffects extends RunGame {
     world.enterScene(scene);
     scene.onSceneCompletion(Scene.STATE_WON);
     
-    Trial trial = world.council.nextTrialFor(kidnap);
-    world.events.scheduleEvent(trial, 24);
-    
     return world;
   }
+  
+  
+  protected boolean runTests(World world, boolean afterLoad, boolean suite) {
+    I.say("\n\n\nEvaluating after-effects of combat scene...");
+    
+    Trial trial = world.events.latestTrial();
+    if (trial == null) {
+      I.say("  Trial was never scheduled!");
+      return false;
+    }
+    
+    while (! trial.complete()) {
+      world.updateWorld(48);
+    }
+    
+    I.say("  Trial concluded...");
+    for (Person p : trial.accused()) {
+      if (! p.isCaptive()) {
+        I.say("  "+p+" was released.");
+      }
+      else {
+        int sentence = world.council.sentenceDuration(p);
+        I.say("  "+p+" is serving a "+sentence+" day sentence.");
+      }
+    }
+    
+    return true;
+  }
+  
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

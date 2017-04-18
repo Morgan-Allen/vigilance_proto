@@ -24,10 +24,6 @@ public class Events {
   List <Event> active = new List();
   List <Event> past   = new List();
   
-  Assignment currentAction = null;
-  static class LogEntry { String info; Assignment action; int priority; }
-  List <LogEntry> actionLog = new List();
-  
   
   Events(World world) {
     this.world = world;
@@ -84,14 +80,17 @@ public class Events {
   public void scheduleEvent(Event event) {
     int time = world.timing.totalHours();
     if (event.timeBegins() == -1 || event.timeBegins() < time) {
-      event.setBeginTime(time);
+      event.setBeginTime(time, true);
+    }
+    if (! event.scheduled()) {
+      event.setBeginTime(event.timeBegins(), true);
     }
     coming.include(event);
   }
   
   
   public void scheduleEvent(Event event, int delayHours) {
-    event.setBeginTime(world.timing.totalHours() + delayHours);
+    event.setBeginTime(world.timing.totalHours() + delayHours, true);
     scheduleEvent(event);
   }
   
@@ -104,51 +103,29 @@ public class Events {
   
   
   public Plot latestPlot() {
-    for (Event e : active) if (e.isPlot()) return (Plot) e;
-    return null;
+    Pick <Event> pick = new Pick();
+    for (Event e : coming) if (e.isPlot()) pick.compare(e, e.timeBegins());
+    for (Event e : active) if (e.isPlot()) pick.compare(e, e.timeBegins());
+    return (Plot) pick.result();
   }
   
   
-  
-  /**  Logging background events-
-    */
-  public void log(String info, int priority) {
-    if (currentAction == null) return;
-    final LogEntry entry = new LogEntry();
-    entry.action   = currentAction;
-    entry.info     = info;
-    entry.priority = priority;
-    actionLog.add(entry);
-    
-    I.say("\nRECORDING IN LOG: "+info);
-    I.say("  Current action: "+currentAction);
+  public Trial latestTrial() {
+    Pick <Event> pick = new Pick();
+    for (Event e : coming) if (e.isTrial()) pick.compare(e, e.timeBegins());
+    for (Event e : active) if (e.isTrial()) pick.compare(e, e.timeBegins());
+    return (Trial) pick.result();
   }
   
-  
-  public void log(String info) {
-    log(info, EVENT_NORMAL);
-  }
-  
-  
-  //  TODO:  Get rid of these.
-  //*
-  public Series <String> extractLogInfo(Assignment action, int minPriority) {
-    final Batch <String> extracts = new Batch();
-    
-    for (LogEntry entry : actionLog) {
-      if (entry.action == action) {
-        actionLog.remove(entry);
-        if (entry.priority >= minPriority) extracts.add(entry.info);
-      }
-    }
-    return extracts;
-  }
-  
-  
-  public Series <String> extractLogInfo(Assignment action) {
-    return extractLogInfo(action, EVENT_NORMAL);
-  }
-  //*/
 }
+
+
+
+
+
+
+
+
+
 
 

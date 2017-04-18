@@ -30,7 +30,7 @@ public class DebugScene extends RunGame {
     Plot kidnap = CrimeTypes.TYPE_KIDNAP.initPlot(crooks);
     kidnap.fillAndExpand();
     kidnap.printRoles();
-    crooks.plots.assignRootPlot(kidnap);
+    crooks.plots.assignRootPlot(kidnap, 0);
     
     Base heroes = world.baseFor(Heroes.JANUS_INDUSTRIES);
     Lead guarding = heroes.leads.leadFor(

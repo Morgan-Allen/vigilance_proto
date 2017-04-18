@@ -25,7 +25,7 @@ public class DebugPlotBefore extends RunGame {
     Base crooks = world.baseFor(Crooks.THE_MADE_MEN);
     Plot kidnap = CrimeTypes.TYPE_KIDNAP.initPlot(crooks);
     kidnap.fillAndExpand();
-    crooks.plots.assignRootPlot(kidnap);
+    crooks.plots.assignRootPlot(kidnap, 0);
     Person organiser = kidnap.organiser();
     Place  hideout   = kidnap.hideout  ();
     

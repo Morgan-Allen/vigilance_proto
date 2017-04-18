@@ -20,7 +20,7 @@ public abstract class Event implements Session.Saveable, Assignment {
   
   final World world;
   int timeBegins = -1;
-  boolean complete;
+  boolean scheduled, complete;
   
   List <Person> involved = new List();
   List <EventEffects> allEffects = new List();
@@ -37,6 +37,7 @@ public abstract class Event implements Session.Saveable, Assignment {
     type       = (EventType) s.loadObject();
     world      = (World    ) s.loadObject();
     timeBegins = s.loadInt ();
+    scheduled  = s.loadBool();
     complete   = s.loadBool();
     s.loadObjects(involved  );
     s.loadObjects(allEffects);
@@ -47,6 +48,7 @@ public abstract class Event implements Session.Saveable, Assignment {
     s.saveObject(type      );
     s.saveObject(world     );
     s.saveInt   (timeBegins);
+    s.saveBool  (scheduled );
     s.saveBool  (complete  );
     s.saveObjects(involved  );
     s.saveObjects(allEffects);
@@ -71,6 +73,11 @@ public abstract class Event implements Session.Saveable, Assignment {
   }
   
   
+  public boolean isTrial() {
+    return this instanceof Trial;
+  }
+  
+  
   
   /**  Assigning perps-
     */
@@ -92,8 +99,9 @@ public abstract class Event implements Session.Saveable, Assignment {
   
   /**  Regular updates and life cycle:
     */
-  public void setBeginTime(int time) {
+  public void setBeginTime(int time, boolean scheduled) {
     this.timeBegins = time;
+    this.scheduled = scheduled;
   }
   
   
@@ -103,7 +111,7 @@ public abstract class Event implements Session.Saveable, Assignment {
   
   
   public boolean scheduled() {
-    return timeBegins >= 0;
+    return scheduled;
   }
   
   
@@ -139,10 +147,7 @@ public abstract class Event implements Session.Saveable, Assignment {
   
   
   public void completeAfterScene(Scene scene, EventEffects effects) {
-    for (Person perp : involved) perp.removeAssignment(this);
-    involved.clear();
-    complete = true;
-    world.events.closeEvent(this);
+    completeEvent();
   }
   
   
