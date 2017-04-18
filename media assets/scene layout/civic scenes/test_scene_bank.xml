@@ -306,9 +306,9 @@
   sprite     = "cubicles.png"
   wide       = "4"
   high       = "4"
-  subtype    = "SUBTYPE_WALLING"
+  subtype    = "SUBTYPE_FURNISH"
   blockLevel = "BLOCK_FULL"
-  blockSight = "false"
+  blockSight = "true"
 />
 
 <prop
@@ -317,7 +317,7 @@
   sprite     = "water.png"
   wide       = "1"
   high       = "1"
-  subtype    = "SUBTYPE_WALLING"
+  subtype    = "SUBTYPE_FURNISH"
   blockLevel = "BLOCK_FULL"
   blockSight = "false"
 />
@@ -328,7 +328,7 @@
   sprite     = "printer.png"
   wide       = "1"
   high       = "1"
-  subtype    = "SUBTYPE_WALLING"
+  subtype    = "SUBTYPE_FURNISH"
   blockLevel = "BLOCK_FULL"
   blockSight = "false"
 />
@@ -339,18 +339,18 @@
   sprite     = "toilet.png"
   wide       = "1"
   high       = "1"
-  subtype    = "SUBTYPE_WALLING"
+  subtype    = "SUBTYPE_FURNISH"
   blockLevel = "BLOCK_FULL"
   blockSight = "false"
 />
 <prop
-  name       = "Pissoit"
-  ID         = "pissoir"
-  sprite     = "pissoir.png"
+  name       = "Urinal"
+  ID         = "urinal"
+  sprite     = "urinal.png"
   wide       = "1"
   high       = "1"
-  subtype    = "SUBTYPE_WALLING"
-  blockLevel = "BLOCK_FULL"
+  subtype    = "SUBTYPE_FURNISH"
+  blockLevel = "BLOCK_PARTIAL"
   blockSight = "false"
 />
 <prop
@@ -359,7 +359,7 @@
   sprite     = "sink.png"
   wide       = "3"
   high       = "1"
-  subtype    = "SUBTYPE_WALLING"
+  subtype    = "SUBTYPE_FURNISH"
   blockLevel = "BLOCK_FULL"
   blockSight = "false"
 />
@@ -369,19 +369,29 @@
   sprite     = "sink_with_towels.png"
   wide       = "4"
   high       = "1"
-  subtype    = "SUBTYPE_WALLING"
+  subtype    = "SUBTYPE_FURNISH"
   blockLevel = "BLOCK_FULL"
   blockSight = "false"
 />
 <prop
-  name       = "Papper towels"
-  ID         = "papper_towels"
-  sprite     = "papper_towels.png"
+  name       = "Paper towels"
+  ID         = "paper_towels"
+  sprite     = "paper_towels.png"
   wide       = "1"
   high       = "1"
-  subtype    = "SUBTYPE_WALLING"
-  blockLevel = "BLOCK_FULL"
+  subtype    = "SUBTYPE_DETAIL"
+  blockLevel = "BLOCK_NONE"
   blockSight = "false"
+/>
+<prop
+  name       = "Toilet Stall Door"
+  ID         = "toilet_stall_door"
+  sprite     = "wall_thin_door.png"
+  wide       = "1"
+  high       = "0"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+  blockSight = "true"
 />
 
 <scene
@@ -392,23 +402,32 @@
   wall   = "civic_wall"
   door   = "civic_door"
   window = "civic_window"
-  floor = "civic_blue_tile_floor"
+  floor  = "civic_blue_tile_floor"
 >
   <grid
+    1 = "toilet_stall_door"
+  >
+    [-  -   -  -   [1s-] 1s-]
+    [   .   .  .     .      ]
+    [_  _   _  [1_]  1_]  1_]
+    [   .   .  [1s]  1s]  1s]
+    [   .   .  .     .      ]
+    [_  _   _  [_]    _]   _]
+  </grid>
+  <grid
     1 = "toilet"
-    2 = "pissoir"
+    2 = "urinal"
     3 = "sink"
     4 = "sink_with_towels"
-    5 = "papper_towels"
+    5 = "paper_towels"
     6 = "bank_plant_1"
   >
-    [-4   -   -   -   [-]_/1   -]_/1
-    [   .   .   .   .    ]
-    [_   _   _6   []_-/1s   ]_-/1s   _]-/1s
-    [3   .   .   []_/1   ]_/1    ]_/1
-    [   .   .   .   .    ]
-    [_6   _5s   _   _[]2   _]2   ]2
-
+    4  .  .  .  1  1
+    .  .  .  .  .  .
+    .  .  6  1s 1s 1s
+    3  .  .  1  1  1
+    .  .  .  .  .  .
+    6  5s .  2  2  2
   </grid>
 </scene>
 
@@ -648,28 +667,6 @@
 </scene>
 
 
-<scene
-  name      = "Bank Scene Insertion"
-  ID        = "bank_scene_insertion"
-  unitSize  = "6"
-  unitsWide = "1"
-  unitsHigh = "2"
-  wall      = "civic_wall"
-  door      = "civic_door"
-  window    = "civic_window"
->
-  <unit
-    typeID = "bank_scene_general_seating"
-    wall   = "WALL_NONE"
-    x = "0" y = "0" dir = "N"
-  />
-  <unit
-    typeID = "bank_scene_teller_screens"
-    wall   = "WALL_NONE"
-    x = "0" y = "1" dir = "N"
-  />
-</scene>
-
 
 <scene
   name      = "Bank Scene Assembled"
@@ -697,10 +694,16 @@
     wall   = "WALL_EXTERIOR"
     x = "2" y = "0" dir = "N"
   />
+  
   <unit
-    typeID = "bank_scene_insertion"
-    wall   = "WALL_EXTERIOR"
+    typeID = "bank_scene_general_seating"
+    wall   = "WALL_NONE"
     x = "2" y = "1" dir = "N"
+  />
+  <unit
+    typeID = "bank_scene_teller_screens"
+    wall   = "WALL_NONE"
+    x = "2" y = "2" dir = "N"
   />
 
   <unit

@@ -22,21 +22,17 @@ public abstract class RunGame extends JFrame implements ActionListener {
   
   
   protected static void runGame(final RunGame game, final String savePath) {
-    EventQueue.invokeLater(new Runnable() {
-      public void run() {
-        game.savePath = savePath;
-        game.setupAssets();
-        game.initUI();
-
-        if (! game.attemptReload(game.savePath)) {
-          game.world = game.setupWorld();
-        }
-        
-        Timer timer = new Timer(1000 / FRAME_RATE, game);
-        timer.start();
-        game.setVisible(true);
-      }
-    });
+    game.savePath = savePath;
+    game.setupAssets();
+    game.initUI();
+    
+    if (! game.attemptReload(game.savePath)) {
+      game.world = game.setupWorld();
+    }
+    
+    Timer timer = new Timer(1000 / FRAME_RATE, game);
+    timer.start();
+    game.setVisible(true);
   }
   
   
