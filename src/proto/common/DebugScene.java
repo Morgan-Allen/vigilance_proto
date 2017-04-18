@@ -27,14 +27,14 @@ public class DebugScene extends RunGame {
     DefaultGame.initDefaultWorld(world);
     
     Base crooks = world.baseFor(Crooks.THE_MADE_MEN);
-    Plot kidnap = CrimeTypes.TYPE_KIDNAP.initPlot(crooks);
-    kidnap.fillAndExpand();
-    kidnap.printRoles();
-    crooks.plots.assignRootPlot(kidnap, 0);
+    Plot plot = CrimeTypes.TYPE_KIDNAP.initPlot(crooks);
+    plot.fillAndExpand();
+    plot.printRoles();
+    crooks.plots.assignRootPlot(plot, 0);
     
     Base heroes = world.baseFor(Heroes.JANUS_INDUSTRIES);
     Lead guarding = heroes.leads.leadFor(
-      kidnap.target(), Lead.LEAD_SURVEIL_PERSON
+      plot.target(), Lead.LEAD_SURVEIL_PERSON
     );
     
     int ID = 0;
@@ -48,9 +48,9 @@ public class DebugScene extends RunGame {
       ID++;
     }
     
-    Step heist = kidnap.stepWithLabel("grab target");
-    kidnap.advanceToStep(heist);
-    Scene scene = kidnap.generateScene(heist, kidnap.target(), guarding);
+    Step heist = plot.mainHeist();
+    plot.advanceToStep(heist);
+    Scene scene = plot.generateScene(heist, plot.target(), guarding);
     world.enterScene(scene);
     
     return world;

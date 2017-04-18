@@ -27,7 +27,7 @@ public abstract class Plot extends Event {
     final public String name;
     final public String category;
     
-    public Role(String ID, String name, String category) {
+    Role(String ID, String name, String category) {
       super(ROLES_INDEX, ID);
       this.name = name;
       this.category = category;
@@ -54,6 +54,10 @@ public abstract class Plot extends Event {
     }
   }
   
+  public static Role role(String ID, String name, String category) {
+    return new Role(ID, name, category);
+  }
+  
   final public static Role
     ROLE_MASTERMIND = new Role("role_mastermind", "Mastermind", PERP  ),
     ROLE_BASED      = new Role("role_based"     , "Based"     , PERP  ),
@@ -70,8 +74,22 @@ public abstract class Plot extends Event {
   
   int spookLevel = 0;
   List <RoleEntry> entries = new List();
-  List <Step     > steps   = new List();
+  
+  private class RoleEntry {
+    
+    Role role, location;
+    Element element;
+    Plot supplies;
+    
+    public String toString() {
+      return element+" ("+role+")";
+    }
+  }
+  
+  
+  List <Step> steps = new List();
   Step current = null;
+  int stepTimes[];
   
   
   protected Plot(PlotType type, Base base) {
@@ -89,13 +107,15 @@ public abstract class Plot extends Event {
     for (int n = s.loadInt(); n-- > 0;) {
       RoleEntry entry = new RoleEntry();
       entry.role     = (Plot.Role) s.loadObject();
-      entry.placing  = (Plot.Role) s.loadObject();
+      entry.location = (Plot.Role) s.loadObject();
       entry.element  = (Element  ) s.loadObject();
       entry.supplies = (Plot     ) s.loadObject();
       entries.add(entry);
     }
     s.loadObjects(steps);
     current = (Step) s.loadObject();
+    stepTimes = new int[steps.size()];
+    for (int i = 0; i < steps.size(); i++) stepTimes[i] = s.loadInt();
   }
   
   
@@ -108,12 +128,13 @@ public abstract class Plot extends Event {
     s.saveInt(entries.size());
     for (RoleEntry entry : entries) {
       s.saveObject(entry.role    );
-      s.saveObject(entry.placing );
+      s.saveObject(entry.location);
       s.saveObject(entry.element );
       s.saveObject(entry.supplies);
     }
     s.saveObjects(steps);
     s.saveObject(current);
+    for (int t : stepTimes) s.saveInt(t);
   }
   
   
@@ -121,14 +142,22 @@ public abstract class Plot extends Event {
   /**  Queueing and executing sub-events and generating clues for
     *  investigation-
     */
+  protected void queueSteps(Step... steps) {
+    this.steps     = new List();
+    this.stepTimes = new int[steps.length];
+    this.current   = null;
+    Visit.appendTo(this.steps, (Object[]) steps);
+    for (int i = steps.length; i-- > 0;) stepTimes[i] = -1;
+  }
+  
+  
   public Step currentStep() {
     return current;
   }
   
   
-  public Step stepWithLabel(String label) {
-    for (Step s : steps) if (label.equals(s.label)) return s;
-    return null;
+  public Series <Step> allSteps() {
+    return steps;
   }
   
   
@@ -138,14 +167,140 @@ public abstract class Plot extends Event {
   }
   
   
-  public Series <Step> allSteps() {
-    return steps;
+  public int startTime(Step step) {
+    return stepTimes[steps.indexOf(step)];
+  }
+  
+
+  public boolean begun(Step step) {
+    return startTime(step) >= 0;
+  }
+  
+  
+  public boolean complete(Step step) {
+    if (! begun(step)) return false;
+    int time = base.world().timing.totalHours();
+    return time >= startTime(step) + step.hoursTaken;
+  }
+  
+  
+  public int timeScheduled(Step step) {
+    if (current == null) return -1;
+    int time = -1;
+    for (Step s : steps) {
+      if (time == -1) time = startTime(step);
+      time += s.hoursTaken;
+      if (s == step) break;
+    }
+    return time;
+  }
+  
+  
+  public int tense(Step step) {
+    int start = startTime(step);
+    if (start == -1) return Lead.TENSE_NONE;
+    int time = base.world().timing.totalHours();
+    boolean begun = start >= 0;
+    boolean done = time >= (start + step.hoursTaken);
+    if (begun) return done ? Lead.TENSE_AFTER : Lead.TENSE_DURING;
+    return Lead.TENSE_BEFORE;
+  }
+  
+  
+  public Series <Element> involved(Step step) {
+    Batch <Element> all = new Batch();
+    for (Role r : step.involved) all.add(filling(r));
+    return all;
+  }
+  
+  
+  public Place from(Step step) {
+    return location(step.from);
+  }
+  
+  
+  public Place goes(Step step) {
+    return location(step.goes);
+  }
+  
+  
+  public Place goes(Person p, Step step) {
+    Role role = roleFor(p);
+    if (Visit.arrayIncludes(step.involved, role)) {
+      if (step.isWired()) {
+        return (role == step.subject) ? goes(step) : from(step);
+      }
+      else {
+        return goes(step);
+      }
+    }
+    return location(role);
+  }
+  
+  
+  
+  /**  General update cycle and associated methods-
+    */
+  public void updateEvent() {
+    for (RoleEntry entry : entries) if (entry.supplies != null) {
+      if (! entry.supplies.hasBegun()) {
+        world.events.scheduleEvent(entry.supplies);
+      }
+    }
+    if (! possible()) return;
+    
+    boolean verbose = GameSettings.eventsVerbose;
+    
+    if (current == null || complete(current)) {
+      int time = world.timing.totalHours();
+      if (verbose) {
+        I.say("\n\n\nUpdating plot: "+this);
+      }
+      
+      if (current != null) {
+        if (verbose) {
+          I.say("  Ended step: "+current.label());
+        }
+        checkForTipoffs(current, false, true);
+        boolean success = checkSuccess(current);
+        onCompletion(current, success);
+      }
+      if (current != steps.last()) {
+        int nextIndex = current == null ? 0 : (steps.indexOf(current) + 1);
+        current = steps.atIndex(nextIndex);
+        stepTimes[steps.indexOf(current)] = time;
+        checkForTipoffs(current, true, false);
+        if (verbose) {
+          I.say("  Began step: "+current.label());
+        }
+      }
+      else {
+        if (verbose) {
+          I.say("  Plot completed.");
+        }
+        completeEvent();
+      }
+      
+      for (Element e : involved(current)) if (e.isPerson()) {
+        ((Person) e).addAssignment(this);
+      }
+      for (Person p : assigned()) {
+        Place goes = goes(p, current);
+        if (goes != null) goes.setAttached(p, true);
+      }
+      
+      if (verbose) {
+        I.say("  Current Time: "+time);
+        I.say("Current Step: "+current);
+        printLocations();
+      }
+    }
   }
   
   
   public void advanceToStep(Step step) {
     current = step;
-    current.timeStart = world.timing.totalHours();
+    stepTimes[steps.indexOf(step)] = world.timing.totalHours();
     printSteps();
   }
   
@@ -169,104 +324,19 @@ public abstract class Plot extends Event {
   }
   
   
-  public void updateEvent() {
-    for (RoleEntry entry : entries) if (entry.supplies != null) {
-      if (! entry.supplies.hasBegun()) {
-        world.events.scheduleEvent(entry.supplies);
-      }
-    }
-    if (! possible()) return;
-    
-    boolean verbose = GameSettings.eventsVerbose;
-    
-    if (current == null || current.complete()) {
-      int time = world.timing.totalHours();
-      if (verbose) {
-        I.say("\n\n\nUpdating plot: "+this);
-      }
-      
-      if (current != null) {
-        if (verbose) {
-          I.say("  Ended step: "+current.label);
-        }
-        checkForTipoffs(current, false, true);
-        boolean success = checkSuccess(current);
-        onCompletion(current, success);
-      }
-      if (current != steps.last()) {
-        int nextIndex = current == null ? 0 : (steps.indexOf(current) + 1);
-        current = steps.atIndex(nextIndex);
-        current.timeStart = time;
-        checkForTipoffs(current, true, false);
-        if (verbose) {
-          I.say("  Began step: "+current.label);
-        }
-      }
-      else {
-        if (verbose) {
-          I.say("  Plot completed.");
-        }
-        completeEvent();
-      }
-
-      for (Element e : current.involved()) if (e.isPerson()) {
-        ((Person) e).addAssignment(this);
-      }
-      for (Person p : assigned()) {
-        Place goes = goes(p);
-        if (goes != null) goes.setAttached(p, true);
-      }
-      
-      if (verbose) {
-        I.say("  Current Time: "+time);
-        I.say("Current Step: "+current);
-        printLocations();
-      }
-    }
-  }
-  
-  
-  public Place goes(Person p) {
-    if (current != null && Visit.arrayIncludes(current.involved(), p)) {
-      if (Lead.isWired(current.medium)) {
-        if (p == current.subject) return current.goes;
-        else                      return current.from;
-      }
-      else {
-        return current.goes;
-      }
-    }
-    
-    RoleEntry entry = entryFor(p, null);
-    return entry == null ? null : (Place) filling(entry.placing);
-  }
-  
-  
   
   /**  Utility methods for assigning roles, fulfilling needs and evaluating
     *  possible targets-
     */
-  private class RoleEntry {
-    
-    Role role, placing;
-    Element element;
-    Plot supplies;
-    
-    public String toString() {
-      return element+" ("+role+")";
-    }
-  }
-  
-  
   public void assignRole(
-    Element element, Role role, Role placing
+    Element element, Role role, Role location
   ) {
     RoleEntry match = entryFor(element, role);
     if (match == null) entries.add(match = new RoleEntry());
     
-    match.role     = role   ;
-    match.placing  = placing;
-    match.element  = element;
+    match.role     = role    ;
+    match.location = location;
+    match.element  = element ;
   }
   
   
@@ -304,7 +374,8 @@ public abstract class Plot extends Event {
   
   
   public Element targetElement(Person p) {
-    return goes(p);
+    if (current == null) return location(roleFor(p));
+    return goes(p, current);
   }
   
   
@@ -341,6 +412,14 @@ public abstract class Plot extends Event {
   public Element filling(Role role) {
     RoleEntry entry = entryFor(null, role);
     return entry == null ? null : entry.element;
+  }
+  
+  
+  public Place location(Role role) {
+    RoleEntry entry = entryFor(null, role);
+    Element location = entry == null ? null : filling(entry.location);
+    if (location == null || ! location.isPlace()) return null;
+    return (Place) location;
   }
   
   
@@ -423,8 +502,8 @@ public abstract class Plot extends Event {
     */
   protected void checkForTipoffs(Step step, boolean begins, boolean ends) {
     
-    Element focus     = (Element) Rand.pickFrom(step.involved());
-    Role    focusRole = roleFor(focus);
+    Role    focusRole = (Role) Rand.pickFrom(step.involved);
+    Element focus     = filling(focusRole);
     Place   at        = focus.place();
     float   trust     = at.region().currentValue(Region.TRUST);
     float   tipChance = trust / (10f * (1 + base.organisationRank(focus)));

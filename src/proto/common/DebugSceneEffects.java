@@ -31,7 +31,7 @@ public class DebugSceneEffects extends RunGame {
     kidnap.printRoles();
     crooks.plots.assignRootPlot(kidnap, 0);
     Element target = kidnap.target();
-    Step heist = kidnap.stepWithLabel("grab target");
+    Step heist = kidnap.mainHeist();
     
     Base  heroes = world.baseFor(Heroes.JANUS_INDUSTRIES);
     Lead  guard  = heroes.leads.leadFor(target, Lead.LEAD_SURVEIL_PERSON);

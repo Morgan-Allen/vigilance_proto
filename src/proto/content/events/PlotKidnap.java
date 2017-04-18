@@ -14,10 +14,42 @@ public class PlotKidnap extends Plot {
   
   
   final public static Plot.Role
-    ROLE_TAILS   = new Plot.Role("role_tails"  , "Tails"  , PERP  ),
-    ROLE_GRABS   = new Plot.Role("role_grabs"  , "Grabs"  , PERP  ),
-    ROLE_RANSOMS = new Plot.Role("role_ransoms", "Ransoms", VICTIM),
-    ROLE_HOME    = new Plot.Role("role_home"   , "Home"   , VICTIM);
+    ROLE_TAILS   = Plot.role("role_tails"  , "Tails"  , PERP  ),
+    ROLE_GRABS   = Plot.role("role_grabs"  , "Grabs"  , PERP  ),
+    ROLE_RANSOMS = Plot.role("role_ransoms", "Ransoms", VICTIM),
+    ROLE_HOME    = Plot.role("role_home"   , "Home"   , VICTIM);
+  
+  final public static Step
+    STEP_CONTACTS = Step.stepWith(
+      "step_initial_contacts", "Initial Contacts",
+      ROLE_MASTERMIND, ROLE_BASED, ROLE_ORGANISER, ROLE_HIDEOUT, ROLE_TARGET,
+      Lead.MEDIUM_WIRE, 24
+    ),
+    STEP_TAILING = Step.stepWith(
+      "step_tailing_target", "Tailing Target",
+      ROLE_TAILS, ROLE_HIDEOUT, ROLE_TARGET, ROLE_SCENE, null,
+      Lead.MEDIUM_SURVEIL, 24
+    ),
+    STEP_GRABS = Step.stepWith(
+      "step_grab_target", "Grab Target",
+      ROLE_TAILS, ROLE_HIDEOUT, ROLE_TARGET, ROLE_SCENE, null,
+      Lead.MEDIUM_ASSAULT, 24, ROLE_GRABS
+    ),
+    STEP_RANSOM_DEMAND = Step.stepWith(
+      "step_ransom_demand", "Ransom Demand",
+      ROLE_ORGANISER, ROLE_HIDEOUT, ROLE_RANSOMS, ROLE_HOME, ROLE_TARGET,
+      Lead.MEDIUM_WIRE, 24
+    ),
+    STEP_RANDOM_PAID = Step.stepWith(
+      "step_ransom_paid", "Ransom Paid",
+      ROLE_RANSOMS, ROLE_HOME, ROLE_ORGANISER, ROLE_HIDEOUT, ROLE_TARGET,
+      Lead.MEDIUM_WIRE, 24
+    ),
+    STEP_REPORT = Step.stepWith(
+      "step_reports_and_payoffs", "Reports And Payoffs",
+      ROLE_ORGANISER, ROLE_HIDEOUT, ROLE_MASTERMIND, ROLE_BASED, null,
+      Lead.MEDIUM_WIRE, 24
+    );
   
   boolean returnedHostage;
   
@@ -75,37 +107,14 @@ public class PlotKidnap extends Plot {
     assignTarget(target, target.resides(), ROLE_HIDEOUT);
     assignMastermind(base().leader(), base());
     //
-    //  Finally, queue up a sequence of steps to model preparation and
-    //  communication among all the involved parties:
-    Step.queueStep(
-      "initial contacts", this,
-      ROLE_MASTERMIND, ROLE_BASED, ROLE_ORGANISER, ROLE_HIDEOUT, ROLE_TARGET,
-      Lead.MEDIUM_WIRE, 24
-    );
-    Step.queueStep(
-      "tailing target", this,
-      ROLE_TAILS, ROLE_HIDEOUT, ROLE_TARGET, ROLE_SCENE, null,
-      Lead.MEDIUM_SURVEIL, 24
-    );
-    Step.queueStep(
-      "grab target", this,
-      ROLE_TAILS, ROLE_HIDEOUT, ROLE_TARGET, ROLE_SCENE, null,
-      Lead.MEDIUM_ASSAULT, 24, ROLE_GRABS
-    );
-    Step.queueStep(
-      "deliver ransom", this,
-      ROLE_ORGANISER, ROLE_HIDEOUT, ROLE_RANSOMS, ROLE_HOME, ROLE_TARGET,
-      Lead.MEDIUM_WIRE, 24
-    );
-    Step.queueStep(
-      "ransom paid", this,
-      ROLE_RANSOMS, ROLE_HOME, ROLE_ORGANISER, ROLE_HIDEOUT, ROLE_TARGET,
-      Lead.MEDIUM_WIRE, 24
-    );
-    Step.queueStep(
-      "reports and payoffs", this,
-      ROLE_ORGANISER, ROLE_HIDEOUT, ROLE_MASTERMIND, ROLE_BASED, null,
-      Lead.MEDIUM_WIRE, 24
+    //  And last but not least, queue up the needed steps:
+    queueSteps(
+      STEP_CONTACTS,
+      STEP_TAILING,
+      STEP_GRABS,
+      STEP_RANSOM_DEMAND,
+      STEP_RANDOM_PAID,
+      STEP_REPORT
     );
     return true;
   }

@@ -59,7 +59,7 @@ public class DebugPlotUtils {
     Plot     plot    = world.events.latestPlot();
     int      time    = world.timing.totalHours();
     Step     current = plot.currentStep();
-    Place    place   = current.goes();
+    Place    place   = plot.goes(current);
     CaseFile file    = played.leads.caseFor(plot);
     
     boolean recordCorrect = true;
@@ -92,7 +92,7 @@ public class DebugPlotUtils {
       if (lead.type.medium == Lead.MEDIUM_ASSAULT){
         continue;
       }
-      if (lead.canDetect(current, current.tense(), plot, time)) {
+      if (lead.canDetect(current, plot.tense(current), plot, time)) {
         toFollow.compare(lead, Rand.num() + 0.5f);
       }
     }
@@ -104,8 +104,8 @@ public class DebugPlotUtils {
     followed.setResult = 0.5f;
     
     Batch <Clue> possible = new Batch();
-    for (Element e : current.involved()) {
-      Visit.appendTo(possible, current.possibleClues(e, followed));
+    for (Element e : plot.involved(current)) {
+      Visit.appendTo(possible, current.possibleClues(plot, e, followed));
     }
     for (Person agent : played.roster()) {
       agent.addAssignment(followed);
@@ -181,7 +181,7 @@ public class DebugPlotUtils {
     loop: while (! plot.complete()) {
       int  time    = world.timing.totalHours();
       Step doing   = plot.currentStep();
-      int  tenseDo = doing == null ? Lead.TENSE_NONE : doing.tense();
+      int  tenseDo = doing == null ? Lead.TENSE_NONE : plot.tense(doing);
       
       if (concise || verbose) {
         I.say("\n\n\nClues acquired:");
@@ -242,8 +242,9 @@ public class DebugPlotUtils {
           }
           float numDetects = 0, numSteps = plot.allSteps().size();
           for (Step step : plot.allSteps()) {
-            if (lead.canDetect(step, step.tense(), plot, time)) {
-              if (step.tense() == Lead.TENSE_DURING) numDetects += numSteps;
+            int tense = plot.tense(step);
+            if (lead.canDetect(step, tense, plot, time)) {
+              if (tense == Lead.TENSE_DURING) numDetects += numSteps;
               else numDetects++;
             }
           }

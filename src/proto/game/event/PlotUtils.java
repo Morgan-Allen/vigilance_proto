@@ -131,21 +131,22 @@ public class PlotUtils {
   public static Scene generateHeistScene(
     Plot plot, Step step, Element focus, Task lead
   ) {
-    if (! Visit.arrayIncludes(step.involved(), focus)) {
-      I.say("Step: "+step+" does not involve: "+focus);
-      return null;
-    }
-    
     Base  base  = plot.base();
     World world = base.world();
     Place place = focus.place();
+    Series <Element> involved = plot.involved(step);
+    
+    if (! involved.includes(focus)) {
+      I.say("Step: "+step+" does not involve: "+focus);
+      return null;
+    }
     
     final float dangerLevel = 0.5f;
     final PersonType GOONS[] = base.goonTypes().toArray(PersonType.class);
     float forceLimit = dangerLevel * 10, forceSum = 0;
     
     final List <Person> forces = new List();
-    for (Element e : step.involved()) {
+    for (Element e : involved) {
       if (e == null || e.place() != place || ! e.isPerson()) continue;
       Person perp = (Person) e;
       forces.add(perp);

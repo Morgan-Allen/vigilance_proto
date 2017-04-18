@@ -338,8 +338,9 @@ public class Lead extends Task {
       return false;
     }
     if (tense == TENSE_AFTER) {
-      if (step.timeStart < 0) return false;
-      int timeFromEnd = step.timeStart + step.hoursTaken - time;
+      int start = plot.startTime(step);
+      if (start < 0) return false;
+      int timeFromEnd = time - (start + step.hoursTaken);
       if (timeFromEnd >= CLUE_EXPIRATION_TIME) return false;
     }
     //
@@ -355,7 +356,7 @@ public class Lead extends Task {
     //
     //  Then check the focus-
     boolean matchFocus = false;
-    for (Element contacts : step.involved()) {
+    for (Element contacts : plot.involved(step)) {
       if (focus.isPerson()) {
         if (contacts != focus) continue;
       }
@@ -382,7 +383,7 @@ public class Lead extends Task {
     //  First, check to see whether anything has actually changed here (i.e,
     //  avoid granting cumulative 'random' info over time.)  If it hasn't,
     //  just return.
-    String contactID = plot.caseID+"_"+step.ID+"_"+tense;
+    String contactID = plot.caseID+"_"+step.uniqueID()+"_"+tense;
     if (contactTime == -1 && ! contactID.equals(lastContactID)) {
       lastContactID = contactID;
       contactTime   = time;
@@ -399,7 +400,7 @@ public class Lead extends Task {
     //
     //  And iterate over over all the elements involved to generate suitable
     //  clues:
-    for (Element e : step.involved()) {
+    for (Element e : plot.involved(step)) {
       //
       //  We assign a higher probability of recognition if the suspect is
       //  present on-site, if the skill-test went well, and based on a random
@@ -420,7 +421,7 @@ public class Lead extends Task {
         file.recordClue(confirms, this, time, scene);
       }
       else if (recognition >= 0.33f) {
-        Series <Clue> possible = step.possibleClues(e, this);
+        Series <Clue> possible = step.possibleClues(plot, e, this);
         Clue gained = (Clue) Rand.pickFrom(possible);
         if (gained != null) file.recordClue(gained, this, time, scene);
       }
@@ -503,7 +504,7 @@ public class Lead extends Task {
     for (Event event : world.events.active()) if (event.isPlot()) {
       Plot plot = (Plot) event;
       for (Step step : plot.allSteps()) {
-        int tense = step.tense();
+        int tense = plot.tense(step);
         if (canDetect(step, tense, plot, time)) {
           Scene scene = enteredScene(step, tense, plot, time);
           if (scene != null) {

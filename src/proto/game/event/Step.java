@@ -7,93 +7,63 @@ import proto.util.*;
 
 
 
-public class Step implements Session.Saveable {
+public class Step extends Index.Entry implements Session.Saveable {
   
   /**  Data fields and save/load methods-
     */
-  Plot plot;
-  String label;
-  int ID;
+  final static Index <Step> INDEX = new Index();
   
-  Element involved[];
-  Element acting  ;
-  Element subject ;
-  Element mentions;
-  Element brings  ;
-  Place from;
-  Place goes;
+  String label;
+  Plot.Role
+    involved[],
+    acting  ,
+    subject ,
+    mentions,
+    brings  ,
+    from    ,
+    goes    ;
   int medium;
   int hoursTaken;
-  int timeStart = -1;
   
   
-  private Step() {
-    return;
+  private Step(String ID, String label) {
+    super(INDEX, ID);
+    this.label = label;
   }
   
   
-  public Step(Session s) throws Exception {
-    s.cacheInstance(this);
-    plot       = (Plot) s.loadObject();
-    label      = s.loadString();
-    ID         = s.loadInt();
-
-    involved   = (Element[]) s.loadObjectArray(Element.class);
-    acting     = (Element) s.loadObject();
-    subject    = (Element) s.loadObject();
-    mentions   = (Element) s.loadObject();
-    brings     = (Element) s.loadObject();
-    from       = (Place  ) s.loadObject();
-    goes       = (Place  ) s.loadObject();
-    medium     = s.loadInt();
-    hoursTaken = s.loadInt();
-    timeStart  = s.loadInt();
+  public static Step loadConstant(Session s) throws Exception {
+    return INDEX.loadEntry(s.input());
   }
   
   
   public void saveState(Session s) throws Exception {
-    s.saveObject(plot );
-    s.saveString(label);
-    s.saveInt   (ID   );
-    
-    s.saveObjectArray(involved);
-    s.saveObject(acting    );
-    s.saveObject(subject   );
-    s.saveObject(mentions  );
-    s.saveObject(brings    );
-    s.saveObject(from      );
-    s.saveObject(goes      );
-    s.saveInt   (medium    );
-    s.saveInt   (hoursTaken);
-    s.saveInt   (timeStart );
+    INDEX.saveEntry(this, s.output());
   }
   
   
   
   /**  Factory methods for convenience:
     */
-  public static Step queueStep(
-    String label, Plot plot,
+  public static Step stepWith(
+    String ID, String label,
     Plot.Role acting, Plot.Role from, Plot.Role subject, Plot.Role goes,
     Plot.Role mentions, int medium, int hoursTaken, Plot.Role... others
   ) {
-    Step s = new Step();
-    s.label      = label;
-    s.plot       = plot;
-    s.ID         = plot.steps.size();
+    Step s = new Step(ID, label);
     s.medium     = medium;
     s.hoursTaken = hoursTaken;
     
-    Batch <Element> involved = new Batch();
-    involved.include(s.acting =       plot.filling(acting ));
-    involved.include(s.from = (Place) plot.filling(from   ));
-    involved.include(s.subject =      plot.filling(subject));
-    involved.include(s.goes = (Place) plot.filling(goes   ));
-    for (Plot.Role role : others) involved.include(plot.filling(role));
+    Batch <Plot.Role> involved = new Batch();
+    involved.include(s.acting  = acting );
+    involved.include(s.from    = from   );
+    involved.include(s.subject = subject);
+    involved.include(s.goes    = goes   );
+    for (Plot.Role role : others) involved.include(role);
     
-    s.involved = involved.toArray(Element.class);
-    s.mentions = plot.filling(mentions);
-    plot.steps.add(s);
+    s.involved = involved.toArray(Plot.Role.class);
+    s.mentions = mentions;
+    
     return s;
   }
   
@@ -126,74 +96,12 @@ public class Step implements Session.Saveable {
   }
   
   
-  public Element[] involved() {
-    return involved;
-  }
-  
-  
-  public Element acting() {
-    return acting;
-  }
-  
-  
-  public Element subject() {
-    return subject;
-  }
-  
-  
-  public Place from() {
-    return from;
-  }
-  
-  
-  public Place goes() {
-    return goes;
-  }
-  
-  
-  
-  /**  Life cycle, timing and updates:
-    */
-  public boolean begun() {
-    return timeStart >= 0;
-  }
-  
-  
-  public boolean complete() {
-    if (! begun()) return false;
-    int time = plot.base.world().timing.totalHours();
-    return time >= timeStart + hoursTaken;
-  }
-  
-  
-  public int timeScheduled() {
-    if (plot.currentStep() == null) return -1;
-    int time = -1;
-    for (Step s : plot.steps) {
-      if (time == -1) time = s.timeStart;
-      time += s.hoursTaken;
-      if (s == this) break;
-    }
-    return time;
-  }
-  
-  
-  public int tense() {
-    if (timeStart == -1) return Lead.TENSE_NONE;
-    int time = plot.base.world().timing.totalHours();
-    boolean begun = timeStart >= 0;
-    boolean done = time >= (timeStart + hoursTaken);
-    if (begun) return done ? Lead.TENSE_AFTER : Lead.TENSE_DURING;
-    return Lead.TENSE_BEFORE;
-  }
-  
-  
   
   /**  Generating potential Clues-
     */
   //*
   protected Series <Clue> addTraitClues(
-    Element involved, Lead lead, Batch <Clue> possible
+    Plot plot, Element involved, Lead lead, Batch <Clue> possible
   ) {
     //
     //  Wiretaps and mentions can't reliably reveal any descriptive features
@@ -232,7 +140,7 @@ public class Step implements Session.Saveable {
   
   
   protected Batch <Clue> addLocationClues(
-    Element involved, Lead lead, Batch <Clue> possible
+    Plot plot, Element involved, Lead lead, Batch <Clue> possible
   ) {
     Plot.Role role = plot.roleFor(involved);
     if (role == null || ! involved.isPlace()) return possible;
@@ -252,7 +160,7 @@ public class Step implements Session.Saveable {
   
   
   protected Batch <Clue> addIntentClues(
-    Element focus, Lead lead, Batch <Clue> possible
+    Plot plot, Element focus, Lead lead, Batch <Clue> possible
   ) {
     //  TODO:  Restore later.
     /*
@@ -274,12 +182,12 @@ public class Step implements Session.Saveable {
   
   
   public Series <Clue> possibleClues(
-    Element focus, Lead lead
+    Plot plot, Element focus, Lead lead
   ) {
     Batch <Clue> possible = new Batch();
-    addTraitClues   (focus, lead, possible);
-    addLocationClues(focus, lead, possible);
-    addIntentClues  (focus, lead, possible);
+    addTraitClues   (plot, focus, lead, possible);
+    addLocationClues(plot, focus, lead, possible);
+    addIntentClues  (plot, focus, lead, possible);
     return possible;
   }
   
@@ -295,12 +203,9 @@ public class Step implements Session.Saveable {
   public String toString() {
     StringBuffer s = new StringBuffer();
     s.append(label);
-    if (timeStart == -1) s.append(" [T=?]");
-    else s.append(" [T="+timeStart+"-"+(timeStart + hoursTaken)+"]");
     s.append(" ["+Lead.MEDIUM_DESC[medium]+"]");
     s.append(" ["+from+" -> "+goes+"] [");
-    for (Element e : involved) {
-      if (e.isPlace() || e.isRegion()) continue;
+    for (Plot.Role e : involved) {
       s.append("\n    "+e);
     }
     s.append("\n  ]");
