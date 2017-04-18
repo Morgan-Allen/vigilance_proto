@@ -67,12 +67,12 @@ public class MainView extends UINode {
     addChildren(sceneView, mainUI);
     
     rosterView = new RosterView(mainUI, new Box2D(
-      0, 0, fullWide, 120
+      0, fullHigh - 120, fullWide, 120
     ));
     mainUI.addChildren(rosterView);
     
     //  Add views for each tab:
-    final Box2D tabSubBounds = new Box2D(0, 145, fullWide, fullHigh - 145);
+    final Box2D tabSubBounds = new Box2D(0, 25, fullWide, fullHigh - 145);
     missionView = new MissionsView (mainUI, tabSubBounds);
     investView  = new InvestingView(mainUI, tabSubBounds);
     equipView   = new EquipmentView(mainUI, tabSubBounds);
@@ -82,7 +82,7 @@ public class MainView extends UINode {
       missionView, investView, equipView, trainView
     };
     
-    tabsNode = new UINode(mainUI, new Box2D(0, 120, fullWide, 25));
+    tabsNode = new UINode(mainUI, new Box2D(0, 0, fullWide, 25));
     Box2D blank = new Box2D();
     final String tabNames[] = {
       "Mission Control", "Investments", "Armory", "Training & Outfit"
@@ -107,10 +107,10 @@ public class MainView extends UINode {
     switchToTab(missionView);
     
     progOptions = new ProgressOptionsView(mainUI, new Box2D(
-      (fullWide / 2) - 100, fullHigh - 50, 200, 50
+      (fullWide / 2) - 100, fullHigh - 170, 200, 50
     ));
     mainReadout = new StatsReadoutView(mainUI, new Box2D(
-      0, fullHigh - 50, (fullWide / 2) - 100, 50
+      0, fullHigh - 170, (fullWide / 2) - 100, 50
     ));
     mainUI.addChildren(progOptions, mainReadout);
     
