@@ -193,6 +193,16 @@ public class World implements Session.Saveable {
   }
   
   
+  public Series <Place> publicPlaces() {
+    Batch <Place> all = new Batch();
+    for (Element e : inside()) if (e.isPlace() && ! e.isBase()) {
+      Place p = (Place) e;
+      all.add(p);
+    }
+    return all;
+  }
+  
+  
   
   /**  Regular updates and activity cycle:
     */

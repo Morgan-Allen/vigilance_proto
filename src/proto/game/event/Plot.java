@@ -19,8 +19,8 @@ public abstract class Plot extends Event {
   final public static String
     ASPECT = "Aspect",
     PERP   = "Perp"  ,
-    VICTIM = "Victim",
-    STEP   = "Step"  ;
+    SCENE  = "Scene" ,
+    VICTIM = "Victim";
   
   public static class Role extends Index.Entry implements Session.Saveable {
     
@@ -45,8 +45,16 @@ public abstract class Plot extends Event {
       return name;
     }
     
+    public boolean isAspect() {
+      return category == ASPECT;
+    }
+    
     public boolean isPerp() {
       return category == PERP;
+    }
+    
+    public boolean isScene() {
+      return category == SCENE;
     }
     
     public boolean isVictim() {
@@ -60,11 +68,11 @@ public abstract class Plot extends Event {
   
   final public static Role
     ROLE_MASTERMIND = new Role("role_mastermind", "Mastermind", PERP  ),
-    ROLE_BASED      = new Role("role_based"     , "Based"     , PERP  ),
+    ROLE_HQ         = new Role("role_hq"        , "HQ"        , SCENE ),
     ROLE_ORGANISER  = new Role("role_organiser" , "Organiser" , PERP  ),
-    ROLE_HIDEOUT    = new Role("role_hideout"   , "Hideout"   , PERP  ),
+    ROLE_HIDEOUT    = new Role("role_hideout"   , "Hideout"   , SCENE ),
     ROLE_TARGET     = new Role("role_target"    , "Target"    , VICTIM),
-    ROLE_SCENE      = new Role("role_scene"     , "Scene"     , VICTIM);
+    ROLE_SCENE      = new Role("role_scene"     , "Scene"     , SCENE );
   
   
   /**  Data fields, construction and save/load methods-
@@ -146,7 +154,14 @@ public abstract class Plot extends Event {
     this.steps     = new List();
     this.stepTimes = new int[steps.length];
     this.current   = null;
-    Visit.appendTo(this.steps, (Object[]) steps);
+    
+    check: for (Step s : steps) if (s != null) {
+      for (Role r : s.involved) if (filling(r) == null) {
+        I.say("  Could not fill role!");
+        continue check;
+      }
+      this.steps.add(s);
+    }
     for (int i = steps.length; i-- > 0;) stepTimes[i] = -1;
   }
   
@@ -350,6 +365,11 @@ public abstract class Plot extends Event {
   }
   
   
+  public void assignTarget(Place target) {
+    assignTarget(target, target, ROLE_SCENE);
+  }
+  
+  
   public void assignTarget(Element target, Place scene, Role stays) {
     assignRole(scene , ROLE_SCENE        );
     assignRole(target, ROLE_TARGET, stays);
@@ -363,8 +383,8 @@ public abstract class Plot extends Event {
   
   
   public void assignMastermind(Person mastermind, Place based) {
-    assignRole(based     , ROLE_BASED                 );
-    assignRole(mastermind, ROLE_MASTERMIND, ROLE_BASED);
+    assignRole(based     , ROLE_HQ                 );
+    assignRole(mastermind, ROLE_MASTERMIND, ROLE_HQ);
   }
   
   
@@ -384,8 +404,8 @@ public abstract class Plot extends Event {
   }
   
   
-  public Place based() {
-    return (Place) filling(ROLE_BASED);
+  public Place HQ() {
+    return (Place) filling(ROLE_HQ);
   }
   
   
@@ -549,7 +569,7 @@ public abstract class Plot extends Event {
     if (step.isAssault()) {
       return PlotUtils.generateHeistScene(this, step, focus, lead);
     }
-    if (focus.place() == hideout() || focus.place() == based()) {
+    if (focus.place() == hideout() || focus.place() == HQ()) {
       return PlotUtils.generateHideoutScene(this, step, focus, lead);
     }
     return PlotUtils.generateSideScene(this, step, focus, lead);

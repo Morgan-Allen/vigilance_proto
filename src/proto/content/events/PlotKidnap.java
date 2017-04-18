@@ -12,42 +12,43 @@ import static proto.game.event.PlotUtils.*;
 
 public class PlotKidnap extends Plot {
   
-  
+  /**  Data fields, construction and save/load methods:
+    */
   final public static Plot.Role
-    ROLE_TAILS   = Plot.role("role_tails"  , "Tails"  , PERP  ),
-    ROLE_GRABS   = Plot.role("role_grabs"  , "Grabs"  , PERP  ),
-    ROLE_RANSOMS = Plot.role("role_ransoms", "Ransoms", VICTIM),
-    ROLE_HOME    = Plot.role("role_home"   , "Home"   , VICTIM);
+    ROLE_TAILS   = Plot.role("kidnap_tails"  , "Tails"  , PERP  ),
+    ROLE_GRABS   = Plot.role("kidnap_grabs"  , "Grabs"  , PERP  ),
+    ROLE_RANSOMS = Plot.role("kidnap_ransoms", "Ransoms", VICTIM),
+    ROLE_HOME    = Plot.role("kidnap_home"   , "Home"   , SCENE );
   
   final public static Step
     STEP_CONTACTS = Step.stepWith(
-      "step_initial_contacts", "Initial Contacts",
-      ROLE_MASTERMIND, ROLE_BASED, ROLE_ORGANISER, ROLE_HIDEOUT, ROLE_TARGET,
+      "kidnap_initial_contacts", "Initial Contacts",
+      ROLE_MASTERMIND, ROLE_HQ, ROLE_ORGANISER, ROLE_HIDEOUT, ROLE_TARGET,
       Lead.MEDIUM_WIRE, 24
     ),
     STEP_TAILING = Step.stepWith(
-      "step_tailing_target", "Tailing Target",
+      "kidnap_tailing_target", "Tailing Target",
       ROLE_TAILS, ROLE_HIDEOUT, ROLE_TARGET, ROLE_SCENE, null,
       Lead.MEDIUM_SURVEIL, 24
     ),
     STEP_GRABS = Step.stepWith(
-      "step_grab_target", "Grab Target",
+      "kidnap_grab_target", "Grab Target",
       ROLE_TAILS, ROLE_HIDEOUT, ROLE_TARGET, ROLE_SCENE, null,
       Lead.MEDIUM_ASSAULT, 24, ROLE_GRABS
     ),
     STEP_RANSOM_DEMAND = Step.stepWith(
-      "step_ransom_demand", "Ransom Demand",
+      "kidnap_ransom_demand", "Ransom Demand",
       ROLE_ORGANISER, ROLE_HIDEOUT, ROLE_RANSOMS, ROLE_HOME, ROLE_TARGET,
       Lead.MEDIUM_WIRE, 24
     ),
-    STEP_RANDOM_PAID = Step.stepWith(
-      "step_ransom_paid", "Ransom Paid",
+    STEP_RANSOM_PAID = Step.stepWith(
+      "kidnap_ransom_paid", "Ransom Paid",
       ROLE_RANSOMS, ROLE_HOME, ROLE_ORGANISER, ROLE_HIDEOUT, ROLE_TARGET,
       Lead.MEDIUM_WIRE, 24
     ),
     STEP_REPORT = Step.stepWith(
-      "step_reports_and_payoffs", "Reports And Payoffs",
-      ROLE_ORGANISER, ROLE_HIDEOUT, ROLE_MASTERMIND, ROLE_BASED, null,
+      "kidnap_reports_and_payoffs", "Reports And Payoffs",
+      ROLE_ORGANISER, ROLE_HIDEOUT, ROLE_MASTERMIND, ROLE_HQ, null,
       Lead.MEDIUM_WIRE, 24
     );
   
@@ -71,6 +72,9 @@ public class PlotKidnap extends Plot {
   }
   
   
+  
+  /**  Plot evaluation, execution and life cycle:
+    */
   protected boolean fillRoles() {
     World world = base().world();
     //
@@ -96,16 +100,16 @@ public class PlotKidnap extends Plot {
     //
     //  Assign these elements their appropriate roles, along with the
     //  mastermind, hideout, organiser and tail:
-    Series <Person> aides = PlotUtils.aidesOnRoster(this);
+    Series <Person> aides = aidesOnRoster(this);
     fillExpertRole(this, BRAINS  , aides, ROLE_ORGANISER);
     fillExpertRole(this, REFLEXES, aides, ROLE_TAILS    );
     fillExpertRole(this, MUSCLE  , aides, ROLE_GRABS    );
-    Place hideout = PlotUtils.chooseHideout(this, target.resides());
-    assignRole(ransoms.resides(), ROLE_HOME              );
-    assignRole(ransoms          , ROLE_RANSOMS, ROLE_HOME);
-    assignRole(hideout          , ROLE_HIDEOUT           );
-    assignTarget(target, target.resides(), ROLE_HIDEOUT);
-    assignMastermind(base().leader(), base());
+    Place hideout = chooseHideout(this, target.resides());
+    assignRole      (ransoms.resides(), ROLE_HOME              );
+    assignRole      (ransoms          , ROLE_RANSOMS, ROLE_HOME);
+    assignRole      (hideout          , ROLE_HIDEOUT           );
+    assignTarget    (target, target.resides(), ROLE_HIDEOUT    );
+    assignMastermind(base().leader(), base()                   );
     //
     //  And last but not least, queue up the needed steps:
     queueSteps(
@@ -113,10 +117,16 @@ public class PlotKidnap extends Plot {
       STEP_TAILING,
       STEP_GRABS,
       STEP_RANSOM_DEMAND,
-      STEP_RANDOM_PAID,
+      STEP_RANSOM_PAID,
       STEP_REPORT
     );
     return true;
+  }
+  
+  
+  protected float ratePlotFor(Person mastermind) {
+    float baseFunds = base().finance.publicFunds();
+    return cashGained(true) / (100 + baseFunds);
   }
   
   
@@ -129,28 +139,24 @@ public class PlotKidnap extends Plot {
     Person target = (Person) target();
     //
     //  Once the target has been grabbed, keep them captive at your hideout:
-    if (step.hasLabel("grab target")) {
+    if (step == STEP_GRABS) {
       hideout().setAttached(target, true);
       target.setCaptive(true);
     }
     //
     //  And once the ransom is paid, release them close to home:
-    else if (step.hasLabel("ransom paid")) {
+    if (step == STEP_REPORT) {
       target.removeAssignment(this);
       target.resides().setAttached(target, true);
       target.setCaptive(false);
-      Person ransomed = (Person) filling(ROLE_RANSOMS);
-      float cashGained = ransomed.stats.levelFor(INVESTMENT) * 50;
-      base().finance.incPublicFunds((int) cashGained);
+      base().finance.incPublicFunds((int) cashGained(false));
     }
   }
   
   
-  protected float ratePlotFor(Person mastermind) {
+  private float cashGained(boolean estimate) {
     Person ransomed = (Person) filling(ROLE_RANSOMS);
-    float cashGained = ransomed.stats.levelFor(INVESTMENT) * 50;
-    float baseFunds = base().finance.publicFunds();
-    return cashGained / (100 + baseFunds);
+    return ransomed.stats.levelFor(INVESTMENT) * 50;
   }
 }
 

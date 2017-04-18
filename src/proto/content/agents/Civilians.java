@@ -109,8 +109,8 @@ public class Civilians {
       WILL    , 5 ,
       MUSCLE  , 2 ,
       
-      PERSUADE, 5,
-      QUESTION, 5,
+      PERSUADE  , 5,
+      QUESTION  , 5,
       INVESTMENT, 4
     ),
     GENTRY = new PersonType(
@@ -123,8 +123,8 @@ public class Civilians {
       WILL    , 4 ,
       MUSCLE  , 3 ,
       
-      PERSUADE, 3,
-      QUESTION, 3,
+      PERSUADE  , 3,
+      QUESTION  , 3,
       INVESTMENT, 7
     ),
     CIVIC_TYPES[] = { POLICE, OFFICIAL, GENTRY }

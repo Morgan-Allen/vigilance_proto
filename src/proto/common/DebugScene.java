@@ -27,7 +27,7 @@ public class DebugScene extends RunGame {
     DefaultGame.initDefaultWorld(world);
     
     Base crooks = world.baseFor(Crooks.THE_MADE_MEN);
-    Plot plot = CrimeTypes.TYPE_KIDNAP.initPlot(crooks);
+    Plot plot = PlotTypes.TYPE_KIDNAP.initPlot(crooks);
     plot.fillAndExpand();
     plot.printRoles();
     crooks.plots.assignRootPlot(plot, 0);

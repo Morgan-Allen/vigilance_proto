@@ -254,12 +254,36 @@ public class Region extends Element {
   }
   
   
+  public int slotFor(Place built) {
+    return Visit.indexOf(built, buildSlots);
+  }
+  
+  
+  public Place replaceFacility(Place newPlace, Place oldPlace) {
+    return replaceFacility(newPlace, slotFor(oldPlace));
+  }
+  
+  
+  public Place replaceFacility(Place newPlace, int slotID) {
+    Place oldPlace = buildSlots[slotID];
+    if (oldPlace != null) {
+      setAttached(oldPlace, false);
+      world.setInside(oldPlace, false);
+    }
+    
+    buildSlots[slotFor(oldPlace)] = newPlace;
+    
+    if (newPlace != null) {
+      setAttached(newPlace, true);
+      world.setInside(newPlace, true);
+    }
+    return newPlace;
+  }
+  
+  
   public Place setupFacility(
     PlaceType print, int slotID, Base owns, boolean complete
   ) {
-    final Place oldPlace = buildSlots[slotID];
-    if (oldPlace != null) world.setInside(oldPlace, false);
-    
     final Place place = new Place(print, slotID, world);
     if (complete || owns == null) {
       place.setOwner(owns);
@@ -272,10 +296,7 @@ public class Region extends Element {
       place.setBuildProgress(0);
     }
     
-    buildSlots[slotID] = place;
-    setAttached(place, true);
-    world.setInside(place, true);
-    return place;
+    return replaceFacility(place, slotID);
   }
   
   

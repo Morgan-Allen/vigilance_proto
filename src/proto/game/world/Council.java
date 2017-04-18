@@ -28,12 +28,11 @@ public class Council {
     TRIAL_SENTENCE_AVG = World.DAYS_PER_WEEK * World.WEEKS_PER_YEAR;
   
   final World world;
-  Base mainHall;
+  Base cityHall;
   List <Place> courts  = new List();
   List <Place> prisons = new List();
   
-  
-  public static class Sentence {
+  static class Sentence {
     Person jailed;
     int timeStarts, timeEnds;
   }
@@ -47,7 +46,7 @@ public class Council {
   
   
   void loadState(Session s) throws Exception {
-    mainHall = (Base) s.loadObject();
+    cityHall = (Base) s.loadObject();
     s.loadObjects(courts );
     s.loadObjects(prisons);
     
@@ -62,7 +61,7 @@ public class Council {
   
   
   void saveState(Session s) throws Exception {
-    s.saveObject(mainHall);
+    s.saveObject(cityHall);
     s.saveObjects(courts );
     s.saveObjects(prisons);
     
@@ -78,8 +77,8 @@ public class Council {
   
   /**  Regular updates and initial setup-
     */
-  public void bindToFaction(Base mainHall) {
-    this.mainHall = mainHall;
+  public void assignCityHall(Base city) {
+    this.cityHall = city;
   }
   
   
@@ -94,7 +93,6 @@ public class Council {
   
   
   public void updateCouncil() {
-    if (mainHall == null) return;
     int time = world.timing.totalHours();
     
     for (Object p : sentences.keySet().toArray()) {
@@ -124,17 +122,13 @@ public class Council {
     Plot plot, Series <Person> captive, Series <CaseFile> evidence,
     int daysDelay
   ) {
-    if (mainHall == null) {
-      I.say("NO MAIN HALL ASSIGNED TO COUNCIL, CANNOT SCHEDULE TRIAL!");
-      return null;
-    }
     if (captive.empty() || evidence.empty()) {
       I.say("NO CAPTIVES OR EVIDENCE, CANNOT SCHEDULE TRIAL!");
       return null;
     }
     
     for (CaseFile f : evidence) {
-      CaseFile m = mainHall.leads.caseFor(f.subject);
+      CaseFile m = cityHall.leads.caseFor(f.subject);
       m.updateCluesFrom(f);
     }
     
@@ -144,11 +138,22 @@ public class Council {
       p.setCaptive(true);
     }
     
-    Trial trial = new Trial(world, mainHall);
-    trial.assignAccused(plot, captive);
+    Trial trial = new Trial(world, cityHall);
+    Person defends = pickOfficial(), prosecutes = pickOfficial(defends);
+    trial.assignParties(plot, defends, prosecutes, captive);
     world.events.scheduleEvent(trial, daysDelay * World.HOURS_PER_DAY);
     
     return trial;
+  }
+  
+  
+  private Person pickOfficial(Person... others) {
+    Batch <Person> from = new Batch();
+    for (Place c : courts) for (Person p : c.residents()) {
+      if (Visit.arrayIncludes(others, p)) continue;
+      from.add(p);
+    }
+    return (Person) Rand.pickFrom(from);
   }
   
   
@@ -177,6 +182,14 @@ public class Council {
   }
   
   
+  public Series <Place> courts() {
+    return courts;
+  }
+  
+  
+  
+  /**  Handling sentencing:
+    */
   public void applySentence(Person accused, float durationMult) {
     Sentence s = new Sentence();
     s.jailed = accused;
@@ -193,7 +206,7 @@ public class Council {
     for (Place prison : prisons) {
       pick.compare(prison, 0 - prison.residents().size());
     }
-    if (pick.empty()) return mainHall;
+    if (pick.empty()) return cityHall;
     return pick.result();
   }
   
@@ -211,6 +224,11 @@ public class Council {
     Sentence s = sentences.get(p);
     if (s == null) return -1;
     return (s.timeEnds - s.timeStarts) / World.HOURS_PER_DAY;
+  }
+  
+  
+  public Series <Place> prisons() {
+    return prisons;
   }
   
 }

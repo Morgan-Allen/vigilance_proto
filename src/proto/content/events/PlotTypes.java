@@ -2,12 +2,12 @@
 
 package proto.content.events;
 import proto.util.*;
+import proto.game.world.*;
 import proto.game.event.*;
-import proto.game.world.Base;
 
 
 
-public class CrimeTypes {
+public class PlotTypes {
   
   
   private static Batch <PlotType> types = new Batch();
@@ -17,7 +17,6 @@ public class CrimeTypes {
   }
   
   /*
-  HEIST    = register(new TypeHeist()),
   MURDER   = register(new TypeMurder()),
   COERCE   = register(new TypeCoerce()),
   BRIBE    = register(new TypeBribe()),
@@ -30,6 +29,11 @@ public class CrimeTypes {
       "Kidnapping", "crime_type_kidnap", null
     ) {
       public Plot initPlot(Base base) { return new PlotKidnap(this, base); }
+    }),
+    TYPE_ROBBERY = register(new PlotType(
+      "Robbery", "crime_type_robbery", null
+    ) {
+      public Plot initPlot(Base base) { return new PlotRobbery(this, base); }
     })
   ;
   
@@ -38,11 +42,6 @@ public class CrimeTypes {
   ;
   
 }
-
-
-
-
-
 
 
 

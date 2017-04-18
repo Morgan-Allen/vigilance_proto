@@ -12,6 +12,8 @@ import proto.view.base.*;
 public class Trial extends Event {
   
   
+  /**  Data fields, construction and save/load methods:
+    */
   final public static EventType TYPE_TRIAL = new EventType(
     "Trial", "event_trial", null
   ) {};
@@ -20,6 +22,7 @@ public class Trial extends Event {
   Base conducts;
   Place venue;
   Plot plot;
+  Person defends, prosecutes;
   List <Person> accused = new List();
   
   
@@ -31,63 +34,34 @@ public class Trial extends Event {
   
   public Trial(Session s) throws Exception {
     super(s);
-    conducts = (Base ) s.loadObject();
-    venue    = (Place) s.loadObject();
-    plot     = (Plot ) s.loadObject();
+    conducts   = (Base  ) s.loadObject();
+    venue      = (Place ) s.loadObject();
+    plot       = (Plot  ) s.loadObject();
+    defends    = (Person) s.loadObject();
+    prosecutes = (Person) s.loadObject();
     s.loadObjects(accused);
   }
   
   
   public void saveState(Session s) throws Exception {
     super.saveState(s);
-    s.saveObject(conducts);
-    s.saveObject(venue);
-    s.saveObject(plot);
+    s.saveObject(conducts  );
+    s.saveObject(venue     );
+    s.saveObject(plot      );
+    s.saveObject(defends   );
+    s.saveObject(prosecutes);
     s.saveObjects(accused);
   }
   
   
   
-  
-  public void assignAccused(Plot plot, Series <Person> accused) {
+  /**  Initial setup and evidence-related queries:
+    */
+  public void assignParties(
+    Plot plot, Person defends, Person prosecutes, Series <Person> accused
+  ) {
     this.plot = plot;
     Visit.appendTo(this.accused, accused);
-  }
-  
-  
-  public void beginEvent() {
-    super.beginEvent();
-    
-    for (Person p : accused) {
-      float evidence = rateEvidence(p);
-      if (Rand.num() < evidence) {
-        world.council.applySentence(p, 1.0f);
-      }
-      else {
-        world.council.releasePrisoner(p);
-      }
-    }
-    
-    MessageUtils.presentSentenceMessage(world.view(), this);
-    completeEvent();
-  }
-  
-  
-  
-  /**  General query methods-
-    */
-  public Element targetElement(Person p) {
-    return venue;
-  }
-  
-  
-  public Plot plot() {
-    return plot;
-  }
-  
-  
-  public Series <Person> accused() {
-    return accused;
   }
   
   
@@ -108,11 +82,53 @@ public class Trial extends Event {
     return sum / Nums.max(1, accused.size());
   }
   
+
+  public Element targetElement(Person p) {
+    return venue;
+  }
+  
+  
+  public Plot plot() {
+    return plot;
+  }
+  
+  
+  public Series <Person> accused() {
+    return accused;
+  }
+  
   
   public boolean involves(Plot plot, Person accused) {
     if (plot != null && plot != this.plot) return false;
     if (accused != null && ! this.accused.includes(accused)) return false;
     return true;
+  }
+  
+  
+  
+  /**  Regular updates and life-cycle:
+    */
+  public void beginEvent() {
+    super.beginEvent();
+    
+    for (Person p : accused) {
+      float evidence = rateEvidence(p);
+      if (Rand.num() < evidence) {
+        world.council.applySentence(p, 1.0f);
+      }
+      else {
+        world.council.releasePrisoner(p);
+      }
+      
+      boolean isBoss = p.base().leader() == p;
+      if (isBoss) {
+        p.history.incBond(prosecutes, -0.5f);
+        p.history.incBond(defends   , 0.25f);
+      }
+    }
+    
+    MessageUtils.presentSentenceMessage(world.view(), this);
+    completeEvent();
   }
   
   

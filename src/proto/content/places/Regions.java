@@ -31,6 +31,7 @@ public class Regions {
     
   
   static {
+    
     final RegionType r1 = SECTOR01;
     r1.view.attachColourKey(-16734721, "01");
     r1.attachDefaultFacilities(STEEL_MILL);
@@ -51,12 +52,12 @@ public class Regions {
     r4.view.attachColourKey(-14812949, "04");
     r4.attachDefaultFacilities(COMMUNITY_COLLEGE);
     r4.attachMapCoordinates(0, 1);
-
+    
     final RegionType r5 = SECTOR05;
     r5.view.attachColourKey(-486371, "05");
     r5.attachDefaultFacilities(CITY_PARK, Civilians.CITY_HALL);
     r5.attachMapCoordinates(1, 1);
-
+    
     final RegionType r6 = SECTOR06;
     r6.view.attachColourKey(-2286088, "06");
     r6.attachDefaultFacilities(BUSINESS_PARK);
@@ -70,12 +71,12 @@ public class Regions {
     
     final RegionType r8 = SECTOR08;
     r8.view.attachColourKey(-11111239, "08");
-    r8.attachDefaultFacilities();
+    r8.attachDefaultFacilities(TECH_STARTUP);
     r8.attachMapCoordinates(1, 2);
-
+    
     final RegionType r9 = SECTOR09;
     r9.view.attachColourKey(-11093671, "09");
-    r9.attachDefaultFacilities(TECH_STARTUP, CHEMICAL_PLANT);
+    r9.attachDefaultFacilities(CHEMICAL_PLANT, Civilians.CITY_JAIL);
     r9.attachMapCoordinates(2, 2);
     
   }

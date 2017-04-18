@@ -74,17 +74,21 @@ public class DefaultGame extends RunGame {
   public static void initDefaultBase(World world) {
     boolean report = GameSettings.reportWorldInit;
     if (report) I.say("\nInitialising Base...");
-    
-    //  TODO:  Move this out to the region-types definitions!
+    //
+    //  TODO:  Move this out to the region-types definitions?
     final Faction city = Civilians.THE_CITY_COUNCIL;
-    final Base cityHall = new Base(Facilities.UNION_OFFICE, world, city);
-    world.regionFor(Regions.SECTOR05).setAttached(cityHall, true);
-    world.council.bindToFaction(cityHall);
-    
-    Region at = world.regionFor(Regions.SECTOR09);
-    Place prison = at.setupFacility(Facilities.LOUNGE, 2, cityHall, true);
-    world.council.assignPrison(prison);
-    
+    for (Region r : world.regions()) for (Place b : r.buildSlots()) {
+      if (b == null) continue;
+      if (b.kind == Civilians.CITY_HALL) {
+        world.council.assignCourt(b);
+      }
+      if (b.kind == Civilians.CITY_JAIL) {
+        world.council.assignPrison(b);
+      }
+    }
+    final Base hall = new Base(Civilians.CITY_HALL, world, city);
+    world.regionFor(Regions.SECTOR04).setAttached(hall, true);
+    world.council.assignCityHall(hall);
     //
     //  
     final Faction owns = Heroes.JANUS_INDUSTRIES;
@@ -194,7 +198,7 @@ public class DefaultGame extends RunGame {
       world.addBase(base, false);
       base.addToRoster(base.leader());
       base.setGoonTypes(goonTypes);
-      base.plots.assignPlotTypes(CrimeTypes.ALL_TYPES);
+      base.plots.assignPlotTypes(PlotTypes.ALL_TYPES);
       
       for (PersonType type : seniorTypes) {
         Person senior = Person.randomOfKind(type, world);

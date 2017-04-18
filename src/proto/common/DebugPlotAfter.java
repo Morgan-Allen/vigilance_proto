@@ -22,7 +22,7 @@ public class DebugPlotAfter extends RunGame {
     DefaultGame.initDefaultWorld(world);
     
     Base crooks = world.baseFor(Crooks.THE_MADE_MEN);
-    Plot plot = CrimeTypes.TYPE_KIDNAP.initPlot(crooks);
+    Plot plot = PlotTypes.TYPE_KIDNAP.initPlot(crooks);
     plot.fillAndExpand();
     crooks.plots.assignRootPlot(plot, 0);
     plot.advanceToStep(plot.mainHeist());
