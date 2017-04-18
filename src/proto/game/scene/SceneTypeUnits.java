@@ -154,13 +154,17 @@ public class SceneTypeUnits extends SceneType {
       Unit unit;
       int tx, ty, facing;
     }
+    
+    I.say("\nPopulating areas for "+this);
+    
     //
     //  While there's space left, we iterate over all possible combinations of
     //  location, unit-type and facing, toss in a little random weighting, and
     //  see which looks most promising.  (Note that we skip over any unit types
     //  already past their placement quotas.)
     while (true) {
-      Pick <SpacePick> pick = new Pick();
+      Pick <SpacePick> pick     = new Pick();
+      List <SpacePick> possible = new List();
       
       for (Unit unit : units) {
         boolean   exact   = unit.exactX != -1 && unit.exactY != -1;
@@ -190,25 +194,33 @@ public class SceneTypeUnits extends SceneType {
               if (c.x            != unit.exactX  ) continue;
               if (c.y            != unit.exactY  ) continue;
               if ((face + 0 % 8) != unit.exactDir) continue;
-              rating += 100;
+              rating = 100;
             }
-            else if (type.checkBordering(g, typeGen, tX, tY, face, resolution)) {
+            if (! type.checkBordering(g, typeGen, tX, tY, face, resolution)) {
+              continue;
+            }
+            if (! exact) {
               rating += Nums.max(0, unit.minCount - count);
               rating += Rand.num() / 2;
             }
             
-            if (rating != -1) {
-              SpacePick s = new SpacePick();
-              s.tx     = tX  ;
-              s.ty     = tY  ;
-              s.unit   = unit;
-              s.facing = face;
-              pick.compare(s, rating);
-            }
+            SpacePick s = new SpacePick();
+            s.tx     = tX  ;
+            s.ty     = tY  ;
+            s.unit   = unit;
+            s.facing = face;
+            pick.compare(s, rating);
+            possible.add(s);
           }
         }
       }
       if (pick.empty()) break;
+      
+      I.say("\nPossible placements were: ");
+      for (SpacePick s : possible) {
+        I.say("  "+s.unit+" at "+s.tx+"|"+s.ty+", face: "+s.facing);
+      }
+      I.say("");
       //
       //  Having pick the most promising option, we apply the furnishings to
       //  the scene:
