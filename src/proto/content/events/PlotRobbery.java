@@ -24,12 +24,6 @@ public class PlotRobbery extends Plot {
     ROLE_OFFICE  = Plot.role("robbery_office" , "Office" , SCENE),
     ROLE_FENCE   = Plot.role("robbery_fence"  , "Fence"  , PERP );
   
-  final static PlaceType THEFT_VENUES[] = {
-    Facilities.BUSINESS_PARK,
-    Facilities.LOUNGE,
-    Civilians.PENTHOUSE
-  };
-  
   final public static Step
     STEP_CONTACTS = Step.stepWith(
       "robbery_contacts", "Contacts",
@@ -61,6 +55,12 @@ public class PlotRobbery extends Plot {
       ROLE_ORGANISER, ROLE_HIDEOUT, ROLE_MASTERMIND, ROLE_HQ, null,
       Lead.MEDIUM_WIRE, 24
     );
+  
+  final static PlaceType THEFT_VENUES[] = {
+    Facilities.BUSINESS_PARK,
+    Facilities.LOUNGE,
+    Civilians.PENTHOUSE
+  };
   
   
   public PlotRobbery(PlotType type, Base base) {
@@ -101,8 +101,7 @@ public class PlotRobbery extends Plot {
     }
     Place office = pickO.result();
     //
-    //  Assign these elements their appropriate roles, along with the
-    //  mastermind, hideout, organiser and tail:
+    //  Assign these elements their appropriate roles:
     Series <Person> aides = aidesOnRoster(this);
     fillExpertRole(this, BRAINS     , aides, ROLE_ORGANISER);
     fillExpertRole(this, REFLEXES   , aides, ROLE_CASING   );

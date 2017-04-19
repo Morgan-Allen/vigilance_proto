@@ -17,7 +17,6 @@ public class PlotTypes {
   }
   
   /*
-  MURDER   = register(new TypeMurder()),
   COERCE   = register(new TypeCoerce()),
   BRIBE    = register(new TypeBribe()),
   MAKE     = register(new TypeMake()),
@@ -28,12 +27,23 @@ public class PlotTypes {
     TYPE_KIDNAP = register(new PlotType(
       "Kidnapping", "crime_type_kidnap", null
     ) {
-      public Plot initPlot(Base base) { return new PlotKidnap(this, base); }
+      public Plot initPlot(Base base) {
+        return new PlotKidnap(this, base);
+      }
     }),
     TYPE_ROBBERY = register(new PlotType(
       "Robbery", "crime_type_robbery", null
     ) {
-      public Plot initPlot(Base base) { return new PlotRobbery(this, base); }
+      public Plot initPlot(Base base) {
+        return new PlotRobbery(this, base);
+      }
+    }),
+    TYPE_ASSASSINATION = register(new PlotType(
+      "Assassination", "crime_type_assassination", null
+    ) {
+      public Plot initPlot(Base base) {
+        return new PlotAssassinate(this, base);
+      }
     })
   ;
   

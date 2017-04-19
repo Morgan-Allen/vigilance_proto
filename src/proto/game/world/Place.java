@@ -103,7 +103,8 @@ public class Place extends Element {
       final int max = kind.baseLevel(type);
       int count = 0;
       for (Person p : residents) {
-        if (p.kind() == type) count++;
+        if (p.health.dead()) Place.setResident(p, this, false);
+        else if (p.kind() == type) count++;
       }
       while (count++ < max) {
         Person resides = Person.randomOfKind((PersonType) type, world);

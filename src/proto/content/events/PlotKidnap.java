@@ -98,8 +98,7 @@ public class PlotKidnap extends Plot {
     if (pickT.empty()) return false;
     Person target = pickT.result();
     //
-    //  Assign these elements their appropriate roles, along with the
-    //  mastermind, hideout, organiser and tail:
+    //  Assign these elements their appropriate roles:
     Series <Person> aides = aidesOnRoster(this);
     fillExpertRole(this, BRAINS  , aides, ROLE_ORGANISER);
     fillExpertRole(this, REFLEXES, aides, ROLE_TAILS    );

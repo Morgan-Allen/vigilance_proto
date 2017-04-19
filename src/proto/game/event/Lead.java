@@ -25,9 +25,10 @@ public class Lead extends Task {
     MEDIUM_SURVEIL  =  3,
     MEDIUM_ASSAULT  =  4,
     MEDIUM_QUESTION =  5,
+    MEDIUM_COVER    =  6,
     MEDIUM_ANY      = -1,
-    PHYSICAL_MEDIA[] = { 1, 3, 4, 5 },
-    SOCIAL_MEDIA  [] = { 1, 5 },
+    PHYSICAL_MEDIA[] = { 1, 3, 4, 5, 6 },
+    SOCIAL_MEDIA  [] = { 1, 5, 6 },
     WIRED_MEDIA   [] = { 2 },
     FORENSIC_MEDIA[] = { 1, 2, 4, 5 },
     //  Whether this lead can pick up on past/present/future contacts-
