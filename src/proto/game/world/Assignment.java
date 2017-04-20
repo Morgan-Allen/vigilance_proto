@@ -23,9 +23,6 @@ public interface Assignment extends Session.Saveable {
     PRIORITY_CASUAL    = 1,
     PRIORITY_NONE      = 0;
   
-  String activeInfo();
-  Image icon();
-  
   boolean allowsAssignment(Person p);
   int assignmentPriority();
   
@@ -33,7 +30,11 @@ public interface Assignment extends Session.Saveable {
   Series <Person> assigned();
   boolean complete();
   
+  Base assigningBase();
   Element targetElement(Person p);
+  
+  String activeInfo();
+  Image icon();
 }
 
 

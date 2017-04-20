@@ -11,7 +11,7 @@ import java.awt.Image;
 
 
 
-public abstract class Event implements Session.Saveable, Assignment {
+public abstract class Event implements Session.Saveable {
   
   
   /**  Data fields, construction and save/load methods-
@@ -23,7 +23,6 @@ public abstract class Event implements Session.Saveable, Assignment {
   int timeBegins = -1;
   boolean scheduled, complete;
   
-  List <Person> involved = new List();
   List <EventEffects> allEffects = new List();
   
   
@@ -41,19 +40,17 @@ public abstract class Event implements Session.Saveable, Assignment {
     timeBegins = s.loadInt ();
     scheduled  = s.loadBool();
     complete   = s.loadBool();
-    s.loadObjects(involved  );
     s.loadObjects(allEffects);
   }
   
   
   public void saveState(Session s) throws Exception {
-    s.saveObject(type      );
-    s.saveObject(world     );
-    s.saveInt   (eventID   );
-    s.saveInt   (timeBegins);
-    s.saveBool  (scheduled );
-    s.saveBool  (complete  );
-    s.saveObjects(involved  );
+    s.saveObject (type      );
+    s.saveObject (world     );
+    s.saveInt    (eventID   );
+    s.saveInt    (timeBegins);
+    s.saveBool   (scheduled );
+    s.saveBool   (complete  );
     s.saveObjects(allEffects);
   }
   
@@ -66,11 +63,6 @@ public abstract class Event implements Session.Saveable, Assignment {
   }
   
   
-  public int assignmentPriority() {
-    return PRIORITY_PLAN_STEP;
-  }
-  
-  
   public boolean isPlot() {
     return this instanceof Plot;
   }
@@ -78,24 +70,6 @@ public abstract class Event implements Session.Saveable, Assignment {
   
   public boolean isTrial() {
     return this instanceof Trial;
-  }
-  
-  
-  
-  /**  Assigning perps-
-    */
-  public Series <Person> assigned() {
-    return involved;
-  }
-  
-  
-  public boolean allowsAssignment(Person p) {
-    return true;
-  }
-  
-  
-  public void setAssigned(Person p, boolean is) {
-    involved.toggleMember(p, is);
   }
   
   
@@ -144,8 +118,6 @@ public abstract class Event implements Session.Saveable, Assignment {
   /**  Helping with scene configuration and after-effects:
     */
   public void completeEvent() {
-    for (Person perp : involved) perp.removeAssignment(this);
-    involved.clear();
     complete = true;
   }
   

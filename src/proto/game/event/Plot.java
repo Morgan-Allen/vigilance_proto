@@ -9,7 +9,7 @@ import proto.util.*;
 
 
 
-public abstract class Plot extends Event {
+public abstract class Plot extends Event implements Assignment {
   
   
   /**  Role-definitions-
@@ -88,8 +88,8 @@ public abstract class Plot extends Event {
     */
   final Base base;
   
-  int spookLevel = 0;
   List <RoleEntry> entries = new List();
+  List <Person> involved = new List();
   
   private class RoleEntry {
     
@@ -102,10 +102,10 @@ public abstract class Plot extends Event {
     }
   }
   
-  
   List <Step> steps = new List();
   Step current = null;
   int stepTimes[];
+  int spookLevel = 0;
   
   
   protected Plot(PlotType type, Base base) {
@@ -116,8 +116,7 @@ public abstract class Plot extends Event {
   
   public Plot(Session s) throws Exception {
     super(s);
-    base       = (Base) s.loadObject();
-    spookLevel = s.loadInt();
+    base = (Base) s.loadObject();
     
     for (int n = s.loadInt(); n-- > 0;) {
       RoleEntry entry = new RoleEntry();
@@ -127,17 +126,19 @@ public abstract class Plot extends Event {
       entry.supplies = (Plot     ) s.loadObject();
       entries.add(entry);
     }
+    s.loadObjects(involved);
+    
     s.loadObjects(steps);
     current = (Step) s.loadObject();
     stepTimes = new int[steps.size()];
     for (int i = 0; i < steps.size(); i++) stepTimes[i] = s.loadInt();
+    spookLevel = s.loadInt();
   }
   
   
   public void saveState(Session s) throws Exception {
     super.saveState(s);
     s.saveObject(base);
-    s.saveInt(spookLevel);
     
     s.saveInt(entries.size());
     for (RoleEntry entry : entries) {
@@ -146,9 +147,12 @@ public abstract class Plot extends Event {
       s.saveObject(entry.element );
       s.saveObject(entry.supplies);
     }
+    s.saveObjects(involved);
+    
     s.saveObjects(steps);
     s.saveObject(current);
     for (int t : stepTimes) s.saveInt(t);
+    s.saveInt(spookLevel);
   }
   
   
@@ -497,6 +501,34 @@ public abstract class Plot extends Event {
   
 
   
+  /**  Implementing the Assignment interface-
+    */
+  public Series <Person> assigned() {
+    return involved;
+  }
+  
+  
+  public boolean allowsAssignment(Person p) {
+    return true;
+  }
+  
+  
+  public void setAssigned(Person p, boolean is) {
+    involved.toggleMember(p, is);
+  }
+  
+  
+  public int assignmentPriority() {
+    return PRIORITY_PLAN_STEP;
+  }
+  
+  
+  public Base assigningBase() {
+    return base;
+  }
+  
+
+  
   /**  Supplementary methods for setting up other plots as sub-steps:
     */
   public void fillAndExpand() {
@@ -567,6 +599,8 @@ public abstract class Plot extends Event {
   
   
   public void completeEvent() {
+    for (Person perp : involved) perp.removeAssignment(this);
+    involved.clear();
     super.completeEvent();
   }
   

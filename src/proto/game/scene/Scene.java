@@ -144,6 +144,11 @@ public class Scene implements Session.Saveable, Assignment, TileConstants {
   }
   
   
+  public Base assigningBase() {
+    return world.playerBase();
+  }
+  
+  
   public boolean complete() {
     return state == STATE_WON || state == STATE_LOST;
   }

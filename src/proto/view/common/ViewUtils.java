@@ -122,11 +122,14 @@ public class ViewUtils {
           g.drawRect(vx + across, vy + down, vw - (across + 10), downEach);
         }
         
-        if (e.refers instanceof Assignment) renderAssigned(
-          ((Assignment) e.refers).assigned(),
-          vx + across + vw - 20, vy + down + downEach,
-          within, surface, g
-        );
+        if (e.refers instanceof Assignment) {
+          Assignment a = (Assignment) e.refers;
+          Base player = within.mainView.player();
+          if (a.assigningBase() == player) renderAssigned(
+            a.assigned(), vx + across + vw - 20, vy + down + downEach,
+            within, surface, g
+          );
+        }
         
         down += downEach + 5;
       }

@@ -88,6 +88,11 @@ public abstract class Task implements Assignment {
   }
   
   
+  public Base assigningBase() {
+    return base;
+  }
+  
+  
   public Series <Person> assigned() {
     return assigned;
   }

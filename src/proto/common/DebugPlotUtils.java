@@ -290,13 +290,15 @@ public class DebugPlotUtils {
       
       if (askToLoop) {
         while (true) {
-          I.say("\n  Proceed? (y/Yes, n/No, s/Save, f/Finish Loop, r/Reprint)");
+          I.say("\n  Proceed? ");
+          I.add("(y/Yes, n/No, s/Save, f/Finish Loop, r/Reevaluate, p/Play)");
           I.say("    ");
           String response = I.listen().toUpperCase().substring(0, 1);
           if      (response.equals("N")) System.exit(0);
           else if (response.equals("S")) world.performSave();
           if      (response.equals("F")) { askToLoop = false; break; }
           else if (response.equals("R")) continue loop;
+          else if (response.equals("P")) return false;
           else if (response.equals("Y")) break;
         }
       }
