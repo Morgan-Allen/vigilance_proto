@@ -128,7 +128,7 @@ public class Council {
     }
     
     for (CaseFile f : evidence) {
-      CaseFile m = cityHall.leads.caseFor(f.subject);
+      CaseFile m = cityHall.leads.caseFor(f.subject());
       m.updateCluesFrom(f);
     }
     

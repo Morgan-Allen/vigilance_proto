@@ -11,10 +11,10 @@ import java.awt.Image;
 
 
 
-public class MissionsViewCluesView extends UINode {
+public class CaseCluesView extends UINode {
   
   
-  public MissionsViewCluesView(UINode parent, Box2D bounds) {
+  public CaseCluesView(UINode parent, Box2D bounds) {
     super(parent, bounds);
   }
   
@@ -23,7 +23,7 @@ public class MissionsViewCluesView extends UINode {
     //
     //  Extract basic game-references first:
     Base player = mainView.player();
-    MissionsView parent = mainView.missionView;
+    CasesView parent = mainView.casesView;
     Object focus = parent.priorFocus();
     boolean forPlot = false, forSuspect = false;
     //
@@ -33,7 +33,7 @@ public class MissionsViewCluesView extends UINode {
     Series <Clue> clues = null;
     if (focus instanceof Plot) {
       Plot plot = (Plot) focus;
-      header = "EVIDENCE FOR "+plot.nameForCase(player);
+      header = "EVIDENCE FOR "+CaseFX.nameFor(plot, player);
       clues = player.leads.cluesFor(plot, true);
       forPlot = true;
     }
@@ -53,7 +53,7 @@ public class MissionsViewCluesView extends UINode {
       null, header, 25, null
     );
     for (Clue clue : clues) {
-      draw.addEntry(null, clue.longDescription(player), 100, clue);
+      draw.addEntry(null, CaseFX.longDescription(clue, player), 100, clue);
     }
     draw.performDraw(across, down, this, surface, g);
     down = draw.down;

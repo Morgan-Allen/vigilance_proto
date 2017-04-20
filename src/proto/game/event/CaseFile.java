@@ -16,8 +16,9 @@ public class CaseFile implements Session.Saveable {
   /**  Data fields, construction and save/load methods-
     */
   final Base base;
-  final public Plot subject;
+  final Plot subject;
   List <Clue> clues = new List();
+  int caseID;
   
   
   
@@ -32,13 +33,20 @@ public class CaseFile implements Session.Saveable {
     base    = (Base) s.loadObject();
     subject = (Plot) s.loadObject();
     s.loadObjects(clues);
+    caseID = s.loadInt();
   }
   
   
   public void saveState(Session s) throws Exception {
-    s.saveObject(base   );
-    s.saveObject(subject);
-    s.saveObjects(clues);
+    s.saveObject (base   );
+    s.saveObject (subject);
+    s.saveObjects(clues  );
+    s.saveInt    (caseID );
+  }
+  
+  
+  public int caseID() {
+    return caseID;
   }
   
   
@@ -86,6 +94,11 @@ public class CaseFile implements Session.Saveable {
     for (Clue clue : other.clues) {
       clues.include(clue);
     }
+  }
+  
+  
+  public Plot subject() {
+    return subject;
   }
   
   

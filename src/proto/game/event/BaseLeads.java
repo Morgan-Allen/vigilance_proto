@@ -110,7 +110,7 @@ public class BaseLeads {
     if (match != null) return match;
     
     final CaseFile file = new CaseFile(base, plot);
-    plot.caseID = nextCaseID++;
+    file.caseID = nextCaseID++;
     files.put(plot, file);
     return file;
   }

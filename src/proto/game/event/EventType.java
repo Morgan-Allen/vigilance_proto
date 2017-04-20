@@ -13,10 +13,10 @@ public abstract class EventType extends Index.Entry implements
   Session.Saveable
 {
   
-  
   final static Index <EventType> INDEX = new Index();
-  final String name;
-  final Image icon;
+  
+  final public String name;
+  final public Image icon;
   
   
   protected EventType(String name, String ID, String imgPath) {

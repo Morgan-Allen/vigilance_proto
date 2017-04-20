@@ -34,12 +34,12 @@ public class MainView extends UINode {
   
   final public EquipmentView equipView  ;
   final public TrainingView  trainView  ;
-  final public MissionsView  missionView;
+  final public CasesView     casesView  ;
   final public InvestingView investView ;
   final public HistoryView   historyView;
   
   final public ProgressOptionsView progOptions;
-  final public StatsReadoutView mainReadout;
+  final public StatsReadoutView    mainReadout;
   
   final public Image selectCircle, selectSquare;
   
@@ -73,13 +73,13 @@ public class MainView extends UINode {
     
     //  Add views for each tab:
     final Box2D tabSubBounds = new Box2D(0, 25, fullWide, fullHigh - 145);
-    missionView = new MissionsView (mainUI, tabSubBounds);
+    casesView = new CasesView (mainUI, tabSubBounds);
     investView  = new InvestingView(mainUI, tabSubBounds);
     equipView   = new EquipmentView(mainUI, tabSubBounds);
     trainView   = new TrainingView (mainUI, tabSubBounds);
     historyView = new HistoryView  (mainUI, tabSubBounds);
     tabContent = new UINode[] {
-      missionView, investView, equipView, trainView
+      casesView, investView, equipView, trainView
     };
     
     tabsNode = new UINode(mainUI, new Box2D(0, 0, fullWide, 25));
@@ -104,7 +104,7 @@ public class MainView extends UINode {
     tabsNode.addChildren(tabButtons);
     mainUI  .addChildren(tabContent);
     
-    switchToTab(missionView);
+    switchToTab(casesView);
     
     progOptions = new ProgressOptionsView(mainUI, new Box2D(
       (fullWide / 2) - 100, fullHigh - 170, 200, 50

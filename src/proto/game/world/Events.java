@@ -78,20 +78,23 @@ public class Events {
   
   
   public void scheduleEvent(Event event) {
-    int time = world.timing.totalHours();
-    if (event.timeBegins() == -1 || event.timeBegins() < time) {
-      event.setBeginTime(time, true);
-    }
-    if (! event.scheduled()) {
-      event.setBeginTime(event.timeBegins(), true);
-    }
-    coming.include(event);
+    scheduleEvent(event, 0);
   }
   
   
   public void scheduleEvent(Event event, int delayHours) {
-    event.setBeginTime(world.timing.totalHours() + delayHours, true);
-    scheduleEvent(event);
+    
+    int time = world.timing.totalHours();
+    int ID   = coming.size() + 1;
+    
+    if (event.timeBegins() == -1 || event.timeBegins() < time) {
+      event.scheduleStart(time + delayHours, ID);
+    }
+    else {
+      event.scheduleStart(event.timeBegins(), ID);
+    }
+    
+    coming.include(event);
   }
   
   

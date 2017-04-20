@@ -19,6 +19,7 @@ public abstract class Event implements Session.Saveable, Assignment {
   final public EventType type;
   
   final World world;
+  int eventID = -1;
   int timeBegins = -1;
   boolean scheduled, complete;
   
@@ -36,6 +37,7 @@ public abstract class Event implements Session.Saveable, Assignment {
     s.cacheInstance(this);
     type       = (EventType) s.loadObject();
     world      = (World    ) s.loadObject();
+    eventID    = s.loadInt();
     timeBegins = s.loadInt ();
     scheduled  = s.loadBool();
     complete   = s.loadBool();
@@ -47,6 +49,7 @@ public abstract class Event implements Session.Saveable, Assignment {
   public void saveState(Session s) throws Exception {
     s.saveObject(type      );
     s.saveObject(world     );
+    s.saveInt   (eventID   );
     s.saveInt   (timeBegins);
     s.saveBool  (scheduled );
     s.saveBool  (complete  );
@@ -99,9 +102,10 @@ public abstract class Event implements Session.Saveable, Assignment {
   
   /**  Regular updates and life cycle:
     */
-  public void setBeginTime(int time, boolean scheduled) {
-    this.timeBegins = time;
-    this.scheduled = scheduled;
+  public void scheduleStart(int time, int eventID) {
+    this.timeBegins = time       ;
+    this.eventID    = eventID    ;
+    this.scheduled  = eventID > 0;
   }
   
   

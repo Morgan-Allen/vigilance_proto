@@ -12,16 +12,16 @@ import java.awt.Graphics2D;
 
 
 
-public class MissionsViewPerpsView extends UINode {
+public class CasePerpsView extends UINode {
   
   
-  public MissionsViewPerpsView(UINode parent, Box2D bounds) {
+  public CasePerpsView(UINode parent, Box2D bounds) {
     super(parent, bounds);
   }
   
   
   protected boolean renderTo(Surface surface, Graphics2D g) {
-    MissionsView parent = mainView.missionView;
+    CasesView parent = mainView.casesView;
     Object focus = parent.activeFocus;
     if (focus instanceof Plot.Role) {
       return renderSuspects((Plot.Role) focus, surface, g);
@@ -37,7 +37,7 @@ public class MissionsViewPerpsView extends UINode {
     //
     //  Extract basic game-references first:
     Base player = mainView.player();
-    MissionsView parent = mainView.missionView;
+    CasesView parent = mainView.casesView;
     Object focus = parent.priorFocus();
     if (! (focus instanceof Plot)) return false;
     Plot plot = (Plot) focus;
@@ -47,7 +47,7 @@ public class MissionsViewPerpsView extends UINode {
     ViewUtils.ListDraw draw = new ViewUtils.ListDraw();
     int across = 10, down = 10;
     draw.addEntry(
-      null, "SUSPECTS FOR "+role+" IN "+plot.nameForCase(player), 40, null
+      null, "SUSPECTS FOR "+role+" IN "+CaseFX.nameFor(plot, player), 40, null
     );
     for (Element e : player.leads.suspectsFor(role, plot)) {
       draw.addEntry(e.icon(), e.name(), 40, e);
@@ -69,7 +69,7 @@ public class MissionsViewPerpsView extends UINode {
     //
     //  Extract basic game-references first:
     Base player = mainView.player();
-    MissionsView parent = mainView.missionView;
+    CasesView parent = mainView.casesView;
     Person agent = mainView.rosterView.selectedPerson();
     Series <Clue> clues = player.leads.cluesFor(suspect, true);
     Place lastSeen = player.leads.lastKnownLocation(suspect);
@@ -87,7 +87,8 @@ public class MissionsViewPerpsView extends UINode {
     }
     else {
       Clue first = clues.first();
-      draw.addEntry(null, first.longDescription(player), 100, first.plot());
+      String desc = CaseFX.longDescription(first, player);
+      draw.addEntry(null, desc, 100, first.plot());
     }
     
     String descAt = null;
@@ -99,19 +100,19 @@ public class MissionsViewPerpsView extends UINode {
       if (lastSeen != null) descAt += " Last Seen: "+lastSeen;
     }
     if (descAt != null) {
-      draw.addEntry(MissionsView.MYSTERY_IMAGE, descAt, 40, null);
+      draw.addEntry(CasesView.MYSTERY_IMAGE, descAt, 40, null);
     }
     
     for (Lead lead : player.leads.leadsFor(suspect)) {
       draw.addEntry(lead.icon(), lead.choiceInfo(agent), 20, lead);
     }
     draw.addEntry(
-      MissionsView.MYSTERY_IMAGE, "View Associates", 20,
-      MissionsView.PERP_LINKS
+      CasesView.MYSTERY_IMAGE, "View Associates", 20,
+      CasesView.PERP_LINKS
     );
     draw.addEntry(
-      MissionsView.FILE_IMAGE, "View All Evidence", 20,
-      MissionsView.PLOT_CLUES
+      CasesView.FILE_IMAGE, "View All Evidence", 20,
+      CasesView.PLOT_CLUES
     );
     draw.performDraw(across, down, this, surface, g);
     down = draw.down;
@@ -134,16 +135,16 @@ public class MissionsViewPerpsView extends UINode {
         parent.setActiveFocus(plot, false);
       }
     }
-    else if (draw.hovered == MissionsView.PERP_LINKS) {
+    else if (draw.hovered == CasesView.PERP_LINKS) {
       hoverDesc = "View persons and places associated with this suspect.";
       if (draw.clicked) {
-        parent.setActiveFocus(MissionsView.PERP_LINKS, false);
+        parent.setActiveFocus(CasesView.PERP_LINKS, false);
       }
     }
-    else if (draw.hovered == MissionsView.PLOT_CLUES) {
+    else if (draw.hovered == CasesView.PLOT_CLUES) {
       hoverDesc = "Review all evidence assembled on this suspect.";
       if (draw.clicked) {
-        parent.setActiveFocus(MissionsView.PLOT_CLUES, false);
+        parent.setActiveFocus(CasesView.PLOT_CLUES, false);
       }
     }
     g.setColor(Color.LIGHT_GRAY);

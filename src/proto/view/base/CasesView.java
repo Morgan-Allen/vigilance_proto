@@ -14,7 +14,7 @@ import java.awt.Graphics2D;
 
 
 
-public class MissionsView extends UINode {
+public class CasesView extends UINode {
   
   /**  Constants, data fields, construction and save/load methods-
     */
@@ -34,10 +34,10 @@ public class MissionsView extends UINode {
   
   MapInsetView mapView;
   ScrollArea casesArea;
-  MissionsViewRolesView rolesView;
-  MissionsViewCluesView cluesView;
-  MissionsViewPerpsView perpsView;
-  MissionsViewLinksView linksView;
+  CaseRolesView rolesView;
+  CaseCluesView cluesView;
+  CasePerpsView perpsView;
+  CaseLinksView linksView;
   UINode focusViews[], activeFocusView;
   StringButton backButton;
   
@@ -46,7 +46,7 @@ public class MissionsView extends UINode {
   
   
   
-  public MissionsView(final UINode parent, Box2D viewBounds) {
+  public CasesView(final UINode parent, Box2D viewBounds) {
     super(parent, viewBounds);
     
     int fullWide = (int) viewBounds.xdim(), fullHigh = (int) viewBounds.ydim();
@@ -71,10 +71,10 @@ public class MissionsView extends UINode {
     UINode scrollKid = new UINode(casesArea, scrollBound) {};
     casesArea.attachScrollPane(scrollKid, (int) scrollBound.ydim());
     
-    rolesView  = new MissionsViewRolesView(scrollKid, scrollBound);
-    cluesView  = new MissionsViewCluesView(scrollKid, scrollBound);
-    perpsView  = new MissionsViewPerpsView(scrollKid, scrollBound);
-    linksView  = new MissionsViewLinksView(scrollKid, scrollBound);
+    rolesView  = new CaseRolesView(scrollKid, scrollBound);
+    cluesView  = new CaseCluesView(scrollKid, scrollBound);
+    perpsView  = new CasePerpsView(scrollKid, scrollBound);
+    linksView  = new CaseLinksView(scrollKid, scrollBound);
     focusViews = new UINode[] { rolesView, cluesView, perpsView, linksView };
     scrollKid.addChildren(focusViews);
     
@@ -132,12 +132,12 @@ public class MissionsView extends UINode {
     for (Plot plot : player.leads.activePlots()) {
       if (plot.complete()) continue;
       Image icon = plot.icon();
-      if (icon == null) icon = MissionsView.ALERT_IMAGE;
-      draw.addEntry(icon, plot.nameForCase(player), 40, plot);
+      if (icon == null) icon = CasesView.ALERT_IMAGE;
+      draw.addEntry(icon, CaseFX.nameFor(plot, player), 40, plot);
     }
     
     for (Trial trial : world.council.upcomingTrials()) {
-      Image icon = MissionsView.TRIAL_IMAGE;
+      Image icon = CasesView.TRIAL_IMAGE;
       String desc = trial.toString();
       float evidence = trial.rateEvidence();
       int date = (trial.timeBegins() - time) / World.HOURS_PER_DAY;

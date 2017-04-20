@@ -20,15 +20,15 @@ public class MessageUtils {
     
     if (clue.isReport()) {
       header.append("CRIME REPORT: "+clue.plot().name());
-      desc.append(clue.longDescription(player));
+      desc.append(CaseFX.longDescription(clue, player));
     }
     else if (clue.isTipoff()) {
       header.append("TIPOFF");
-      desc.append(clue.longDescription(player));
+      desc.append(CaseFX.longDescription(clue, player));
     }
     else {
       header.append("EVIDENCE FOUND");
-      desc.append(clue.longDescription(player));
+      desc.append(CaseFX.longDescription(clue, player));
     }
     if (effects != null) {
       Region region = clue.place().region();
@@ -58,7 +58,7 @@ public class MessageUtils {
     s.append(" are scheduled for trial in "+days+" days time.");
     
     view.queueMessage(new MessageView(
-      view, MissionsView.TRIAL_IMAGE, "Trial Scheduled", s.toString(),
+      view, CasesView.TRIAL_IMAGE, "Trial Scheduled", s.toString(),
       "Dismiss"
     ) {
       protected void whenClicked(String option, int optionID) {
@@ -86,7 +86,7 @@ public class MessageUtils {
     }
     
     view.queueMessage(new MessageView(
-      view, MissionsView.TRIAL_IMAGE, "Trial Concluded", s.toString(),
+      view, CasesView.TRIAL_IMAGE, "Trial Concluded", s.toString(),
       "Dismiss"
     ) {
       protected void whenClicked(String option, int optionID) {
@@ -103,7 +103,7 @@ public class MessageUtils {
     s.append(person+" has been released after serving their sentence.");
     
     view.queueMessage(new MessageView(
-      view, MissionsView.TRIAL_IMAGE, "Trial Concluded", s.toString(),
+      view, CasesView.TRIAL_IMAGE, "Trial Concluded", s.toString(),
       "Dismiss"
     ) {
       protected void whenClicked(String option, int optionID) {

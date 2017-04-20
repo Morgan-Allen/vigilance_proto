@@ -377,6 +377,23 @@ public class Lead extends Task {
   }
   
   
+  protected float recognition(int attemptResult, Place scene, Element e) {
+    //
+    //  We assign a higher probability of recognition if the suspect is
+    //  present on-site, if the skill-test went well, and based on a random
+    //  roll.
+    float recognition;
+    if (setResult > 0) {
+      recognition = setResult;
+    }
+    else {
+      recognition = e == null ? 0 : (e.place() == scene ? 0.5f : -0.5f);
+      recognition = (recognition + attemptResult + Rand.num()) / 3;
+    }
+    return recognition;
+  }
+  
+  
   protected float attemptFollow(
     Step step, int tense, Plot plot, Series <Person> follow, int time
   ) {
@@ -384,7 +401,7 @@ public class Lead extends Task {
     //  First, check to see whether anything has actually changed here (i.e,
     //  avoid granting cumulative 'random' info over time.)  If it hasn't,
     //  just return.
-    String contactID = plot.caseID+"_"+step.uniqueID()+"_"+tense;
+    String contactID = plot.eventID+"_"+step.uniqueID()+"_"+tense;
     if (contactTime == -1 && ! contactID.equals(lastContactID)) {
       lastContactID = contactID;
       contactTime   = time;
@@ -394,34 +411,25 @@ public class Lead extends Task {
     }
     //
     //  Then perform the actual skill-test needed to ensure success:
-    CaseFile file    = base.leads.caseFor(plot);
-    Place    scene   = focus.place();
-             attempt = configAttempt(follow);
-    int      outcome = setResult > 0 ? 1 : attempt.performAttempt(1);
+    attempt = configAttempt(follow);
+    CaseFile file = base.leads.caseFor(plot);
+    Place scene = focus.place();
+    int outcome = setResult > 0 ? 1 : attempt.performAttempt(1);
     //
     //  And iterate over over all the elements involved to generate suitable
     //  clues:
     for (Element e : plot.involved(step)) {
-      //
-      //  We assign a higher probability of recognition if the suspect is
-      //  present on-site, if the skill-test went well, and based on a random
-      //  roll.
-      float recognition;
-      if (setResult > 0) recognition = setResult;
-      else {
-        recognition = e.place() == scene ? 0.5f : -0.5f;
-        recognition = (recognition + outcome + Rand.num()) / 3;
-      }
+      float recognition = recognition(outcome, scene, e);
       Plot.Role role = plot.roleFor(e);
       //
       //  If recognition is strong, we get an exact confirmation of the role of
       //  the suspect and their current location.  If it's weaker, we get a
       //  partial clue, and if it's weaker still, we get no clue at all.
-      if (recognition >= 0.66f) {
+      if (recognition > 0.66f) {
         Clue confirms = Clue.confirmSuspect(plot, role, e, e.place());
         file.recordClue(confirms, this, time, scene);
       }
-      else if (recognition >= 0.33f) {
+      else if (recognition > 0.33f) {
         Series <Clue> possible = step.possibleClues(plot, e, this);
         Clue gained = (Clue) Rand.pickFrom(possible);
         if (gained != null) file.recordClue(gained, this, time, scene);
@@ -429,6 +437,21 @@ public class Lead extends Task {
       else {
         continue;
       }
+    }
+    //
+    //  We check separately for any element whose role is mentioned-
+    float recogMention = recognition(outcome, scene, null);
+    if (step.mentions != null && recogMention > 0.5f) {
+      Element match = plot.filling(step.mentions);
+      Clue confirms = Clue.confirmSuspect(plot, step.mentions, match);
+      file.recordClue(confirms, this, time, scene);
+    }
+    //
+    //  And for the overall objective of the plot-
+    float recogAim = recognition(outcome, scene, null);
+    if (step.canLeakAim() && recogAim > 0.5f) {
+      Clue confirms = Clue.confirmAim(plot);
+      file.recordClue(confirms, this, time, scene);
     }
     //
     //  Either way, you have to take the risk of tipping off the perps

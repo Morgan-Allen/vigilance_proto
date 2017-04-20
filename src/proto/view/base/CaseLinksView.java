@@ -11,10 +11,10 @@ import java.awt.Graphics2D;
 
 
 
-public class MissionsViewLinksView extends UINode {
+public class CaseLinksView extends UINode {
   
   
-  public MissionsViewLinksView(UINode parent, Box2D bounds) {
+  public CaseLinksView(UINode parent, Box2D bounds) {
     super(parent, bounds);
   }
   
@@ -23,7 +23,7 @@ public class MissionsViewLinksView extends UINode {
     //
     //  Extract basic game-references first:
     Base player = mainView.player();
-    MissionsView parent = mainView.missionView;
+    CasesView parent = mainView.casesView;
     Object focus = parent.priorFocus();
     if (! (focus instanceof Element)) return false;
     Element suspect = (Element) focus;
@@ -41,7 +41,7 @@ public class MissionsViewLinksView extends UINode {
         r.associate
       );
       if (r.plot != null) draw.addEntry(
-        r.plot.icon(), r.label+" "+r.plot.nameForCase(player), 25,
+        r.plot.icon(), r.label+" "+CaseFX.nameFor(r.plot, player), 25,
         r.plot
       );
     }

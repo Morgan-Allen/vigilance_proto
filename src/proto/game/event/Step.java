@@ -19,7 +19,6 @@ public class Step extends Index.Entry implements Session.Saveable {
     acting  ,
     subject ,
     mentions,
-    brings  ,
     from    ,
     goes    ;
   int medium;
@@ -159,26 +158,13 @@ public class Step extends Index.Entry implements Session.Saveable {
   }
   
   
-  protected Batch <Clue> addIntentClues(
-    Plot plot, Element focus, Lead lead, Batch <Clue> possible
-  ) {
-    //  TODO:  Restore later.
-    /*
-    World world = plot.base.world();
-    int time = world.timing.totalHours();
-    Place place = focus.place();
-    
-    Step heist = plot.mainHeist();
-    int heistTime = heist.timeScheduled();
-    PlotType heistType = (PlotType) plot.type;
-    
-    Clue forHeist = new Clue(plot, Plot.ROLE_OBJECTIVE);
-    forHeist.confirmHeistDetails(heistType, heistTime, lead, time, place);
-    possible.add(forHeist);
-    //*/
-    return possible;
+  protected boolean canLeakAim() {
+    for (Plot.Role main : Plot.MAIN_ROLES) {
+      if (main == mentions) return true;
+      if (Visit.arrayIncludes(involved, main)) return true;
+    }
+    return false;
   }
-  
   
   
   public Series <Clue> possibleClues(
@@ -187,7 +173,6 @@ public class Step extends Index.Entry implements Session.Saveable {
     Batch <Clue> possible = new Batch();
     addTraitClues   (plot, focus, lead, possible);
     addLocationClues(plot, focus, lead, possible);
-    addIntentClues  (plot, focus, lead, possible);
     return possible;
   }
   

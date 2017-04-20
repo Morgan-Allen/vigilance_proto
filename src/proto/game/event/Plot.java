@@ -19,6 +19,7 @@ public abstract class Plot extends Event {
   final public static String
     ASPECT = "Aspect",
     PERP   = "Perp"  ,
+    ITEM   = "Item"  ,
     SCENE  = "Scene" ,
     VICTIM = "Victim";
   
@@ -53,6 +54,10 @@ public abstract class Plot extends Event {
       return category == PERP;
     }
     
+    public boolean isItem() {
+      return category == ITEM;
+    }
+    
     public boolean isScene() {
       return category == SCENE;
     }
@@ -67,18 +72,21 @@ public abstract class Plot extends Event {
   }
   
   final public static Role
+    ROLE_OBJECTIVE  = new Role("role_objective" , "Objective" , ASPECT),
+    ROLE_TIME       = new Role("role_time"      , "Time"      , ASPECT),
     ROLE_MASTERMIND = new Role("role_mastermind", "Mastermind", PERP  ),
     ROLE_HQ         = new Role("role_hq"        , "HQ"        , SCENE ),
     ROLE_ORGANISER  = new Role("role_organiser" , "Organiser" , PERP  ),
     ROLE_HIDEOUT    = new Role("role_hideout"   , "Hideout"   , SCENE ),
     ROLE_TARGET     = new Role("role_target"    , "Target"    , VICTIM),
-    ROLE_SCENE      = new Role("role_scene"     , "Scene"     , SCENE );
+    ROLE_SCENE      = new Role("role_scene"     , "Scene"     , SCENE ),
+    
+    MAIN_ROLES[] = { ROLE_MASTERMIND, ROLE_ORGANISER, ROLE_TARGET };
   
   
   /**  Data fields, construction and save/load methods-
     */
   final Base base;
-  int caseID = -1;
   
   int spookLevel = 0;
   List <RoleEntry> entries = new List();
@@ -109,7 +117,6 @@ public abstract class Plot extends Event {
   public Plot(Session s) throws Exception {
     super(s);
     base       = (Base) s.loadObject();
-    caseID     = s.loadInt();
     spookLevel = s.loadInt();
     
     for (int n = s.loadInt(); n-- > 0;) {
@@ -130,7 +137,6 @@ public abstract class Plot extends Event {
   public void saveState(Session s) throws Exception {
     super.saveState(s);
     s.saveObject(base);
-    s.saveInt(caseID    );
     s.saveInt(spookLevel);
     
     s.saveInt(entries.size());
@@ -617,31 +623,6 @@ public abstract class Plot extends Event {
   
   public String name() {
     return type.name+": "+target();
-  }
-  
-  
-  public String nameForCase(Base base) {
-    //return ""+organiser()+" (No. "+caseID+")";
-    //*
-    //CaseFile file = base.leads.caseFor(this);
-    //CaseFile forTarget = base.leads.caseFor(target());
-    boolean targetKnown = false, typeKnown = false;
-    
-    /*
-    for (Clue clue : file.clues) if (clue.heistType == this.type) {
-      typeKnown = true;
-    }
-    for (Clue clue : forTarget.clues) if (clue.confirmed) {
-      targetKnown = true;
-    }
-    //*/
-    
-    String name = "Case No. "+caseID;
-    if (targetKnown && typeKnown) name = type.name+": "+target();
-    else if (targetKnown) name += " (target: "+target()+")";
-    else if (typeKnown  ) name += " ("+type.name+")";
-    return name;
-    //*/
   }
   
 }

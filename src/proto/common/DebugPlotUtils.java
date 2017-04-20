@@ -6,13 +6,8 @@ import proto.game.event.*;
 import proto.game.scene.*;
 import proto.game.person.*;
 import proto.util.*;
+import proto.view.base.*;
 
-
-
-
-/*
- TODO:  Test to see if plots can be completed without guaranteed wins?
-//*/
 
 
 public class DebugPlotUtils {
@@ -72,7 +67,7 @@ public class DebugPlotUtils {
     file.recordClue(toPlace, Lead.LEAD_REPORT, time, place);
     file.recordClue(further, Lead.LEAD_REPORT, time, place);
     
-    I.say("\nGenerated location clue: "+toPlace.longDescription(played));
+    I.say("\nGenerated location clue: "+CaseFX.longDescription(toPlace, played));
     if (! file.clues().includes(toPlace)) {
       I.say("  Clue was not recorded.");
       recordCorrect = false;
@@ -231,7 +226,7 @@ public class DebugPlotUtils {
           I.say("  Should Bust? "+shouldBust);
           I.say("  Evidence Rating: "+evidence+"  Trail ID: "+trailIndex);
           for (Clue clue : played.leads.cluesFor(plot, role, true)) {
-            I.say("    "+clue.traitDescription()+" ("+clue.leadType()+")");
+            I.say("    "+clue+" ("+clue.leadType()+")");
           }
         }
         

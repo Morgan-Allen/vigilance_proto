@@ -157,19 +157,19 @@ public abstract class MapInsetView extends UINode {
       Series <Element> suspects = played.leads.activeSuspectsForRegion(n);
       int off = (suspects.size() * 50) / -2;
       for (final Element suspect : suspects) {
-        Image alertImage = MissionsView.FILE_IMAGE;
+        Image alertImage = CasesView.FILE_IMAGE;
         if (played.leads.suspectIsUrgent(suspect)) {
-          alertImage = MissionsView.ALERT_IMAGE;
+          alertImage = CasesView.ALERT_IMAGE;
         }
         ImageButton button = new ImageButton(
           alertImage, new Box2D(x + off - vx, y - (25 + vy), 50, 50), this
         ) {
           protected void whenClicked() {
-            mainView.switchToTab(mainView.missionView);
-            mainView.missionView.setActiveFocus(suspect, true);
+            mainView.switchToTab(mainView.casesView);
+            mainView.casesView.setActiveFocus(suspect, true);
           }
         };
-        button.toggled = suspect == mainView.missionView.activeFocus;
+        button.toggled = suspect == mainView.casesView.activeFocus;
         button.refers = suspect;
         button.renderNow(surface, g);
         
