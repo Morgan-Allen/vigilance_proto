@@ -3,16 +3,17 @@
 package proto.game.scene;
 import proto.common.*;
 import proto.game.world.*;
-import static proto.game.scene.SceneGen.*;
 import proto.util.*;
 
 
 
+/*
 public class SceneTypeCorridors extends SceneType {
   
   
   /**  Public constructor definition and generation methods-
     */
+/*
   public SceneTypeCorridors(
     String name, String ID, Object... args
   ) {
@@ -20,21 +21,21 @@ public class SceneTypeCorridors extends SceneType {
   }
   
 
-  public Scene generateScene(World world, int size, boolean forTesting) {
-    final Scene scene = new Scene(world, size);
-    scene.setupScene(forTesting);
-    applyToScene(scene, 2, 2, N, size - 4, forTesting);
+  public Scene generateScene(World world, int w, int h, boolean testing) {
+    final Scene scene = new Scene(world, w, h);
+    scene.setupScene(testing);
+    applyToScene(scene, 2, 2, N, w - 4, h - 4, testing);
     return scene;
   }
   
   
   public void applyToScene(
-    Scene scene, int offX, int offY, int facing, int limit, boolean forTesting
+    Scene scene, int offX, int offY, int facing, int w, int h, boolean testing
   ) {
     final SceneGenCorridors g = new SceneGenCorridors();
-    final Box2D area = new Box2D(offX, offY, limit, limit);
+    final Box2D area = new Box2D(offX, offY, w, h);
     g.scene = scene;
-    g.verbose = forTesting;
+    g.verbose = testing;
     attemptRoomDivision(g, this, area);
     
     placeCurtainWall(g, this, area);
@@ -50,6 +51,7 @@ public class SceneTypeCorridors extends SceneType {
   
   /**  Internal utility methods and data structures-
     */
+/*
   static class SceneGenCorridors extends SceneGen {
     int minRoomSize = 4;
     float corWideFraction = 0.125f;
@@ -152,6 +154,7 @@ public class SceneTypeCorridors extends SceneType {
   
   /**  Utility methods for checking the validity of room placement-
     */
+/*
   AreaCheck attemptAreaCheck(
     SceneGenCorridors g, SceneType parent, Box2D area
   ) {
@@ -203,6 +206,7 @@ public class SceneTypeCorridors extends SceneType {
   
   /**  Utility methods for furniture placement-
     */
+/*
   //  TODO:  In future, you might want to do a proper perimeter trace...
   void placeCurtainWall(
     SceneGenCorridors g, SceneType buildingType, Box2D area
@@ -288,7 +292,7 @@ public class SceneTypeCorridors extends SceneType {
   }
 }
 
-
+//*/
 
 
 

@@ -166,7 +166,7 @@ public class Common {
         Person hits  = volley.origAsPerson();
         Scene  scene = self  .currentScene();
         Tile at = self.currentTile();
-        self.setExactPosition(at.scene, at.x, at.y, 0);
+        self.setExactPosition((Scene) at.scene, at.x, at.y, 0);
         float counterChance = 0.5f;
         boolean opening = volley.melee() && ! volley.didConnect();
         if (Rand.num() < counterChance && opening) {

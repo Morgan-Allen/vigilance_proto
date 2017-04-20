@@ -29,14 +29,14 @@ public class SceneVision implements TileConstants {
   }
   
   
-  void setupFog(int size) {
+  void setupFog(int wide, int high) {
     Person.Side SIDES[] = Person.Side.values();
     allMaps = new FogMap[SIDES.length];
     
     for (Person.Side side : SIDES) {
       FogMap map = allMaps[side.ordinal()] = new FogMap();
       map.side = side;
-      map.fog = new byte[size][size];
+      map.fog = new byte[wide][high];
     }
   }
   
@@ -72,7 +72,7 @@ public class SceneVision implements TileConstants {
     //  TODO:  You need to include visibility-lifting persistent items or
     //  debuffs here...
     for (FogMap map : allMaps) {
-      for (Coord c : Visit.grid(0, 0, scene.size, scene.size, 1)) {
+      for (Coord c : Visit.grid(0, 0, scene.wide, scene.high, 1)) {
         map.fog[c.x][c.y] = 0;
       }
     }
@@ -143,7 +143,7 @@ public class SceneVision implements TileConstants {
   
   
   public int coverFor(Tile at, Tile from, boolean report) {
-    Scene scene = from.scene;
+    Scene scene = (Scene) from.scene;
     final SightLine line = new SightLine();
     line.setTo(from, at);
     line.shrinkToDest(1.44f);

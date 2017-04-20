@@ -4,8 +4,9 @@
   couple of notes:
   
   Allowable subtypes are:
-    SUBTYPE_WALLING and SUBTYPE_FURNISH
-    (Walls are usually for partitions/exteriors, furniture for interiors.)
+    SUBTYPE_WALLING, SUBTYPE_FURNISH and SUBTYPE_DETAIL
+    (Walls are usually for partitions/exteriors, furniture for interiors, and
+    details for small objects that you want rendered on top of furniture.)
   
   Allowable blockLevels are:
     BLOCK_NONE, BLOCK_PARTIAL and BLOCK_FULL
@@ -115,10 +116,14 @@
   Note:  walls, doors, windows and even the floor-type are optional (though you
   might get a crash if you try to add walls without a wall-type?)
   
-  Fixed scenes define a grid, including a map between index-numbers and object-
+  Fixed scenes define grids, including a map between index-numbers and object-
   types for furniture.  The grid then specifies contents for each x/y point
   within it's width and height.  (Each point should be separated by whitespace,
   but the amount doesn't matter.)
+  
+  Multiple grids can be specified for a given scene, to allow for multiple
+  layers of objects.  (e.g, you can lay out a custom floor-pattern using a grid
+  layout.  If you do so, you can omit the usual floor argument from the scene.)
   
   
   Refer to an object in a given space by it's index.  Use n(orth), e(ast),
@@ -143,12 +148,12 @@
   Wall Left:    [
   Wall Bottom:  _
   Wall Right:   ]
-  Wall Top:     ‾
+  Wall Top:     -
   Window:       '
   Door:         /
   
   Example 2:
-    [‾ ‾  ‾  ‾]
+    [- -  -  -]
     [  1  .   ]'
     [  .  2e  ]/
     [_ _  _  _]
@@ -174,7 +179,7 @@
     1 = "civic_jewel_case"
     2 = "civic_jewel_case_long"
   >
-    [‾ ‾' ‾/ ‾  ‾  ‾]
+    [- -' -/ -  -  -]
     [  1s 2w .  1w  ]'
     [  2  .  .  2   ]/
     [/ .  .  .  .   ]
@@ -211,9 +216,42 @@
 
 <comment>
   This defines a composite scene.  Composite scenes are put together like
-  jigsaws from other, smaller scenes, in a semi-random order.  You can specify
-  units that reference another scene's ID, and add some parameters that control
-  how often that unit will be used.
+  jigsaws from other, smaller scenes, in a semi-random order.
+  
+  The following parameters place constraints on how large the scene can be:
+  
+  unitSize:
+    The expected size of a normal unit within this scene.  Placements will be
+    locked to multiples of this size- e.g, if unitSize = "7", then sub-units
+    can be placed at x = 7, x = 14, x = 21, x = 28, etc.
+  
+  minUnitsWide: (optional)
+    The minimum number of units wide this scene should be.  Defaults to 2.
+  
+  minUnitsHigh: (optional)
+    The minimum number of units high this scene should be.  Defaults to 2.
+  
+  maxUnitsWide: (optional)
+    The maximum number of units wide this scene should be.  Defaults to 8.
+  
+  maxUnitsHigh: (optional)
+    The maximum number of units high this scene should be.  Defaults to 8.
+  
+  unitsWide: (optional)
+    Sets both minUnitsWide and maxUnitsWide to this value.
+  
+  unitsHigh: (optional)
+    Sets both minUnitsHigh and maxUnitsHigh to this value.
+  
+  For example, if
+    unitSize = "10"
+    minUnitsWide = "3" maxUnitsWide = "5"
+    minUnitsHigh = "2" maxUnitsHigh = "3"
+  Then the scene will be no smaller than 30x20 tiles, and no larger than 50x30.
+  
+  
+  You can specify units (the 'jigsaw pieces') that reference another scene's ID,
+  and add some parameters that control how often that unit will be used.
   
   Priorities allowed are:
     PRIORITY_HIGH, PRIORITY_MEDIUM, PRIORITY_LOW
@@ -230,9 +268,10 @@
   will appear, and 'percent' specifies how many should appear as a fraction of
   total units.  You don't have to specify both.
   
-  Note:  This part is still kind of experimental, so if you have any requests
-  or complaints let me know.  (We could also skip it entirely if it's causing
-  problems, and just use grid-based scenes for now.)
+  Alternatively, you can specify exact 'x', 'y' and 'dir' coordinates to place
+  a unit at a fixed position and facing.  (Note that x and y are in unit
+  increments, not tile coordinates.  e.g, if unitSize = 8, then x = "3" and y
+  = "1" will place the unit 24 tiles across and 8 tiles down.)
   
 </comment>
 
@@ -241,7 +280,8 @@
   name           = "Civic Test Structure"
   ID             = "civic_test_structure"
   unitSize       = "6"
-  maxUnitsAcross = "2"
+  maxUnitsWide   = "2"
+  maxUnitsHigh   = "2"
   floor          = "civic_floor"
   wall           = "civic_wall"
   door           = "civic_door"              

@@ -5,25 +5,26 @@ import proto.common.*;
 import proto.game.world.*;
 import proto.game.person.*;
 import proto.util.*;
-import static proto.util.TileConstants.*;
 
 
 
-public class Tile implements Session.Saveable {
+public class Tile implements Session.Saveable, TileConstants {
   
   
   /**  Data fields, constructors and save/load methods-
     */
-  final public Scene scene;
+  final public Scenery scene;
   final public int x, y;
   
+  Scenery.Room room;
   private Stack <Element> inside  = new Stack();
   private Stack <Person > persons = new Stack();
+  private Prop floor = null;
   
   Object flag;
   
   
-  Tile(Scene s, int x, int y) {
+  Tile(Scenery s, int x, int y) {
     this.scene = s;
     this.x = x;
     this.y = y;
@@ -32,11 +33,12 @@ public class Tile implements Session.Saveable {
   
   public Tile(Session s) throws Exception {
     s.cacheInstance(this);
-    scene = (Scene) s.loadObject();
+    scene = (Scenery) s.loadObject();
     x     = s.loadInt();
     y     = s.loadInt();
     s.loadObjects(inside );
     s.loadObjects(persons);
+    floor = (Prop) s.loadObject();
   }
   
   
@@ -46,6 +48,7 @@ public class Tile implements Session.Saveable {
     s.saveInt(y);
     s.saveObjects(inside );
     s.saveObjects(persons);
+    s.saveObject (floor  );
   }
   
   
@@ -62,8 +65,8 @@ public class Tile implements Session.Saveable {
   }
   
   
-  public Element topInside() {
-    return inside.last();
+  public Prop floor() {
+    return floor;
   }
   
   
@@ -190,22 +193,34 @@ public class Tile implements Session.Saveable {
     float eastY = solveY(origin, line, x + 1);
     
     if (nortX >= 0) {
-      if (report) I.say("    Intersects Y="+(y + 0)+" at "+nortX);
+      if (report) {
+        I.say("    Intersects Y="+(y + 0)+" at "+nortX);
+        I.add("  Filling is: "+filling(W));
+      }
       maxVal = Nums.max(maxVal, fillVal);
       maxVal = Nums.max(maxVal, wallVal(W, valID));
     }
     if (soutX >= 0) {
-      if (report) I.say("    Intersects Y="+(y + 1)+" at "+soutX);
+      if (report) {
+        I.say("    Intersects Y="+(y + 1)+" at "+soutX);
+        I.add("  Filling is: "+filling(E));
+      }
       maxVal = Nums.max(maxVal, fillVal);
       maxVal = Nums.max(maxVal, wallVal(E, valID));
     }
     if (westY >= 0) {
-      if (report) I.say("    Intersects X="+(x + 0)+" at "+westY);
+      if (report) {
+        I.say("    Intersects X="+(x + 0)+" at "+westY);
+        I.add("  Filling is: "+filling(S));
+      }
       maxVal = Nums.max(maxVal, fillVal);
       maxVal = Nums.max(maxVal, wallVal(S, valID));
     }
     if (eastY >= 0) {
-      if (report) I.say("    Intersects X="+(x + 1)+" at "+eastY);
+      if (report) {
+        I.say("    Intersects X="+(x + 1)+" at "+eastY);
+        I.add("  Filling is: "+filling(N));
+      }
       maxVal = Nums.max(maxVal, fillVal);
       maxVal = Nums.max(maxVal, wallVal(N, valID));
     }
@@ -258,25 +273,39 @@ public class Tile implements Session.Saveable {
   
   
   public boolean hasWall(int dir) {
-    int facing = (dir + 2) % 8;
-    for (Element e : inside()) if (e.isProp()) {
-      Prop p = (Prop) e;
-      if (p.kind().thin() && p.facing() == facing) return true;
-    }
-    return false;
+    Prop wall = filling((dir + 2) % 8);
+    return wall != null && PropType.isWall(wall);
+  }
+  
+  
+  public boolean hasFloor() {
+    return floor != null;
   }
   
   
   
   /**  Modifying occupancy-
     */
-  public void setInside(Element p, boolean is) {
+  public void setOccupant(Person p, boolean is) {
+    setInside(p, is);
+    if (is) persons.include((Person) p);
+    else    persons.remove ((Person) p);
+  }
+  
+  
+  public void setDropped(Item i, boolean is) {
+    setInside(i, is);
+  }
+  
+  
+  protected void setFloor(Prop f) {
+    floor = f;
+  }
+  
+  
+  protected void setInside(Element p, boolean is) {
     if (is) inside.include(p);
     else    inside.remove (p);
-    if (p.isPerson()) {
-      if (is) persons.include((Person) p);
-      else    persons.remove ((Person) p);
-    }
   }
   
   
@@ -289,13 +318,13 @@ public class Tile implements Session.Saveable {
   
   
   public static void printWallsMask(Scene scene) {
-    int size = scene.size(), span = (size * 2) + 1;
+    int spanW = scene.fills.length, spanH = scene.fills[0].length;
     I.say("\nPRINTING WALLS FOR SCENE");
     
-    for (int y = 0; y < span; y++) {
+    for (int y = 0; y < spanH; y++) {
       I.add("\n  ");
       
-      for (int x = 0; x < span; x++) {
+      for (int x = 0; x < spanW; x++) {
         boolean bordY = y % 2 == 0;
         boolean bordX = x % 2 == 0;
         Prop fills = scene.fills[x][y];

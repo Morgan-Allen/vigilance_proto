@@ -18,7 +18,6 @@ public class DebugSceneGen {
     World world = new World();
     Place park = new Place(Facilities.BUSINESS_PARK, 0, world);
     SceneType root = park.kind().sceneType();
-    root.generateScene(world, 32, true);
+    root.generateScene(world, 32, 32, true);
   }
-  
 }

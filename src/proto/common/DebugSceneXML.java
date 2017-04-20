@@ -11,7 +11,7 @@ import proto.content.places.*;
 
 
 
-public class DebugSceneFile extends RunGame {
+public class DebugSceneXML extends RunGame {
   
   final static SceneType FILE_TEST_SCENE;
   final static XML SCENE_XML;
@@ -29,18 +29,20 @@ public class DebugSceneFile extends RunGame {
   public static void main(String args[]) {
     GameSettings.debugScene = true;
     GameSettings.pauseScene = true;
-    runGame(new DebugSceneFile(), "saves/debug_scene_file");
+    runGame(new DebugSceneXML(), "saves/debug_scene_xml");
   }
   
   
   protected World setupWorld() {
     this.world = new World(this, savePath);
     
-    int     sceneSize = SCENE_XML.getInt("size");
-    Scene   scene     = FILE_TEST_SCENE.generateScene(world, sceneSize, true);
-    Faction owns      = Heroes.JANUS_INDUSTRIES;
-    Base    player    = new Base(Facilities.MANOR, world, owns);
+    int     pS     = SCENE_XML.getInt("prefSize");
+    Scene   scene  = FILE_TEST_SCENE.generateScene(world, pS, pS, true);
+    Faction owns   = Heroes.JANUS_INDUSTRIES;
+    Base    player = new Base(Facilities.MANOR, world, owns);
     world.addBase(player, true);
+    
+    Tile.printWallsMask(scene);
     
     Person toSelect = null;
     
@@ -59,8 +61,9 @@ public class DebugSceneFile extends RunGame {
     
     world.enterScene(scene);
     
-    if (toSelect == null) {
-      scene.view().setZoomPoint(scene.tileAt(8, 8));
+    if (toSelect == null || toSelect.currentTile() == null) {
+      int dim = Nums.min(scene.wide() / 2, scene.high() / 2);
+      scene.view().setZoomPoint(scene.tileAt(dim, dim));
     }
     else {
       scene.view().setSelection(toSelect, false);

@@ -11,10 +11,10 @@ import static proto.content.places.UrbanScenes.*;
 
 
 
-public class DebugSceneFixed extends RunGame {
+public class DebugSceneGrid extends RunGame {
   
   
-  final public static SceneType FIXED_TEST_SCENE = new SceneTypeFixed(
+  final public static SceneType GRID_TEST_SCENE = new SceneTypeGrid(
     "fixed test scene", "type_urban_scene_fixed",
     KIND_FLOOR,
     new PropType[] {
@@ -42,9 +42,7 @@ public class DebugSceneFixed extends RunGame {
   public static void main(String args[]) {
     GameSettings.debugScene      = true ;
     GameSettings.reportWorldInit = false;
-    //GameSettings.viewSceneBlocks = true;
-    //GameSettings.debugLineSight  = true;
-    runGame(new DebugSceneFixed(), "saves/debug_scene_fixed");
+    runGame(new DebugSceneGrid(), "saves/debug_scene_grid");
   }
   
   
@@ -53,14 +51,15 @@ public class DebugSceneFixed extends RunGame {
     DefaultGame.initDefaultWorld(world);
     //
     //  Generate the scene-
-    final Scene mission = new Scene(world, 12);
+    final Scene mission = new Scene(world, 12, 12);
     mission.setupScene(true);
     //*
-    SceneType sceneType = FIXED_TEST_SCENE;
-    sceneType.applyToScene(mission, 2, 2, TileConstants.E, 8, true);
-    for (int y = mission.size() - 1; y-- > 1;) {
+    SceneType sceneType = GRID_TEST_SCENE;
+    Scenery   gen       = sceneType.generateScenery(world, 8, 8, true);
+    sceneType.applyScenery(mission, gen, 2, 2, TileConstants.E, true);
+    for (int y = mission.high() - 1; y-- > 1;) {
       PropType kind = y == 6 ? KIND_DOOR : KIND_WALL;
-      mission.addProp(kind, 4, y, TileConstants.E);
+      mission.addProp(kind, 4, y, TileConstants.E, world);
     }
     //*/
     /*
@@ -79,7 +78,7 @@ public class DebugSceneFixed extends RunGame {
     //
     //  Then introduce the agent/s themselves-
     final Base base = world.playerBase();
-    int across = (mission.size() - 0) / 2;
+    int across = (mission.wide() - 0) / 2;
     Person hero = base.roster().first();
     hero.gear.equipItem(Gadgets.TEAR_GAS, PersonGear.SLOT_ITEM_1);
     hero.gear.equipItem(Gadgets.BOLAS   , PersonGear.SLOT_ITEM_2);
@@ -97,7 +96,7 @@ public class DebugSceneFixed extends RunGame {
     //  And a random goon-
     Person goon = Person.randomOfKind(Crooks.BRUISER, world);
     goon.addAssignment(mission);
-    mission.enterScene(goon, mission.size() - 1, across++);
+    mission.enterScene(goon, mission.wide() - 1, across++);
     goon.onTurnStart();
     goon.actions.assignAction(Common.STRIKE.configAction(
       goon, hero.currentTile(), hero, mission, null, null

@@ -4,7 +4,7 @@ package proto.content.places;
 import proto.common.*;
 import proto.game.scene.*;
 import static proto.game.scene.SceneType.*;
-import static proto.game.scene.SceneTypeGrid.*;
+import static proto.game.scene.SceneTypeUnits.*;
 
 
 
@@ -88,7 +88,7 @@ public class UrbanScenes {
     }
   ;
   
-  final public static SceneTypeFixed ROOM_MAIN_BAR = new SceneTypeFixed(
+  final public static SceneTypeGrid ROOM_MAIN_BAR = new SceneTypeGrid(
     "main bar", "type_main_bar_urban",
     KIND_FLOOR, BAR_ROOM_PROP_TYPES,
     8, 8, new byte[][] {
@@ -102,7 +102,7 @@ public class UrbanScenes {
       { 2, 2, 0, 2, 2, 0, 2, 2 },
     }
   );
-  final public static SceneTypeFixed ROOM_POOL_AREA = new SceneTypeFixed(
+  final public static SceneTypeGrid ROOM_POOL_AREA = new SceneTypeGrid(
     "pool area", "type_pool_area_urban",
     KIND_FLOOR, BAR_ROOM_PROP_TYPES,
     8, 8, new byte[][] {
@@ -116,7 +116,7 @@ public class UrbanScenes {
       { 0, 0, 0, 0, 0, 0, 7, 0 },
     }
   );
-  final public static SceneTypeFixed ROOM_SEATING = new SceneTypeFixed(
+  final public static SceneTypeGrid ROOM_SEATING = new SceneTypeGrid(
     "seating", "type_seating_urban",
     KIND_FLOOR, BAR_ROOM_PROP_TYPES,
     8, 8, new byte[][] {
@@ -155,7 +155,7 @@ public class UrbanScenes {
     }
   ;
   
-  final public static SceneTypeFixed ROOM_BATHROOM = new SceneTypeFixed(
+  final public static SceneTypeGrid ROOM_BATHROOM = new SceneTypeGrid(
     "bathroom", "type_bathroom_urban",
     KIND_BATHROOM_FLOOR, BATHROOM_PROP_TYPES,
     8, 8, new byte[][] {
@@ -170,9 +170,9 @@ public class UrbanScenes {
     }
   );
   
-  final public static SceneType URBAN_SCENE = new SceneTypeGrid(
+  final public static SceneType URBAN_SCENE = new SceneTypeUnits(
     "urban scene", "type_urban_scene",
-    8, 3,
+    8, 2, 2, 4, 4,
     KIND_WALL, KIND_DOOR, KIND_WINDOW, KIND_FLOOR,
     numberUnit         (ROOM_MAIN_BAR , WALL_EXTERIOR, 1    ),
     numberOrPercentUnit(ROOM_BATHROOM , WALL_INTERIOR, 20, 1),
