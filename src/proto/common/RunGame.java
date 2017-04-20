@@ -55,7 +55,8 @@ public abstract class RunGame extends JFrame implements ActionListener {
   
   public boolean attemptReload(String savePath) {
     if (! Assets.exists(savePath)) return false;
-    this.world = null;
+    this.world  = null;
+    this.paused = true;
     Session s = Session.loadSession(savePath, true);
     this.world = (World) s.loaded()[0];
     if (world != null) {

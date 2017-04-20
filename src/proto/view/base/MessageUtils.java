@@ -3,6 +3,7 @@
 package proto.view.base;
 import proto.game.world.*;
 import proto.game.event.*;
+import proto.game.scene.*;
 import proto.game.person.*;
 import proto.view.common.*;
 import proto.util.*;
@@ -40,6 +41,32 @@ public class MessageUtils {
     view.queueMessage(new MessageView(
       view, clue.icon(), header.toString(), desc.toString(),
       "Dismiss"
+    ) {
+      protected void whenClicked(String option, int optionID) {
+        mainView.dismissMessage(this);
+      }
+    });
+  }
+  
+  
+  public static void presentBustMessage(
+    MainView view, Scene scene, Lead lead, Plot plot
+  ) {
+    StringBuffer desc = new StringBuffer();
+    
+    Series <Person> did = lead.assigned();
+    for (Person p : did) {
+      if (p == did.first()) desc.append(""+p);
+      else if (p == did.last()) desc.append(" and "+p);
+      else desc.append(", "+p);
+    }
+    desc.append(" interrupted ");
+    desc.append(plot.toString());
+    desc.append(".");
+    
+    view.queueMessage(new MessageView(
+      view, null, "Busted: "+plot.type.name, desc.toString(),
+      "Begin Mission"
     ) {
       protected void whenClicked(String option, int optionID) {
         mainView.dismissMessage(this);

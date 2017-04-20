@@ -86,7 +86,7 @@ public class TrainingView extends UINode {
     }
     
     ViewUtils.drawWrappedString(
-      "Currently training: "+trainDesc, g,
+      person+" currently training: "+trainDesc, g,
       vx + across, vy + down, 320, 30
     );
     

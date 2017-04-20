@@ -187,7 +187,11 @@ public abstract class Plot extends Event implements Assignment {
   
   
   public Step mainHeist() {
-    for (Step s : steps) if (s.medium == Lead.MEDIUM_ASSAULT) return s;
+    for (Step s : steps) {
+      if (s.subject != ROLE_TARGET        ) continue;
+      if (s.medium  != Lead.MEDIUM_ASSAULT) continue;
+      return s;
+    }
     return null;
   }
   
@@ -577,13 +581,15 @@ public abstract class Plot extends Event implements Assignment {
       file.recordClue(tipoff, Lead.LEAD_TIPOFF, time, at);
     }
     
-    if (ends && step.medium == Lead.MEDIUM_ASSAULT) {
+    if (ends && step == mainHeist()) {
       EventEffects effects = generateEffects(step);
       Element  target = target();
       Place    scene  = target.place();
       Clue     report = Clue.confirmSuspect(this, ROLE_TARGET, target, scene);
+      Clue     aim    = Clue.confirmAim(this);
       CaseFile file   = player.leads.caseFor(this);
-      file.recordClue(report, Lead.LEAD_REPORT, time, scene);
+      file.recordClue(aim   , Lead.LEAD_REPORT, time, scene, false);
+      file.recordClue(report, Lead.LEAD_REPORT, time, scene       );
       effects.applyEffects(target.place());
       recordEffects(effects);
     }
@@ -656,7 +662,7 @@ public abstract class Plot extends Event implements Assignment {
   
   
   public String name() {
-    return type.name+": "+target();
+    return type.name+" of "+target();
   }
   
 }

@@ -6,6 +6,7 @@ import proto.game.world.*;
 import proto.game.person.*;
 import proto.game.scene.*;
 import proto.util.*;
+import proto.view.base.*;
 import static proto.game.person.PersonStats.*;
 
 import java.awt.Image;
@@ -506,7 +507,7 @@ public class Lead extends Task {
   
   
   protected Scene enteredScene(Step step, int tense, Plot plot, int time) {
-    if (tense != TENSE_DURING || noScene) {
+    if (noScene || tense != TENSE_DURING) {
       return null;
     }
     if (step.medium != MEDIUM_ASSAULT && type.medium != MEDIUM_ASSAULT) {
@@ -519,8 +520,8 @@ public class Lead extends Task {
   public boolean updateAssignment() {
     if (! super.updateAssignment()) return false;
     Series <Person> active = active();
-    World world = base.world();
-    int time = world.timing.totalHours();
+    World world  = base.world();
+    int   time   = world.timing.totalHours();
     float result = RESULT_NONE;
     //
     //  Continuously monitor for events of interest connected to the current
@@ -532,6 +533,7 @@ public class Lead extends Task {
         if (canDetect(step, tense, plot, time)) {
           Scene scene = enteredScene(step, tense, plot, time);
           if (scene != null) {
+            MessageUtils.presentBustMessage(world.view(), scene, this, plot);
             base.world().enterScene(scene);
           }
           else {

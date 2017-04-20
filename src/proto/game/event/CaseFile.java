@@ -71,6 +71,13 @@ public class CaseFile implements Session.Saveable {
   
   
   public void recordClue(
+    Clue clue, Lead.Type type, int time, Place place, boolean report
+  ) {
+    recordClue(clue, null, type, time, place, null, report);
+  }
+  
+  
+  public void recordClue(
     Clue clue, Lead source, Lead.Type type, int time, Place place,
     EventEffects effects, boolean display
   ) {
