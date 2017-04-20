@@ -66,6 +66,17 @@
 />
 
 <prop
+  name       = "Dark Wood Floor"
+  ID         = "civic_dark_wood_floor"
+  sprite     = "floor_wood_dark.png"
+  wide       = "1"
+  high       = "1"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+  blockSight = "false"
+/>
+
+<prop
   name       = "Blue Tile Floor"
   ID         = "civic_blue_tile_floor"
   sprite     = "floor_blue_tile.png"
@@ -394,6 +405,75 @@
   blockSight = "true"
 />
 
+<prop
+  name       = "Kitchen Sink"
+  ID         = "kitchen_sink"
+  sprite     = "kitchen_sink.png"
+  wide       = "2"
+  high       = "1"
+  subtype    = "SUBTYPE_FURNISH"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "false"
+/>
+
+<prop
+  name       = "Kitchen Cupboard"
+  ID         = "kitchen_cupboard"
+  sprite     = "kitchen_cupboard.png"
+  wide       = "3"
+  high       = "1"
+  subtype    = "SUBTYPE_FURNISH"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "false"
+/>
+<prop
+  name       = "Kitchen Table"
+  ID         = "kitchen_table"
+  sprite     = "kitchen_table.png"
+  wide       = "3"
+  high       = "2"
+  subtype    = "SUBTYPE_FURNISH"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "false"
+/>
+<prop
+  name       = "Kitchen Frige"
+  ID         = "kitchen_frige"
+  sprite     = "frige.png"
+  wide       = "1"
+  high       = "1"
+  subtype    = "SUBTYPE_FURNISH"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "true"
+/>
+
+<scene
+  name   = "Kitchen"
+  ID     = "bank_scene_kitchen"
+  wide   = "6"
+  high   = "6"
+  wall   = "civic_wall"
+  door   = "civic_door"
+  window = "civic_window"
+  floor  = "civic_dark_wood_floor"
+>
+  <grid
+    1 = "kitchen_sink"
+    2 = "kitchen_cupboard"
+    3 = "fridge"
+    4 = "kitchen_table"
+    5 = "water"
+    6 = "bank_plant_1"
+  >
+    -1  - -2 - - -3
+    .   .  . . .  .
+    .   .  . . .  .
+    .   .  4 . .  .
+    5w  .  . . .  .
+    .   .  . . .  .
+  </grid>
+</scene>
+
 <scene
   name   = "Toilets"
   ID     = "bank_scene_toilets"
@@ -405,16 +485,6 @@
   floor  = "civic_blue_tile_floor"
 >
   <grid
-    1 = "toilet_stall_door"
-  >
-    .  .   .  .   [1s-] 1s-]
-    .  .   .  .     .    .
-    _  _   _  [1_]  1_]  1_
-    .  .   .  [1s]  1s]  1s
-    .  .   .  .     .    .
-    .  .   .  [_]   .    .
-  </grid>
-  <grid
     1 = "toilet"
     2 = "urinal"
     3 = "sink"
@@ -422,12 +492,12 @@
     5 = "paper_towels"
     6 = "bank_plant_1"
   >
-    4  .  .  .  1  1
-    .  .  .  .  .  .
-    .  .  6  1s 1s 1s
-    3  .  .  1  1  1
-    .  .  .  .  .  .
-    6  5s .  2  2  2
+    4  .  .    .   1   1
+    .  .  .    .   .   .
+    _  _  _6  _1s _1s _1s
+    3  .  .    1   1   1
+    .  .  .    .   .   .
+    6  5s .    2   2   2
   </grid>
 </scene>
 
@@ -485,18 +555,18 @@
   4 = "civic_metal_floor"
   5 = "civic_floor_edge_vertical"
 >
-  4  4  4  4  4  4  4  4  4  4  4  4
-  4  4  4  4  4  4  4  4  4  4  4  4
-  3  2e 2e 2e 2e 2e 2e 2e 2e 2e 2e 3e
-  5  1  1  1  1  1  1  1  1  1  1  5s
-  5  1  1  1  1  1  1  1  1  1  1  5s
-  5  1  1  1  1  1  1  1  1  1  1  5s
-  5  1  1  1  1  1  1  1  1  1  1  5s
-  5  1  1  1  1  1  1  1  1  1  1  5s
-  5  1  1  1  1  1  1  1  1  1  1  5s
-  3w 2w 2w 2w 2w 2w 2w 2w 2w 2w 2w 3s
-  1  1  1  1  1  1  1  1  1  1  1  1
-  1  1  1  1  1  1  1  1  1  1  1  1
+  4  4  4  4  4   4   4  4  4  4  4  4
+  4  4  4  4  4   4   4  4  4  4  4  4
+  3  2e 2e 2e 2e  2e  2e 2e 2e 2e 2e 3e
+  5  1  1  1  1   1   1  1  1  1  1  5s
+  5  1  1  1  1   1   1  1  1  1  1  5s
+  5  1  1  1  1   1   1  1  1  1  1  5s
+  5  1  1  1  1   1   1  1  1  1  1  5s
+  5  1  1  1  1   1   1  1  1  1  1  5s
+  5  1  1  1  1   1   1  1  1  1  1  5s
+  3w 2w 2w 2w 3e  1   1  3  2w 2w 2w 3s
+  1  1  1  1  5   1   1  5s  1  1  1  1
+  1  1  1  1  3w  2w  2w 3s  1  1  1  1
 </grid
   <grid
     1 = "bank_plant_1"
@@ -660,5 +730,15 @@
     typeID = "bank_scene_toilets"
     wall   = "WALL_INTERIOR"
     x = "2" y = "3" dir = "N"
+  />
+  <unit
+    typeID = "bank_scene_kitchen"
+    wall   = "WALL_EXTERIOR"
+    x = "0" y = "4" dir = "N"
+  />
+  <unit
+    typeID = "bank_scene_general_office"
+    wall   = "WALL_EXTERIOR"
+    x = "1" y = "4" dir = "S"
   />
 </scene>
