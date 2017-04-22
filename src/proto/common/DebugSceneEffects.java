@@ -46,44 +46,87 @@ public class DebugSceneEffects extends RunGame {
   
   protected boolean runTests(World world, boolean afterLoad, boolean suite) {
     I.say("\n\n\nEvaluating after-effects of combat scene...");
+    I.say("  Current date: "+world.timing.currentTimeString());
     
     Trial trial = world.events.latestTrial();
+    Batch <Person> released = new Batch();
     if (trial == null) {
       I.say("  Trial was never scheduled!");
       return false;
     }
     
+    Base base = trial.plot().base();
+    Person leader = base.leader();
+    int maxSentence = 0, maxTrialTime = world.timing.totalHours();
+    maxTrialTime += Council.TRIAL_DELAY_MAX * World.HOURS_PER_DAY;
+    trial.addToAccused(leader);
+    
     while (! trial.complete()) {
       world.updateWorld(48);
+      
+      if (world.timing.totalHours() > maxTrialTime) {
+        I.say("  Trial did not conclude in allowed time!");
+        return false;
+      }
     }
     
     I.say("  Trial concluded...");
     for (Person p : trial.accused()) {
       if (! p.isCaptive()) {
-        I.say("  "+p+" was released.");
+        released.add(p);
+        I.say("    "+p+" was released.");
       }
       else {
         int sentence = world.council.sentenceDuration(p);
-        I.say("  "+p+" is serving a "+sentence+" day sentence.");
+        maxSentence = Nums.max(maxSentence, sentence);
+        I.say("    "+p+" is serving a "+sentence+" day sentence.");
       }
     }
     
+    if (leader != null) {
+      world.council.applySentence(leader, 2);
+      int sentence = world.council.sentenceDuration(leader);
+      maxSentence = Nums.max(maxSentence, sentence);
+      I.say("    "+leader+" is serving a "+sentence+" day sentence.");
+    }
+    
+    int maxCaptiveTime = world.timing.totalHours();
+    maxCaptiveTime += maxSentence * World.HOURS_PER_DAY;
+    maxCaptiveTime += World.HOURS_PER_DAY * World.DAYS_PER_WEEK;
+    
+    I.say("  Awaiting release of all prisoners...");
+    while (released.size() < trial.accused().size()) {
+      for (Person p : trial.accused()) {
+        if (released.includes(p)) {
+          continue;
+        }
+        if (! p.isCaptive()) {
+          released.add(p);
+          I.say("    "+p+" was released on "+world.timing.currentTimeString());
+        }
+      }
+      
+      boolean leaderFree = released.includes(leader);
+      for (Event e : world.events.coming()) if (e.isPlot()) {
+        Plot plot = (Plot) e;
+        if (leaderFree || base != plot.base()) continue;
+        
+        I.say("New plot was generated while mastermind was still captive!");
+        return false;
+      }
+      
+      world.updateWorld(48);
+      
+      if (world.timing.totalHours() > maxCaptiveTime) {
+        I.say("  Prisoners were not released in allowed time!");
+        return false;
+      }
+    }
+    
+    I.say("  Scene effects all correct!");
     return true;
   }
   
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

@@ -194,7 +194,7 @@ public class Council {
     Sentence s = new Sentence();
     s.jailed = accused;
     s.timeStarts = world.timing.totalHours();
-    s.timeEnds = (int) ((Rand.num() + 0.5f) + TRIAL_SENTENCE_AVG);
+    s.timeEnds = (int) ((Rand.num() + 0.5f) * TRIAL_SENTENCE_AVG);
     s.timeEnds *= World.HOURS_PER_DAY * durationMult;
     s.timeEnds += s.timeStarts;
     sentences.put(accused, s);

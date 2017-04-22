@@ -1,6 +1,7 @@
 
 
 package proto.game.event;
+import proto.game.person.Person;
 import proto.game.world.*;
 import proto.common.*;
 import proto.util.*;
@@ -44,6 +45,12 @@ public class BasePlots {
   
   
   public Plot generateNextPlot() {
+    
+    Person leader = base.leader();
+    if (leader == null || leader.isCaptive() || ! leader.health.conscious()) {
+      return null;
+    }
+    
     Pick <Plot> pick = new Pick(0);
     
     for (PlotType type : plotTypes) {

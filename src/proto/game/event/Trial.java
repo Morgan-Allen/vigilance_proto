@@ -65,6 +65,11 @@ public class Trial extends Event {
   }
   
   
+  public void addToAccused(Person person) {
+    accused.add(person);
+  }
+  
+  
   public float rateEvidence(Person p) {
     float sumEvidence = 0;
     for (Plot plot : conducts.leads.involvedIn(p, true)) {
