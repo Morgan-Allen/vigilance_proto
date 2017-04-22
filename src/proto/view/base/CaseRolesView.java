@@ -30,7 +30,7 @@ public class CaseRolesView extends UINode {
     //  Then sort of the roles involved in the crime based on quality of
     //  information-
     class RoleView {
-      Plot.Role role;
+      Role role;
       Series <Clue> clues;
       Series <Element> suspects;
     }
@@ -40,7 +40,7 @@ public class CaseRolesView extends UINode {
         return 0;
       }
     };
-    for (Plot.Role role : player.leads.knownRolesFor(plot)) {
+    for (Role role : player.leads.knownRolesFor(plot)) {
       RoleView r = new RoleView();
       r.role = role;
       r.suspects = player.leads.suspectsFor(role, plot);
@@ -56,7 +56,7 @@ public class CaseRolesView extends UINode {
       null, "CASE FILE: "+CaseFX.nameFor(plot, player), 40, null
     );
     for (RoleView r : roles) {
-      Plot.Role role = r.role;
+      Role role = r.role;
       Image icon = null;
       String desc = null;
       Element match = r.suspects.size() == 1 ? r.suspects.first() : null;
@@ -102,8 +102,8 @@ public class CaseRolesView extends UINode {
         parent.setActiveFocus(CasesView.PLOT_CLUES, false);
       }
     }
-    else if (hovered instanceof Plot.Role) {
-      Plot.Role role = (Plot.Role) hovered;
+    else if (hovered instanceof Role) {
+      Role role = (Role) hovered;
       Series <Clue> clues = player.leads.cluesFor(plot, role, true);
       Clue top = clues.first();
       if (top != null) {

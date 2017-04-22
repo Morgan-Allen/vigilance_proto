@@ -216,11 +216,13 @@ public class SceneTypeUnits extends SceneType {
       }
       if (pick.empty()) break;
       
+      /*
       I.say("\nPossible placements were: ");
       for (SpacePick s : possible) {
         I.say("  "+s.unit+" at "+s.tx+"|"+s.ty+", face: "+s.facing);
       }
       I.say("");
+      //*/
       //
       //  Having pick the most promising option, we apply the furnishings to
       //  the scene:

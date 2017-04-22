@@ -27,7 +27,7 @@ public class PlotUtils {
   
   
   public static void fillExpertRole(
-    Plot plot, Trait trait, Series <Person> candidates, Plot.Role role
+    Plot plot, Trait trait, Series <Person> candidates, Role role
   ) {
     fillExpertRole(plot, trait, candidates, role, Plot.ROLE_HIDEOUT);
   }
@@ -35,7 +35,7 @@ public class PlotUtils {
   
   public static void fillExpertRole(
     Plot plot, Trait trait, Series <Person> candidates,
-    Plot.Role role, Plot.Role placing
+    Role role, Role placing
   ) {
     Pick <Person> pick = new Pick();
     for (Person p : candidates) {
@@ -50,7 +50,7 @@ public class PlotUtils {
   
   public static void fillInsideRole(
     Plot plot, Place target,
-    Plot.Role role, Plot.Role placing
+    Role role, Role placing
   ) {
     Pick <Person> pick = new Pick();
     for (Person p : target.residents()) {
@@ -65,7 +65,7 @@ public class PlotUtils {
   
   public static void fillItemRole(
     Plot plot, ItemType type, World world,
-    Plot.Role role, Plot.Role placing
+    Role role, Role placing
   ) {
     plot.assignRole(new Item(type, world), role, placing);
   }
@@ -207,7 +207,7 @@ public class PlotUtils {
       
       if (p.isCriminal() && p.currentScene() == scene && scene.wasWon()) {
         CaseFile  file = player.leads.caseFor(plot);
-        Plot.Role role = plot.roleFor(p);
+        Role      role = plot.roleFor(p);
         Place     site = scene.site();
         Clue redHanded = Clue.confirmSuspect(plot, role, p, site);
         file.recordClue(redHanded, lead, time, site, false);

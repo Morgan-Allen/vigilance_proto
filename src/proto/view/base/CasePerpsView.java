@@ -23,8 +23,8 @@ public class CasePerpsView extends UINode {
   protected boolean renderTo(Surface surface, Graphics2D g) {
     CasesView parent = mainView.casesView;
     Object focus = parent.activeFocus;
-    if (focus instanceof Plot.Role) {
-      return renderSuspects((Plot.Role) focus, surface, g);
+    if (focus instanceof Role) {
+      return renderSuspects((Role) focus, surface, g);
     }
     else if (parent.activeFocus instanceof Element) {
       return renderSuspect((Element) focus, surface, g);
@@ -33,7 +33,7 @@ public class CasePerpsView extends UINode {
   }
   
   
-  boolean renderSuspects(Plot.Role role, Surface surface, Graphics2D g) {
+  boolean renderSuspects(Role role, Surface surface, Graphics2D g) {
     //
     //  Extract basic game-references first:
     Base player = mainView.player();

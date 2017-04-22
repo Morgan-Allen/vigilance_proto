@@ -14,7 +14,7 @@ public class PlotKidnap extends Plot {
   
   /**  Data fields, construction and save/load methods:
     */
-  final public static Plot.Role
+  final public static Role
     ROLE_TAILS   = Plot.role("kidnap_tails"  , "Tails"  , PERP  ),
     ROLE_GRABS   = Plot.role("kidnap_grabs"  , "Grabs"  , PERP  ),
     ROLE_RANSOMS = Plot.role("kidnap_ransoms", "Ransoms", VICTIM),

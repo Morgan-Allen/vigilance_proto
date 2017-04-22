@@ -20,9 +20,9 @@ public class Clue implements Session.Saveable {
     TYPE_TRAIT    = 2,
     TYPE_LOCATION = 3;
 
-  int       clueType;
-  Plot      plot    ;
-  Plot.Role role    ;
+  int  clueType;
+  Plot plot    ;
+  Role role    ;
   
   Element match     = null;
   Trait   trait     = null;
@@ -41,7 +41,7 @@ public class Clue implements Session.Saveable {
     
     clueType   = s.loadInt();
     plot       = (Plot     ) s.loadObject();
-    role       = (Plot.Role) s.loadObject();
+    role       = (Role) s.loadObject();
     
     match      = (Element) s.loadObject();
     trait      = (Trait  ) s.loadObject();
@@ -80,7 +80,7 @@ public class Clue implements Session.Saveable {
   
   
   public static Clue locationClue(
-    Plot plot, Plot.Role role, Element location, int nearRange
+    Plot plot, Role role, Element location, int nearRange
   ) {
     Clue c = new Clue();
     c.plot      = plot;
@@ -93,7 +93,7 @@ public class Clue implements Session.Saveable {
   
   
   public static Clue traitClue(
-    Plot plot, Plot.Role role, Trait trait
+    Plot plot, Role role, Trait trait
   ) {
     Clue c = new Clue();
     c.plot     = plot;
@@ -105,7 +105,7 @@ public class Clue implements Session.Saveable {
   
   
   public static Clue confirmSuspect(
-    Plot plot, Plot.Role role, Element match, Place at
+    Plot plot, Role role, Element match, Place at
   ) {
     Clue c = new Clue();
     c.plot      = plot;
@@ -119,7 +119,7 @@ public class Clue implements Session.Saveable {
   
   
   public static Clue confirmSuspect(
-    Plot plot, Plot.Role role, Element match
+    Plot plot, Role role, Element match
   ) {
     return confirmSuspect(plot, role, match, null);
   }
@@ -193,7 +193,7 @@ public class Clue implements Session.Saveable {
   public Lead      source  () { return source  ; }
   public int       clueType() { return clueType; }
   public Plot      plot    () { return plot    ; }
-  public Plot.Role role    () { return role    ; }
+  public Role      role    () { return role    ; }
   
   public int     time        () { return timeFound ; }
   public Place   place       () { return placeFound; }

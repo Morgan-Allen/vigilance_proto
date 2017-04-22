@@ -421,7 +421,7 @@ public class Lead extends Task {
     //  clues:
     for (Element e : plot.involved(step)) {
       float recognition = recognition(outcome, scene, e);
-      Plot.Role role = plot.roleFor(e);
+      Role role = plot.roleFor(e);
       //
       //  If recognition is strong, we get an exact confirmation of the role of
       //  the suspect and their current location.  If it's weaker, we get a
@@ -497,6 +497,16 @@ public class Lead extends Task {
       if (perp != null) obstacle = perp.stats.levelFor(PERSUADE);
       if (site != null) obstacle = -1;
       if (area != null) obstacle = 10;
+    }
+    
+    if (perp != null) {
+      obstacle *= (perp.base().organisationRank(perp) + 2) / 4f;
+    }
+    if (site != null) {
+      obstacle *= (site.owner().organisationRank(site) + 2) / 4f;
+    }
+    if (area != null) {
+      obstacle *= 1f;
     }
     
     Attempt attempt = new Attempt(this);

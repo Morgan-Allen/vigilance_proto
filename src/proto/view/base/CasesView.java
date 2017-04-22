@@ -188,7 +188,7 @@ public class CasesView extends UINode {
     else if (focus instanceof Plot) {
       activeFocusView = rolesView;
     }
-    else if (focus instanceof Plot.Role) {
+    else if (focus instanceof Role) {
       activeFocusView = perpsView;
     }
     else if (focus instanceof Element) {

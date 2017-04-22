@@ -61,7 +61,7 @@ public class BaseLeads {
   }
   
   
-  public Series <Clue> cluesFor(Plot plot, Plot.Role role, boolean sort) {
+  public Series <Clue> cluesFor(Plot plot, Role role, boolean sort) {
     return cluesFor(plot, null, role, null, sort);
   }
   
@@ -80,7 +80,7 @@ public class BaseLeads {
   
   
   public Series <Clue> cluesFor(
-    Plot plot, Element match, Plot.Role role, Region area, boolean sort
+    Plot plot, Element match, Role role, Region area, boolean sort
   ) {
     List <Clue> matches = new List <Clue> () {
       protected float queuePriority(Clue r) {
@@ -130,8 +130,8 @@ public class BaseLeads {
   }
   
   
-  public Series <Plot.Role> knownRolesFor(Plot plot) {
-    Batch <Plot.Role> known = new Batch();
+  public Series <Role> knownRolesFor(Plot plot) {
+    Batch <Role> known = new Batch();
     known.include(Plot.ROLE_ORGANISER);
     known.include(Plot.ROLE_TARGET   );
     
@@ -177,7 +177,7 @@ public class BaseLeads {
   }
   
   
-  public Series <Element> suspectsFor(Plot.Role role, Plot plot) {
+  public Series <Element> suspectsFor(Role role, Plot plot) {
     Series <Clue> related = cluesFor(plot, null, role, null, false);
     Batch <Element> matches = new Batch();
     
@@ -198,7 +198,7 @@ public class BaseLeads {
     Element subject, Plot plot, boolean confirmedOnly
   ) {
     CaseFile file = caseFor(plot);
-    Plot.Role role = plot.roleFor(subject);
+    Role role = plot.roleFor(subject);
     float evidence = 0;
     
     for (Clue c : file.clues) {
@@ -219,7 +219,7 @@ public class BaseLeads {
   
   /**  ...and to their known locations:
     */
-  public Series <Element> possibleLocations(Plot.Role role, Plot plot) {
+  public Series <Element> possibleLocations(Role role, Plot plot) {
     //  TODO:  Return these values!
     Batch <Element> matches = new Batch();
     return matches;
@@ -234,6 +234,7 @@ public class BaseLeads {
   
   
   public Place lastKnownLocation(Element suspect) {
+    
     if (suspect.isPlace()) {
       return (Place) suspect;
     }
@@ -299,40 +300,35 @@ public class BaseLeads {
   public Series <Lead> leadsFor(Element focus) {
     final Batch <Lead> all = new Batch();
     Place   scene    = lastKnownLocation(focus);
-    boolean canFind  = scene == focus.place();
     boolean canEnter = scene != null && scene.canEnter(base);
     
-    if (focus.isPerson() && canFind) {
-      Person suspect = (Person) focus;
-      boolean victim = suspect.isCivilian();
-      boolean perp   = suspect.isCriminal();
+    if (focus.isPerson()) {
+      Person  suspect  = (Person) focus;
+      boolean canFind  = scene == focus.place();
+      boolean canMeet  = canFind && canEnter;
+      boolean canGuard = suspect.isCivilian() && canFind;
+      boolean canBust  = suspect.isCriminal() && canFind;
       
-      all.add(leadFor(suspect, Lead.LEAD_SURVEIL_PERSON));
-      if (canEnter) all.add(leadFor(suspect, Lead.LEAD_QUESTION));
-      if (victim  ) all.add(leadFor(suspect, Lead.LEAD_GUARD   ));
-      if (perp    ) all.add(leadFor(suspect, Lead.LEAD_BUST    ));
-    }
-    
-    if (focus.isPerson() && canEnter) {
-      all.add(leadFor(scene, Lead.LEAD_SURVEIL_BUILDING));
-      all.add(leadFor(scene, Lead.LEAD_WIRETAP         ));
-      all.add(leadFor(scene, Lead.LEAD_SEARCH          ));
+      if (canFind ) all.add(leadFor(suspect, Lead.LEAD_SURVEIL_PERSON));
+      if (canMeet ) all.add(leadFor(suspect, Lead.LEAD_QUESTION      ));
+      if (canEnter) all.add(leadFor(scene  , Lead.LEAD_WIRETAP       ));
+      if (canGuard) all.add(leadFor(suspect, Lead.LEAD_GUARD         ));
+      if (canBust ) all.add(leadFor(suspect, Lead.LEAD_BUST          ));
     }
     
     if (focus.isPlace()) {
       all.add(leadFor(focus, Lead.LEAD_SURVEIL_BUILDING));
       all.add(leadFor(focus, Lead.LEAD_WIRETAP         ));
-      all.add(leadFor(focus, Lead.LEAD_BUST            ));
-      if (canEnter) {
-        all.add(leadFor(focus, Lead.LEAD_SEARCH));
-        all.add(leadFor(focus, Lead.LEAD_GUARD ));
-      }
+      all.add(leadFor(focus, Lead.LEAD_SEARCH          ));
+      if (canEnter) all.add(leadFor(focus, Lead.LEAD_GUARD));
+      else          all.add(leadFor(focus, Lead.LEAD_BUST ));
     }
     
     if (focus.isRegion()) {
-      all.add(leadFor(focus, Lead.LEAD_PATROL ));
-      all.add(leadFor(focus, Lead.LEAD_SCAN   ));
-      all.add(leadFor(focus, Lead.LEAD_CANVASS));
+      all.add(leadFor(focus, Lead.LEAD_PATROL   ));
+      all.add(leadFor(focus, Lead.LEAD_SCAN     ));
+      all.add(leadFor(focus, Lead.LEAD_CANVASS  ));
+      //all.add(leadFor(focus, Lead.LEAD_CRACKDOWN));
     }
     
     return all;
@@ -354,12 +350,12 @@ public class BaseLeads {
   }
   
   
-  private boolean suspectHasRole(Element suspect, Plot.Role... roles) {
+  private boolean suspectHasRole(Element suspect, Role... roles) {
     for (Clue clue : this.cluesFor(suspect, true)) {
       Plot plot = clue.plot();
       if (plot.complete()) continue;
       
-      for (Plot.Role r : roles) {
+      for (Role r : roles) {
         Element fills = plot.filling(r);
         if (suspect == fills) return true;
       }

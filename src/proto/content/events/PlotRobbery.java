@@ -17,7 +17,7 @@ public class PlotRobbery extends Plot {
   
   /**  Data fields, construction and save/load methods-
     */
-  final public static Plot.Role
+  final public static Role
     ROLE_CASING  = Plot.role("robbery_casing" , "Casing" , PERP ),
     ROLE_CRACKER = Plot.role("robbery_cracker", "Cracker", PERP ),
     ROLE_HACKER  = Plot.role("robbery_hacker" , "Hacker" , PERP ),

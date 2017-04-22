@@ -118,7 +118,7 @@ public class DebugPlotUtils {
       Series <Clue> extracted = played.leads.extractNewClues();
       if (extracted.empty()) continue;
       
-      Batch <Plot.Role> roles = new Batch();
+      Batch <Role> roles = new Batch();
       boolean narrowed = true, allPossible = true;
       for (Clue clue : extracted) {
         Clue match = null;
@@ -138,7 +138,7 @@ public class DebugPlotUtils {
         I.say("  Not all Clues were originally possible!");
       }
       
-      for (Plot.Role role : roles) {
+      for (Role role : roles) {
         Series <Element> suspects = played.leads.suspectsFor(role, plot);
         I.say("\n"+suspects.size()+" Suspects for role: "+role);
         int sID = 0;
@@ -214,11 +214,11 @@ public class DebugPlotUtils {
         float evidence = played.leads.evidenceAgainst(suspect, plot, false);
         if (evidence <= 0) continue;
         
-        int       trailIndex = 1 + Visit.indexOf(suspect, bestTrail);
-        boolean   shouldBust = suspect == Visit.last(bestTrail);
-        Plot.Role role       = plot.roleFor(suspect);
-        Place     lastKnown  = played.leads.lastKnownLocation(suspect);
-        Place     location   = suspect.place();
+        int     trailIndex = 1 + Visit.indexOf(suspect, bestTrail);
+        boolean shouldBust = suspect == Visit.last(bestTrail);
+        Role    role       = plot.roleFor(suspect);
+        Place   lastKnown  = played.leads.lastKnownLocation(suspect);
+        Place   location   = suspect.place();
         
         if (verbose) {
           I.say("\n  "+suspect+" ("+role+")");

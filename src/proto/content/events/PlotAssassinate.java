@@ -15,7 +15,7 @@ public class PlotAssassinate extends Plot {
   
   /**  Data fields, construction and save/load methods-
     */
-  final public static Plot.Role
+  final public static Role
     ROLE_MOLE    = Plot.role("assass_mole"   , "Mole"   , PERP),
     ROLE_SCOUTS  = Plot.role("assass_scouts" , "Scouts" , PERP),
     ROLE_SHOOTER = Plot.role("assass_shooter", "Shooter", PERP);

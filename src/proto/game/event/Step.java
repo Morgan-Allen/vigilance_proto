@@ -14,7 +14,7 @@ public class Step extends Index.Entry implements Session.Saveable {
   final static Index <Step> INDEX = new Index();
   
   String label;
-  Plot.Role
+  Role
     involved[],
     acting  ,
     subject ,
@@ -46,21 +46,21 @@ public class Step extends Index.Entry implements Session.Saveable {
     */
   public static Step stepWith(
     String ID, String label,
-    Plot.Role acting, Plot.Role from, Plot.Role subject, Plot.Role goes,
-    Plot.Role mentions, int medium, int hoursTaken, Plot.Role... others
+    Role acting, Role from, Role subject, Role goes,
+    Role mentions, int medium, int hoursTaken, Role... others
   ) {
     Step s = new Step(ID, label);
     s.medium     = medium;
     s.hoursTaken = hoursTaken;
     
-    Batch <Plot.Role> involved = new Batch();
+    Batch <Role> involved = new Batch();
     involved.include(s.acting  = acting );
     involved.include(s.from    = from   );
     involved.include(s.subject = subject);
     involved.include(s.goes    = goes   );
-    for (Plot.Role role : others) involved.include(role);
+    for (Role role : others) involved.include(role);
     
-    s.involved = involved.toArray(Plot.Role.class);
+    s.involved = involved.toArray(Role.class);
     s.mentions = mentions;
     
     return s;
@@ -105,7 +105,7 @@ public class Step extends Index.Entry implements Session.Saveable {
     //
     //  Wiretaps and mentions can't reliably reveal any descriptive features
     //  of the suspects involved.
-    Plot.Role role = plot.roleFor(involved);
+    Role role = plot.roleFor(involved);
     if (role == null || medium == Lead.MEDIUM_WIRE) {
       return possible;
     }
@@ -141,7 +141,7 @@ public class Step extends Index.Entry implements Session.Saveable {
   protected Batch <Clue> addLocationClues(
     Plot plot, Element involved, Lead lead, Batch <Clue> possible
   ) {
-    Plot.Role role = plot.roleFor(involved);
+    Role role = plot.roleFor(involved);
     if (role == null || ! involved.isPlace()) return possible;
     
     World world = plot.base.world();
@@ -159,7 +159,7 @@ public class Step extends Index.Entry implements Session.Saveable {
   
   
   protected boolean canLeakAim() {
-    for (Plot.Role main : Plot.MAIN_ROLES) {
+    for (Role main : Plot.MAIN_ROLES) {
       if (main == mentions) return true;
       if (Visit.arrayIncludes(involved, main)) return true;
     }
@@ -190,7 +190,7 @@ public class Step extends Index.Entry implements Session.Saveable {
     s.append(label);
     s.append(" ["+Lead.MEDIUM_DESC[medium]+"]");
     s.append(" ["+from+" -> "+goes+"] [");
-    for (Plot.Role e : involved) {
+    for (Role e : involved) {
       s.append("\n    "+e);
     }
     s.append("\n  ]");
