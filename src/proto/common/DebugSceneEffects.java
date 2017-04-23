@@ -49,14 +49,22 @@ public class DebugSceneEffects extends RunGame {
     I.say("  Current date: "+world.timing.currentTimeString());
     
     Trial trial = world.events.latestTrial();
-    Batch <Person> released = new Batch();
+    boolean jailLeader = true;
+    
     if (trial == null) {
       I.say("  Trial was never scheduled!");
       return false;
     }
     
+    List <Person> released = new List();
     Base base = trial.plot().base();
     Person leader = base.leader();
+    
+    if (leader == null) {
+      I.say("  Plot has no mastermind/base-leader!");
+      return false;
+    }
+    
     int maxSentence = 0, maxTrialTime = world.timing.totalHours();
     maxTrialTime += Council.TRIAL_DELAY_MAX * World.HOURS_PER_DAY;
     trial.addToAccused(leader);
@@ -71,6 +79,9 @@ public class DebugSceneEffects extends RunGame {
     }
     
     I.say("  Trial concluded...");
+    I.say("  Defends:    "+trial.defends   ());
+    I.say("  Prosecutes: "+trial.prosecutes());
+    
     for (Person p : trial.accused()) {
       if (! p.isCaptive()) {
         released.add(p);
@@ -83,11 +94,12 @@ public class DebugSceneEffects extends RunGame {
       }
     }
     
-    if (leader != null) {
+    if (jailLeader) {
       world.council.applySentence(leader, 2);
       int sentence = world.council.sentenceDuration(leader);
       maxSentence = Nums.max(maxSentence, sentence);
-      I.say("    "+leader+" is serving a "+sentence+" day sentence.");
+      released.remove(leader);
+      I.say("  Leader "+leader+" is serving a "+sentence+" day sentence.");
     }
     
     int maxCaptiveTime = world.timing.totalHours();
@@ -107,12 +119,14 @@ public class DebugSceneEffects extends RunGame {
       }
       
       boolean leaderFree = released.includes(leader);
-      for (Event e : world.events.coming()) if (e.isPlot()) {
-        Plot plot = (Plot) e;
-        if (leaderFree || base != plot.base()) continue;
-        
-        I.say("New plot was generated while mastermind was still captive!");
+      Plot coming = comingPlot(base);
+      if (jailLeader && coming != null && ! leaderFree) {
+        I.say("New plot was generated while mastermind was captive: "+coming);
         return false;
+      }
+      if (coming != null && ! jailLeader) {
+        I.say("New plot was generated: "+coming);
+        break;
       }
       
       world.updateWorld(48);
@@ -123,10 +137,32 @@ public class DebugSceneEffects extends RunGame {
       }
     }
     
+    boolean newPlot = false;
+    if (jailLeader) while (! newPlot) {
+      Plot coming = comingPlot(base);
+      if (coming != null) {
+        I.say("  New plot was generated after mastermind's release: "+coming);
+        newPlot = true;
+        break;
+      }
+      world.updateWorld(48);
+    }
+    
     I.say("  Scene effects all correct!");
     return true;
   }
   
+  
+  private static Plot comingPlot(Base base) {
+    for (Event e : base.world().events.coming()) if (e.isPlot()) {
+      Plot plot = (Plot) e;
+      if (plot.base() == base) return plot;
+    }
+    return null;
+  }
+  
 }
+
+
 
 

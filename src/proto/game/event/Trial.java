@@ -103,6 +103,16 @@ public class Trial extends Event {
   }
   
   
+  public Person defends() {
+    return defends;
+  }
+  
+  
+  public Person prosecutes() {
+    return prosecutes;
+  }
+  
+  
   public boolean involves(Plot plot, Person accused) {
     if (plot != null && plot != this.plot) return false;
     if (accused != null && ! this.accused.includes(accused)) return false;
