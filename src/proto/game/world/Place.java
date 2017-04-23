@@ -110,6 +110,7 @@ public class Place extends Element {
         Person resides = Person.randomOfKind((PersonType) type, world);
         world.setInside(resides, true);
         setAttached(resides, true);
+        resides.setBase(owner());
         Place.setResident(resides, this, true);
       }
     }

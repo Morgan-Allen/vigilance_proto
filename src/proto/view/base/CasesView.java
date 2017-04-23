@@ -146,6 +146,17 @@ public class CasesView extends UINode {
       draw.addEntry(icon, desc, 50, trial.plot());
     }
     
+    //  TODO:  Also add entries for investment projects and agents in training,
+    //  and sort by estimated order of completion.
+    /*
+    for (Place place : world.underConstruction()) {
+      
+    }
+    for (Task task : player.activeAgentTasks()) {
+      
+    }
+    //*/
+    
     draw.performDraw(across, down, this, surface, g);
     down = draw.down;
     //

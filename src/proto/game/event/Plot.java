@@ -258,6 +258,15 @@ public abstract class Plot extends Event implements Assignment {
         int nextIndex = current == null ? 0 : (steps.indexOf(current) + 1);
         current = steps.atIndex(nextIndex);
         stepTimes[steps.indexOf(current)] = time;
+        
+        for (Element e : involved(current)) if (e.isPerson()) {
+          ((Person) e).addAssignment(this);
+        }
+        for (Person p : assigned()) {
+          Place goes = goes(p, current);
+          if (goes != null) goes.setAttached(p, true);
+        }
+        
         checkForTipoffs(current, true, false);
         if (verbose) {
           I.say("  Began step: "+current.label());
@@ -270,13 +279,6 @@ public abstract class Plot extends Event implements Assignment {
         completeEvent();
       }
       
-      for (Element e : involved(current)) if (e.isPerson()) {
-        ((Person) e).addAssignment(this);
-      }
-      for (Person p : assigned()) {
-        Place goes = goes(p, current);
-        if (goes != null) goes.setAttached(p, true);
-      }
       
       if (verbose) {
         I.say("  Current Time: "+time);
@@ -534,7 +536,7 @@ public abstract class Plot extends Event implements Assignment {
         Element focus     = filling(focusRole);
         Place   at        = focus.place();
         float   trust     = at.region().currentValue(Region.TRUST);
-        float   tipChance = trust / 10f;
+        float   tipChance = trust / 100f;
         
         tipChance -= base.organisationRank(focus) / 2f;
         if (GameSettings.freeTipoffs) tipChance = 1;
@@ -542,14 +544,17 @@ public abstract class Plot extends Event implements Assignment {
         tipWeights[i] = Nums.max(0, tipChance);
       }
       
-      Role     pickRole = (Role) Rand.pickFrom(step.involved, tipWeights);
-      Element  pick     = filling(pickRole);
-      Place    at       = pick.place();
-      Clue     tipoff   = Clue.confirmSuspect(this, pickRole, pick, at);
-      CaseFile file     = player.leads.caseFor(this);
+      Role  pickRole  = (Role) Rand.pickFrom(step.involved, tipWeights);
+      float tipChance = tipWeights[Visit.indexOf(pickRole, step.involved)];
       
-      file.recordClue(tipoff, Lead.LEAD_TIPOFF, time, at);
-      gaveTip = true;
+      if (tipChance > Rand.num()) {
+        Element  pick     = filling(pickRole);
+        Place    at       = pick.place();
+        Clue     tipoff   = Clue.confirmSuspect(this, pickRole, pick, at);
+        CaseFile file     = player.leads.caseFor(this);
+        file.recordClue(tipoff, Lead.LEAD_TIPOFF, time, at);
+        gaveTip = true;
+      }
     }
     
     if (ends && step == mainHeist()) {
