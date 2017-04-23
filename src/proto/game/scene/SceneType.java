@@ -196,7 +196,9 @@ public abstract class SceneType extends Index.Entry implements
       boolean isDoor = gen.tileAt(gx, gy).hasWall(dir);
       Tile    at     = within.tileAt(tx, ty);
       boolean blockT = at == null ? true  : (at.blocked() || at.opaque());
-      if (isDoor && blockT) return false;
+      if (isDoor && blockT) {
+        return false;
+      }
     }
     
     return true;

@@ -21,7 +21,8 @@ public class SceneView extends UINode implements TileConstants {
   /**  Data fields, construction and save/load methods-
     */
   final static int
-    TILE_SIZE = 64;
+    MAX_TILE_SIZE = 64,
+    MIN_TILE_SIZE = 16;
   final static String
     IMG_DIR = "media assets/action view/";
   final static Image
@@ -45,6 +46,7 @@ public class SceneView extends UINode implements TileConstants {
   Vec3D zoomPoint = new Vec3D();
   Tile hoverTile, zoomTile;
   int zoomX, zoomY;
+  int tileSize = MAX_TILE_SIZE;
   Person selectedPerson;
   
   static class TempFX {
@@ -156,8 +158,8 @@ public class SceneView extends UINode implements TileConstants {
     //
     //  Update camera information first-
     if (zoomTile != null) {
-      zoomX = (int) (zoomPoint.x * TILE_SIZE);
-      zoomY = (int) (zoomPoint.y * TILE_SIZE);
+      zoomX = (int) (zoomPoint.x * tileSize);
+      zoomY = (int) (zoomPoint.y * tileSize);
       zoomX -= vw / 2;
       zoomY -= vh / 2;
     }
@@ -245,9 +247,9 @@ public class SceneView extends UINode implements TileConstants {
     //  Otherwise, determine what tile (and any objects above) are being
     //  selected-
     boolean hasFocus = surface.tryHover(this);
-    int HT = TILE_SIZE / 2;
-    int hoverX = (surface.mouseX() + zoomX + HT - vx) / TILE_SIZE;
-    int hoverY = (surface.mouseY() + zoomY + HT - vy) / TILE_SIZE;
+    int HT = tileSize / 2;
+    int hoverX = (surface.mouseX() + zoomX + HT - vx) / tileSize;
+    int hoverY = (surface.mouseY() + zoomY + HT - vy) / tileSize;
     hoverTile = hasFocus ? scene.tileAt(hoverX, hoverY) : null;
     
     if (hoverTile != null) {
@@ -375,8 +377,8 @@ public class SceneView extends UINode implements TileConstants {
     float px, float py, String s, Color c, Graphics2D g
   ) {
     int x, y;
-    x = vx + (int) ((px - 0.50f) * TILE_SIZE);
-    y = vy + (int) ((py + 0.15f) * TILE_SIZE);
+    x = vx + (int) ((px - 0.50f) * tileSize);
+    y = vy + (int) ((py + 0.15f) * tileSize);
     g.setColor(c);
     g.drawString(s, x - zoomX, y - zoomY);
   }
@@ -389,8 +391,8 @@ public class SceneView extends UINode implements TileConstants {
     if (sprite == null) return;
     //
     //  Firstly, determine the centre of the tile in the visual field:
-    float x = vx + (px * TILE_SIZE);
-    float y = vy + (py * TILE_SIZE);
+    float x = vx + (px * tileSize);
+    float y = vy + (py * tileSize);
     //
     //  You want to centre the image on the centre of the tile, and rotate
     //  around that point.  However, the default image-rendering routines in
@@ -401,13 +403,13 @@ public class SceneView extends UINode implements TileConstants {
       offDist  = Nums.sqrt((w * w) + (h * h)) / 2,
       offX     = Nums.sin(offAngle) * offDist,
       offY     = Nums.cos(offAngle) * offDist;
-    x += offX * TILE_SIZE;
-    y += offY * TILE_SIZE;
+    x += offX * tileSize;
+    y += offY * tileSize;
     //
     //  We can then adjust the scale of the image to stretch out the sprite
     //  correctly, apply the needed transformations, and render:
-    w *= TILE_SIZE * 1f / sprite.getWidth (null);
-    h *= TILE_SIZE * 1f / sprite.getHeight(null);
+    w *= tileSize * 1f / sprite.getWidth (null);
+    h *= tileSize * 1f / sprite.getHeight(null);
     AffineTransform t = new AffineTransform();
     t.translate(x - zoomX, y - zoomY);
     t.rotate(Nums.toRadians(angle));
@@ -422,10 +424,10 @@ public class SceneView extends UINode implements TileConstants {
   ) {
     int x, y;
     if (! centre) { px -= 0.5f; py -= 0.5f; }
-    x = vx + (int) ((px - (centre ? (w / 2) : 0)) * TILE_SIZE);
-    y = vy + (int) ((py - (centre ? (h / 2) : 0)) * TILE_SIZE);
-    w *= TILE_SIZE;
-    h *= TILE_SIZE;
+    x = vx + (int) ((px - (centre ? (w / 2) : 0)) * tileSize);
+    y = vy + (int) ((py - (centre ? (h / 2) : 0)) * tileSize);
+    w *= tileSize;
+    h *= tileSize;
     g.setColor(fill);
     g.fillRect(x - zoomX, y - zoomY, (int) w, (int) h);
   }
@@ -457,8 +459,8 @@ public class SceneView extends UINode implements TileConstants {
   
   public Coord screenCoord(float px, float py) {
     int x, y;
-    x = (int) ((px - 0.0f) * TILE_SIZE) - zoomX;
-    y = (int) ((py - 0.0f) * TILE_SIZE) - zoomY;
+    x = (int) ((px - 0.0f) * tileSize) - zoomX;
+    y = (int) ((py - 0.0f) * tileSize) - zoomY;
     return new Coord(x, y);
   }
 }

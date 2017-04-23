@@ -1,0 +1,236 @@
+
+
+
+<prop
+  name       = "Floor"
+  ID         = "civic_floor"
+  sprite     = "floor_1.png"
+  wide       = "1"
+  high       = "1"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+  blockSight = "false"
+/>
+
+<prop
+  name       = "Thin Wall"
+  ID         = "civic_wall"
+  sprite     = "wall_thin.png"
+  wide       = "1"
+  high       = "0"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "true"
+/>
+
+<prop
+  name       = "Door"
+  ID         = "civic_door"
+  sprite     = "wall_thin_door.png"
+  wide       = "1"
+  high       = "0"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+  blockSight = "true"
+/>
+
+<prop
+  name       = "Window"
+  ID         = "civic_window"
+  sprite     = "wall_thin_window.png"
+  wide       = "1"
+  high       = "0"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "false"
+/>
+
+<prop
+  name       = "Wall"
+  ID         = "civic_wall_thick"
+  sprite     = "wall_thick.png"
+  wide       = "1"
+  high       = "1"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "true"
+/>
+
+
+
+
+<scene
+  name   = "Corner Unit"
+  ID     = "bank_corner_unit"
+  wide   = "8"
+  high   = "8"
+  wall   = "civic_wall"
+  door   = "civic_door"
+  window = "civic_window"
+>
+  <grid
+  >
+    [-  -  -  -  -  -] .  .
+    [.  .  .  .  .  .] .  .
+    [.  .  .  .  .  .  -  -
+    [.  .  .  .  .  .  .  .
+    [.  .  .  .  .  .  .  .
+    [_  _  .  .  .  .  .  .
+     .  . [.  .  .  .  .  _
+     .  . [.  .  .  .  .] .
+  </grid>
+</scene>
+
+<scene
+  name   = "Outside Facing Unit"
+  ID     = "bank_facing_unit_a"
+  wide   = "8"
+  high   = "8"
+  wall   = "civic_wall"
+  door   = "civic_door"
+  window = "civic_window"
+>
+  <grid
+  >
+     .  .  .  .  .  .  .  .
+     . [-  -  -  -  -  -] .
+     -  .  .  .  .  .  .  -
+     .  .  .  .  .  .  .  .
+     .  .  .  .  .  .  .  .
+     .  .  .  .  .  .  .  .
+     _  _  .  _  _  .  _  _
+     .  .  .  .  .  .  .  .
+  </grid>
+</scene>
+
+<scene
+  name   = "Outside Facing Unit"
+  ID     = "bank_facing_unit_b"
+  wide   = "8"
+  high   = "8"
+  wall   = "civic_wall"
+  door   = "civic_door"
+  window = "civic_window"
+>
+  <grid
+  >
+     .  .  .  .  .  .  .  .
+     .  .  .  .  .  .  .  .
+     -] . [-  -  -  -] . [-
+     .  -  .  .  .  .  -  .
+     .  .  .  .  .  .  .  .
+     .  .  .  .  .  .  .  .
+     _  .  _  _  _  _  .  _
+     .  .  .  .  .  .  .  .
+  </grid>
+</scene>
+
+
+<scene
+  name   = "Central Hall"
+  ID     = "bank_hall_unit"
+  wide   = "16"
+  high   = "8"
+  wall   = "civic_wall"
+  door   = "civic_door"
+  window = "civic_window"
+>
+  <grid
+    1 = "civic_wall_thick"
+  >
+     .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+     .  1  .  1  .  .  1  .  .  1  .  .  1  .  1  .
+     .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+     .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+     .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+     .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+     .  1  .  1  .  .  1  .  .  1  .  .  1  .  1  .
+     .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+  </grid>
+</scene>
+
+
+
+<prop
+  name       = "Revolving Door"
+  ID         = "revolving_door"
+  sprite     = "revolving_door.png"
+  wide       = "3"
+  high       = "2"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "false"
+/>
+
+<prop
+  name       = "Security Desk"
+  ID         = "security_desk"
+  sprite     = "security_desk.png"
+  wide       = "2"
+  high       = "4"
+  subtype    = "SUBTYPE_FURNISH"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "false"
+/>
+
+<scene
+  name   = "Front Entrance"
+  ID     = "bank_front_unit"
+  wide   = "16"
+  high   = "8"
+  wall   = "civic_wall"
+  door   = "civic_door"
+  window = "civic_window"
+>
+  <grid
+    1 = "civic_wall_thick"
+    2 = "revolving_door"
+    3 = "security_desk"
+  >
+     .  .  .  .  .  2  .  .  2  .  .  .  .  .  .  .
+     .  .  .  .  ]  .  .  .  .  .  .  [  .  .  .  .
+     -  -  -  -  -  .  .  .  .  .  .  -  -  -  -  -
+     .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+     .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+     .  .  .  .  .  3  .  .  .  .  .  .  .  .  .  .
+     .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+     .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+  </grid>
+</scene>
+
+
+<scene
+  name      = "Bank Scene Assembled"
+  ID        = "bank_scene_assembled"
+  unitSize  = "8"
+  unitsWide = "6"
+  unitsHigh = "4"
+  wall      = "civic_wall"
+  door      = "civic_door"
+  window    = "civic_window"
+>
+  <unit typeID = "bank_corner_unit"   x = "0" y = "0" dir = "N" />
+  <unit typeID = "bank_corner_unit"   x = "5" y = "0" dir = "E" />
+  <unit typeID = "bank_corner_unit"   x = "0" y = "3" dir = "W" />
+  <unit typeID = "bank_corner_unit"   x = "5" y = "3" dir = "S" />
+  
+  <unit typeID = "bank_facing_unit_a" x = "1" y = "0" dir = "N" />
+  <unit typeID = "bank_facing_unit_a" x = "4" y = "0" dir = "N" />
+  <unit typeID = "bank_facing_unit_a" x = "0" y = "2" dir = "W" />
+  <unit typeID = "bank_facing_unit_a" x = "5" y = "2" dir = "E" />
+  <unit typeID = "bank_facing_unit_a" x = "1" y = "3" dir = "S" />
+  <unit typeID = "bank_facing_unit_a" x = "4" y = "3" dir = "S" />
+  
+  <unit typeID = "bank_facing_unit_b" x = "2" y = "0" dir = "N" />
+  <unit typeID = "bank_facing_unit_b" x = "3" y = "0" dir = "N" />
+  <unit typeID = "bank_facing_unit_b" x = "0" y = "1" dir = "W" />
+  <unit typeID = "bank_facing_unit_b" x = "5" y = "1" dir = "E" />
+  
+  <unit typeID = "bank_hall_unit"     x = "2" y = "2" dir = "N" />
+  <unit typeID = "bank_front_unit"    x = "2" y = "3" dir = "S" />
+</scene>
+
+
+
+
+
