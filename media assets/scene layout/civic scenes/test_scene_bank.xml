@@ -491,10 +491,22 @@
   blockLevel = "BLOCK_FULL"
   blockSight = "false"
 />
+
 <prop
-  name       = "Kitchen Frige"
-  ID         = "kitchen_frige"
-  sprite     = "frige.png"
+  name       = "Kitchen Fruits"
+  ID         = "kitchen_fruits"
+  sprite     = "fruit_dish.png"
+  wide       = "1"
+  high       = "1"
+  subtype    = "SUBTYPE_DETAIL"
+  blockLevel = "BLOCK_NONE"
+  blockSight = "false"
+/>
+
+<prop
+  name       = "Kitchen Fridge"
+  ID         = "kitchen_fridge"
+  sprite     = "fridge.png"
   wide       = "1"
   high       = "1"
   subtype    = "SUBTYPE_FURNISH"
@@ -771,7 +783,7 @@
   <grid
     1 = "kitchen_sink"
     2 = "kitchen_cupboard"
-    3 = "fridge"
+    3 = "kitchen_fridge"
     4 = "kitchen_table"
     5 = "water"
     6 = "bank_plant_1"
@@ -782,6 +794,17 @@
     .   .  4 . .  .
     5w  .  . . .  .
     .   .  . . .  .
+  </grid>
+  <grid
+    1 = "bank_plant_2"
+    2 = "kitchen_fruits"
+  >
+    1s . . . .  1s
+    .  . . . .  .
+    .  . . . .  .
+    .  . 2 . .  .
+    .  . . . .  .
+    .  . . . .  .
   </grid>
 </scene>
 
