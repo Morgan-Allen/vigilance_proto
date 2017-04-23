@@ -491,6 +491,18 @@
   blockLevel = "BLOCK_FULL"
   blockSight = "false"
 />
+
+<prop
+  name       = "Kitchen Fruits"
+  ID         = "kitchen_fruits"
+  sprite     = "fruit_dish.png"
+  wide       = "1"
+  high       = "1"
+  subtype    = "SUBTYPE_DETAIL"
+  blockLevel = "BLOCK_NONE"
+  blockSight = "false"
+/>
+
 <prop
   name       = "Kitchen Fridge"
   ID         = "kitchen_fridge"
@@ -681,12 +693,12 @@
     1 = "asphalt"
     2 = "asphalt"
   >
-    2 2 2 2 2 2
-    2 2 1 1 1 2
-    2 2 2 2 2 2
-    2 2 1 1 1 2
-    2 2 2 2 2 2
-    2 2 1 1 1 2
+    . . . . . .
+    . . 1 1 1 .
+    . . . . . .
+    . . 1 1 1 .
+    . . . . . .
+    . . 1 1 1 .
   </grid>
 </scene>
 
@@ -868,7 +880,7 @@
     .  4  .  4  7  .
     .  2s .  .  .  .
     .  .  .  .  .  .
-    .  3s 6  3s 1  .
+    .  3s 6  3s 1s .
     .  .  .  .  .  .
   </grid>
 </scene>
@@ -898,8 +910,19 @@
     .  .  .  .  1s 2w .  9  .  .  .  .
     .  .  .  .  .  .  .  .  .  .  .  .
     7w .  .  .  .  .  .  .  .  .  2w .
-    .  .  5w .  1e 2  .  .  1e .  1  .
-    6w .  3e .  .  .  .  .  .  5  .  .
+    .  .  5  .  1e 2  .  .  1e .  1  .
+    6w .  3e .  .  .  .  .  .  .  .  .
+  </grid>
+  <grid
+    1 = "bank_plant_2"
+    2 = "kitchen_fruits"
+  >
+    1e .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .
+    2  .  .  .  .  .  .  .  .  1  .  .
   </grid>
 </scene>
 
