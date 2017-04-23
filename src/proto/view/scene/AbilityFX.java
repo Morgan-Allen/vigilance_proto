@@ -133,7 +133,7 @@ public class AbilityFX {
   public void previewCurvedTrajectory(Action a, Scene s, Graphics2D g) {
     Tile t = s.tileUnder(a.target), v = a.acting.currentTile();
     SceneView SV = s.view();
-    int TS = SceneView.TILE_SIZE;
+    int TS = SV.tileSize;
     int offX = SV.zoomX, offY = SV.zoomY;
     int x = (v.x * TS) - offX, y = (v.y * TS) - offY;
     int w = (t.x - v.x) * TS, h = (t.y - v.y) * TS;
@@ -161,8 +161,8 @@ public class AbilityFX {
   
   
   private void drawLine(Tile a, Tile b, Scene s, Graphics2D g) {
-    int TS = SceneView.TILE_SIZE;
     SceneView SV = s.view();
+    int TS = SV.tileSize;
     int offX = SV.zoomX, offY = SV.zoomY;
     g.drawLine(
       (a.x * TS) - offX,

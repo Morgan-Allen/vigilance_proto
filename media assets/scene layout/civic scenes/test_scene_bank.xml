@@ -88,12 +88,23 @@
 />
 
 <prop
+  name       = "Asphalt Line"
+  ID         = "asphalt_line"
+  sprite     = "asphalt_line.png"
+  wide       = "1"
+  high       = "1"
+  subtype    = "SUBTYPE_DETAIL"
+  blockLevel = "BLOCK_NONE"
+  blockSight = "false"
+/>
+
+<prop
   name       = "Pavement"
   ID         = "pavement"
   sprite     = "pavement.png"
   wide       = "1"
   high       = "1"
-  subtype    = "SUBTYPE_WALLING"
+  subtype    = "SUBTYPE_FURNISH"
   blockLevel = "BLOCK_NONE"
   blockSight = "false"
 />
@@ -104,7 +115,7 @@
   sprite     = "pavement_edge.png"
   wide       = "1"
   high       = "1"
-  subtype    = "SUBTYPE_WALLING"
+  subtype    = "SUBTYPE_FURNISH"
   blockLevel = "BLOCK_NONE"
   blockSight = "false"
 />
@@ -115,7 +126,7 @@
   sprite     = "pavement_corner.png"
   wide       = "1"
   high       = "1"
-  subtype    = "SUBTYPE_WALLING"
+  subtype    = "SUBTYPE_FURNISH"
   blockLevel = "BLOCK_NONE"
   blockSight = "false"
 />
@@ -325,7 +336,7 @@
 <prop
   name       = "Revolving Door"
   ID         = "revolving_door"
-  sprite     = "revolving_door_2.png"
+  sprite     = "revolving_door.png"
   wide       = "3"
   high       = "2"
   subtype    = "SUBTYPE_WALLING"
@@ -338,7 +349,7 @@
   ID         = "security_desk"
   sprite     = "security_desk.png"
   wide       = "2"
-  high       = "5"
+  high       = "4"
   subtype    = "SUBTYPE_FURNISH"
   blockLevel = "BLOCK_FULL"
   blockSight = "false"
@@ -565,7 +576,7 @@
   sprite     = "hatch.png"
   wide       = "1"
   high       = "1"
-  subtype    = "SUBTYPE_DETAIL"
+  subtype    = "SUBTYPE_FURNISH"
   blockLevel = "BLOCK_NONE"
   blockSight = "false"
 />
@@ -615,6 +626,7 @@
 />
 
 
+
 <scene
   name   = "Front Outside"
   ID     = "bank_scene_front_outside"
@@ -623,18 +635,27 @@
   wall   = "civic_wall"
   door   = "civic_door"
   window = "civic_window"
-  floor  = "asphalt"
 >
+  <grid
+    1 = "hatch"
+    2 = "asphalt_line"
+  >
+    . . . . . .
+    . 1 . . . .
+    2 2 2 2 2 2
+    . . . . . .
+    . . . . . .
+    . . . . . .
+  </grid>
   <grid
     1 = "pavement"
     2 = "pavement_edge"
-    3 = "hatch"
-    4 = "asphalt"
+    3 = "asphalt"
   >
-    . . . . . .
-    . 3 . . . .
-    4 4 4 . . .
-    . . . . . .
+    3 3 3 3 3 3
+    3 3 3 3 3 3
+    3 3 3 3 3 3
+    3 3 3 3 3 3
     2 2 2 2 2 2
     1 1 1 1 1 1
   </grid>
@@ -655,11 +676,11 @@
     2 = "pavement_edge"
     3 = "pavement_corner"
     4 = "hatch"
-    5 = "asphalt"
+    5 = "asphalt_line"
   >
     . .  . . . .
     . 4  . . . .
-    5 5  5 . . .
+    5 5  5 5 5 5
     . .  . . . .
     2 3  . . . .
     1 2e . . . .
@@ -681,24 +702,26 @@
     3 = "hatch"
     4 = "dumpster_a"
     5 = "dumpster_b"
+    6 = "asphalt_line"
   >
-    . 1 . . . .
-    4 1 . . . .
-    . 1 . 3 . .
-    5 1 . . . .
-    . 1 2 . . .
-    . 1 . . . .
+    . . 6 6 6 .
+    4 . . . . .
+    . . . 3 . .
+    5 . 6 6 6 .
+    . . 2 . . .
+    . . . . . .
   </grid>
   <grid
-    1 = "asphalt"
-    2 = "asphalt"
+    1 = "pavement"
+    2 = "pavement_edge"
+    3 = "asphalt"
   >
-    . . . . . .
-    . . 1 1 1 .
-    . . . . . .
-    . . 1 1 1 .
-    . . . . . .
-    . . 1 1 1 .
+    1 2e 3 3 3 3
+    1 2e 3 3 3 3
+    1 2e 3 3 3 3
+    1 2e 3 3 3 3
+    1 2e 3 3 3 3
+    1 2e 3 3 3 3
   </grid>
 </scene>
 
@@ -766,7 +789,7 @@
     .  .  .  .  1s 2w .  9  .  .  .  .
     .  .  .  .  .  .  .  .  .  .  .  .
     7w .  .  .  .  .  .  .  .  .  2w .
-    .  .  .  .  1e 2  .  .  1e .  1  .
+    .  .  5  .  1e 2  .  .  1e .  1  .
     6w .  3e .  .  .  .  .  .  5  .  .
   </grid>
   <grid
@@ -777,7 +800,7 @@
     .  .  .  .  .  .  .  .  .  .  .  .
     .  .  .  .  .  .  .  .  .  .  .  .
     .  .  .  .  .  .  .  .  .  .  .  .
-    .  1  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .
     2  .  .  .  .  .  .  .  .  .  .  .
   </grid>
 </scene>
@@ -826,18 +849,16 @@
   wide   = "12"
   high   = "12"
   wall   = "civic_wall"
-  door   = "civic_glass_door"
+  door   = "civic_door"
   window = "civic_window"
 >
 <grid
   1 = "civic_floor"
   2 = "civic_floor_edge_horizontal"
   3 = "civic_floor_corner"
-  4 = "civic_metal_floor"
+  4 = "civic_floor"
   5 = "civic_floor_edge_vertical"
 >
-  4  4  4  4  4   4   4  4  4  4  4  4
-  4  4  4  4  4   4   4  4  4  4  4  4
   3  2e 2e 2e 2e  2e  2e 2e 2e 2e 2e 3e
   5  1  1  1  1   1   1  1  1  1  1  5s
   5  1  1  1  1   1   1  1  1  1  1  5s
@@ -846,26 +867,30 @@
   5  1  1  1  1   1   1  1  1  1  1  5s
   5  1  1  1  1   1   1  1  1  1  1  5s
   3w 2w 2w 2w 3e  1   1  3  2w 2w 2w 3s
-  1  1  1  1  5   1   1  5s  1  1  1  1
-  1  1  1  1  3w  2w  2w 3s  1  1  1  1
+  1  1  1  1  5   1   1  5s 1  1  1  1
+  1  1  1  1  3w  2w  2w 3s 1  1  1  1
+  4  4  4  4  4   4   4  4  4  4  4  4
+  4  4  4  4  4   4   4  4  4  4  4  4
 </grid
   <grid
     1 = "bank_plant_1"
     2 = "revolving_door"
     3 = "security_desk"
     4 = "elevators"
+    5 = "civic_glass_door"
+    6 = "civic_support_column"
   >
-    .  .  .  2  .  .  2  .  .  .  .  .]
-    _  _/ _  _  .  _  _  .  _  _  _/ _]
+    [5  -  5  [2 .  .  2  .  ]  5  -  5]
+    [.  6  .  .  .  .  .  .  .  .  6  .]
+    [.  .  .  .  .  .  .  .  .  .  .  .]
+    [.  .  .  .  .  .  .  .  .  .  .  .]
+    [.  .  .  .  .  .  .  .  .  .  .  .]
+    [.  6  .  .  3w .  .  .  .  .  6  .]
+    [.  .  .  .  .  .  .  .  .  .  .  .]
+    [.  .  .  .  .  .  .  .  .  .  .  .]
+    [4  .  .  .  .  .  .  .  4  .  .  .]
+    [.  .  .  .  _  _/ _/ _  .  .  .  .]
     .  .  .  .  .  .  .  .  .  .  .  .
-    .  .  .  .  .  .  .  .  .  .  .  .
-    .  3  .  .  .  .  .  .  .  .  .  .
-    .  .  .  .  .  .  .  .  .  .  .  .
-    .  .  .  .  .  .  .  .  .  .  .  .
-    .  .  .  .  .  .  .  .  .  .  .  .
-    .  .  .  .  .  .  .  .  .  .  .  .
-    .  .  .  .  .  .  .  .  .  .  .  .
-    4  .  .  .  .  .  .  .  4  .  .  .
     .  .  .  .  .  .  .  .  .  .  .  .
   </grid>
 </scene>
@@ -904,8 +929,8 @@
     .  3  1  6  1  .
     .  .  .  .  .  .
     .  .  .  .  .  4
-    [ 5s  . 5s  .  5s]
-    [_ _  _  _  _   _]
+    . 5s  . 5s  .  5s
+    .  .  .  .  .  .
   </grid>
 </scene>
 
@@ -984,6 +1009,11 @@
     typeID = "bank_scene_back_outside"
     wall   = "WALL_NONE"
     x = "3" y = "3" dir = "N"
+  />
+  <unit
+    typeID = "bank_scene_back_outside"
+    wall   = "WALL_NONE"
+    x = "3" y = "4" dir = "N"
   />
 
   <unit
