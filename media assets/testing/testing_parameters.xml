@@ -23,7 +23,7 @@
 <sceneTest
   userPath = "morganallen"
   basePath = "media assets/scene layout/civic scenes/"
-  fileName = "civic_bank.xml"
+  fileName = "alt_bank_scene.xml"
   sceneID  = "scene_assembled"
   prefSize = "18"
 >

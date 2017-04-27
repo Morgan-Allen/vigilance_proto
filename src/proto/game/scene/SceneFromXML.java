@@ -66,11 +66,12 @@ public class SceneFromXML implements TileConstants {
     if (cached != null) return cached;
     
     for (XML node : fileXML.allChildrenMatching("prop")) {
-      String propKey = basePath.toLowerCase()+"_"+node.value("ID");
+      String nodeID  = node.value("ID");
+      String propKey = basePath.toLowerCase()+"_"+nodeID;
       if (Assets.getResource(propKey) != null) continue;
       Assets.cacheResource("PROP_HOLDER", propKey);
       
-      String name     = node.value("name");
+      String name     = node.value("name"  );
       String sprite   = node.value("sprite");
       int    subtype  = Kind.loadField(node.value("subtype"));
       int    wide     = getInt(node, "wide", 1);
@@ -78,8 +79,8 @@ public class SceneFromXML implements TileConstants {
       int    blockage = Kind.loadField(node.value("blockLevel"));
       String opacity  = node.value("blockSight");
       
-      if (name     == null) name     = propKey.replace("_", " ");
-      if (sprite   == null) sprite   = propKey+".png";
+      if (name     == null) name     = nodeID.replace("_", " ");
+      if (sprite   == null) sprite   = nodeID+".png";
       if (subtype  == -1  ) subtype  = Kind.SUBTYPE_FURNISH;
       if (blockage == -1  ) blockage = Kind.BLOCK_FULL;
       if (opacity  == null) opacity  = blockage == Kind.BLOCK_FULL ?
@@ -95,7 +96,6 @@ public class SceneFromXML implements TileConstants {
     
     Object match = Assets.getResource(key);
     if (match instanceof PropType) return (PropType) match;
-    
     return null;
   }
   
