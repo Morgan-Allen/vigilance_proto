@@ -1,14 +1,14 @@
 
 <prop
   ID         = "floor"
-  sprite     = "office_floor_2.png"
+  sprite     = "office/office_floor_2.png"
   subtype    = "SUBTYPE_WALLING"
   blockLevel = "BLOCK_NONE"
 />
 
 <prop
   ID         = "blue_tile_floor"
-  sprite     = "floor_blue_tile.png"
+  sprite     = "office/floor_blue_tile.png"
   subtype    = "SUBTYPE_WALLING"
   blockLevel = "BLOCK_NONE"
 />
@@ -16,72 +16,72 @@
 
 <prop
   ID         = "cubicle_a"
-  sprite     = "cubicle_a.png"
+  sprite     = "office/cubicle_a.png"
   wide       = "2"
   high       = "2"
 />
 
 <prop
   ID         = "cubicle_b"
-  sprite     = "cubicle_b.png"
+  sprite     = "office/cubicle_b.png"
   wide       = "2"
   high       = "2"
 />
 
 <prop
   ID         = "supply_cupboards"
-  sprite     = "supply_cupboards.png"
+  sprite     = "office/supply_cupboards.png"
   wide       = "2"
   high       = "2"
 />
 
 <prop
   ID         = "trash_bin"
-  sprite     = "trash_bin.png"
+  sprite     = "office/trash_bin.png"
   blockSight = "false"
 />
 
 <prop
   ID         = "water"
-  sprite     = "water.png"
+  sprite     = "office/water.png"
   blockSight = "false"
 />
 
 <prop
   ID         = "printer"
-  sprite     = "printer.png"
+  sprite     = "office/printer.png"
   blockSight = "false"
 />
 
 <prop
   ID         = "toilet"
-  sprite     = "toilet.png"
+  sprite     = "office/toilet.png"
   blockSight = "false"
 />
 
 <prop
   ID         = "urinal"
-  sprite     = "urinal.png"
+  sprite     = "office/urinal.png"
   blockLevel = "BLOCK_PARTIAL"
 />
 
 <prop
   ID         = "wide_sink"
-  sprite     = "wide_sink.png"
+  sprite     = "office/wide_sink.png"
   wide       = "3"
   blockSight = "false"
 />
 
 <prop
   ID         = "paper_towels"
-  sprite     = "paper_towels.png"
+  sprite     = "office/paper_towels.png"
   subtype    = "SUBTYPE_DETAIL"
   blockLevel = "BLOCK_NONE"
 />
 
 <prop
   ID         = "toilet_stall_door"
-  sprite     = "wall_thin_door.png"
+  sprite     = "office/wall_thin_door.png"
   high       = "0"
   subtype    = "SUBTYPE_WALLING"
   blockLevel = "BLOCK_NONE"
@@ -90,21 +90,21 @@
 
 <prop
   ID         = "kitchen_sink"
-  sprite     = "kitchen_sink.png"
+  sprite     = "office/kitchen_sink.png"
   wide       = "2"
   blockSight = "false"
 />
 
 <prop
   ID         = "kitchen_cupboard"
-  sprite     = "kitchen_cupboard.png"
+  sprite     = "office/kitchen_cupboard.png"
   wide       = "3"
   blockSight = "false"
 />
 
 <prop
   ID         = "kitchen_table"
-  sprite     = "kitchen_table.png"
+  sprite     = "office/kitchen_table.png"
   wide       = "3"
   high       = "2"
   blockSight = "false"
@@ -112,14 +112,14 @@
 
 <prop
   ID         = "kitchen_fruits"
-  sprite     = "fruit_dish.png"
+  sprite     = "office/fruit_dish.png"
   subtype    = "SUBTYPE_DETAIL"
   blockLevel = "BLOCK_NONE"
 />
 
 <prop
   ID         = "kitchen_fridge"
-  sprite     = "kitchen_fridge.png"
+  sprite     = "office/kitchen_fridge.png"
 />
 
 

@@ -2,13 +2,13 @@
 
 <prop
   ID         = "small_table"
-  sprite     = "box.png"
+  sprite     = "inside/box.png"
   blockSight = "false"
 />
 
 <prop
   ID         = "table_set"
-  sprite     = "desk_set.png"
+  sprite     = "inside/desk_set.png"
   wide       = "2"
   high       = "2"
   blockSight = "false"
@@ -16,33 +16,33 @@
 
 <prop
   ID         = "desk_phone"
-  sprite     = "desk_phone_2.png"
+  sprite     = "inside/desk_phone_2.png"
   subtype    = "SUBTYPE_DETAIL"
   blockLevel = "BLOCK_NONE"
 />
 
 <prop
   ID         = "chair"
-  sprite     = "solid_green_chair.png"
+  sprite     = "inside/solid_green_chair.png"
   blockSight = "false"
 />
 
 <prop
   ID         = "plant_1"
-  sprite     = "plant_1.png"
+  sprite     = "inside/plant_1.png"
   blockSight = "false"
 />
 
 <prop
   ID         = "plant_2"
-  sprite     = "plant_2.png"
+  sprite     = "inside/plant_2.png"
   subtype    = "SUBTYPE_DETAIL"
   blockLevel = "BLOCK_NONE"
 />
 
 <prop
   ID         = "revolving_door"
-  sprite     = "revolving_door.png"
+  sprite     = "inside/revolving_door.png"
   wide       = "3"
   high       = "2"
   subtype    = "SUBTYPE_WALLING"
@@ -52,7 +52,7 @@
 
 <prop
   ID         = "security_desk"
-  sprite     = "security_desk.png"
+  sprite     = "inside/security_desk.png"
   wide       = "2"
   high       = "4"
   blockSight = "false"
@@ -60,7 +60,7 @@
 
 <prop
   ID         = "elevators"
-  sprite     = "elevators.png"
+  sprite     = "inside/elevators.png"
   wide       = "4"
   high       = "2"
   subtype    = "SUBTYPE_WALLING"

@@ -11,18 +11,29 @@ import java.util.StringTokenizer;
 public class SceneFromXML implements TileConstants {
   
   
+  //  NOTE:  These are primarily used to assist in debugging...
+  public static String
+    lastTriedID   = "",
+    lastTriedFile = "",
+    lastTriedPath = "";
+  
+  
   public static PropType propWithID(String ID, String file, String basePath) {
     String split[] = splitFilenameFromID(ID);
-    ///I.say("Split was: "+I.list(split));
     if (split != null) { file = split[0]+".xml"; ID = split[1]; }
+    lastTriedID   = ID;
+    lastTriedFile = file;
+    lastTriedPath = basePath;
     return propFromXML(ID, file, basePath, getCachedXML(basePath+file));
   }
   
   
   public static SceneType sceneWithID(String ID, String file, String basePath) {
     String split[] = splitFilenameFromID(ID);
-    ///I.say("Split was: "+I.list(split));
     if (split != null) { file = split[0]+".xml"; ID = split[1]; }
+    lastTriedID   = ID;
+    lastTriedFile = file;
+    lastTriedPath = basePath;
     return sceneFromXML(ID, file, basePath, getCachedXML(basePath+file));
   }
   
@@ -62,17 +73,14 @@ public class SceneFromXML implements TileConstants {
       String name     = node.value("name");
       String sprite   = node.value("sprite");
       int    subtype  = Kind.loadField(node.value("subtype"));
-      int    size     = getInt(node, "size",  1);
-      int    wide     = getInt(node, "wide", -1);
-      int    high     = getInt(node, "high", -1);
+      int    wide     = getInt(node, "wide", 1);
+      int    high     = getInt(node, "high", 1);
       int    blockage = Kind.loadField(node.value("blockLevel"));
       String opacity  = node.value("blockSight");
       
       if (name     == null) name     = propKey.replace("_", " ");
       if (sprite   == null) sprite   = propKey+".png";
       if (subtype  == -1  ) subtype  = Kind.SUBTYPE_FURNISH;
-      if (wide     == -1  ) wide     = size;
-      if (high     == -1  ) high     = size;
       if (blockage == -1  ) blockage = Kind.BLOCK_FULL;
       if (opacity  == null) opacity  = blockage == Kind.BLOCK_FULL ?
         "true" : "false"

@@ -35,6 +35,20 @@
   high       = "2"
 />
 
+<prop
+  ID         = "warehouse_car"
+  sprite     = "warehouse_car.png"
+  high       = "2"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "warehouse_car_empty"
+  sprite     = "warehouse_car_empty.png"
+  high       = "2"
+  blockSight = "false"
+/>
+
 
 <scene
   name   = "Storage"
@@ -48,12 +62,14 @@
 >
   <grid
     1 = "warehouse_shelf"
+    2 = "warehouse_car"
+    3 = "warehouse_car_empty"
   >
     .  .  .  .  .  .  .  .
     .  1  1  .  .  1  1  .
-    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  3s
     .  1  1  .  .  1  1  .
-    .  .  .  .  .  .  .  .
+    .  .  .  2  .  .  .  .
     .  1  1  .  .  1  1  .
     .  .  .  .  .  .  .  .
     .  .  .  .  .  .  .  .

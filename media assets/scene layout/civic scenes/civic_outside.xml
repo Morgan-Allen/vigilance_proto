@@ -1,39 +1,39 @@
 
 <prop
   ID         = "asphalt"
-  sprite     = "asphalt.png"
+  sprite     = "outside/asphalt.png"
   subtype    = "SUBTYPE_WALLING"
   blockLevel = "BLOCK_NONE"
 />
 
 <prop
   ID         = "asphalt_line"
-  sprite     = "asphalt_line.png"
+  sprite     = "outside/asphalt_line.png"
   subtype    = "SUBTYPE_DETAIL"
   blockLevel = "BLOCK_NONE"
 />
 
 <prop
   ID         = "pavement"
-  sprite     = "pavement.png"
+  sprite     = "outside/pavement.png"
   blockLevel = "BLOCK_NONE"
 />
 
 <prop
   ID         = "pavement_edge"
-  sprite     = "pavement_edge.png"
+  sprite     = "outside/pavement_edge.png"
   blockLevel = "BLOCK_NONE"
 />
 
 <prop
   ID         = "pavement_corner"
-  sprite     = "pavement_corner.png"
+  sprite     = "outside/pavement_corner.png"
   blockLevel = "BLOCK_NONE"
 />
 
 <prop
   ID         = "parapet"
-  sprite     = "parapet.png"
+  sprite     = "outside/parapet.png"
   subtype    = "SUBTYPE_WALLING"
   blockLevel = "BLOCK_NONE"
 />
@@ -41,52 +41,52 @@
 
 <prop
   ID         = "car"
-  sprite     = "car.png"
+  sprite     = "outside/car.png"
   wide       = "3"
   high       = "2"
 />
 
 <prop
   ID         = "car_2"
-  sprite     = "car_2.png"
+  sprite     = "outside/car_2.png"
   wide       = "3"
   high       = "2"
 />
 
 <prop
   ID         = "sign_1"
-  sprite     = "sign_1.png"
+  sprite     = "outside/sign_1.png"
   blockSight = "false"
 />
 
 <prop
   ID         = "sign_2"
-  sprite     = "sign_2.png"
+  sprite     = "outside/sign_2.png"
   blockSight = "false"
 />
 
 <prop
   ID         = "hatch"
-  sprite     = "hatch.png"
+  sprite     = "outside/hatch.png"
   blockLevel = "BLOCK_NONE"
 />
 
 <prop
   ID         = "conditioner"
-  sprite     = "conditioner.png"
+  sprite     = "outside/conditioner.png"
   blockLevel = "BLOCK_NONE"
 />
 
 <prop
   ID         = "dumpster_a"
-  sprite     = "dumpster_a.png"
+  sprite     = "outside/dumpster_a.png"
   high       = "2"
   blockSight = "false"
 />
 
 <prop
   ID         = "dumpster_b"
-  sprite     = "dumpster_b.png"
+  sprite     = "outside/dumpster_b.png"
   high       = "2"
   blockSight = "false"
 />
