@@ -56,14 +56,28 @@ public class SceneFromXML implements TileConstants {
       if (Assets.getResource(propKey) != null) continue;
       Assets.cacheResource("PROP_HOLDER", propKey);
       
+      String name     = node.value("name");
+      String sprite   = node.value("sprite");
+      int    subtype  = Kind.loadField(node.value("subtype"));
+      int    size     = getInt(node, "size",  1);
+      int    wide     = getInt(node, "wide", -1);
+      int    high     = getInt(node, "high", -1);
+      int    blockage = Kind.loadField(node.value("blockLevel"));
+      String opacity  = node.value("blockSight");
+      
+      if (name     == null) name     = propKey.replace("_", " ");
+      if (sprite   == null) sprite   = propKey+".png";
+      if (subtype  == -1  ) subtype  = Kind.SUBTYPE_FURNISH;
+      if (wide     == -1  ) wide     = size;
+      if (high     == -1  ) high     = size;
+      if (blockage == -1  ) blockage = Kind.BLOCK_FULL;
+      if (opacity  == null) opacity  = blockage == Kind.BLOCK_FULL ?
+        "true" : "false"
+      ;
+      
       PropType type = new PropType(
-        node.value("name"), propKey,
-        basePath+node.value("sprite"),
-        Kind.loadField(node.value("subtype")),
-        node.getInt("wide"),
-        node.getInt("high"),
-        Kind.loadField(node.value("blockLevel")),
-        node.getBool("blockSight")
+        name, propKey, basePath+sprite,
+        subtype, wide, high, blockage, Boolean.parseBoolean(opacity)
       );
       Assets.cacheResource(type, propKey);
     }

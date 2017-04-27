@@ -15,6 +15,17 @@
   Allowable blockSights are:
     true and false
     (Whether this blocks a character's vision.)
+  
+  NOTE- Only the 'ID' attribute is absolutely required, as many of these
+  attributes have default values:
+    'name'       -defaults to the ID string with _ replaced by spaces.
+    'sprite'     -defaults to the ID string with ".png" as the image extension.
+    'wide'       -defaults to the 'size' attribute, or 1 otherwise.
+    'high'       -defaults to the 'size' attribute, or 1 otherwise.
+    'subtype'    -defaults to SUBTYPE_FURNISH.
+    'blockLevel' -defaults to BLOCK_FULL.
+    'blockSight' -defaults to true if blockLevel = BLOCK_FULL, false otherwise.
+  
 </comment>
 
 
