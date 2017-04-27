@@ -1,0 +1,125 @@
+
+<prop
+  name       = "Floor"
+  ID         = "civic_floor"
+  sprite     = "floor_marble_2.png"
+  wide       = "1"
+  high       = "1"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+  blockSight = "false"
+/>
+
+<prop
+  name       = "Door"
+  ID         = "civic_door"
+  sprite     = "wall_thin_door.png"
+  wide       = "1"
+  high       = "0"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+  blockSight = "true"
+/>
+
+<prop
+  name       = "Window"
+  ID         = "civic_window"
+  sprite     = "wall_thin_window.png"
+  wide       = "1"
+  high       = "0"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "false"
+/>
+
+<prop
+  name       = "Wall"
+  ID         = "civic_wall"
+  sprite     = "wall_thin.png"
+  wide       = "1"
+  high       = "0"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "true"
+/>
+
+<prop
+  name       = "Support Column"
+  ID         = "civic_support_column"
+  sprite     = "support_column.png"
+  wide       = "1"
+  high       = "1"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "true"
+/>
+
+
+
+
+<prop
+  name       = "Small Table"
+  ID         = "bank_small_table"
+  sprite     = "box.png"
+  wide       = "1"
+  high       = "1"
+  subtype    = "SUBTYPE_FURNISH"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "false"
+/>
+
+<prop
+  name       = "Table Set"
+  ID         = "bank_table"
+  sprite     = "desk_set.png"
+  wide       = "2"
+  high       = "2"
+  subtype    = "SUBTYPE_FURNISH"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "false"
+/>
+
+<prop
+  name       = "Desk Phone"
+  ID         = "bank_desk_phone"
+  sprite     = "desk_phone_2.png"
+  wide       = "1"
+  high       = "1"
+  subtype    = "SUBTYPE_DETAIL"
+  blockLevel = "BLOCK_NONE"
+  blockSight = "false"
+/>
+
+<prop
+  name       = "Chair"
+  ID         = "bank_chair"
+  sprite     = "solid_green_chair.png"
+  wide       = "1"
+  high       = "1"
+  subtype    = "SUBTYPE_FURNISH"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "false"
+/>
+
+<prop
+  name       = "Plant 1"
+  ID         = "bank_plant_1"
+  sprite     = "plant_1.png"
+  wide       = "1"
+  high       = "1"
+  subtype    = "SUBTYPE_FURNISH"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "false"
+/>
+
+<prop
+  name       = "Plant 2"
+  ID         = "bank_plant_2"
+  sprite     = "plant_2.png"
+  wide       = "1"
+  high       = "1"
+  subtype    = "SUBTYPE_DETAIL"
+  blockLevel = "BLOCK_NONE"
+  blockSight = "false"
+/>
+
