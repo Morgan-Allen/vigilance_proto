@@ -1,42 +1,42 @@
 
 <prop
   ID         = "metal_floor"
-  sprite     = "floor_metal.png"
+  sprite     = "bank/floor_metal.png"
   subtype    = "SUBTYPE_WALLING"
   blockLevel = "BLOCK_NONE"
 />
 
 <prop
   ID         = "vault_door"
-  sprite     = "vault_door_lighter.png"
+  sprite     = "bank/vault_door_lighter.png"
   high       = "3"
 />
 
 <prop
   ID         = "vault_wall"
-  sprite     = "vault_wall.png"
+  sprite     = "bank/vault_wall.png"
 />
 
 <prop
   ID         = "vault_wall_corner"
-  sprite     = "vault_wall_corner.png"
+  sprite     = "bank/vault_wall_corner.png"
 />
 
 <prop
   ID         = "gold_bars"
-  sprite     = "gold_bars.png"
+  sprite     = "bank/gold_bars.png"
   blockSight = "false"
 />
 
 <prop
   ID         = "money_stacks"
-  sprite     = "money_stacks.png"
+  sprite     = "bank/money_stacks.png"
   blockSight = "false"
 />
 
 <prop
   ID         = "teller_screen"
-  sprite     = "teller_screen_2.png"
+  sprite     = "bank/teller_screen_2.png"
   wide       = "2"
   blockSight = "false"
 />
