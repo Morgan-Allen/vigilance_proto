@@ -13,6 +13,7 @@ public class SceneFromXML implements TileConstants {
   
   public static PropType propWithID(String ID, String file, String basePath) {
     String split[] = splitFilenameFromID(ID);
+    ///I.say("Split was: "+I.list(split));
     if (split != null) { file = split[0]+".xml"; ID = split[1]; }
     return propFromXML(ID, file, basePath, getCachedXML(basePath+file));
   }
@@ -20,16 +21,18 @@ public class SceneFromXML implements TileConstants {
   
   public static SceneType sceneWithID(String ID, String file, String basePath) {
     String split[] = splitFilenameFromID(ID);
+    ///I.say("Split was: "+I.list(split));
     if (split != null) { file = split[0]+".xml"; ID = split[1]; }
     return sceneFromXML(ID, file, basePath, getCachedXML(basePath+file));
   }
   
   
   private static String[] splitFilenameFromID(String ID) {
+    if (ID == null) return null;
     int splitIndex = ID.indexOf(".");
     if (splitIndex == -1) return null;
     return new String[] {
-      ID.substring(0             , splitIndex - 1),
+      ID.substring(0             , splitIndex - 0),
       ID.substring(splitIndex + 1, ID.length()   )
     };
   }

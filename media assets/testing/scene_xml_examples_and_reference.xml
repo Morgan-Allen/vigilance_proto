@@ -25,7 +25,6 @@
     'subtype'    -defaults to SUBTYPE_FURNISH.
     'blockLevel' -defaults to BLOCK_FULL.
     'blockSight' -defaults to true if blockLevel = BLOCK_FULL, false otherwise.
-  
 </comment>
 
 
@@ -173,6 +172,20 @@
     top-left corner, one of type 2 toward the bottom-right rotated by 90
     degrees, and a door and window on the right wall.
   
+  
+  NOTE:  Optionally, you can refer to prop-types in other files using a period
+  ('.') to separate the prop-ID from the file-name.  For example:
+    
+    floor = "other_xml_file.floor_type"
+    door  = "third_xml_file.door_type"
+    
+    <grid
+      1 = "prop_type"
+      2 = "other_xml_file.prop_type"
+    >
+      [...
+      etc.
+  
 </comment>
 
 
@@ -283,6 +296,14 @@
   a unit at a fixed position and facing.  (Note that x and y are in unit
   increments, not tile coordinates.  e.g, if unitSize = 8, then x = "3" and y
   = "1" will place the unit 24 tiles across and 8 tiles down.)
+  
+  
+  
+  NOTE:  Optionally, you can refer to scene-types in other files using a period
+  ('.') to separate the scene-ID from the file-name.  For example:
+    
+    typeID = "other_xml_file.scene_type"
+    etc.
   
 </comment>
 

@@ -1,0 +1,207 @@
+
+<prop
+  ID         = "floor"
+  sprite     = "office_floor_2.png"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+/>
+
+<prop
+  ID         = "blue_tile_floor"
+  sprite     = "floor_blue_tile.png"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+/>
+
+
+<prop
+  ID         = "cubicle_a"
+  sprite     = "cubicle_a.png"
+  wide       = "2"
+  high       = "2"
+/>
+
+<prop
+  ID         = "cubicle_b"
+  sprite     = "cubicle_b.png"
+  wide       = "2"
+  high       = "2"
+/>
+
+<prop
+  ID         = "supply_cupboards"
+  sprite     = "supply_cupboards.png"
+  wide       = "2"
+  high       = "2"
+/>
+
+<prop
+  ID         = "trash_bin"
+  sprite     = "trash_bin.png"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "water"
+  sprite     = "water.png"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "printer"
+  sprite     = "printer.png"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "toilet"
+  sprite     = "toilet.png"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "urinal"
+  sprite     = "urinal.png"
+  blockLevel = "BLOCK_PARTIAL"
+/>
+
+<prop
+  ID         = "wide_sink"
+  sprite     = "wide_sink.png"
+  wide       = "3"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "paper_towels"
+  sprite     = "paper_towels.png"
+  subtype    = "SUBTYPE_DETAIL"
+  blockLevel = "BLOCK_NONE"
+/>
+
+<prop
+  ID         = "toilet_stall_door"
+  sprite     = "wall_thin_door.png"
+  high       = "0"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+  blockSight = "true"
+/>
+
+<prop
+  ID         = "kitchen_sink"
+  sprite     = "kitchen_sink.png"
+  wide       = "2"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "kitchen_cupboard"
+  sprite     = "kitchen_cupboard.png"
+  wide       = "3"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "kitchen_table"
+  sprite     = "kitchen_table.png"
+  wide       = "3"
+  high       = "2"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "kitchen_fruits"
+  sprite     = "fruit_dish.png"
+  subtype    = "SUBTYPE_DETAIL"
+  blockLevel = "BLOCK_NONE"
+/>
+
+<prop
+  ID         = "kitchen_fridge"
+  sprite     = "kitchen_fridge.png"
+/>
+
+
+
+<scene
+  name   = "General Office"
+  ID     = "scene_general_office"
+  wide   = "12"
+  high   = "6"
+  floor  = "floor"
+  wall   = "civic_common.wall"
+  door   = "civic_common.door"
+  window = "civic_common.window"
+>
+  <grid
+    1 = "cubicle_a"
+    2 = "cubicle_b"
+    3 = "water"
+    4 = "printer"
+    5 = "civic_inside.plant_1"
+    6 = "kitchen_sink"
+    7 = "kitchen_cupboard"
+    8 = "kitchen_fridge"
+    9 = "civic_common.support_column"
+  >
+    8w .  .  .  .  .  .  4e .  .  .  .
+    .  .  .  .  1s 2w .  9  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .
+    7w .  .  .  .  .  .  .  .  .  2w .
+    .  .  5  .  1e 2  .  .  1e .  1  .
+    6w .  3e .  .  .  .  .  .  5  .  .
+  </grid>
+  <grid
+    1 = "civic_inside.plant_2"
+    2 = "kitchen_fruits"
+  >
+    1e .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .
+    2  .  .  .  .  .  .  .  .  .  .  .
+  </grid>
+</scene>
+
+
+<scene
+  name   = "Toilets"
+  ID     = "scene_toilets"
+  wide   = "6"
+  high   = "6"
+  wall   = "civic_common.wall"
+  door   = "civic_common.door"
+  window = "civic_common.window"
+>
+  <grid
+    1 = "toilet"
+    2 = "urinal"
+    3 = "wide_sink"
+    4 = "paper_towels"
+    5 = "civic_inside.plant_1"
+    6 = "supply_cupboards"
+    7 = "trash_bin"
+    8 = "printer"
+  >
+    .   /] .  .  .  7s
+    .   8] .  6e 6  .
+    _/ _5] _  _  _  _
+    .   4  4  3  .  .
+    .   .  .  .  .  .
+    1s  1s 1s 5e 2  2
+  </grid>
+  <grid
+    1 = "floor"
+    2 = "blue_tile_floor"
+  >
+    1 1 1 1 1 1
+    1 1 1 1 1 1
+    1 1 1 1 1 1
+    2 2 2 2 2 2
+    2 2 2 2 2 2
+    2 2 2 2 2 2
+  </grid>
+</scene>
+
