@@ -6,11 +6,13 @@ import proto.game.scene.*;
 import proto.game.world.*;
 import proto.util.*;
 
-import javax.swing.JOptionPane;
-
 import proto.content.agents.*;
 import proto.content.items.*;
 import proto.content.places.*;
+
+import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileSystemView;
+import java.io.*;
 
 
 
@@ -22,7 +24,7 @@ public class DebugSceneXML extends RunGame {
     String fullPath = "", sceneID = "", fileName = "", basePath = "";
     try {
       XML testXML = XML.load("media assets/testing/testing_parameters.xml");
-      SCENE_XML = testXML.child("sceneTest");
+      SCENE_XML = findUserPrefsXML(testXML);
       sceneID  = SCENE_XML.value("sceneID" );
       fileName = SCENE_XML.value("fileName");
       basePath = SCENE_XML.value("basePath");
@@ -37,6 +39,10 @@ public class DebugSceneXML extends RunGame {
         trace.append("\n  "+o);
       }
       trace.append(
+        "\n\nThe last ID referenced was "+SceneFromXML.lastTriedID+" from "+
+        SceneFromXML.lastTriedPath+SceneFromXML.lastTriedFile
+      );
+      trace.append(
         "\n\nPlease check to ensure that all identifiers are correct and "+
         "fully-qualified, using / to separate directories."
       );
@@ -44,6 +50,23 @@ public class DebugSceneXML extends RunGame {
       JOptionPane.showMessageDialog(null, trace.toString());
       System.exit(0);
     }
+  }
+  
+  private static XML findUserPrefsXML(XML parent) {
+    XML defaultChild = parent.child("does_not_exist");
+    try {
+      File home = FileSystemView.getFileSystemView().getHomeDirectory();
+      String homePath = home.getAbsolutePath();
+      
+      for (XML child : parent.allChildrenMatching("sceneTest")) {
+        String userPath = child.value("userPath");
+        if (userPath == null) defaultChild = child;
+        if (userPath == null || ! homePath.contains(userPath)) continue;
+        return child;
+      }
+    }
+    catch (Exception e) {}
+    return defaultChild;
   }
   
   

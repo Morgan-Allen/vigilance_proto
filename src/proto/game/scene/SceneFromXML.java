@@ -11,9 +11,19 @@ import java.util.StringTokenizer;
 public class SceneFromXML implements TileConstants {
   
   
+  //  NOTE:  These are primarily used to assist in debugging...
+  public static String
+    lastTriedID   = "",
+    lastTriedFile = "",
+    lastTriedPath = "";
+  
+  
   public static PropType propWithID(String ID, String file, String basePath) {
     String split[] = splitFilenameFromID(ID);
     if (split != null) { file = split[0]+".xml"; ID = split[1]; }
+    lastTriedID   = ID;
+    lastTriedFile = file;
+    lastTriedPath = basePath;
     return propFromXML(ID, file, basePath, getCachedXML(basePath+file));
   }
   
@@ -21,6 +31,9 @@ public class SceneFromXML implements TileConstants {
   public static SceneType sceneWithID(String ID, String file, String basePath) {
     String split[] = splitFilenameFromID(ID);
     if (split != null) { file = split[0]+".xml"; ID = split[1]; }
+    lastTriedID   = ID;
+    lastTriedFile = file;
+    lastTriedPath = basePath;
     return sceneFromXML(ID, file, basePath, getCachedXML(basePath+file));
   }
   
