@@ -1,64 +1,50 @@
 
 <prop
-  name       = "Floor"
-  ID         = "civic_floor"
+  ID         = "floor"
   sprite     = "floor.png"
-  wide       = "1"
-  high       = "1"
   subtype    = "SUBTYPE_WALLING"
   blockLevel = "BLOCK_NONE"
-  blockSight = "false"
 />
+
 <prop
-  name       = "Window"
-  ID         = "civic_window"
+  ID         = "window"
   sprite     = "wall_thin_window.png"
-  wide       = "1"
   high       = "0"
   subtype    = "SUBTYPE_WALLING"
-  blockLevel = "BLOCK_FULL"
   blockSight = "false"
 />
+
 <prop
-  name       = "Door"
-  ID         = "civic_door"
+  ID         = "door"
   sprite     = "wall_thin_door.png"
   wide       = "1"
-  high       = "0"
   subtype    = "SUBTYPE_WALLING"
   blockLevel = "BLOCK_NONE"
-  blockSight = "true"
 />
+
 <prop
-  name       = "Wall"
-  ID         = "civic_wall"
+  ID         = "wall"
   sprite     = "wall_thin.png"
-  wide       = "1"
   high       = "0"
   subtype    = "SUBTYPE_WALLING"
-  blockLevel = "BLOCK_FULL"
-  blockSight = "true"
 />
+
 <prop
-  name       = "Shelf"
   ID         = "warehouse_shelf"
   sprite     = "warehouse_shelf.png"
-  wide       = "1"
   high       = "2"
-  subtype    = "SUBTYPE_FURNISH"
-  blockLevel = "BLOCK_FULL"
-  blockSight = "false"
 />
+
 
 <scene
   name   = "Storage"
   ID     = "warehouse_scene_storage"
   wide   = "8"
   high   = "8"
-  floor  = "civic_floor"
-  wall   = "civic_wall"
-  door   = "civic_door"
-  window = "civic_window"
+  floor  = "floor"
+  wall   = "wall"
+  door   = "door"
+  window = "window"
 >
   <grid
     1 = "warehouse_shelf"
@@ -82,13 +68,13 @@
   unitSize  = "8"
   unitsWide = "8"
   unitsHigh = "8"
-  wall      = "civic_wall"
-  door      = "civic_door"
-  window    = "civic_window"
+  wall      = "wall"
+  door      = "door"
+  window    = "window"
 >
   <unit
     typeID = "warehouse_scene_storage"
     wall   = "WALL_EXTERIOR"
     x = "0" y = "0" dir = "N"
   />
-  </scene>
+</scene>
