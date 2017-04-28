@@ -30,6 +30,7 @@ public class DebugSceneXML extends RunGame {
       basePath = SCENE_XML.value("basePath");
       fullPath = basePath+fileName+", "+sceneID;
       FILE_TEST_SCENE = SceneFromXML.sceneWithID(sceneID, fileName, basePath);
+      if (FILE_TEST_SCENE == null) throw new Exception("No such scene!");
     }
     catch (Exception e) {
       StringBuffer trace = new StringBuffer();

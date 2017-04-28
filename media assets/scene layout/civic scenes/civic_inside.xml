@@ -85,21 +85,20 @@
   window = "civic_common.window"
 >
   <grid
-    1 = "civic_common.floor"
-    2 = "civic_common.floor_edge_horizontal"
-    3 = "civic_common.floor_corner"
+    1 = "civic_common.floor_marble"
+    2 = "civic_common.floor_marble_edge"
+    3 = "civic_common.floor_marble_corner"
     4 = "civic_common.floor"
-    5 = "civic_common.floor_edge_vertical"
   >
-    3  2e 2e 2e 2e  2e  2e 2e 2e 2e 2e 3e
-    5  1  1  1  1   1   1  1  1  1  1  5s
-    5  1  1  1  1   1   1  1  1  1  1  5s
-    5  1  1  1  1   1   1  1  1  1  1  5s
-    5  1  1  1  1   1   1  1  1  1  1  5s
-    5  1  1  1  1   1   1  1  1  1  1  5s
-    5  1  1  1  1   1   1  1  1  1  1  5s
-    3w 2w 2w 2w 3e  1   1  3  2w 2w 2w 3s
-    1  1  1  1  5   1   1  5s 1  1  1  1
+    3  2  2  2  2   2   2  2  2  2  2  3e
+    2e 1  1  1  1   1   1  1  1  1  1  2w
+    2e 1  1  1  1   1   1  1  1  1  1  2w
+    2e 1  1  1  1   1   1  1  1  1  1  2w
+    2e 1  1  1  1   1   1  1  1  1  1  2w
+    2e 1  1  1  1   1   1  1  1  1  1  2w
+    2e 1  1  1  1   1   1  1  1  1  1  2w
+    3w 2s 2s 2s 3e  1   1  3  2s 2s 2s 2w
+    1  1  1  1  2e  1   1  2w 1  1  1  1
     1  1  1  1  3w  2w  2w 3s 1  1  1  1
     4  4  4  4  4   4   4  4  4  4  4  4
     4  4  4  4  4   4   4  4  4  4  4  4
