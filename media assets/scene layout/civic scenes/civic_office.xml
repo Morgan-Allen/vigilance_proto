@@ -29,6 +29,20 @@
 />
 
 <prop
+  ID         = "desk"
+  sprite     = "office/desk.png"
+  wide       = "2"
+  high       = "1"
+/>
+
+<prop
+  ID         = "sofa"
+  sprite     = "inside/sofa.png"
+  high       = "3"
+  blockSight = "false"
+/>
+
+<prop
   ID         = "supply_cupboards"
   sprite     = "office/supply_cupboards.png"
   wide       = "2"
@@ -123,12 +137,41 @@
 />
 
 
+<scene
+  name   = "General Shipping And Receiving"
+  ID     = "scene_shipping_and_receiving"
+  wide   = "8"
+  high   = "8"
+  floor  = "floor"
+  wall   = "civic_common.wall"
+  door   = "civic_common.door"
+  window = "civic_common.window"
+>
+  <grid
+    1 = "water"
+    2 = "printer"
+    3 = "civic_inside.plant_1"
+    4 = "desk"
+    5 = "sofa"
+    6 = "chair"
+    7 = "book_shelf"
+  >
+    .  .  .  .  .  .  .  3
+    .  .  .  .  4e .  4e .
+    5  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    3  .  .  .  4e .  4e .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+  </grid>
+</scene>
 
 <scene
   name   = "General Office"
   ID     = "scene_general_office"
-  wide   = "12"
-  high   = "6"
+  wide   = "8"
+  high   = "8"
   floor  = "floor"
   wall   = "civic_common.wall"
   door   = "civic_common.door"
@@ -144,24 +187,16 @@
     7 = "kitchen_cupboard"
     8 = "kitchen_fridge"
     9 = "civic_common.support_column"
+    10 = "desk"
   >
-    8w .  .  .  .  .  .  4e .  .  .  .
-    .  .  .  .  1s 2w .  9  .  .  .  .
-    .  .  .  .  .  .  .  .  .  .  .  .
-    7w .  .  .  .  .  .  .  .  .  2w .
-    .  .  5  .  1e 2  .  .  1e .  1  .
-    6w .  3e .  .  .  .  .  .  5  .  .
-  </grid>
-  <grid
-    1 = "civic_inside.plant_2"
-    2 = "kitchen_fruits"
-  >
-    1e .  .  .  .  .  .  .  .  .  .  .
-    .  .  .  .  .  .  .  .  .  .  .  .
-    .  .  .  .  .  .  .  .  .  .  .  .
-    .  .  .  .  .  .  .  .  .  .  .  .
-    .  .  .  .  .  .  .  .  .  .  .  .
-    2  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  2s .  .  .  1s 2w .
+    5  .  .  .  .  .  .  5
+    .  1e .  .  .  .  2  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  3e
+    .  .  .  .  .  .  .  .
+    .  .  .  . 7s  8s .  6s
   </grid>
 </scene>
 
@@ -169,8 +204,8 @@
 <scene
   name   = "Toilets"
   ID     = "scene_toilets"
-  wide   = "6"
-  high   = "6"
+  wide   = "8"
+  high   = "8"
   wall   = "civic_common.wall"
   door   = "civic_common.door"
   window = "civic_common.window"
@@ -185,23 +220,26 @@
     7 = "trash_bin"
     8 = "printer"
   >
-    .   /] .  .  .  7s
-    .   8] .  6e 6  .
-    _/ _5] _  _  _  _
-    .   4  4  3  .  .
-    .   .  .  .  .  .
-    1s  1s 1s 5e 2  2
+    .   .  .  .  .   .  .  ]/
+    .   .  8s  5  .   .  .  .
+    -   -  -  -  [1w  -  -/  -
+    .   .  6w .  [1w  .  .  4e
+    7   .  .  .  [1w  .  .  3e
+    .   .  .  .  [5   .  .  .
+    .   .  6  .  [2e  .  .  .
+    .   .  .  .  [2e  . _/  4e
   </grid>
   <grid
     1 = "floor"
     2 = "blue_tile_floor"
   >
-    1 1 1 1 1 1
-    1 1 1 1 1 1
-    1 1 1 1 1 1
-    2 2 2 2 2 2
-    2 2 2 2 2 2
-    2 2 2 2 2 2
+    1 1 1 1 1 1 1 1
+    1 1 1 1 1 1 1 1
+    1 1 1 1 2 2 2 2
+    1 1 1 1 2 2 2 2
+    1 1 1 1 2 2 2 2
+    1 1 1 1 2 2 2 2
+    1 1 1 1 2 2 2 2
+    1 1 1 1 2 2 2 2
   </grid>
 </scene>
-

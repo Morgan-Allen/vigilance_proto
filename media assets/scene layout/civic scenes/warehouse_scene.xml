@@ -50,10 +50,9 @@
     .  1  1  .  .  1  1  .
     .  .  .  .  .  .  .  .
     .  .  .  .  .  .  .  .
-
-
   </grid>
 </scene>
+
 
 <scene
   name      = "Warehouse Scene Assembled"
@@ -61,47 +60,47 @@
   unitSize  = "8"
   unitsWide = "8"
   unitsHigh = "8"
-  wall      = "wall"
-  door      = "door"
-  window    = "window"
+  wall      = "civic_common.wall"
+  door      = "civic_common.door"
+  window    = "civic_common.window"
 >
   <unit
     typeID = "warehouse_scene_storage"
-    wall   = "WALL_INTERIOR"
+    wall   = "WALL_EXTERIOR"
     x = "1" y = "0" dir = "N"
   />
   <unit
     typeID = "warehouse_scene_storage"
-    wall   = "WALL_INTERIOR"
+    wall   = "WALL_EXTERIOR"
     x = "2" y = "0" dir = "N"
   />
   <unit
     typeID = "warehouse_scene_storage"
-    wall   = "WALL_INTERIOR"
+    wall   = "WALL_EXTERIOR"
     x = "1" y = "1" dir = "N"
   />
   <unit
     typeID = "warehouse_scene_storage"
-    wall   = "WALL_INTERIOR"
+    wall   = "WALL_EXTERIOR"
     x = "2" y = "1" dir = "N"
   />
   <unit
     typeID = "warehouse_scene_storage"
-    wall   = "WALL_INTERIOR"
+    wall   = "WALL_EXTERIOR"
     x = "3" y = "0" dir = "N"
   />
   <unit
-    typeID = "civic_office_8x8.scene_shipping_and_receiving"
+    typeID = "civic_office.scene_shipping_and_receiving"
     wall   = "WALL_INTERIOR"
     x = "0" y = "0" dir = "N"
   />
   <unit
-    typeID = "civic_office_8x8.scene_general_office"
+    typeID = "civic_office.scene_general_office"
     wall   = "WALL_INTERIOR"
     x = "0" y = "1" dir = "N"
   />
   <unit
-    typeID = "civic_office_8x8.scene_toilets"
+    typeID = "civic_office.scene_toilets"
     wall   = "WALL_INTERIOR"
     x = "0" y = "2" dir = "N"
   />
