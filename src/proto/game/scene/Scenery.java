@@ -82,7 +82,7 @@ public class Scenery implements Session.Saveable, TileConstants {
     s.cacheInstance(this);
     wide = s.loadInt();
     high = s.loadInt();
-    initArrays(wide, high);
+    initTiling(wide, high);
     for (Coord c : Visit.grid(0, 0, wide, high, 1)) {
       tiles[c.x][c.y] = (Tile) s.loadObject();
     }
@@ -199,7 +199,7 @@ public class Scenery implements Session.Saveable, TileConstants {
   
   /**  Supplementary population methods for use during initial setup-
     */
-  protected void initArrays(int wide, int high) {
+  protected void initTiling(int wide, int high) {
     tiles = new Tile[wide][high];
     int wallW = (wide * 2) + 1, wallH = (high * 2) + 1;
     fills = new Prop[wallW][wallH];
@@ -207,7 +207,7 @@ public class Scenery implements Session.Saveable, TileConstants {
   
   
   public void setupScene(boolean forTesting) {
-    initArrays(wide, high);
+    initTiling(wide, high);
     for (Coord c : Visit.grid(0, 0, wide, high, 1)) {
       tiles[c.x][c.y] = new Tile(this, c.x, c.y);
     }

@@ -77,35 +77,6 @@ public abstract class SceneType extends Index.Entry implements
   
   
   
-  
-  /**  Property queries-
-    */
-  //  TODO:  Check whether this is needed...
-  Table <Trait, Boolean> traitQueryCache = new Table();
-  
-  public boolean hasFurnitureOfType(Trait trait) {
-    Boolean cached = traitQueryCache.get(trait);
-    if (cached != null) return cached;
-    
-    Kind all[] = { borders, door, window, floors };
-    Boolean result = false;
-    
-    for (Kind kind : all) {
-      if (kind != null && kind.baseLevel(trait) > 0) result = true;
-    }
-    for (Kind kind : props) {
-      if (kind != null && kind.baseLevel(trait) > 0) result = true;
-    }
-    for (SceneType kid : kidTypes) {
-      if (kid.hasFurnitureOfType(trait)) result = true;
-    }
-    
-    traitQueryCache.put(trait, result);
-    return result;
-  }
-  
-  
-  
   /**  Actual scene generation-
     */
   public Scene generateScene(World world) {
@@ -225,7 +196,9 @@ public abstract class SceneType extends Index.Entry implements
       boolean isDoor = gen.tileAt(gx, gy).hasWall(dir);
       Tile    at     = within.tileAt(tx, ty);
       boolean blockT = at == null ? true  : (at.blocked() || at.opaque());
-      if (isDoor && blockT) return false;
+      if (isDoor && blockT) {
+        return false;
+      }
     }
     
     return true;

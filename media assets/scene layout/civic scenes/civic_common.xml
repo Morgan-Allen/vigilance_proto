@@ -1,0 +1,69 @@
+
+<prop
+  ID         = "floor"
+  sprite     = "common/floor_1.png"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+/>
+
+<prop
+  ID         = "floor_marble"
+  sprite     = "common/floor_marble.png"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+/>
+
+<prop
+  ID         = "floor_marble_edge"
+  sprite     = "common/floor_marble_edge.png"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+/>
+
+<prop
+  ID         = "floor_marble_corner"
+  sprite     = "common/floor_marble_corner.png"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+/>
+
+<prop
+  ID         = "wall"
+  sprite     = "common/wall_thin.png"
+  high       = "0"
+  subtype    = "SUBTYPE_WALLING"
+/>
+
+<prop
+  ID         = "door"
+  sprite     = "common/wall_thin_door.png"
+  high       = "0"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+  blockSight = "true"
+/>
+
+<prop
+  ID         = "glass_door"
+  sprite     = "common/glass_door.png"
+  high       = "0"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "window"
+  sprite     = "common/wall_thin_window.png"
+  high       = "0"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "support_column"
+  sprite     = "common/support_column.png"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_FULL"
+/>

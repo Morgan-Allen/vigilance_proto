@@ -80,6 +80,7 @@ public class SceneTypeGrid extends SceneType {
     for (Placing p : placings) {
       int propDir = (p.facing + gen.facing) % 8;
       if (p.type == floors) propDir = N;
+      
       if (Prop.hasSpace(gen, p.type, p.x, p.y, propDir)) {
         gen.addProp(p.type, p.x, p.y, propDir, world);
       }

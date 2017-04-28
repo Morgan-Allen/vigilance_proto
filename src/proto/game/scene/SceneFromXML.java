@@ -1,5 +1,4 @@
 
-
 package proto.game.scene;
 import proto.common.*;
 import proto.util.*;
@@ -8,20 +7,49 @@ import java.util.StringTokenizer;
 
 
 
+
 public class SceneFromXML implements TileConstants {
   
   
+  //  NOTE:  These are primarily used to assist in debugging...
+  public static String
+    lastTriedID   = "",
+    lastTriedFile = "",
+    lastTriedPath = "";
+  
+  
   public static PropType propWithID(String ID, String file, String basePath) {
-    return propWithID(ID, getCachedXML(basePath+file), basePath);
+    String split[] = splitFilenameFromID(ID);
+    if (split != null) { file = split[0]+".xml"; ID = split[1]; }
+    lastTriedID   = ID;
+    lastTriedFile = file;
+    lastTriedPath = basePath;
+    return propFromXML(ID, file, basePath, getCachedXML(basePath+file));
   }
   
   
   public static SceneType sceneWithID(String ID, String file, String basePath) {
-    return sceneWithID(ID, getCachedXML(basePath+file), basePath);
+    String split[] = splitFilenameFromID(ID);
+    if (split != null) { file = split[0]+".xml"; ID = split[1]; }
+    lastTriedID   = ID;
+    lastTriedFile = file;
+    lastTriedPath = basePath;
+    return sceneFromXML(ID, file, basePath, getCachedXML(basePath+file));
   }
   
   
-  public static XML getCachedXML(String xmlPath) {
+  private static String[] splitFilenameFromID(String ID) {
+    if (ID == null) return null;
+    int splitIndex = ID.indexOf(".");
+    if (splitIndex == -1) return null;
+    return new String[] {
+      ID.substring(0             , splitIndex - 0),
+      ID.substring(splitIndex + 1, ID.length()   )
+    };
+  }
+  
+  
+  private static XML getCachedXML(String xmlPath) {
     XML cached = (XML) Assets.getResource(xmlPath);
     if (cached == null) {
       Assets.cacheResource(cached = XML.load(xmlPath), xmlPath);
@@ -30,51 +58,72 @@ public class SceneFromXML implements TileConstants {
   }
   
   
-  static PropType propWithID(String ID, XML file, String basePath) {
-    String key = basePath.toLowerCase()+"_"+ID;
+  private static String uniqueID(String ID, String file, String basePath) {
+    return (basePath+file).toLowerCase()+"\\"+ID;
+  }
+  
+  
+  static PropType propFromXML(
+    String ID, String file, String basePath, XML fileXML
+  ) {
+    String   key    = uniqueID(ID, file, basePath);
     PropType cached = (PropType) Assets.getResource(key);
     if (cached != null) return cached;
-
-    for (XML node : file.allChildrenMatching("prop")) {
-      String propKey = basePath.toLowerCase()+"_"+node.value("ID");
+    
+    for (XML node : fileXML.allChildrenMatching("prop")) {
+      String nodeID  = node.value("ID");
+      String propKey = uniqueID(nodeID, file, basePath);
       if (Assets.getResource(propKey) != null) continue;
       Assets.cacheResource("PROP_HOLDER", propKey);
       
+      String name     = node.value("name"  );
+      String sprite   = node.value("sprite");
+      int    subtype  = Kind.loadField(node.value("subtype"));
+      int    wide     = getInt(node, "wide", 1);
+      int    high     = getInt(node, "high", 1);
+      int    blockage = Kind.loadField(node.value("blockLevel"));
+      String opacity  = node.value("blockSight");
+      
+      if (name     == null) name     = nodeID.replace("_", " ");
+      if (sprite   == null) sprite   = nodeID+".png";
+      if (subtype  == -1  ) subtype  = Kind.SUBTYPE_FURNISH;
+      if (blockage == -1  ) blockage = Kind.BLOCK_FULL;
+      if (opacity  == null) opacity  = blockage == Kind.BLOCK_FULL ?
+        "true" : "false"
+      ;
+      
       PropType type = new PropType(
-        node.value("name"), propKey,
-        basePath+node.value("sprite"),
-        Kind.loadField(node.value("subtype")),
-        node.getInt("wide"),
-        node.getInt("high"),
-        Kind.loadField(node.value("blockLevel")),
-        node.getBool("blockSight")
+        name, propKey, basePath+sprite,
+        subtype, wide, high, blockage, Boolean.parseBoolean(opacity)
       );
       Assets.cacheResource(type, propKey);
     }
     
     Object match = Assets.getResource(key);
     if (match instanceof PropType) return (PropType) match;
-    
     return null;
   }
   
   
-  public static SceneType sceneWithID(String ID, XML file, String basePath) {
-    String key = basePath.toLowerCase()+"_"+ID;
+  public static SceneType sceneFromXML(
+    String ID, String file, String basePath, XML fileXML
+  ) {
+    String key    = uniqueID(ID, file, basePath);
     Object cached = Assets.getResource(key);
     if (cached instanceof SceneType) return (SceneType) cached;
     
-    for (XML node : file.allChildrenMatching("scene")) {
-      String sceneKey = basePath.toLowerCase()+"_"+node.value("ID");
+    for (XML node : fileXML.allChildrenMatching("scene")) {
+      String nodeID   = node.value("ID");
+      String sceneKey = uniqueID(nodeID, file, basePath);
       if (Assets.getResource(sceneKey) != null) continue;
       Assets.cacheResource("SCENE_HOLDER", sceneKey);
       
       if (! node.child("unit").isNull()) {
-        SceneType type = unitSceneFrom(node, basePath, sceneKey);
+        SceneType type = unitSceneFrom(file, node, basePath, sceneKey);
         Assets.cacheResource(type, sceneKey);
       }
       else if (! node.child("grid").isNull()) {
-        SceneType type = gridSceneFrom(node, basePath, sceneKey);
+        SceneType type = gridSceneFrom(file, node, basePath, sceneKey);
         Assets.cacheResource(type, sceneKey);
       }
     }
@@ -86,9 +135,8 @@ public class SceneFromXML implements TileConstants {
   
   
   static SceneTypeUnits unitSceneFrom(
-    XML sceneNode, String filePath, String ID
+    String file, XML sceneNode, String basePath, String ID
   ) {
-    XML    file     = sceneNode.parent();
     String name     = sceneNode.value("name"  );
     String floorID  = sceneNode.value("floor" );
     String wallID   = sceneNode.value("wall"  );
@@ -99,7 +147,7 @@ public class SceneFromXML implements TileConstants {
     Batch <SceneTypeUnits.Unit> units = new Batch();
     
     for (XML u : unitXML) {
-      SceneType type = sceneWithID(u.value("typeID"), file, filePath);
+      SceneType type = sceneWithID(u.value("typeID"), file, basePath);
       int wallType = Kind.loadField(u.value("wall"    ), SceneTypeUnits.class);
       int priority = Kind.loadField(u.value("priority"), SceneTypeUnits.class);
       
@@ -111,7 +159,7 @@ public class SceneFromXML implements TileConstants {
       int minCount = getInt(u, "minCount", -1);
       int maxCount = getInt(u, "maxCount", -1);
       
-      if (wallType == -1) wallType = SceneTypeUnits.WALL_EXTERIOR  ;
+      if (wallType == -1) wallType = SceneTypeUnits.WALL_NONE      ;
       if (priority == -1) priority = SceneTypeUnits.PRIORITY_MEDIUM;
       if (exactDir == -1) exactDir = N;
       
@@ -131,10 +179,10 @@ public class SceneFromXML implements TileConstants {
     int unitsH   = getInt(sceneNode, "unitsHigh"   , -1);
     int unitsW   = getInt(sceneNode, "unitsWide"   , -1);
     PropType
-      floor  = propWithID(floorID , file, filePath),
-      wall   = propWithID(wallID  , file, filePath),
-      door   = propWithID(doorID  , file, filePath),
-      window = propWithID(windowID, file, filePath);
+      floor  = propWithID(floorID , file, basePath),
+      wall   = propWithID(wallID  , file, basePath),
+      door   = propWithID(doorID  , file, basePath),
+      window = propWithID(windowID, file, basePath);
     
     if (unitsW != -1) maxUW = minUW = unitsW;
     if (unitsH != -1) maxUH = minUH = unitsH;
@@ -150,11 +198,10 @@ public class SceneFromXML implements TileConstants {
   
   
   static SceneTypeGrid gridSceneFrom(
-    XML sceneNode, String filePath, String ID
+    String file, XML sceneNode, String basePath, String ID
   ) {
     //
     //  First load up the basic stats for this scene-type:
-    XML    file     = sceneNode.parent();
     String name     = sceneNode.value ("name"  );
     int    wide     = sceneNode.getInt("wide"  );
     int    high     = sceneNode.getInt("high"  );
@@ -164,10 +211,10 @@ public class SceneFromXML implements TileConstants {
     String windowID = sceneNode.value ("window");
     
     PropType
-      floor  = propWithID(floorID , file, filePath),
-      wall   = propWithID(wallID  , file, filePath),
-      door   = propWithID(doorID  , file, filePath),
-      window = propWithID(windowID, file, filePath);
+      floor  = propWithID(floorID , file, basePath),
+      wall   = propWithID(wallID  , file, basePath),
+      door   = propWithID(doorID  , file, basePath),
+      window = propWithID(windowID, file, basePath);
     SceneTypeGrid sceneType = new SceneTypeGrid(name, ID, wide, high);
     sceneType.floors  = floor ;
     sceneType.borders = wall  ;
@@ -182,7 +229,7 @@ public class SceneFromXML implements TileConstants {
       PropType types[] = new PropType[gridArgs.length];
       for (int i = types.length; i-- > 0;) {
         int index = Integer.parseInt(gridArgs[i]) - 1;
-        types[index] = propWithID(gridXML.value(gridArgs[i]), file, filePath);
+        types[index] = propWithID(gridXML.value(gridArgs[i]), file, basePath);
       }
       //
       //  The content of the grid node represent the x/y position of those

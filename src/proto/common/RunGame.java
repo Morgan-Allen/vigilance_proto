@@ -33,7 +33,7 @@ public abstract class RunGame extends JFrame implements ActionListener {
     
     if (! game.attemptReload(game.savePath)) {
       game.world = game.setupWorld();
-      game.runTests(game.world, true, false);
+      game.runTests(game.world, false, false);
     }
     
     Timer timer = new Timer(1000 / FRAME_RATE, game);

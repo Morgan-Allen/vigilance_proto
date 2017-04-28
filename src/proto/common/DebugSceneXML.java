@@ -5,24 +5,69 @@ import proto.game.person.*;
 import proto.game.scene.*;
 import proto.game.world.*;
 import proto.util.*;
+
 import proto.content.agents.*;
 import proto.content.items.*;
 import proto.content.places.*;
+
+import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileSystemView;
+import java.io.*;
 
 
 
 public class DebugSceneXML extends RunGame {
   
-  final static SceneType FILE_TEST_SCENE;
-  final static XML SCENE_XML;
+  static SceneType FILE_TEST_SCENE = null;
+  static XML SCENE_XML = null;
   static {
-    XML testXML = XML.load("media assets/testing/testing_parameters.xml");
-    SCENE_XML = testXML.child("sceneTest");
-    FILE_TEST_SCENE = SceneFromXML.sceneWithID(
-      SCENE_XML.value("sceneID" ),
-      SCENE_XML.value("fileName"),
-      SCENE_XML.value("basePath")
-    );
+    String fullPath = "", sceneID = "", fileName = "", basePath = "";
+    try {
+      XML testXML = XML.load("media assets/testing/testing_parameters.xml");
+      SCENE_XML = findUserPrefsXML(testXML);
+      sceneID  = SCENE_XML.value("sceneID" );
+      fileName = SCENE_XML.value("fileName");
+      basePath = SCENE_XML.value("basePath");
+      fullPath = basePath+fileName+", "+sceneID;
+      FILE_TEST_SCENE = SceneFromXML.sceneWithID(sceneID, fileName, basePath);
+      if (FILE_TEST_SCENE == null) throw new Exception("No such scene!");
+    }
+    catch (Exception e) {
+      StringBuffer trace = new StringBuffer();
+      trace.append("Attempted to load "+sceneID+" from "+basePath+fileName);
+      trace.append("\n\n  Encountered error: "+e.toString()+" at-");
+      for (Object o : e.getStackTrace()) {
+        trace.append("\n  "+o);
+      }
+      trace.append(
+        "\n\nThe last ID referenced was "+SceneFromXML.lastTriedID+" from "+
+        SceneFromXML.lastTriedPath+SceneFromXML.lastTriedFile
+      );
+      trace.append(
+        "\n\nPlease check to ensure that all identifiers are correct and "+
+        "fully-qualified, using / to separate directories."
+      );
+      
+      JOptionPane.showMessageDialog(null, trace.toString());
+      System.exit(0);
+    }
+  }
+  
+  private static XML findUserPrefsXML(XML parent) {
+    XML defaultChild = parent.child("does_not_exist");
+    try {
+      File home = FileSystemView.getFileSystemView().getHomeDirectory();
+      String homePath = home.getAbsolutePath();
+      
+      for (XML child : parent.allChildrenMatching("sceneTest")) {
+        String userPath = child.value("userPath");
+        if (userPath == null) defaultChild = child;
+        if (userPath == null || ! homePath.contains(userPath)) continue;
+        return child;
+      }
+    }
+    catch (Exception e) {}
+    return defaultChild;
   }
   
   
@@ -34,7 +79,14 @@ public class DebugSceneXML extends RunGame {
   
   
   protected World setupWorld() {
-    this.world = new World(this, savePath);
+    World world = new World(this, savePath);
+    
+    if (FILE_TEST_SCENE == null) {
+      Scene scene = new Scene(world, 2, 2);
+      scene.setupScene(true);
+      world.enterScene(scene);
+      return world;
+    }
     
     int     pS     = SCENE_XML.getInt("prefSize");
     Scene   scene  = FILE_TEST_SCENE.generateScene(world, pS, pS, true);

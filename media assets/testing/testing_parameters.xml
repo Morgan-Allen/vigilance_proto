@@ -5,15 +5,31 @@
   agents that can be added to a scene.
 </comment>
 
+
 <sceneTest
   basePath = "media assets/scene layout/civic scenes/"
-  fileName = "test_scene_bank.xml"
-  sceneID  = "bank_scene_assembled"
+  fileName = "warehouse_scene.xml"
+  sceneID  = "warehouse_scene_assembled"
   prefSize = "18"
 >
   <agent
     ID     = "hero_kind_phobos"
     startX = "0"
     startY = "8"
+  />
+</sceneTest>
+
+
+<sceneTest
+  userPath = "morganallen"
+  basePath = "media assets/scene layout/civic scenes/"
+  fileName = "civic_bank.xml"
+  sceneID  = "scene_assembled"
+  prefSize = "18"
+>
+  <agent
+    ID     = "hero_kind_phobos"
+    startX = "0"
+    startY = "4"
   />
 </sceneTest>
