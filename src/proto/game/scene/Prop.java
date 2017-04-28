@@ -238,6 +238,7 @@ public class Prop extends Element implements TileConstants {
   public int renderPriority() {
     PropType kind = kind();
     int priority = kind.renderPriority();
+    if (kind.isFloor()) priority -= 5;
     if (kind.isWall() || kind.effect() || kind.detail()) priority += 5;
     return priority;
   }

@@ -1,0 +1,196 @@
+
+<prop
+  ID         = "asphalt"
+  sprite     = "outside/asphalt.png"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+/>
+
+<prop
+  ID         = "asphalt_line"
+  sprite     = "outside/asphalt_line.png"
+  subtype    = "SUBTYPE_DETAIL"
+  blockLevel = "BLOCK_NONE"
+/>
+
+<prop
+  ID         = "pavement"
+  sprite     = "outside/pavement.png"
+  blockLevel = "BLOCK_NONE"
+/>
+
+<prop
+  ID         = "pavement_edge"
+  sprite     = "outside/pavement_edge.png"
+  blockLevel = "BLOCK_NONE"
+/>
+
+<prop
+  ID         = "pavement_corner"
+  sprite     = "outside/pavement_corner.png"
+  blockLevel = "BLOCK_NONE"
+/>
+
+<prop
+  ID         = "parapet"
+  sprite     = "outside/parapet.png"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+/>
+
+
+<prop
+  ID         = "car"
+  sprite     = "outside/car.png"
+  wide       = "3"
+  high       = "2"
+/>
+
+<prop
+  ID         = "car_2"
+  sprite     = "outside/car_2.png"
+  wide       = "3"
+  high       = "2"
+/>
+
+<prop
+  ID         = "sign_1"
+  sprite     = "outside/sign_1.png"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "sign_2"
+  sprite     = "outside/sign_2.png"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "hatch"
+  sprite     = "outside/hatch.png"
+  blockLevel = "BLOCK_NONE"
+/>
+
+<prop
+  ID         = "conditioner"
+  sprite     = "outside/conditioner.png"
+  blockLevel = "BLOCK_NONE"
+/>
+
+<prop
+  ID         = "dumpster_a"
+  sprite     = "outside/dumpster_a.png"
+  high       = "2"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "dumpster_b"
+  sprite     = "outside/dumpster_b.png"
+  high       = "2"
+  blockSight = "false"
+/>
+
+
+
+
+<scene
+  name   = "Front Outside"
+  ID     = "scene_front"
+  wide   = "6"
+  high   = "6"
+  wall   = "civic_common.wall"
+  door   = "civic_common.door"
+  window = "civic_common.window"
+>
+  <grid
+    1 = "hatch"
+    2 = "asphalt_line"
+  >
+    . . . . . .
+    . 1 . . . .
+    2 2 2 2 2 2
+    . . . . . .
+    . . . . . .
+    . . . . . .
+  </grid>
+  <grid
+    1 = "pavement"
+    2 = "pavement_edge"
+    3 = "asphalt"
+  >
+    3 3 3 3 3 3
+    3 3 3 3 3 3
+    3 3 3 3 3 3
+    3 3 3 3 3 3
+    2 2 2 2 2 2
+    1 1 1 1 1 1
+  </grid>
+</scene>
+
+
+<scene
+  name   = "Outside Corner"
+  ID     = "scene_corner"
+  wide   = "6"
+  high   = "6"
+  wall   = "civic_common.wall"
+  door   = "civic_common.door"
+  window = "civic_common.window"
+  floor  = "asphalt"
+>
+  <grid
+    1 = "pavement"
+    2 = "pavement_edge"
+    3 = "pavement_corner"
+    4 = "hatch"
+    5 = "asphalt_line"
+  >
+    . .  . . . .
+    . 4  . . . .
+    5 5  5 5 5 5
+    . .  . . . .
+    2 3  . . . .
+    1 2e . . . .
+  </grid>
+</scene>
+
+
+<scene
+  name   = "Back Outside"
+  ID     = "scene_back"
+  wide   = "6"
+  high   = "6"
+  wall   = "civic_common.wall"
+  door   = "civic_common.door"
+  window = "civic_common.window"
+>
+  <grid
+    1 = "parapet"
+    2 = "car_2"
+    3 = "hatch"
+    4 = "dumpster_a"
+    5 = "dumpster_b"
+    6 = "asphalt_line"
+  >
+    . . 6 6 6 .
+    4 . . . . .
+    . . . 3 . .
+    5 . 6 6 6 .
+    . . 2 . . .
+    . . . . . .
+  </grid>
+  <grid
+    1 = "pavement"
+    2 = "pavement_edge"
+    3 = "asphalt"
+  >
+    1 2e 3 3 3 3
+    1 2e 3 3 3 3
+    1 2e 3 3 3 3
+    1 2e 3 3 3 3
+    1 2e 3 3 3 3
+    1 2e 3 3 3 3
+  </grid>
+</scene>
+

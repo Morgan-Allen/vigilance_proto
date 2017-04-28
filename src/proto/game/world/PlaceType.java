@@ -54,11 +54,6 @@ public class PlaceType extends Kind {
   }
   
   
-  public boolean hasFurnitureType(Trait trait) {
-    return sceneType.hasFurnitureOfType(trait);
-  }
-  
-  
   
   /**  Active effects-
     */

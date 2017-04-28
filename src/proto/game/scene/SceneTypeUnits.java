@@ -196,10 +196,10 @@ public class SceneTypeUnits extends SceneType {
               if ((face + 0 % 8) != unit.exactDir) continue;
               rating = 100;
             }
-            if (! type.checkBordering(g, typeGen, tX, tY, face, resolution)) {
-              continue;
-            }
             if (! exact) {
+              if (! type.checkBordering(g, typeGen, tX, tY, face, resolution)) {
+                continue;
+              }
               rating += Nums.max(0, unit.minCount - count);
               rating += Rand.num() / 2;
             }

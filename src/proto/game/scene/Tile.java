@@ -151,6 +151,7 @@ public class Tile implements Session.Saveable, TileConstants {
   
   public int coverLevel(int dir) {
     Tile other = scene.tileAt(x + T_X[dir], y + T_Y[dir]);
+    if (other == null) return Kind.BLOCK_NONE;
     int block  = blockageVal(dir);
     int opaque = opacityVal (dir);
     if (other != null) {

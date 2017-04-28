@@ -208,6 +208,12 @@ public class ActionsView extends UINode {
       }
       s.append(", E to exit debug mode.");
       if (surface.isPressed('e')) GameSettings.debugScene = false;
+      s.append("\n  Press Z to un/zoom.");
+      if (surface.isPressed('z')) {
+        SceneView SV = scene.view();
+        boolean inZoom = SV.tileSize == SceneView.MAX_TILE_SIZE;
+        SV.tileSize = inZoom ? SceneView.MIN_TILE_SIZE : SceneView.MAX_TILE_SIZE;
+      }
     }
     
     return s.toString();

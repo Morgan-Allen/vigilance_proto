@@ -50,17 +50,20 @@ public class Scene extends Scenery implements Assignment {
   public Scene(World world, int wide, int high) {
     super(wide, high);
     this.world = world;
+    vision.setupFog(wide, high);
   }
   
   
   public Scene(Session s) throws Exception {
     super(s);
+    vision.setupFog(wide, high);
+    
     world        = (World) s.loadObject();
     site         = (Place) s.loadObject();
     playerTask   = (Task ) s.loadObject();
     triggerEvent = (Event) s.loadObject();
-    time         = s.loadInt();
     state        = s.loadInt();
+    time         = s.loadInt();
     
     s.loadObjects(playerTeam );
     s.loadObjects(othersTeam );
@@ -78,6 +81,7 @@ public class Scene extends Scenery implements Assignment {
   
   
   public void saveState(Session s) throws Exception {
+    super.saveState(s);
     s.saveObject (world       );
     s.saveObject (site        );
     s.saveObject (playerTask  );
@@ -216,12 +220,6 @@ public class Scene extends Scenery implements Assignment {
   
   /**  Supplementary population methods for use during initial setup-
     */
-  protected void initArrays(int wide, int high) {
-    super.initArrays(wide, high);
-    vision.setupFog(wide, high);
-  }
-  
-  
   public void setupScene(boolean forTesting) {
     this.state = forTesting ? STATE_TEST : STATE_SETUP;
     super.setupScene(forTesting);
