@@ -284,7 +284,6 @@ public class SceneView extends UINode implements TileConstants {
     }
     //
     //  Finally, some supplementary debugging-related checks:
-    //GameSettings.debugLineSight = true;
     if (
       GameSettings.debugLineSight && I.used60Frames &&
       zoomTile != null && zoomTile == hoverTile &&
@@ -356,17 +355,28 @@ public class SceneView extends UINode implements TileConstants {
     //  top, rather than as a form of tinting for specific sprites.)  Remove
     //  as soon as possible once you migrate to a proper graphics engine.
     
+    boolean report = false;
+    /*
+    if (
+      I.used60Frames && tile == zoomTile &&
+      zoomTile != null && zoomTile == hoverTile
+    ) {
+      I.say("\nTile is: "+tile);
+      report = true;
+    }
+    //*/
+    
     Scene scene = (Scene) tile.scene;
     float maxSight = scene.vision.fogAt(tile, side);
-    if (maxSight > 0 || ! tile.opaque()) return maxSight;
+    if (maxSight > 0) return maxSight;
     
     for (int dir : T_ADJACENT) {
       if (tile.hasWall(dir)) continue;
+      if (report) I.say("  Checking dir:"+dir);
       
+      dir = (dir + 2) % 8;
       Tile near = scene.tileAt(tile.x + T_X[dir], tile.y + T_Y[dir]);
       if (near == null) continue;
-      if (near.hasWall((dir + 4) % 8)) continue;
-      
       maxSight = Nums.max(maxSight, scene.vision.fogAt(near, side));
     }
     return maxSight;

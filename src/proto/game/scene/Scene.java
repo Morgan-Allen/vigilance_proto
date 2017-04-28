@@ -62,8 +62,8 @@ public class Scene extends Scenery implements Assignment {
     site         = (Place) s.loadObject();
     playerTask   = (Task ) s.loadObject();
     triggerEvent = (Event) s.loadObject();
-    time         = s.loadInt();
     state        = s.loadInt();
+    time         = s.loadInt();
     
     s.loadObjects(playerTeam );
     s.loadObjects(othersTeam );
