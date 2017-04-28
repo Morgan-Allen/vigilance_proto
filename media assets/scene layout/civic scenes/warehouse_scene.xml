@@ -1,50 +1,27 @@
 
 <prop
   ID         = "floor"
-  sprite     = "floor.png"
+  sprite     = "warehouse/floor.png"
   subtype    = "SUBTYPE_WALLING"
   blockLevel = "BLOCK_NONE"
-/>
-
-<prop
-  ID         = "window"
-  sprite     = "wall_thin_window.png"
-  high       = "0"
-  subtype    = "SUBTYPE_WALLING"
-  blockSight = "false"
-/>
-
-<prop
-  ID         = "door"
-  sprite     = "wall_thin_door.png"
-  wide       = "1"
-  subtype    = "SUBTYPE_WALLING"
-  blockLevel = "BLOCK_NONE"
-/>
-
-<prop
-  ID         = "wall"
-  sprite     = "wall_thin.png"
-  high       = "0"
-  subtype    = "SUBTYPE_WALLING"
 />
 
 <prop
   ID         = "warehouse_shelf"
-  sprite     = "warehouse_shelf.png"
+  sprite     = "warehouse/warehouse_shelf.png"
   high       = "2"
 />
 
 <prop
   ID         = "warehouse_car"
-  sprite     = "warehouse_car.png"
+  sprite     = "warehouse/warehouse_car.png"
   high       = "2"
   blockSight = "false"
 />
 
 <prop
   ID         = "warehouse_car_empty"
-  sprite     = "warehouse_car_empty.png"
+  sprite     = "warehouse/warehouse_car_empty.png"
   high       = "2"
   blockSight = "false"
 />
@@ -56,9 +33,9 @@
   wide   = "8"
   high   = "8"
   floor  = "floor"
-  wall   = "wall"
-  door   = "door"
-  window = "window"
+  wall   = "civic_common.wall"
+  door   = "civic_common.door"
+  window = "civic_common.window"
 >
   <grid
     1 = "warehouse_shelf"
@@ -91,6 +68,22 @@
   <unit
     typeID = "warehouse_scene_storage"
     wall   = "WALL_EXTERIOR"
-    x = "0" y = "0" dir = "N"
+    x = "2" y = "0" dir = "N"
+  />
+  <unit
+    typeID = "warehouse_scene_storage"
+    wall   = "WALL_EXTERIOR"
+    x = "3" y = "0" dir = "N"
+  />
+
+  <unit
+    typeID = "civic_office_8x8.scene_general_office"
+    wall   = "WALL_EXTERIOR"
+    x = "0" y = "1" dir = "N"
+  />
+  <unit
+    typeID = "civic_office_8x8.scene_toilets"
+    wall   = "WALL_INTERIOR"
+    x = "1" y = "0" dir = "N"
   />
 </scene>

@@ -15,6 +15,13 @@
 />
 
 <prop
+  ID         = "desk"
+  sprite     = "inside/desk.png"
+  wide       = "2"
+  blockSight = "false"
+/>
+
+<prop
   ID         = "desk_phone"
   sprite     = "inside/desk_phone_2.png"
   subtype    = "SUBTYPE_DETAIL"
