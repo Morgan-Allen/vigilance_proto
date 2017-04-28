@@ -78,11 +78,11 @@
     3w .  .  .  .  3e .  .
     5e .  1  .  2s 3e .  .
     .  .  .  .  .  .  .  .
-    .  .  .  .  .  .  6e .
+    .  .  .  .  .  6e .  .
     .  2w .  .  .  .  .  .
     3s 3s .  .  .  .  .  .
+    .  .  1  .  .  .  .  .
     .  .  5e .  .  .  .  .
-    .  .  5e 1  .  .  .  .
   </grid>
 </scene>
 
@@ -171,6 +171,54 @@
 </scene>
 
 <scene
+  name   = "Toilets"
+  ID     = "toilet_unit"
+  wide   = "8"
+  high   = "8"
+  wall   = "civic_common.wall"
+  door   = "civic_common.door"
+  window = "civic_common.window"
+>
+  <grid
+    1 = "civic_office.floor"
+    2 = "civic_outside.pavement"
+    3 = "civic_common.floor_marble"
+    4 = "civic_office.blue_tile_floor"
+  >
+     2  2  2   2  2  2   2    2
+     2 [1- 1-  1- 1- 1-  1-]  2_/
+    [4- 4- 4- [1  1  1   1]/  3]
+    [4  4  4  [1_ 1_ 1_ _1]   3]
+    [4  4  4  [1  1  1   1]   3]
+    [4  4  4  [1  1  1   1]/  3]
+    [4_ 4_ 4  [1_ 1_ 1_ [3-   3]
+     3  3  3-/ 3  3  3   3    3
+  </grid>
+  <grid
+    1 = "civic_common.support_column"
+    2 = "civic_office.toilet"
+    3 = "civic_office.urinal"
+    4 = "civic_office.wide_sink"
+    5 = "civic_office.paper_towels"
+    6 = "civic_inside.plant_1"
+    7 = "civic_office.supply_cupboards"
+    8 = "civic_office.trash_bin"
+    9 = "civic_office.printer"
+    10 = "civic_outside.dumpster_a"
+    11 = "civic_outside.dumpster_b"
+  >
+     . 11w . 10w .  .  .  .
+     .  3s 3s 5  4  .  .  .
+     .  .  8e .  .  .  .  .
+     .  7s .  6e 2s 2s 2s .
+     .  7e .  6w 2  2  2  .
+     .  .  .  5w .  .  .  .
+     9w .  .  .  .  4s 1  .
+     .  .  .  .  .  .  .  .
+  </grid>
+</scene>
+
+<scene
   name   = "Front Entrance"
   ID     = "front_unit"
   wide   = "16"
@@ -185,29 +233,32 @@
     3 = "civic_common.floor_marble"
     4 = "civic_common.floor_marble_edge"
     5 = "civic_common.floor_marble_corner"
+    6 = "civic_office.floor"
   >
-     2  2   2   2  2   2  2  2  2  2  2  2   2    2  2  2
-     2  2   2   2  2]  5  4  4  4  4 e5 [2   2    2  2  2
-     1  1- [5   4  4  s5  3  3  3  3 w5  4   4   e5] 1- 1
-     1  1  [e4  3  3   3  3  3  3  3  3  3   3   w4] 1  1
-     1  1  [e4/ 3  3   3  3  3  3  3  3  3   3  /w4] 1  1
-     1  1  [e4  3  3   3  3  3  3  3  3  3   3   w4] 1  1
-     1  1  [w5  4  4   4  4  4  4  4  4  4   4   s5] 1  1
-     3  3   3   3  3   3  3  3  3  3  3  3   3    3  3  3
+     2  2   2   2  2   2  2  2  2  2  2  2  2   2  2  2
+     2  2   2   2  2]  5  4  4  4  4 e5 [2  2   2  2  2
+     1 [6  6- [5   4  s5  3  3  3  3 w5  4  e5] 1- 1  1-
+     1 [6  6  [e4  3   3  3  3  3  3  3  3  w4] 1  1  1
+     1 [6  6  [e4/ 3   3  3  3  3  3  3  3 /w4] 1  1  1
+     1 [6  6  [e4  3   3  3  3  3  3  3  3  w4] 1  1  1
+     1 [6_ 6_ [e4  3   3  3  3  3  3  3  3  w4] 1_ 1  1_
+     3  3  3   w5  4   4  4  4  4  4  4  4  s5  3  3  3
   </grid>
   <grid
     1 = "civic_common.support_column"
-    2 = "civic_inside.revolving_door"
+    2 = "civic_inside.plant_1"
     3 = "civic_inside.security_desk"
     4 = "civic_common.glass_door"
+    5 = "civic_office.desk"
+    6 = "civic_inside.chair"
   >
-     .  .  .  .  .  2  .  .  2  .  .  .  .  .  .  .
-     .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
-     -' .  -' -' 4  .  .  .  .  .  .  4  -' -' .  -'
-     .  .  .  1  .  .  .  .  .  .  .  .  1  .  .  .
-     .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
-     .  .  .  1  .  .  3w .  .  .  .  .  1  .  .  .
-     _/ _/ .  .  .  .  .  .  .  .  .  .  .  .  _/ _/
+     .  .  1  .  .  .  .  .  .  .  .  .  .  1  .  .
+     .  .  .  .  1  4  4  4  4  4  4  1  .  .  .  .
+    -2' -' .  -' -  .  .  .  .  .  .  -  -' 6w -' 6e
+     .  .  5w .  1  3  .  .  .  .  .  1  .  6w .  6e
+     .  .  .  .  .  .  .  .  .  .  .  6e .  .  .  .
+     .  .  .  .  .  .  .  .  .  .  .  6e .  6w .  .
+     _/ .  5w .  1  .  .  .  .  .  .  1  .  6w _/ 2s
      .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
   </grid>
 </scene>
@@ -228,14 +279,15 @@
     3 = "vault_wall_corner"
     4 = "gold_bars"
     5 = "money_stacks"
+    6 = "civic_common.support_column"
   >
-    .  3w 2  2  2  2  2  2  2  2  3  .  .  .  .  .
+    .  3w 2  2  2  2  2  2  2  2  3  .  .  .  6  .
     .  2w 4  .  4  4  .  4  5  .  2e .  .  .  .  .
     .  2w 4  .  5  4  .  4  5  .  2e .  .  .  .  .
     .  2w 5  .  4  4  .  5  5  .  1  .  .  .  .  .
     .  2w 4  .  5  5  .  4  4  .  .  .  .  .  .  .
     .  2w .  .  .  .  .  .  .  .  .  .  .  .  .  .
-    .  3s 2s 2s 2s 2s 2s 2s 2s 2s 3e .  .  .  .  .
+    .  3s 2s 2s 2s 2s 2s 2s 2s 2s 3e .  .  .  6  .
     .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
   </grid>
   <grid
@@ -330,12 +382,12 @@
     8 = "civic_inside.plant_1"
   >
     .  .  .  .  .  .  .  .  .  .   .  .  .  .   .  .
-    . [.  .] .  .] 2- .  s5 . s5  -2] .  .  -  2-] .
+    . [.  .] .  .] 2- .  s5 . s5  -2] .  .  -8 2-] .
     . [.  .] .  .] 7w .  .  .  .  7e] .  .  .  1e] .
     . [.  .] .  .] -  -  -  -  -/ -8] .  .  .   .] .
     . [.  .] .  .] .  .  .  .  .    ] .  .  .   .] .
     . [.  .] .  .] .  6w .  6w .   /] .  .  .   .] .
-    . [_  _] _  _] 2_ _ /_  _  _  _2] .  .  _  2_] .
+    . [_  _] _  _] 2_ _ /_  _  _  _2] .  .  _8 2_] .
     .  .  .  .  .  .  .  .  .  .   .  .  .  .   .  .
   </grid>
   <grid
@@ -384,12 +436,12 @@
     2 = "civic_inside.plant_1"
   >
     .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
-    .  .  .  .  1  2  .  .  .  .  2  1  .  .  .  .
+    .  .  1  .  1  2  .  .  .  .  2  1  .  1  .  .
     .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
     .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
     .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
     .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
-    .  .  .  .  1s 2s .  .  .  .  2s 1s .  .  .  .
+    .  .  1s .  1s 2s .  .  .  .  2s 1s .  1s .  .
     .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
   </grid>
 </scene>
@@ -410,7 +462,6 @@
   <unit typeID = "corner_unit"   x = "0" y = "3" dir = "W" />
   <unit typeID = "corner_unit"   x = "5" y = "3" dir = "S" />
   
-  <unit typeID = "facing_unit_a" x = "1" y = "0" dir = "N" />
   <unit typeID = "facing_unit_a" x = "4" y = "0" dir = "N" />
   <unit typeID = "facing_unit_a" x = "0" y = "2" dir = "W" />
   <unit typeID = "facing_unit_a" x = "5" y = "2" dir = "E" />
@@ -422,9 +473,10 @@
   <unit typeID = "facing_unit_b" x = "0" y = "1" dir = "W" />
   <unit typeID = "facing_unit_b" x = "5" y = "1" dir = "E" />
   
+  <unit typeID = "toilet_unit"   x = "1" y = "0" dir = "N" />
   <unit typeID = "front_unit"    x = "2" y = "3" dir = "S" />
   
-  <unit typeID = "office_unit"   x = "1" y = "1" dir = "W" />
+  <unit typeID = "office_unit"   x = "1" y = "1" dir = "E" />
   <unit typeID = "vault_unit"    x = "4" y = "1" dir = "E" />
   <unit typeID = "stairs_unit"   x = "2" y = "1" dir = "S" />
   <unit typeID = "hall_unit"     x = "2" y = "2" dir = "N" />
