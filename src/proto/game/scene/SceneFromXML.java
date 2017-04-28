@@ -58,16 +58,21 @@ public class SceneFromXML implements TileConstants {
   }
   
   
+  private static String uniqueID(String ID, String file, String basePath) {
+    return (basePath+file).toLowerCase()+"\\"+ID;
+  }
+  
+  
   static PropType propFromXML(
     String ID, String file, String basePath, XML fileXML
   ) {
-    String key = basePath.toLowerCase()+"_"+ID;
+    String   key    = uniqueID(ID, file, basePath);
     PropType cached = (PropType) Assets.getResource(key);
     if (cached != null) return cached;
     
     for (XML node : fileXML.allChildrenMatching("prop")) {
       String nodeID  = node.value("ID");
-      String propKey = basePath.toLowerCase()+"_"+nodeID;
+      String propKey = uniqueID(nodeID, file, basePath);
       if (Assets.getResource(propKey) != null) continue;
       Assets.cacheResource("PROP_HOLDER", propKey);
       
@@ -103,12 +108,13 @@ public class SceneFromXML implements TileConstants {
   public static SceneType sceneFromXML(
     String ID, String file, String basePath, XML fileXML
   ) {
-    String key = basePath.toLowerCase()+"_"+ID;
+    String key    = uniqueID(ID, file, basePath);
     Object cached = Assets.getResource(key);
     if (cached instanceof SceneType) return (SceneType) cached;
     
     for (XML node : fileXML.allChildrenMatching("scene")) {
-      String sceneKey = basePath.toLowerCase()+"_"+node.value("ID");
+      String nodeID   = node.value("ID");
+      String sceneKey = uniqueID(nodeID, file, basePath);
       if (Assets.getResource(sceneKey) != null) continue;
       Assets.cacheResource("SCENE_HOLDER", sceneKey);
       
