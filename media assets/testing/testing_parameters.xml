@@ -24,7 +24,7 @@
   userPath = "morganallen"
   basePath = "media assets/scene layout/civic scenes/"
   fileName = "alt_bank_scene.xml"
-  sceneID  = "front_unit"
+  sceneID  = "scene_assembled"
   prefSize = "18"
 >
   <agent

@@ -2,7 +2,7 @@
 
 <prop
   ID         = "small_table"
-  sprite     = "inside/box.png"
+  sprite     = "inside/small_table.png"
   blockSight = "false"
 />
 
@@ -71,6 +71,40 @@
   wide       = "4"
   high       = "2"
   subtype    = "SUBTYPE_WALLING"
+/>
+
+<prop
+  ID         = "old_desk"
+  sprite     = "inside/green_desk.png"
+  wide       = "2"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "bankers_lamp"
+  sprite     = "inside/desk_lamp.png"
+  subtype    = "SUBTYPE_DETAIL"
+  blockLevel = "BLOCK_NONE"
+/>
+
+<prop
+  ID         = "old_bookshelf"
+  sprite     = "inside/green_book_shelf.png"
+  wide       = "1"
+/>
+
+<prop
+  ID         = "small_cabinet"
+  sprite     = "inside/small_desk.png"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "conference_table"
+  sprite     = "inside/conference_table.png"
+  wide       = "3"
+  high       = "2"
+  blockSight = "false"
 />
 
 
