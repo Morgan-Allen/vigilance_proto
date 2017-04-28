@@ -232,13 +232,28 @@
     2 = "civic_common.support_column"
   >
     .  .  .  .  .  .  .  .  .  .  .  .  .  .  .   .
-    2 [.  .] .  .] .  .  .  .  .  .  .  .  -  2-] .
+    . [.  .] .  .] 2  .  .  .  .  2  .  .  -  2-] .
     . [.  .] .  .] .  .  .  .  .  .  .  .  .  1e] .
     . [.  .] .  .] .  .  .  .  .  .  .  .  .   .] .
     . [.  .] .  .] .  .  .  .  .  .  .  .  .   .] .
     . [.  .] .  .] .  .  .  .  .  .  .  .  .   .] .
-    2 [_  _] _  _] .  .  .  .  .  .  .  .  _  2_] .
+    . [_  _] _  _] 2  .  .  .  .  2  .  .  _  2_] .
     .  .  .  .  .  .  .  .  .  .  .  .  .  .  .   .
+  </grid>
+  <grid
+    1 = ""
+    2 = "civic_common.floor_marble"
+    3 = "civic_common.floor_marble_edge"
+    4 = "civic_common.floor_marble_corner"
+  >
+    4  3s 3s 3s 3s 3s 3s 3s 3s 3s 3s 3s 3s 3s 3s 4e
+    3w .  .  .  .  4  3  3  3  3  4e 2  2  2  .  3e
+    3w .  .  .  .  3w 2  2  2  2  3e 2  2  .  .  3e
+    3w .  .  .  .  3w 2  2  2  2  3e 2  2  .  .  3e
+    3w .  .  .  .  3w 2  2  2  2  3e 2  2  .  .  3e
+    3w .  .  .  .  3w 2  2  2  2  3e 2  2  .  .  3e
+    3w .  .  .  .  4w 3s 3s 3s 3s 4s 2  2  2  .  3e
+    4w 3s 3s 3s 3s 3s 3s 3s 3s 3s 3s 3s 3s 3s 3s 4s
   </grid>
 </scene>
 
@@ -298,10 +313,10 @@
   
   <unit typeID = "front_unit"    x = "2" y = "3" dir = "S" />
   
-  <unit typeID = "office_unit"   x = "1" y = "1" dir = "E" />
-  <unit typeID = "stairs_unit"   x = "2" y = "1" dir = "E" />
-  <unit typeID = "vault_unit"    x = "4" y = "1" dir = "W" />
-  <unit typeID = "hall_unit"     x = "3" y = "1" dir = "E" />
+  <unit typeID = "office_unit"   x = "1" y = "1" dir = "W" />
+  <unit typeID = "vault_unit"    x = "4" y = "1" dir = "E" />
+  <unit typeID = "stairs_unit"   x = "2" y = "1" dir = "S" />
+  <unit typeID = "hall_unit"     x = "2" y = "2" dir = "N" />
 </scene>
 
 
