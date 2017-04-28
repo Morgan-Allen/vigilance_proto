@@ -1,27 +1,27 @@
 
 <prop
   ID         = "floor"
+  sprite     = "common/floor_1.png"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+/>
+
+<prop
+  ID         = "floor_marble"
   sprite     = "common/floor_marble_2.png"
   subtype    = "SUBTYPE_WALLING"
   blockLevel = "BLOCK_NONE"
 />
 
 <prop
-  ID         = "floor_edge_horizontal"
-  sprite     = "common/floor_marble_edge_horizontal.png"
+  ID         = "floor_marble_edge"
+  sprite     = "common/floor_marble_edge.png"
   subtype    = "SUBTYPE_WALLING"
   blockLevel = "BLOCK_NONE"
 />
 
 <prop
-  ID         = "floor_edge_vertical"
-  sprite     = "common/floor_marble_edge_vertical.png"
-  subtype    = "SUBTYPE_WALLING"
-  blockLevel = "BLOCK_NONE"
-/>
-
-<prop
-  ID         = "floor_corner"
+  ID         = "floor_marble_corner"
   sprite     = "common/floor_marble_corner.png"
   subtype    = "SUBTYPE_WALLING"
   blockLevel = "BLOCK_NONE"
@@ -40,6 +40,7 @@
   high       = "0"
   subtype    = "SUBTYPE_WALLING"
   blockLevel = "BLOCK_NONE"
+  blockSight = "true"
 />
 
 <prop
@@ -47,7 +48,7 @@
   sprite     = "common/glass_door.png"
   high       = "0"
   subtype    = "SUBTYPE_WALLING"
-  blockLevel = "BLOCK_FULL"
+  blockLevel = "BLOCK_NONE"
   blockSight = "false"
 />
 

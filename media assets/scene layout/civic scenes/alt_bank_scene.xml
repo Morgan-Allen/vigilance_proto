@@ -9,16 +9,29 @@
   window = "civic_common.window"
 >
   <grid
+    1 = "civic_common.floor"
+    2 = "civic_outside.pavement"
+  >
+    [1- 1- 1- 1- 1- 1-] 2 2
+    [1  1  1  1  1  1]  2 2
+    [1  1  1  1  1  1  1- 1-
+    [1  1  1  1  1  1  1  1
+    [1  1  1  1  1  1  1  1
+    [1_ 1_ 1  1  1  1  1  1
+     2  2 [1  1  1  1  1  1_
+     2  2 [1  1  1  1  1] .
+  </grid>
+  <grid
     1 = "civic_common.support_column"
   >
-    [-  -  -  -  -  -] .  .
-    [.  .  .  .  .  .] .  .
-    [.  .  .  .  .  .  -  -
-    [.  .  .  .  .  .  .  .
-    [.  .  .  .  .  .  .  .
-    [_  _  .  .  .  1  .  .
-     .  . [.  .  .  .  .  _
-     .  . [.  .  .  .  .] .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  1  .  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
   </grid>
 </scene>
 
@@ -32,15 +45,28 @@
   window = "civic_common.window"
 >
   <grid
+    1 = "civic_common.floor"
+    2 = "civic_outside.pavement"
+  >
+     2  2  2   2  2  2   2   2
+     2 [1- 1-  1- 1- 1-  1-] 2
+     1- 1  1   1  1  1   1  -1]
+     1  1  1   1  1  1   1   1]
+     1  1  1   1  1  1   1   1]
+     1  1  1   1  1  1   1   1]
+     1_ 1_ 1_/ 1_ 1_ 1_/ 1_ _1]
+     .  .  .   .  .  .   .   .
+  </grid>
+  <grid
     1 = "civic_common.support_column"
   >
      .  .  .  .  .  .  .  .
-     . [-  -  -  -  -  -] .
-     -  .  .  .  .  .  .  -]
-     .  .  .  .  .  .  .  .]
-     .  .  .  .  .  .  .  .]
-     .  .  .  .  .  .  .  .]
-     _  _1 .  _  _  .  _1 _]
+     .  .  .  .  .  .  .  .
+     .  .  .  .  .  .  .  .
+     .  .  .  .  .  .  .  .
+     .  .  .  .  .  .  .  .
+     .  .  .  .  .  .  .  .
+     .  1  .  .  .  .  1  .
      .  .  .  .  .  .  .  .
   </grid>
 </scene>
@@ -55,18 +81,74 @@
   window = "civic_common.window"
 >
   <grid
+    1 = "civic_common.floor"
+    2 = "civic_outside.pavement"
+  >
+     2   2   2  2  2  2   2  2
+     2   2   2  2  2  2   2  2
+     1-] 2  [1- 1- 1- 1-] 2 [1-
+     1   1- [1  1  1  1  1-  1
+     1   1  [1  1  1  1  1   1
+     1   1  [/1 1  1  1  1   1
+     1_  1  [1_ 1_ 1_ 1_ 1   1_
+     .   .   .  .  .  .  .   .
+  </grid>
+  <grid
     1 = "civic_common.support_column"
   >
-     .  .  .  .  .  .  .  .
-     .  .  .  .  .  .  .  .
-     -] . [-  -  -  -] . [-
-     . 1- [.  .  .  .  -1 .
-     .  . [.  .  .  .  .  .
-     .  .  .  .  .  .  .  .
-     _  . [_  _  _  _  .  _
-     .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  1  .  .  .  .  1  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
   </grid>
 </scene>
+
+<scene
+  name   = "Front Entrance"
+  ID     = "front_unit"
+  wide   = "16"
+  high   = "8"
+  wall   = "civic_common.wall"
+  door   = "civic_common.door"
+  window = "civic_common.window"
+>
+  <grid
+    1 = "civic_common.floor"
+    2 = "civic_outside.pavement"
+    3 = "civic_common.floor_marble"
+    4 = "civic_common.floor_marble_edge"
+    5 = "civic_common.floor_marble_corner"
+  >
+     2  2   2   2  2   2  2  2  2  2  2  2   2    2  2  2
+     2  2   2   2  2]  5  4  4  4  4 e5 [2   2    2  2  2
+     1- 1- [5-  4- 4  s5  3  3  3  3 w5  4   4- -e5] 1- 1-
+     1  1  [e4  3  3   3  3  3  3  3  3  3   3   w4] 1  1
+     1  1  [e4/ 3  3   3  3  3  3  3  3  3   3  /w4] 1  1
+     1  1  [e4  3  3   3  3  3  3  3  3  3   3   w4] 1  1
+     1  1  [w5_ 4_ 4_/ 4_ 4_ 4_ 4_ 4_ 4_ 4_/ 4_ _s5] 1  1
+     .  .    .  .  .   .  .  .  .  .  .  .   .    .  .  .
+  </grid>
+  <grid
+    1 = "civic_common.support_column"
+    2 = "civic_inside.revolving_door"
+    3 = "civic_inside.security_desk"
+    4 = "civic_common.glass_door"
+  >
+     .  .  .  .  .  2  .  .  2  .  .  .  .  .  .  .
+     .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+     .  .  .  .  4  .  .  .  .  .  .  4  .  .  .  .
+     .  .  .  1  .  .  .  .  .  .  .  .  1  .  .  .
+     .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+     .  .  .  1  .  .  3w .  .  .  .  .  1  .  .  .
+     .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+     .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+  </grid>
+</scene>
+
 
 
 
@@ -95,8 +177,6 @@
   </grid>
 </scene>
 
-
-
 <scene
   name   = "General Office"
   ID     = "office_unit"
@@ -122,9 +202,6 @@
    [_  _  _  _  _  _  .  _  _  .  _] _  .  _  _  _]
   </grid>
 </scene>
-
-
-
 
 <scene
   name   = "Stairs And Lifts"
@@ -173,31 +250,6 @@
   </grid>
 </scene>
 
-<scene
-  name   = "Front Entrance"
-  ID     = "front_unit"
-  wide   = "16"
-  high   = "8"
-  wall   = "civic_common.wall"
-  door   = "civic_common.door"
-  window = "civic_common.window"
->
-  <grid
-    1 = "civic_common.support_column"
-    2 = "civic_inside.revolving_door"
-    3 = "civic_inside.security_desk"
-  >
-     .  .  .  .  .  2  .  .  2  .  .  .  .  .  .  .
-     .  .  .  .  ]  .  .  .  .  .  .  [  .  .  .  .
-     -  - [-  -  -  .  .  .  .  .  .  -  -  -] -  -
-     .  . [.  1  .  .  .  .  .  .  .  .  1  .] .  .
-     .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
-     .  . [.  1  .  .  3w .  .  .  .  .  1  .] .  .
-     .  . [_  _  .  _  _  _  _  _  _  .  _  _] .  .
-     .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
-  </grid>
-</scene>
-
 
 <scene
   name      = "Bank Scene Assembled"
@@ -226,12 +278,12 @@
   <unit typeID = "facing_unit_b" x = "0" y = "1" dir = "W" />
   <unit typeID = "facing_unit_b" x = "5" y = "1" dir = "E" />
   
+  <unit typeID = "front_unit"    x = "2" y = "3" dir = "S" />
+  
   <unit typeID = "office_unit"   x = "1" y = "1" dir = "E" />
   <unit typeID = "stairs_unit"   x = "2" y = "1" dir = "E" />
   <unit typeID = "vault_unit"    x = "4" y = "1" dir = "W" />
-  
   <unit typeID = "hall_unit"     x = "3" y = "1" dir = "E" />
-  <unit typeID = "front_unit"    x = "2" y = "3" dir = "S" />
 </scene>
 
 
