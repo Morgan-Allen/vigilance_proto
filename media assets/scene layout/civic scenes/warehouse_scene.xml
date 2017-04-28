@@ -76,6 +76,21 @@
     x = "2" y = "0" dir = "N"
   />
   <unit
+    typeID = "warehouse_scene_storage"
+    wall   = "WALL_INTERIOR"
+    x = "1" y = "1" dir = "N"
+  />
+  <unit
+    typeID = "warehouse_scene_storage"
+    wall   = "WALL_INTERIOR"
+    x = "2" y = "1" dir = "N"
+  />
+  <unit
+    typeID = "warehouse_scene_storage"
+    wall   = "WALL_INTERIOR"
+    x = "3" y = "0" dir = "N"
+  />
+  <unit
     typeID = "civic_office_8x8.scene_shipping_and_receiving"
     wall   = "WALL_INTERIOR"
     x = "0" y = "0" dir = "N"
