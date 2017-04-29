@@ -36,12 +36,18 @@
 />
 
 <prop
-  ID         = "sofe"
+  ID         = "sofa"
   sprite     = "inside/sofa.png"
   high       = "3"
   blockSight = "false"
 />
 
+<prop
+  ID         = "chair_row"
+  sprite     = "inside/black_chair_row.png"
+  wide       = "2"
+  blockSight = "false"
+/>
 <prop
   ID         = "supply_cupboards"
   sprite     = "office/supply_cupboards.png"
@@ -70,6 +76,12 @@
 <prop
   ID         = "toilet"
   sprite     = "office/toilet.png"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "toilet_2"
+  sprite     = "office/toilet_2.png"
   blockSight = "false"
 />
 
@@ -152,18 +164,30 @@
     2 = "printer"
     3 = "industrial_inside.plant_1"
     4 = "desk"
-    5 = "sofe"
+    5 = "sofa"
     6 = "chair"
     7 = "book_shelf"
   >
-    .  .  .  .  .  .  .  3
-    .  .  .  .  4e .  4e  .
-    5  .  .  .  .  .  .  .
+    3  .  .  .  . 5e  .  3
     .  .  .  .  .  .  .  .
     .  .  .  .  .  .  .  .
-    3  .  .  .  4e .  4e .
     .  .  .  .  .  .  .  .
+    .  .  .  4s .  . 4s  .
     .  .  .  .  .  .  .  .
+    .  .  . 4s  .  . 4s  .
+    2s .  .  .  .  .  .  .
+
+  </grid>
+  <grid
+  >
+    [-  -  -  -  -  -  -  -]
+    [   .  .  .  .  .  .   ]
+    [/  .  .  .  .  .  .   ]/
+    [/  .  .  .  .  .  .   ]
+    [   .  .  .  .  .  .   ]
+    [   .  .  .  .  .  .   ]
+    [   .  .  .  .  .  .   ]
+    [_  _  _  _/  _  _  _  _]
   </grid>
 </scene>
 
@@ -186,8 +210,6 @@
     6 = "kitchen_sink"
     7 = "kitchen_cupboard"
     8 = "kitchen_fridge"
-    9 = "industrial_common.support_column"
-    10 = "desk"
   >
     .  .  .  .  .  .  .  .
     .  2s .  .  .  1s 2w .
@@ -197,6 +219,17 @@
     .  .  .  .  .  .  .  3e
     .  .  .  .  .  .  .  .
     .  .  .  . 7s  8s .  6s
+  </grid>
+  <grid
+  >
+    [-  - -/  -  -  -  -  -]
+    [   .  .  .  .  .  .   ]
+    [   .  .  .  .  .  .   ]
+    [   .  .  .  .  .  .   ]
+    [   .  .  .  .  .  .   ]
+    [   .  .  .  .  .  .   ]
+    [   .  .  .  .  .  .   ]
+    [_  _/ _  _  _  _  _  _]
   </grid>
 </scene>
 
@@ -220,14 +253,14 @@
     7 = "trash_bin"
     8 = "printer"
   >
-    .   .  .  .  .   .  .  ]/
+    .   .  .  .   .   .  .  ]
     .   .  8s  5  .   .  .  .
-    -   -  -  -  [1w  -  -/  -
+    -   -/ -  - -[1w  -  -/ -
     .   .  6w .  [1w  .  .  4e
     7   .  .  .  [1w  .  .  3e
     .   .  .  .  [5   .  .  .
     .   .  6  .  [2e  .  .  .
-    .   .  .  .  [2e  . _/  4e
+    .   .  .  .  [2e  .  .   4e
   </grid>
   <grid
     1 = "floor"
@@ -241,5 +274,69 @@
     1 1 1 1 2 2 2 2
     1 1 1 1 2 2 2 2
     1 1 1 1 2 2 2 2
+  </grid>
+  <grid
+  >
+    [-  -/ -  -  -  -  -  -]
+    [/  .  .  .  .  .  .   ]/
+    [   .  .  .  .  .  .   ]
+    [   .  .  .  .  .  .   ]
+    [   .  .  .  .  .  .   ]
+    [   .  .  .  .  .  .   ]
+    [   .  .  .  .  .  .   ]
+    [_  _/ _  _  _  _  _  _]
+  </grid>
+</scene>
+
+<scene
+  name   = "Restroom"
+  ID     = "scene_restroom"
+  wide   = "8"
+  high   = "8"
+  wall   = "industrial_common.wall"
+  door   = "industrial_common.door"
+  window = "industrial_common.window"
+>
+  <grid
+    1  = "toilet_2"
+    2  = "industrial_inside.plant_1"
+    3  = "sofa"
+    4  = "kitchen_table"
+    5  = "kitchen_fruits"
+    6  = "kitchen_sink"
+    7  = "kitchen_cupboard"
+  >
+    [/ 1e  .  6   .   7  .  .
+    [/ 1e  .  .   .   .  .  .
+    .   .  .  .   .   .  .  .
+    .   .  4  5e  .   .  .  .
+    .   .  .  .   .   .  .  .
+    .   .  .  .   .   .  .  .
+    .   .  .  .   .   .  .  3s
+    2   .  .  3w  .   .  .  .
+  </grid>
+  <grid
+    1 = "floor"
+    2 = "blue_tile_floor"
+  >
+    2 2 1 1 1 1 1 1
+    2 2 1 1 1 1 1 1
+    1 1 1 1 1 1 1 1
+    1 1 1 1 1 1 1 1
+    1 1 1 1 1 1 1 1
+    1 1 1 1 1 1 1 1
+    1 1 1 1 1 1 1 1
+    1 1 1 1 1 1 1 1
+  </grid>
+  <grid
+  >
+    [-  -]  -  -  -  -  -  -]
+    [-_ -_] .  .  .  .  .   ]
+    [   .   .  .  .  .  .   ]/
+    [   .   .  .  .  .  .   ]
+    [   .   .  .  .  .  .   ]
+    [/  .   .  .  .  .  .   ]
+    [   .   .  .  .  .  .   ]
+    [_  _/  _  _  _  _  _  _]
   </grid>
 </scene>

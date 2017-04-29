@@ -75,14 +75,14 @@
     2 = "warehouse_car"
     3 = "warehouse_car_empty"
   >
-    .  .  .  .  .  .  .  .
-    .  1  1  .  .  1  1  .
-    .  .  .  .  .  .  .  .
-    .  1  1  .  .  1  1  .
-    .  .  .  2  .  .  .  .
-    .  1  1  .  .  1  1  .
-    .  .  .  .  .  .  .  .
-    .  .  .  .  .  .  .  .
+    -  -  -  -  -  -  - -]
+    .  1  1  .  .  1  1  ]
+    .  .  .  .  .  .  .  ]
+    .  1  1  .  .  1  1  ]
+    .  .  .  2  .  .  .  ]
+    .  1  1  .  .  1  1  ]
+    .  .  .  .  .  .  .  ]
+    .  .  .  .  .  .  .  ]
 
 
   </grid>
@@ -102,21 +102,25 @@
     1 = "warehouse_shelf_big"
     2 = "warehouse_car"
     3 = "warehouse_car_empty"
+    4 = "warehouse_box"
+    5 = "warehouse_boxes"
+    6 = "warehouse_pallets"
+    7 = "warehouse_more_pallets"
   >
+    -  -  -  -  -  -  -  -
+    .  .  1  1  .  1  1  .
+    .  4  .  .  .  .  .  .
+    .  .  1  1  .  1  1  .
+    .  .  .  .  .  .  .  5
+    .  .  1  1  .  1  1  .
     .  .  .  .  .  .  .  .
-    .  1  1  .  .  1  1  .
+    7  .  1  1  .  1  1  3s
+    6  .  .  .  .  .  .  .
+    .  .  1  1  .  1  1  .
     .  .  .  .  .  .  .  .
-    .  1  1  .  .  1  1  .
-    .  .  .  .  .  .  .  .
-    .  1  1  .  .  1  1  .
-    .  .  .  .  .  .  .  .
-    .  1  1  .  .  1  1  3s
-    .  .  .  .  .  .  .  .
-    .  1  1  .  .  1  1  .
-    .  .  .  .  .  .  .  .
-    .  1  1  .  .  1  1  .
-    .  .  .  .  .  .  .  .
-    .  1  1  .  .  1  1  .
+    6  .  1  1  .  1  1  .
+    7  .  .  .  .  .  .  .
+    6  .  1  1  .  1  1  .
     .  .  .  2  .  .  .  .
     .  .  .  .  .  .  .  .
 
@@ -164,6 +168,11 @@
   door      = "door"
   window    = "window"
 >
+  <unit
+    typeID = "industrial_outside.scene_entrance"
+    wall   = "WALL_NONE"
+    x = "0" y = "0" dir = "N"
+  />
   <unit
     typeID = "warehouse_scene_big_storage"
     wall   = "WALL_INTERIOR"
@@ -213,6 +222,13 @@
     wall   = "WALL_INTERIOR"
     x = "1" y = "2" dir = "N"
   />
+
+  <unit
+    typeID = "industrial_office.scene_restroom"
+    wall   = "WALL_INTERIOR"
+    x = "4" y = "2" dir = "N"
+  />
+
   <unit
     typeID = "industrial_outside.scene_parking"
     wall   = "WALL_NONE"
@@ -222,6 +238,18 @@
     typeID = "industrial_outside.scene_parking"
     wall   = "WALL_NONE"
     x = "0" y = "2" dir = "S"
+  />
+
+  <unit
+    typeID = "industrial_outside.scene_corner"
+    wall   = "WALL_NONE"
+    x = "0" y = "3" dir = "S"
+  />
+
+  <unit
+    typeID = "industrial_outside.scene_corner"
+    wall   = "WALL_NONE"
+    x = "1" y = "3" dir = "E"
   />
 
   <unit
@@ -240,6 +268,23 @@
     typeID = "industrial_outside.scene_small_trucks_docks"
     wall   = "WALL_NONE"
     x = "5" y = "1" dir = "W"
+  />
+
+  <unit
+    typeID = "industrial_outside.scene_back"
+    wall   = "WALL_NONE"
+    x = "4" y = "3" dir = "N"
+  />
+  <unit
+    typeID = "industrial_outside.scene_back"
+    wall   = "WALL_NONE"
+    x = "5" y = "2" dir = "W"
+  />
+
+  <unit
+    typeID = "industrial_outside.scene_back"
+    wall   = "WALL_NONE"
+    x = "5" y = "0" dir = "W"
   />
 
 </scene>
