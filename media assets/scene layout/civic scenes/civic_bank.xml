@@ -1,6 +1,6 @@
 
 <prop
-  ID         = "metal_floor"
+  ID         = "floor_metal"
   sprite     = "bank/floor_metal.png"
   subtype    = "SUBTYPE_WALLING"
   blockLevel = "BLOCK_NONE"
@@ -42,79 +42,407 @@
 />
 
 
+
+
 <scene
-  name   = "Teller Screens"
-  ID     = "scene_teller_screens"
-  wide   = "6"
-  high   = "6"
+  name   = "Corner Unit"
+  ID     = "corner_unit"
+  wide   = "8"
+  high   = "8"
   wall   = "civic_common.wall"
   door   = "civic_common.door"
   window = "civic_common.window"
 >
   <grid
     1 = "civic_common.floor"
-    2 = "civic_common.floor_edge_horizontal"
-    3 = "civic_common.floor_corner"
-    4 = "civic_common.floor_edge_vertical"
+    2 = "civic_outside.pavement"
+    3 = "civic_common.floor_marble"
   >
-    3  2e 2e 2e 2e 3e
-    4  1  1  1  1  4s
-    4  1  1  1  1  4s
-    4  1  1  1  1  4s
-    4  1  1  1  1  4s
-    3w 2w 2w 2w 2w 3s
+    [1- 1-  1-' 1-' 1-  1-] 2   2
+    [1  1   1   1   1   1]  2   2
+    [1' 1   1   1   1   1   1-' 1-'
+    [1' 1   1   1   1   1   1   1
+    [1  1   1   1   1   1   1   1
+    [1_ 1_  1   1   1   1   1   1
+     2  2  [1   1   1   1   1_  1_/
+     2  2  [1   1   1   1]  3_  3
   </grid>
   <grid
-    1 = "civic_inside.chair"
-    2 = "civic_inside.small_table"
-    3 = "civic_inside.plant_1"
-    4 = "civic_inside.plant_2"
-    5 = "teller_screen"
-    6 = "civic_common.support_column"
+    1 = "civic_common.support_column"
+    2 = "civic_inside.old_desk"
+    3 = "civic_inside.old_bookshelf"
+    4 = "civic_inside.bankers_lamp"
+    5 = "civic_inside.small_cabinet"
+    6 = "civic_inside.conference_table"
   >
-    .  .  .  .  .  .
-    .  3  1  6  1  .
-    .  .  .  .  .  .
-    .  .  .  .  .  4
-    . 5s  . 5s  .  5s
-    .  .  .  .  .  .
+    3w .  .  .  .  3e .  .
+    5e .  1  .  2s 3e .  .
+    .  .  .  .  .  .  .  .
+    .  2e .  .  .  6e .  .
+    .  .  .  .  .  .  .  .
+    3s 3s .  .  .  .  .  .
+    .  .  1  .  .  .  .  .
+    .  .  5e .  .  .  .  .
   </grid>
 </scene>
 
-
 <scene
-  name   = "Safe Vault"
-  ID     = "scene_safe_vault"
-  wide   = "12"
-  high   = "6"
+  name   = "Outside Facing Unit"
+  ID     = "facing_unit_a"
+  wide   = "8"
+  high   = "8"
   wall   = "civic_common.wall"
   door   = "civic_common.door"
   window = "civic_common.window"
 >
   <grid
-    1 = "metal_floor"
-    2 = "civic_common.floor"
+    1 = "civic_common.floor"
+    2 = "civic_outside.pavement"
+    3 = "civic_common.floor_marble"
   >
-    1 1 1 1 1 2  2 1 1 1 1 1
-    1 1 1 1 1 2  2 1 1 1 1 1
-    1 1 1 1 1 2  2 1 1 1 1 1
-    1 1 1 1 1 2  2 1 1 1 1 1
-    1 1 1 1 1 2  2 1 1 1 1 1
-    1 1 1 1 1 2  2 2 2 2 2 2
+     2  2  2   2  2  2   2   2
+     2 [1- 1-' 1- 1- 1-' 1-] 2
+    [1- 1  1   1  1  1   1  -1]
+    [1  1  1   1  1  1   1   1]
+    [1/ 1  1   1  1  1   1   1]/
+    [1/ 1  1   1  1  1   1   1]/
+    [1_ 1_ 1_  1_ 1_ 1_  1_ _1]
+     3  3  3   3  3  3   3   3
   </grid>
+  <grid
+    1 = "civic_common.support_column"
+    2 = "civic_inside.old_desk"
+    3 = "civic_inside.old_bookshelf"
+    4 = "civic_inside.bankers_lamp"
+    5 = "civic_inside.small_cabinet"
+    6 = "civic_inside.conference_table"
+  >
+     .  .  .  .  .  .  .  .
+     .  5s .  .  .  .  3  .
+     .  .  .  .  .  .  .  .
+     .  .  6  .  .  .  2w .
+     .  .  .  .  .  .  .  .
+     .  .  .  .  .  .  .  .
+     5  1  5  5  3s 3s 1  .
+     .  .  .  .  .  .  .  .
+  </grid>
+</scene>
+
+<scene
+  name   = "Outside Facing Unit"
+  ID     = "facing_unit_b"
+  wide   = "8"
+  high   = "8"
+  wall   = "civic_common.wall"
+  door   = "civic_common.door"
+  window = "civic_common.window"
+>
+  <grid
+    1 = "civic_common.floor"
+    2 = "civic_outside.pavement"
+    3 = "civic_common.floor_marble"
+  >
+     2   2   2   2   2   2   2   2
+     2   2   2   2   2   2   2   2
+    '1- [2  [1-  1-' 1-' 1-] 2]  1-'
+     1   1- [1   1   1   1   1-  1
+     1   1  [1   1   1   1   1   1
+     1   1  [1/  1   1   1   1   1
+     1_  1  [1_  1_  1_  1_  1_  1_
+     3   3   3   3   3   3   3   3
+  </grid>
+  <grid
+    1 = "civic_common.support_column"
+    2 = "civic_inside.old_desk"
+    3 = "civic_inside.old_bookshelf"
+    4 = "civic_inside.bankers_lamp"
+    5 = "civic_inside.small_cabinet"
+    6 = "civic_inside.plant_1"
+  >
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  .  3w .  .  .  .  .
+    .  1  3w 4w 2s .  1  .
+    .  .  .  .  .  .  5s .
+    .  .  .  .  .  .  .  .
+    6  _/ 3w 5  5  .  .  .
+    .  .  .  .  .  .  .  .
+  </grid>
+</scene>
+
+<scene
+  name   = "Toilets"
+  ID     = "toilet_unit"
+  wide   = "8"
+  high   = "8"
+  wall   = "civic_common.wall"
+  door   = "civic_common.door"
+  window = "civic_common.window"
+>
+  <grid
+    1 = "civic_office.floor"
+    2 = "civic_outside.pavement"
+    3 = "civic_common.floor_marble"
+    4 = "civic_office.blue_tile_floor"
+  >
+     2  2  2   2  2  2   2    2
+     2 [1- 1-  1- 1- 1-  1-]  2_/
+    [4- 4- 4- [1  1  1   1]/  3]
+    [4  4  4  [1_ 1_ 1_ _1]   3]
+    [4  4  4  [1  1  1   1]   3]
+    [4  4  4  [1  1  1   1]/  3]
+    [4_ 4_ 4  [1_ 1_ 1_ [3-   3]
+     3  3  3-/ 3  3  3   3    3
+  </grid>
+  <grid
+    1 = "civic_common.support_column"
+    2 = "civic_office.toilet"
+    3 = "civic_office.urinal"
+    4 = "civic_office.wide_sink"
+    5 = "civic_office.paper_towels"
+    6 = "civic_inside.plant_1"
+    7 = "civic_office.supply_cupboards"
+    8 = "civic_office.trash_bin"
+    9 = "civic_office.printer"
+    10 = "civic_outside.dumpster_a"
+    11 = "civic_outside.dumpster_b"
+  >
+     . 11w . 10w .  .  .  .
+     .  3s 3s 5  4  .  .  .
+     .  .  8e .  .  .  .  .
+     .  7s .  6e 2s 2s 2s .
+     .  7e .  6w 2  2  2  .
+     .  .  .  5w .  .  .  .
+     9w .  .  .  .  4s 1  .
+     .  .  .  .  .  .  .  .
+  </grid>
+</scene>
+
+<scene
+  name   = "Front Entrance"
+  ID     = "front_unit"
+  wide   = "16"
+  high   = "8"
+  wall   = "civic_common.wall"
+  door   = "civic_common.door"
+  window = "civic_common.window"
+>
+  <grid
+    1 = "civic_common.floor"
+    2 = "civic_outside.pavement"
+    3 = "civic_common.floor_marble"
+    4 = "civic_common.floor_marble_edge"
+    5 = "civic_common.floor_marble_corner"
+    6 = "civic_office.floor"
+  >
+     2  2   2   2  2   2  2  2  2  2  2  2  2   2  2  2
+     2  2   2   2  2]  5  4  4  4  4 e5 [2  2   2  2  2
+     1 [6  6- [5   4  s5  3  3  3  3 w5  4  e5] 1- 1  1-
+     1 [6  6  [e4  3   3  3  3  3  3  3  3  w4] 1  1  1
+     1 [6  6  [e4/ 3   3  3  3  3  3  3  3 /w4] 1  1  1
+     1 [6  6  [e4  3   3  3  3  3  3  3  3  w4] 1  1  1
+     1 [6_ 6_ [e4  3   3  3  3  3  3  3  3  w4] 1_ 1  1_
+     3  3  3   w5  4   4  4  4  4  4  4  4  s5  3  3  3
+  </grid>
+  <grid
+    1 = "civic_common.support_column"
+    2 = "civic_inside.plant_1"
+    3 = "civic_inside.security_desk"
+    4 = "civic_common.glass_door"
+    5 = "civic_office.desk"
+    6 = "civic_inside.chair"
+  >
+     .  .  1  .  .  .  .  .  .  .  .  .  .  1  .  .
+     .  .  .  .  1  4  4  4  4  4  4  1  .  .  .  .
+    -2' -' .  -' -  .  .  .  .  .  .  -  -' 6w -' 6e
+     .  .  5w .  1  3  .  .  .  .  .  1  .  6w .  6e
+     .  .  .  .  .  .  .  .  .  .  .  6e .  .  .  .
+     .  .  .  .  .  .  .  .  .  .  .  6e .  6w .  .
+     _/ .  5w .  1  .  .  .  .  .  .  1  .  6w _/ 2s
+     .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+  </grid>
+</scene>
+
+
+<scene
+  name   = "Main Vault"
+  ID     = "vault_unit"
+  wide   = "16"
+  high   = "8"
+  wall   = "civic_common.wall"
+  door   = "civic_common.door"
+  window = "civic_common.window"
+>
   <grid
     1 = "vault_door"
     2 = "vault_wall"
-    3 = "gold_bars"
-    4 = "money_stacks"
-    5 = "vault_wall_corner"
+    3 = "vault_wall_corner"
+    4 = "gold_bars"
+    5 = "money_stacks"
+    6 = "civic_common.support_column"
   >
-    5w  2   2   2   5   . . 5w 2  2  2  5
-    2w  4   4   4   2e  . . .  .  4  4  2e
-    2w  3   .   .   1   . . .  .  .  3  2e
-    2w  3   .   .   .   . . 1s .  .  3  2e
-    2w  3   .   .   .   . . 5s 2s 2s 2s 5e
-    5s  2s  2s  2s  5e   . . .  .  .  .  .
+    .  3w 2  2  2  2  2  2  2  2  3  .  .  .  6  .
+    .  2w 4  .  4  4  .  4  5  .  2e .  .  .  .  .
+    .  2w 4  .  5  4  .  4  5  .  2e .  .  .  .  .
+    .  2w 5  .  4  4  .  5  5  .  1  .  .  .  .  .
+    .  2w 4  .  5  5  .  4  4  .  .  .  .  .  .  .
+    .  2w .  .  .  .  .  .  .  .  .  .  .  .  .  .
+    .  3s 2s 2s 2s 2s 2s 2s 2s 2s 3e .  .  .  6  .
+    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+  </grid>
+  <grid
+  >
+    .  [- -  -  -  -  -  -  -  -  -  -  -/ -/ -] .
+    .  [  .  .  .  .  .  .  .  .  .  .  .  .   ] .
+    .  [  .  .  .  .  .  .  .  .  .  .  .  .   ] .
+    .  [  .  .  .  .  .  .  .  .  .  .  .  .   ] .
+    .  [  .  .  .  .  .  .  .  .  .  .  .  .   ] .
+    .  [  .  .  .  .  .  .  .  .  .  .  .  .   ] .
+    .  [_ _  _  _  _  _  _  _  _  _  _  _/ _/ _] .
+    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+  </grid>
+  <grid
+    1 = "civic_common.floor"
+    2 = "civic_common.floor_marble"
+    3 = "floor_metal"
+  >
+    2  3  3  3  3  3  3  3  3  3  3  3  1  1  3  2
+    2  3  3  3  3  3  3  3  3  3  3  3  1  1  3  2
+    2  3  3  3  3  3  3  3  3  3  3  3  1  1  3  2
+    2  3  3  3  3  3  3  3  3  3  3  1  1  1  3  2
+    2  3  3  3  3  3  3  3  3  3  3  1  1  1  3  2
+    2  3  3  3  3  3  3  3  3  3  3  1  1  1  3  2
+    2  3  3  3  3  3  3  3  3  3  3  3  1  1  3  2
+    2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2
+  </grid>
+</scene>
+
+<scene
+  name   = "General Office"
+  ID     = "office_unit"
+  wide   = "16"
+  high   = "8"
+  wall   = "civic_common.wall"
+  door   = "civic_common.door"
+  window = "civic_common.window"
+>
+  <grid
+    1 = "civic_office.floor"
+    2 = "civic_common.floor_marble"
+  >
+    2  2  2  2  2  2  2   2  2  2  2  2   2  2  2  2
+    2 [1- 1- 1- 1- 1- 1-  1- 1- 1- 1- 1-  1- 1- -1] 2
+    2 [1  1  1  1  1  1   1  1  1  1  1   1  1  /1] 2
+    2 [1  1  1  1  1  1   1  1  1  1  1   1  1   1] 2
+    2 [1  1  1  1  1  1   1  1  1  1  1   1  1   1] 2
+    2 [1  1  1  1  1  1   1  1  1  1  1   1  1   1] 2
+    2 [1  1  1  1  1  1   1  1  1  1  1   1  1  /1] 2
+    2 [1_ 1_ 1_ 1_ 1_ 1_/ 1_ 1_ 1_ 1_ 1_/ 1_ 1_ _1] 2
+  </grid>
+  <grid
+    1 = "civic_office.cubicle_a"
+    2 = "civic_office.cubicle_b"
+    3 = "civic_inside.table_set"
+    4 = "civic_office.water"
+    5 = "civic_office.printer"
+    6 = "civic_inside.plant_1"
+    7 = "civic_office.kitchen_sink"
+    8 = "civic_office.kitchen_cupboard"
+    9 = "civic_office.kitchen_fridge"
+    10 = "civic_inside.desk_phone"
+  >
+    .  .   .  .  .  .  .  .  .  .  .  .  .  .  .  .
+    .  9w  .  6  .  .  .  .  .  .  .  .  .  .  .  .
+    .  .   .  4e .  1s .  2w .  .  1s .  3  10 .  .
+    .  .   .  .  .  1e .  2  .  .  1e .  .  .  .  .
+    .  8w  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+    .  .   .  .  .  .  .  .  .  .  .  .  3  10 .  .
+    .  7w  .  .  .  1s .  2w .  .  1s .  .  .  .  .
+    .  5w  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+  </grid>
+</scene>
+
+<scene
+  name   = "Stairs And Lifts"
+  ID     = "stairs_unit"
+  wide   = "16"
+  high   = "8"
+  wall   = "civic_common.wall"
+  door   = "civic_common.door"
+  window = "civic_common.window"
+>
+  <grid
+    1 = "civic_inside.elevators"
+    2 = "civic_common.support_column"
+    3 = "civic_inside.plant_1"
+    4 = "civic_inside.plant_2"
+    5 = "teller_screen"
+    6 = "civic_office.desk"
+    7 = "civic_office.printer"
+    8 = "civic_inside.plant_1"
+  >
+    .  .  .  .  .  .  .  .  .  .   .  .  .  .   .  .
+    . [.  .] .  .] 2- .  s5 . s5  -2] .  .  -8 2-] .
+    . [.  .] .  .] 7w .  .  .  .  7e] .  .  .  1e] .
+    . [.  .] .  .] -  -  -  -  -/ -8] .  .  .   .] .
+    . [.  .] .  .] .  .  .  .  .    ] .  .  .   .] .
+    . [.  .] .  .] .  6w .  6w .   /] .  .  .   .] .
+    . [_  _] _  _] 2_ _ /_  _  _  _2] .  .  _8 2_] .
+    .  .  .  .  .  .  .  .  .  .   .  .  .  .   .  .
+  </grid>
+  <grid
+    1 = "civic_office.floor"
+    2 = "civic_common.floor_marble"
+    3 = "civic_common.floor_marble_edge"
+    4 = "civic_common.floor_marble_corner"
+  >
+    4  3s 3s 3s 3s 3s 3s 3s 3s 3s 3s 3s 3s 3s 3s 4e
+    3w .  .  .  .  1  1  1  1  1  1  4  4e 2  .  3e
+    3w .  .  .  .  1  1  1  1  1  1  3w 3e .  .  3e
+    3w .  .  .  .  1  1  1  1  1  1  3w 3e .  .  3e
+    3w .  .  .  .  1  1  1  1  1  1  3w 3e .  .  3e
+    3w .  .  .  .  1  1  1  1  1  1  3w 3e .  .  3e
+    3w .  .  .  .  1  1  1  1  1  1  4w 4s 2  .  3e
+    4w 3s 3s 3s 3s 3s 3s 3s 3s 3s 3s 3s 3s 3s 3s 4s
+  </grid>
+</scene>
+
+<scene
+  name   = "Central Hall"
+  ID     = "hall_unit"
+  wide   = "16"
+  high   = "8"
+  wall   = "civic_common.wall"
+  door   = "civic_common.door"
+  window = "civic_common.window"
+>
+  <grid
+    1 = "civic_common.support_column"
+    2 = "civic_common.floor_marble"
+    3 = "civic_common.floor_marble_edge"
+    4 = "civic_common.floor_marble_corner"
+  >
+    4  3s 3s 3s 3s 3s 3s 3s 3s 3s 3s 3s 3s 3s 3s 4e
+    3w 1  2  1  2  2  1  2  2  1  2  2  1  2  1  3e
+    3w 4  3  3  3  3  3  4e 4  3  3  3  3  3  4e 3e
+    3w 3w 2  2  2  2  2  3e 3w 2  2  2  2  2  3e 3e
+    3w 3w 2  2  2  2  2  3e 3w 2  2  2  2  2  3e 3e
+    3w 4w 3s 3s 3s 3s 3s 4s 4w 3s 3s 3s 3s 3s 4s 3e
+    3w 1  2  1  2  2  1  2  2  1  2  2  1  2  1  3e
+    4w 3s 3s 3s 3s 3s 3s 3s 3s 3s 3s 3s 3s 3s 3s 4s
+  </grid>
+  <grid
+    1 = "civic_inside.chair"
+    2 = "civic_inside.plant_1"
+  >
+    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  1  .  1  2  .  .  .  .  2  1  .  1  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  1s .  1s 2s .  .  .  .  2s 1s .  1s .  .
+    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
   </grid>
 </scene>
 
@@ -122,88 +450,36 @@
 <scene
   name      = "Bank Scene Assembled"
   ID        = "scene_assembled"
-  unitSize  = "6"
-  unitsWide = "8"
-  unitsHigh = "8"
-  wall      = "civic_common.wall"
-  door      = "civic_common.door"
-  window    = "civic_common.window"
+  unitSize  = "8"
+  unitsWide = "6"
+  unitsHigh = "4"
+  wall      = "civic_wall"
+  door      = "civic_door"
+  window    = "civic_window"
 >
-  <unit
-    typeID = "civic_outside.scene_front"
-    wall   = "WALL_NONE"
-    x = "0" y = "0" dir = "N"
-  />
-  <unit
-    typeID = "civic_outside.scene_front"
-    wall   = "WALL_NONE"
-    x = "1" y = "0" dir = "N"
-  />
-  <unit
-    typeID = "civic_outside.scene_front"
-    wall   = "WALL_NONE"
-    x = "2" y = "0" dir = "N"
-  />
-  <unit
-    typeID = "civic_outside.scene_corner"
-    wall   = "WALL_NONE"
-    x = "3" y = "0" dir = "N"
-  />
-  <unit
-    typeID = "civic_outside.scene_back"
-    wall   = "WALL_NONE"
-    x = "3" y = "1" dir = "N"
-  />
-  <unit
-    typeID = "civic_outside.scene_back"
-    wall   = "WALL_NONE"
-    x = "3" y = "2" dir = "N"
-  />
-  <unit
-    typeID = "civic_outside.scene_back"
-    wall   = "WALL_NONE"
-    x = "3" y = "3" dir = "N"
-  />
-  <unit
-    typeID = "civic_outside.scene_back"
-    wall   = "WALL_NONE"
-    x = "3" y = "4" dir = "N"
-  />
-
-  <unit
-    typeID = "civic_inside.scene_general_entrance"
-    wall   = "WALL_EXTERIOR"
-    x = "0" y = "1" dir = "N"
-  />
-  <unit
-    typeID = "scene_safe_vault"
-    wall   = "WALL_INTERIOR"
-    x = "0" y = "3" dir = "N"
-  />
-  <unit
-    typeID = "civic_inside.scene_general_seating"
-    wall   = "WALL_EXTERIOR"
-    x = "2" y = "1" dir = "N"
-  />
-  <unit
-    typeID = "civic_inside.scene_general_seating"
-    wall   = "WALL_EXTERIOR"
-    x = "2" y = "2" dir = "N"
-  />
-  <unit
-    typeID = "scene_teller_screens"
-    wall   = "WALL_EXTERIOR"
-    x = "2" y = "3" dir = "N"
-  />
-  <unit
-    typeID = "civic_office.scene_general_office"
-    wall   = "WALL_EXTERIOR"
-    x = "0" y = "4" dir = "N"
-  />
-  <unit
-    typeID = "civic_office.scene_toilets"
-    wall   = "WALL_INTERIOR"
-    x = "2" y = "4" dir = "N"
-  />
+  <unit typeID = "corner_unit"   x = "0" y = "0" dir = "N" />
+  <unit typeID = "corner_unit"   x = "5" y = "0" dir = "E" />
+  <unit typeID = "corner_unit"   x = "0" y = "3" dir = "W" />
+  <unit typeID = "corner_unit"   x = "5" y = "3" dir = "S" />
+  
+  <unit typeID = "facing_unit_a" x = "4" y = "0" dir = "N" />
+  <unit typeID = "facing_unit_a" x = "0" y = "2" dir = "W" />
+  <unit typeID = "facing_unit_a" x = "5" y = "2" dir = "E" />
+  <unit typeID = "facing_unit_a" x = "1" y = "3" dir = "S" />
+  <unit typeID = "facing_unit_a" x = "4" y = "3" dir = "S" />
+  
+  <unit typeID = "facing_unit_b" x = "2" y = "0" dir = "N" />
+  <unit typeID = "facing_unit_b" x = "3" y = "0" dir = "N" />
+  <unit typeID = "facing_unit_b" x = "0" y = "1" dir = "W" />
+  <unit typeID = "facing_unit_b" x = "5" y = "1" dir = "E" />
+  
+  <unit typeID = "toilet_unit"   x = "1" y = "0" dir = "N" />
+  <unit typeID = "front_unit"    x = "2" y = "3" dir = "S" />
+  
+  <unit typeID = "office_unit"   x = "1" y = "1" dir = "E" />
+  <unit typeID = "vault_unit"    x = "4" y = "1" dir = "E" />
+  <unit typeID = "stairs_unit"   x = "2" y = "1" dir = "S" />
+  <unit typeID = "hall_unit"     x = "2" y = "2" dir = "N" />
 </scene>
+
 

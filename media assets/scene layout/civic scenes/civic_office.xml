@@ -29,6 +29,20 @@
 />
 
 <prop
+  ID         = "desk"
+  sprite     = "office/desk.png"
+  wide       = "2"
+  high       = "1"
+/>
+
+<prop
+  ID         = "sofa"
+  sprite     = "inside/sofa.png"
+  high       = "3"
+  blockSight = "false"
+/>
+
+<prop
   ID         = "supply_cupboards"
   sprite     = "office/supply_cupboards.png"
   wide       = "2"
@@ -123,85 +137,33 @@
 />
 
 
-
 <scene
-  name   = "General Office"
-  ID     = "scene_general_office"
-  wide   = "12"
-  high   = "6"
+  name   = "General Shipping And Receiving"
+  ID     = "scene_shipping_and_receiving"
+  wide   = "8"
+  high   = "8"
   floor  = "floor"
   wall   = "civic_common.wall"
   door   = "civic_common.door"
   window = "civic_common.window"
 >
   <grid
-    1 = "cubicle_a"
-    2 = "cubicle_b"
-    3 = "water"
-    4 = "printer"
-    5 = "civic_inside.plant_1"
-    6 = "kitchen_sink"
-    7 = "kitchen_cupboard"
-    8 = "kitchen_fridge"
-    9 = "civic_common.support_column"
+    1 = "water"
+    2 = "printer"
+    3 = "civic_inside.plant_1"
+    4 = "desk"
+    5 = "sofa"
+    6 = "chair"
+    7 = "book_shelf"
   >
-    8w .  .  .  .  .  .  4e .  .  .  .
-    .  .  .  .  1s 2w .  9  .  .  .  .
-    .  .  .  .  .  .  .  .  .  .  .  .
-    7w .  .  .  .  .  .  .  .  .  2w .
-    .  .  5  .  1e 2  .  .  1e .  1  .
-    6w .  3e .  .  .  .  .  .  5  .  .
-  </grid>
-  <grid
-    1 = "civic_inside.plant_2"
-    2 = "kitchen_fruits"
-  >
-    1e .  .  .  .  .  .  .  .  .  .  .
-    .  .  .  .  .  .  .  .  .  .  .  .
-    .  .  .  .  .  .  .  .  .  .  .  .
-    .  .  .  .  .  .  .  .  .  .  .  .
-    .  .  .  .  .  .  .  .  .  .  .  .
-    2  .  .  .  .  .  .  .  .  .  .  .
-  </grid>
-</scene>
-
-
-<scene
-  name   = "Toilets"
-  ID     = "scene_toilets"
-  wide   = "6"
-  high   = "6"
-  wall   = "civic_common.wall"
-  door   = "civic_common.door"
-  window = "civic_common.window"
->
-  <grid
-    1 = "toilet"
-    2 = "urinal"
-    3 = "wide_sink"
-    4 = "paper_towels"
-    5 = "civic_inside.plant_1"
-    6 = "supply_cupboards"
-    7 = "trash_bin"
-    8 = "printer"
-  >
-    .   /] .  .  .  7s
-    .   8] .  6e 6  .
-    _/ _5] _  _  _  _
-    .   4  4  3  .  .
-    .   .  .  .  .  .
-    1s  1s 1s 5e 2  2
-  </grid>
-  <grid
-    1 = "floor"
-    2 = "blue_tile_floor"
-  >
-    1 1 1 1 1 1
-    1 1 1 1 1 1
-    1 1 1 1 1 1
-    2 2 2 2 2 2
-    2 2 2 2 2 2
-    2 2 2 2 2 2
+    .  .  .  .  .  .  .  3
+    .  .  .  .  4e .  4e .
+    5  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    3  .  .  .  4e .  4e .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
   </grid>
 </scene>
 
