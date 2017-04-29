@@ -1,0 +1,245 @@
+
+<prop
+  ID         = "floor"
+  sprite     = "warehouse/floor.png"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+/>
+
+<prop
+  ID         = "warehouse_shelf"
+  sprite     = "warehouse/warehouse_shelf.png"
+  high       = "2"
+/>
+
+<prop
+  ID         = "warehouse_car"
+  sprite     = "warehouse/warehouse_car.png"
+  high       = "2"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "warehouse_car_empty"
+  sprite     = "warehouse/warehouse_car_empty.png"
+  high       = "2"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "warehouse_shelf_big"
+  sprite     = "warehouse/warehouse_shelf_big.png"
+  high       = "2"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "warehouse_box"
+  sprite     = "warehouse/warehouse_box.png"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "warehouse_boxes"
+  sprite     = "warehouse/warehouse_boxes.png"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "warehouse_pallets"
+  sprite     = "warehouse/warehouse_pallets.png"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "warehouse_more_pallets"
+  sprite     = "warehouse/warehouse_more_pallets.png"
+  blockSight = "false"
+/>
+
+
+
+
+<scene
+  name   = "Storage"
+  ID     = "warehouse_scene_small_storage"
+  wide   = "8"
+  high   = "8"
+  floor  = "floor"
+  wall   = "industrial_common.wall"
+  door   = "industrial_common.door"
+  window = "industrial_common.window"
+>
+  <grid
+    1 = "warehouse_shelf"
+    2 = "warehouse_car"
+    3 = "warehouse_car_empty"
+  >
+    .  .  .  .  .  .  .  .
+    .  1  1  .  .  1  1  .
+    .  .  .  .  .  .  .  .
+    .  1  1  .  .  1  1  .
+    .  .  .  2  .  .  .  .
+    .  1  1  .  .  1  1  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+
+
+  </grid>
+</scene>
+
+<scene
+  name   = "Storage"
+  ID     = "warehouse_scene_big_storage"
+  wide   = "8"
+  high   = "16"
+  floor  = "floor"
+  wall   = "industrial_common.wall"
+  door   = "industrial_common.door"
+  window = "industrial_common.window"
+>
+  <grid
+    1 = "warehouse_shelf_big"
+    2 = "warehouse_car"
+    3 = "warehouse_car_empty"
+  >
+    .  .  .  .  .  .  .  .
+    .  1  1  .  .  1  1  .
+    .  .  .  .  .  .  .  .
+    .  1  1  .  .  1  1  .
+    .  .  .  .  .  .  .  .
+    .  1  1  .  .  1  1  .
+    .  .  .  .  .  .  .  .
+    .  1  1  .  .  1  1  3s
+    .  .  .  .  .  .  .  .
+    .  1  1  .  .  1  1  .
+    .  .  .  .  .  .  .  .
+    .  1  1  .  .  1  1  .
+    .  .  .  .  .  .  .  .
+    .  1  1  .  .  1  1  .
+    .  .  .  2  .  .  .  .
+    .  .  .  .  .  .  .  .
+
+  </grid>
+</scene>
+
+<scene
+  name   = "Storage"
+  ID     = "warehouse_scene_entrances"
+  wide   = "8"
+  high   = "8"
+  floor  = "floor"
+  wall   = "industrial_common.wall"
+  door   = "industrial_common.door"
+  window = "industrial_common.window"
+>
+  <grid
+    1 = "warehouse_box"
+    2 = "warehouse_boxes"
+    3 = "warehouse_pallets"
+    4 = "warehouse_more_pallets"
+    5 = "warehouse_car"
+    6 = "warehouse_car_empty"
+  >
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  6w  .  .
+    3  4  4  4  3  .  .  .
+    .  3  4  3  3  1  1  .
+    .  .  3  .  .  2  .  .
+    .  1  1  .  .  2  1  .
+    .  .  .  5e  .  .  .  .
+    .  .  .  .  .  .  .  .
+
+
+  </grid>
+</scene>
+
+<scene
+  name      = "Warehouse Scene Assembled"
+  ID        = "warehouse_scene_assembled"
+  unitSize  = "8"
+  unitsWide = "8"
+  unitsHigh = "8"
+  wall      = "wall"
+  door      = "door"
+  window    = "window"
+>
+  <unit
+    typeID = "warehouse_scene_big_storage"
+    wall   = "WALL_INTERIOR"
+    x = "2" y = "0" dir = "N"
+  />
+  <unit
+    typeID = "warehouse_scene_big_storage"
+    wall   = "WALL_INTERIOR"
+    x = "3" y = "0" dir = "N"
+  />
+  <unit
+    typeID = "warehouse_scene_small_storage"
+    wall   = "WALL_INTERIOR"
+    x = "4" y = "0" dir = "N"
+  />
+
+  <unit
+    typeID = "warehouse_scene_entrances"
+    wall   = "WALL_INTERIOR"
+    x = "2" y = "2" dir = "N"
+  />
+
+  <unit
+    typeID = "warehouse_scene_entrances"
+    wall   = "WALL_INTERIOR"
+    x = "3" y = "2" dir = "N"
+  />
+
+  <unit
+    typeID = "warehouse_scene_entrances"
+    wall   = "WALL_INTERIOR"
+    x = "4" y = "1" dir = "W"
+  />
+
+  <unit
+    typeID = "industrial_office.scene_shipping_and_receiving"
+    wall   = "WALL_INTERIOR"
+    x = "1" y = "0" dir = "N"
+  />
+  <unit
+    typeID = "industrial_office.scene_general_office"
+    wall   = "WALL_INTERIOR"
+    x = "1" y = "1" dir = "N"
+  />
+  <unit
+    typeID = "industrial_office.scene_toilets"
+    wall   = "WALL_INTERIOR"
+    x = "1" y = "2" dir = "N"
+  />
+  <unit
+    typeID = "industrial_outside.scene_parking"
+    wall   = "WALL_NONE"
+    x = "0" y = "1" dir = "S"
+  />
+  <unit
+    typeID = "industrial_outside.scene_parking"
+    wall   = "WALL_NONE"
+    x = "0" y = "2" dir = "S"
+  />
+
+  <unit
+    typeID = "industrial_outside.scene_big_trucks_docks"
+    wall   = "WALL_NONE"
+    x = "2" y = "3" dir = "N"
+  />
+
+  <unit
+    typeID = "industrial_outside.scene_big_trucks_docks"
+    wall   = "WALL_NONE"
+    x = "3" y = "3" dir = "N"
+  />
+
+  <unit
+    typeID = "industrial_outside.scene_small_trucks_docks"
+    wall   = "WALL_NONE"
+    x = "5" y = "1" dir = "W"
+  />
+
+</scene>
