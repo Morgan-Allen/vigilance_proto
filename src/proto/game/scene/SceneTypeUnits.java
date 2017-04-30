@@ -146,17 +146,30 @@ public class SceneTypeUnits extends SceneType {
   
   
   void populateWithAreas(World world, Scenery g, boolean testing) {
+    I.say("\nPopulating areas for "+this);
     //
-    //  First, we set up a tally of total placements for each unit-type:
+    //  We apply all units with exact positions in a separate pass first:
+    for (Unit unit : units) {
+      boolean exact = unit.exactX != -1 && unit.exactY != -1;
+      if (! exact) continue;
+
+      int tX = g.offX + (unit.exactX * resolution);
+      int tY = g.offY + (unit.exactY * resolution);
+      
+      Scenery scenery = unit.type.generateScenery(world, testing);
+      unit.type.applyScenery(g, scenery, tX, tY, unit.exactDir, testing);
+      
+      if (g.areaUnder(tX, tY) != null) continue;
+      insertRoom(unit, g, scenery, tX, tY, unit.exactDir, testing);
+    }
+    //
+    //  Then we set up a tally of total placements for other unit-types:
     int     counts  [] = new int    [units.length];
     Scenery typeGens[] = new Scenery[units.length];
     class SpacePick {
       Unit unit;
       int tx, ty, facing;
     }
-    
-    I.say("\nPopulating areas for "+this);
-    
     //
     //  While there's space left, we iterate over all possible combinations of
     //  location, unit-type and facing, toss in a little random weighting, and
@@ -167,7 +180,9 @@ public class SceneTypeUnits extends SceneType {
       List <SpacePick> possible = new List();
       
       for (Unit unit : units) {
-        boolean   exact   = unit.exactX != -1 && unit.exactY != -1;
+        boolean exact = unit.exactX != -1 && unit.exactY != -1;
+        if (exact) continue;
+        
         SceneType type    = unit.type;
         int       count   = counts  [unit.ID];
         Scenery   typeGen = typeGens[unit.ID];
@@ -177,11 +192,9 @@ public class SceneTypeUnits extends SceneType {
           typeGens[unit.ID] = typeGen;
         }
         
-        if (! exact) {
-          int percent = (count * 100) / (g.gridW * g.gridH);
-          if (unit.maxCount > 0 && count   >= unit.maxCount) continue;
-          if (unit.percent  > 0 && percent >= unit.percent ) continue;
-        }
+        int percent = (count * 100) / (g.gridW * g.gridH);
+        if (unit.maxCount > 0 && count   >= unit.maxCount) continue;
+        if (unit.percent  > 0 && percent >= unit.percent ) continue;
         
         for (Coord c : Visit.grid(0, 0, g.gridW, g.gridH, 1)) {
           int tX = g.offX + (c.x * resolution);
@@ -189,20 +202,13 @@ public class SceneTypeUnits extends SceneType {
           if (g.areaUnder(tX, tY) != null) continue;
           
           for (int face : T_ADJACENT) {
+            if (! type.checkBordering(g, typeGen, tX, tY, face, resolution)) {
+              continue;
+            }
+            
             float rating = unit.priority * 1f / PRIORITY_MEDIUM;
-            if (exact) {
-              if (c.x            != unit.exactX  ) continue;
-              if (c.y            != unit.exactY  ) continue;
-              if ((face + 0 % 8) != unit.exactDir) continue;
-              rating = 100;
-            }
-            if (! exact) {
-              if (! type.checkBordering(g, typeGen, tX, tY, face, resolution)) {
-                continue;
-              }
-              rating += Nums.max(0, unit.minCount - count);
-              rating += Rand.num() / 2;
-            }
+            rating += Nums.max(0, unit.minCount - count);
+            rating += Rand.num() / 2;
             
             SpacePick s = new SpacePick();
             s.tx     = tX  ;
@@ -225,28 +231,34 @@ public class SceneTypeUnits extends SceneType {
       //  Having pick the most promising option, we apply the furnishings to
       //  the scene:
       SpacePick s       = pick.result();
-      SceneType type    = s.unit.type;
       Scenery   typeGen = typeGens[s.unit.ID];
-      Box2D     bound   = type.borderBounds(
-        g, typeGen, s.tx, s.ty, s.facing, resolution
-      );
-      I.say("PICKED GRID UNIT "+type+" AT "+s.tx+"|"+s.ty+", FACE: "+s.facing);
-      type.applyScenery(g, typeGen, s.tx, s.ty, s.facing, testing);
-      //
-      //  And mark out a room within the grid with the appropriate attributes,
-      //  before incrementing the type's placement counter and clearing the
-      //  scenery-
-      Room area = new Room();
-      area.unit = s.unit;
-      area.ID   = g.rooms.size();
-      area.minX = s.tx;
-      area.minY = s.ty;
-      area.wide = (int) bound.xdim();
-      area.high = (int) bound.ydim();
-      g.recordRoom(area, bound);
+      insertRoom(s.unit, g, typeGen, s.tx, s.ty, s.facing, testing);
       counts  [s.unit.ID]++;
       typeGens[s.unit.ID] = null;
     }
+  }
+  
+  
+  void insertRoom(
+    Unit unit, Scenery g, Scenery typeGen,
+    int tX, int tY, int facing, boolean testing
+  ) {
+    Box2D bound = unit.type.borderBounds(
+      g, typeGen, tX, tY, facing, resolution
+    );
+    unit.type.applyScenery(g, typeGen, tX, tY, facing, testing);
+    //
+    //  And mark out a room within the grid with the appropriate attributes,
+    //  before incrementing the type's placement counter and clearing the
+    //  scenery-
+    Room area = new Room();
+    area.unit = unit;
+    area.ID   = g.rooms.size();
+    area.minX = tX;
+    area.minY = tY;
+    area.wide = (int) bound.xdim();
+    area.high = (int) bound.ydim();
+    g.recordRoom(area, bound);
   }
   
   

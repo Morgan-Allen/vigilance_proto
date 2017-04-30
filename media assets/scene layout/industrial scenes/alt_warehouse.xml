@@ -59,7 +59,10 @@
 
 
 
-
+<COMMENT>
+  To add:  These are just some small 'filler' areas you can use to plug gaps
+  between larger segments.  (There's also a wall segment for around the edge.)
+</COMMENT>
 
 <scene
   name   = "Small Regular Storage"
@@ -166,6 +169,34 @@
   </grid>
 </scene>
 
+<scene
+  name   = "Wall segment"
+  ID     = "unit_wall_segment"
+  wide   = "8"
+  high   = "8"
+  wall   = "industrial_common.wall"
+  door   = "industrial_common.door"
+  window = "industrial_common.window"
+>
+  <grid
+  >
+    .  .  .  .  .  .  .  .]'
+    .  .  .  .  .  .  .  .]/
+    .  .  .  .  .  .  .  .]'
+    .  .  .  .  .  .  .  .]
+    .  .  .  .  .  .  .  .]
+    .  .  .  .  .  .  .  .]'
+    .  .  .  .  .  .  .  .]/
+    .  .  .  .  .  .  .  .]'
+  </grid>
+</scene>
+
+
+
+<COMMENT>
+  To add:  As above, but you have more space to work with, so you can park
+  the shelves next to eachother, maybe include some conveyer belt, etc.?
+</COMMENT>
 
 <scene
   name   = "Bulk Storage"
@@ -236,6 +267,12 @@
   </grid>
 </scene>
 
+
+
+<COMMENT>
+  To add:  The usual- some desks, a restroom, supply cupboards, filing cabinets,
+  etc.  Could also add some boxes in the areas outside the office.
+</COMMENT>
 
 <scene
   name   = "Main Office"
@@ -327,6 +364,15 @@
 </scene>
 
 
+
+
+<COMMENT>
+  To add:  Shutter doors, maybe a keypad for security?
+  Also a small conveyor belt, and the usual assortment
+  of boxes, forklifts, etc.
+</COMMENT>
+
+
 <scene
   name   = "Wide Entrance"
   ID     = "unit_wide_entrance"
@@ -399,6 +445,12 @@
 </scene>
 
 
+
+<COMMENT>
+  To add:  Small sections of paving between the parking spaces?  Varying
+  colours/style for trucks and cars?  Maybe a security gate?
+</COMMENT>
+
 <scene
   name   = "Wide Parking"
   ID     = "unit_wide_parking"
@@ -447,45 +499,6 @@
 
 
 <scene
-  name   = "Wall segment"
-  ID     = "unit_wall_segment"
-  wide   = "8"
-  high   = "8"
-  wall   = "industrial_common.wall"
-  door   = "industrial_common.door"
-  window = "industrial_common.window"
->
-  <grid
-  >
-    .  .  .  .  .  .  .  .]'
-    .  .  .  .  .  .  .  .]/
-    .  .  .  .  .  .  .  .]'
-    .  .  .  .  .  .  .  .]
-    .  .  .  .  .  .  .  .]
-    .  .  .  .  .  .  .  .]'
-    .  .  .  .  .  .  .  .]/
-    .  .  .  .  .  .  .  .]'
-  </grid>
-</scene>
-
-
-<comment>
-  ID     = "unit_storage_a"
-  ID     = "unit_storage_b"
-  ID     = "unit_storage_c"
-  ID     = "unit_storage_d"
-  ID     = "unit_bulk_storage"
-  ID     = "unit_external_sheds"
-  ID     = "unit_wide_entrance"
-  ID     = "unit_side_entrance"
-  ID     = "unit_main_office"
-  ID     = "unit_side_office"
-  ID     = "unit_wide_parking"
-  ID     = "unit_small_parking"
-</comment>
-
-
-<scene
   name      = "Warehouse Scene Assembled"
   ID        = "warehouse_scene_assembled"
   unitSize  = "8"
@@ -516,7 +529,6 @@
   <unit typeID = "unit_storage_a"       x = "5" y = "3" dir = "E" />
   <unit typeID = "unit_storage_b"       x = "5" y = "4" dir = "N" />
   <unit typeID = "unit_storage_d"       x = "6" y = "4" dir = "W" />
-  
   
   <unit typeID = "unit_wall_segment"    x = "3" y = "1" dir = "W" />
   <unit typeID = "unit_wall_segment"    x = "4" y = "1" dir = "W" />
