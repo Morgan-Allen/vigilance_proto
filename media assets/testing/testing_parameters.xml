@@ -22,9 +22,9 @@
 
 <sceneTest
   userPath = "morganallen"
-  basePath = "media assets/scene layout/industrial scenes/"
-  fileName = "alt_warehouse.xml"
-  sceneID  = "warehouse_scene_assembled"
+  basePath = "media assets/scene layout/civic scenes/"
+  fileName = "civic_bank.xml"
+  sceneID  = "scene_assembled"
   prefSize = "18"
 >
   <agent
