@@ -7,27 +7,6 @@
 />
 
 <prop
-  ID         = "floor_marble"
-  sprite     = "common/floor_marble.png"
-  subtype    = "SUBTYPE_WALLING"
-  blockLevel = "BLOCK_NONE"
-/>
-
-<prop
-  ID         = "floor_marble_edge"
-  sprite     = "common/floor_marble_edge.png"
-  subtype    = "SUBTYPE_WALLING"
-  blockLevel = "BLOCK_NONE"
-/>
-
-<prop
-  ID         = "floor_marble_corner"
-  sprite     = "common/floor_marble_corner.png"
-  subtype    = "SUBTYPE_WALLING"
-  blockLevel = "BLOCK_NONE"
-/>
-
-<prop
   ID         = "wall"
   sprite     = "common/wall_thin.png"
   high       = "0"
@@ -67,3 +46,51 @@
   subtype    = "SUBTYPE_WALLING"
   blockLevel = "BLOCK_FULL"
 />
+
+
+<prop
+  ID         = "floor_marble"
+  sprite     = "common/floor_marble.png"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+/>
+
+<prop
+  ID         = "floor_marble_edge"
+  sprite     = "common/floor_marble_edge.png"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+/>
+
+<prop
+  ID         = "floor_marble_corner"
+  sprite     = "common/floor_marble_corner.png"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+/>
+
+<prop
+  ID         = "steps_marble"
+  sprite     = "common/steps_marble.png"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+/>
+
+<prop
+  ID         = "floor_marble_outside"
+  sprite     = "common/floor_marble_4.png"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+/>
+
+<prop
+  ID         = "steps_marble_corner"
+  sprite     = "common/steps_marble_corner.png"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+/>
+
+
+
+
+

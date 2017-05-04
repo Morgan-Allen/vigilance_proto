@@ -55,7 +55,7 @@
 >
   <grid
     1 = "civic_common.floor"
-    2 = "civic_outside.pavement"
+    2 = "civic_common.floor_marble_outside"
     3 = "civic_common.floor_marble"
   >
     [1- 1-  1-' 1-' 1-  1-] 2   2
@@ -97,7 +97,7 @@
 >
   <grid
     1 = "civic_common.floor"
-    2 = "civic_outside.pavement"
+    2 = "civic_common.floor_marble_outside"
     3 = "civic_common.floor_marble"
   >
      2  2  2   2  2  2   2   2
@@ -139,7 +139,7 @@
 >
   <grid
     1 = "civic_common.floor"
-    2 = "civic_outside.pavement"
+    2 = "civic_common.floor_marble_outside"
     3 = "civic_common.floor_marble"
   >
      2   2   2   2   2   2   2   2
@@ -181,7 +181,7 @@
 >
   <grid
     1 = "civic_office.floor"
-    2 = "civic_outside.pavement"
+    2 = "civic_common.floor_marble_outside"
     3 = "civic_common.floor_marble"
     4 = "civic_office.blue_tile_floor"
   >
@@ -229,7 +229,7 @@
 >
   <grid
     1 = "civic_common.floor"
-    2 = "civic_outside.pavement"
+    2 = "civic_common.floor_marble_outside"
     3 = "civic_common.floor_marble"
     4 = "civic_common.floor_marble_edge"
     5 = "civic_common.floor_marble_corner"
@@ -380,13 +380,14 @@
     6 = "civic_office.desk"
     7 = "civic_office.printer"
     8 = "civic_inside.plant_1"
+    9 = "civic_common.steps_marble"
   >
     .  .  .  .  .  .  .  .  .  .   .  .  .  .   .  .
-    . [.  .] .  .] 2- .  s5 . s5  -2] .  .  -8 2-] .
-    . [.  .] .  .] 7w .  .  .  .  7e] .  .  .  1e] .
-    . [.  .] .  .] -  -  -  -  -/ -8] .  .  .   .] .
-    . [.  .] .  .] .  .  .  .  .    ] .  .  .   .] .
-    . [.  .] .  .] .  6w .  6w .   /] .  .  .   .] .
+    . [9  9] 9  9] 2- .  s5 . s5  -2] .  .  -8 2-] .
+    . [9  9] 9  9] 7w .  .  .  .  7e] .  .  .  1e] .
+    . [9  9] 9  9] -  -  -  -  -/ -8] .  .  .   .] .
+    . [9  9] 9  9] .  .  .  .  .    ] .  .  .   .] .
+    . [9  9] 9  9] .  6w .  6w .   /] .  .  .   .] .
     . [_  _] _  _] 2_ _ /_  _  _  _2] .  .  _8 2_] .
     .  .  .  .  .  .  .  .  .  .   .  .  .  .   .  .
   </grid>
@@ -452,7 +453,7 @@
   ID        = "scene_assembled"
   unitSize  = "8"
   unitsWide = "6"
-  unitsHigh = "4"
+  unitsHigh = "6"
   wall      = "civic_wall"
   door      = "civic_door"
   window    = "civic_window"
@@ -480,6 +481,24 @@
   <unit typeID = "vault_unit"    x = "4" y = "1" dir = "E" />
   <unit typeID = "stairs_unit"   x = "2" y = "1" dir = "S" />
   <unit typeID = "hall_unit"     x = "2" y = "2" dir = "N" />
+  
+  <unit typeID = "civic_outside.unit_marble_parking" x = "0" y = "4" dir = "N"/>
+  <unit typeID = "civic_outside.unit_marble_parking" x = "1" y = "4" dir = "N"/>
+  <unit typeID = "civic_outside.unit_marble_steps"   x = "2" y = "4" dir = "N"/>
+  <unit typeID = "civic_outside.unit_marble_steps"   x = "3" y = "4" dir = "N"/>
+  <unit typeID = "civic_outside.unit_marble_parking" x = "4" y = "4" dir = "N"/>
+  <unit typeID = "civic_outside.unit_marble_parking" x = "5" y = "4" dir = "N"/>
+  
+  <unit typeID = "civic_outside.unit_street_a" x = "0" y = "5" dir = "N"/>
+  <unit typeID = "civic_outside.unit_street_a" x = "1" y = "5" dir = "N"/>
+  <unit typeID = "civic_outside.unit_street_b" x = "2" y = "5" dir = "N"/>
+  <unit typeID = "civic_outside.unit_street_a" x = "3" y = "5" dir = "N"/>
+  <unit typeID = "civic_outside.unit_street_b" x = "4" y = "5" dir = "N"/>
+  <unit typeID = "civic_outside.unit_street_b" x = "5" y = "5" dir = "N"/>
 </scene>
+
+
+
+
 
 

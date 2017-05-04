@@ -7,8 +7,8 @@
 
 
 <sceneTest
-  basePath = "media assets/scene layout/civic scenes/"
-  fileName = "warehouse_scene.xml"
+  basePath = "media assets/scene layout/industrial scenes/"
+  fileName = "industrial_warehouse.xml"
   sceneID  = "warehouse_scene_assembled"
   prefSize = "18"
 >
@@ -22,8 +22,8 @@
 
 <sceneTest
   userPath = "morganallen"
-  basePath = "media assets/scene layout/civic scenes/"
-  fileName = "civic_bank.xml"
+  basePath = "media assets/scene layout/slum scenes/"
+  fileName = "slum_bar.xml"
   sceneID  = "scene_assembled"
   prefSize = "18"
 >
