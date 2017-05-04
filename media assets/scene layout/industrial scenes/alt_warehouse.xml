@@ -1,0 +1,547 @@
+
+<prop
+  ID         = "floor"
+  sprite     = "warehouse/floor.png"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+/>
+
+<prop
+  ID         = "warehouse_shelf"
+  sprite     = "warehouse/warehouse_shelf.png"
+  high       = "2"
+/>
+
+<prop
+  ID         = "warehouse_shelf_big"
+  sprite     = "warehouse/warehouse_shelf_big.png"
+  high       = "2"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "warehouse_box"
+  sprite     = "warehouse/warehouse_box.png"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "warehouse_boxes"
+  sprite     = "warehouse/warehouse_boxes.png"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "warehouse_pallets"
+  sprite     = "warehouse/warehouse_pallets.png"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "warehouse_more_pallets"
+  sprite     = "warehouse/warehouse_more_pallets.png"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "warehouse_forklift"
+  sprite     = "warehouse/warehouse_car.png"
+  high       = "2"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "warehouse_forklift_empty"
+  sprite     = "warehouse/warehouse_car_empty.png"
+  high       = "2"
+  blockSight = "false"
+/>
+
+
+
+<COMMENT>
+  To add:  These are just some small 'filler' areas you can use to plug gaps
+  between larger segments.  (There's also a wall segment for around the edge.)
+</COMMENT>
+
+<scene
+  name   = "Small Regular Storage"
+  ID     = "unit_storage_a"
+  wide   = "8"
+  high   = "8"
+  floor  = "floor"
+  wall   = "industrial_common.wall"
+  door   = "industrial_common.door"
+  window = "industrial_common.window"
+>
+  <grid
+    1 = "warehouse_shelf"
+    2 = "warehouse_box"
+    3 = "warehouse_forklift"
+  >
+    .  .  .  .  .  .  .  .
+    .  1  1  .  1w .  2  .
+    .  .  .  .  1w .  2  .
+    .  .  .  .  .  .  .  .
+    .  1  1  .  1w .  2  .
+    .  .  .  .  1w .  2  .
+    .  3w .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+  </grid>
+</scene>
+
+<scene
+  name   = "Small Package Storage"
+  ID     = "unit_storage_b"
+  wide   = "8"
+  high   = "8"
+  floor  = "floor"
+  wall   = "industrial_common.wall"
+  door   = "industrial_common.door"
+  window = "industrial_common.window"
+>
+  <grid
+    1 = "warehouse_box"
+    2 = "warehouse_boxes"
+    3 = "warehouse_pallets"
+    4 = "warehouse_more_pallets"
+  >
+    .  .  .  .  .  .  .  .
+    .  2  1  .  2  3  1  .
+    .  2  3  .  .  2  4  .
+    .  .  .  .  .  .  .  .
+    .  3  2  .  3  2  1  .
+    .  4  1  .  3  1  2  .
+    .  4  2  .  2  1  3  .
+    .  .  .  .  .  .  .  .
+  </grid>
+</scene>
+
+<scene
+  name   = "Small Empty Storage"
+  ID     = "unit_storage_c"
+  wide   = "8"
+  high   = "8"
+  floor  = "floor"
+  wall   = "industrial_common.wall"
+  door   = "industrial_common.door"
+  window = "industrial_common.window"
+>
+  <grid
+    1 = "industrial_common.support_column"
+    2 = "warehouse_boxes"
+  >
+    .  .  .  .  .  .  .  .
+    .  1  2  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  2  .  1  .
+    .  .  .  .  .  .  .  .
+  </grid>
+</scene>
+
+<scene
+  name   = "Small Sorting Storage"
+  ID     = "unit_storage_d"
+  wide   = "8"
+  high   = "8"
+  floor  = "floor"
+  wall   = "industrial_common.wall"
+  door   = "industrial_common.door"
+  window = "industrial_common.window"
+>
+  <grid
+    1 = "warehouse_forklift"
+    2 = "warehouse_boxes"
+    3 = "warehouse_pallets"
+    4 = "warehouse_shelf"
+  >
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  4  4  .  .  4w .  .
+    .  .  .  .  .  3  2  .
+    .  2  3  .  .  .  .  .
+    .  3  2  .  1  .  1  .
+    .  .  .  .  .  2  .  .
+    .  .  .  .  .  .  .  .
+  </grid>
+</scene>
+
+<scene
+  name   = "Wall segment"
+  ID     = "unit_wall_segment"
+  wide   = "8"
+  high   = "8"
+  wall   = "industrial_common.wall"
+  door   = "industrial_common.door"
+  window = "industrial_common.window"
+>
+  <grid
+  >
+    .  .  .  .  .  .  .  .]'
+    .  .  .  .  .  .  .  .]/
+    .  .  .  .  .  .  .  .]'
+    .  .  .  .  .  .  .  .]
+    .  .  .  .  .  .  .  .]
+    .  .  .  .  .  .  .  .]'
+    .  .  .  .  .  .  .  .]/
+    .  .  .  .  .  .  .  .]'
+  </grid>
+</scene>
+
+
+
+<COMMENT>
+  To add:  As above, but you have more space to work with, so you can park
+  the shelves next to eachother, maybe include some conveyer belt, etc.?
+</COMMENT>
+
+<scene
+  name   = "Bulk Storage"
+  ID     = "unit_bulk_storage"
+  wide   = "16"
+  high   = "16"
+  floor  = "floor"
+  wall   = "industrial_common.wall"
+  door   = "industrial_common.door"
+  window = "industrial_common.window"
+>
+  <grid
+    1 = "warehouse_shelf"
+  >
+    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+  </grid>
+</scene>
+
+
+<scene
+  name   = "External Sheds"
+  ID     = "unit_external_sheds"
+  wide   = "16"
+  high   = "8"
+  wall   = "industrial_common.wall"
+  door   = "industrial_common.door"
+  window = "industrial_common.window"
+>
+  <grid
+  >
+    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  . [-  -  -  - [-  -  -] .  . [-  -] .
+    .  .  .  . [.  .  .  . [.  .  .] .  . [.  .] .
+    .  .  .  . [.  .  .  . [.  .  .] .  . [_  _] .
+    .  .  .  . [.  .  .  . [.  .  .] .  .  .  .  .
+    .  .  .  . [_  _  _  _ [_  _  _] .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+  </grid>
+  <grid
+    1 = "floor"
+    2 = "industrial_office.floor"
+    3 = "industrial_outside.asphalt"
+  >
+    3  3  3  3  3  3  3  3  3  3  3  3  3  3  3  3
+    3  3  3  3  3  3  3  3  3  3  3  3  3  3  3  3
+    3  3  3  3  1  1  1  1  2  2  2  3  3  1  1  3
+    3  3  3  3  1  1  1  1  2  2  2  3  3  1  1  3
+    3  3  3  3  1  1  1  1  2  2  2  3  3  1  1  3
+    3  3  3  3  1  1  1  1  2  2  2  3  3  3  3  3
+    3  3  3  3  1  1  1  1  2  2  2  3  3  3  3  3
+    3  3  3  3  3  3  3  3  3  3  3  3  3  3  3  3
+  </grid>
+</scene>
+
+
+
+<COMMENT>
+  To add:  The usual- some desks, a restroom, supply cupboards, filing cabinets,
+  etc.  Could also add some boxes in the areas outside the office.
+</COMMENT>
+
+<scene
+  name   = "Main Office"
+  ID     = "unit_main_office"
+  wide   = "16"
+  high   = "16"
+  wall   = "industrial_common.wall"
+  door   = "industrial_common.door"
+  window = "industrial_common.window"
+>
+  <grid
+  >
+    [-  -  -  -  -  -  -  -] -  -  -  -  -] -  -  -
+    [.  .  .  .  .  .  .  .] .  .  .  .  .] .  .  .
+    [.  .  .  .  .  .  .  .] .  .  .  .  .] .  .  .
+    [.  .  .  .  .  .  .  .] .  .  .  .  .] .  .  .
+    [.  .  .  .  .  .  .  .] .  .  .  .  .] .  .  .
+    [.  .  .  .  .  .  .  .] -  -  -  -  -] .  .  .
+    [.  .  .  .  .  .  .  .] .  .  .  .  .] .  .  .
+    [.  .  .  .  .  .  .  .] .  .  .  .  .] .  .  .
+    [.  .  .  .  .  .  .  .] .  .  .  .  .] .  .  .
+    [.  .  .  .  .  .  .  .] .  .  .  .  .] .  .  .
+    [-  -  -  -  -  -  -  -  -  -] -  -  -  .  .  .
+    [.  .  .  .  .  .  .  .  .  .] .  .  .  .  .  .
+    [.  .  .  .  .  .  .  .  .  .] .  .  .  .  .  .
+    [.  .  .  .  .  .  .  .  .  .] .  .  .  .  .  .
+    [.  .  .  .  .  .  .  .  .  .] .  .  .  .  .  .
+    [_  _  _  _  _  _  _  _  _  _] .  .  .  .  .  .
+  </grid>
+  <grid
+    1 = "floor"
+    2 = "industrial_office.floor"
+  >
+    2  2  2  2  2  2  2  2  2  2  2  2  2  1  1  1
+    2  2  2  2  2  2  2  2  2  2  2  2  2  1  1  1
+    2  2  2  2  2  2  2  2  2  2  2  2  2  1  1  1
+    2  2  2  2  2  2  2  2  2  2  2  2  2  1  1  1
+    2  2  2  2  2  2  2  2  2  2  2  2  2  1  1  1
+    2  2  2  2  2  2  2  2  2  2  2  2  2  1  1  1
+    2  2  2  2  2  2  2  2  2  2  2  2  2  1  1  1
+    2  2  2  2  2  2  2  2  2  2  2  2  2  1  1  1
+    2  2  2  2  2  2  2  2  2  2  2  2  2  1  1  1
+    2  2  2  2  2  2  2  2  2  2  2  2  2  1  1  1
+    2  2  2  2  2  2  2  2  2  2  1  1  1  1  1  1
+    2  2  2  2  2  2  2  2  2  2  1  1  1  1  1  1
+    2  2  2  2  2  2  2  2  2  2  1  1  1  1  1  1
+    2  2  2  2  2  2  2  2  2  2  1  1  1  1  1  1
+    2  2  2  2  2  2  2  2  2  2  1  1  1  1  1  1
+    2  2  2  2  2  2  2  2  2  2  1  1  1  1  1  1
+    2  2  2  2  2  2  2  2  2  2  1  1  1  1  1  1
+    2  2  2  2  2  2  2  2  2  2  1  1  1  1  1  1
+  </grid>
+</scene>
+
+
+<scene
+  name   = "Side Office"
+  ID     = "unit_side_office"
+  wide   = "16"
+  high   = "8"
+  wall   = "industrial_common.wall"
+  door   = "industrial_common.door"
+  window = "industrial_common.window"
+>
+  <grid
+  >
+    [.  .  .  .  .  .  .] -  -  -  -  -  -  -  -  -]
+    [_  _  _  _  _  _  _] .  .  .  .  .  .  .  .  .]
+    [.  .  .  .  .  .  .] .  .  .  .  .  .  .  .  .]
+    [.  .  .  .  .  .  .] .  .  .  .  .  .  .  .  .]
+    [.  .  .  .  .  .  .] .  .  .  .  .  .  .  .  .]
+    [.  .  .  .  .  .  .] .  .  .  .  .  .  .  .  .]
+    [.  .  .  .  .  .  .] .  .  .  .  .  .  .  .  .]
+    [_  _  _  _  _  _  _] _  _  _  _  _  _  _  _  _]
+  </grid>
+  <grid
+    1 = "floor"
+    2 = "industrial_office.floor"
+  >
+    1  1  1  1  1  1  1  2  2  2  2  2  2  2  2  2
+    1  1  1  1  1  1  1  2  2  2  2  2  2  2  2  2
+    2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2
+    2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2
+    2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2
+    2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2
+    2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2
+    2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2
+  </grid>
+</scene>
+
+
+
+
+<COMMENT>
+  To add:  Shutter doors, maybe a keypad for security?
+  Also a small conveyor belt, and the usual assortment
+  of boxes, forklifts, etc.
+</COMMENT>
+
+
+<scene
+  name   = "Wide Entrance"
+  ID     = "unit_wide_entrance"
+  wide   = "16"
+  high   = "8"
+  wall   = "industrial_common.wall"
+  door   = "industrial_common.door"
+  window = "industrial_common.window"
+>
+  <grid
+  >
+    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  _  _  _  _  _  _  _  _  _  _  _  _  .  .
+    .  .] .  .  .  .  .  .  .  .  .  .  .  . [.  .
+    _  _] .  .  .  .  .  .  .  .  .  .  .  . [_  _
+  </grid>
+  <grid
+    1 = "floor"
+    2 = "industrial_outside.asphalt"
+  >
+    1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1
+    1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1
+    1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1
+    1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1
+    1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1
+    1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1
+    1  1  2  2  2  2  2  2  2  2  2  2  2  2  1  1
+    1  1  2  2  2  2  2  2  2  2  2  2  2  2  1  1
+  </grid>
+</scene>
+
+
+<scene
+  name   = "Side Entrance"
+  ID     = "unit_side_entrance"
+  wide   = "8"
+  high   = "8"
+  wall   = "industrial_common.wall"
+  door   = "industrial_common.door"
+  window = "industrial_common.window"
+>
+  <grid
+  >
+    .  .  .  .  .  .  .  .]
+    .  .  .  .  .  .  _  _]
+    .  .  .  .  .  .] .  .
+    .  .  .  .  .  .] .  .
+    .  .  .  .  .  .] .  .
+    .  .  .  .  .  .] .  .
+    .  .  .  .  .  .  -  -]
+    .  .  .  .  .  .  .  .]
+  </grid>
+  <grid
+    1 = "floor"
+    2 = "industrial_outside.asphalt"
+  >
+    1  1  1  1  1  1  1  1
+    1  1  1  1  1  1  1  1
+    1  1  1  1  1  1  2  2
+    1  1  1  1  1  1  2  2
+    1  1  1  1  1  1  2  2
+    1  1  1  1  1  1  2  2
+    1  1  1  1  1  1  1  1
+    1  1  1  1  1  1  1  1
+  </grid>
+</scene>
+
+
+
+<COMMENT>
+  To add:  Small sections of paving between the parking spaces?  Varying
+  colours/style for trucks and cars?  Maybe a security gate?
+</COMMENT>
+
+<scene
+  name   = "Wide Parking"
+  ID     = "unit_wide_parking"
+  wide   = "16"
+  high   = "8"
+  floor  = "industrial_outside.asphalt"
+  wall   = "industrial_common.wall"
+  door   = "industrial_common.door"
+  window = "industrial_common.window"
+>
+  <grid
+  >
+    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+  </grid>
+</scene>
+
+<scene
+  name   = "Small Parking"
+  ID     = "unit_small_parking"
+  wide   = "8"
+  high   = "8"
+  floor  = "industrial_outside.asphalt"
+  wall   = "industrial_common.wall"
+  door   = "industrial_common.door"
+  window = "industrial_common.window"
+>
+  <grid
+  >
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+  </grid>
+</scene>
+
+
+<scene
+  name      = "Warehouse Scene Assembled"
+  ID        = "warehouse_scene_assembled"
+  unitSize  = "8"
+  unitsWide = "8"
+  unitsHigh = "8"
+  wall      = "wall"
+  door      = "door"
+  window    = "window"
+>
+  <unit typeID = "unit_main_office"     x = "1" y = "1" dir = "N" />
+  <unit typeID = "unit_side_office"     x = "1" y = "4" dir = "N" />
+  <unit typeID = "unit_bulk_storage"    x = "3" y = "1" dir = "N" />
+  <unit typeID = "unit_side_office"     x = "5" y = "5" dir = "N" />
+  <unit typeID = "unit_external_sheds"  x = "5" y = "6" dir = "N" />
+  <unit typeID = "unit_wide_entrance"   x = "3" y = "4" dir = "N" />
+  <unit typeID = "unit_side_entrance"   x = "6" y = "3" dir = "N" />
+  
+  <unit typeID = "unit_storage_a"       x = "1" y = "3" dir = "W" />
+  <unit typeID = "unit_storage_c"       x = "2" y = "3" dir = "E" />
+  <unit typeID = "unit_storage_b"       x = "3" y = "3" dir = "N" />
+  <unit typeID = "unit_storage_d"       x = "4" y = "3" dir = "N" />
+  
+  <unit typeID = "unit_storage_b"       x = "5" y = "1" dir = "N" />
+  <unit typeID = "unit_storage_d"       x = "6" y = "1" dir = "S" />
+  <unit typeID = "unit_storage_c"       x = "5" y = "2" dir = "E" />
+  <unit typeID = "unit_storage_b"       x = "6" y = "2" dir = "N" />
+  
+  <unit typeID = "unit_storage_a"       x = "5" y = "3" dir = "E" />
+  <unit typeID = "unit_storage_b"       x = "5" y = "4" dir = "N" />
+  <unit typeID = "unit_storage_d"       x = "6" y = "4" dir = "W" />
+  
+  <unit typeID = "unit_wall_segment"    x = "3" y = "1" dir = "W" />
+  <unit typeID = "unit_wall_segment"    x = "4" y = "1" dir = "W" />
+  <unit typeID = "unit_wall_segment"    x = "5" y = "1" dir = "W" />
+  <unit typeID = "unit_wall_segment"    x = "6" y = "1" dir = "W" />
+  <unit typeID = "unit_wall_segment"    x = "6" y = "1" dir = "N" />
+  <unit typeID = "unit_wall_segment"    x = "6" y = "2" dir = "N" />
+  <unit typeID = "unit_wall_segment"    x = "6" y = "4" dir = "N" />
+  <unit typeID = "unit_wall_segment"    x = "1" y = "3" dir = "S" />
+</scene>
+
+
+
+
+
+

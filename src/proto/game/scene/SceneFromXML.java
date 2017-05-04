@@ -148,6 +148,8 @@ public class SceneFromXML implements TileConstants {
     
     for (XML u : unitXML) {
       SceneType type = sceneWithID(u.value("typeID"), file, basePath);
+      if (type == null) continue;
+      
       int wallType = Kind.loadField(u.value("wall"    ), SceneTypeUnits.class);
       int priority = Kind.loadField(u.value("priority"), SceneTypeUnits.class);
       

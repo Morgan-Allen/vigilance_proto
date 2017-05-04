@@ -1,0 +1,39 @@
+
+<prop
+  ID         = "floor"
+  sprite     = "common/sprite_floor.png"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+/>
+
+<prop
+  ID         = "wall"
+  sprite     = "common/sprite_wall_thin.png"
+  high       = "0"
+  subtype    = "SUBTYPE_WALLING"
+/>
+
+<prop
+  ID         = "door"
+  sprite     = "common/sprite_door_thin.png"
+  high       = "0"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+  blockSight = "true"
+/>
+
+<prop
+  ID         = "window"
+  sprite     = "common/sprite_window_thin.png"
+  high       = "0"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_FULL"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "support_column"
+  sprite     = "common/sprite_wall.png"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_FULL"
+/>
