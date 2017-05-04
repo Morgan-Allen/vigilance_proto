@@ -7,24 +7,75 @@ import proto.game.person.*;
 import proto.game.scene.*;
 import proto.util.*;
 import proto.content.agents.*;
-import static proto.content.places.UrbanScenes.*;
+import proto.content.places.*;
 
 
 
 public class DebugSceneGrid extends RunGame {
   
   
+  final static String IMG_DIR = "media assets/testing/test tiles/";
+  final public static PropType
+    KIND_WALL = new PropType(
+      "Wall", "test_prop_wall",
+      IMG_DIR+"tile_wall.png",
+      Kind.SUBTYPE_WALLING, 1, 0, Kind.BLOCK_FULL, true
+    ),
+    KIND_FLOOR = new PropType(
+      "Floor", "test_prop_floor",
+      IMG_DIR+"tile_floor.png",
+      Kind.SUBTYPE_WALLING, 1, 1, Kind.BLOCK_NONE, false
+    ),
+    KIND_DOOR = new PropType(
+      "Door", "test_prop_door",
+      IMG_DIR+"tile_door.png",
+      Kind.SUBTYPE_WALLING, 1, 0, Kind.BLOCK_PARTIAL, true,
+      PlacesCommon.ALARMED, 1
+    ),
+    KIND_WINDOW = new PropType(
+      "Window", "test_prop_window",
+      IMG_DIR+"tile_window.png",
+      Kind.SUBTYPE_WALLING, 1, 0, Kind.BLOCK_FULL, false,
+      PlacesCommon.ALARMED, 1
+    ),
+    KIND_COLUMN = new PropType(
+      "Column", "test_prop_column",
+      IMG_DIR+"tile_column.png",
+      Kind.SUBTYPE_WALLING, 1, 1, Kind.BLOCK_FULL, true
+    ),
+    KIND_BIG_TABLE = new PropType(
+      "Table", "test_prop_big_table",
+      IMG_DIR+"tile_big_table.png",
+      Kind.SUBTYPE_FURNISH, 3, 2, Kind.BLOCK_FULL, false
+    ),
+    KIND_SMALL_TABLE = new PropType(
+      "Bar Table", "test_prop_small_table",
+      IMG_DIR+"tile_small_table.png",
+      Kind.SUBTYPE_FURNISH, 2, 1, Kind.BLOCK_FULL, false
+    ),
+    KIND_CHAIR = new PropType(
+      "Bar Stool", "test_prop_chair",
+      IMG_DIR+"tile_chair.png",
+      Kind.SUBTYPE_FURNISH, 1, 1, Kind.BLOCK_PARTIAL, false
+    ),
+    KIND_ROOM_OBJECT = new PropType(
+      "Jukebox", "test_prop_room_object",
+      IMG_DIR+"tile_room_object.png",
+      Kind.SUBTYPE_FURNISH, 1, 1, Kind.BLOCK_FULL, true
+    );
+  
+  
   final public static SceneType GRID_TEST_SCENE = new SceneTypeGrid(
     "fixed test scene", "type_urban_scene_fixed",
     KIND_FLOOR,
     new PropType[] {
-      KIND_THICK_WALL,
-      KIND_DOOR      ,
-      KIND_WINDOW    ,
-      KIND_POOL_TABLE,
-      KIND_BAR_TABLE ,
-      KIND_BAR_STOOL ,
-      KIND_JUKEBOX   ,
+      KIND_COLUMN     ,
+      KIND_DOOR       ,
+      KIND_WINDOW     ,
+      KIND_BIG_TABLE  ,
+      KIND_SMALL_TABLE,
+      KIND_CHAIR      ,
+      KIND_ROOM_OBJECT,
     },
     8, 8, new byte[][] {
       { 0, 0, 0, 0, 0, 0, 1, 0 },
