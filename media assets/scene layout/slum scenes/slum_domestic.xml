@@ -1,0 +1,19 @@
+
+<prop
+  ID         = "floor_bathroom"
+  sprite     = "domestic/sprite_bathroom_floor.png"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+/>
+
+<prop
+  ID         = "toilet_stall"
+  sprite     = "domestic/sprite_bathroom_stall.png"
+  wide       = "2"
+/>
+
+<prop
+  ID         = "toilet_basin"
+  sprite     = "domestic/sprite_basin.png"
+  blockLevel = "BLOCK_PARTIAL"
+/>

@@ -1,0 +1,76 @@
+
+<prop
+  ID         = "asphalt"
+  sprite     = "outside/asphalt.png"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+/>
+
+<prop
+  ID         = "asphalt_line"
+  sprite     = "outside/asphalt_line.png"
+  subtype    = "SUBTYPE_DETAIL"
+  blockLevel = "BLOCK_NONE"
+/>
+
+<prop
+  ID         = "pavement"
+  sprite     = "outside/pavement.png"
+  blockLevel = "BLOCK_NONE"
+/>
+
+<prop
+  ID         = "pavement_edge"
+  sprite     = "outside/pavement_edge.png"
+  blockLevel = "BLOCK_NONE"
+/>
+
+<prop
+  ID         = "pavement_corner"
+  sprite     = "outside/pavement_corner.png"
+  blockLevel = "BLOCK_NONE"
+/>
+
+
+<prop
+  ID         = "car"
+  sprite     = "outside/car.png"
+  wide       = "3"
+  high       = "2"
+/>
+
+<prop
+  ID         = "car_2"
+  sprite     = "outside/car_2.png"
+  wide       = "3"
+  high       = "2"
+/>
+
+<prop
+  ID         = "hatch"
+  sprite     = "outside/hatch.png"
+  blockLevel = "BLOCK_NONE"
+/>
+
+<prop
+  ID         = "conditioner"
+  sprite     = "outside/conditioner.png"
+  blockLevel = "BLOCK_NONE"
+/>
+
+
+<prop
+  ID         = "dumpster_a"
+  sprite     = "outside/dumpster_a.png"
+  high       = "2"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "dumpster_b"
+  sprite     = "outside/dumpster_b.png"
+  high       = "2"
+  blockSight = "false"
+/>
+
+

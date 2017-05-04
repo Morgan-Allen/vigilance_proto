@@ -1,0 +1,304 @@
+
+<prop
+  ID         = "pool_table"
+  sprite     = "bar/sprite_pool_table.png"
+  wide       = "3"
+  high       = "2"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "table"
+  sprite     = "bar/sprite_bar_table.png"
+  wide       = "2"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "stools_a"
+  sprite     = "bar/sprite_bar_stool.png"
+  blockLevel = "BLOCK_PARTIAL"
+/>
+
+<prop
+  ID         = "stools_b"
+  sprite     = "bar/sprite_bar_stools.png"
+  blockLevel = "BLOCK_PARTIAL"
+/>
+
+<prop
+  ID         = "counter"
+  sprite     = "bar/sprite_bar_taps.png"
+  wide       = "3"
+  high       = "2"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "jukebox"
+  sprite     = "bar/sprite_jukebox.png"
+/>
+
+<prop
+  ID         = "pinball_machine"
+  sprite     = "bar/sprite_pinball_machine.png"
+/>
+
+
+<scene
+  name   = "Corner Seats"
+  ID     = "unit_corner_seats"
+  wide   = "8"
+  high   = "8"
+  wall   = "slum_common.wall"
+  door   = "slum_common.door"
+  window = "slum_common.window"
+>
+  <grid
+    1 = "slum_common.floor"
+    2 = "slum_outside.pavement"
+  >
+    [1- 1- 1-]  2   2   2   2 [1-
+    [1  1  1  -'1 -'1 -'1 -'1  1
+    [1  1  1    1   1   1   1  1
+    [1' 1  1    1   1   1   1  1
+    [1' 1  1    1   1   1   1  1
+    [1  1  1    1   1   1   1  1
+    [1  1  1    1   1   1   1  1
+    [1  1  1    1   1   1   1  1
+  </grid>
+  <grid
+    1 = "table"
+    2 = "stools_a"
+    3 = "stools_b"
+    4 = "jukebox"
+    5 = "slum_common.support_column"
+  >
+    .  2  .  .  .  .  .  4
+    3  1e 3  .  2  2s .  .
+    2  .  3  .  1  .  .  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    3  1e 2  .  1  .  .  .
+    2  .  2  .  3  3  5  .
+    .  .  .  .  .  .  .  .
+  </grid>
+</scene>
+
+<scene
+  name   = "Main Entrance"
+  ID     = "unit_entrance"
+  wide   = "8"
+  high   = "8"
+  wall   = "slum_common.wall"
+  door   = "slum_common.door"
+  window = "slum_common.window"
+>
+  <grid
+    1 = "slum_common.floor"
+    2 = "slum_outside.pavement"
+  >
+    1- 1-' 1-] 2  2  2 [-1 -1'
+    1  1   1] 2_ 2_/ _2 [1  1
+    1  1   1   1  1  1   1  1
+    1  1   1   1  1  1   1  1
+    1  1   1   1  1  1   1  1
+    1  1   1   1  1  1   1  1
+    1  1   1   1  1  1   1  1
+    1  1   1   1  1  1   1  1
+  </grid>
+  <grid
+    1 = ""
+    2 = "table"
+    3 = "stools_a"
+    4 = "stools_b"
+    5 = "slum_common.support_column"
+  >
+    .  .  4  .  .  .  .  .
+    .  .  5  .  .  .  5  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  3  .  .  .  4  4  .
+    .  2e 3  .  .  2  .  .
+    .  .  4  .  .  3  4  .
+    .  .  .  .  .  .  .  .
+  </grid>
+</scene>
+
+
+<scene
+  name   = "Main Bar"
+  ID     = "unit_main_bar"
+  wide   = "8"
+  high   = "8"
+  wall   = "slum_common.wall"
+  door   = "slum_common.door"
+  window = "slum_common.window"
+>
+  <grid
+    1 = "slum_common.floor"
+    2 = "slum_outside.pavement"
+  >
+    1- 1- 1- 1- 1- 1-] 2  2
+    1  1  1  1  1  1]  2  2
+    1  1  1  1  1  1]  2  2
+    1  1  1  1  1  1]  2  2
+    1  1  1  1  1  1]  2  2
+    1  1  1  1  1  1] 2_/ 2_
+    1  1  1  1  1  1  1  1]
+    1  1  1  1  1  1  1  1]
+  </grid>
+  <grid
+    1 = "counter"
+    2 = "table"
+    3 = "stools_a"
+    4 = "stools_b"
+    5 = "pinball_machine"
+    6 = "slum_outside.dumpster_a"
+    7 = "slum_outside.dumpster_b"
+  >
+    .  .  .  .  .  .  .  .
+    .  3e 4  .  .  .  6  .
+    .  2  .  .  1w .  .  .
+    .  .  .  .  .  .  7  .
+    .  4  3s .  .  .  .  .
+    .  2  .  .  1w .  .  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  5w
+  </grid>
+</scene>
+
+<scene
+  name   = "Toilets"
+  ID     = "unit_toilets"
+  wide   = "8"
+  high   = "8"
+  wall   = "slum_common.wall"
+  door   = "slum_common.door"
+  window = "slum_common.window"
+>
+  <grid
+    1 = "slum_common.floor"
+    2 = "slum_domestic.floor_bathroom"
+  >
+    [1  1  1  1  1  1   1  1
+    [1  1  1  1  1  1   1  1
+    [2- 2- 2- 2- 2- 2-] 1  1
+    [2  2  2  2  2  2]/ 1  1
+    [2_ 2_ 2_ 2_ 2_ 2_] 1  1
+    [2  2  2  2  2  2]  1  1
+    [2  2  2  2  2  2]/ 1  1
+    [2_ 2_ 2_ 2_ 2_ 2]_ 1_ 1_
+  </grid>
+  <grid
+    1 = "slum_domestic.toilet_stall"
+    2 = "slum_domestic.toilet_basin"
+    3 = "pinball_machine"
+    4 = "table"
+    5 = "stools_a"
+    6 = "stools_b"
+  >
+    3w .  .  .  .  .  .  .
+    .  .  5  6  4  .  .  .
+    .  .  .  .  2  2  .  .
+    1e 1e 1e .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  2  2  .  .
+    1e 1e 1e .  .  .  .  .
+    .  .  .  .  .  .  .  .
+  </grid>
+</scene>
+
+<scene
+  name   = "Pool Area"
+  ID     = "unit_pool_area"
+  wide   = "8"
+  high   = "8"
+  wall   = "slum_common.wall"
+  door   = "slum_common.door"
+  window = "slum_common.window"
+>
+  <grid
+    1 = "slum_common.floor"
+  >
+    1  1  1  1  1  1  1  1
+    1  1  1  1  1  1  1  1
+    1  1  1  1  1  1  1  1
+    1  1  1  1  1  1  1  1
+    1  1  1  1  1  1  1  1
+    1  1  1  1  1  1  1  1
+    1  1  1  1  1  1  1  1
+    1_ 1_ 1_ 1_ 1_ 1_ 1_ 1_
+  </grid>
+  <grid
+    1 = "pool_table"
+    2 = "stools_a"
+    3 = "slum_common.support_column"
+  >
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  2  3  .
+    .  1  .  .  .  .  2e .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  1e .
+    .  1  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+  </grid>
+</scene>
+
+<scene
+  name   = "Alley"
+  ID     = "unit_alley"
+  wide   = "8"
+  high   = "8"
+  wall   = "slum_common.wall"
+  door   = "slum_common.door"
+  window = "slum_common.window"
+  floor  = "slum_outside.asphalt"
+>
+  <grid
+   1 = "slum_outside.pavement"
+   2 = "slum_outside.pavement_edge"
+   3 = "slum_outside.pavement_corner"
+   4 = "slum_outside.hatch"
+   5 = "slum_outside.car"
+  >
+    2s 2s 2s 2s 2s 2s 2s 2s
+    .  .  .  .  .  .  .  .
+    4  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    2  2  2  2  2  2  2  2
+    1  1  1  1  1  1  1  1
+    1  1  1  1  1  1  1  1
+  </grid>
+</scene>
+
+
+<scene
+  name      = "Bar Scene Assembled"
+  ID        = "scene_assembled"
+  unitSize  = "8"
+  unitsWide = "3"
+  unitsHigh = "3"
+>
+  <unit typeID = "unit_alley"         x = "0" y = "0" dir = "N" />
+  <unit typeID = "unit_alley"         x = "1" y = "0" dir = "N" />
+  <unit typeID = "unit_alley"         x = "2" y = "0" dir = "N" />
+  
+  <unit typeID = "unit_corner_seats"  x = "0" y = "1" dir = "N" />
+  <unit typeID = "unit_entrance"      x = "1" y = "1" dir = "N" />
+  <unit typeID = "unit_main_bar"      x = "2" y = "1" dir = "N" />
+  <unit typeID = "unit_toilets"       x = "0" y = "2" dir = "N" />
+  <unit typeID = "unit_pool_area"     x = "1" y = "2" dir = "N" />
+  <unit typeID = "unit_corner_seats"  x = "2" y = "2" dir = "S" />
+</scene>
+
+
+
+
+
+
+
+
+
