@@ -38,6 +38,7 @@ public class DefaultGame extends RunGame {
     DefaultGame.initDefaultBase   (world);
     DefaultGame.initDefaultCrime  (world);
     DefaultGame.initDefaultBonds  (world);
+    DefaultGame.initDefaultPlots  (world);
   }
   
   
@@ -277,7 +278,28 @@ public class DefaultGame extends RunGame {
       }
     }
   }
+  
+  
+  public static void initDefaultPlots(World world) {
+    final Batch <Plot> plots = new Batch();
+    
+    for (Base base : world.bases()) if (base.faction().criminal) {
+      Plot root = base.plots.generateNextPlot();
+      plots.add(root);
+    }
+    
+    Plot first = (Plot) Rand.pickFrom(plots);
+    first.base().plots.assignRootPlot(first, 24);
+    
+    for (Plot plot : plots) if (plot != first) {
+      int delay = Rand.index(GameSettings.MIN_PLOT_THINKING_TIME);
+      plot.base().plots.assignRootPlot(plot, 48 + delay);
+    }
+  }
+  
 }
+
+
 
 
 
