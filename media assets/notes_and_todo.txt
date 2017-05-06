@@ -3,3 +3,30 @@
 
 *  You may have to use Facts as outcomes for lead-investigation, rather than
    linking simply to Objects.
+
+
+Vigilance.
+
+The train/build/craft loop needs better representation.
+
+Employment:  Engineering projects complete faster
+Health:      Medical projects complete faster
+Education:   Research projects complete faster
+Diversions:  Morale is recovered more quickly
+
+Yes, excellent.
+
+
+
+Assassinations, Kidnappings, Robberies,
+Data Hacks, Smugglings, Bombings,
+Breakouts, Busts, Petty Crime.
+
+Warehouse/Docks.  Factory.  Chemical Plant.
+Tenements.  Brothel/Bar.  Church.
+
+Museum.  Bank.  City Hall/Courthouse.
+Penthouse.  Lounge.  Casino.
+
+Corporate Office.  Shopping Mall.  Funhouse.
+Police Barracks.  Prison Yard.  Army Base.

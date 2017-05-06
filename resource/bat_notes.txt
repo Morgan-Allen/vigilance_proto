@@ -1,0 +1,13 @@
+
+BAT file for launching jar:
+
+example : cd C:\Users***\Desktop\directory\target
+
+java -jar myjar.jar
+
+example bat file looks like this
+
+@echo OFF
+cd C:\Users\****\Desktop\directory\target
+java -jar myjar.jar
+my file will not work because all targets (the place where file is) are different)
