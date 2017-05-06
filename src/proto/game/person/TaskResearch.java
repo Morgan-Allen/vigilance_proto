@@ -85,6 +85,11 @@ public class TaskResearch extends Task {
   }
   
   
+  public float taskDaysRemaining(Person p) {
+    return developed.researchTime() * 1f / World.HOURS_PER_DAY;
+  }
+  
+  
   public String activeInfo() {
     return "Researching "+developed+" in "+room;
   }

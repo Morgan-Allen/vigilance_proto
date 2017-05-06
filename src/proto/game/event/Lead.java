@@ -616,6 +616,11 @@ public class Lead extends Task {
   public String choiceInfo(Person p) {
     return type.name+" ("+focus+")";
   }
+  
+  
+  public float taskDaysRemaining(Person p) {
+    return 1;
+  }
 }
 
 

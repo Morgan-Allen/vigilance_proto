@@ -222,6 +222,7 @@ public abstract class Task implements Assignment {
   }
   
   
+  public abstract float taskDaysRemaining(Person p);
   public abstract String choiceInfo(Person p);
   
   

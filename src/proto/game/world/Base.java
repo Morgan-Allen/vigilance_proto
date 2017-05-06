@@ -84,6 +84,7 @@ public class Base extends Place {
   public World world() { return world; }
   
   
+  
   /**  Regular updates and life-cycle methods:
     */
   void updateBase() {
@@ -223,6 +224,20 @@ public class Base extends Place {
   
   public Place[] rooms() {
     return rooms;
+  }
+  
+  
+  
+  /**  Ongoing tasks-
+    */
+  public Series <Task> activeAgentTasks() {
+    Batch <Task> tasks = new Batch();
+    for (Person p : roster()) {
+      for (Assignment a : p.assignments()) if (a instanceof Task) {
+        tasks.include((Task) a);
+      }
+    }
+    return tasks;
   }
   
   

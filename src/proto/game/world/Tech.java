@@ -23,6 +23,7 @@ public class Tech extends Index.Entry implements Session.Saveable {
   final Image icon;
   
   Object researchArgs[];
+  final int researchTime;
   final Object granted[];
   
   
@@ -36,6 +37,7 @@ public class Tech extends Index.Entry implements Session.Saveable {
     this.icon = Kind.loadImage(imgPath);
     
     this.researchArgs = new Object[] {};
+    this.researchTime = World.HOURS_PER_DAY * World.DAYS_PER_WEEK * 2;
     this.granted = granted;
   }
   
@@ -52,6 +54,11 @@ public class Tech extends Index.Entry implements Session.Saveable {
   
   public Object[] researchArgs() {
     return researchArgs;
+  }
+  
+  
+  public int researchTime() {
+    return researchTime;
   }
   
   

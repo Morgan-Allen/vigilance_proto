@@ -62,6 +62,11 @@ public class Place extends Element {
   }
   
   
+  public float buildDaysRemaining() {
+    return kind().buildTime * (1 - buildProgress);
+  }
+  
+  
   public Base owner() {
     return owner;
   }

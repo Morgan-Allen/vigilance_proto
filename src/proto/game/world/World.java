@@ -183,11 +183,29 @@ public class World implements Session.Saveable {
   }
   
   
+  public Series <Person> persons() {
+    Batch <Person> all = new Batch();
+    for (Element e : inside()) if (e.isPerson()) {
+      all.add((Person) e);
+    }
+    return all;
+  }
+  
+  
   public Series <Person> civilians() {
     Batch <Person> all = new Batch();
     for (Element e : inside()) if (e.isPerson()) {
       Person p = (Person) e;
       if (p.isCivilian()) all.add(p);
+    }
+    return all;
+  }
+  
+  
+  public Series <Place> places() {
+    Batch <Place> all = new Batch();
+    for (Element e : inside()) if (e.isPlace()) {
+      all.add((Place) e);
     }
     return all;
   }

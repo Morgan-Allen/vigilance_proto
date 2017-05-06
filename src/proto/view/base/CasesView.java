@@ -125,8 +125,9 @@ public class CasesView extends UINode {
     
     ViewUtils.ListDraw draw = new ViewUtils.ListDraw();
     int across = vw - 320, down = 10;
+    boolean hasCase = false;
     draw.addEntry(
-      null, "OPEN CASES", 40, null
+      null, "OPEN CASES", 25, null
     );
     
     for (Plot plot : player.leads.activePlots()) {
@@ -134,6 +135,7 @@ public class CasesView extends UINode {
       Image icon = plot.icon();
       if (icon == null) icon = CasesView.ALERT_IMAGE;
       draw.addEntry(icon, CaseFX.nameFor(plot, player), 40, plot);
+      hasCase = true;
     }
     
     for (Trial trial : world.council.upcomingTrials()) {
@@ -144,18 +146,48 @@ public class CasesView extends UINode {
       desc += "\n  Date: "+date+" days";
       desc += "  Evidence: "+caseDesc[Nums.clamp((int) (evidence * 3), 3)];
       draw.addEntry(icon, desc, 50, trial.plot());
+      hasCase = true;
+    }
+    if (! hasCase) {
+      draw.addEntry(null, "    None", 25, null);
     }
     
-    //  TODO:  Also add entries for investment projects and agents in training,
-    //  and sort by estimated order of completion.
-    /*
-    for (Place place : world.underConstruction()) {
-      
+    draw.addEntry(
+      null, "ONGOING TASKS", 25, null
+    );
+    //  TODO:  Make this an interface for the relevant objects?
+    class Upcoming { Object ref; float daysLeft; Image icon; }
+    List <Upcoming> schedule = new List <Upcoming> () {
+      protected float queuePriority(Upcoming r) {
+        return r.daysLeft;
+      }
+    };
+    for (Place place : world.places()) {
+      if (place.buildProgress() < 1) {
+        Upcoming o = new Upcoming();
+        o.ref      = place;
+        o.daysLeft = place.buildDaysRemaining();
+        o.icon     = place.icon();
+        schedule.add(o);
+      }
     }
     for (Task task : player.activeAgentTasks()) {
-      
+      for (Person p : task.assigned()) {
+        Upcoming o = new Upcoming();
+        o.ref      = task;
+        o.daysLeft = task.taskDaysRemaining(p);
+        o.icon     = task.icon();
+        schedule.add(o);
+      }
     }
-    //*/
+    schedule.queueSort();
+    for (Upcoming o : schedule) {
+      String desc = ""+o.ref+" ("+I.shorten(o.daysLeft, 1)+" days)";
+      draw.addEntry(o.icon, desc, 25, null);
+    }
+    if (schedule.empty()) {
+      draw.addEntry(null, "    None", 25, null);
+    }
     
     draw.performDraw(across, down, this, surface, g);
     down = draw.down;

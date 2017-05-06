@@ -158,6 +158,11 @@ public class TaskCraft extends Task {
   }
   
   
+  public float taskDaysRemaining(Person p) {
+    return craftingTime() * 1f / World.HOURS_PER_DAY;
+  }
+  
+  
   public String activeInfo() {
     return "Crafting "+made;
   }
