@@ -8,7 +8,7 @@
 
 <sceneTest
   basePath = "media assets/scene layout/industrial scenes/"
-  fileName = "alt_warehouse.xml"
+  fileName = "industrial_warehouse.xml"
   sceneID  = "warehouse_scene_assembled"
   prefSize = "18"
 >

@@ -13,22 +13,6 @@
   blockLevel = "BLOCK_NONE"
 />
 
-
-<prop
-  ID         = "cubicle_a"
-  sprite     = "office/cubicle_a.png"
-  wide       = "2"
-  high       = "2"
-/>
-
-<prop
-  ID         = "cubicle_b"
-  sprite     = "office/cubicle_b.png"
-  wide       = "2"
-  high       = "2"
-/>
-
-
 <prop
   ID         = "cubicle_wooden_a"
   sprite     = "office/cubicle_wooden_a.png"
@@ -41,12 +25,6 @@
   sprite     = "office/cubicle_wooden_b.png"
   wide       = "2"
   high       = "2"
-/>
-
-<prop
-  ID         = "desk"
-  sprite     = "office/desk.png"
-  wide       = "2"
 />
 
 <prop
@@ -107,8 +85,14 @@
 />
 
 <prop
-  ID         = "paper_towels"
-  sprite     = "office/paper_towels.png"
+  ID         = "toilet_sink"
+  sprite     = "office/toilet_sink.png"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "papper_towels"
+  sprite     = "office/papper_towels.png"
   subtype    = "SUBTYPE_DETAIL"
   blockLevel = "BLOCK_NONE"
 />
@@ -188,190 +172,6 @@
   sprite     = "office/file_cabinet.png"
   wide       = "2"
 />
-<scene
-  name   = "General Shipping And Receiving"
-  ID     = "scene_shipping_and_receiving"
-  wide   = "8"
-  high   = "8"
-  floor  = "floor"
-  wall   = "industrial_common.wall"
-  door   = "industrial_common.door"
-  window = "industrial_common.window"
->
-  <grid
-    1 = "water"
-    2 = "printer"
-    3 = "industrial_inside.plant_1"
-    4 = "desk"
-    5 = "sofa"
-    6 = "chair"
-    7 = "book_shelf"
-  >
-    3  .  .  .  . 5e  .  3
-    .  .  .  .  .  .  .  .
-    .  .  .  .  .  .  .  .
-    .  .  .  .  .  .  .  .
-    .  .  .  4s .  . 4s  .
-    .  .  .  .  .  .  .  .
-    .  .  . 4s  .  . 4s  .
-    2s .  .  .  .  .  .  .
-
-  </grid>
-  <grid
-  >
-    [-  -  -  -  -  -  -  -]
-    [   .  .  .  .  .  .   ]
-    [/  .  .  .  .  .  .   ]/
-    [/  .  .  .  .  .  .   ]
-    [   .  .  .  .  .  .   ]
-    [   .  .  .  .  .  .   ]
-    [   .  .  .  .  .  .   ]
-    [_  _  _  _/  _  _  _  _]
-  </grid>
-</scene>
-
-<scene
-  name   = "General Office"
-  ID     = "scene_general_office"
-  wide   = "8"
-  high   = "8"
-  floor  = "floor"
-  wall   = "industrial_common.wall"
-  door   = "industrial_common.door"
-  window = "industrial_common.window"
->
-  <grid
-    1 = "cubicle_a"
-    2 = "cubicle_b"
-    3 = "water"
-    4 = "printer"
-    5 = "industrial_inside.plant_1"
-    6 = "kitchen_sink"
-    7 = "kitchen_cupboard"
-    8 = "kitchen_fridge"
-  >
-    .  .  .  .  .  .  .  .
-    .  2s .  .  .  1s 2w .
-    5  .  .  .  .  .  .  5
-    .  1e .  .  .  .  2  .
-    .  .  .  .  .  .  .  .
-    .  .  .  .  .  .  .  3e
-    .  .  .  .  .  .  .  .
-    .  .  .  . 7s  8s .  6s
-  </grid>
-  <grid
-  >
-    [-  - -/  -  -  -  -  -]
-    [   .  .  .  .  .  .   ]
-    [   .  .  .  .  .  .   ]
-    [   .  .  .  .  .  .   ]
-    [   .  .  .  .  .  .   ]
-    [   .  .  .  .  .  .   ]
-    [   .  .  .  .  .  .   ]
-    [_  _/ _  _  _  _  _  _]
-  </grid>
-</scene>
-
-
-<scene
-  name   = "Toilets"
-  ID     = "scene_toilets"
-  wide   = "8"
-  high   = "8"
-  wall   = "industrial_common.wall"
-  door   = "industrial_common.door"
-  window = "industrial_common.window"
->
-  <grid
-
-  >
-    .   .  .  .   .   .  .  ]
-    .   .  8s  5  .   .  .  .
-    -   -/ -  - -[1w  -  -/ -
-    .   .  6w .  [1w  .  .  4e
-    7   .  .  .  [1w  .  .  3e
-    .   .  .  .  [5   .  .  .
-    .   .  6  .  [2e  .  .  .
-    .   .  .  .  [2e  .  .   4e
-  </grid>
-  <grid
-    1 = "floor"
-    2 = "blue_tile_floor"
-  >
-    1 1 1 1 1 1 1 1
-    1 1 1 1 1 1 1 1
-    1 1 1 1 2 2 2 2
-    1 1 1 1 2 2 2 2
-    1 1 1 1 2 2 2 2
-    1 1 1 1 2 2 2 2
-    1 1 1 1 2 2 2 2
-    1 1 1 1 2 2 2 2
-  </grid>
-  <grid
-  >
-    [-  -/ -  -  -  -  -  -]
-    [/  .  .  .  .  .  .   ]/
-    [   .  .  .  .  .  .   ]
-    [   .  .  .  .  .  .   ]
-    [   .  .  .  .  .  .   ]
-    [   .  .  .  .  .  .   ]
-    [   .  .  .  .  .  .   ]
-    [_  _/ _  _  _  _  _  _]
-  </grid>
-</scene>
-
-<scene
-  name   = "Restroom"
-  ID     = "scene_restroom"
-  wide   = "8"
-  high   = "8"
-  wall   = "industrial_common.wall"
-  door   = "industrial_common.door"
-  window = "industrial_common.window"
->
-  <grid
-    1  = "toilet_2"
-    2  = "industrial_inside.plant_1"
-    3  = "sofa"
-    4  = "kitchen_table"
-    5  = "kitchen_fruits"
-    6  = "kitchen_sink"
-    7  = "kitchen_cupboard"
-  >
-    [/ 1e  .  6   .   7  .  .
-    [/ 1e  .  .   .   .  .  .
-    .   .  .  .   .   .  .  .
-    .   .  4  5e  .   .  .  .
-    .   .  .  .   .   .  .  .
-    .   .  .  .   .   .  .  .
-    .   .  .  .   .   .  .  3s
-    2   .  .  3w  .   .  .  .
-  </grid>
-  <grid
-    1 = "floor"
-    2 = "blue_tile_floor"
-  >
-    2 2 1 1 1 1 1 1
-    2 2 1 1 1 1 1 1
-    1 1 1 1 1 1 1 1
-    1 1 1 1 1 1 1 1
-    1 1 1 1 1 1 1 1
-    1 1 1 1 1 1 1 1
-    1 1 1 1 1 1 1 1
-    1 1 1 1 1 1 1 1
-  </grid>
-  <grid
-  >
-    [-  -]  -  -  -  -  -  -]
-    [-_ -_] .  .  .  .  .   ]
-    [   .   .  .  .  .  .   ]/
-    [   .   .  .  .  .  .   ]
-    [   .   .  .  .  .  .   ]
-    [/  .   .  .  .  .  .   ]
-    [   .   .  .  .  .  .   ]
-    [_  _/  _  _  _  _  _  _]
-  </grid>
-</scene>
 
 <scene
   name   = "Main Office"
@@ -383,70 +183,66 @@
   window = "industrial_common.window"
 >
   <grid
-      1  = "water"
-      2  = "printer"
-      3  = "industrial_inside.plant_1"
-      4  = "desk_wooden"
-      5  = "sofa"
-      6  = "chair"
-      7  = "book_shelf"
-      8  = "toilet_2"
-      9  = "industrial_inside.plant_1"
-      10 = "kitchen_table"
-      11 = "kitchen_fruits"
-      12 = "kitchen_sink"
-      13 = "kitchen_cupboard"
-      14 = "toilet"
-      15 = "urinal"
-      16 = "wide_sink"
-      17 = "paper_towels"
-      18 = "supply_cupboards"
-      19 = "trash_bin"
-      20 = "printer"
-      21 = "industrial_warehouse.warehouse_pallets"
-      22 = "industrial_warehouse.warehouse_more_pallets"
-      23 = "cubicle_wooden_a"
-      24 = "cubicle_wooden_b"
+      1  = "industrial_inside.black_chair"
+      2  = "industrial_inside.black_chair_row"
+      3  = "desk_wooden"
+      4  = "industrial_inside.plant_1"
+      5  = "industrial_inside.reception_table"
+      6  = "industrial_inside.sofa"
+      7  = "industrial_inside.glass_table"
+      8  = "file_cabinet"
+      9  = "papper_box"
+      10 = "pappers"
+      11 = "toilet"
+      12 = "toilet_sink"
+      13 = "urinal"
+      14 = "papper_towels"
+      15 = "supply_cupboards"
+      16 = "trash_bin"
+
+
   >
-    [-  -  -  -  -  -    -  -]   -  -  -  -  -] -  -  -
-    [3  .  . 4e  . 4e    .  3]   . 18s . 18w .] .  .  .
-    [.  .  .  .  .  .    .  .]   .  .  .  .  .] 22  .  .
-    [.  .  .  .  .  .    .  .]  19  .  . 18  .] 22  .  .
-    [.  .  .  .  .  .    .  .]  19  .  .  .  .] 21  .  .
-    [.  .  .  .  .  .    . 2e] -14w -  -  -  -] 22  .  .
-    [. 24s 24w . .  .    .  .] 14w  .  .  . 16e] 21 .  .
-    [.  .  .  .  .  .    . 1e] 14w  .  .  .  .] .  .  .
-    [. 23e 24 .  .  .    23 .] 14w  .  .  .  .] .  .  .
-    [.  .  .  .  .  .    .  .]   .  .  .  . 17e] . .  .
-    [-3 -  - -5e -  -    -  -    -  -] -  -  -  .  .  .
-    [5  .  .  .  .  .    .  .    .  .] 22 .  .  .  .  .
-    [.  .  .  .  .  10   .  .    .  .] 22 .  .  .  .  .
-    [.  .  .  .  .  .    .  .    .  .] 21 .  .  .  .  .
-    [.  .  .  .  .  .    .  .    .  .] .  .  .  .  .  .
-    [_  _  _  _  _  _12s _  _ 13s_  _] .  .  .  .  .  .
+
+  [-6 - -/ -  - -3e - -]  -  - -[11w - -14 -12]  .  .
+  [  7e .  .  1e . . 8e]  . 15s [11w  .  . ]/   .  .
+  [  .  .  .  .  . . 10]  .  .  [-11w - -14 12-] .  .
+  [/ .  .  .  .  . . 8e]  16  .  [13 13 . ]/     .  .
+  [/ .  .  .  . 3e . 9w]  - /-  -  -  - -]      .  .
+  [5 .  .  .  1e .  .  ]  .  .  .  .  .  ]      .  .
+  [  .  .  .  .  4  .  ]  .  .  .  .  .  ]      .  .
+  [- - -/  -  - -  -  -  .  .  ]  -  -  -       .  .
+  [  .  .  .  .  .  .  .  .  .  ]  .  .  .      .  .
+  [  .  .  .  .  .  .  .  .  .  ]  .  .  .      .  .
+  [  .  .  .  .  .  .  .  .  . ]/  .  .  .      .  .
+  [  .  .  .  .  .  .  .  .  .  ]  .  .  .      .  .
+  [  .  .  .  .  .  .  .  .  .  ]  .  .  .      .  .
+  [  .  .  .  .  .  .  .  .  .  ]  .  .  .      .  .
+  [  .  .  .  .  .  .  .  .  .  ]  .  .  .      .  .
+  [_ _  _  _  _  _  _  _  _  _ _]  .  .  .      .  .
   </grid>
   <grid
     1 = "industrial_warehouse.floor"
-    2 = "industrial_office.floor"
+    2 = "floor"
+    3 = "blue_tile_floor"
   >
-    2  2  2  2  2  2  2  2  2  2  2  2  2  1  1  1
-    2  2  2  2  2  2  2  2  2  2  2  2  2  1  1  1
-    2  2  2  2  2  2  2  2  2  2  2  2  2  1  1  1
-    2  2  2  2  2  2  2  2  2  2  2  2  2  1  1  1
-    2  2  2  2  2  2  2  2  2  2  2  2  2  1  1  1
-    2  2  2  2  2  2  2  2  2  2  2  2  2  1  1  1
-    2  2  2  2  2  2  2  2  2  2  2  2  2  1  1  1
-    2  2  2  2  2  2  2  2  2  2  2  2  2  1  1  1
-    2  2  2  2  2  2  2  2  2  2  2  2  2  1  1  1
-    2  2  2  2  2  2  2  2  2  2  2  2  2  1  1  1
-    2  2  2  2  2  2  2  2  2  2  1  1  1  1  1  1
-    2  2  2  2  2  2  2  2  2  2  1  1  1  1  1  1
-    2  2  2  2  2  2  2  2  2  2  1  1  1  1  1  1
-    2  2  2  2  2  2  2  2  2  2  1  1  1  1  1  1
-    2  2  2  2  2  2  2  2  2  2  1  1  1  1  1  1
-    2  2  2  2  2  2  2  2  2  2  1  1  1  1  1  1
-    2  2  2  2  2  2  2  2  2  2  1  1  1  1  1  1
-    2  2  2  2  2  2  2  2  2  2  1  1  1  1  1  1
+    2  2  2  2  2  2  2  2  2  2  3  3  3  3  1  1
+    2  2  2  2  2  2  2  2  2  2  3  3  3  3  1  1
+    2  2  2  2  2  2  2  2  2  2  3  3  3  3  1  1
+    2  2  2  2  2  2  2  2  2  2  3  3  3  3  1  1
+    2  2  2  2  2  2  2  2  2  2  2  2  2  2  1  1
+    2  2  2  2  2  2  2  2  2  2  2  2  2  2  1  1
+    2  2  2  2  2  2  2  2  2  2  2  2  2  2  1  1
+    2  2  2  2  2  2  2  2  2  2  2  1  1  1  1  1
+    2  2  2  2  2  2  2  2  2  2  2  1  1  1  1  1
+    2  2  2  2  2  2  2  2  2  2  2  1  1  1  1  1
+    2  2  2  2  2  2  2  2  2  2  2  1  1  1  1  1
+    2  2  2  2  2  2  2  2  2  2  2  1  1  1  1  1
+    2  2  2  2  2  2  2  2  2  2  2  1  1  1  1  1
+    2  2  2  2  2  2  2  2  2  2  2  1  1  1  1  1
+    2  2  2  2  2  2  2  2  2  2  2  1  1  1  1  1
+    2  2  2  2  2  2  2  2  2  2  2  1  1  1  1  1
+    2  2  2  2  2  2  2  2  2  2  2  1  1  1  1  1
+    2  2  2  2  2  2  2  2  2  2  2  1  1  1  1  1
   </grid>
 </scene>
 
