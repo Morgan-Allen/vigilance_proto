@@ -69,7 +69,7 @@ public class Lead extends Task {
   
   final public static String
     MEDIUM_DESC[] = {null,
-      "Meet", "Wire", "Surveil", "Heist", "Question"
+      "Meet", "Wire", "Surveil", "Heist", "Question", "Cover"
     },
     TENSE_DESC[] = {
       "Before", "During", "After"
@@ -360,10 +360,10 @@ public class Lead extends Task {
     boolean matchFocus = false;
     for (Element contacts : plot.involved(step)) {
       if (focus.isPerson()) {
-        if (contacts != focus) continue;
+        if (contacts.place() != focus.place()) continue;
       }
       if (focus.isPlace()) {
-        if (contacts != focus) continue;
+        if (contacts.place() != focus) continue;
       }
       if (focus.isRegion()) {
         if (! contacts.isPlace()) continue;
@@ -499,10 +499,10 @@ public class Lead extends Task {
       if (area != null) obstacle = 10;
     }
     
-    if (perp != null) {
+    if (perp != null && perp.base() != null) {
       obstacle *= (perp.base().organisationRank(perp) + 2) / 4f;
     }
-    if (site != null) {
+    if (site != null && site.owner() != null) {
       obstacle *= (site.owner().organisationRank(site) + 2) / 4f;
     }
     if (area != null) {

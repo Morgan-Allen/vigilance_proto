@@ -63,7 +63,7 @@ public class Place extends Element {
   
   
   public float buildDaysRemaining() {
-    return kind().buildTime * (1 - buildProgress);
+    return kind().buildTime * (1f - buildProgress);
   }
   
   

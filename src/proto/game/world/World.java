@@ -2,7 +2,8 @@
 
 package proto.game.world;
 import proto.common.*;
-import proto.game.person.Person;
+import proto.game.event.*;
+import proto.game.person.*;
 import proto.game.scene.*;
 import proto.util.*;
 import proto.view.common.MainView;
@@ -224,6 +225,21 @@ public class World implements Session.Saveable {
   
   /**  Regular updates and activity cycle:
     */
+  public void updateWorldInRealTime(float realSeconds) {
+    float hoursGone = RunGame.SLOW_HOURS_PER_REAL_SECOND;
+    if (events.active().empty()) hoursGone = RunGame.FAST_HOURS_PER_REAL_SECOND;
+    hoursGone *= realSeconds;
+    
+    Event next = events.nextComing();
+    if (next != null) {
+      float startGap = next.timeBegins() - timing.totalHours();
+      hoursGone = Nums.max(startGap + 0.5f, hoursGone);
+    }
+    
+    updateWorld(hoursGone);
+  }
+  
+  
   public void updateWorld(float hoursGone) {
     timing.updateTiming(hoursGone);
     for (Region d : regions) {

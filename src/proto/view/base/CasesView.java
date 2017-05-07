@@ -176,7 +176,7 @@ public class CasesView extends UINode {
         Upcoming o = new Upcoming();
         o.ref      = task;
         o.daysLeft = task.taskDaysRemaining(p);
-        o.icon     = task.icon();
+        o.icon     = p.icon();
         schedule.add(o);
       }
     }

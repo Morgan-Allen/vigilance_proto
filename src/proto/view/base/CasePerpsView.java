@@ -100,7 +100,7 @@ public class CasePerpsView extends UINode {
       if (lastSeen != null) descAt += " Last Seen: "+lastSeen;
     }
     if (descAt != null) {
-      draw.addEntry(CasesView.MYSTERY_IMAGE, descAt, 40, null);
+      draw.addEntry(CasesView.MYSTERY_IMAGE, descAt, 40, lastSeen);
     }
     
     for (Lead lead : player.leads.leadsFor(suspect)) {
@@ -145,6 +145,12 @@ public class CasePerpsView extends UINode {
       hoverDesc = "Review all evidence assembled on this suspect.";
       if (draw.clicked) {
         parent.setActiveFocus(CasesView.PLOT_CLUES, false);
+      }
+    }
+    else if (draw.hovered instanceof Place) {
+      hoverDesc = "View this location.";
+      if (draw.clicked) {
+        parent.setActiveFocus(draw.hovered, false);
       }
     }
     g.setColor(Color.LIGHT_GRAY);

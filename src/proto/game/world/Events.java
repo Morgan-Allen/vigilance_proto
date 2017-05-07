@@ -105,6 +105,16 @@ public class Events {
   }
   
   
+  
+  /**  Query methods for specific event-types:
+    */
+  public Event nextComing() {
+    Pick <Event> pick = new Pick();
+    for (Event e : coming) pick.compare(e, 0 - e.timeBegins());
+    return pick.result();
+  }
+  
+  
   public Plot latestPlot() {
     Pick <Event> pick = new Pick();
     for (Event e : coming) if (e.isPlot()) pick.compare(e, e.timeBegins());
@@ -119,14 +129,7 @@ public class Events {
     for (Event e : active) if (e.isTrial()) pick.compare(e, e.timeBegins());
     return (Trial) pick.result();
   }
-  
 }
-
-
-
-
-
-
 
 
 

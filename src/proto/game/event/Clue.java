@@ -253,7 +253,8 @@ public class Clue implements Session.Saveable {
     */
   public String toString() {
     if (isConfirmation()) {
-      return "is "+match+" at "+location;
+      if (match.isPerson()) return "is "+match+" at "+location;
+      else return "is "+match;
     }
     if (isTraitClue()) {
       return "has "+trait;

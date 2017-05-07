@@ -1,5 +1,6 @@
 
 
 
-*  You may have to use Facts as outcomes for lead-investigation, rather than
-   linking simply to Objects.
+Redundant clues should be skipped.
+
+Crime reports should mention impact on both trust and deterrance!

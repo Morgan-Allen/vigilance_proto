@@ -39,7 +39,8 @@ public class CaseFX {
     desc.append(" indicates that "+nameFor(plot, base)+"'s "+role);
     
     if (clue.isConfirmation()) {
-      desc.append(" is "+match+" at "+location);
+      if (match.isPerson()) desc.append(" is "+match+" at "+location);
+      else desc.append(" is "+match);
     }
     if (clue.isTraitClue()) {
       desc.append(" has "+trait);

@@ -134,18 +134,13 @@ public class PlotUtils {
     Base  base  = plot.base();
     World world = base.world();
     Place place = focus.place();
-    Series <Element> involved = plot.involved(step);
-    
-    if (! involved.includes(focus)) {
-      I.say("Step: "+step+" does not involve: "+focus);
-      return null;
-    }
+    Batch <Element> involved = plot.allInvolved();
+    List <Person> forces = new List();
     
     final float dangerLevel = 0.5f;
     final PersonType GOONS[] = base.goonTypes().toArray(PersonType.class);
     float forceLimit = dangerLevel * 10, forceSum = 0;
     
-    final List <Person> forces = new List();
     for (Element e : involved) {
       if (e == null || e.place() != place || ! e.isPerson()) continue;
       Person perp = (Person) e;
