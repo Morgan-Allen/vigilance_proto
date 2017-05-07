@@ -400,3 +400,57 @@
     . .  .  . .  .  . .
   </grid>
 </scene>
+
+<COMMENT>
+  To add:  Small sections of paving between the parking spaces?  Varying
+  colours/style for trucks and cars?  Maybe a security gate?
+</COMMENT>
+
+<scene
+  name   = "Wide Parking"
+  ID     = "unit_wide_parking"
+  wide   = "16"
+  high   = "8"
+  floor  = "industrial_outside.asphalt"
+  wall   = "industrial_common.wall"
+  door   = "industrial_common.door"
+  window = "industrial_common.window"
+>
+  <grid
+  1 = "hatch"
+  2 = "asphalt_line"
+  3 = "big_truck"
+  >
+    .  3  .  .  .  3  .  2e  .  .  .  .   .  .  .  .
+    .  .  .  .  .  .  .  2e  .  .  .  .   1  .  .  .
+    .  .  .  .  .  .  .  .   .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  2e  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  2e  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .   .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  2e  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  2e  .  .  .  .  .  .  .  .
+  </grid>
+</scene>
+
+<scene
+  name   = "Small Parking"
+  ID     = "unit_small_parking"
+  wide   = "8"
+  high   = "8"
+  floor  = "industrial_outside.asphalt"
+  wall   = "industrial_common.wall"
+  door   = "industrial_common.door"
+  window = "industrial_common.window"
+>
+  <grid
+  >
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+  </grid>
+</scene>
