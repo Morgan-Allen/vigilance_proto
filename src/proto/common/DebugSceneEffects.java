@@ -48,7 +48,7 @@ public class DebugSceneEffects extends RunGame {
     I.say("\n\n\nEvaluating after-effects of combat scene...");
     I.say("  Current date: "+world.timing.currentTimeString());
     
-    Trial trial = world.events.latestTrial();
+    Trial trial = world.events.nextTrial();
     boolean jailLeader = true;
     
     if (trial == null) {

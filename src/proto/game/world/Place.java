@@ -92,6 +92,11 @@ public class Place extends Element {
   }
   
   
+  public Series <Trait> traits() {
+    return properties;
+  }
+  
+  
   
   /**  Updates and other life-cycle methods:
     */

@@ -14,16 +14,19 @@ public class CaseFX {
   
   public static String longDescription(Clue clue, Base base) {
     
-    World   world     = base.world();
-    Lead    source    = clue.source();
-    Plot    plot      = clue.plot();
-    Role    role      = clue.role();
-    Element match     = clue.match();
-    Trait   trait     = clue.trait();
-    Element location  = clue.locationNear();
-    int     nearRange = clue.nearRange();
+    World     world     = base.world();
+    Lead      source    = clue.source();
+    Plot      plot      = clue.plot();
+    Role      role      = clue.role();
+    Element   match     = clue.match();
+    Trait     trait     = clue.trait();
+    Element   location  = clue.locationNear();
+    int       nearRange = clue.nearRange();
+    Lead.Type leadType  = clue.leadType();
     
-    StringBuffer desc = new StringBuffer(clue.leadType().name);
+    StringBuffer desc = new StringBuffer();
+    if (leadType != null) desc.append(leadType.name  );
+    else                  desc.append("Investigation");
     
     if (source != null) {
       desc.append(" by ");

@@ -108,30 +108,56 @@ public class Events {
   
   /**  Query methods for specific event-types:
     */
+  final static int MODE_ANY = 0, MODE_PLOTS = 1, MODE_TRIALS = 2;
+  
+  private Event nextEvent(
+    Pick pick, boolean checkComing, boolean checkActive, final int mode
+  ) {
+    if (pick == null) pick = new Pick <Event> () {
+      public void compare(Event next, float rating) {
+        if (mode == MODE_PLOTS  && ! next.isPlot ()) return;
+        if (mode == MODE_TRIALS && ! next.isTrial()) return;
+        super.compare(next, rating);
+      }
+    };
+    if (checkComing) {
+      for (Event e : coming) pick.compare(e, 0 - e.timeBegins());
+    }
+    if (checkActive) {
+      for (Event e : active) pick.compare(e, 0 - e.timeBegins());
+    }
+    return (Event) pick.result();
+  }
+  
+  
   public Event nextComing() {
-    Pick <Event> pick = new Pick();
-    for (Event e : coming) pick.compare(e, 0 - e.timeBegins());
-    return pick.result();
+    return nextEvent(null, true, false, MODE_ANY);
   }
   
   
-  public Plot latestPlot() {
-    Pick <Event> pick = new Pick();
-    for (Event e : coming) if (e.isPlot()) pick.compare(e, e.timeBegins());
-    for (Event e : active) if (e.isPlot()) pick.compare(e, e.timeBegins());
-    return (Plot) pick.result();
+  public Event nextActive() {
+    return nextEvent(null, false, true, MODE_ANY);
   }
   
   
-  public Trial latestTrial() {
-    Pick <Event> pick = new Pick();
-    for (Event e : coming) if (e.isTrial()) pick.compare(e, e.timeBegins());
-    for (Event e : active) if (e.isTrial()) pick.compare(e, e.timeBegins());
-    return (Trial) pick.result();
+  public Plot nextPlot() {
+    return (Plot) nextEvent(null, true, true, MODE_PLOTS);
+  }
+  
+  
+  public Plot nextActivePlot() {
+    return (Plot) nextEvent(null, false, true, MODE_PLOTS);
+  }
+  
+  
+  public Trial nextTrial() {
+    return (Trial) nextEvent(null, true, true, MODE_TRIALS);
+  }
+  
+  
+  public Trial nextActiveTrial() {
+    return (Trial) nextEvent(null, false, true, MODE_TRIALS);
   }
 }
-
-
-
 
 

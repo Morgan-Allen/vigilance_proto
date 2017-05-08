@@ -51,23 +51,23 @@ public class DebugPlotUtils {
     world.updateWorld(0);
     played.leads.extractNewClues();
     
-    Plot     plot    = world.events.latestPlot();
+    Plot     plot    = world.events.nextActivePlot();
     int      time    = world.timing.totalHours();
     Step     current = plot.currentStep();
     Place    place   = plot.goes(current);
     CaseFile file    = played.leads.caseFor(plot);
+    Role     roleP   = plot.roleFor(place);
+    Trait    trait   = (Trait) Rand.pickFrom(place.traits());
     
     boolean recordCorrect = true;
-    Clue toPlace = Clue.locationClue(
-      plot, plot.roleFor(place), place.region(), 0
-    );
-    Clue further = Clue.locationClue(
-      plot, plot.roleFor(place), place.region(), 1
-    );
+    Clue toPlace = Clue.locationClue(plot, roleP, place.region(), 0);
+    Clue further = Clue.locationClue(plot, roleP, place.region(), 1);
     file.recordClue(toPlace, Lead.LEAD_REPORT, time, place);
     file.recordClue(further, Lead.LEAD_REPORT, time, place);
     
-    I.say("\nGenerated location clue: "+CaseFX.longDescription(toPlace, played));
+    I.say("\nGenerated location clues...");
+    I.say("  "+CaseFX.longDescription(toPlace, played));
+    I.say("  "+CaseFX.longDescription(further, played));
     if (! file.clues().includes(toPlace)) {
       I.say("  Clue was not recorded.");
       recordCorrect = false;
@@ -77,9 +77,28 @@ public class DebugPlotUtils {
       recordCorrect = false;
     }
     file.wipeRecord();
+    
+    Clue confirms = Clue.confirmSuspect(plot, roleP, place);
+    Clue forTrait = Clue.traitClue     (plot, roleP, trait);
+    file.recordClue(confirms, Lead.LEAD_REPORT, time, place);
+    file.recordClue(forTrait, Lead.LEAD_REPORT, time, place);
+
+    I.say("\nGenerated trait clue after confirmation...");
+    I.say("  "+CaseFX.longDescription(confirms, played));
+    I.say("  "+CaseFX.longDescription(forTrait, played));
+    if (! file.clues().includes(confirms)) {
+      I.say("  Clue was not recorded.");
+      recordCorrect = false;
+    }
+    if (file.clues().includes(forTrait)) {
+      I.say("  Redundant clue was stored.");
+      recordCorrect = false;
+    }
+    
+    file.wipeRecord();
     played.leads.extractNewClues();
     if (! recordCorrect) return false;
-    I.say("  Clue was recorded correctly.");
+    I.say("  Clues were recorded correctly.");
     I.say("  Current step is: "+current);
     
     Pick <Lead> toFollow = new Pick();
@@ -324,7 +343,7 @@ public class DebugPlotUtils {
   
   
   public static boolean runPlotToCompletion(World world) {
-    Plot plot = world.events.latestPlot();
+    Plot plot = world.events.nextActivePlot();
     Region affects = plot.target().region();
     
     I.say("\n\n\nRunning plot to completion: "+plot);

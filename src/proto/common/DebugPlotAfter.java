@@ -37,7 +37,7 @@ public class DebugPlotAfter extends RunGame {
     if (afterLoad) return false;
     
     GameSettings.noTipoffs = true;
-    Plot plot = world.events.latestPlot();
+    Plot plot = world.events.nextActivePlot();
     if (plot != null) return DebugPlotUtils.enterPlotDebugLoop(
       world, plot, ! suite, suite, plot.scene(), plot.organiser()
     );

@@ -133,9 +133,9 @@ public class Element implements Session.Saveable {
   }
   
   
-  final static Batch NO_TRAITS = new Batch();
+  final static Batch <Trait> NO_TRAITS = new Batch();
   
-  public Series <Object> traits() {
+  public Series <Trait> traits() {
     return NO_TRAITS;
   }
   

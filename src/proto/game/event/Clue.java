@@ -152,6 +152,8 @@ public class Clue implements Session.Saveable {
     if (role != other.role) return false;
     
     if (isConfirmation()) {
+      if (match.isPlace() && other.isLocationClue()) return true;
+      if (other.isTraitClue()) return true;
       if (location == other.location && match == other.match) return true;
     }
     
