@@ -91,8 +91,8 @@
 />
 
 <prop
-  ID         = "papper_towels"
-  sprite     = "office/papper_towels.png"
+  ID         = "paper_towels"
+  sprite     = "office/paper_towels.png"
   subtype    = "SUBTYPE_DETAIL"
   blockLevel = "BLOCK_NONE"
 />
@@ -141,22 +141,22 @@
 />
 
 <prop
-  ID         = "pappers"
-  sprite     = "office/pappers.png"
+  ID         = "papers"
+  sprite     = "office/papers.png"
   subtype    = "SUBTYPE_DETAIL"
   blockLevel = "BLOCK_NONE"
 />
 
 <prop
-  ID         = "pappers_2"
-  sprite     = "office/pappers_2.png"
+  ID         = "papers_2"
+  sprite     = "office/papers_2.png"
   subtype    = "SUBTYPE_DETAIL"
   blockLevel = "BLOCK_NONE"
 />
 
 <prop
-  ID         = "papper_box"
-  sprite     = "office/papper_box.png"
+  ID         = "paper_box"
+  sprite     = "office/paper_box.png"
   subtype    = "SUBTYPE_DETAIL"
   blockLevel = "BLOCK_NONE"
 />
@@ -191,12 +191,12 @@
       6  = "industrial_inside.sofa"
       7  = "industrial_inside.glass_table"
       8  = "file_cabinet"
-      9  = "papper_box"
-      10 = "pappers"
+      9  = "paper_box"
+      10 = "papers"
       11 = "toilet"
       12 = "toilet_sink"
       13 = "urinal"
-      14 = "papper_towels"
+      14 = "paper_towels"
       15 = "supply_cupboards"
       16 = "trash_bin"
 
@@ -258,8 +258,8 @@
 >
 
   <grid
-      1  = "papper_box"
-      2  = "pappers"
+    1  = "paper_box"
+    2  = "papers"
   >
     [.  .  .  .  .  .  .] -  -  -  -  -  - -1s -  -]
     [_  _  _  _  _  _  _] .  .  .  .  .  .  .  .  .]
