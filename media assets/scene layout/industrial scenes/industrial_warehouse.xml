@@ -205,12 +205,12 @@
   <grid
   >
     .  .  .  .  .  .  .  .]'
-    .  .  .  .  .  .  .  .]/
+    .  .  .  .  .  .  .  .]
     .  .  .  .  .  .  .  .]'
     .  .  .  .  .  .  .  .]
     .  .  .  .  .  .  .  .]
     .  .  .  .  .  .  .  .]'
-    .  .  .  .  .  .  .  .]/
+    .  .  .  .  .  .  .  .]
     .  .  .  .  .  .  .  .]'
   </grid>
 </scene>
@@ -232,7 +232,6 @@
   door   = "industrial_common.door"
   window = "industrial_common.window"
 >
-
     <grid
          1 = "warehouse_box"
          1 = "warehouse_forklift"
@@ -366,12 +365,13 @@
   </grid>
 </scene>
 
+
+
 <COMMENT>
   To add:  Shutter doors, maybe a keypad for security?
   Also a small conveyor belt, and the usual assortment
   of boxes, forklifts, etc.
 </COMMENT>
-
 
 <scene
   name   = "Wide Entrance"
@@ -454,6 +454,7 @@
   door      = "door"
   window    = "window"
 >
+
   <unit typeID = "industrial_office.unit_main_office"     x = "1" y = "1" dir = "N" />
   <unit typeID = "industrial_office.unit_restroom"     x = "1" y = "4" dir = "N" />
   <unit typeID = "unit_big_storage"    x = "3" y = "1" dir = "N" />
@@ -482,7 +483,5 @@
   <unit typeID = "unit_wall_segment"    x = "6" y = "2" dir = "N" />
   <unit typeID = "unit_wall_segment"    x = "6" y = "4" dir = "N" />
   <unit typeID = "unit_wall_segment"    x = "1" y = "3" dir = "S" />
-
-  <unit typeID = "industrial_outside.unit_wide_parking"    x = "7" y = "0" dir = "W" />
 
 </scene>
