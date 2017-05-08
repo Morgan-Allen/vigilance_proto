@@ -34,6 +34,13 @@
 />
 
 <prop
+  ID         = "short_sofa"
+  sprite     = "inside/short_sofa.png"
+  high       = "2"
+  blockSight = "false"
+/>
+
+<prop
   ID         = "plant_1"
   sprite     = "inside/plant_1.png"
   blockSight = "false"

@@ -27,12 +27,6 @@
   high       = "2"
 />
 
-<prop
-  ID         = "sofa"
-  sprite     = "inside/sofa.png"
-  high       = "3"
-  blockSight = "false"
-/>
 
 <prop
   ID         = "supply_cupboards"
@@ -141,6 +135,13 @@
 />
 
 <prop
+  ID         = "kitchen_counter"
+  sprite     = "office/kitchen_counter.png"
+  wide       = "3"
+  blockSight = "false"
+/>
+
+<prop
   ID         = "pappers"
   sprite     = "office/pappers.png"
   subtype    = "SUBTYPE_DETAIL"
@@ -199,26 +200,36 @@
       14 = "papper_towels"
       15 = "supply_cupboards"
       16 = "trash_bin"
+      17 = "cubicle_wooden_a"
+      18 = "cubicle_wooden_b"
+      19 = "printer"
+      20 = "kitchen_sink"
+      21 = "kitchen_cupboard"
+      22 = "kitchen_fridge"
+      23 = "kitchen_counter"
+      24 = "water"
+      25 = "industrial_warehouse.pallets"
+      26 = "industrial_warehouse.more_pallets"
 
 
   >
 
-  [-6 - -/ -  - -3e - -]  -  - -[11w - -14 -12]  .  .
-  [  7e .  .  1e . . 8e]  . 15s [11w  .  . ]/   .  .
-  [  .  .  .  .  . . 10]  .  .  [-11w - -14 12-] .  .
-  [/ .  .  .  .  . . 8e]  16  .  [13 13 . ]/     .  .
-  [/ .  .  .  . 3e . 9w]  - /-  -  -  - -]      .  .
-  [5 .  .  .  1e .  .  ]  .  .  .  .  .  ]      .  .
-  [  .  .  .  .  4  .  ]  .  .  .  .  .  ]      .  .
-  [- - -/  -  - -  -  -  .  .  ]  -  -  -       .  .
-  [  .  .  .  .  .  .  .  .  .  ]  .  .  .      .  .
-  [  .  .  .  .  .  .  .  .  .  ]  .  .  .      .  .
-  [  .  .  .  .  .  .  .  .  . ]/  .  .  .      .  .
-  [  .  .  .  .  .  .  .  .  .  ]  .  .  .      .  .
-  [  .  .  .  .  .  .  .  .  .  ]  .  .  .      .  .
-  [  .  .  .  .  .  .  .  .  .  ]  .  .  .      .  .
-  [  .  .  .  .  .  .  .  .  .  ]  .  .  .      .  .
-  [_ _  _  _  _  _  _  _  _  _ _]  .  .  .      .  .
+ [-6 -  -/ -  - -3e - -]  -  - -[11w  - -14 -12] .  .
+  [  7e .  .  1e . . 8e]  . 15s [11w  .  .    /] 25 .
+  [  .  .  .  .  . . 10]  .  .  [-11w - -14 12-] 25 .
+  [/ .  .  .  .  . . 8e]  16 .  [13   13 .    /] 26 .
+  [/ .  .  .  . 3e . 9w] -23e  -/ -21 - - ]-20e  .  .
+  [5 .  .  .  1e .  .  ]  .  .  .  .   .  ]      .  .
+  [  .  .  .  .  4  .  ]  .  .  . 24s  .  ]22e   .  .
+ [-8 -9s - -/ - -19 -8 9s- - .  ]  -  -  -       .  .
+  [  .  .  .  .  .  .  .  .  .  ]  .  .  .       .  .
+  [  17 .  . 17e .  .  .  .  .  ]  .  .  .       .  .
+  [  .  .  .  .  . 17w .  . 17s ]/ .  .  .       .  .
+  [  18 .  . 17e .  .  .  .  .  ]  .  .  .       .  .
+  [  .  .  .  .  . 17w .  . 17s ]  .  .  .       .  .
+  [  17 .  . 17e .  .  .  .  .  ]  .  .  .       .  .
+  [  .  .  .  .  . 17w .  . 18s ]  .  .  .       .  .
+  [_ _  _  _  _  _  _ _ _ 24s_ _]4 .  .  .       .  .
   </grid>
   <grid
     1 = "industrial_warehouse.floor"
@@ -246,6 +257,58 @@
   </grid>
 </scene>
 
+<scene
+  name   = "Restroom"
+  ID     = "unit_restroom"
+  wide   = "16"
+  high   = "8"
+  wall   = "industrial_common.wall"
+  door   = "industrial_common.door"
+  window = "industrial_common.window"
+>
+  <grid
+      1  = "industrial_inside.plant_1"
+      2  = "industrial_inside.sofa"
+      3  = "toilet"
+      4  = "toilet_sink"
+      5  = "urinal"
+      6  = "papper_towels"
+      7  = "kitchen_sink"
+      8  = "kitchen_cupboard"
+      9  = "kitchen_table"
+      10 = "water"
+      11 = "industrial_inside.glass_table"
+      12 = "industrial_inside.short_sofa"
+      13 = "supply_cupboards"
+      14 = "industrial_warehouse.warehouse_table"
+      15 = "pappers"
+  >
+
+    [-  -   -   -   -   -   -  -12e -1 [-4w -/ [-4w /-  -]  .   .
+    [   .   9   .   .   .   .   .   .  [6w  .  [6w  . 5w]   .   14w
+    [   .   .   .   .   .   .  11w  .  [3w  .  [3w  . 5w]   .   .
+    [   .   .   .   .   .   .   .   2s [_3w _  [_3w _ 5w]_  .   15w
+    [   .   9   .   .   .   .   .   .   .   .   .   .  ]    .   14w
+    [12 .   .   .   .   .   .   .   .   .   .  13s 13w ]    .   .
+    [   .   .   .   .   .   .   .   .   .   .   .  .   ]/   .   .
+    [_1 _   _   _  _8s  _  _7s _10s _   _   _   _  _  _]    _   _
+  </grid>
+
+  <grid
+    1 = "industrial_warehouse.floor"
+    2 = "floor"
+    3 = "blue_tile_floor"
+  >
+    2  2  2  2  2  2  2  2  2  3  3  3  3  3  1  1
+    2  2  2  2  2  2  2  2  2  3  3  3  3  3  1  1
+    2  2  2  2  2  2  2  2  2  3  3  3  3  3  1  1
+    2  2  2  2  2  2  2  2  2  3  3  3  3  3  1  1
+    2  2  2  2  2  2  2  2  2  2  2  2  2  2  1  1
+    2  2  2  2  2  2  2  2  2  2  2  2  2  2  1  1
+    2  2  2  2  2  2  2  2  2  2  2  2  2  2  1  1
+    2  2  2  2  2  2  2  2  2  2  2  2  2  2  1  1
+  </grid>
+</scene>
 
 <scene
   name   = "Side Office"
@@ -256,50 +319,38 @@
   door   = "industrial_common.door"
   window = "industrial_common.window"
 >
-
-  <grid
-      1  = "papper_box"
-      2  = "pappers"
-  >
-    [.  .  .  .  .  .  .] -  -  -  -  -  - -1s -  -]
-    [_  _  _  _  _  _  _] .  .  .  .  .  .  .  .  .]
-    [.  .  .  .  .  .  .] .  .  .  .  .  .  .  .  2]
-    [.  .  .  .  .  .  .] .  .  .  .  .  .  .  .  .]
-    [.  .  .  .  .  .  .] .  .  .  .  .  .  .  .  .]
-    [.  .  .  .  .  .  .] .  .  .  .  .  .  .  .  .]
-    [.  .  .  .  .  .  .] .  .  .  .  .  .  .  .  .]
-    [_  _  _  _  _  _  _] _  _  _  _  _  _  _  _  _]
-  </grid>
   <grid
       1  = "water"
       2  = "printer"
       3  = "industrial_inside.plant_1"
       4  = "desk_wooden"
       5  = "sofa"
-      6  = "chair"
-      7 = "printer"
-      8 = "cubicle_wooden_a"
-      9 = "cubicle_wooden_b"
+      6  = "industrial_inside.black_chair"
+      7  = "printer"
+      8  = "cubicle_wooden_a"
+      9  = "cubicle_wooden_b"
       10 = "industrial_warehouse.warehouse_pallets"
       11 = "industrial_warehouse.warehouse_more_pallets"
       12 = "file_cabinet"
+      13 = "industrial_warehouse.warehouse_table"
+      14 = "pappers"
   >
-    [.  .  . 10 11  .  .] -  -  -  -  - -12 -  -  -]
-    [_  _  _ _11 _11 _ _] .  9s 8w .  .  .  .  . 12e]
-    [.  .  .  .  .  .  .] .  .  .  .  .  .  .  .  .]
-    [.  .  4  .  .  4  .] .  .  .  .  .  .  .  .  .]
-    [.  .  .  .  .  .  .] .  .  .  .  .  .  .  .  .]
-    [.  .  4  .  .  4  .] .  9s 8w .  .  .  9s 8w .]
-    [.  .  .  .  .  .  .] .  .  .  .  .  .  .  .  .]
-    [_  _  _  _  _  _  _] _  _  _  _  _  _  _  _  _]
+    [-   -   -   -]   .   .   .   .  13s  .  14e  13s  .   .   .   .
+    [12w .   4   .]   .   .   .   .   .   .   .   .   .   .   .   .
+    [.   .   .   .]   -   -/  -   -   -12 -   -2  -  -12  -   -   -]
+    [_12w _  _   _]/  .   .   .   .   .   .   .   .   .   .   .  1e]
+    [.   .   .   .]   .   .   9   .   .   8e  .   9   .   .   9e  .]
+    [.   .   .   .]/  .   .   .   .   .   .   .   .   .   .   .   .]
+    [.  4w   6w  .]   .   .   .   .   .   .   .   .   .   .   .   .]
+    [_   _   _   _]3  _   _   _9w _   _   _9s _  9w_  _   _  8s_  _]
   </grid>
 
   <grid
     1 = "industrial_warehouse.floor"
     2 = "floor"
   >
-    1  1  1  1  1  1  1  2  2  2  2  2  2  2  2  2
-    1  1  1  1  1  1  1  2  2  2  2  2  2  2  2  2
+    2  2  2  2  1  1  1  1  1  1  1  1  1  1  1  1
+    2  2  2  2  1  1  1  1  1  1  1  1  1  1  1  1
     2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2
     2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2
     2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2
