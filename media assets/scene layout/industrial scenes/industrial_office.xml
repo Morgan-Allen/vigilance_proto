@@ -156,6 +156,13 @@
 />
 
 <prop
+  ID         = "checklist"
+  sprite     = "office/checklist.png"
+  subtype    = "SUBTYPE_DETAIL"
+  blockLevel = "BLOCK_NONE"
+/>
+
+<prop
   ID         = "paper_box"
   sprite     = "office/paper_box.png"
   subtype    = "SUBTYPE_DETAIL"
@@ -172,6 +179,12 @@
   ID         = "file_cabinet"
   sprite     = "office/file_cabinet.png"
   wide       = "2"
+/>
+
+
+<prop
+  ID         = "safe"
+  sprite     = "office/safe.png"
 />
 
 <scene
@@ -210,16 +223,17 @@
       24 = "water"
       25 = "industrial_warehouse.pallets"
       26 = "industrial_warehouse.more_pallets"
+      27 = "industrial_inside.desk_phone"
 
 
   >
 
- [-6 -  -/ -  - -3e - -]  -  - -[11w  - -14 -12] .  .
+ [-6 -  -/ -  - -3e - -]  -  - -[11w  - -14 -12] -  -
   [  7e .  .  1e . . 8e]  . 15s [11w  .  .    /] 25 .
   [  .  .  .  .  . . 10]  .  .  [-11w - -14 12-] 25 .
   [/ .  .  .  .  . . 8e]  16 .  [13   13 .    /] 26 .
   [/ .  .  .  . 3e . 9w] -23e  -/ -21 - - ]-20e  .  .
-  [5 .  .  .  1e .  .  ]  .  .  .  .   .  ]      .  .
+  [5 .  .  . 1e 27e .  ]  .  .  .  .   .  ]      .  .
   [  .  .  .  .  4  .  ]  .  .  . 24s  .  ]22e   .  .
  [-8 -9s - -/ - -19 -8 9s- - .  ]  -  -  -       .  .
   [  .  .  .  .  .  .  .  .  .  ]  .  .  .       .  .
@@ -281,14 +295,16 @@
       12 = "industrial_inside.short_sofa"
       13 = "supply_cupboards"
       14 = "industrial_warehouse.warehouse_table"
-      15 = "papers"
+      15 = "papers_2"
+      16 = "checklist"
+      17 = "industrial_inside.desk_phone"
   >
 
-    [-  -   -   -   -   -   -  -12e -1 [-4w -/ [-4w /-  -]  .   .
+    [-  -   -   -   -   -   -  -12e -1 [-4w -/ [-4w /-  -]  .   15s
     [   .   9   .   .   .   .   .   .  [6w  .  [6w  . 5w]   .   14w
     [   .   .   .   .   .   .  11w  .  [3w  .  [3w  . 5w]   .   .
-    [   .   .   .   .   .   .   .   2s [_3w _  [_3w _ 5w]_  .   15w
-    [   .   9   .   .   .   .   .   .   .   .   .   .  ]    .   14w
+    [   .   .   .   .   .   .   .   2s [_3w _  [_3w _ 5w]_  .   16e
+    [   .   9   .   .   .   .   .   .   .   .   17s .  ]    .   14w
     [12 .   .   .   .   .   .   .   .   .   .  13s 13w ]    .   .
     [   .   .   .   .   .   .   .   .   .   .   .  .   ]/   .   .
     [_1 _   _   _  _8s  _  _7s _10s _   _   _   _  _  _]    _   _
@@ -319,6 +335,21 @@
   door   = "industrial_common.door"
   window = "industrial_common.window"
 >
+<grid
+    1 = "checklist"
+    2 = "paper_box"
+    3 = "papers"
+>
+  .  . . . . . . . . . . . . .  . .
+  2e . . 3 . . . . . . . . . .  . .
+  2e . . . . . . . . . . . 1 2s . .
+  2e . . . . . . . . . . . . .  . .
+  .  . . . . . . . . . . . . .  . .
+  .  . . . . . . . . . . . . .  . .
+  .  . . . . . . . . . . . . .  . .
+  .  . . . . . . . . . . . . .  . .
+
+</grid>
   <grid
       1  = "water"
       2  = "printer"
@@ -334,15 +365,19 @@
       12 = "file_cabinet"
       13 = "industrial_warehouse.warehouse_table"
       14 = "papers"
+      15 = "checklist"
+      16 = "industrial_inside.short_sofa"
+      17 = "safe"
+      18 = "industrial_inside.desk_phone"
   >
-    [-   -   -   -]   .   .   .   .  13s  .  14e  13s  .   .   .   .
+    [-   -   -   -]   .   .   .   .  13s  .  15  13s  .   .   .   .
     [12w .   4   .]   .   .   .   .   .   .   .   .   .   .   .   .
-    [.   .   .   .]   -   -/  -   -   -12 -   -2  -  -12  -   -   -]
-    [_12w _  _   _]/  .   .   .   .   .   .   .   .   .   .   .  1e]
-    [.   .   .   .]   .   .   9   .   .   8e  .   9   .   .   9e  .]
-    [.   .   .   .]/  .   .   .   .   .   .   .   .   .   .   .   .]
-    [.  4w   6w  .]   .   .   .   .   .   .   .   .   .   .   .   .]
-    [_   _   _   _]3  _   _   _9w _   _   _9s _  9w_  _   _  8s_  _]
+    [    .   .   .]   -   -/  -  -   -12 -18s -2  -  -12  -   -   -]
+    [_12w _  _   _]   .   .   .   .   .   .   .   .   .   .   .  1e]
+    [.   .   .    ]   .   .   9   .   .   8e  .   9   .   .   9e  .]
+    [.  18w  . 16s]   .   .   .   .   .   .   .   .   .   .   .   .]
+    [.  4w   .   .]/  .   .   .   .   .   .   .   .   .   .   .   .]
+    [_17w _  _   _]3  _   _   _9w _   _   _9s _  9w_  _   _  8s_  _]
   </grid>
 
   <grid
@@ -352,7 +387,7 @@
     2  2  2  2  1  1  1  1  1  1  1  1  1  1  1  1
     2  2  2  2  1  1  1  1  1  1  1  1  1  1  1  1
     2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2
-    2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2
+    2  2  2  2/ 2  2  2  2  2  2  2  2  2  2  2  2
     2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2
     2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2
     2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2

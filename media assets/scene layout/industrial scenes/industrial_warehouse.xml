@@ -13,15 +13,54 @@
 />
 
 <prop
-  ID         = "warehouse_shelf_big"
-  sprite     = "warehouse/warehouse_shelf_big.png"
+  ID         = "warehouse_shelf_big_1"
+  sprite     = "warehouse/warehouse_shelf_big_1.png"
   high       = "2"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "warehouse_shelf_big_2"
+  sprite     = "warehouse/warehouse_shelf_big_2.png"
+  high       = "2"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "warehouse_shelf_big_3"
+  sprite     = "warehouse/warehouse_shelf_big_3.png"
+  high       = "2"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "warehouse_shelf_big_4"
+  sprite     = "warehouse/warehouse_shelf_big_4.png"
+  high       = "2"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "warehouse_keyboard"
+  sprite     = "warehouse/warehouse_keyboard.png"
   blockSight = "false"
 />
 
 <prop
   ID         = "warehouse_box"
   sprite     = "warehouse/warehouse_box.png"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "warehouse_small_box_1"
+  sprite     = "warehouse/warehouse_small_box_1.png"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "warehouse_small_box_2"
+  sprite     = "warehouse/warehouse_small_box_2.png"
   blockSight = "false"
 />
 
@@ -34,6 +73,12 @@
 <prop
   ID         = "warehouse_pallets"
   sprite     = "warehouse/warehouse_pallets.png"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "warehouse_pallets_rotated"
+  sprite     = "warehouse/warehouse_pallets_rotated.png"
   blockSight = "false"
 />
 
@@ -224,7 +269,7 @@
 
 <scene
   name   = "Big Storage"
-  ID     = "unit_big_storage"
+  ID     = "unit_bulk_storage"
   wide   = "16"
   high   = "16"
   floor  = "floor"
@@ -234,26 +279,33 @@
 >
     <grid
          1 = "warehouse_box"
-         1 = "warehouse_forklift"
          2 = "warehouse_boxes"
          3 = "warehouse_pallets"
-         4 = "warehouse_shelf_big"
+         4 = "warehouse_shelf_big_1"
+         5 = "warehouse_shelf_big_2"
+         6 = "warehouse_shelf_big_3"
+         7 = "warehouse_shelf_big_4"
+         8 = "warehouse_forklift"
+         9 = "warehouse_forklift_empty"
+         10 = "warehouse_more_pallets"
+         11 = "warehouse_pallets_rotated"
+
         >
+         .  .  .  .  .  .  .  .  3 11  .  3  10 11 .  .
+         .  8  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+         .  .  .  .  2  .  .  .  .  .  .  .  .  .  .  .
+         .  .  .  4  4  .  .  6  4  .  .  6  4  .  .  .
+         .  .  .  .  .  .  1  .  .  .  .  .  .  .  .  .
+         .  .  .  4  5  .  .  4  7  .  .  4  4  .  .  .
+         .  .  .  .  .  .  8  .  .  .  .  .  .  2  .  .
+         .  .  .  4  6  .  .  4  4  11  .  7  4  1  .  .
+         2  .  .  .  .  .  .  .  .  3  .  .  .  .  .  .
+         2  .  .  6  7  . 11  6  7  .  .  6  5  .  .  .
+         1  .  .  .  .  .  3  .  .  .  9s .  .  .  .  .
+         .  .  .  4  4  .  .  6  4  .  .  5  4  .  .  .
+         .  .  .  10 10 .  .  .  3  .  .  .  .  .  .  .
          .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
-         .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
-         .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
-         .  .  .  4  4  .  .  4  4  .  .  4  4  .  .  .
-         .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
-         .  .  .  4  4  .  .  4  4  .  .  4  4  .  .  .
-         .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
-         .  .  .  4  4  .  .  4  4  .  .  4  4  .  .  .
-         .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
-         .  .  .  4  4  .  .  4  4  .  .  4  4  .  .  .
-         .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
-         .  .  .  4  4  .  .  4  4  .  .  4  4  .  .  .
-         .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
-         .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
-         .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+         .  .  .  .  .  .  . 8e  .  .  .  .  .  1  2  .
          .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
     </grid>
 
@@ -261,14 +313,38 @@
 
 
 <scene
-  name   = "Bulk Storage"
-  ID     = "unit_bulk_storage"
+  name   = "Storage With Conveyor"
+  ID     = "unit_bulk_storage_with_conveyor"
   wide   = "16"
   high   = "16"
   wall   = "industrial_common.wall"
   door   = "industrial_common.door"
   window = "industrial_common.window"
+  floor  = "floor"
 >
+    <grid
+
+        1  = "warehouse_small_box_1"
+        2  = "warehouse_small_box_2"
+
+        >
+        .   .   .   .   .   .   2e  .   .   .   .   .   .   .   .   .
+        .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .
+        .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .
+        .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .
+        .   .   .   .   .   2   .   .   .   .   .   .   .   .   .   .
+        .   .   .   .   .   .   .   .   .   .   1e  .   .   .   .   .
+        .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .
+        .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .
+        .   .   .   .   .   .   .   .   .  2e   .   .   .   .   .   .
+        .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .
+        .   .   .   .   .   .   .   .   .   .   .   .  1e   .   .   .
+        .   .   .   .   .   .   2e   .   .   .   .   .   .   .   .   .
+        .   .   2   1   .   .   .   .  1e   .   .   .   .   .   .   .
+        .   .   .   .   .   2   .   .   .   .   .   .   .   .   .   .
+        .   .   .   .   .   .   .   .   .   .   .  1e   .   .   .   .
+        .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .
+    </grid>
     <grid
         1  = "warehouse_shelf_big"
         2  = "warehouse_shelf"
@@ -279,8 +355,9 @@
         7  = "warehouse_more_pallets"
         8  = "warehouse_box"
         9  = "warehouse_forklift"
-        10  = "warehouse_forklift_empty"
+        10 = "warehouse_forklift_empty"
         11 = "warehouse_boxes"
+        12 = "warehouse_keyboard"
         >
         .   .   .   .   .   4   3   3   3   3  4e   .  10w  .   .   .
         .   .   .   .   .   3w  .   .   .   .  3w   .   .   .   .   .
@@ -296,30 +373,8 @@
         .   .   4   3   3   5   3   3   5   3   3   5   4s  .   .   .
         .   .   3e  11  .  3e   8    .  3e   8   .  3e  11  .   .   .
         .   .   3e  .   .  3e   11   .  3e   .   .  3e  8   11  .   .
-        _   _   _   _   _   _   _   _   _   _   _   _   _   _   .   .
-        [   .   .   .   .   .   .   .   .   .   .   .   .   .   [_  _
-    </grid>
-
-    <grid
-         1 = "industrial_outside.asphalt"
-         2 = "floor"
-        >
-        2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
-        2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
-        2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
-        2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
-        2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
-        2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
-        2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
-        2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
-        2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
-        2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
-        2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
-        2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
-        2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
-        2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
-        2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
-        1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2
+        .   .   3e  .   .  3e   .   .   3e   .   11 3e  .   .   .   .
+        .   .   3e  .   .  3e   .   .   3e   .   8  3e  .   .   .   .
     </grid>
 </scene>
 
@@ -383,15 +438,24 @@
   window = "industrial_common.window"
 >
   <grid
+      1  = "warehouse_pallets"
+      2  = "warehouse_more_pallets"
+      3  = "warehouse_box"
+      4  = "warehouse_forklift_empty"
+      5  = "warehouse_boxes"
+      6  = "warehouse_pallets_rotated"
+      7  = "warehouse_keyboard"
+      8  = "warehouse_table"
+      9  = "industrial_office.checklist"
   >
-    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
-    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
-    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
-    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
-    .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
-    .  .  _  _  _  _  _  _  _  _  _  _  _  _  .  .
-    .  .] .  .  .  .  .  .  .  .  .  .  .  . [.  .
-    _  _] .  .  .  .  .  .  .  .  .  .  .  . [_  _
+    [.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+    [.  .  .  .  1  6  .  .  .  .  .  5  .  .  .  .
+    [. 9w  .  .  5  3  .  .  .  5  3  5  .  . 8e  .
+    [. 8w  .  .  .  3  .  .  .  5  3  .  .  .  9  .
+    [.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+    [.  . _7s _  _/ _/ _/ _  _  _/ _/ _/ _ _7s .  .
+    [.  .] .  .  .  .  .  .  .  .  .  .  .  . [.  .
+    [_  _] .  .  .  .  .  .  .  .  .  .  .  . [_  _
   </grid>
   <grid
     1 = "floor"
@@ -456,32 +520,33 @@
 >
 
   <unit typeID = "industrial_office.unit_main_office"     x = "1" y = "1" dir = "N" />
-  <unit typeID = "industrial_office.unit_restroom"     x = "1" y = "4" dir = "N" />
-  <unit typeID = "unit_big_storage"    x = "3" y = "1" dir = "N" />
+  <unit typeID = "industrial_office.unit_restroom"        x = "1" y = "4" dir = "N" />
+  <unit typeID = "unit_bulk_storage"                      x = "3" y = "1" dir = "N" />
   <unit typeID = "industrial_office.unit_side_office"     x = "5" y = "5" dir = "N" />
-  <unit typeID = "unit_external_sheds"  x = "5" y = "6" dir = "N" />
-  <unit typeID = "unit_bulk_storage"   x = "3" y = "3" dir = "N" />
-  <unit typeID = "unit_side_entrance"   x = "6" y = "3" dir = "N" />
+  <unit typeID = "unit_external_sheds"                    x = "5" y = "6" dir = "N" />
+  <unit typeID = "unit_bulk_storage_with_conveyor"        x = "3" y = "3" dir = "N" />
+  <unit typeID = "unit_side_entrance"                     x = "6" y = "3" dir = "N" />
+  <unit typeID = "unit_wide_entrance"                     x = "3" y = "5" dir = "N" />
 
-  <unit typeID = "unit_storage_a"       x = "1" y = "3" dir = "W" />
-  <unit typeID = "unit_storage_c"       x = "2" y = "3" dir = "E" />
+  <unit typeID = "unit_storage_a"                         x = "1" y = "3" dir = "W" />
+  <unit typeID = "unit_storage_c"                         x = "2" y = "3" dir = "E" />
 
-  <unit typeID = "unit_storage_b"       x = "5" y = "1" dir = "N" />
-  <unit typeID = "unit_storage_d"       x = "6" y = "1" dir = "S" />
-  <unit typeID = "unit_storage_c"       x = "5" y = "2" dir = "E" />
-  <unit typeID = "unit_storage_b"       x = "6" y = "2" dir = "N" />
+  <unit typeID = "unit_storage_b"                         x = "5" y = "1" dir = "N" />
+  <unit typeID = "unit_storage_d"                         x = "6" y = "1" dir = "S" />
+  <unit typeID = "unit_storage_c"                         x = "5" y = "2" dir = "E" />
+  <unit typeID = "unit_storage_b"                         x = "6" y = "2" dir = "N" />
 
-  <unit typeID = "unit_storage_a"       x = "5" y = "3" dir = "E" />
-  <unit typeID = "unit_storage_b"       x = "5" y = "4" dir = "N" />
-  <unit typeID = "unit_storage_d"       x = "6" y = "4" dir = "W" />
+  <unit typeID = "unit_storage_a"                         x = "5" y = "3" dir = "E" />
+  <unit typeID = "unit_storage_b"                         x = "5" y = "4" dir = "N" />
+  <unit typeID = "unit_storage_d"                         x = "6" y = "4" dir = "W" />
 
-  <unit typeID = "unit_wall_segment"    x = "3" y = "1" dir = "W" />
-  <unit typeID = "unit_wall_segment"    x = "4" y = "1" dir = "W" />
-  <unit typeID = "unit_wall_segment"    x = "5" y = "1" dir = "W" />
-  <unit typeID = "unit_wall_segment"    x = "6" y = "1" dir = "W" />
-  <unit typeID = "unit_wall_segment"    x = "6" y = "1" dir = "N" />
-  <unit typeID = "unit_wall_segment"    x = "6" y = "2" dir = "N" />
-  <unit typeID = "unit_wall_segment"    x = "6" y = "4" dir = "N" />
-  <unit typeID = "unit_wall_segment"    x = "1" y = "3" dir = "S" />
+  <unit typeID = "unit_wall_segment"                      x = "3" y = "1" dir = "W" />
+  <unit typeID = "unit_wall_segment"                      x = "4" y = "1" dir = "W" />
+  <unit typeID = "unit_wall_segment"                      x = "5" y = "1" dir = "W" />
+  <unit typeID = "unit_wall_segment"                      x = "6" y = "1" dir = "W" />
+  <unit typeID = "unit_wall_segment"                      x = "6" y = "1" dir = "N" />
+  <unit typeID = "unit_wall_segment"                      x = "6" y = "2" dir = "N" />
+  <unit typeID = "unit_wall_segment"                      x = "6" y = "4" dir = "N" />
+  <unit typeID = "unit_wall_segment"                      x = "1" y = "3" dir = "S" />
 
 </scene>
