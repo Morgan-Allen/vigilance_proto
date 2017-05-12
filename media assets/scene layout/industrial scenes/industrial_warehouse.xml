@@ -9,22 +9,35 @@
 <prop
   ID         = "fence"
   sprite     = "warehouse/fence.png"
+  high       = "0"
   subtype    = "SUBTYPE_WALLING"
-  blockLevel = "BLOCK_NONE"
+  blockLevel = "BLOCK_FULL"
 />
+
+
+<prop
+  ID         = "fence_door"
+  sprite     = "warehouse/fence_door.png"
+  high       = "0"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_FULL"
+/>
+
 
 <prop
   ID         = "fence_with_pillar"
   sprite     = "warehouse/fence_with_pillar.png"
+  high       = "0"
   subtype    = "SUBTYPE_WALLING"
-  blockLevel = "BLOCK_NONE"
+  blockLevel = "BLOCK_FULL"
 />
 
 <prop
   ID         = "fence_corner"
   sprite     = "warehouse/fence_corner.png"
+  high       = "0"
   subtype    = "SUBTYPE_WALLING"
-  blockLevel = "BLOCK_NONE"
+  blockLevel = "BLOCK_FULL"
 />
 
 <prop
@@ -326,18 +339,42 @@
   window = "industrial_common.window"
 >
   <grid
+      1 = "shutter_door_left"
+      2 = "shutter_door_right"
   >
-    .  .  .  .  .  .  .  .]'
     .  .  .  .  .  .  .  .]
-    .  .  .  .  .  .  .  .]'
+    .  .  .  .  .  .  .   1e
+    .  .  .  .  .  .  .   2e
     .  .  .  .  .  .  .  .]
     .  .  .  .  .  .  .  .]
-    .  .  .  .  .  .  .  .]'
+    .  .  .  .  .  .  .   1e
+    .  .  .  .  .  .  .   2e
     .  .  .  .  .  .  .  .]
-    .  .  .  .  .  .  .  .]'
   </grid>
 </scene>
 
+
+<scene
+  name   = "Empty Wall segment"
+  ID     = "unit_empty_wall_segment"
+  wide   = "8"
+  high   = "8"
+  wall   = "industrial_common.wall"
+  door   = "industrial_common.door"
+  window = "industrial_common.window"
+>
+  <grid
+  >
+    .  .  .  .  .  .  .  .]
+    .  .  .  .  .  .  .  .]
+    .  .  .  .  .  .  .  .]
+    .  .  .  .  .  .  .  .]
+    .  .  .  .  .  .  .  .]
+    .  .  .  .  .  .  .  .]/
+    .  .  .  .  .  .  .  .]
+    .  .  .  .  .  .  .  .]
+  </grid>
+</scene>
 
 
 <COMMENT>
@@ -486,6 +523,7 @@
       15 = "fence"
       16 = "fence_with_pillar"
       17 = "fence_corner"
+      18 = "fence_door"
       >
       16e   .   .   .   .   .   .   .   .   .   .   .   .   .   .   7
       15e   12  3w  .  4w   .  3w   .  4w   .  6w   .   4w  .   .   8
@@ -494,7 +532,7 @@
       16e   .   2  14   .   2   1   .   .   2   2   .   2  14   .   .
       15e   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .
       16e   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .
-      17e  15   16  15  16  15  16 15  16  15  16  15  16   15  16  15
+      17e  15   18  15  16  15  16 15  16  15  16  15  16   15  16  15
 
   </grid>
 </scene>
@@ -518,15 +556,17 @@
       7  = "fence"
       8  = "fence_with_pillar"
       9  = "fence_corner"
+      10 = "industrial_outside.conditioner"
+      11 = "fence_door"
   >
-    7e  .  .  .  .  .  .  .  .  .  .  .  .  .  .  7w
+    7e  .  . 10e 10e . .  . 10e 10e . .  . 10e .  7w
     8e  .  .  .  .  .  .  .  .  .  .  .  .  .  .  8w
     7e  .  .  . [2 -2  -  - [-  -  -] .  . [-  -] 7w
     8e  4  .  . [1  6  .  . [3  5  .] .  . [.  .] 8w
     7e  .  .  . [1  6  .  . [3  5  .] .  . [_  _] 7w
-    8e  .  .  . [.  .  .  . [3  3  5] .  .  .  .  8w
+    11e .  .  . [.  .  .  . [3  3  5] .  .  .  .  11w
     7e  .  .  . [_  _  _  _ [_  _5 _] .  .  .  .  7w
-    9e  _/ 7  8  7  8  7  8  7  8  7  8  7  8  7  9
+    9e  7    8  7  8  7  8  7  8  7  8  7  8  7  9
   </grid>
   <grid
     1 = "floor"
@@ -650,57 +690,63 @@
   window    = "window"
 >
 
-  <unit typeID = "industrial_office.unit_main_office"     x = "1" y = "1" dir = "N" />
-  <unit typeID = "industrial_office.unit_restroom"        x = "1" y = "4" dir = "N" />
-  <unit typeID = "unit_bulk_storage"                      x = "3" y = "1" dir = "N" />
-  <unit typeID = "industrial_office.unit_side_office"     x = "5" y = "5" dir = "N" />
-  <unit typeID = "unit_external_sheds"                    x = "5" y = "6" dir = "N" />
-  <unit typeID = "unit_bulk_storage_with_conveyor"        x = "3" y = "3" dir = "N" />
-  <unit typeID = "unit_side_entrance"                     x = "6" y = "3" dir = "N" />
-  <unit typeID = "unit_wide_entrance"                     x = "3" y = "5" dir = "N" />
+  <unit typeID = "unit_empty_wall_segment"                          x = "3" y = "1" dir = "W" />
+  <unit typeID = "unit_empty_wall_segment"                          x = "4" y = "1" dir = "W" />
+  <unit typeID = "unit_empty_wall_segment"                          x = "5" y = "1" dir = "W" />
+  <unit typeID = "unit_empty_wall_segment"                          x = "6" y = "1" dir = "W" />
+  <unit typeID = "unit_empty_wall_segment"                          x = "6" y = "1" dir = "N" />
+  <unit typeID = "unit_wall_segment"                                x = "6" y = "2" dir = "N" />
+  <unit typeID = "unit_wall_segment"                                x = "6" y = "4" dir = "N" />
+  <unit typeID = "unit_wall_segment"                                x = "1" y = "3" dir = "S" />
+  <unit typeID = "unit_empty_wall_segment"                          x = "6" y = "5" dir = "N" />
 
-  <unit typeID = "unit_storage_a"                         x = "1" y = "3" dir = "W" />
-  <unit typeID = "unit_storage_c"                         x = "2" y = "3" dir = "E" />
+  <unit typeID = "industrial_office.unit_main_office"               x = "1" y = "1" dir = "N" />
+  <unit typeID = "industrial_office.unit_restroom"                  x = "1" y = "4" dir = "N" />
+  <unit typeID = "unit_bulk_storage"                                x = "3" y = "1" dir = "N" />
+  <unit typeID = "industrial_office.unit_side_office"               x = "5" y = "5" dir = "N" />
+  <unit typeID = "unit_external_sheds"                              x = "5" y = "6" dir = "N" />
+  <unit typeID = "unit_bulk_storage_with_conveyor"                  x = "3" y = "3" dir = "N" />
+  <unit typeID = "unit_side_entrance"                               x = "6" y = "3" dir = "N" />
+  <unit typeID = "unit_wide_entrance"                               x = "3" y = "5" dir = "N" />
 
-  <unit typeID = "unit_storage_medium"                    x = "5" y = "1" dir = "N" />
-  <unit typeID = "unit_storage_c"                         x = "5" y = "2" dir = "E" />
-  <unit typeID = "unit_storage_b"                         x = "6" y = "2" dir = "N" />
+  <unit typeID = "unit_storage_a"                                   x = "1" y = "3" dir = "W" />
+  <unit typeID = "unit_storage_c"                                   x = "2" y = "3" dir = "E" />
 
-  <unit typeID = "unit_storage_a"                         x = "5" y = "3" dir = "E" />
-  <unit typeID = "unit_storage_b"                         x = "5" y = "4" dir = "N" />
-  <unit typeID = "unit_storage_d"                         x = "6" y = "4" dir = "W" />
+  <unit typeID = "unit_storage_medium"                              x = "5" y = "1" dir = "N" />
+  <unit typeID = "unit_storage_c"                                   x = "5" y = "2" dir = "E" />
+  <unit typeID = "unit_storage_b"                                   x = "6" y = "2" dir = "N" />
 
-  <unit typeID = "unit_wall_segment"                      x = "3" y = "1" dir = "W" />
-  <unit typeID = "unit_wall_segment"                      x = "4" y = "1" dir = "W" />
-  <unit typeID = "unit_wall_segment"                      x = "5" y = "1" dir = "W" />
-  <unit typeID = "unit_wall_segment"                      x = "6" y = "1" dir = "W" />
-  <unit typeID = "unit_wall_segment"                      x = "6" y = "1" dir = "N" />
-  <unit typeID = "unit_wall_segment"                      x = "6" y = "2" dir = "N" />
-  <unit typeID = "unit_wall_segment"                      x = "6" y = "4" dir = "N" />
-  <unit typeID = "unit_wall_segment"                      x = "1" y = "3" dir = "S" />
+  <unit typeID = "unit_storage_a"                                   x = "5" y = "3" dir = "E" />
+  <unit typeID = "unit_storage_b"                                   x = "5" y = "4" dir = "N" />
+  <unit typeID = "unit_storage_d"                                   x = "6" y = "4" dir = "W" />
 
-  <unit typeID = "industrial_outside.unit_parking"        x = "0" y = "2" dir = "S" />
-  <unit typeID = "industrial_outside.unit_entrance"       x = "0" y = "0" dir = "N" />
-  <unit typeID = "industrial_outside.unit_wide_parking"   x = "0" y = "3" dir = "E" />
-  <unit typeID = "industrial_outside.unit_wide_parking"   x = "7" y = "2" dir = "W" />
-  <unit typeID = "industrial_outside.unit_big_trucks_parking"   x = "3" y = "6" dir = "N" />
+  <unit typeID = "industrial_outside.unit_parking"                  x = "0" y = "2" dir = "S" />
+  <unit typeID = "industrial_outside.unit_entrance"                 x = "0" y = "0" dir = "N" />
 
-  <unit typeID = "industrial_outside.unit_parking"        x = "7" y = "1" dir = "N" />
-  <unit typeID = "industrial_outside.unit_parking"        x = "7" y = "5" dir = "N" />
+  <unit typeID = "industrial_outside.unit_trucks_parking"           x = "0" y = "3" dir = "E" />
+  <unit typeID = "industrial_outside.unit_trucks_parking"           x = "7" y = "2" dir = "W" />
+  <unit typeID = "industrial_outside.unit_entrance_trucks_parking"  x = "7" y = "3" dir = "W" />
+  <unit typeID = "industrial_outside.unit_trucks_parking"           x = "7" y = "4" dir = "W" />
 
-  <unit typeID = "industrial_outside.unit_back"           x = "2" y = "5" dir = "N" />
-  <unit typeID = "industrial_outside.unit_back"           x = "1" y = "5" dir = "N" />
-  <unit typeID = "industrial_outside.unit_back"           x = "7" y = "4" dir = "W" />
-  <unit typeID = "industrial_outside.unit_back"           x = "7" y = "6" dir = "W" />
+  <unit typeID = "industrial_outside.unit_entrance_big_trucks_parking" x = "3" y = "6" dir = "N" />
 
-  <unit typeID = "industrial_outside.unit_empty_corner"   x = "0" y = "5" dir = "W" />
-  <unit typeID = "industrial_outside.unit_empty_corner"   x = "2" y = "6" dir = "W" />
+  <unit typeID = "industrial_outside.unit_parking_contining"        x = "7" y = "1" dir = "N" />
+  <unit typeID = "industrial_outside.unit_parking"                  x = "7" y = "5" dir = "N" />
 
-  <unit typeID = "industrial_outside.unit_front"          x = "1" y = "0" dir = "N" />
-  <unit typeID = "industrial_outside.unit_front"          x = "2" y = "0" dir = "N" />
-  <unit typeID = "industrial_outside.unit_front"          x = "3" y = "0" dir = "N" />
-  <unit typeID = "industrial_outside.unit_front"          x = "4" y = "0" dir = "N" />
-  <unit typeID = "industrial_outside.unit_front"          x = "5" y = "0" dir = "N" />
-  <unit typeID = "industrial_outside.unit_front"          x = "6" y = "0" dir = "N" />
-  <unit typeID = "industrial_outside.unit_corner"         x = "7" y = "0" dir = "N" />
+  <unit typeID = "industrial_outside.unit_back"                     x = "0" y = "4" dir = "E" />
+
+  <unit typeID = "industrial_outside.unit_back"                     x = "2" y = "5" dir = "N" />
+  <unit typeID = "industrial_outside.unit_empty_corner"                     x = "1" y = "5" dir = "N" />
+  <unit typeID = "industrial_outside.unit_parking_contining"        x = "7" y = "6" dir = "N" />
+
+  <unit typeID = "industrial_outside.unit_empty_corner"             x = "0" y = "5" dir = "W" />
+  <unit typeID = "industrial_outside.unit_empty_corner"             x = "2" y = "6" dir = "W" />
+
+  <unit typeID = "industrial_outside.unit_front"                    x = "1" y = "0" dir = "N" />
+  <unit typeID = "industrial_outside.unit_front"                    x = "2" y = "0" dir = "N" />
+  <unit typeID = "industrial_outside.unit_front"                    x = "3" y = "0" dir = "N" />
+  <unit typeID = "industrial_outside.unit_front"                    x = "4" y = "0" dir = "N" />
+  <unit typeID = "industrial_outside.unit_front"                    x = "5" y = "0" dir = "N" />
+  <unit typeID = "industrial_outside.unit_front"                    x = "6" y = "0" dir = "N" />
+  <unit typeID = "industrial_outside.unit_corner"                   x = "7" y = "0" dir = "N" />
 </scene>

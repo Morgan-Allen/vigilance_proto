@@ -7,13 +7,6 @@
 />
 
 <prop
-  ID         = "grass"
-  sprite     = "outside/grass.png"
-  subtype    = "SUBTYPE_WALLING"
-  blockLevel = "BLOCK_NONE"
-/>
-
-<prop
   ID         = "asphalt_line"
   sprite     = "outside/asphalt_line.png"
   subtype    = "SUBTYPE_DETAIL"
@@ -55,15 +48,12 @@
 />
 
 <prop
-  ID         = "big_bush"
-  sprite     = "outside/big_bush.png"
-  wide       = "2"
-  high       = "2"
-/>
-
-<prop
-  ID         = "small_bush"
-  sprite     = "outside/small_bush.png"
+  ID         = "stairs_small"
+  sprite     = "outside/stairs_small_2.png"
+  wide       = "1"
+  high       = "3"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
 />
 
 <prop
@@ -121,6 +111,15 @@
 <prop
   ID         = "truck"
   sprite     = "warehouse/truck.png"
+  wide       = "2"
+  high       = "6"
+  blockSight = "false"
+/>
+
+
+<prop
+  ID         = "truck_2"
+  sprite     = "warehouse/truck_2.png"
   wide       = "2"
   high       = "6"
   blockSight = "false"
@@ -188,15 +187,17 @@
     1 = "hatch"
     2 = "dumpster_a"
     3 = "dumpster_b"
+    4 = "stairs_small"
+    5 = "conditioner"
   >
-    . 2e . . 3e . . .
-    . .  . . .  . . .
-    . .  . . .  . . .
-    . .  . . .  . . .
-    . .  . . .  . . .
-    . .  . 1 .  . . .
-    . .  . . .  . . .
-    . .  . . .  . . .
+    . 4w . . .  . . 3e
+    . . . .  .  . . .
+    . . . .  .  . . .
+    . . . .  .  . . .
+    . . . .  .  . . .
+    . . . 1  .  . . .
+    . . . .  .  . . .
+    . . . .  .  . . .
   </grid>
 </scene>
 
@@ -221,11 +222,23 @@
     . .  . . . . . .
     . .  . . . . . .
     . .  . . . . . .
-    . 4  . . . . . .
-    . .  . . . . . .
+    5 5  5 5 5 5 5 5
+    . .  . . . 4 . .
     . .  . . . . . .
     2 3  . . . . . .
     1 2e . . . . . .
+  </grid>
+  <grid
+    1 = "sign_1"
+  >
+    . .  . . . . . .
+    . .  . . . . . .
+    . .  . . . . . .
+    . .  . . . . . .
+    . .  . . . . . .
+    . .  . . . . . .
+    1 .  . . . . . .
+    . .  . . . . . .
   </grid>
 </scene>
 
@@ -268,23 +281,26 @@
     1 = "stairs"
     2 = "hatch"
     3 = "pavement_corner"
+    4 = "industrial_inside.plant_1"
+    5 = "sign_1"
+    6 = "asphalt_line"
   >
-    . . . .  . . . .
-    . . . .  . . . .
-    . . . .  . . . .
-    . . . .  . . . .
-    . . . .  . . . .
-    . . . .  . . . .
-    . . . 3w . . . .
-    . . . .  . . . .
-    . . . .  . . . .
-    . . . .  . . . .
-    . . . .  . . . .
-    . . . .  . 1 . .
-    . 2 . .  . . . .
-    . . . .  . . . .
-    . . . .  . . . .
-    . . . 3s . . . .
+    . . . .   . . . .
+    . . . .   . . . .
+    . . . .   . . . .
+    6 6 6 6   6 6 6 6
+    . . . .   . . . .
+    . . . .   . . . .
+    . . . 3w 5s . . .
+    . . . .   . . . .
+    . . . .   . . . .
+    . . . .   . . . .
+    . . . .   . . . 4
+    . . . .   . 1 . .
+    . 2 . .   . . . .
+    . . . .   . . . 4
+    . . . .   . . . .
+    . . . 3s  . . . .
   </grid>
   <grid
     1 = "pavement"
@@ -321,6 +337,63 @@
   window = "industrial_common.window"
 >
 <grid
+  1 = "car"
+>
+  . . . . . . . .
+  . . . . . . . .
+  . . 1 . . . . .
+  . . . . . . . .
+  . . . . . . . .
+  . . . . . . . .
+  . . . . . . . .
+  . . . . . . . .
+</grid>
+  <grid
+    1 = "parapet"
+    2 = "car_2"
+    3 = "hatch"
+    4 = "dumpster_a"
+    5 = "dumpster_b"
+    6 = "asphalt_line"
+    7 = "stairs_small"
+    8 = "pavement_corner"
+    9 = "conditioner"
+  >
+    . . . . . . . .
+    . 8 . . . . . .
+    9 . 6 6 6 . . .
+    . . . . . . . .
+    . . 6 6 6 . . .
+    . . . . . . 3 .
+   7s . 6 6 6 . . .
+    . . . . . . . .
+  </grid>
+  <grid
+    1 = "pavement"
+    2 = "pavement_edge"
+    3 = "asphalt"
+  >
+    3  3 3 3 3 3 3 3
+    2  3 3 3 3 3 3 3
+    1 2e 3 3 3 3 3 3
+    1 2e 3 3 3 3 3 3
+    1 2e 3 3 3 3 3 3
+    1 2e 3 3 3 3 3 3
+    1 2e 3 3 3 3 3 3
+    1 2e 3 3 3 3 3 3
+  </grid>
+</scene>
+
+<scene
+  name   = "Parking Contining"
+  ID     = "unit_parking_contining"
+  wide   = "8"
+  high   = "8"
+  wall   = "industrial_common.wall"
+  door   = "industrial_common.door"
+  window = "industrial_common.window"
+>
+<grid
   1 = "car_2"
 >
   . . . . . . . .
@@ -339,15 +412,17 @@
     4 = "dumpster_a"
     5 = "dumpster_b"
     6 = "asphalt_line"
+    7 = "pavement_corner"
+    8 = "sign_2"
   >
     . . 6 6 6 . . .
-    . . . . . . . .
-    . . 6 6 6 . . .
-    . . . . . . 3 .
-    . . 6 6 6 . . .
-    . . . . . . . .
-    . . 6 6 6 . . .
-    . . . . . . . .
+    . 8  . . . . . .
+    . .  6 6 6 . . .
+    . .  . . . . . .
+    . .  6 6 6 . . .
+    . .  . . . . 3 .
+    . 7e 6 6 6 . . .
+    . .  . . . . . .
   </grid>
   <grid
     1 = "pavement"
@@ -360,11 +435,10 @@
     1 2e 3 3 3 3 3 3
     1 2e 3 3 3 3 3 3
     1 2e 3 3 3 3 3 3
-    1 2e 3 3 3 3 3 3
-    1 2e 3 3 3 3 3 3
+   2s 3 3 3 3 3 3 3
+    3 3 3 3 3 3 3 3
   </grid>
 </scene>
-
 
 <COMMENT>
   To add:  Small sections of paving between the parking spaces?  Varying
@@ -372,9 +446,36 @@
 </COMMENT>
 
 <scene
-  name   = "Wide Parking"
-  ID     = "unit_wide_parking"
-  wide   = "16"
+  name   = "Trucks Parking"
+  ID     = "unit_trucks_parking"
+  wide   = "8"
+  high   = "8"
+  floor  = "industrial_outside.asphalt"
+  wall   = "industrial_common.wall"
+  door   = "industrial_common.door"
+  window = "industrial_common.window"
+>
+  <grid
+  1 = "hatch"
+  2 = "asphalt_line"
+  3 = "truck"
+  4 = "truck_2"
+  >
+    .  .  .  .  .  .  .  .
+    .  3  .  .  .  4  .  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  1  .  .  .
+    .  .  .  .  .  .  .  .
+  </grid>
+</scene>
+
+<scene
+  name   = "Entrance Trucks Parking"
+  ID     = "unit_entrance_trucks_parking"
+  wide   = "8"
   high   = "8"
   floor  = "industrial_outside.asphalt"
   wall   = "industrial_common.wall"
@@ -387,20 +488,20 @@
   3 = "truck"
   4 = "big_truck"
   >
-    .  .  .  4  .  .  .  2e  .  .  .  .   .  .  .  .
-    3  .  .  .  .  .  .  2e  .  3  .  .  3  .  .  .
-    .  .  .  .  .  .  .  .   .  .  .  .  .  .  .  .
-    .  .  .  .  .  .  .  2e  .  .  .  .  .  .  .  .
-    .  .  .  .  .  .  .  2e  .  .  .  .  .  .  .  .
-    .  .  .  .  .  .  .  .   .  .  .  .  .  .  .  .
-    .  .  .  .  .  .  .  2e  .  .  .  .  .  .  .  .
-    .  .  .  .  .  .  .  2e  .  .  .  .  .  .  .  .
+    .  .  .  4  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .
+    .  .  .  .  1  .  .  .
+    .  .  .  .  .  .  .  .
   </grid>
 </scene>
 
 <scene
-  name   = "Big Trucks Parking"
-  ID     = "unit_big_trucks_parking"
+  name   = "Entrance Big Trucks Parking"
+  ID     = "unit_entrance_big_trucks_parking"
   wide   = "16"
   high   = "8"
   floor  = "industrial_outside.asphalt"
