@@ -1,6 +1,4 @@
 
 
 
-Redundant clues should be skipped.
-
-Crime reports should mention impact on both trust and deterrance!
+You should begin thinking about a UI for building up scenes.

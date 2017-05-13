@@ -565,7 +565,7 @@ public abstract class Plot extends Event implements Assignment {
       Clue     aim    = Clue.confirmAim(this);
       Clue     forAt  = Clue.confirmSuspect(this, ROLE_SCENE, scene, scene);
       CaseFile file   = player.leads.caseFor(this);
-      file.recordClue(report, Lead.LEAD_REPORT, time, scene       );
+      file.recordClue(report, null, Lead.LEAD_REPORT, time, scene, effects, true);
       file.recordClue(aim   , Lead.LEAD_REPORT, time, scene, false);
       file.recordClue(forAt , Lead.LEAD_REPORT, time, scene, false);
       effects.applyEffects(target.place());
