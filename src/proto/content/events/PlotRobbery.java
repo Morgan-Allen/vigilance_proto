@@ -109,10 +109,10 @@ public class PlotRobbery extends Plot {
     fillExpertRole(this, ENGINEERING, aides, ROLE_HACKER   );
     fillExpertRole(this, INVESTMENT , aides, ROLE_FENCE    );
     Place hideout = chooseHideout(this, target);
-    assignRole      (office , ROLE_OFFICE       );
-    assignRole      (hideout, ROLE_HIDEOUT      );
-    assignTarget    (target , target, ROLE_SCENE);
-    assignMastermind(base().leader(), base()    );
+    assignRole      (office , ROLE_OFFICE        );
+    assignRole      (hideout, ROLE_HIDEOUT       );
+    assignTarget    (target , target, ROLE_SCENE );
+    assignMastermind(base().leader(), base().HQ());
     //
     //  And last but not least, queue up the needed steps:
     queueSteps(

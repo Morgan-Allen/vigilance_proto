@@ -19,7 +19,7 @@ public class PlotUtils {
   ) {
     Pick <Place > pickH = new Pick();
     for (Place b : venuesNearby(plot, crimeScene, 1)) {
-      if (b.isBase() || b == crimeScene) continue;
+      if (b.isHQ() || b == crimeScene) continue;
       pickH.compare(b, Rand.num());
     }
     return pickH.result();
@@ -56,7 +56,7 @@ public class PlotUtils {
     for (Person p : target.residents()) {
       if (p.isCaptive() || ! p.health.conscious()) continue;
       if (plot.entryFor(p, null) != null) continue;
-      pick.compare(p, 0 - p.history.bondWith(target.owner()));
+      pick.compare(p, 0 - p.history.bondWith(target.owner().leader()));
     }
     if (pick.empty()) return;
     plot.assignRole(pick.result(), role, placing);

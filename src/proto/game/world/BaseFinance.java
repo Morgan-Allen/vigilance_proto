@@ -63,10 +63,6 @@ public class BaseFinance {
       publicIncome  += dist.incomeFor  (base);
       publicExpense += dist.expensesFor(base);
     }
-    for (Place room : base.rooms) {
-      //  TODO:  Implement this!
-      //secretExpense += room.expenseFor(base);
-    }
     
     if (base.world.timing.monthIsUp()) {
       int secretShare = secretIncome();

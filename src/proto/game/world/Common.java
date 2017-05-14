@@ -336,6 +336,7 @@ public class Common {
   //  Hot, Cold, Wet, Sunny?
   //  Treat proximities as traits?
   final public static Trait
+    VENUE_IS_HQ = Trait.traitsWith("place_trait", null, "_is_HQ")[0],
     VENUE_TRAITS[] = Trait.traitsWith(
       "place_trait", null,
       "Rural"     ,

@@ -143,7 +143,8 @@ public class Civilians {
     Civilians.OFFICIAL, 3,
     Common.VENUE_OFFICE,
     Common.VENUE_CIVIC,
-    Common.VENUE_SECURITY
+    Common.VENUE_SECURITY,
+    Common.VENUE_IS_HQ
   );
   
   final public static PlaceType PENTHOUSE = new PlaceType(

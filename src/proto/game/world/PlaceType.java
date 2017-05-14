@@ -85,10 +85,8 @@ public class PlaceType extends Kind {
   }
   
   
-  public Place createRoom(Base base, int slotID) {
-    Place place = new Place(this, slotID, base.world);
-    place.setOwner(base);
-    return place;
+  public boolean isHQ() {
+    return baseLevel(Common.VENUE_IS_HQ) > 0;
   }
   
   

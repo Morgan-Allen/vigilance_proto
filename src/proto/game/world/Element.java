@@ -107,7 +107,6 @@ public class Element implements Session.Saveable {
   public boolean isItem  () { return type == Kind.TYPE_ITEM  ; }
   public boolean isProp  () { return type == Kind.TYPE_PROP  ; }
   public boolean isClue  () { return type == Kind.TYPE_CLUE  ; }
-  public boolean isBase  () { return this instanceof Base    ; }
   
   
   
@@ -125,6 +124,14 @@ public class Element implements Session.Saveable {
   public boolean canEnter(Base belongs) {
     Access level = accessLevel(belongs);
     return level == Access.GRANTED || level == Access.POSSIBLE;
+  }
+  
+  
+  public boolean isHQ() {
+    if (isPlace()) {
+      return this == ((Place) this).owner().HQ();
+    }
+    return false;
   }
   
   

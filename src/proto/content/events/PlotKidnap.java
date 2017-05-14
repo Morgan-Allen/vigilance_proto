@@ -108,7 +108,7 @@ public class PlotKidnap extends Plot {
     assignRole      (ransoms          , ROLE_RANSOMS, ROLE_HOME);
     assignRole      (hideout          , ROLE_HIDEOUT           );
     assignTarget    (target, target.resides(), ROLE_HIDEOUT    );
-    assignMastermind(base().leader(), base()                   );
+    assignMastermind(base().leader(), base().HQ()              );
     //
     //  And last but not least, queue up the needed steps:
     queueSteps(

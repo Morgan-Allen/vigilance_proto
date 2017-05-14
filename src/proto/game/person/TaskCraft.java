@@ -126,7 +126,7 @@ public class TaskCraft extends Task {
   
   
   public Element targetElement(Person p) {
-    return base;
+    return base.HQ();
   }
 
 

@@ -16,13 +16,15 @@ public class Facilities {
   final public static PlaceType MANOR = new PlaceType(
     "Manor", "base_type_manor",
     null, "",
-    0, BUILD_TIME_NONE, URBAN_SCENE
+    0, BUILD_TIME_NONE, MANSION_SCENE,
+    Common.VENUE_IS_HQ
   );
   
   final public static PlaceType LOUNGE = new PlaceType(
     "Lounge", "base_type_lounge",
     null, "",
-    0, BUILD_TIME_NONE, MANSION_SCENE
+    0, BUILD_TIME_NONE, MANSION_SCENE,
+    Common.VENUE_IS_HQ
   );
   
   

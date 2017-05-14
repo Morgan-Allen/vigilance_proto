@@ -77,7 +77,7 @@ public class DefaultGame extends RunGame {
     if (report) I.say("\nInitialising Base...");
     //
     //  TODO:  Move this out to the region-types definitions?
-    final Faction city = Civilians.THE_CITY_COUNCIL;
+    final Base city = world.baseFor(Civilians.THE_CITY_COUNCIL);
     for (Region r : world.regions()) for (Place b : r.buildSlots()) {
       if (b == null) continue;
       if (b.kind == Civilians.CITY_HALL) {
@@ -87,17 +87,16 @@ public class DefaultGame extends RunGame {
         world.council.assignPrison(b);
       }
     }
-    final Base hall = new Base(Civilians.CITY_HALL, world, city);
-    world.regionFor(Regions.SECTOR04).setAttached(hall, true);
-    world.council.assignCityHall(hall);
+    world.council.assignCity(city);
     //
     //  
-    final Faction owns = Heroes.JANUS_INDUSTRIES;
-    final Base base = new Base(Facilities.MANOR, world, owns);
+    final Base base = world.baseFor(Heroes.JANUS_INDUSTRIES);
+    //final Faction owns = Heroes.JANUS_INDUSTRIES;
+    //final Base base = new Base(Facilities.MANOR, world, owns);
     Person leader = new Person(Heroes.HERO_PHOBOS, world);
-    base.setLeader(leader);
+    base.assignLeader(leader);
     
-    Place.setResident(leader, base, true);
+    Place.setResident(leader, base.HQ(), true);
     base.addToRoster(leader);
     base.addToRoster(new Person(Heroes.HERO_NIGHT_SWIFT, world));
     base.addToRoster(new Person(Heroes.HERO_DEIMOS     , world));
@@ -106,11 +105,9 @@ public class DefaultGame extends RunGame {
     for (Person p : base.roster()) for (Person o : base.roster()) {
       if (p != o) p.history.incBond(o, 0.2f);
     }
-    world.regionFor(Regions.SECTOR03).setAttached(base, true);
-    
     for (Person p : base.roster()) {
       world.setInside(p, true);
-      base.setAttached(p, true);
+      base.HQ().setAttached(p, true);
     }
     
     final PlaceType buildTechs[] = {
@@ -153,7 +150,7 @@ public class DefaultGame extends RunGame {
     world.addBase(base, true);
     
     if (report) {
-      I.say("  Roster for "+owns);
+      I.say("  Roster for "+base.faction());
       for (Person p : base.roster()) I.say("    "+p);
       I.say("  Known technologies:");
       for (Object o : base.knownTech()) I.say("    "+o);
@@ -176,13 +173,11 @@ public class DefaultGame extends RunGame {
       Crooks.GANGSTER, Crooks.GANGSTER, Crooks.HITMAN,
       Civilians.DOCTOR, Civilians.INVENTOR, Civilians.BROKER
     };
-    
-    final Faction owns = Crooks.THE_MADE_MEN;
     final Batch <Base> hideouts = new Batch();
+    
+    final Base base1 = world.baseFor(Crooks.THE_MADE_MEN);
     final Person boss1 = new Person(Villains.MORETTI, world);
-    final Base base1 = new Base(Facilities.LOUNGE, world, owns);
-    world.regionFor(Regions.SECTOR04).setAttached(base1, true);
-    base1.setLeader(boss1);
+    base1.assignLeader(boss1);
     base1.finance.setSecretPercent(0);
     base1.finance.incPublicFunds(100);
     hideouts.add(base1);
@@ -208,7 +203,7 @@ public class DefaultGame extends RunGame {
       
       for (Person p : base.roster()) {
         world.setInside(p, true);
-        base.setAttached(p, true);
+        base.HQ().setAttached(p, true);
       }
       
       if (report) {

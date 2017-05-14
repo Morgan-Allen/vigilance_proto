@@ -93,7 +93,7 @@ public class PlotAssassinate extends Plot {
     Place hideout = chooseHideout(this, target.resides());
     assignRole      (hideout, ROLE_HIDEOUT                );
     assignTarget    (target , target.resides(), ROLE_SCENE);
-    assignMastermind(base().leader(), base()              );
+    assignMastermind(base().leader(), base().HQ()         );
     //
     //  And last but not least, queue up the needed steps:
     queueSteps(

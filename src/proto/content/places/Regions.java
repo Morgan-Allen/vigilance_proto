@@ -2,8 +2,7 @@
 
 package proto.content.places;
 import static proto.content.places.Facilities.*;
-
-import proto.content.agents.Civilians;
+import proto.content.agents.*;
 import proto.game.world.*;
 
 
@@ -31,52 +30,61 @@ public class Regions {
     
   
   static {
+    //  TODO:  It won't work to have Bases as a subtype of Place.  Villains
+    //  need to be able to switch hideouts, for a start.
+    
+    Faction heroes  = Heroes.JANUS_INDUSTRIES;
+    Faction city    = Civilians.THE_CITY_COUNCIL;
+    Faction crooks1 = Crooks.THE_MADE_MEN;
+    
     
     final RegionType r1 = SECTOR01;
     r1.view.attachColourKey(-16734721, "01");
-    r1.attachDefaultFacilities(STEEL_MILL);
+    r1.attachFacilities(heroes, STEEL_MILL);
     r1.attachMapCoordinates(0, 0);
 
     final RegionType r2 = SECTOR02;
     r2.view.attachColourKey(-3584, "02");
-    r2.attachDefaultFacilities(UNION_OFFICE);
+    r2.attachFacilities(heroes, UNION_OFFICE);
     r2.attachMapCoordinates(1, 0);
     
     final RegionType r3 = SECTOR03;
     r3.view.attachColourKey(-65354, "03");
-    r3.attachDefaultFacilities(SOUP_KITCHEN);
+    r3.attachFacilities(heroes, SOUP_KITCHEN, MANOR);
     r3.attachMapCoordinates(2, 0);
     
     
     final RegionType r4 = SECTOR04;
     r4.view.attachColourKey(-14812949, "04");
-    r4.attachDefaultFacilities(COMMUNITY_COLLEGE);
+    r4.attachFacilities(city, COMMUNITY_COLLEGE);
+    r4.attachFacilities(crooks1, LOUNGE);
     r4.attachMapCoordinates(0, 1);
     
     final RegionType r5 = SECTOR05;
     r5.view.attachColourKey(-486371, "05");
-    r5.attachDefaultFacilities(CITY_PARK, Civilians.CITY_HALL);
+    r5.attachFacilities(city, CITY_PARK, Civilians.CITY_HALL);
     r5.attachMapCoordinates(1, 1);
     
     final RegionType r6 = SECTOR06;
     r6.view.attachColourKey(-2286088, "06");
-    r6.attachDefaultFacilities(BUSINESS_PARK);
+    r6.attachFacilities(heroes, BUSINESS_PARK);
     r6.attachMapCoordinates(2, 1);
     
     
     final RegionType r7 = SECTOR07;
     r7.view.attachColourKey(-4628394, "07");
-    r7.attachDefaultFacilities(Civilians.PENTHOUSE);
+    r7.attachFacilities(city, Civilians.PENTHOUSE);
     r7.attachMapCoordinates(0, 2);
     
     final RegionType r8 = SECTOR08;
     r8.view.attachColourKey(-11111239, "08");
-    r8.attachDefaultFacilities(TECH_STARTUP);
+    r8.attachFacilities(heroes, TECH_STARTUP);
     r8.attachMapCoordinates(1, 2);
     
     final RegionType r9 = SECTOR09;
     r9.view.attachColourKey(-11093671, "09");
-    r9.attachDefaultFacilities(CHEMICAL_PLANT, Civilians.CITY_JAIL);
+    r9.attachFacilities(heroes, CHEMICAL_PLANT);
+    r9.attachFacilities(city, Civilians.CITY_JAIL);
     r9.attachMapCoordinates(2, 2);
     
   }

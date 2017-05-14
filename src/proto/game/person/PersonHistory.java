@@ -53,12 +53,14 @@ public class PersonHistory {
   
   
   public float bondWith(Element other) {
+    if (other == null) return 0;
     Bond r = relations.get(other);
     return r == null ? 0 : r.value;
   }
   
   
   public void setBond(Element other, float value) {
+    if (other == null) return;
     Bond r = relations.get(other);
     if (r == null) relations.put(other, r = new Bond());
     r.other = other;

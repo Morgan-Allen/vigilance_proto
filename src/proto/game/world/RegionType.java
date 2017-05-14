@@ -19,7 +19,9 @@ public class RegionType extends Kind {
   float   defaultDeterrence = 25   ;
   int     baseFunding       = 75   ;
   boolean defaultMember     = true ;
-  PlaceType defaultFacilities[];
+  
+  Batch <PlaceType> defaultFacilities = new Batch();
+  Batch <Faction  > defaultOwners     = new Batch();
   float mapX, mapY;
   
   
@@ -36,8 +38,11 @@ public class RegionType extends Kind {
   
   /**  Assigning default stats and facilities-
     */
-  public void attachDefaultFacilities(PlaceType... facilities) {
-    this.defaultFacilities = facilities;
+  public void attachFacilities(Faction owner, PlaceType... facilities) {
+    for (PlaceType p : facilities) {
+      defaultFacilities.add(p);
+      defaultOwners.add(owner);
+    }
   }
   
   

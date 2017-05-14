@@ -146,7 +146,9 @@ public class World implements Session.Saveable {
   
   public Base baseFor(Faction faction) {
     for (Base b : bases) if (b.faction == faction) return b;
-    return null;
+    Base base = new Base(this, faction);
+    bases.add(base);
+    return base;
   }
   
   
@@ -214,7 +216,7 @@ public class World implements Session.Saveable {
   
   public Series <Place> publicPlaces() {
     Batch <Place> all = new Batch();
-    for (Element e : inside()) if (e.isPlace() && ! e.isBase()) {
+    for (Element e : inside()) if (e.isPlace() && ! e.isHQ()) {
       Place p = (Place) e;
       all.add(p);
     }

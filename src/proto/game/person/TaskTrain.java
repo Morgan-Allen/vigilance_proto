@@ -54,7 +54,7 @@ public class TaskTrain extends Task {
   
   
   public Element targetElement(Person p) {
-    return base;
+    return base.HQ();
   }
   
   

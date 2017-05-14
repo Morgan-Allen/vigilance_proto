@@ -282,20 +282,20 @@ public class Region extends Element {
   
   
   public Place setupFacility(
-    PlaceType print, int slotID, Base owns, boolean complete
+    PlaceType print, int slotID, Faction faction, boolean complete
   ) {
     final Place place = new Place(print, slotID, world);
+    Base owns = world.baseFor(faction);
+    place.setOwner(owns);
+    
     if (complete || owns == null) {
-      place.setOwner(owns);
       place.setBuildProgress(1);
       place.updateResidents();
     }
     else {
-      place.setOwner(owns);
       owns.finance.incPublicFunds(0 - place.kind().buildCost);
       place.setBuildProgress(0);
     }
-    
     return replaceFacility(place, slotID);
   }
   
@@ -305,11 +305,14 @@ public class Region extends Element {
     */
   public void initialiseRegion() {
     
-    final PlaceType DF[] = kind().defaultFacilities;
-    for (int i = 0; i < buildSlots.length; i++) {
-      if (DF == null || i >= DF.length) break;
-      setupFacility(DF[i], i, null, true);
+    for (int i : Visit.range(0, buildSlots.length)) {
+      PlaceType p = kind().defaultFacilities.atIndex(i);
+      Faction   f = kind().defaultOwners    .atIndex(i);
+      if (p == null || f == null) continue;
+      Place built = setupFacility(p, i, f, true);
+      if (p.isHQ()) built.owner().assignHQ(built);
     }
+    
     updateStats(0);
     
     incLevel(Region.TRUST     , kind().defaultTrust     , true);
