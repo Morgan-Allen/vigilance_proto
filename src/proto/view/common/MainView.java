@@ -35,7 +35,7 @@ public class MainView extends UINode {
   final public EquipmentView equipView  ;
   final public TrainingView  trainView  ;
   final public CasesView     casesView  ;
-  final public InvestingView investView ;
+  //final public InvestingView investView ;
   final public HistoryView   historyView;
   
   final public ProgressOptionsView progOptions;
@@ -73,19 +73,18 @@ public class MainView extends UINode {
     
     //  Add views for each tab:
     final Box2D tabSubBounds = new Box2D(0, 25, fullWide, fullHigh - 145);
-    casesView = new CasesView (mainUI, tabSubBounds);
-    investView  = new InvestingView(mainUI, tabSubBounds);
+    casesView   = new CasesView    (mainUI, tabSubBounds);
     equipView   = new EquipmentView(mainUI, tabSubBounds);
     trainView   = new TrainingView (mainUI, tabSubBounds);
     historyView = new HistoryView  (mainUI, tabSubBounds);
-    tabContent = new UINode[] {
-      casesView, investView, equipView, trainView
+    tabContent  = new UINode[] {
+      casesView, equipView, trainView
     };
     
     tabsNode = new UINode(mainUI, new Box2D(0, 0, fullWide, 25));
     Box2D blank = new Box2D();
     final String tabNames[] = {
-      "Mission Control", "Investments", "Armory", "Training & Outfit"
+      "Mission Control", "Armory", "Training & Outfit"
     };
     tabButtons = new UINode[tabContent.length];
     int butW = (int) (tabsNode.relBounds.xdim() / tabButtons.length);
@@ -157,6 +156,7 @@ public class MainView extends UINode {
   /**  Various custom popup-presentation methods:
     */
   public void queueMessage(UINode message) {
+    if (messageQueue.includes(message)) return;
     messageQueue.add(message);
     game().setPaused(true);
   }
@@ -164,6 +164,7 @@ public class MainView extends UINode {
   
   public void dismissMessage(UINode message) {
     messageQueue.remove(message);
+    setChild(message, false);
   }
   
   

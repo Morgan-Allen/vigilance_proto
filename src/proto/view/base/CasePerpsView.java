@@ -68,12 +68,12 @@ public class CasePerpsView extends UINode {
   boolean renderSuspect(Element suspect, Surface surface, Graphics2D g) {
     //
     //  Extract basic game-references first:
-    Base player = mainView.player();
-    CasesView parent = mainView.casesView;
-    Person agent = mainView.rosterView.selectedPerson();
+    Base      player   = mainView.player();
+    CasesView parent   = mainView.casesView;
+    Person    agent    = mainView.rosterView.selectedPerson();
+    Place     lastSeen = player.leads.lastKnownLocation(suspect);
+    boolean   atSeen   = player.leads.atKnownLocation(suspect);
     Series <Clue> clues = player.leads.cluesFor(suspect, true);
-    Place lastSeen = player.leads.lastKnownLocation(suspect);
-    boolean atSeen = player.leads.atKnownLocation(suspect);
     //
     //  Create a list-display, and render the header, latest clue, entries for
     //  each possible lead, and an option to view associates-

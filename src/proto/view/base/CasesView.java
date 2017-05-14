@@ -34,10 +34,13 @@ public class CasesView extends UINode {
   
   MapInsetView mapView;
   ScrollArea casesArea;
-  CaseRolesView rolesView;
-  CaseCluesView cluesView;
-  CasePerpsView perpsView;
-  CaseLinksView linksView;
+  
+  CaseRolesView rolesView ;
+  CaseCluesView cluesView ;
+  CasePerpsView perpsView ;
+  CaseLinksView linksView ;
+  RegionView    regionView;
+  
   UINode focusViews[], activeFocusView;
   StringButton backButton;
   
@@ -75,7 +78,10 @@ public class CasesView extends UINode {
     cluesView  = new CaseCluesView(scrollKid, scrollBound);
     perpsView  = new CasePerpsView(scrollKid, scrollBound);
     linksView  = new CaseLinksView(scrollKid, scrollBound);
-    focusViews = new UINode[] { rolesView, cluesView, perpsView, linksView };
+    regionView = new RegionView   (scrollKid, scrollBound);
+    focusViews = new UINode[] {
+      rolesView, cluesView, perpsView, linksView, regionView
+    };
     scrollKid.addChildren(focusViews);
     
     backButton = new StringButton(
@@ -206,6 +212,8 @@ public class CasesView extends UINode {
   }
   
   
+  //  TODO:  You may need the ability to pass in arbitrary views.
+  
   public void setActiveFocus(Object focus, boolean wipeStack) {
     if (wipeStack) {
       focusStack.clear();
@@ -233,6 +241,10 @@ public class CasesView extends UINode {
     }
     else if (focus instanceof Role) {
       activeFocusView = perpsView;
+    }
+    else if (focus instanceof Region) {
+      activeFocusView = regionView;
+      mapView.setSelectedRegion((Region) focus);
     }
     else if (focus instanceof Element) {
       activeFocusView = perpsView;

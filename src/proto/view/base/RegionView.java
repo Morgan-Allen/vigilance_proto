@@ -26,20 +26,17 @@ public class RegionView extends UINode {
     );
   
   
-  final MapInsetView mapRefers;
-  
-  
-  public RegionView(UINode parent, MapInsetView map, Box2D viewBounds) {
+  public RegionView(UINode parent, Box2D viewBounds) {
     super(parent, viewBounds);
-    this.mapRefers = map;
   }
   
   
-
+  
   /**  Actual rendering methods-
     */
   protected boolean renderTo(Surface surface, Graphics2D g) {
     
+    MapInsetView mapRefers = mainView.casesView.mapView;
     final Region region = mapRefers.selectedRegion();
     if (region == null) {
       //  TODO:  Render some help-text instead!
@@ -76,7 +73,7 @@ public class RegionView extends UINode {
       down += 20;
     }
     
-    renderFacilities(region, surface, g);
+    //renderFacilities(region, surface, g);
     
     if (hovered != null) {
       g.setColor(Color.LIGHT_GRAY);
@@ -87,12 +84,13 @@ public class RegionView extends UINode {
     }
     
     g.setColor(Color.DARK_GRAY);
-    g.drawRect(vx, vy, vw, vh);
+    g.drawRect(vx + 5, vy + 5, vw - 10, vh - 10);
     
     return true;
   }
   
   
+  /*
   void renderFacilities(
     final Region d, final Surface surface, final Graphics2D g
   ) {
@@ -154,6 +152,7 @@ public class RegionView extends UINode {
       );
     }
   }
+  //*/
   
   
   void presentBuildOptions(

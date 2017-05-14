@@ -144,6 +144,13 @@ public abstract class Visit <T> implements Iterable <T>, Iterator <T> {
   }
   
   
+  public static int[] range(int min, int max) {
+    final int range[] = new int[max - min];
+    for (int n = min, i = 0; n < max; n++) range[i] = n;
+    return range;
+  }
+  
+  
   
   /**  Couple of list-utility methods-
     */

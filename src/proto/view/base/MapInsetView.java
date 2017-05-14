@@ -127,7 +127,6 @@ public abstract class MapInsetView extends UINode {
     if (mouseInMap && mX >= 0 && mX < imgWide && mY >= 0 && mY < imgHigh) {
       pixVal = ((BufferedImage) keyImage).getRGB(mX, mY);
     }
-    
     ///if (I.used60Frames) I.say("Pixel value is: "+pixVal);
     
     for (Region n : regions) if (n.kind().view.colourKey == pixVal) {
@@ -141,7 +140,9 @@ public abstract class MapInsetView extends UINode {
     renderOutline(selectedRegion(), surface, g, mapWRatio, mapHRatio);
     renderOutline(regionHovered   , surface, g, mapWRatio, mapHRatio);
     
-    for (Region n : regions) {
+    //
+    //  Then render any other widgets for each region-
+    for (final Region n : regions) {
       int x = (int) ((n.kind().view.centerX / mapWRatio) + vx);
       int y = (int) ((n.kind().view.centerY / mapHRatio) + vy);
       
@@ -154,15 +155,49 @@ public abstract class MapInsetView extends UINode {
         Color.RED, Color.BLACK, crimeLevel, false, g
       );
       
+      //
+      //  Render any facilities in the region-
+      final int maxF = n.maxFacilities();
+      int offF = 5 + ((maxF * 50) / -2);
+      for (final int slotID : Visit.range(0, maxF)) {
+        final Place     slot  = n.buildSlot(slotID);
+        final PlaceType built = slot == null ? null : slot.kind();
+        final float     prog  = slot == null ? 0 : slot.buildProgress();
+        
+        Image icon = null;
+        if (built == null) {
+          icon = RegionView.NOT_BUILT;
+        }
+        else {
+          icon = built.icon();
+        }
+        
+        final ImageButton button = new ImageButton(
+          icon, new Box2D(x + offF - vx, y - (70 + vy), 40, 40), this
+        ) {
+          protected void whenClicked() {
+            presentBuildOptions(n, slotID);
+          }
+        };
+        button.refers = n.kind+"_slot_"+slotID;
+        if (prog < 1 && built != null) {
+          button.attachOverlay(RegionView.IN_PROGRESS);
+        }
+        button.renderNow(surface, g);
+        offF += 50;
+      }
+      
+      //
+      //  Render active suspects for the region-
       Series <Element> suspects = played.leads.activeSuspectsForRegion(n);
-      int off = (suspects.size() * 50) / -2;
+      int offS = (suspects.size() * 50) / -2;
       for (final Element suspect : suspects) {
         Image alertImage = CasesView.FILE_IMAGE;
         if (played.leads.suspectIsUrgent(suspect)) {
           alertImage = CasesView.ALERT_IMAGE;
         }
         ImageButton button = new ImageButton(
-          alertImage, new Box2D(x + off - vx, y - (25 + vy), 50, 50), this
+          alertImage, new Box2D(x + offS - vx, y - (25 + vy), 50, 50), this
         ) {
           protected void whenClicked() {
             mainView.switchToTab(mainView.casesView);
@@ -173,10 +208,11 @@ public abstract class MapInsetView extends UINode {
         button.refers = suspect;
         button.renderNow(surface, g);
         
-        g.drawImage(suspect.icon(), x + off + 25, y, 25, 25, null);
-        off += 50;
+        g.drawImage(suspect.icon(), x + offS + 25, y, 25, 25, null);
+        offS += 50;
       }
-      
+      //
+      //  Then render any current visitors-
       ViewUtils.renderAssigned(visitors(n), x + 25, y + 75, this, surface, g);
     }
     
@@ -184,6 +220,9 @@ public abstract class MapInsetView extends UINode {
   }
   
   
+  
+  /**  Additional helper methods-
+    */
   private Series <Person> visitors(Region located) {
     final Batch <Person> visitors = new Batch();
     final Series <Person> roster = mainView.world().playerBase().roster();
@@ -197,6 +236,14 @@ public abstract class MapInsetView extends UINode {
       }
     }
     return visitors;
+  }
+  
+  
+  void presentBuildOptions(
+    Region d, int slotID
+  ) {
+    final BuildOptionsView options = new BuildOptionsView(mainView, d, slotID);
+    mainView.queueMessage(options);
   }
   
   
@@ -214,6 +261,9 @@ public abstract class MapInsetView extends UINode {
   }
   
   
+  
+  /**  Handling region-selection:
+    */
   protected abstract void onRegionSelect(Region region);
   
   

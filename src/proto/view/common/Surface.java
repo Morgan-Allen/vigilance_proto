@@ -137,7 +137,7 @@ public class Surface extends JPanel implements
     }
     
     this.mouseClicked = this.lastClick;
-    this.lastClick   = false;
+    this.lastClick    = false;
     this.lastX = mouseX;
     this.lastY = mouseY;
     pressed.clear();
