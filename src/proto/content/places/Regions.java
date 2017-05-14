@@ -50,14 +50,14 @@ public class Regions {
     
     final RegionType r3 = SECTOR03;
     r3.view.attachColourKey(-65354, "03");
-    r3.attachFacilities(heroes, SOUP_KITCHEN, MANOR);
+    r3.attachFacilities(heroes, MANOR, SOUP_KITCHEN);
     r3.attachMapCoordinates(2, 0);
     
     
     final RegionType r4 = SECTOR04;
     r4.view.attachColourKey(-14812949, "04");
-    r4.attachFacilities(city, COMMUNITY_COLLEGE);
     r4.attachFacilities(crooks1, LOUNGE);
+    r4.attachFacilities(city, COMMUNITY_COLLEGE);
     r4.attachMapCoordinates(0, 1);
     
     final RegionType r5 = SECTOR05;

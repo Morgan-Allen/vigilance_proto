@@ -62,10 +62,14 @@ public class DefaultGame extends RunGame {
       if (report) {
         I.say("  "+region);
         for (Place p : region.buildSlots()) if (p != null) {
-          I.say("    "+p+" residents:");
+          I.say("    "+p+" residents:"+(p.isHQ() ? " (HQ)" : ""));
           for (Person r : p.residents()) {
             I.say("      "+r);
           }
+        }
+        for (Region.Stat stat : Region.CIVIC_STATS) {
+          float level = region.currentValue(stat);
+          if (report) I.say("  "+stat.name+": "+level);
         }
       }
     }

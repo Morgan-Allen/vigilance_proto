@@ -304,7 +304,6 @@ public class Region extends Element {
   /**  Updates and life-cycle:
     */
   public void initialiseRegion() {
-    
     for (int i : Visit.range(0, buildSlots.length)) {
       PlaceType p = kind().defaultFacilities.atIndex(i);
       Faction   f = kind().defaultOwners    .atIndex(i);
