@@ -13,10 +13,9 @@ public class PersonMind {
 
   final public static int
     STATE_INIT    = -1,
-    STATE_AS_PC   =  0,
-    STATE_UNAWARE =  1,
-    STATE_ACTIVE  =  2,
-    STATE_RETREAT =  3;
+    STATE_UNAWARE =  0,
+    STATE_ACTIVE  =  1,
+    STATE_RETREAT =  2;
   
   final Person person;
   
@@ -57,6 +56,11 @@ public class PersonMind {
   }
   
   
+  public void setDoing(int AIstate) {
+    this.AIstate = AIstate;
+  }
+  
+  
   public boolean isDoing(int AIstate) {
     return this.AIstate == AIstate;
   }
@@ -80,20 +84,27 @@ public class PersonMind {
     if (confidence < 1) {
       AIstate = STATE_RETREAT;
     }
-    else {
-      AIstate = STATE_ACTIVE;
+    else if (AIstate == STATE_ACTIVE) {
       
       for (Person p : scene.allPersons()) {
         if (! person.actions.checkToNotice(p)) {
-          if (report) I.say("  Not currently aware of "+p);
+          if (report) {
+            I.say("  Not currently aware of "+p);
+          }
           continue;
         }
         for (Ability a : abilities) {
           Action use = a.configAction(person, p.location, p, scene, null, null);
           if (use == null) continue;
           float rating = a.rateUsage(use) * Rand.avgNums(2);
-          if (report) I.say("  Rating for "+a+" is "+rating);
           pick.compare(use, rating);
+          
+          if (report) {
+            String rateDesc = "  Rating for "+a;
+            if (use.target != person) rateDesc += " ("+use.target+")";
+            rateDesc += " is "+I.shorten(rating, 2);
+            I.say(rateDesc);
+          }
         }
       }
       
@@ -129,7 +140,7 @@ public class PersonMind {
     Scene scene = person.currentScene();
     float teamHealth = 0, teamPower = 0, enemySight = 0;
     
-    I.say("Assessing confidence for "+person);
+    I.say("\nAssessing confidence for "+person);
     
     for (Person p : scene.allPersons()) {
       if (p.isAlly(person)) {
@@ -146,14 +157,16 @@ public class PersonMind {
     float courage = 0.2f, minAlert = (
       person.stats.levelFor(REFLEXES) +
       person.stats.levelFor(WILL    )
-    ) / 100f;
+    ) / 40f;
     if (enemySight > 0) {
       wariness += enemySight / 4f;
     }
-    else {
-      wariness -= 0.25f;
+    if (AIstate == STATE_UNAWARE && wariness >= 0.5f) {
+      setDoing(STATE_ACTIVE);
     }
-    wariness = Nums.clamp(wariness, minAlert, 1);
+    if (AIstate == STATE_RETREAT) wariness -= 0.25f;
+    if (AIstate == STATE_ACTIVE ) wariness += 0.50f;
+    wariness = Nums.clamp(wariness + minAlert, minAlert, 1);
     
     if (person.isHero    ()) courage = 1.5f;
     if (person.isCriminal()) courage = 0.5f;
@@ -165,9 +178,13 @@ public class PersonMind {
       confidence = teamHealth / teamPower;
       confidence = (confidence + person.health.healthLevel()) / 2;
       if (! retreating()) confidence += courage;
-      
-      I.say("Confidence for "+person+": "+confidence);
     }
+    
+    I.say("  AI state is:  "+Kind.fieldLabel(AIstate, getClass()));
+    I.say("  Wariness is   "+wariness  );
+    I.say("  Confidence is "+confidence);
   }
   
 }
+
+

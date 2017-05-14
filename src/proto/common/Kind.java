@@ -222,6 +222,17 @@ public class Kind extends Index.Entry implements Session.Saveable {
   }
   
   
+  public static String fieldLabel(int value, Class from) {
+    try {
+      for (Field f : from.getDeclaredFields()) {
+        if (f.getInt(null) == value) return f.getName();
+      }
+    }
+    catch (Exception e) {}
+    return null;
+  }
+  
+  
   public static Kind kindWithID(String ID) {
     for (Kind k : INDEX.allEntries(Kind.class)) {
       if (k.entryKey().equals(ID)) return k;

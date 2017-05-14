@@ -383,7 +383,7 @@ public class Person extends Element {
   public String confidenceDescription() {
     if (! health .alive     ()) return "Dead"       ;
     if (! health .conscious ()) return "Unconscious";
-    if (  actions.captive   ()) return "Captive"    ;
+    if (          isCaptive ()) return "Captive"    ;
     if (  mind   .retreating()) return "Retreating" ;
     
     float confidence = mind.confidence(), wariness = mind.wariness();
@@ -407,22 +407,6 @@ public class Person extends Element {
     return;
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

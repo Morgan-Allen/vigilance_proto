@@ -37,6 +37,7 @@ public class SceneEntry implements TileConstants {
     int across = (scene.wide() - (forces.size())) / 2;
     for (Person p : forces) {
       p.addAssignment(scene);
+      p.mind.setDoing(PersonMind.STATE_ACTIVE);
       scene.enterScene(p, across++, 0);
     }
   }
@@ -47,6 +48,9 @@ public class SceneEntry implements TileConstants {
     //  TODO:  It would be nice to have multiple 'pods' of enemies going on
     //  patrol around areas of the scene.
     
+    //  TODO:  Goons on-base should be unwary by default- not necessarily so
+    //  on a heist.
+    
     int nX = scene.wide() / 2, nY = scene.high() / 2;
     nX += 5 - Rand.index(scene.wide() / 4);
     nY += 5 - Rand.index(scene.high() / 4);
@@ -55,6 +59,7 @@ public class SceneEntry implements TileConstants {
       Tile entry = findEntryPoint(nX, nY, p);
       if (entry == null) continue;
       p.addAssignment(scene);
+      p.mind.setDoing(PersonMind.STATE_UNAWARE);
       scene.enterScene(p, entry.x, entry.y);
     }
   }

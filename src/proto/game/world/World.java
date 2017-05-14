@@ -261,6 +261,7 @@ public class World implements Session.Saveable {
   public void enterScene(Scene mission) {
     I.say("ENTERING SCENE: "+mission);
     this.activeScene = mission;
+    if (mission != null) mission.beginScene();
   }
   
   
@@ -278,9 +279,6 @@ public class World implements Session.Saveable {
     return view;
   }
 }
-
-
-
 
 
 

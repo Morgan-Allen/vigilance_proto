@@ -551,7 +551,7 @@ public abstract class Ability extends Trait {
     rating *= 10f / (10 + at.scene.distance(acts.location, at));
     
     //  TODO:  Include a rating for hit-chance, assuming that a Volley is
-    //  involved?  (Maybe base on brains?)
+    //  involved.
     return rating;
   }
   

@@ -145,7 +145,8 @@ public class PlotUtils {
       if (e == null || e.place() != place || ! e.isPerson()) continue;
       Person perp = (Person) e;
       forces.add(perp);
-      if (perp.isCriminal()) forceSum += perp.stats.powerLevel();
+      if      (perp.isCriminal()) forceSum += perp.stats.powerLevel();
+      else if (perp.isCivilian()) perp.setCaptive(true);
     }
     if (forces.empty()) return null;
     
@@ -208,6 +209,9 @@ public class PlotUtils {
         file.recordClue(redHanded, lead, time, site, false);
         captives.add(p);
         evidence.add(file);
+      }
+      if (p.isCivilian() && p.isCaptive() && ! p.isCriminal()) {
+        p.setCaptive(false);
       }
     }
     
