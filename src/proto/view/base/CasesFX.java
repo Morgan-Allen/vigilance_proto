@@ -9,7 +9,7 @@ import proto.util.*;
 
 
 
-public class CaseFX {
+public class CasesFX {
   
   
   public static String longDescription(Clue clue, Base base) {

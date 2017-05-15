@@ -1,4 +1,25 @@
 
 
 
+You need to show the various improvements on the map, and show information on
+poverty, unemployment, etc. directly from the sector.
+
+
+
+You need to create adjacency-effects for different facilities and ensure there
+are alternative ways to create employment.
+
+
+
+You need to create some alternative henchmen for different villains and their
+factions.
+
+You need to add some intelligence to their motions/patrol patterns, and to
+distribute them more evenly about the map.
+
+
+
 You should begin thinking about a UI for building up scenes.
+
+
+You should begin thinking about reluctance, initiative and motives for agents.

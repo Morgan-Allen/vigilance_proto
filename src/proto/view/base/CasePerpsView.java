@@ -12,6 +12,8 @@ import java.awt.Graphics2D;
 
 
 
+//*
+
 public class CasePerpsView extends UINode {
   
   
@@ -47,7 +49,7 @@ public class CasePerpsView extends UINode {
     ViewUtils.ListDraw draw = new ViewUtils.ListDraw();
     int across = 10, down = 10;
     draw.addEntry(
-      null, "SUSPECTS FOR "+role+" IN "+CaseFX.nameFor(plot, player), 40, null
+      null, "SUSPECTS FOR "+role+" IN "+CasesFX.nameFor(plot, player), 40, null
     );
     for (Element e : player.leads.suspectsFor(role, plot)) {
       draw.addEntry(e.icon(), e.name(), 40, e);
@@ -87,7 +89,7 @@ public class CasePerpsView extends UINode {
     }
     else {
       Clue first = clues.first();
-      String desc = CaseFX.longDescription(first, player);
+      String desc = CasesFX.longDescription(first, player);
       draw.addEntry(null, desc, 100, first.plot());
     }
     
@@ -106,10 +108,12 @@ public class CasePerpsView extends UINode {
     for (Lead lead : player.leads.leadsFor(suspect)) {
       draw.addEntry(lead.icon(), lead.choiceInfo(agent), 20, lead);
     }
+    /*
     draw.addEntry(
       CasesView.MYSTERY_IMAGE, "View Associates", 20,
       CasesView.PERP_LINKS
     );
+    //*/
     draw.addEntry(
       CasesView.FILE_IMAGE, "View All Evidence", 20,
       CasesView.PLOT_CLUES
@@ -135,12 +139,14 @@ public class CasePerpsView extends UINode {
         parent.setActiveFocus(plot, false);
       }
     }
+    /*
     else if (draw.hovered == CasesView.PERP_LINKS) {
       hoverDesc = "View persons and places associated with this suspect.";
       if (draw.clicked) {
         parent.setActiveFocus(CasesView.PERP_LINKS, false);
       }
     }
+    //*/
     else if (draw.hovered == CasesView.PLOT_CLUES) {
       hoverDesc = "Review all evidence assembled on this suspect.";
       if (draw.clicked) {
@@ -166,7 +172,7 @@ public class CasePerpsView extends UINode {
 }
 
 
-
+//*/
 
 
 

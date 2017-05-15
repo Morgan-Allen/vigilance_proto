@@ -66,8 +66,8 @@ public class DebugPlotUtils {
     file.recordClue(further, Lead.LEAD_REPORT, time, place);
     
     I.say("\nGenerated location clues...");
-    I.say("  "+CaseFX.longDescription(toPlace, played));
-    I.say("  "+CaseFX.longDescription(further, played));
+    I.say("  "+CasesFX.longDescription(toPlace, played));
+    I.say("  "+CasesFX.longDescription(further, played));
     if (! file.clues().includes(toPlace)) {
       I.say("  Clue was not recorded.");
       recordCorrect = false;
@@ -84,8 +84,8 @@ public class DebugPlotUtils {
     file.recordClue(forTrait, Lead.LEAD_REPORT, time, place);
 
     I.say("\nGenerated trait clue after confirmation...");
-    I.say("  "+CaseFX.longDescription(confirms, played));
-    I.say("  "+CaseFX.longDescription(forTrait, played));
+    I.say("  "+CasesFX.longDescription(confirms, played));
+    I.say("  "+CasesFX.longDescription(forTrait, played));
     if (! file.clues().includes(confirms)) {
       I.say("  Clue was not recorded.");
       recordCorrect = false;

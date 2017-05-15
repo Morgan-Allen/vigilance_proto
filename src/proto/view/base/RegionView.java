@@ -3,8 +3,8 @@
 package proto.view.base;
 import proto.common.*;
 import proto.game.event.*;
+import proto.game.person.*;
 import proto.game.world.*;
-
 import proto.util.*;
 import proto.view.common.*;
 
@@ -37,17 +37,17 @@ public class RegionView extends UINode {
   protected boolean renderTo(Surface surface, Graphics2D g) {
     
     MapInsetView mapRefers = mainView.casesView.mapView;
-    final Region region = mapRefers.selectedRegion();
-    if (region == null) {
-      //  TODO:  Render some help-text instead!
-      return false;
-    }
+    Region    region = mapRefers.selectedRegion();
+    Base      player = mainView.player();
+    CasesView parent = mainView.casesView;
+    Person    agent  = mainView.rosterView.selectedPerson();
+    if (region == null) return false;
     
     g.drawString(region.kind().name(), vx + 20, vy + 20);
     
     Region.Stat hovered = null;
+    int across = 10, down = 50;
     
-    int down = 50;
     for (Region.Stat stat : Region.CIVIC_STATS) {
       if (surface.tryHover(vx, vy + down - 10, 120, 20, stat, this)) {
         hovered = stat;
@@ -73,86 +73,58 @@ public class RegionView extends UINode {
       down += 20;
     }
     
-    //renderFacilities(region, surface, g);
     
-    if (hovered != null) {
-      g.setColor(Color.LIGHT_GRAY);
-      String desc = hovered.description;
-      ViewUtils.drawWrappedString(
-        desc, g, vx + 25, vy + 190, 275, 500
-      );
+    ViewUtils.ListDraw draw = new ViewUtils.ListDraw();
+    
+    draw.addEntry(null, "Facilities:", 20, null);
+    for (Place p : region.buildSlots()) if (p != null) {
+      draw.addEntry(p.icon(), p.name(), 40, p);
     }
     
-    g.setColor(Color.DARK_GRAY);
-    g.drawRect(vx + 5, vy + 5, vw - 10, vh - 10);
+    /*
+    draw.addEntry(null, "Leads:", 20, null);
+    for (Lead lead : player.leads.leadsFor(region)) {
+      draw.addEntry(lead.icon(), lead.choiceInfo(agent), 20, lead);
+    }
+    //*/
+    draw.performDraw(across, down, this, surface, g);
+    down = draw.down;
     
+    String hoverDesc = "";
+    if (hovered != null) {
+      hoverDesc = hovered.description;
+    }
+    else if (draw.hovered instanceof Lead) {
+      Lead lead = (Lead) draw.hovered;
+      hoverDesc = lead.testInfo(agent);
+      if (draw.clicked) {
+        if (agent.assignments().includes(lead)) agent.removeAssignment(lead);
+        else agent.addAssignment(lead);
+      }
+    }
+    else if (draw.hovered instanceof Place) {
+      Place built = (Place) draw.hovered;
+      float prog = built.buildProgress();
+      
+      hoverDesc = "";
+      hoverDesc += built.kind().defaultInfo();
+      hoverDesc += "\nInvestor: "+built.owner().faction().name;
+      if (prog < 1) hoverDesc += " ("+((int) (prog * 100))+"% complete)";
+      
+      if (draw.clicked) {
+        //parent.setActiveFocus(draw.hovered, false);
+      }
+    }
+    
+    g.setColor(Color.LIGHT_GRAY);
+    ViewUtils.drawWrappedString(
+      hoverDesc, g, vx + across, vy + down, 275, 250
+    );
+    down += 250;
+    
+    //parent.casesArea.setScrollheight(down);
     return true;
   }
-  
-  
-  /*
-  void renderFacilities(
-    final Region d, final Surface surface, final Graphics2D g
-  ) {
-    final int maxF = d.maxFacilities();
-    int across = 25, down = 125;
-    int hoverSlotID = -1;
-    
-    for (int n = 0; n < maxF; n++) {
-      final Place     slot  = d.buildSlot(n);
-      final PlaceType built = slot == null ? null : slot.kind();
-      final float     prog  = slot == null ? 0 : slot.buildProgress();
-      final int slotID = n;
-      
-      Image icon = null;
-      if (built == null) {
-        icon = NOT_BUILT;
-      }
-      else {
-        icon = built.icon();
-      }
-      
-      final ImageButton button = new ImageButton(
-        icon, new Box2D(across, down, 60, 60), this
-      ) {
-        protected void whenClicked() {
-          presentBuildOptions(d, slotID, surface, g);
-        }
-      };
-      button.refers = built+"_slot_"+slotID;
-      if (prog < 1 && built != null) button.attachOverlay(IN_PROGRESS);
-      button.renderNow(surface, g);
-      if (surface.wasHovered(button.refers)) hoverSlotID = n;
-      
-      across += 60 + 10;
-    }
-    
-    if (hoverSlotID != -1 && d.buildSlot(hoverSlotID) == null) {
-      g.setColor(Color.LIGHT_GRAY);
-      String desc = "Vacant Site\n  (Click to begin construction)";
-      ViewUtils.drawWrappedString(
-        desc, g, vx + 25, vy + 190, 275, 500
-      );
-    }
-    else if (hoverSlotID != -1) {
-      g.setColor(Color.LIGHT_GRAY);
-      
-      final Place     slot  = d.buildSlot(hoverSlotID);
-      final PlaceType built = slot.kind();
-      final Base      owns  = slot.owner();
-      final float     prog  = slot.buildProgress();
-      
-      String desc = "";
-      desc += built.defaultInfo();
-      desc += "\nInvestor: "+owns.faction().name;
-      if (prog < 1) desc += " ("+((int) (prog * 100))+"% complete)";
-      
-      ViewUtils.drawWrappedString(
-        desc, g, vx + 25, vy + 190, 275, 500
-      );
-    }
-  }
-  //*/
   
   
   void presentBuildOptions(

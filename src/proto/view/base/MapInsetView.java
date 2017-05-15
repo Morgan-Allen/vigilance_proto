@@ -43,20 +43,19 @@ public abstract class MapInsetView extends UINode {
       mapW  = mapImage.getWidth (),
       mapH  = mapImage.getHeight(),
       selfW = relBounds.xdim(),
-      selfH = relBounds.ydim(),
-      relW  = mapW / selfW,
-      relH  = mapH / selfH
+      selfH = relBounds.ydim()
     ;
     
-    if (relW < relH) {
-      float shrink = selfW * ((relH / relW) - 1);
-      relBounds.incWide(0 - shrink);
-      relBounds.incX   (shrink / 2);
-    }
-    if (relH < relW) {
-      float shrink = selfH * ((relW / relH) - 1);
+    if (selfW < selfH) {
+      float shrink = selfH - selfW;
       relBounds.incHigh(0 - shrink);
       relBounds.incY   (shrink / 2);
+    }
+    
+    if (selfH < selfW) {
+      float shrink = selfW - selfH;
+      relBounds.incWide(0 - shrink);
+      relBounds.incX   (shrink / 2);
     }
   }
   
@@ -105,7 +104,8 @@ public abstract class MapInsetView extends UINode {
     */
   protected boolean renderTo(Surface surface, Graphics2D g) {
     Region regions[] = mainView.world().regions();
-    Base played = mainView.world().playerBase();
+    Base   played    = mainView.world().playerBase();
+    
     attachOutlinesFor(regions);
     if (selectedRegion() == null) setSelectedRegion(regions[0]);
     //
@@ -143,6 +143,8 @@ public abstract class MapInsetView extends UINode {
     //
     //  Then render any other widgets for each region-
     for (final Region n : regions) {
+      
+      //*
       int x = (int) ((n.kind().view.centerX / mapWRatio) + vx);
       int y = (int) ((n.kind().view.centerY / mapHRatio) + vy);
       
@@ -179,6 +181,7 @@ public abstract class MapInsetView extends UINode {
             presentBuildOptions(n, slotID);
           }
         };
+        button.valid = false;
         button.refers = n.kind+"_slot_"+slotID;
         if (prog < 1 && built != null) {
           button.attachOverlay(RegionView.IN_PROGRESS);
@@ -200,11 +203,11 @@ public abstract class MapInsetView extends UINode {
           alertImage, new Box2D(x + offS - vx, y - (25 + vy), 50, 50), this
         ) {
           protected void whenClicked() {
-            mainView.switchToTab(mainView.casesView);
+            //mainView.switchToTab(mainView.casesView);
             mainView.casesView.setActiveFocus(suspect, true);
           }
         };
-        button.toggled = suspect == mainView.casesView.activeFocus;
+        //button.toggled = suspect == mainView.casesView.activeFocus;
         button.refers = suspect;
         button.renderNow(surface, g);
         

@@ -11,6 +11,9 @@ import java.awt.Image;
 
 
 
+
+//*
+
 public class CaseCluesView extends UINode {
   
   
@@ -33,7 +36,7 @@ public class CaseCluesView extends UINode {
     Series <Clue> clues = null;
     if (focus instanceof Plot) {
       Plot plot = (Plot) focus;
-      header = "EVIDENCE FOR "+CaseFX.nameFor(plot, player);
+      header = "EVIDENCE FOR "+CasesFX.nameFor(plot, player);
       clues = player.leads.cluesFor(plot, true);
       forPlot = true;
     }
@@ -53,7 +56,7 @@ public class CaseCluesView extends UINode {
       null, header, 25, null
     );
     for (Clue clue : clues) {
-      draw.addEntry(null, CaseFX.longDescription(clue, player), 100, clue);
+      draw.addEntry(null, CasesFX.longDescription(clue, player), 100, clue);
     }
     draw.performDraw(across, down, this, surface, g);
     down = draw.down;
@@ -71,5 +74,5 @@ public class CaseCluesView extends UINode {
   
 }
 
-
+//*/
 

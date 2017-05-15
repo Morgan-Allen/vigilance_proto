@@ -100,15 +100,11 @@ public class PlaceType extends Kind {
   
   public String defaultInfo() {
     final StringBuffer s = new StringBuffer();
-    
     s.append(name());
     s.append("\n\n");
     s.append(super.defaultInfo());
     s.append("\n\n");
-    s.append("Build cost: "+buildCost+" ("+(buildTime / 7)+" weeks to build)");
-    s.append("\n");
     s.append(statInfo());
-    
     return s.toString();
   }
   

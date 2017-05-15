@@ -21,15 +21,15 @@ public class MessageUtils {
     
     if (clue.isReport()) {
       header.append("CRIME REPORT: "+clue.plot().name());
-      desc.append(CaseFX.longDescription(clue, player));
+      desc.append(CasesFX.longDescription(clue, player));
     }
     else if (clue.isTipoff()) {
       header.append("TIPOFF");
-      desc.append(CaseFX.longDescription(clue, player));
+      desc.append(CasesFX.longDescription(clue, player));
     }
     else {
       header.append("EVIDENCE FOUND");
-      desc.append(CaseFX.longDescription(clue, player));
+      desc.append(CasesFX.longDescription(clue, player));
     }
     if (effects != null) {
       Region region = clue.place().region();

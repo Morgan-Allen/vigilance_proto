@@ -10,6 +10,7 @@ import proto.util.*;
 import java.awt.Graphics2D;
 
 
+/*
 
 public class CaseLinksView extends UINode {
   
@@ -127,3 +128,4 @@ public class CaseLinksView extends UINode {
 
 
 
+//*/

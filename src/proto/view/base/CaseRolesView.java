@@ -12,6 +12,8 @@ import java.awt.Image;
 
 
 
+//*
+
 public class CaseRolesView extends UINode {
   
   
@@ -53,7 +55,7 @@ public class CaseRolesView extends UINode {
     int across = 10, down = 10;
     ViewUtils.ListDraw draw = new ViewUtils.ListDraw();
     draw.addEntry(
-      null, "CASE FILE: "+CaseFX.nameFor(plot, player), 40, null
+      null, "CASE FILE: "+CasesFX.nameFor(plot, player), 40, null
     );
     for (RoleView r : roles) {
       Role role = r.role;
@@ -75,7 +77,9 @@ public class CaseRolesView extends UINode {
         
         if (r.clues.size() > 0) {
           desc += "\n  ";
-          for (Clue c : r.clues) desc += CaseFX.shortDescription(c, player)+" ";
+          for (Clue c : r.clues) {
+            desc += CasesFX.shortDescription(c, player)+" ";
+          }
           if (! canFollow) desc += "\n  (numerous suspects)";
           else desc += "\n  ("+r.suspects.size()+" suspects)";
         }
@@ -107,7 +111,7 @@ public class CaseRolesView extends UINode {
       Series <Clue> clues = player.leads.cluesFor(plot, role, true);
       Clue top = clues.first();
       if (top != null) {
-        hoverDesc = "\nLatest Evidence:  "+CaseFX.longDescription(top, player);
+        hoverDesc = "\nLatest Evidence:  "+CasesFX.longDescription(top, player);
       }
       else {
         hoverDesc = "\nNo Evidence";
@@ -123,7 +127,7 @@ public class CaseRolesView extends UINode {
       Series <Clue> clues = player.leads.cluesFor(plot, element, true);
       Clue top = clues.first();
       if (top != null) {
-        hoverDesc = "\nLatest Evidence:  "+CaseFX.longDescription(top, player);
+        hoverDesc = "\nLatest Evidence:  "+CasesFX.longDescription(top, player);
       }
       else {
         hoverDesc = "\nNo Evidence";
@@ -142,7 +146,7 @@ public class CaseRolesView extends UINode {
     return true;
   }
 }
-
+//*/
 
 
 

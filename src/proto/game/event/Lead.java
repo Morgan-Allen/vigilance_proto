@@ -614,7 +614,7 @@ public class Lead extends Task {
   
   
   public String choiceInfo(Person p) {
-    return type.name+" ("+focus+")";
+    return type.name;//+" ("+focus+")";
   }
   
   

@@ -62,9 +62,10 @@ public class DefaultGame extends RunGame {
       if (report) {
         I.say("  "+region);
         for (Place p : region.buildSlots()) if (p != null) {
-          I.say("    "+p+" residents:"+(p.isHQ() ? " (HQ)" : ""));
+          I.say("    "+p+" "+(p.isHQ() ? " (HQ)" : ""));
+          I.add(" ("+p.owner().faction().name+")");
           for (Person r : p.residents()) {
-            I.say("      "+r);
+            I.say("      Resident: "+r);
           }
         }
         for (Region.Stat stat : Region.CIVIC_STATS) {
@@ -125,12 +126,6 @@ public class DefaultGame extends RunGame {
       Facilities.SOUP_KITCHEN
     };
     for (Object t : buildTechs) base.addTech(t);
-    
-    for (Region r : world.regions()) {
-      for (Place built : r.buildSlots()) if (built != null) {
-        built.setOwner(base);
-      }
-    }
     
     final ItemType craftTechs[] = {
       Weapons.WING_BLADES,
