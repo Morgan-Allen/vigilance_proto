@@ -23,7 +23,7 @@ public class CasePerpsView extends UINode {
   
   
   protected boolean renderTo(Surface surface, Graphics2D g) {
-    CasesView parent = mainView.casesView;
+    MapView parent = mainView.casesView;
     Object focus = parent.activeFocus;
     if (focus instanceof Role) {
       return renderSuspects((Role) focus, surface, g);
@@ -39,7 +39,7 @@ public class CasePerpsView extends UINode {
     //
     //  Extract basic game-references first:
     Base player = mainView.player();
-    CasesView parent = mainView.casesView;
+    MapView parent = mainView.casesView;
     Object focus = parent.priorFocus();
     if (! (focus instanceof Plot)) return false;
     Plot plot = (Plot) focus;
@@ -71,7 +71,7 @@ public class CasePerpsView extends UINode {
     //
     //  Extract basic game-references first:
     Base      player   = mainView.player();
-    CasesView parent   = mainView.casesView;
+    MapView parent   = mainView.casesView;
     Person    agent    = mainView.rosterView.selectedPerson();
     Place     lastSeen = player.leads.lastKnownLocation(suspect);
     boolean   atSeen   = player.leads.atKnownLocation(suspect);
@@ -102,7 +102,7 @@ public class CasePerpsView extends UINode {
       if (lastSeen != null) descAt += " Last Seen: "+lastSeen;
     }
     if (descAt != null) {
-      draw.addEntry(CasesView.MYSTERY_IMAGE, descAt, 40, lastSeen);
+      draw.addEntry(MapView.MYSTERY_IMAGE, descAt, 40, lastSeen);
     }
     
     for (Lead lead : player.leads.leadsFor(suspect)) {
@@ -115,8 +115,8 @@ public class CasePerpsView extends UINode {
     );
     //*/
     draw.addEntry(
-      CasesView.FILE_IMAGE, "View All Evidence", 20,
-      CasesView.PLOT_CLUES
+      MapView.FILE_IMAGE, "View All Evidence", 20,
+      MapView.PLOT_CLUES
     );
     draw.performDraw(across, down, this, surface, g);
     down = draw.down;
@@ -147,10 +147,10 @@ public class CasePerpsView extends UINode {
       }
     }
     //*/
-    else if (draw.hovered == CasesView.PLOT_CLUES) {
+    else if (draw.hovered == MapView.PLOT_CLUES) {
       hoverDesc = "Review all evidence assembled on this suspect.";
       if (draw.clicked) {
-        parent.setActiveFocus(CasesView.PLOT_CLUES, false);
+        parent.setActiveFocus(MapView.PLOT_CLUES, false);
       }
     }
     else if (draw.hovered instanceof Place) {

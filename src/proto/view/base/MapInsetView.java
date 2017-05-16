@@ -195,9 +195,9 @@ public abstract class MapInsetView extends UINode {
       Series <Element> suspects = played.leads.activeSuspectsForRegion(n);
       int offS = (suspects.size() * 50) / -2;
       for (final Element suspect : suspects) {
-        Image alertImage = CasesView.FILE_IMAGE;
+        Image alertImage = MapView.FILE_IMAGE;
         if (played.leads.suspectIsUrgent(suspect)) {
-          alertImage = CasesView.ALERT_IMAGE;
+          alertImage = MapView.ALERT_IMAGE;
         }
         ImageButton button = new ImageButton(
           alertImage, new Box2D(x + offS - vx, y - (25 + vy), 50, 50), this

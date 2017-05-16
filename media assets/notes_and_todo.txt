@@ -1,13 +1,11 @@
 
 
 
-You need to show the various improvements on the map, and show information on
-poverty, unemployment, etc. directly from the sector.
 
 
+You need to create adjacency-effects for different facilities, and allow their
+effects to spill over into nearby districts.
 
-You need to create adjacency-effects for different facilities and ensure there
-are alternative ways to create employment.
 
 
 

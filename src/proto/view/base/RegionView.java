@@ -37,16 +37,18 @@ public class RegionView extends UINode {
   protected boolean renderTo(Surface surface, Graphics2D g) {
     
     MapInsetView mapRefers = mainView.casesView.mapView;
-    Region    region = mapRefers.selectedRegion();
-    Base      player = mainView.player();
-    CasesView parent = mainView.casesView;
-    Person    agent  = mainView.rosterView.selectedPerson();
+    Region  region = mapRefers.selectedRegion();
+    Base    player = mainView.player();
+    MapView parent = mainView.casesView;
+    Person  agent  = mainView.rosterView.selectedPerson();
     if (region == null) return false;
     
-    g.drawString(region.kind().name(), vx + 20, vy + 20);
-    
     Region.Stat hovered = null;
-    int across = 10, down = 50;
+    int across = 10, down = 10;
+    
+    g.setColor(Color.WHITE);
+    g.drawString(region.kind().name(), vx + across + 0, vy + down + 0);
+    down = 30;
     
     for (Region.Stat stat : Region.CIVIC_STATS) {
       if (surface.tryHover(vx, vy + down - 10, 120, 20, stat, this)) {
@@ -60,7 +62,7 @@ public class RegionView extends UINode {
       down += 20;
     }
     
-    down = 50;
+    down = 30;
     for (Region.Stat stat : Region.SOCIAL_STATS) {
       if (surface.tryHover(vx + 160, vy + down - 10, 120, 20, stat, this)) {
         hovered = stat;
@@ -74,21 +76,43 @@ public class RegionView extends UINode {
     }
     
     
-    ViewUtils.ListDraw draw = new ViewUtils.ListDraw();
+    Region.IncomeReport r = region.incomeReport(player);
+    String sumDescs[] = {
+      "Revenue:",
+      "Violence:",
+      "Corruption:",
+      "Expenses:",
+      "Total Profit:"
+    };
+    Object descVals[] = {
+      r.income,
+      0 - r.lossViolence,
+      0 - r.lossCorruption,
+      0 - r.expense,
+      r.profit
+    };
     
+    down += 10;
+    for (int i : Visit.range(0, descVals.length)) {
+      g.drawString(""+sumDescs[i]    , vx + across + 20 , vy + down);
+      g.drawString(""+descVals[i]+"m", vx + across + 160, vy + down);
+      down += 20;
+    }
+    g.drawRect(vx + across + 20, vy + down - 36, 240, 0);
+    
+    
+    ViewUtils.ListDraw draw = new ViewUtils.ListDraw();
     draw.addEntry(null, "Facilities:", 20, null);
+    
+    //  TODO:  Use slot-IDs here instead, and arrange horizontally.
+    
     for (Place p : region.buildSlots()) if (p != null) {
       draw.addEntry(p.icon(), p.name(), 40, p);
     }
     
-    /*
-    draw.addEntry(null, "Leads:", 20, null);
-    for (Lead lead : player.leads.leadsFor(region)) {
-      draw.addEntry(lead.icon(), lead.choiceInfo(agent), 20, lead);
-    }
-    //*/
     draw.performDraw(across, down, this, surface, g);
     down = draw.down;
+    
     
     String hoverDesc = "";
     if (hovered != null) {

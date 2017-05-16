@@ -189,35 +189,38 @@ public class Region extends Element {
   }
   
   
-  private int incomeFor(Base base, boolean positive) {
-    int total = 0;
-    
-    if (positive && ! base.faction().criminal) {
-      float crime = 0;
-      crime += currentValue(VIOLENCE  ) / 100f;
-      crime += currentValue(CORRUPTION) / 100f;
-      total += kind().baseFunding * (1 - Nums.clamp(crime, 0, 1));
-    }
+  public static class IncomeReport {
+    public Base base;
+    public int
+      income,
+      expense,
+      lossViolence,
+      lossCorruption,
+      incomeAfterLoss,
+      profit;
+  }
+  
+  public IncomeReport incomeReport(Base base) {
+    IncomeReport r = new IncomeReport();
     
     for (Place slot : buildSlots) {
       if (slot == null || slot.owner() != base) continue;
       if (slot.buildProgress() < 1) continue;
       
       final int inc = slot.kind().incomeFrom(this);
-      if (positive) total += Nums.max(inc, 0      );
-      else          total += Nums.max(0  , 0 - inc);
+      r.income  += Nums.max(inc, 0      );
+      r.expense += Nums.max(0  , 0 - inc);
     }
-    return total;
-  }
-  
-  
-  public int incomeFor(Base base) {
-    return incomeFor(base, true);
-  }
-  
-  
-  public int expensesFor(Base base) {
-    return incomeFor(base, false);
+    
+    if (! base.faction().criminal) {
+      r.lossViolence   = (int) (r.income * currentValue(VIOLENCE  ) / 100f);
+      r.lossCorruption = (int) (r.income * currentValue(CORRUPTION) / 100f);
+    }
+    
+    r.base            = base;
+    r.incomeAfterLoss = r.income - (r.lossViolence + r.lossCorruption);
+    r.profit          = r.incomeAfterLoss - r.expense;
+    return r;
   }
   
   

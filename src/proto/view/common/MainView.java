@@ -34,7 +34,7 @@ public class MainView extends UINode {
   
   final public EquipmentView equipView  ;
   final public TrainingView  trainView  ;
-  final public CasesView     casesView  ;
+  final public MapView       casesView  ;
   final public HistoryView   historyView;
   
   final public ProgressOptionsView progOptions;
@@ -72,7 +72,7 @@ public class MainView extends UINode {
     
     //  Add views for each tab:
     final Box2D tabSubBounds = new Box2D(0, 25, fullWide, fullHigh - 145);
-    casesView   = new CasesView    (mainUI, tabSubBounds);
+    casesView   = new MapView    (mainUI, tabSubBounds);
     equipView   = new EquipmentView(mainUI, tabSubBounds);
     trainView   = new TrainingView (mainUI, tabSubBounds);
     historyView = new HistoryView  (mainUI, tabSubBounds);
@@ -83,7 +83,7 @@ public class MainView extends UINode {
     tabsNode = new UINode(mainUI, new Box2D(0, 0, fullWide, 25));
     Box2D blank = new Box2D();
     final String tabNames[] = {
-      "Mission Control", "Armory", "Outfit & Regimen"
+      "City Map", "Spending", "Outfit & Regimen"
     };
     tabButtons = new UINode[tabContent.length];
     int butW = (int) (tabsNode.relBounds.xdim() / tabButtons.length);

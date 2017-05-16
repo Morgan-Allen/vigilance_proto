@@ -26,7 +26,7 @@ public class CaseRolesView extends UINode {
     //
     //  First, obtain basic references to relevant game objects-
     Base player = mainView.player();
-    CasesView parent = mainView.casesView;
+    MapView parent = mainView.casesView;
     Plot plot = (Plot) parent.activeFocus;
     //
     //  Then sort of the roles involved in the crime based on quality of
@@ -71,7 +71,7 @@ public class CaseRolesView extends UINode {
         refers = match;
       }
       else {
-        icon = CasesView.MYSTERY_IMAGE;
+        icon = MapView.MYSTERY_IMAGE;
         desc = role+": Unknown";
         refers = canFollow ? role : null;
         
@@ -90,8 +90,8 @@ public class CaseRolesView extends UINode {
       draw.addEntry(icon, desc, 40, refers);
     }
     draw.addEntry(
-      CasesView.FILE_IMAGE, "View All Evidence", 25,
-      CasesView.PLOT_CLUES
+      MapView.FILE_IMAGE, "View All Evidence", 25,
+      MapView.PLOT_CLUES
     );
     draw.performDraw(across, down, this, surface, g);
     down = draw.down;
@@ -100,10 +100,10 @@ public class CaseRolesView extends UINode {
     //  list-elements:
     Object hovered = draw.hovered;
     String hoverDesc = "";
-    if (hovered == CasesView.PLOT_CLUES) {
+    if (hovered == MapView.PLOT_CLUES) {
       hoverDesc = "Review all evidence assembled on this case.";
       if (draw.clicked) {
-        parent.setActiveFocus(CasesView.PLOT_CLUES, false);
+        parent.setActiveFocus(MapView.PLOT_CLUES, false);
       }
     }
     else if (hovered instanceof Role) {

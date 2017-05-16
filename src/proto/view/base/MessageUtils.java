@@ -85,7 +85,7 @@ public class MessageUtils {
     s.append(" are scheduled for trial in "+days+" days time.");
     
     view.queueMessage(new MessageView(
-      view, CasesView.TRIAL_IMAGE, "Trial Scheduled", s.toString(),
+      view, MapView.TRIAL_IMAGE, "Trial Scheduled", s.toString(),
       "Dismiss"
     ) {
       protected void whenClicked(String option, int optionID) {
@@ -113,7 +113,7 @@ public class MessageUtils {
     }
     
     view.queueMessage(new MessageView(
-      view, CasesView.TRIAL_IMAGE, "Trial Concluded", s.toString(),
+      view, MapView.TRIAL_IMAGE, "Trial Concluded", s.toString(),
       "Dismiss"
     ) {
       protected void whenClicked(String option, int optionID) {
@@ -130,7 +130,7 @@ public class MessageUtils {
     s.append(person+" has been released after serving their sentence.");
     
     view.queueMessage(new MessageView(
-      view, CasesView.TRIAL_IMAGE, "Trial Concluded", s.toString(),
+      view, MapView.TRIAL_IMAGE, "Trial Concluded", s.toString(),
       "Dismiss"
     ) {
       protected void whenClicked(String option, int optionID) {

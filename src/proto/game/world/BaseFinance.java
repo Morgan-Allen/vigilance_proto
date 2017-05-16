@@ -60,8 +60,9 @@ public class BaseFinance {
     secretExpense = 0;
     
     for (Region dist : base.world.regions) {
-      publicIncome  += dist.incomeFor  (base);
-      publicExpense += dist.expensesFor(base);
+      Region.IncomeReport r = dist.incomeReport(base);
+      publicIncome  += r.incomeAfterLoss;
+      publicExpense += r.expense;
     }
     
     if (base.world.timing.monthIsUp()) {

@@ -39,13 +39,13 @@ public class EventsView extends UINode {
     for (Plot plot : player.leads.activePlots()) {
       if (plot.complete()) continue;
       Image icon = plot.icon();
-      if (icon == null) icon = CasesView.ALERT_IMAGE;
+      if (icon == null) icon = MapView.ALERT_IMAGE;
       draw.addEntry(icon, CasesFX.nameFor(plot, player), 40, plot);
       hasCase = true;
     }
     
     for (Trial trial : world.council.upcomingTrials()) {
-      Image icon = CasesView.TRIAL_IMAGE;
+      Image icon = MapView.TRIAL_IMAGE;
       String desc = trial.toString();
       float evidence = trial.rateEvidence();
       int date = (trial.timeBegins() - time) / World.HOURS_PER_DAY;
