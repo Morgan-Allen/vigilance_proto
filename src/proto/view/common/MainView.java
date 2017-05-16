@@ -86,9 +86,7 @@ public class MainView extends UINode {
     equipView   = new EquipmentView(mainUI, tabSubBounds);
     trainView   = new TrainingView (mainUI, tabSubBounds);
     historyView = new HistoryView  (mainUI, tabSubBounds);
-    tabContent  = new UINode[] {
-      mapView, equipView, trainView
-    };
+    tabContent  = new UINode[] { mapView, equipView, trainView };
     
     int butW = (int) ((fullWide - 210) / tabButtons.length);
     for (int i = tabContent.length; i-- > 0;) {

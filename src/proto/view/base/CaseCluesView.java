@@ -58,7 +58,7 @@ public class CaseCluesView extends UINode {
     for (Clue clue : clues) {
       draw.addEntry(null, CasesFX.longDescription(clue, player), 100, clue);
     }
-    draw.performDraw(across, down, this, surface, g);
+    draw.performVerticalDraw(across, down, this, surface, g);
     down = draw.down;
     
     if (draw.hovered != null) {
@@ -68,7 +68,7 @@ public class CaseCluesView extends UINode {
       }
     }
     
-    parent.casesArea.setScrollheight(down);
+    parent.infoArea.setScrollheight(down);
     return true;
   }
   

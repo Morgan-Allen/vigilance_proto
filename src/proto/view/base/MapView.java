@@ -32,7 +32,7 @@ public class MapView extends UINode {
   
   
   MapInsetView mapView;
-  ScrollArea casesArea;
+  ScrollArea infoArea;
   
   EventsView    eventsView;
   CaseRolesView rolesView ;
@@ -67,10 +67,10 @@ public class MapView extends UINode {
     
     Box2D casesBound  = new Box2D(fullWide - 340, 25, 340, fullHigh - 25);
     Box2D scrollBound = new Box2D(0             , 25, 320, fullHigh - 25);
-    casesArea = new ScrollArea(this, casesBound);
-    addChildren(casesArea);
-    UINode scrollKid = new UINode(casesArea, scrollBound) {};
-    casesArea.attachScrollPane(scrollKid, (int) scrollBound.ydim());
+    infoArea = new ScrollArea(this, casesBound);
+    addChildren(infoArea);
+    UINode scrollKid = new UINode(infoArea, scrollBound) {};
+    infoArea.attachScrollPane(scrollKid, (int) scrollBound.ydim());
     
     backButton = new StringButton(
       "Back", new Box2D(fullWide - 70, 10, 60, 25), this

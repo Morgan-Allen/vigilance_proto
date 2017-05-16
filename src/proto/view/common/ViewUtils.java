@@ -59,9 +59,9 @@ public class ViewUtils {
   public static class ListDraw {
     
     static class Entry {
-      Image icon;
-      String label;
-      int down;
+      Image  icon  ;
+      String label ;
+      int    along ;
       Object refers;
     }
     List <Entry> entries = new List();
@@ -71,11 +71,11 @@ public class ViewUtils {
     public boolean clicked;
     
     
-    public void addEntry(Image icon, String label, int down, Object refers) {
+    public void addEntry(Image icon, String label, int along, Object refers) {
       Entry e = new Entry();
       e.icon   = icon  ;
       e.label  = label ;
-      e.down   = down  ;
+      e.along  = along ;
       e.refers = refers;
       entries.add(e);
     }
@@ -84,58 +84,93 @@ public class ViewUtils {
     public void clearEntries() {
       entries.clear();
       clicked = false;
-      hovered = null;
+      hovered = null ;
+    }
+    
+    
+    public void performVerticalDraw(
+      int across, int down, UINode within, Surface surface, Graphics2D g
+    ) {
+      performDraw(across, down, true, within, surface, g);
+    }
+    
+    
+    public void performHorizontalDraw(
+      int across, int down, UINode within, Surface surface, Graphics2D g
+    ) {
+      performDraw(across, down, false, within, surface, g);
     }
     
     
     public void performDraw(
-      int across, int down, UINode within, Surface surface, Graphics2D g
+      int across, int down, boolean vertical,
+      UINode within, Surface surface, Graphics2D g
     ) {
-      int vx = within.vx, vy = within.vy, vw = within.vw;
+      int vx = within.vx, vy = within.vy, vw = within.vw, maxh = 0;
+      this.across = across;
+      this.down   = down  ;
       
       for (Entry e : entries) {
-        int downEach = e.down, iconSize = 0;
+        int downEach = e.along, iconSize = 0;
         g.setColor(Color.LIGHT_GRAY);
         if (e.refers == null) g.setColor(Color.WHITE);
         
         if (e.icon != null) {
-          iconSize = e.down;
+          iconSize = e.along;
           g.drawImage(e.icon, vx + across, vy + down, iconSize, iconSize, null);
         }
         
         if (e.label != null) ViewUtils.drawWrappedString(
           e.label, g,
-          vx + across + iconSize + 10, vy + down,
+          vx + across + (vertical ? (iconSize + 10) : 0),
+          vy + down   + (vertical ? 0 : (iconSize + 10)),
           vw - (iconSize + 20), downEach
         );
         
         if (e.refers != null) {
           if (surface.tryHover(
-            vx + across, vy + down, vw - (across + 10), downEach,
+            vx + across,
+            vy + down,
+            vertical ? (vw - (across + 10)) : downEach,
+            downEach,
             e.refers, within
           )) {
             hovered = e.refers;
-            clicked = surface.mouseClicked(); 
+            clicked = surface.mouseClicked();
           }
           
           g.setColor(hovered == e.refers ? Color.BLUE : Color.GRAY);
-          g.drawRect(vx + across, vy + down, vw - (across + 10), downEach);
+          g.drawRect(
+            vx + across,
+            vy + down,
+            vertical ? (vw - (across + 10)) : downEach,
+            downEach
+          );
         }
         
         if (e.refers instanceof Assignment) {
           Assignment a = (Assignment) e.refers;
           Base player = within.mainView.player();
+          
           if (a.assigningBase() == player) renderAssigned(
-            a.assigned(), vx + across + vw - 20, vy + down + downEach,
+            a.assigned(),
+            vx + across + vw - 20,
+            vy + down + downEach,
             within, surface, g
           );
         }
         
-        down += downEach + 5;
+        if (vertical) {
+          down += downEach + 5;
+        }
+        else {
+          across += downEach + 5;
+          maxh = Nums.max(maxh, downEach);
+        }
       }
       
       this.across = across;
-      this.down = down;
+      this.down   = down + maxh;
       entries.clear();
     }
   }

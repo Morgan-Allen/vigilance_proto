@@ -160,22 +160,18 @@ public abstract class MapInsetView extends UINode {
       //
       //  Render any facilities in the region-
       final int maxF = n.maxFacilities();
-      int offF = 5 + ((maxF * 50) / -2);
+      int offF = 5 + ((maxF * 35) / -2);
       for (final int slotID : Visit.range(0, maxF)) {
         final Place     slot  = n.buildSlot(slotID);
         final PlaceType built = slot == null ? null : slot.kind();
         final float     prog  = slot == null ? 0 : slot.buildProgress();
         
         Image icon = null;
-        if (built == null) {
-          icon = RegionView.NOT_BUILT;
-        }
-        else {
-          icon = built.icon();
-        }
+        if (built == null) icon = RegionView.NOT_BUILT;
+        else               icon = built.icon();
         
         final ImageButton button = new ImageButton(
-          icon, new Box2D(x + offF - vx, y - (70 + vy), 40, 40), this
+          icon, new Box2D(x + offF - vx, y - (70 + vy), 30, 30), this
         ) {
           protected void whenClicked() {
             presentBuildOptions(n, slotID);
@@ -187,7 +183,7 @@ public abstract class MapInsetView extends UINode {
           button.attachOverlay(RegionView.IN_PROGRESS);
         }
         button.renderNow(surface, g);
-        offF += 50;
+        offF += 30 + 5;
       }
       
       //

@@ -40,7 +40,6 @@ public class RegionView extends UINode {
     Region  region = mapRefers.selectedRegion();
     Base    player = mainView.player();
     MapView parent = mainView.mapView;
-    Person  agent  = mainView.rosterView.selectedPerson();
     if (region == null) return false;
     
     Region.Stat hovered = null;
@@ -101,42 +100,45 @@ public class RegionView extends UINode {
     g.drawRect(vx + across + 20, vy + down - 36, 240, 0);
     
     
-    ViewUtils.ListDraw draw = new ViewUtils.ListDraw();
-    draw.addEntry(null, "Facilities:", 20, null);
+    g.drawString("Facilities", vx + across + 10, vy + down + 10);
+    down += 15;
     
     //  TODO:  Use slot-IDs here instead, and arrange horizontally.
-    
-    for (Place p : region.buildSlots()) if (p != null) {
-      draw.addEntry(p.icon(), p.name(), 40, p);
+    ViewUtils.ListDraw draw = new ViewUtils.ListDraw();
+    for (Integer slotID : Visit.range(0, region.maxFacilities())) {
+      Place p = region.buildSlot(slotID);
+      if (p != null) draw.addEntry(p.icon() , null, 60, slotID);
+      else           draw.addEntry(NOT_BUILT, null, 60, slotID);
     }
-    
-    draw.performDraw(across, down, this, surface, g);
-    down = draw.down;
+    draw.performHorizontalDraw(across + 20, down, this, surface, g);
+    down = draw.down + 10;
     
     
     String hoverDesc = "";
     if (hovered != null) {
       hoverDesc = hovered.description;
     }
-    else if (draw.hovered instanceof Lead) {
-      Lead lead = (Lead) draw.hovered;
-      hoverDesc = lead.testInfo(agent);
-      if (draw.clicked) {
-        if (agent.assignments().includes(lead)) agent.removeAssignment(lead);
-        else agent.addAssignment(lead);
+    else if (draw.hovered instanceof Integer) {
+      int   slotID = (Integer) draw.hovered;
+      Place built  = region.buildSlot(slotID);
+      Base  owner  = built == null ? null : built.owner();
+      
+      if (built != null) {
+        float prog = built.buildProgress();
+        hoverDesc = "";
+        hoverDesc += built.kind().defaultInfo();
+        hoverDesc += "\nInvestor: "+built.owner().faction().name;
+        if (prog < 1) hoverDesc += " ("+((int) (prog * 100))+"% complete)";
       }
-    }
-    else if (draw.hovered instanceof Place) {
-      Place built = (Place) draw.hovered;
-      float prog = built.buildProgress();
+      else {
+        hoverDesc = "Vacant Site (click to begin construction)";
+      }
       
-      hoverDesc = "";
-      hoverDesc += built.kind().defaultInfo();
-      hoverDesc += "\nInvestor: "+built.owner().faction().name;
-      if (prog < 1) hoverDesc += " ("+((int) (prog * 100))+"% complete)";
-      
-      if (draw.clicked) {
-        //parent.setActiveFocus(draw.hovered, false);
+      if (draw.clicked && owner == player) {
+        presentDemolishDialog(region, slotID);
+      }
+      if (draw.clicked && owner == null) {
+        presentBuildOptions(region, slotID);
       }
     }
     
@@ -146,14 +148,34 @@ public class RegionView extends UINode {
     );
     down += 250;
     
-    //parent.casesArea.setScrollheight(down);
+    parent.infoArea.setScrollheight(down);
     return true;
   }
   
   
-  void presentBuildOptions(
-    Region d, int slotID, Surface surface, Graphics2D g
-  ) {
+  void presentDemolishDialog(final Region d, final int slotID) {
+    final MessageView dialog = new MessageView(
+      this, null, "Confirm Demolition?",
+      "In order to begin construction of new facilities, you will have to "+
+      "demolish the current structure.  Are you sure you want to do this?",
+      "Proceed",
+      "Cancel"
+    ) {
+      protected void whenClicked(String option, int optionID) {
+        if (optionID == 0) {
+          mainView.dismissMessage(this);
+          presentBuildOptions(d, slotID);
+        }
+        if (optionID == 1) {
+          mainView.dismissMessage(this);
+        }
+      }
+    };
+    mainView.queueMessage(dialog);
+  }
+  
+  
+  void presentBuildOptions(Region d, int slotID) {
     final BuildOptionsView options = new BuildOptionsView(mainView, d, slotID);
     mainView.queueMessage(options);
   }

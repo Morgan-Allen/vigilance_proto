@@ -54,7 +54,7 @@ public class CasePerpsView extends UINode {
     for (Element e : player.leads.suspectsFor(role, plot)) {
       draw.addEntry(e.icon(), e.name(), 40, e);
     }
-    draw.performDraw(across, down, this, surface, g);
+    draw.performVerticalDraw(across, down, this, surface, g);
     down = draw.down;
     //
     //  If one is selected, zoom to that element:
@@ -62,7 +62,7 @@ public class CasePerpsView extends UINode {
       parent.setActiveFocus(draw.hovered, false);
     }
     
-    parent.casesArea.setScrollheight(down);
+    parent.infoArea.setScrollheight(down);
     return true;
   }
   
@@ -118,7 +118,7 @@ public class CasePerpsView extends UINode {
       MapView.FILE_IMAGE, "View All Evidence", 20,
       MapView.PLOT_CLUES
     );
-    draw.performDraw(across, down, this, surface, g);
+    draw.performVerticalDraw(across, down, this, surface, g);
     down = draw.down;
     //
     //  Then given suitable tool-tips and click-reponses for any encountered
@@ -165,7 +165,7 @@ public class CasePerpsView extends UINode {
     );
     down += 150;
     
-    parent.casesArea.setScrollheight(down);
+    parent.infoArea.setScrollheight(down);
     return true;
   }
   

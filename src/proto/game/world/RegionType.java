@@ -14,7 +14,7 @@ public class RegionType extends Kind {
     */
   final public RegionAssets view = new RegionAssets();
   
-  int     maxFacilities     = 3    ;
+  int     maxFacilities     = 4    ;
   float   defaultTrust      = 25   ;
   float   defaultDeterrence = 25   ;
   int     baseFunding       = 75   ;

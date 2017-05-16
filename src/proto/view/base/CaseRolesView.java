@@ -93,7 +93,7 @@ public class CaseRolesView extends UINode {
       MapView.FILE_IMAGE, "View All Evidence", 25,
       MapView.PLOT_CLUES
     );
-    draw.performDraw(across, down, this, surface, g);
+    draw.performVerticalDraw(across, down, this, surface, g);
     down = draw.down;
     //
     //  Then given suitable tool-tips and click-reponses for any encountered
@@ -142,7 +142,7 @@ public class CaseRolesView extends UINode {
     );
     down += 150;
     
-    parent.casesArea.setScrollheight(down);
+    parent.infoArea.setScrollheight(down);
     return true;
   }
 }

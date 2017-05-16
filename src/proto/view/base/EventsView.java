@@ -95,7 +95,7 @@ public class EventsView extends UINode {
       draw.addEntry(null, "    None", 25, null);
     }
     
-    draw.performDraw(across, down, this, surface, g);
+    draw.performVerticalDraw(across, down, this, surface, g);
     down = draw.down;
     //
     //  If one is selected, zoom to that element:
