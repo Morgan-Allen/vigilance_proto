@@ -24,8 +24,8 @@ public class EventsView extends UINode {
     //
     //  Create a list-display, and render the header plus entries for each
     //  associate:
-    World world = mainView.world();
-    Base player = mainView.player();
+    World world  = mainView.world();
+    Base  player = mainView.player();
     String caseDesc[] = { "Weak", "Fair", "Strong" };
     int time = world.timing.totalHours();
     
@@ -99,11 +99,9 @@ public class EventsView extends UINode {
     down = draw.down;
     //
     //  If one is selected, zoom to that element:
-    /*
     if (draw.clicked) {
-      setActiveFocus(draw.hovered, true);
+      mainView.mapView.setActiveFocus(draw.hovered, true);
     }
-    //*/
     return true;
   }
   

@@ -26,7 +26,7 @@ public class CaseRolesView extends UINode {
     //
     //  First, obtain basic references to relevant game objects-
     Base player = mainView.player();
-    MapView parent = mainView.casesView;
+    MapView parent = mainView.mapView;
     Plot plot = (Plot) parent.activeFocus;
     //
     //  Then sort of the roles involved in the crime based on quality of

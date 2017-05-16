@@ -39,7 +39,7 @@ public class MapView extends UINode {
   CaseCluesView cluesView ;
   CasePerpsView perpsView ;
   RegionView    regionView;
-  
+
   UINode focusViews[], activeFocusView;
   StringButton backButton, closeButton;
   
@@ -84,7 +84,7 @@ public class MapView extends UINode {
       "Close", new Box2D(fullWide - 340, 10, 60, 25), this
     ) {
       protected void whenClicked() {
-        setActiveFocus(ALL_CASES, true);
+        wipeFocusStack();
       }
     };
     addChildren(backButton, closeButton);
@@ -99,7 +99,7 @@ public class MapView extends UINode {
     };
     scrollKid.addChildren(focusViews);
     
-    setActiveFocus(ALL_CASES, false);
+    wipeFocusStack();
   }
   
   
@@ -147,6 +147,11 @@ public class MapView extends UINode {
     for (UINode node : focusViews) {
       node.visible = node == activeFocusView;
     }
+  }
+  
+  
+  public void wipeFocusStack() {
+    setActiveFocus(ALL_CASES, true);
   }
   
   

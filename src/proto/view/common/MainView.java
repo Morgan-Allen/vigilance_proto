@@ -25,20 +25,17 @@ public class MainView extends UINode {
   private World world;
   SceneView  sceneView ;
   UINode     mainUI    ;
+  
   final public RosterView rosterView;
-  
-  
+  final public BasicInfoBar basicBar;
   UINode tabsNode;
   UINode tabButtons[], tabContent[];
   UINode currentTab = null;
   
   final public EquipmentView equipView  ;
   final public TrainingView  trainView  ;
-  final public MapView       casesView  ;
+  final public MapView       mapView  ;
   final public HistoryView   historyView;
-  
-  final public ProgressOptionsView progOptions;
-  final public StatsReadoutView    mainReadout;
   
   final public Image selectCircle, selectSquare;
   
@@ -72,12 +69,12 @@ public class MainView extends UINode {
     
     //  Add views for each tab:
     final Box2D tabSubBounds = new Box2D(0, 25, fullWide, fullHigh - 145);
-    casesView   = new MapView    (mainUI, tabSubBounds);
+    mapView   = new MapView    (mainUI, tabSubBounds);
     equipView   = new EquipmentView(mainUI, tabSubBounds);
     trainView   = new TrainingView (mainUI, tabSubBounds);
     historyView = new HistoryView  (mainUI, tabSubBounds);
     tabContent  = new UINode[] {
-      casesView, equipView, trainView
+      mapView, equipView, trainView
     };
     
     tabsNode = new UINode(mainUI, new Box2D(0, 0, fullWide, 25));
@@ -102,15 +99,12 @@ public class MainView extends UINode {
     tabsNode.addChildren(tabButtons);
     mainUI  .addChildren(tabContent);
     
-    switchToTab(casesView);
+    switchToTab(mapView);
     
-    progOptions = new ProgressOptionsView(mainUI, new Box2D(
-      (fullWide / 2) - 100, fullHigh - 170, 200, 50
+    basicBar = new BasicInfoBar(mainUI, new Box2D(
+      0, fullHigh - 150, fullWide, 25
     ));
-    mainReadout = new StatsReadoutView(mainUI, new Box2D(
-      0, fullHigh - 170, (fullWide / 2) - 100, 50
-    ));
-    mainUI.addChildren(progOptions, mainReadout);
+    mainUI.addChildren(basicBar);
     
     selectCircle  = Kind.loadImage(ACTS_DIR+"select_circle.png");
     selectSquare  = Kind.loadImage(MNUI_DIR+"select_square.png");
@@ -148,6 +142,17 @@ public class MainView extends UINode {
     for (UINode c : tabContent) {
       c.visible = c == content;
     }
+  }
+  
+  
+  public void setMonitoring(boolean start) {
+    RunGame game = mainView.game();
+    if (start) {
+      mapView.wipeFocusStack();
+      switchToTab(mapView);
+      game.setPaused(false);
+    }
+    else game.setPaused(true);
   }
   
   

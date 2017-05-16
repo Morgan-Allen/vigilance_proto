@@ -23,7 +23,7 @@ public class CasePerpsView extends UINode {
   
   
   protected boolean renderTo(Surface surface, Graphics2D g) {
-    MapView parent = mainView.casesView;
+    MapView parent = mainView.mapView;
     Object focus = parent.activeFocus;
     if (focus instanceof Role) {
       return renderSuspects((Role) focus, surface, g);
@@ -39,7 +39,7 @@ public class CasePerpsView extends UINode {
     //
     //  Extract basic game-references first:
     Base player = mainView.player();
-    MapView parent = mainView.casesView;
+    MapView parent = mainView.mapView;
     Object focus = parent.priorFocus();
     if (! (focus instanceof Plot)) return false;
     Plot plot = (Plot) focus;
@@ -71,7 +71,7 @@ public class CasePerpsView extends UINode {
     //
     //  Extract basic game-references first:
     Base      player   = mainView.player();
-    MapView parent   = mainView.casesView;
+    MapView parent   = mainView.mapView;
     Person    agent    = mainView.rosterView.selectedPerson();
     Place     lastSeen = player.leads.lastKnownLocation(suspect);
     boolean   atSeen   = player.leads.atKnownLocation(suspect);

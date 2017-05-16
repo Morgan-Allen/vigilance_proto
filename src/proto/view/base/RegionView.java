@@ -36,10 +36,10 @@ public class RegionView extends UINode {
     */
   protected boolean renderTo(Surface surface, Graphics2D g) {
     
-    MapInsetView mapRefers = mainView.casesView.mapView;
+    MapInsetView mapRefers = mainView.mapView.mapView;
     Region  region = mapRefers.selectedRegion();
     Base    player = mainView.player();
-    MapView parent = mainView.casesView;
+    MapView parent = mainView.mapView;
     Person  agent  = mainView.rosterView.selectedPerson();
     if (region == null) return false;
     

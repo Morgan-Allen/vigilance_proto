@@ -195,7 +195,7 @@ public abstract class MapInsetView extends UINode {
       Series <Element> suspects = played.leads.activeSuspectsForRegion(n);
       int offS = (suspects.size() * 50) / -2;
       for (final Element suspect : suspects) {
-        Image alertImage = MapView.FILE_IMAGE;
+        Image alertImage = MapView.ALERT_IMAGE;
         if (played.leads.suspectIsUrgent(suspect)) {
           alertImage = MapView.ALERT_IMAGE;
         }
@@ -204,7 +204,7 @@ public abstract class MapInsetView extends UINode {
         ) {
           protected void whenClicked() {
             //mainView.switchToTab(mainView.casesView);
-            mainView.casesView.setActiveFocus(suspect, true);
+            mainView.mapView.setActiveFocus(suspect, true);
           }
         };
         //button.toggled = suspect == mainView.casesView.activeFocus;

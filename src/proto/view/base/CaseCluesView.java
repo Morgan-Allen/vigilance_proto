@@ -26,7 +26,7 @@ public class CaseCluesView extends UINode {
     //
     //  Extract basic game-references first:
     Base player = mainView.player();
-    MapView parent = mainView.casesView;
+    MapView parent = mainView.mapView;
     Object focus = parent.priorFocus();
     boolean forPlot = false, forSuspect = false;
     //
