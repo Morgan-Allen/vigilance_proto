@@ -48,7 +48,7 @@ public abstract class MessageView extends UINode {
     g.setColor(Color.WHITE);
     g.drawRect(vx, vy, vw, vh);
     
-    int optionsSize = options.length * 20;
+    int optionsSize = options.length * 25;
     g.drawString(title, vx + 5, vy + 20);
     renderContent(surface, g, optionsSize);
     
@@ -68,7 +68,7 @@ public abstract class MessageView extends UINode {
       button.valid = optionValid(index);
       button.refers = options[index];
       button.updateAndRender(surface, g);
-      down += 20;
+      down += 25;
     }
     
     return true;

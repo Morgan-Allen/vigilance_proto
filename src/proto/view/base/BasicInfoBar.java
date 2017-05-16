@@ -1,9 +1,7 @@
 
 
 package proto.view.base;
-import proto.common.*;
-import proto.game.world.Base;
-import proto.game.world.World;
+import proto.game.world.*;
 import proto.util.*;
 import proto.view.common.*;
 
@@ -15,7 +13,7 @@ import java.awt.Graphics2D;
 public class BasicInfoBar extends UINode {
   
   
-  final StringButton monitorButton, saveButton, loadButton, quitButton;
+  StringButton monitorButton;
   
   
   public BasicInfoBar(UINode parent, Box2D viewBounds) {
@@ -37,31 +35,6 @@ public class BasicInfoBar extends UINode {
       }
     };
     addChildren(monitorButton);
-    
-    across = across + 250;
-    
-    saveButton = new StringButton(
-      "Save", new Box2D(across + 0, down, 50, 25), this
-    ) {
-      protected void whenClicked() {
-        mainView.world().performSave();
-      }
-    };
-    loadButton = new StringButton(
-      "Reload", new Box2D(across + 50, down, 50, 25), this
-    ) {
-      protected void whenClicked() {
-        mainView.world().reloadFromSave();
-      }
-    };
-    quitButton = new StringButton(
-      "Quit", new Box2D(across + 100, down, 50, 25), this
-    ) {
-      protected void whenClicked() {
-        mainView.world().performSaveAndQuit();
-      }
-    };
-    addChildren(saveButton, loadButton, quitButton);
   }
   
   

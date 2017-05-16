@@ -27,7 +27,7 @@ public class MapView extends UINode {
     TRIAL_IMAGE   = Kind.loadImage(IMG_DIR+"trial_image.png"   ),
     JAILED_IMAGE  = Kind.loadImage(IMG_DIR+"jailed_image.png"  );
   final static Object
-    ALL_CASES  = "all-cases",
+    ALL_EVENTS  = "all-cases",
     PLOT_CLUES = "plot-clues";
   
   
@@ -41,7 +41,7 @@ public class MapView extends UINode {
   RegionView    regionView;
 
   UINode focusViews[], activeFocusView;
-  StringButton backButton, closeButton;
+  StringButton backButton, eventsButton;
   
   Object activeFocus = null;
   List <Object> focusStack = new List();
@@ -50,10 +50,10 @@ public class MapView extends UINode {
   
   public MapView(final UINode parent, Box2D viewBounds) {
     super(parent, viewBounds);
-
+    
     int fullWide = (int) viewBounds.xdim(), fullHigh = (int) viewBounds.ydim();
     mapView = new MapInsetView(this, new Box2D(
-      5, 5, fullWide - 340, fullHigh - 10
+      10, 10, fullWide - 360, fullHigh - 20
     )) {
       protected void onRegionSelect(Region region) {
         setActiveFocus(region, true);
@@ -63,7 +63,6 @@ public class MapView extends UINode {
       MainView.MAPS_DIR+"city_map.png",
       MainView.MAPS_DIR+"city_districts_key.png"
     );
-    //mapView.resizeToFitAspectRatio();
     addChildren(mapView);
     
     Box2D casesBound  = new Box2D(fullWide - 340, 25, 340, fullHigh - 25);
@@ -80,14 +79,14 @@ public class MapView extends UINode {
         navigateFocusBack();
       }
     };
-    closeButton = new StringButton(
-      "Close", new Box2D(fullWide - 340, 10, 60, 25), this
+    eventsButton = new StringButton(
+      "View Events", new Box2D(fullWide - 340, 10, 270, 25), this
     ) {
       protected void whenClicked() {
-        wipeFocusStack();
+        showEventsFocus();
       }
     };
-    addChildren(backButton, closeButton);
+    addChildren(backButton, eventsButton);
     
     eventsView = new EventsView   (scrollKid, scrollBound);
     rolesView  = new CaseRolesView(scrollKid, scrollBound);
@@ -99,7 +98,7 @@ public class MapView extends UINode {
     };
     scrollKid.addChildren(focusViews);
     
-    wipeFocusStack();
+    showEventsFocus();
   }
   
   
@@ -120,10 +119,10 @@ public class MapView extends UINode {
     
     this.activeFocus     = focus;
     this.activeFocusView = null ;
-    backButton .visible = focusStack.size() > 1;
-    closeButton.visible = activeFocus != ALL_CASES;
+    backButton  .valid   = focusStack.size() > 1;
+    eventsButton.valid   = activeFocus != ALL_EVENTS;
     
-    if (focus == ALL_CASES) {
+    if (focus == ALL_EVENTS) {
       activeFocusView = eventsView;
     }
     else if (focus == PLOT_CLUES) {
@@ -150,15 +149,15 @@ public class MapView extends UINode {
   }
   
   
-  public void wipeFocusStack() {
-    setActiveFocus(ALL_CASES, true);
+  public void showEventsFocus() {
+    setActiveFocus(ALL_EVENTS, true);
   }
   
   
   public void navigateFocusBack() {
     focusStack.removeLast();
     Object before = focusStack.last();
-    if (before == null) before = ALL_CASES;
+    if (before == null) before = ALL_EVENTS;
     this.activeFocus = before;
     setActiveFocus(before, false);
   }
