@@ -368,7 +368,7 @@ public class SceneView extends UINode implements TileConstants {
     
     Scene scene = (Scene) tile.scene;
     float maxSight = scene.vision.fogAt(tile, side);
-    if (maxSight > 0) return maxSight;
+    if (maxSight > 0 || ! tile.blocked()) return maxSight;
     
     for (int dir : T_ADJACENT) {
       if (tile.hasWall(dir)) continue;

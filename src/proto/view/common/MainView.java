@@ -201,6 +201,7 @@ public class MainView extends UINode {
       protected void whenClicked(String option, int optionID) {
         if (optionID == 0) {
           world().performSave();
+          dismissMessage(this);
         }
         if (optionID == 1) {
           world().reloadFromSave();

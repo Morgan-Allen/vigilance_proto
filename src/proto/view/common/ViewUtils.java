@@ -59,10 +59,10 @@ public class ViewUtils {
   public static class ListDraw {
     
     static class Entry {
-      Image  icon  ;
-      String label ;
-      int    along ;
-      Object refers;
+      Image  icons[];
+      String label  ;
+      int    along  ;
+      Object refers ;
     }
     List <Entry> entries = new List();
     
@@ -71,13 +71,20 @@ public class ViewUtils {
     public boolean clicked;
     
     
-    public void addEntry(Image icon, String label, int along, Object refers) {
+    public Object addEntry(Image icon, String label, int along, Object refers) {
       Entry e = new Entry();
-      e.icon   = icon  ;
+      e.icons  = new Image[] { icon };
       e.label  = label ;
       e.along  = along ;
       e.refers = refers;
       entries.add(e);
+      return e;
+    }
+    
+    
+    public void attachOverlay(Object ref, Image layer) {
+      Entry e = (Entry) ref;
+      e.icons = (Image[]) Visit.appendTo(e.icons, Image.class, layer);
     }
     
     
@@ -115,9 +122,9 @@ public class ViewUtils {
         g.setColor(Color.LIGHT_GRAY);
         if (e.refers == null) g.setColor(Color.WHITE);
         
-        if (e.icon != null) {
+        for (Image icon : e.icons) if (icon != null) {
           iconSize = e.along;
-          g.drawImage(e.icon, vx + across, vy + down, iconSize, iconSize, null);
+          g.drawImage(icon, vx + across, vy + down, iconSize, iconSize, null);
         }
         
         if (e.label != null) ViewUtils.drawWrappedString(

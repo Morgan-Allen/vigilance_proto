@@ -274,7 +274,7 @@ public class Region extends Element {
       world.setInside(oldPlace, false);
     }
     
-    buildSlots[slotFor(oldPlace)] = newPlace;
+    buildSlots[slotID] = newPlace;
     
     if (newPlace != null) {
       setAttached(newPlace, true);

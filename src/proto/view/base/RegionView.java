@@ -103,12 +103,14 @@ public class RegionView extends UINode {
     g.drawString("Facilities", vx + across + 10, vy + down + 10);
     down += 15;
     
-    //  TODO:  Use slot-IDs here instead, and arrange horizontally.
     ViewUtils.ListDraw draw = new ViewUtils.ListDraw();
     for (Integer slotID : Visit.range(0, region.maxFacilities())) {
       Place p = region.buildSlot(slotID);
-      if (p != null) draw.addEntry(p.icon() , null, 60, slotID);
-      else           draw.addEntry(NOT_BUILT, null, 60, slotID);
+      Image icon = p == null ? NOT_BUILT : p.icon();
+      Object entry = draw.addEntry(icon, null, 60, slotID);
+      if (p != null && p.buildProgress() < 1) {
+        draw.attachOverlay(entry, IN_PROGRESS);
+      }
     }
     draw.performHorizontalDraw(across + 20, down, this, surface, g);
     down = draw.down + 10;

@@ -108,7 +108,10 @@ public class SceneVision implements TileConstants {
   
   
   public void checkForEnemySightEntry(Person p, Action doing) {
-    for (Person other : scene.allPersons) if (other.side() != p.side()) {
+    for (Person other : scene.allPersons) {
+      if (other.side() == p.side()  ) continue;
+      if (! other.health.conscious()) continue;
+      
       float sight = degreeOfSight(other, p.currentTile(), false);
       if (sight > 0) {
         other.actions.onNoticing(p, doing);
@@ -169,12 +172,12 @@ public class SceneVision implements TileConstants {
     final Tile orig = p.currentTile();
     Batch <Tile> vantage = new Batch();
     boolean nextToWall = false;
+    
     for (int dir : T_ADJACENT) {
       Tile near = scene.tileAt(orig.x + T_X[dir], orig.y + T_Y[dir]);
       if (near == null) continue;
-      if (orig.coverLevel(dir) >= Kind.BLOCK_FULL) {
-        nextToWall = true;
-      }
+      boolean walled = orig.opacityVal(dir) > 0 || near.opaque();
+      if (walled) nextToWall = true;
       else vantage.add(near);
     }
     //
