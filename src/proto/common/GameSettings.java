@@ -33,7 +33,7 @@ public class GameSettings {
     pauseScene      = false,
     debugLineSight  = false,
     viewSceneBlocks = false,
-    eventsVerbose   = false
+    eventsVerbose   = true 
   ;
   
 }

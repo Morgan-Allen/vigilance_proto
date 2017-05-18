@@ -100,7 +100,7 @@ public class Step extends Index.Entry implements Session.Saveable {
     */
   //*
   protected Series <Clue> addTraitClues(
-    Plot plot, Element involved, Lead lead, Batch <Clue> possible
+    Plot plot, Element involved, Base follows, Batch <Clue> possible
   ) {
     //
     //  Wiretaps and mentions can't reliably reveal any descriptive features
@@ -139,7 +139,7 @@ public class Step extends Index.Entry implements Session.Saveable {
   
   
   protected Batch <Clue> addLocationClues(
-    Plot plot, Element involved, Lead lead, Batch <Clue> possible
+    Plot plot, Element involved, Base follows, Batch <Clue> possible
   ) {
     Role role = plot.roleFor(involved);
     if (role == null || ! involved.isPlace()) return possible;
@@ -168,12 +168,20 @@ public class Step extends Index.Entry implements Session.Saveable {
   
   
   public Series <Clue> possibleClues(
-    Plot plot, Element focus, Lead lead
+    Plot plot, Element focus, Base follows
   ) {
     Batch <Clue> possible = new Batch();
-    addTraitClues   (plot, focus, lead, possible);
-    addLocationClues(plot, focus, lead, possible);
-    return possible;
+    Batch <Clue> screened = new Batch();
+    
+    addTraitClues   (plot, focus, follows, possible);
+    addLocationClues(plot, focus, follows, possible);
+    
+    CaseFile file = follows.leads.caseFor(plot);
+    for (Clue clue : possible) if (! file.isRedundant(clue)) {
+      screened.add(clue);
+    }
+    
+    return screened;
   }
   
   

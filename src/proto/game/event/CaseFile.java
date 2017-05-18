@@ -81,10 +81,7 @@ public class CaseFile implements Session.Saveable {
     Clue clue, Lead source, Lead.Type type, int time, Place place,
     EventEffects effects, boolean display
   ) {
-    for (Clue prior : clues) {
-      if (! prior.makesRedundant(clue)) continue;
-      return;
-    }
+    if (isRedundant(clue)) return;
     
     if (source != null) clue.confirmSource(source, time, place);
     else                clue.confirmSource(type  , time, place);
@@ -94,6 +91,14 @@ public class CaseFile implements Session.Saveable {
     if (display) {
       MessageUtils.presentClueMessage(base.world().view(), clue, effects);
     }
+  }
+  
+  
+  public boolean isRedundant(Clue clue) {
+    for (Clue prior : clues) {
+      if (prior.makesRedundant(clue)) return true;
+    }
+    return false;
   }
   
   

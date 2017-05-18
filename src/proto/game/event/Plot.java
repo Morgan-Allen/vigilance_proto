@@ -6,6 +6,7 @@ import proto.game.world.*;
 import proto.game.person.*;
 import proto.game.scene.*;
 import proto.util.*;
+import static proto.game.event.Lead.*;
 
 
 
@@ -148,8 +149,8 @@ public abstract class Plot extends Event implements Assignment {
   
   public Step mainHeist() {
     for (Step s : steps) {
-      if (s.subject != ROLE_TARGET        ) continue;
-      if (s.medium  != Lead.MEDIUM_ASSAULT) continue;
+      if (s.subject != ROLE_TARGET   ) continue;
+      if (s.medium  != MEDIUM_ASSAULT) continue;
       return s;
     }
     return null;
@@ -187,12 +188,12 @@ public abstract class Plot extends Event implements Assignment {
   
   public int tense(Step step) {
     int start = startTime(step);
-    if (start == -1) return Lead.TENSE_NONE;
+    if (start == -1) return TENSE_NONE;
     int time = base.world().timing.totalHours();
     boolean begun = start >= 0;
     boolean done = time >= (start + step.hoursTaken);
-    if (begun) return done ? Lead.TENSE_AFTER : Lead.TENSE_DURING;
-    return Lead.TENSE_BEFORE;
+    if (begun) return done ? TENSE_AFTER : TENSE_DURING;
+    return TENSE_BEFORE;
   }
   
   
@@ -245,6 +246,7 @@ public abstract class Plot extends Event implements Assignment {
     if (! possible()) return;
     
     boolean verbose = GameSettings.eventsVerbose;
+    Base getsTipped = world.playerBase();
     
     if (current == null || complete(current)) {
       int time = world.timing.totalHours();
@@ -256,7 +258,7 @@ public abstract class Plot extends Event implements Assignment {
         if (verbose) {
           I.say("  Ended step: "+current.label());
         }
-        checkForTipoffs(current, false, true);
+        checkForTipoffs(current, false, true, getsTipped);
         boolean success = checkSuccess(current);
         onCompletion(current, success);
       }
@@ -269,7 +271,7 @@ public abstract class Plot extends Event implements Assignment {
           ((Person) e).addAssignment(this);
         }
         
-        checkForTipoffs(current, true, false);
+        checkForTipoffs(current, true, false, getsTipped);
         if (verbose) {
           I.say("  Began step: "+current.label());
         }
@@ -300,7 +302,7 @@ public abstract class Plot extends Event implements Assignment {
   
   public void takeSpooking(int spookAmount) {
     spookLevel += spookAmount;
-    float abortFactor = spookLevel * 1f / Lead.PROFILE_SUSPICIOUS;
+    float abortFactor = spookLevel * 1f / PROFILE_SUSPICIOUS;
     abortFactor = (abortFactor / entries.size()) - 1;
     float roll = Rand.num();
     //
@@ -520,9 +522,10 @@ public abstract class Plot extends Event implements Assignment {
   
   /**  Generating reports, tipoffs, actual scenes, and other after-effects:
     */
-  protected void checkForTipoffs(Step step, boolean begins, boolean ends) {
-    Base player = world.playerBase();
-    int  time   = world.timing.totalHours();
+  protected void checkForTipoffs(
+    Step step, boolean begins, boolean ends, Base follows
+  ) {
+    int time = world.timing.totalHours();
     
     if (begins && tipsCount < 2) {
       float tipWeights[] = new float[step.involved.length];
@@ -550,11 +553,14 @@ public abstract class Plot extends Event implements Assignment {
       float tipChance = tipWeights[Visit.indexOf(pickRole, step.involved)];
       
       if (tipsCount == 0 || tipChance > Rand.num()) {
-        Element  pick     = filling(pickRole);
-        Place    at       = pick.place();
-        Clue     tipoff   = Clue.confirmSuspect(this, pickRole, pick, at);
-        CaseFile file     = player.leads.caseFor(this);
-        file.recordClue(tipoff, Lead.LEAD_TIPOFF, time, at);
+        Element  pick = filling(pickRole);
+        Place    at   = pick.place();
+        CaseFile file = follows.leads.caseFor(this);
+        
+        Series <Clue> possible = step.possibleClues(this, pick, follows);
+        Clue tipoff = (Clue) Rand.pickFrom(possible);
+        
+        file.recordClue(tipoff, LEAD_TIPOFF, time, at);
         tipsCount += 1;
       }
     }
@@ -564,12 +570,13 @@ public abstract class Plot extends Event implements Assignment {
       Element  target = target();
       Place    scene  = target.place();
       Clue     report = Clue.confirmSuspect(this, ROLE_TARGET, target, scene);
-      Clue     aim    = Clue.confirmAim(this);
-      Clue     forAt  = Clue.confirmSuspect(this, ROLE_SCENE, scene, scene);
-      CaseFile file   = player.leads.caseFor(this);
-      file.recordClue(report, null, Lead.LEAD_REPORT, time, scene, effects, true);
-      file.recordClue(aim   , Lead.LEAD_REPORT, time, scene, false);
-      file.recordClue(forAt , Lead.LEAD_REPORT, time, scene, false);
+      Clue     aim    = Clue.confirmAim    (this                            );
+      Clue     forAt  = Clue.confirmSuspect(this, ROLE_SCENE , scene , scene);
+      CaseFile file   = follows.leads.caseFor(this);
+      
+      file.recordClue(report, null, LEAD_REPORT, time, scene, effects, true );
+      file.recordClue(aim   ,       LEAD_REPORT, time, scene         , false);
+      file.recordClue(forAt ,       LEAD_REPORT, time, scene         , false);
       effects.applyEffects(target.place());
       recordEffects(effects);
     }
