@@ -60,7 +60,7 @@ public abstract class Plot extends Event implements Assignment {
   Step current = null;
   int stepTimes[];
   
-  boolean gaveTip = false;
+  int tipsCount  = 0;
   int spookLevel = 0;
   
   
@@ -89,8 +89,8 @@ public abstract class Plot extends Event implements Assignment {
     stepTimes = new int[steps.size()];
     for (int i = 0; i < steps.size(); i++) stepTimes[i] = s.loadInt();
     
-    gaveTip    = s.loadBool();
-    spookLevel = s.loadInt ();
+    tipsCount  = s.loadInt();
+    spookLevel = s.loadInt();
   }
   
   
@@ -111,8 +111,8 @@ public abstract class Plot extends Event implements Assignment {
     s.saveObject(current);
     for (int t : stepTimes) s.saveInt(t);
     
-    s.saveBool(gaveTip   );
-    s.saveInt (spookLevel);
+    s.saveInt(tipsCount );
+    s.saveInt(spookLevel);
   }
   
   
@@ -227,6 +227,12 @@ public abstract class Plot extends Event implements Assignment {
   }
   
   
+  public Element targetElement(Person p) {
+    if (current == null) return location(roleFor(p));
+    return goes(p, current);
+  }
+  
+  
   
   /**  General update cycle and associated methods-
     */
@@ -261,10 +267,6 @@ public abstract class Plot extends Event implements Assignment {
         
         for (Element e : involved(current)) if (e.isPerson()) {
           ((Person) e).addAssignment(this);
-        }
-        for (Person p : assigned()) {
-          Place goes = goes(p, current);
-          if (goes != null) goes.setAttached(p, true);
         }
         
         checkForTipoffs(current, true, false);
@@ -366,12 +368,6 @@ public abstract class Plot extends Event implements Assignment {
   
   public Base base() {
     return base;
-  }
-  
-  
-  public Element targetElement(Person p) {
-    if (current == null) return location(roleFor(p));
-    return goes(p, current);
   }
   
   
@@ -528,7 +524,7 @@ public abstract class Plot extends Event implements Assignment {
     Base player = world.playerBase();
     int  time   = world.timing.totalHours();
     
-    if (begins && ! gaveTip) {
+    if (begins && tipsCount < 2) {
       float tipWeights[] = new float[step.involved.length];
       
       for (int i = step.involved.length; i-- > 0;) {
@@ -538,22 +534,28 @@ public abstract class Plot extends Event implements Assignment {
         float   trust     = at.region().currentValue(Region.TRUST);
         float   tipChance = trust / 100f;
         
-        tipChance -= base.organisationRank(focus) / 2f;
+        if (Visit.arrayIncludes(MAIN_ROLES, focusRole)) tipChance = 0;
+        else if (focusRole.isPerp  ()) tipChance -= 0.50f;
+        else if (focusRole.isScene ()) tipChance -= 0.50f;
+        else if (focusRole.isItem  ()) tipChance -= 0.50f;
+        else if (focusRole.isVictim()) tipChance += 0.25f;
+        
         if (GameSettings.freeTipoffs) tipChance = 1;
         if (GameSettings.noTipoffs  ) tipChance = 0;
+        
         tipWeights[i] = Nums.max(0, tipChance);
       }
       
       Role  pickRole  = (Role) Rand.pickFrom(step.involved, tipWeights);
       float tipChance = tipWeights[Visit.indexOf(pickRole, step.involved)];
       
-      if (tipChance > Rand.num()) {
+      if (tipsCount == 0 || tipChance > Rand.num()) {
         Element  pick     = filling(pickRole);
         Place    at       = pick.place();
         Clue     tipoff   = Clue.confirmSuspect(this, pickRole, pick, at);
         CaseFile file     = player.leads.caseFor(this);
         file.recordClue(tipoff, Lead.LEAD_TIPOFF, time, at);
-        gaveTip = true;
+        tipsCount += 1;
       }
     }
     

@@ -66,12 +66,12 @@ public class Place extends Element {
   }
   
   
-  public Base owner() {
+  public Base base() {
     return owner;
   }
   
   
-  public void setOwner(Base owns) {
+  public void setBase(Base owns) {
     this.owner = owns;
   }
   
@@ -119,7 +119,7 @@ public class Place extends Element {
         Person resides = Person.randomOfKind((PersonType) type, world);
         world.setInside(resides, true);
         setAttached(resides, true);
-        resides.setBase(owner());
+        resides.setBase(base());
         Place.setResident(resides, this, true);
       }
     }

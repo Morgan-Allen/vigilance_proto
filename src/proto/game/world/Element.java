@@ -63,6 +63,11 @@ public class Element implements Session.Saveable {
   }
   
   
+  public Base base() {
+    return null;
+  }
+  
+  
   public void setAttached(Element other, boolean is) {
     final Element oldP = other.attachedTo;
     attached.toggleMember(other, is);
@@ -128,10 +133,7 @@ public class Element implements Session.Saveable {
   
   
   public boolean isHQ() {
-    if (isPlace()) {
-      return this == ((Place) this).owner().HQ();
-    }
-    return false;
+    return base() != null && base().HQ() == this;
   }
   
   

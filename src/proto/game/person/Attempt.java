@@ -146,7 +146,7 @@ public class Attempt implements Session.Saveable {
   
   public void grantFacilityModifiers(Base owns) {
     for (Region r : owns.world().regions()) {
-      for (Place p : r.buildSlots()) if (p != null && p.owner() == owns) {
+      for (Place p : r.buildSlots()) if (p != null && p.base() == owns) {
         PlaceType type = p.kind();
         float speed = type.speedBonus(this);
         float trait = type.traitBonus(this);

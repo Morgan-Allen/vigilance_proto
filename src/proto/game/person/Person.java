@@ -303,10 +303,24 @@ public class Person extends Element {
   /**  Regular updates and life-cycle-
     */
   public void updateOnBase() {
+    //
+    //  Remove any completed assignments:
     for (Assignment a : assignments) {
       if (a.complete()) { removeAssignment(a); continue; }
     }
-
+    //
+    //  And either move to whatever location the top assignment requires you to
+    //  be, or return home if possible.
+    Assignment top = topAssignment();
+    Place goes = top == null ? null : top.targetElement(this).place();
+    if (goes != null) {
+      goes.place().setAttached(this, true);
+    }
+    else if (base.HQ() != null) {
+      base.HQ().setAttached(this, true);
+    }
+    //
+    //  Update health and stats:
     float numWeeks = world().timing.hoursInTick();
     health.updateHealth(numWeeks);
     if (health.alive()) {

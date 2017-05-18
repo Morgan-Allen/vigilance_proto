@@ -88,7 +88,7 @@ public class PlotRobbery extends Plot {
     Pick <Place> pickT = new Pick(0);
     for (Place p : world.publicPlaces()) {
       if (! Visit.arrayIncludes(THEFT_VENUES, p.kind())) continue;
-      if (p.owner() == base()) continue;
+      if (p.base() == base()) continue;
       pickT.compare(p, Rand.num());
     }
     if (pickT.empty()) return false;

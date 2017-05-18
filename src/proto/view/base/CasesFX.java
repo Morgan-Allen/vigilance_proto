@@ -38,6 +38,7 @@ public class CasesFX {
       }
     }
     
+    desc.append(" at "+clue.place());
     desc.append(" at "+world.timing.timeString(clue.time()));
     desc.append(" indicates that "+nameFor(plot, base)+"'s "+role);
     

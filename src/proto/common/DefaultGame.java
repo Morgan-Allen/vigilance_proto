@@ -63,7 +63,7 @@ public class DefaultGame extends RunGame {
         I.say("  "+region);
         for (Place p : region.buildSlots()) if (p != null) {
           I.say("    "+p+" "+(p.isHQ() ? " (HQ)" : ""));
-          I.add(" ("+p.owner().faction().name+")");
+          I.add(" ("+p.base().faction().name+")");
           for (Person r : p.residents()) {
             I.say("      Resident: "+r);
           }

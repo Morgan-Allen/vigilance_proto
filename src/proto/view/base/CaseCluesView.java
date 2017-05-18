@@ -11,9 +11,6 @@ import java.awt.Image;
 
 
 
-
-//*
-
 public class CaseCluesView extends UINode {
   
   
@@ -71,8 +68,5 @@ public class CaseCluesView extends UINode {
     parent.infoArea.setScrollheight(down);
     return true;
   }
-  
 }
-
-//*/
 

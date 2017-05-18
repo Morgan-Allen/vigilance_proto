@@ -119,14 +119,6 @@ public class Base implements Session.Saveable {
   }
   
   
-  public float organisationRank(Element p) {
-    if (p == leader || p == HQ) return 2;
-    if (p.isPerson() && roster.includes((Person) p)   ) return 1;
-    if (p.isPlace () && ((Place ) p).owner  () == this) return 1;
-    return 0;
-  }
-  
-  
   public Series <Person> roster() {
     return roster;
   }

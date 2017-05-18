@@ -471,6 +471,7 @@ public class Lead extends Task {
     Person perp = focus.isPerson() ? ((Person) focus) : null;
     Place  site = focus.isPlace () ? ((Place ) focus) : null;
     Region area = focus.isRegion() ? ((Region) focus) : null;
+    Base   base = focus.base();
     
     if (type.medium == MEDIUM_SURVEIL) {
       skill = SIGHT_RANGE;
@@ -499,14 +500,11 @@ public class Lead extends Task {
       if (area != null) obstacle = 10;
     }
     
-    if (perp != null && perp.base() != null) {
-      obstacle *= (perp.base().organisationRank(perp) + 2) / 4f;
+    if (base != null && (focus == base.HQ() || focus == base.leader())) {
+      obstacle *= 2;
     }
-    if (site != null && site.owner() != null) {
-      obstacle *= (site.owner().organisationRank(site) + 2) / 4f;
-    }
-    if (area != null) {
-      obstacle *= 1f;
+    else if (perp != null && perp.isCriminal()) {
+      obstacle *= 1.5f;
     }
     
     Attempt attempt = new Attempt(this);
@@ -530,9 +528,10 @@ public class Lead extends Task {
   public boolean updateAssignment() {
     if (! super.updateAssignment()) return false;
     Series <Person> active = active();
-    World world  = base.world();
-    int   time   = world.timing.totalHours();
-    float result = RESULT_NONE;
+    World   world  = base.world();
+    int     time   = world.timing.totalHours();
+    float   result = RESULT_NONE;
+    boolean report = GameSettings.eventsVerbose;
     //
     //  Continuously monitor for events of interest connected to the current
     //  focus of your investigation, and see if any new information pops up...
@@ -541,13 +540,23 @@ public class Lead extends Task {
       for (Step step : plot.allSteps()) {
         int tense = plot.tense(step);
         if (canDetect(step, tense, plot, time)) {
+          if (report) {
+            I.say("\nAttempting to follow lead: "+this);
+            I.say("  Plot detected: "+plot);
+          }
           Scene scene = enteredScene(step, tense, plot, time);
           if (scene != null) {
+            if (report) {
+              I.say("  Entering scene: "+scene);
+            }
             MessageUtils.presentBustMessage(world.view(), scene, this, plot);
             base.world().enterScene(scene);
           }
           else {
             result = attemptFollow(step, tense, plot, active, time);
+            if (report) {
+              I.say("  Follow result: "+result);
+            }
           }
         }
       }

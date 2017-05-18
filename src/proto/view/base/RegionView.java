@@ -123,13 +123,13 @@ public class RegionView extends UINode {
     else if (draw.hovered instanceof Integer) {
       int   slotID = (Integer) draw.hovered;
       Place built  = region.buildSlot(slotID);
-      Base  owner  = built == null ? null : built.owner();
+      Base  owner  = built == null ? null : built.base();
       
       if (built != null) {
         float prog = built.buildProgress();
         hoverDesc = "";
         hoverDesc += built.kind().defaultInfo();
-        hoverDesc += "\nInvestor: "+built.owner().faction().name;
+        hoverDesc += "\nInvestor: "+built.base().faction().name;
         if (prog < 1) hoverDesc += " ("+((int) (prog * 100))+"% complete)";
       }
       else {

@@ -65,22 +65,22 @@ public class MapView extends UINode {
     );
     addChildren(mapView);
     
-    Box2D casesBound  = new Box2D(fullWide - 340, 25, 340, fullHigh - 25);
-    Box2D scrollBound = new Box2D(0             , 25, 320, fullHigh - 25);
+    Box2D casesBound  = new Box2D(fullWide - 340, 35, 340, fullHigh - 35);
+    Box2D scrollBound = new Box2D(0             ,  0, 320, fullHigh - 35);
     infoArea = new ScrollArea(this, casesBound);
     addChildren(infoArea);
     UINode scrollKid = new UINode(infoArea, scrollBound) {};
     infoArea.attachScrollPane(scrollKid, (int) scrollBound.ydim());
     
     backButton = new StringButton(
-      "Back", new Box2D(fullWide - 70, 10, 60, 25), this
+      "Back", new Box2D(fullWide - 70, 5, 60, 25), this
     ) {
       protected void whenClicked() {
         navigateFocusBack();
       }
     };
     eventsButton = new StringButton(
-      "View Events", new Box2D(fullWide - 340, 10, 270, 25), this
+      "View Events", new Box2D(fullWide - 340, 5, 270, 25), this
     ) {
       protected void whenClicked() {
         showEventsFocus();

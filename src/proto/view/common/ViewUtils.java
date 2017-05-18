@@ -122,6 +122,11 @@ public class ViewUtils {
         g.setColor(Color.LIGHT_GRAY);
         if (e.refers == null) g.setColor(Color.WHITE);
         
+        if ((across + downEach > vw) && ! vertical) {
+          across = this.across;
+          down += downEach;
+        }
+        
         for (Image icon : e.icons) if (icon != null) {
           iconSize = e.along;
           g.drawImage(icon, vx + across, vy + down, iconSize, iconSize, null);
@@ -161,8 +166,8 @@ public class ViewUtils {
           
           if (a.assigningBase() == player) renderAssigned(
             a.assigned(),
-            vx + across + vw - 20,
-            vy + down + downEach,
+            vx + (vertical ? (across + vw - 20) : (across + downEach)),
+            vy + down + downEach + 10,
             within, surface, g
           );
         }

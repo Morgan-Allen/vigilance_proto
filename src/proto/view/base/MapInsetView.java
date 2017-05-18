@@ -103,8 +103,8 @@ public abstract class MapInsetView extends UINode {
   /**  Actual rendering methods-
     */
   protected boolean renderTo(Surface surface, Graphics2D g) {
-    Region regions[] = mainView.world().regions();
-    Base   played    = mainView.world().playerBase();
+    Region  regions[] = mainView.world().regions();
+    Base    played    = mainView.world().playerBase();
     
     attachOutlinesFor(regions);
     if (selectedRegion() == null) setSelectedRegion(regions[0]);
@@ -143,8 +143,6 @@ public abstract class MapInsetView extends UINode {
     //
     //  Then render any other widgets for each region-
     for (final Region n : regions) {
-      
-      //*
       int x = (int) ((n.kind().view.centerX / mapWRatio) + vx);
       int y = (int) ((n.kind().view.centerY / mapHRatio) + vy);
       
@@ -159,27 +157,20 @@ public abstract class MapInsetView extends UINode {
       
       //
       //  Render any facilities in the region-
-      final int maxF = n.maxFacilities();
-      int offF = 5 + ((maxF * 35) / -2);
-      for (final int slotID : Visit.range(0, maxF)) {
-        final Place     slot  = n.buildSlot(slotID);
-        final PlaceType built = slot == null ? null : slot.kind();
-        final float     prog  = slot == null ? 0 : slot.buildProgress();
-        
-        Image icon = null;
-        if (built == null) icon = RegionView.NOT_BUILT;
-        else               icon = built.icon();
-        
+      Batch <Place> built = new Batch();
+      for (Place p : n.buildSlots()) if (p != null) built.add(p);
+      int offF = 5 + ((built.size() * 35) / -2);
+      
+      for (final Place slot : built) {
         final ImageButton button = new ImageButton(
-          icon, new Box2D(x + offF - vx, y - (70 + vy), 30, 30), this
+          slot.icon(), new Box2D(x + offF - vx, y - (70 + vy), 30, 30), this
         ) {
           protected void whenClicked() {
-            presentBuildOptions(n, slotID);
+            mainView.mapView.setActiveFocus(slot, true);
           }
         };
-        button.valid = false;
-        button.refers = n.kind+"_slot_"+slotID;
-        if (prog < 1 && built != null) {
+        button.refers = slot;
+        if (slot.buildProgress() < 1) {
           button.attachOverlay(RegionView.IN_PROGRESS);
         }
         button.renderNow(surface, g);
@@ -199,11 +190,9 @@ public abstract class MapInsetView extends UINode {
           alertImage, new Box2D(x + offS - vx, y - (25 + vy), 50, 50), this
         ) {
           protected void whenClicked() {
-            //mainView.switchToTab(mainView.casesView);
             mainView.mapView.setActiveFocus(suspect, true);
           }
         };
-        //button.toggled = suspect == mainView.casesView.activeFocus;
         button.refers = suspect;
         button.renderNow(surface, g);
         
@@ -225,6 +214,7 @@ public abstract class MapInsetView extends UINode {
   private Series <Person> visitors(Region located) {
     final Batch <Person> visitors = new Batch();
     final Series <Person> roster = mainView.world().playerBase().roster();
+    
     for (Person p : roster) {
       final Assignment a = p.topAssignment();
       if (a != null && a.targetElement(p).region() == located) {

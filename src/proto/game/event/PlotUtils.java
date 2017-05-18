@@ -56,7 +56,7 @@ public class PlotUtils {
     for (Person p : target.residents()) {
       if (p.isCaptive() || ! p.health.conscious()) continue;
       if (plot.entryFor(p, null) != null) continue;
-      pick.compare(p, 0 - p.history.bondWith(target.owner().leader()));
+      pick.compare(p, 0 - p.history.bondWith(target.base().leader()));
     }
     if (pick.empty()) return;
     plot.assignRole(pick.result(), role, placing);
@@ -161,7 +161,12 @@ public class PlotUtils {
     
     Scene scene = place.kind().sceneType().generateScene(world);
     scene.entry.provideInProgressEntry(forces);
-    scene.entry.provideBorderEntry(lead.assigned());
+    
+    Batch <Person> onSite = new Batch();
+    for (Person p : lead.base.roster()) {
+      if (p.place() == place) onSite.add(p);
+    }
+    scene.entry.provideBorderEntry(onSite);
     scene.assignMissionParameters(place, lead, plot);
     
     return scene;

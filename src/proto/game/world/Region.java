@@ -204,7 +204,7 @@ public class Region extends Element {
     IncomeReport r = new IncomeReport();
     
     for (Place slot : buildSlots) {
-      if (slot == null || slot.owner() != base) continue;
+      if (slot == null || slot.base() != base) continue;
       if (slot.buildProgress() < 1) continue;
       
       final int inc = slot.kind().incomeFrom(this);
@@ -289,7 +289,7 @@ public class Region extends Element {
   ) {
     final Place place = new Place(print, slotID, world);
     Base owns = world.baseFor(faction);
-    place.setOwner(owns);
+    place.setBase(owns);
     
     if (complete || owns == null) {
       place.setBuildProgress(1);
@@ -312,7 +312,7 @@ public class Region extends Element {
       Faction   f = kind().defaultOwners    .atIndex(i);
       if (p == null || f == null) continue;
       Place built = setupFacility(p, i, f, true);
-      if (p.isHQ()) built.owner().assignHQ(built);
+      if (p.isHQ()) built.base().assignHQ(built);
     }
     
     updateStats(0);
@@ -338,7 +338,7 @@ public class Region extends Element {
     
     for (Place slot : buildSlots) if (slot != null) {
       final PlaceType built = slot.kind();
-      final Base      owns  = slot.owner();
+      final Base      owns  = slot.base();
       final float     prog  = slot.buildProgress();
       
       if (built == null) {
