@@ -54,7 +54,7 @@ public class MessageUtils {
   ) {
     StringBuffer desc = new StringBuffer();
     
-    Series <Person> did = lead.assigned();
+    Series <Person> did = scene.playerTeam();
     for (Person p : did) {
       if (p == did.first()) desc.append(""+p);
       else if (p == did.last()) desc.append(" and "+p);

@@ -12,8 +12,6 @@ import java.awt.Image;
 
 
 
-//*
-
 public class CaseRolesView extends UINode {
   
   
@@ -43,10 +41,11 @@ public class CaseRolesView extends UINode {
       }
     };
     for (Role role : player.leads.knownRolesFor(plot)) {
+      if (Visit.arrayIncludes(Plot.NEVER_SHOW, role)) continue;
       RoleView r = new RoleView();
-      r.role = role;
+      r.role     = role;
       r.suspects = player.leads.suspectsFor(role, plot);
-      r.clues = player.leads.cluesFor(plot, role, false);
+      r.clues    = player.leads.cluesFor(plot, role, false);
       roles.queueAdd(r);
     }
     //
@@ -146,9 +145,6 @@ public class CaseRolesView extends UINode {
     return true;
   }
 }
-//*/
-
-
 
 
 

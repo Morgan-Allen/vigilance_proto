@@ -209,8 +209,9 @@ public class PlotUtils {
       if (p.isCriminal() && p.currentScene() == scene && scene.wasWon()) {
         CaseFile  file = player.leads.caseFor(plot);
         Role      role = plot.roleFor(p);
+        Step      step = plot.currentStep();
         Place     site = scene.site();
-        Clue redHanded = Clue.confirmSuspect(plot, role, p, site);
+        Clue redHanded = Clue.confirmSuspect(plot, role, step, p, site);
         file.recordClue(redHanded, lead, time, site, false);
         captives.add(p);
         evidence.add(file);

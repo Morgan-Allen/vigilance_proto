@@ -23,19 +23,19 @@ public class DebugPlotBefore extends RunGame {
     DefaultGame.initDefaultWorld(world);
     
     Base crooks = world.baseFor(Crooks.THE_MADE_MEN);
-    Plot kidnap = PlotTypes.TYPE_KIDNAP.initPlot(crooks);
-    kidnap.fillAndExpand();
-    crooks.plots.assignRootPlot(kidnap, 0);
-    Person organiser = kidnap.organiser();
-    Place  hideout   = kidnap.hideout  ();
+    Plot crime = PlotTypes.TYPE_KIDNAP.initPlot(crooks);
+    crime.fillAndExpand();
+    crooks.plots.assignRootPlot(crime, 0);
+    Person organiser = crime.organiser();
+    Place  hideout   = crime.hideout  ();
     
     Base played = world.playerBase();
     Clue tipoff = Clue.confirmSuspect(
-      kidnap, Plot.ROLE_ORGANISER, organiser, hideout
+      crime, Plot.ROLE_ORGANISER, crime.currentStep(), organiser, hideout
     );
     int timeFound = world.timing.totalHours();
-    Place placeFound = kidnap.hideout();
-    CaseFile file = played.leads.caseFor(kidnap);
+    Place placeFound = crime.hideout();
+    CaseFile file = played.leads.caseFor(crime);
     file.recordClue(tipoff, Lead.LEAD_TIPOFF, timeFound, placeFound);
 
     GameSettings.noTipoffs = true;

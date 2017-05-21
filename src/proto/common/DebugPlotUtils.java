@@ -51,17 +51,17 @@ public class DebugPlotUtils {
     world.updateWorld(0);
     played.leads.extractNewClues();
     
-    Plot     plot    = world.events.nextActivePlot();
-    int      time    = world.timing.totalHours();
-    Step     current = plot.currentStep();
-    Place    place   = plot.goes(current);
-    CaseFile file    = played.leads.caseFor(plot);
-    Role     roleP   = plot.roleFor(place);
-    Trait    trait   = (Trait) Rand.pickFrom(place.traits());
+    Plot     plot  = world.events.nextActivePlot();
+    int      time  = world.timing.totalHours();
+    Step     step  = plot.currentStep();
+    Place    place = plot.goes(step);
+    CaseFile file  = played.leads.caseFor(plot);
+    Role     roleP = plot.roleFor(place);
+    Trait    trait = (Trait) Rand.pickFrom(place.traits());
     
     boolean recordCorrect = true;
-    Clue toPlace = Clue.locationClue(plot, roleP, place.region(), 0);
-    Clue further = Clue.locationClue(plot, roleP, place.region(), 1);
+    Clue toPlace = Clue.locationClue(plot, roleP, step, place.region(), 0);
+    Clue further = Clue.locationClue(plot, roleP, step, place.region(), 1);
     file.recordClue(toPlace, Lead.LEAD_REPORT, time, place);
     file.recordClue(further, Lead.LEAD_REPORT, time, place);
     
@@ -78,8 +78,8 @@ public class DebugPlotUtils {
     }
     file.wipeRecord();
     
-    Clue confirms = Clue.confirmSuspect(plot, roleP, place);
-    Clue forTrait = Clue.traitClue     (plot, roleP, trait);
+    Clue confirms = Clue.confirmSuspect(plot, roleP, step, place);
+    Clue forTrait = Clue.traitClue     (plot, roleP, step, trait);
     file.recordClue(confirms, Lead.LEAD_REPORT, time, place);
     file.recordClue(forTrait, Lead.LEAD_REPORT, time, place);
 
@@ -99,14 +99,14 @@ public class DebugPlotUtils {
     played.leads.extractNewClues();
     if (! recordCorrect) return false;
     I.say("  Clues were recorded correctly.");
-    I.say("  Current step is: "+current);
+    I.say("  Current step is: "+step);
     
     Pick <Lead> toFollow = new Pick();
     for (Lead lead : played.leads.leadsFor(place)) {
       if (lead.type.medium == Lead.MEDIUM_ASSAULT){
         continue;
       }
-      if (lead.canDetect(current, plot.tense(current), plot, time)) {
+      if (lead.canDetect(step, plot.tense(step), plot, time)) {
         toFollow.compare(lead, Rand.num() + 0.5f);
       }
     }
@@ -118,8 +118,8 @@ public class DebugPlotUtils {
     followed.setResult = 0.5f;
     
     Batch <Clue> possible = new Batch();
-    for (Element e : plot.involved(current)) {
-      Visit.appendTo(possible, current.possibleClues(plot, e, played, true));
+    for (Element e : plot.involved(step)) {
+      Visit.appendTo(possible, step.possibleClues(plot, e, step, played, true));
     }
     for (Person agent : played.roster()) {
       agent.addAssignment(followed);

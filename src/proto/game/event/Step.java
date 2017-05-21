@@ -103,7 +103,7 @@ public class Step extends Index.Entry implements Session.Saveable {
   /**  Generating potential Clues-
     */
   protected Series <Clue> addTraitClues(
-    Plot plot, Element involved,
+    Plot plot, Element involved, Step step,
     Base follows, boolean tipoff,
     Batch <Clue> possible
   ) {
@@ -119,7 +119,7 @@ public class Step extends Index.Entry implements Session.Saveable {
       Person p = (Person) involved;
       for (Trait t : Common.PERSON_TRAITS) {
         if (p.stats.levelFor(t) <= 0) continue;
-        Clue forTrait = Clue.traitClue(plot, role, t);
+        Clue forTrait = Clue.traitClue(plot, role, step, t);
         possible.add(forTrait);
       }
     }
@@ -128,14 +128,14 @@ public class Step extends Index.Entry implements Session.Saveable {
       Place p = (Place) involved;
       for (Trait t : Common.VENUE_TRAITS) {
         if (! p.hasProperty(t)) continue;
-        Clue forTrait = Clue.traitClue(plot, role, t);
+        Clue forTrait = Clue.traitClue(plot, role, step, t);
         possible.add(forTrait);
       }
     }
     
     if (involved.isItem()) {
       Item p = (Item) involved;
-      Clue match = Clue.confirmSuspect(plot, role, p, p.place());
+      Clue match = Clue.confirmSuspect(plot, role, step, p, p.place());
       possible.add(match);
     }
     
@@ -144,7 +144,7 @@ public class Step extends Index.Entry implements Session.Saveable {
   
   
   protected Batch <Clue> addLocationClues(
-    Plot plot, Element involved,
+    Plot plot, Element involved, Step step,
     Base follows, boolean tipoff,
     Batch <Clue> possible
   ) {
@@ -157,7 +157,7 @@ public class Step extends Index.Entry implements Session.Saveable {
     
     for (Region near : around) {
       int range = (int) world.distanceBetween(at, near);
-      Clue clue = Clue.locationClue(plot, role, near, range);
+      Clue clue = Clue.locationClue(plot, role, step, near, range);
       clue.setGetChance(1f / ((1 + range) * (1 + range)));
       possible.add(clue);
     }
@@ -179,14 +179,14 @@ public class Step extends Index.Entry implements Session.Saveable {
   
   
   public Series <Clue> possibleClues(
-    Plot plot, Element focus,
+    Plot plot, Element focus, Step step,
     Base follows, boolean tipoff
   ) {
     Batch <Clue> possible = new Batch();
     Batch <Clue> screened = new Batch();
     
-    addTraitClues   (plot, focus, follows, tipoff, possible);
-    addLocationClues(plot, focus, follows, tipoff, possible);
+    addTraitClues   (plot, focus, step, follows, tipoff, possible);
+    addLocationClues(plot, focus, step, follows, tipoff, possible);
     
     CaseFile file = follows.leads.caseFor(plot);
     for (Clue clue : possible) if (! file.isRedundant(clue)) {

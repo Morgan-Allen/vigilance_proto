@@ -427,11 +427,11 @@ public class Lead extends Task {
       //  the suspect and their current location.  If it's weaker, we get a
       //  partial clue, and if it's weaker still, we get no clue at all.
       if (recognition > 0.66f) {
-        Clue confirms = Clue.confirmSuspect(plot, role, e, e.place());
+        Clue confirms = Clue.confirmSuspect(plot, role, step, e, e.place());
         file.recordClue(confirms, this, time, scene);
       }
       else if (recognition > 0.33f) {
-        Series <Clue> possible = step.possibleClues(plot, e, base, false);
+        Series <Clue> possible = step.possibleClues(plot, e, step, base, false);
         Clue gained = step.pickFrom(possible);
         if (gained != null) file.recordClue(gained, this, time, scene);
       }
@@ -444,7 +444,7 @@ public class Lead extends Task {
     float recogMention = recognition(outcome, scene, null);
     if (step.mentions != null && recogMention > 0.5f) {
       Element match = plot.filling(step.mentions);
-      Clue confirms = Clue.confirmSuspect(plot, step.mentions, match);
+      Clue confirms = Clue.confirmSuspect(plot, step.mentions, step, match);
       file.recordClue(confirms, this, time, scene);
     }
     //

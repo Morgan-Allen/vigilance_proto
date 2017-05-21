@@ -18,6 +18,7 @@ public class CasesFX {
     Lead      source    = clue.source();
     Plot      plot      = clue.plot();
     Role      role      = clue.role();
+    Step      step      = clue.step();
     Element   match     = clue.match();
     Trait     trait     = clue.trait();
     Element   location  = clue.locationNear();
@@ -25,6 +26,7 @@ public class CasesFX {
     Lead.Type leadType  = clue.leadType();
     Element   fills     = plot.filling(role);
     Faction   faction   = plot.base().faction();
+    int       plotTime  = plot.timeScheduled(plot.mainHeist());
     
     StringBuffer desc = new StringBuffer();
     if (leadType != null) desc.append(leadType.name  );
@@ -44,9 +46,10 @@ public class CasesFX {
     desc.append(" at "+world.timing.timeString(clue.time()));
     
     String perpDesc = "", pronDesc = "";
-    if (fills.isPerson()) pronDesc = "someone";
-    if (fills.isPlace ()) pronDesc = "somewhere";
-    if (fills.isItem  ()) pronDesc = "something";
+    if      (fills == null   ) pronDesc = "nothing";
+    else if (fills.isPerson()) pronDesc = "someone";
+    else if (fills.isPlace ()) pronDesc = "an unknown location";
+    else if (fills.isItem  ()) pronDesc = "something";
     
     if (clue.isConfirmation()) {
       perpDesc = match.name();
@@ -59,24 +62,43 @@ public class CasesFX {
       if (nearRange == 0) perpDesc = pronDesc+" at "  +location;
       else                perpDesc = pronDesc+" near "+location;
     }
-    
-    String roleDesc = role.descTemplate;
-    roleDesc = roleDesc.replace("<faction>", faction.name);
-    roleDesc = roleDesc.replace("<suspect>", perpDesc);
-    roleDesc = roleDesc.replace("<plot>"   , nameFor(plot, base));
-    
-    for (Role r : plot.allRoles()) {
-      Series <Element> suspects = base.leads.suspectsFor(role, plot);
-      String otherDesc = "";
-      if (suspects.size() == 1) otherDesc = suspects.first().name();
-      else otherDesc = "the "+r.name.toLowerCase();
-      roleDesc = roleDesc.replace(r.entryKey(), otherDesc);
+    if (clue.isAim()) {
+      
     }
     
+    Table <String, String> replacements = new Table();
+    replacements.put("<faction>", faction.name       );
+    replacements.put("<suspect>", perpDesc           );
+    replacements.put("<plot>"   , nameFor(plot, base));
+    replacements.put("<aim>"    , plot.type.name     );
+    for (Role r : plot.allRoles()) {
+      Series <Element> suspects = base.leads.suspectsFor(r, plot);
+      String otherDesc = "";
+      if (suspects.size() == 1) otherDesc = suspects.first().name();
+      else otherDesc = "an unknown "+r.name.toLowerCase();
+      replacements.put("<"+r.entryKey()+">", otherDesc);
+    }
+    
+    String stepDesc = step.descTemplate();
+    stepDesc = replaceKeywords(stepDesc, replacements);
+    replacements.put("<step>", stepDesc);
+    replacements.put("<time>", world.timing.timeString(plotTime));
+    
+    String roleDesc = replaceKeywords(role.descTemplate, replacements);
     desc.append(" indicates ");
     desc.append(roleDesc);
     
     return desc.toString();
+  }
+  
+  
+  static String replaceKeywords(
+    String template, Table <String, String> replacements
+  ) {
+    for (String key : replacements.keySet()) {
+      template = template.replace(key, replacements.get(key));
+    }
+    return template;
   }
   
   
@@ -103,8 +125,8 @@ public class CasesFX {
     
     String name = "Unknown Plot";
     if      (targKnown && aimKnown) name = type.name+" of "+plot.target();
-    else if (targKnown            ) name += " (target: "+plot.target()+")";
-    else if (aimKnown             ) name += " ("+type.name+")";
+    else if (targKnown            ) name += " (Target: "+plot.target()+")";
+    else if (aimKnown             ) name = ""+type.name+" (Unknown Target)";
     return name;
   }
   

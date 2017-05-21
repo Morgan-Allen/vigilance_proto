@@ -23,6 +23,7 @@ public class Clue implements Session.Saveable {
   int   clueType ;
   Plot  plot     ;
   Role  role     ;
+  Step  step     ;
   float getChance;
   
   Element match     = null;
@@ -41,8 +42,9 @@ public class Clue implements Session.Saveable {
     s.cacheInstance(this);
     
     clueType   = s.loadInt();
-    plot       = (Plot     ) s.loadObject();
+    plot       = (Plot) s.loadObject();
     role       = (Role) s.loadObject();
+    step       = (Step) s.loadObject();
     getChance  = s.loadFloat();
     
     match      = (Element) s.loadObject();
@@ -62,6 +64,7 @@ public class Clue implements Session.Saveable {
     s.saveInt   (clueType   );
     s.saveObject(plot       );
     s.saveObject(role       );
+    s.saveObject(step       );
     s.saveFloat (getChance  );
     
     s.saveObject(match      );
@@ -92,6 +95,7 @@ public class Clue implements Session.Saveable {
   public int       clueType () { return clueType ; }
   public Plot      plot     () { return plot     ; }
   public Role      role     () { return role     ; }
+  public Step      step     () { return step     ; }
   public float     getChance() { return getChance; }
   
   public int     time        () { return timeFound ; }
@@ -109,11 +113,13 @@ public class Clue implements Session.Saveable {
   
   
   public static Clue locationClue(
-    Plot plot, Role role, Element location, int nearRange
+    Plot plot, Role role, Step step,
+    Element location, int nearRange
   ) {
     Clue c = new Clue();
     c.plot      = plot;
     c.role      = role;
+    c.step      = step;
     c.clueType  = TYPE_LOCATION;
     c.location  = location;
     c.nearRange = nearRange;
@@ -123,11 +129,13 @@ public class Clue implements Session.Saveable {
   
   
   public static Clue traitClue(
-    Plot plot, Role role, Trait trait
+    Plot plot, Role role, Step step,
+    Trait trait
   ) {
     Clue c = new Clue();
     c.plot      = plot;
     c.role      = role;
+    c.step      = step;
     c.clueType  = TYPE_TRAIT;
     c.trait     = trait;
     c.getChance = 1;
@@ -136,11 +144,13 @@ public class Clue implements Session.Saveable {
   
   
   public static Clue confirmSuspect(
-    Plot plot, Role role, Element match, Place at
+    Plot plot, Role role, Step step,
+    Element match, Place at
   ) {
     Clue c = new Clue();
     c.plot      = plot;
     c.role      = role;
+    c.step      = step;
     c.clueType  = TYPE_MATCH;
     c.match     = match;
     c.location  = at;
@@ -151,9 +161,9 @@ public class Clue implements Session.Saveable {
   
   
   public static Clue confirmSuspect(
-    Plot plot, Role role, Element match
+    Plot plot, Role role, Step step, Element match
   ) {
-    return confirmSuspect(plot, role, match, null);
+    return confirmSuspect(plot, role, step, match, null);
   }
   
   
@@ -161,6 +171,7 @@ public class Clue implements Session.Saveable {
     Clue c = new Clue();
     c.plot      = plot;
     c.role      = Plot.ROLE_OBJECTIVE;
+    c.step      = plot.currentStep();
     c.clueType  = TYPE_AIM;
     c.getChance = 1;
     return c;

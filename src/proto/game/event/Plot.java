@@ -31,11 +31,11 @@ public abstract class Plot extends Event implements Assignment {
   final public static Role
     ROLE_OBJECTIVE = role(
       "role_objective", "Objective", ASPECT,
-      ""
+      "<faction> are planning <aim>."
     ),
     ROLE_TIME = role(
       "role_time", "Time", ASPECT,
-      ""
+      "<plot> is scheduled for <time>."
     ),
     ROLE_MASTERMIND = role(
       "role_mastermind", "Mastermind", PERP,
@@ -61,8 +61,9 @@ public abstract class Plot extends Event implements Assignment {
       "role_scene", "Scene", SCENE,
       "<suspect> is the scene for <plot>."
     ),
-    KNOWS_AIM[] = { ROLE_MASTERMIND, ROLE_ORGANISER },
-    NEVER_TIP[] = { ROLE_MASTERMIND, ROLE_HQ, ROLE_TARGET, ROLE_SCENE };
+    KNOWS_AIM [] = { ROLE_MASTERMIND, ROLE_ORGANISER },
+    NEVER_SHOW[] = { ROLE_OBJECTIVE, ROLE_TIME },
+    NEVER_TIP [] = { ROLE_MASTERMIND, ROLE_HQ, ROLE_TARGET, ROLE_SCENE };
   
   
   /**  Data fields, construction and save/load methods-
@@ -574,13 +575,12 @@ public abstract class Plot extends Event implements Assignment {
         float   tipChance = trust / 100f;
         
         if (Visit.arrayIncludes(NEVER_TIP, focusRole)) tipChance = 0;
-        else if (focusRole.isPerp  ()) tipChance /= 2;
-        else if (focusRole.isScene ()) tipChance /= 2;
-        else if (focusRole.isItem  ()) tipChance /= 2;
-        else if (focusRole.isVictim()) tipChance += 0.25f;
-        
-        if (GameSettings.freeTipoffs) tipChance = 1;
-        if (GameSettings.noTipoffs  ) tipChance = 0;
+        else if (GameSettings.freeTipoffs) tipChance = 1;
+        else if (GameSettings.noTipoffs  ) tipChance = 0;
+        else if (focusRole.isPerp  ()    ) tipChance /= 2;
+        else if (focusRole.isScene ()    ) tipChance /= 2;
+        else if (focusRole.isItem  ()    ) tipChance /= 2;
+        else if (focusRole.isVictim()    ) tipChance += 0.25f;
         
         sumWeights += tipWeights[i] = Nums.max(0, tipChance);
       }
@@ -596,10 +596,12 @@ public abstract class Plot extends Event implements Assignment {
         Clue     tipoff = null;
         
         if (tipsCount == 0) {
-          tipoff = Clue.confirmSuspect(this, pickRole, pick, at);
+          tipoff = Clue.confirmSuspect(this, pickRole, step, pick, at);
         }
         else {
-          Series <Clue> clues = step.possibleClues(this, pick, follows, true);
+          Series <Clue> clues = step.possibleClues(
+            this, pick, step, follows, true
+          );
           tipoff = step.pickFrom(clues);
         }
         if (tipoff != null) {
@@ -613,14 +615,16 @@ public abstract class Plot extends Event implements Assignment {
       EventEffects effects = generateEffects(step);
       Element  target = target();
       Place    scene  = target.place();
-      Clue     report = Clue.confirmSuspect(this, ROLE_TARGET, target, scene);
-      Clue     aim    = Clue.confirmAim    (this                            );
-      Clue     forAt  = Clue.confirmSuspect(this, ROLE_SCENE , scene , scene);
       CaseFile file   = follows.leads.caseFor(this);
+      Clue 
+        report = Clue.confirmSuspect(this, ROLE_TARGET, step, target, scene),
+        aim    = Clue.confirmAim    (this                                  ),
+        forAt  = Clue.confirmSuspect(this, ROLE_SCENE , step, scene , scene);
       
       file.recordClue(report, null, LEAD_REPORT, time, scene, effects, true );
       file.recordClue(aim   ,       LEAD_REPORT, time, scene         , false);
       file.recordClue(forAt ,       LEAD_REPORT, time, scene         , false);
+      
       effects.applyEffects(target.place());
       recordEffects(effects);
     }
