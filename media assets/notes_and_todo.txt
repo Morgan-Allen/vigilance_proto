@@ -1,11 +1,31 @@
 
 
 
+Update the map so that it looks better.
 
+Either agents need to auto-assign themselves to leads and other tasks, or leads
+need to be more persistent.
+
+
+
+Pare down the list of facilities to what's necessary.
 
 You need to create adjacency-effects for different facilities, and allow their
 effects to spill over into nearby districts.
 
+Cut construction down to 6 months or so.
+Increase lead-following to 1 week.
+
+
+
+
+You need to give each agent some unique flavour, based on costume.
+  *  Phobos has free ultrasound and mobility.
+  *  Deimos has rapid fire/double-tap and heavy armour.
+  *  Black Swift has sidekicks and melee mastery.
+  *  Dr. Yang has disguise and misdirection/false alarm.
+
+Add some reluctance, initiative and motives for agents.
 
 
 
@@ -15,9 +35,14 @@ factions.
 You need to add some intelligence to their motions/patrol patterns, and to
 distribute them more evenly about the map.
 
+Add the full tech tree and range of gadgets.
 
 
-You should begin thinking about a UI for building up scenes.
+
+Scenes should generate procedurally in random ways using corner/mid/inside
+segments.
+
+You might add a UI for building up scenes.
 
 
-You should begin thinking about reluctance, initiative and motives for agents.
+
