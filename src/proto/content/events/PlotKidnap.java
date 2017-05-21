@@ -15,39 +15,57 @@ public class PlotKidnap extends Plot {
   /**  Data fields, construction and save/load methods:
     */
   final public static Role
-    ROLE_TAILS   = Plot.role("kidnap_tails"  , "Tails"  , PERP  ),
-    ROLE_GRABS   = Plot.role("kidnap_grabs"  , "Grabs"  , PERP  ),
-    ROLE_RANSOMS = Plot.role("kidnap_ransoms", "Ransoms", VICTIM),
-    ROLE_HOME    = Plot.role("kidnap_home"   , "Home"   , SCENE );
+    ROLE_TAILS = role(
+      "kidnap_tails", "Tails", PERP,
+      "<suspect> is responsible for tailing <role_target> in <plot>."
+    ),
+    ROLE_GRABS = role(
+      "kidnap_grabs", "Grabs", PERP,
+      "<suspect> is responsible for grabbing <role_target> in <plot>."
+    ),
+    ROLE_RANSOMS = role(
+      "kidnap_ransoms", "Ransoms", VICTIM,
+      "<suspect> is to be ransomed in <plot>."
+    ),
+    ROLE_HOME = role(
+      "kidnap_home", "Home", SCENE,
+      "<suspect> is the home for <kidnap_ransoms>."
+    );
   
   final public static Step
     STEP_CONTACTS = Step.stepWith(
       "kidnap_initial_contacts", "Initial Contacts",
+      "",
       ROLE_MASTERMIND, ROLE_HQ, ROLE_ORGANISER, ROLE_HIDEOUT, ROLE_TARGET,
       Lead.MEDIUM_WIRE, 24
     ),
     STEP_TAILING = Step.stepWith(
       "kidnap_tailing_target", "Tailing Target",
+      "",
       ROLE_TAILS, ROLE_HIDEOUT, ROLE_TARGET, ROLE_SCENE, null,
       Lead.MEDIUM_SURVEIL, 24
     ),
     STEP_GRABS = Step.stepWith(
       "kidnap_grab_target", "Grab Target",
+      "",
       ROLE_TAILS, ROLE_HIDEOUT, ROLE_TARGET, ROLE_SCENE, null,
       Lead.MEDIUM_ASSAULT, 24, ROLE_GRABS
     ),
     STEP_RANSOM_DEMAND = Step.stepWith(
       "kidnap_ransom_demand", "Ransom Demand",
+      "",
       ROLE_ORGANISER, ROLE_HIDEOUT, ROLE_RANSOMS, ROLE_HOME, ROLE_TARGET,
       Lead.MEDIUM_WIRE, 24
     ),
     STEP_RANSOM_PAID = Step.stepWith(
       "kidnap_ransom_paid", "Ransom Paid",
+      "",
       ROLE_RANSOMS, ROLE_HOME, ROLE_ORGANISER, ROLE_HIDEOUT, ROLE_TARGET,
       Lead.MEDIUM_WIRE, 24
     ),
     STEP_REPORT = Step.stepWith(
       "kidnap_reports_and_payoffs", "Reports And Payoffs",
+      "",
       ROLE_ORGANISER, ROLE_HIDEOUT, ROLE_MASTERMIND, ROLE_HQ, null,
       Lead.MEDIUM_WIRE, 24
     );

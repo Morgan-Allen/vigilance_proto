@@ -14,6 +14,7 @@ public class Step extends Index.Entry implements Session.Saveable {
   final static Index <Step> INDEX = new Index();
   
   String label;
+  String descTemplate;
   Role
     involved[],
     acting  ,
@@ -25,9 +26,8 @@ public class Step extends Index.Entry implements Session.Saveable {
   int hoursTaken;
   
   
-  private Step(String ID, String label) {
+  private Step(String ID) {
     super(INDEX, ID);
-    this.label = label;
   }
   
   
@@ -45,12 +45,16 @@ public class Step extends Index.Entry implements Session.Saveable {
   /**  Factory methods for convenience:
     */
   public static Step stepWith(
-    String ID, String label,
+    String ID, String label, String descTemplate,
     Role acting, Role from, Role subject, Role goes,
     Role mentions, int medium, int hoursTaken, Role... others
   ) {
-    Step s = new Step(ID, label);
-    s.medium     = medium;
+    Step s = new Step(ID);
+    
+    s.label        = label       ;
+    s.descTemplate = descTemplate;
+    
+    s.medium     = medium    ;
     s.hoursTaken = hoursTaken;
     
     Batch <Role> involved = new Batch();
@@ -98,7 +102,6 @@ public class Step extends Index.Entry implements Session.Saveable {
   
   /**  Generating potential Clues-
     */
-  //*
   protected Series <Clue> addTraitClues(
     Plot plot, Element involved,
     Base follows, boolean tipoff,
@@ -210,6 +213,11 @@ public class Step extends Index.Entry implements Session.Saveable {
   }
   
   
+  public String descTemplate() {
+    return descTemplate;
+  }
+  
+  
   public String toString() {
     StringBuffer s = new StringBuffer();
     s.append(label);
@@ -223,7 +231,4 @@ public class Step extends Index.Entry implements Session.Saveable {
     return s.toString();
   }
 }
-
-
-
 

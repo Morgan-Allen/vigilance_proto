@@ -16,7 +16,7 @@ public class Crooks {
   
   
   final public static Faction THE_MADE_MEN = new Faction(
-    "The Made Men", "faction_the_made_men", true
+    "The Moretti Family", "faction_the_moretti_family", true
   );
   
   

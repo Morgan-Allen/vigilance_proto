@@ -22,22 +22,47 @@ public abstract class Plot extends Event implements Assignment {
     SCENE  = "Scene" ,
     VICTIM = "Victim";
   
-  public static Role role(String ID, String name, String category) {
-    return new Role(ID, name, category);
+  public static Role role(
+    String ID, String name, String category, String descTemplate
+  ) {
+    return new Role(ID, name, category, descTemplate);
   }
   
   final public static Role
-    ROLE_OBJECTIVE  = new Role("role_objective" , "Objective" , ASPECT),
-    ROLE_TIME       = new Role("role_time"      , "Time"      , ASPECT),
-    ROLE_MASTERMIND = new Role("role_mastermind", "Mastermind", PERP  ),
-    ROLE_HQ         = new Role("role_hq"        , "HQ"        , SCENE ),
-    ROLE_ORGANISER  = new Role("role_organiser" , "Organiser" , PERP  ),
-    ROLE_HIDEOUT    = new Role("role_hideout"   , "Hideout"   , SCENE ),
-    ROLE_TARGET     = new Role("role_target"    , "Target"    , VICTIM),
-    ROLE_SCENE      = new Role("role_scene"     , "Scene"     , SCENE ),
-    
+    ROLE_OBJECTIVE = role(
+      "role_objective", "Objective", ASPECT,
+      ""
+    ),
+    ROLE_TIME = role(
+      "role_time", "Time", ASPECT,
+      ""
+    ),
+    ROLE_MASTERMIND = role(
+      "role_mastermind", "Mastermind", PERP,
+      "<suspect> is the mastermind for <plot>."
+    ),
+    ROLE_HQ = role(
+      "role_hq", "HQ", SCENE,
+      "<suspect> is the headquarters for <faction>."
+    ),
+    ROLE_ORGANISER = role(
+      "role_organiser", "Organiser", PERP,
+      "<suspect> is the organiser for <plot>."
+    ),
+    ROLE_HIDEOUT = role(
+      "role_hideout", "Hideout", SCENE,
+      "<suspect> is the hideout for a crew involved in <plot>."
+    ),
+    ROLE_TARGET = role(
+      "role_target", "Target", VICTIM,
+      "<suspect> is the target of <plot>."
+    ),
+    ROLE_SCENE = role(
+      "role_scene", "Scene", SCENE,
+      "<suspect> is the scene for <plot>."
+    ),
     KNOWS_AIM[] = { ROLE_MASTERMIND, ROLE_ORGANISER },
-    NEVER_TIP [] = { ROLE_MASTERMIND, ROLE_HQ, ROLE_TARGET, ROLE_SCENE };
+    NEVER_TIP[] = { ROLE_MASTERMIND, ROLE_HQ, ROLE_TARGET, ROLE_SCENE };
   
   
   /**  Data fields, construction and save/load methods-
@@ -441,6 +466,15 @@ public abstract class Plot extends Event implements Assignment {
       return entry;
     }
     return null;
+  }
+  
+  
+  public Batch <Role> allRoles() {
+    Batch <Role> all = new Batch();
+    for (RoleEntry entry : entries) {
+      all.include(entry.role);
+    }
+    return all;
   }
   
   

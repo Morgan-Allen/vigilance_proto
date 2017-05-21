@@ -18,40 +18,61 @@ public class PlotRobbery extends Plot {
   /**  Data fields, construction and save/load methods-
     */
   final public static Role
-    ROLE_CASING  = Plot.role("robbery_casing" , "Casing" , PERP ),
-    ROLE_CRACKER = Plot.role("robbery_cracker", "Cracker", PERP ),
-    ROLE_HACKER  = Plot.role("robbery_hacker" , "Hacker" , PERP ),
-    ROLE_OFFICE  = Plot.role("robbery_office" , "Office" , SCENE),
-    ROLE_FENCE   = Plot.role("robbery_fence"  , "Fence"  , PERP );
+    ROLE_CASING = role(
+      "robbery_casing", "Casing", PERP,
+      "<suspect> is casing <role_scene> as part of <plot>."
+    ),
+    ROLE_CRACKER = role(
+      "robbery_cracker", "Cracker", PERP,
+      "<suspect> is responsible for cracking safes during <plot>."
+    ),
+    ROLE_HACKER = role(
+      "robbery_hacker", "Hacker", PERP,
+      "<suspect> is responsible for bypassing security during <plot>."
+    ),
+    ROLE_OFFICE = role(
+      "robbery_office", "Office", SCENE,
+      "<robbery_hacker> is going to look up blueprints at <suspect>."
+    ),
+    ROLE_FENCE = role(
+      "robbery_fence", "Fence", PERP,
+      "<suspect> is fencing goods on behalf of <faction>."
+    );
   
   final public static Step
     STEP_CONTACTS = Step.stepWith(
       "robbery_contacts", "Contacts",
+      "",
       ROLE_MASTERMIND, ROLE_HQ, ROLE_ORGANISER, ROLE_HIDEOUT, null,
       Lead.MEDIUM_WIRE, 24
     ),
     STEP_CASING = Step.stepWith(
       "robbery_casing", "Casing",
+      "",
       ROLE_CASING, ROLE_HIDEOUT, ROLE_TARGET, ROLE_SCENE, null,
       Lead.MEDIUM_SURVEIL, 24
     ),
     STEP_RESEARCH = Step.stepWith(
       "robbery_research", "Research",
+      "",
       ROLE_HACKER, ROLE_HIDEOUT, ROLE_OFFICE, ROLE_OFFICE, null,
       Lead.MEDIUM_MEET, 24
     ),
     STEP_HEIST = Step.stepWith(
       "robbery_heist", "Heist",
+      "",
       ROLE_CASING, ROLE_HIDEOUT, ROLE_TARGET, ROLE_SCENE, null,
       Lead.MEDIUM_ASSAULT, 24, ROLE_CRACKER, ROLE_HACKER
     ),
     STEP_VALUATION = Step.stepWith(
       "robbery_valuation", "Valuation and Fencing",
+      "",
       ROLE_ORGANISER, ROLE_HIDEOUT, ROLE_FENCE, ROLE_HIDEOUT, null,
       Lead.MEDIUM_MEET, 24, ROLE_CASING, ROLE_CRACKER, ROLE_HACKER
     ),
     STEP_REPORT = Step.stepWith(
       "robbery_report", "Report and Payoffs",
+      "",
       ROLE_ORGANISER, ROLE_HIDEOUT, ROLE_MASTERMIND, ROLE_HQ, null,
       Lead.MEDIUM_WIRE, 24
     );

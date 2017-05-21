@@ -12,12 +12,14 @@ public class Role extends Index.Entry implements Session.Saveable {
   
   final public String name;
   final public String category;
+  final public String descTemplate;
   
   
-  Role(String ID, String name, String category) {
+  Role(String ID, String name, String category, String descTemplate) {
     super(ROLES_INDEX, ID);
     this.name = name;
     this.category = category;
+    this.descTemplate = descTemplate;
   }
   
   public static Role loadConstant(Session s) throws Exception {
@@ -38,4 +40,7 @@ public class Role extends Index.Entry implements Session.Saveable {
   public boolean isScene () { return category == Plot.SCENE ; }
   public boolean isVictim() { return category == Plot.VICTIM; }
 }
+
+
+
 

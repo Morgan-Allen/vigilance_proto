@@ -389,8 +389,7 @@ public class Person extends Element {
   /**  Interface, rendering and debug methods-
     */
   public String name() {
-    if (isHero() || isVillain()) return name;
-    return name+" ("+kind.name()+")";
+    return name;
   }
   
   
