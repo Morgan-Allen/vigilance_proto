@@ -50,7 +50,7 @@ public class CasesFX {
       desc.append(" has "+trait);
     }
     if (clue.isLocationClue()) {
-      if (nearRange == 0) desc.append(" is at "+location);
+      if (nearRange == 0) desc.append(" is at "  +location);
       else                desc.append(" is near "+location);
     }
     

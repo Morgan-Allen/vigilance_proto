@@ -431,8 +431,8 @@ public class Lead extends Task {
         file.recordClue(confirms, this, time, scene);
       }
       else if (recognition > 0.33f) {
-        Series <Clue> possible = step.possibleClues(plot, e, base);
-        Clue gained = (Clue) Rand.pickFrom(possible);
+        Series <Clue> possible = step.possibleClues(plot, e, base, false);
+        Clue gained = step.pickFrom(possible);
         if (gained != null) file.recordClue(gained, this, time, scene);
       }
       else {

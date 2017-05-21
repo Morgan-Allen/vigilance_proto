@@ -20,9 +20,10 @@ public class Clue implements Session.Saveable {
     TYPE_TRAIT    = 2,
     TYPE_LOCATION = 3;
 
-  int  clueType;
-  Plot plot    ;
-  Role role    ;
+  int   clueType ;
+  Plot  plot     ;
+  Role  role     ;
+  float getChance;
   
   Element match     = null;
   Trait   trait     = null;
@@ -42,6 +43,7 @@ public class Clue implements Session.Saveable {
     clueType   = s.loadInt();
     plot       = (Plot     ) s.loadObject();
     role       = (Role) s.loadObject();
+    getChance  = s.loadFloat();
     
     match      = (Element) s.loadObject();
     trait      = (Trait  ) s.loadObject();
@@ -60,6 +62,7 @@ public class Clue implements Session.Saveable {
     s.saveInt   (clueType   );
     s.saveObject(plot       );
     s.saveObject(role       );
+    s.saveFloat (getChance  );
     
     s.saveObject(match      );
     s.saveObject(trait      );
@@ -71,6 +74,32 @@ public class Clue implements Session.Saveable {
     s.saveObject(placeFound );
     s.saveInt   (timeFound  );
   }
+  
+  
+  
+  /**  Basic access methods-
+    */
+  public boolean isAim         () { return clueType == TYPE_AIM        ; }
+  public boolean isConfirmation() { return clueType == TYPE_MATCH      ; }
+  public boolean isTraitClue   () { return clueType == TYPE_TRAIT      ; }
+  public boolean isLocationClue() { return clueType == TYPE_LOCATION   ; }
+  public boolean isReport      () { return leadType == Lead.LEAD_REPORT; }
+  public boolean isTipoff      () { return leadType == Lead.LEAD_TIPOFF; }
+  public boolean isEvidence    () { return ! (isReport() || isTipoff()); }
+  
+  public Lead.Type leadType () { return leadType ; }
+  public Lead      source   () { return source   ; }
+  public int       clueType () { return clueType ; }
+  public Plot      plot     () { return plot     ; }
+  public Role      role     () { return role     ; }
+  public float     getChance() { return getChance; }
+  
+  public int     time        () { return timeFound ; }
+  public Place   place       () { return placeFound; }
+  public Element match       () { return match     ; }
+  public Trait   trait       () { return trait     ; }
+  public Element locationNear() { return location  ; }
+  public int     nearRange   () { return nearRange ; }
   
   
   
@@ -88,6 +117,7 @@ public class Clue implements Session.Saveable {
     c.clueType  = TYPE_LOCATION;
     c.location  = location;
     c.nearRange = nearRange;
+    c.getChance = 1;
     return c;
   }
   
@@ -96,10 +126,11 @@ public class Clue implements Session.Saveable {
     Plot plot, Role role, Trait trait
   ) {
     Clue c = new Clue();
-    c.plot     = plot;
-    c.role     = role;
-    c.clueType = TYPE_TRAIT;
-    c.trait    = trait;
+    c.plot      = plot;
+    c.role      = role;
+    c.clueType  = TYPE_TRAIT;
+    c.trait     = trait;
+    c.getChance = 1;
     return c;
   }
   
@@ -114,6 +145,7 @@ public class Clue implements Session.Saveable {
     c.match     = match;
     c.location  = at;
     c.nearRange = at != null ? 0 : -1;
+    c.getChance = 1;
     return c;
   }
   
@@ -127,10 +159,19 @@ public class Clue implements Session.Saveable {
   
   public static Clue confirmAim(Plot plot) {
     Clue c = new Clue();
-    c.plot     = plot;
-    c.role     = Plot.ROLE_OBJECTIVE;
-    c.clueType = TYPE_AIM;
+    c.plot      = plot;
+    c.role      = Plot.ROLE_OBJECTIVE;
+    c.clueType  = TYPE_AIM;
+    c.getChance = 1;
     return c;
+  }
+  
+  
+  
+  /**  Assigning get-chance, confirming sources and checking redundancy-
+    */
+  public void setGetChance(float chance) {
+    this.getChance = chance;
   }
   
   
@@ -179,30 +220,6 @@ public class Clue implements Session.Saveable {
     return false;
   }
   
-  
-  
-  /**  Other basic access methods-
-    */
-  public boolean isAim         () { return clueType == TYPE_AIM        ; }
-  public boolean isConfirmation() { return clueType == TYPE_MATCH      ; }
-  public boolean isTraitClue   () { return clueType == TYPE_TRAIT      ; }
-  public boolean isLocationClue() { return clueType == TYPE_LOCATION   ; }
-  public boolean isReport      () { return leadType == Lead.LEAD_REPORT; }
-  public boolean isTipoff      () { return leadType == Lead.LEAD_TIPOFF; }
-  public boolean isEvidence    () { return ! (isReport() || isTipoff()); }
-  
-  public Lead.Type leadType() { return leadType; }
-  public Lead      source  () { return source  ; }
-  public int       clueType() { return clueType; }
-  public Plot      plot    () { return plot    ; }
-  public Role      role    () { return role    ; }
-  
-  public int     time        () { return timeFound ; }
-  public Place   place       () { return placeFound; }
-  public Element match       () { return match     ; }
-  public Trait   trait       () { return trait     ; }
-  public Element locationNear() { return location  ; }
-  public int     nearRange   () { return nearRange ; }
 
 
   /**  Evaluation of possible suspects-

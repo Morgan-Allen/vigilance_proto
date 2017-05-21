@@ -36,7 +36,8 @@ public abstract class Plot extends Event implements Assignment {
     ROLE_TARGET     = new Role("role_target"    , "Target"    , VICTIM),
     ROLE_SCENE      = new Role("role_scene"     , "Scene"     , SCENE ),
     
-    MAIN_ROLES[] = { ROLE_MASTERMIND, ROLE_ORGANISER, ROLE_TARGET };
+    KNOWS_AIM[] = { ROLE_MASTERMIND, ROLE_ORGANISER },
+    NEVER_TIP [] = { ROLE_MASTERMIND, ROLE_HQ, ROLE_TARGET, ROLE_SCENE };
   
   
   /**  Data fields, construction and save/load methods-
@@ -528,7 +529,8 @@ public abstract class Plot extends Event implements Assignment {
     int time = world.timing.totalHours();
     
     if (begins && tipsCount < 2) {
-      float tipWeights[] = new float[step.involved.length];
+      float tipWeights[] = new float[step.involved.length], sumWeights = 0;
+      float progress = steps.indexOf(current) * 1f / steps.size();
       
       for (int i = step.involved.length; i-- > 0;) {
         Role    focusRole = step.involved[i];
@@ -537,31 +539,39 @@ public abstract class Plot extends Event implements Assignment {
         float   trust     = at.region().currentValue(Region.TRUST);
         float   tipChance = trust / 100f;
         
-        if (Visit.arrayIncludes(MAIN_ROLES, focusRole)) tipChance = 0;
-        else if (focusRole.isPerp  ()) tipChance -= 0.50f;
-        else if (focusRole.isScene ()) tipChance -= 0.50f;
-        else if (focusRole.isItem  ()) tipChance -= 0.50f;
+        if (Visit.arrayIncludes(NEVER_TIP, focusRole)) tipChance = 0;
+        else if (focusRole.isPerp  ()) tipChance /= 2;
+        else if (focusRole.isScene ()) tipChance /= 2;
+        else if (focusRole.isItem  ()) tipChance /= 2;
         else if (focusRole.isVictim()) tipChance += 0.25f;
         
         if (GameSettings.freeTipoffs) tipChance = 1;
         if (GameSettings.noTipoffs  ) tipChance = 0;
         
-        tipWeights[i] = Nums.max(0, tipChance);
+        sumWeights += tipWeights[i] = Nums.max(0, tipChance);
       }
       
-      Role  pickRole  = (Role) Rand.pickFrom(step.involved, tipWeights);
-      float tipChance = tipWeights[Visit.indexOf(pickRole, step.involved)];
+      Role pickRole = (Role) Rand.pickFrom(step.involved, tipWeights);
+      if (sumWeights == 0) pickRole = null;
+      else sumWeights += progress;
       
-      if (tipsCount == 0 || tipChance > Rand.num()) {
-        Element  pick = filling(pickRole);
-        Place    at   = pick.place();
-        CaseFile file = follows.leads.caseFor(this);
+      if (pickRole != null && sumWeights > Rand.num()) {
+        Element  pick   = filling(pickRole);
+        Place    at     = pick.place();
+        CaseFile file   = follows.leads.caseFor(this);
+        Clue     tipoff = null;
         
-        Series <Clue> possible = step.possibleClues(this, pick, follows);
-        Clue tipoff = (Clue) Rand.pickFrom(possible);
-        
-        file.recordClue(tipoff, LEAD_TIPOFF, time, at);
-        tipsCount += 1;
+        if (tipsCount == 0) {
+          tipoff = Clue.confirmSuspect(this, pickRole, pick, at);
+        }
+        else {
+          Series <Clue> clues = step.possibleClues(this, pick, follows, true);
+          tipoff = step.pickFrom(clues);
+        }
+        if (tipoff != null) {
+          file.recordClue(tipoff, LEAD_TIPOFF, time, at);
+          tipsCount += 1;
+        }
       }
     }
     

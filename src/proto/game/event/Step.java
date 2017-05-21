@@ -100,13 +100,15 @@ public class Step extends Index.Entry implements Session.Saveable {
     */
   //*
   protected Series <Clue> addTraitClues(
-    Plot plot, Element involved, Base follows, Batch <Clue> possible
+    Plot plot, Element involved,
+    Base follows, boolean tipoff,
+    Batch <Clue> possible
   ) {
     //
     //  Wiretaps and mentions can't reliably reveal any descriptive features
-    //  of the suspects involved.
+    //  of the suspects involved, except as tipoffs.
     Role role = plot.roleFor(involved);
-    if (role == null || medium == Lead.MEDIUM_WIRE) {
+    if (role == null || (medium == Lead.MEDIUM_WIRE && ! tipoff)) {
       return possible;
     }
     
@@ -139,7 +141,9 @@ public class Step extends Index.Entry implements Session.Saveable {
   
   
   protected Batch <Clue> addLocationClues(
-    Plot plot, Element involved, Base follows, Batch <Clue> possible
+    Plot plot, Element involved,
+    Base follows, boolean tipoff,
+    Batch <Clue> possible
   ) {
     Role role = plot.roleFor(involved);
     if (role == null || ! involved.isPlace()) return possible;
@@ -151,6 +155,7 @@ public class Step extends Index.Entry implements Session.Saveable {
     for (Region near : around) {
       int range = (int) world.distanceBetween(at, near);
       Clue clue = Clue.locationClue(plot, role, near, range);
+      clue.setGetChance(1f / ((1 + range) * (1 + range)));
       possible.add(clue);
     }
     
@@ -158,23 +163,27 @@ public class Step extends Index.Entry implements Session.Saveable {
   }
   
   
+  //  TODO:  Not sure I like this.  Think about it again.
+  //*
   protected boolean canLeakAim() {
-    for (Role main : Plot.MAIN_ROLES) {
+    for (Role main : Plot.KNOWS_AIM) {
       if (main == mentions) return true;
       if (Visit.arrayIncludes(involved, main)) return true;
     }
     return false;
   }
+  //*/
   
   
   public Series <Clue> possibleClues(
-    Plot plot, Element focus, Base follows
+    Plot plot, Element focus,
+    Base follows, boolean tipoff
   ) {
     Batch <Clue> possible = new Batch();
     Batch <Clue> screened = new Batch();
     
-    addTraitClues   (plot, focus, follows, possible);
-    addLocationClues(plot, focus, follows, possible);
+    addTraitClues   (plot, focus, follows, tipoff, possible);
+    addLocationClues(plot, focus, follows, tipoff, possible);
     
     CaseFile file = follows.leads.caseFor(plot);
     for (Clue clue : possible) if (! file.isRedundant(clue)) {
@@ -182,6 +191,14 @@ public class Step extends Index.Entry implements Session.Saveable {
     }
     
     return screened;
+  }
+  
+  
+  public Clue pickFrom(Series <Clue> possible) {
+    Clue band[] = possible.toArray(Clue.class);
+    float weights[] = new float[band.length];
+    for (int i = band.length; i-- > 0;) weights[i] = band[i].getChance();
+    return (Clue) Rand.pickFrom(band, weights);
   }
   
   

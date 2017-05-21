@@ -138,13 +138,16 @@ public class CasePerpsView extends UINode {
       if (a.associate != null) {
         hoverDesc = a.associate.name()+" ("+a.label+")";
         hoverDesc += "\n\nClick to view this associate.";
+        if (draw.clicked) {
+          parent.setActiveFocus(a.associate, false);
+        }
       }
       if (a.plot != null) {
         hoverDesc = a.label+" "+CasesFX.nameFor(a.plot, player);
         hoverDesc += "\n\nClick to view this case.";
-      }
-      if (draw.clicked) {
-        parent.setActiveFocus(a.associate, false);
+        if (draw.clicked) {
+          parent.setActiveFocus(a.plot, false);
+        }
       }
     }
     //
