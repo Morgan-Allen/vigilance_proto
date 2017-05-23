@@ -572,8 +572,11 @@ public class Lead extends Task {
       }
     }
     //
-    //  Remember to close the lead once one or more clues have been extracted.
-    if (result != RESULT_NONE) setCompleted(result > RESULT_COLD);
+    //  Remember to close the lead if it's impossible to follow.
+    if (! base.leads.atKnownLocation(focus)) {
+      MessageUtils.presentColdTrailMessage(world.view(), this);
+      setCompleted(false);
+    }
     return true;
   }
   

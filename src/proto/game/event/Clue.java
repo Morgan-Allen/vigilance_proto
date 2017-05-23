@@ -99,7 +99,7 @@ public class Clue implements Session.Saveable {
   public float     getChance() { return getChance; }
   
   public int     time        () { return timeFound ; }
-  public Place   place       () { return placeFound; }
+  public Place   found       () { return placeFound; }
   public Element match       () { return match     ; }
   public Trait   trait       () { return trait     ; }
   public Element locationNear() { return location  ; }

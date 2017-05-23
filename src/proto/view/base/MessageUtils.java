@@ -32,7 +32,7 @@ public class MessageUtils {
       desc.append(CasesFX.longDescription(clue, player));
     }
     if (effects != null) {
-      Region region = clue.place().region();
+      Region region = clue.found().region();
       float trust = effects.trustEffect, deter = effects.deterEffect;
       desc.append("\n"+region+" Trust "     +I.signNum((int) trust)+"%");
       desc.append("\n"+region+" Deterrence "+I.signNum((int) deter)+"%");
@@ -40,6 +40,21 @@ public class MessageUtils {
     
     view.queueMessage(new MessageView(
       view, clue.icon(), header.toString(), desc.toString(),
+      "Dismiss"
+    ) {
+      protected void whenClicked(String option, int optionID) {
+        mainView.dismissMessage(this);
+      }
+    });
+  }
+  
+  
+  public static void presentColdTrailMessage(
+    MainView view, Lead lead
+  ) {
+    view.queueMessage(new MessageView(
+      view, lead.icon(), "Target Lost",
+      "The location of "+lead.focus+" is no longer known.",
       "Dismiss"
     ) {
       protected void whenClicked(String option, int optionID) {

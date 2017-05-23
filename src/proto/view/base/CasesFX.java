@@ -42,7 +42,7 @@ public class CasesFX {
       }
     }
     
-    desc.append(" at "+clue.place());
+    desc.append(" at "+clue.found());
     desc.append(" at "+world.timing.timeString(clue.time()));
     
     String perpDesc = "", pronDesc = "";

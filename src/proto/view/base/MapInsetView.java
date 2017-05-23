@@ -176,31 +176,43 @@ public abstract class MapInsetView extends UINode {
         button.renderNow(surface, g);
         offF += 30 + 5;
       }
-      
       //
-      //  Render active suspects for the region-
-      Series <Element> suspects = played.leads.activeSuspectsForRegion(n);
-      int offS = (suspects.size() * 50) / -2;
-      for (final Element suspect : suspects) {
-        Image alertImage = MapView.ALERT_IMAGE;
-        if (played.leads.suspectIsUrgent(suspect)) {
-          alertImage = MapView.ALERT_IMAGE;
-        }
+      //  Render the latest relevant clues for the region-
+      Series <Clue> latest = played.leads.latestPlotClues(n);
+      int offS = (latest.size() * 50) / -2;
+      
+      for (Clue c : latest) {
+        final Plot plot = c.plot();
+        final Role role = c.role();
+        Series <Element> suspects = played.leads.suspectsFor(role, plot);
+        final boolean confirmed = suspects.size() == 1;
+        final Element suspect   = suspects.first();
+        final Object  refers    = confirmed ? suspect : role;
+        
+        Image alertIcon = MapView.ALERT_IMAGE;
+        Image perpIcon  = confirmed ? suspect.icon() : MapView.MYSTERY_IMAGE;
+        
         ImageButton button = new ImageButton(
-          alertImage, new Box2D(x + offS - vx, y - (25 + vy), 50, 50), this
+          alertIcon, new Box2D(x + offS - vx, y - (25 + vy), 50, 50), this
         ) {
           protected void whenClicked() {
-            mainView.mapView.setActiveFocus(suspect, true);
+            if (confirmed) {
+              mainView.mapView.setActiveFocus(refers, true);
+            }
+            else {
+              mainView.mapView.setActiveFocus(plot  , true );
+              mainView.mapView.setActiveFocus(refers, false);
+            }
           }
         };
-        button.refers = suspect;
+        button.refers = refers;
         button.renderNow(surface, g);
         
-        g.drawImage(suspect.icon(), x + offS + 25, y, 25, 25, null);
+        g.drawImage(perpIcon, x + offS + 25, y, 25, 25, null);
         offS += 50;
       }
       //
-      //  Then render any current visitors-
+      //  Then render any current visitors to the region-
       ViewUtils.renderAssigned(visitors(n), x + 25, y + 75, this, surface, g);
     }
     

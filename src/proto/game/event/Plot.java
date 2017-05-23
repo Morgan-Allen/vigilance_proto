@@ -589,21 +589,16 @@ public abstract class Plot extends Event implements Assignment {
       if (sumWeights == 0) pickRole = null;
       else sumWeights += progress;
       
-      if (pickRole != null && sumWeights > Rand.num()) {
+      if (pickRole != null && (tipsCount == 0 || sumWeights > Rand.num())) {
         Element  pick   = filling(pickRole);
         Place    at     = pick.place();
         CaseFile file   = follows.leads.caseFor(this);
         Clue     tipoff = null;
         
-        if (tipsCount == 0) {
-          tipoff = Clue.confirmSuspect(this, pickRole, step, pick, at);
-        }
-        else {
-          Series <Clue> clues = step.possibleClues(
-            this, pick, step, follows, true
-          );
-          tipoff = step.pickFrom(clues);
-        }
+        Series <Clue> clues = step.possibleClues(
+          this, pick, step, follows, true
+        );
+        tipoff = step.pickFrom(clues);
         if (tipoff != null) {
           file.recordClue(tipoff, LEAD_TIPOFF, time, at);
           tipsCount += 1;

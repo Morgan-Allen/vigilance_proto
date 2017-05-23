@@ -144,23 +144,24 @@ public class BaseLeads {
   }
   
   
-  public Series <Plot> activePlotsForRegion(Region r) {
-    Batch <Plot> known = new Batch();
-    for (Clue c : cluesFor(null, null, null, r, false)) {
-      if (c.plot.complete() || ! c.isConfirmation()) continue;
-      known.include(c.plot);
+  public Series <Clue> latestPlotClues(Region r) {
+    //
+    //  Returns the most recent clue on the identity of participants in any
+    //  active plot, if that most recent clue was found in the region.
+    Batch <Clue> latest = new Batch();
+    
+    for (Plot plot : activePlots()) {
+      Series <Clue> clues = cluesFor(plot, null, null, null, false);
+      Batch <Role> roles = new Batch();
+      for (Clue c : clues) roles.include(c.role());
+      
+      for (Role role : roles) {
+        Clue top = cluesFor(plot, role, true).first();
+        if (top != null && top.found().region() == r) latest.add(top);
+      }
     }
-    return known;
-  }
-  
-  
-  public Series <Element> activeSuspectsForRegion(Region r) {
-    Batch <Element> known = new Batch();
-    for (Clue c : cluesFor(null, null, null, r, false)) {
-      if (c.plot.complete() || ! c.isConfirmation()) continue;
-      known.include(c.match);
-    }
-    return known;
+    
+    return latest;
   }
   
   
@@ -306,8 +307,8 @@ public class BaseLeads {
       Person  suspect  = (Person) focus;
       boolean canFind  = scene == focus.place();
       boolean canMeet  = canFind && canEnter;
-      boolean canGuard = suspect.isCivilian() && canFind;
-      boolean canBust  = suspect.isCriminal() && canFind;
+      boolean canGuard = suspectIsVictim(suspect) && canFind;
+      boolean canBust  = suspectIsBoss  (suspect) && canFind;
       
       if (canFind ) all.add(leadFor(suspect, Lead.LEAD_SURVEIL_PERSON));
       if (canMeet ) all.add(leadFor(suspect, Lead.LEAD_QUESTION      ));
@@ -317,11 +318,13 @@ public class BaseLeads {
     }
     
     if (focus.isPlace()) {
+      boolean canGuard = suspectIsVictim(focus);
+      boolean canBust  = suspectIsBoss  (focus);
       all.add(leadFor(focus, Lead.LEAD_SURVEIL_BUILDING));
       all.add(leadFor(focus, Lead.LEAD_WIRETAP         ));
       all.add(leadFor(focus, Lead.LEAD_SEARCH          ));
-      if (canEnter) all.add(leadFor(focus, Lead.LEAD_GUARD));
-      else          all.add(leadFor(focus, Lead.LEAD_BUST ));
+      if (canGuard) all.add(leadFor(focus, Lead.LEAD_GUARD));
+      if (canBust ) all.add(leadFor(focus, Lead.LEAD_BUST ));
     }
     
     if (focus.isRegion()) {
@@ -336,12 +339,15 @@ public class BaseLeads {
   
   
   public boolean suspectIsVictim(Element suspect) {
-    return suspectHasRole(suspect, Plot.ROLE_TARGET);
+    return suspectHasRole(suspect, Plot.ROLE_TARGET, Plot.ROLE_SCENE);
   }
   
   
   public boolean suspectIsBoss(Element suspect) {
-    return suspectHasRole(suspect, Plot.ROLE_ORGANISER, Plot.ROLE_MASTERMIND);
+    return suspectHasRole(suspect,
+      Plot.ROLE_ORGANISER, Plot.ROLE_MASTERMIND,
+      Plot.ROLE_HIDEOUT  , Plot.ROLE_HQ
+    );
   }
   
   
