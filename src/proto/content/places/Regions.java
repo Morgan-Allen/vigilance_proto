@@ -30,22 +30,21 @@ public class Regions {
     
   
   static {
-    //  TODO:  It won't work to have Bases as a subtype of Place.  Villains
-    //  need to be able to switch hideouts, for a start.
-    
     Faction heroes  = Heroes.JANUS_INDUSTRIES;
     Faction city    = Civilians.THE_CITY_COUNCIL;
-    Faction crooks1 = Crooks.THE_MADE_MEN;
+    Faction crooks1 = Crooks.THE_MORETTI_FAMILY;
     
     
     final RegionType r1 = SECTOR01;
     r1.view.attachColourKey(-16734721, "01");
     r1.attachFacilities(heroes, STEEL_MILL);
+    r1.attachFacilities(crooks1, Civilians.WAREHOUSE);
     r1.attachMapCoordinates(0, 0);
 
     final RegionType r2 = SECTOR02;
     r2.view.attachColourKey(-3584, "02");
     r2.attachFacilities(heroes, UNION_OFFICE);
+    r1.attachFacilities(crooks1, Civilians.WAREHOUSE);
     r2.attachMapCoordinates(1, 0);
     
     final RegionType r3 = SECTOR03;
@@ -68,6 +67,7 @@ public class Regions {
     final RegionType r6 = SECTOR06;
     r6.view.attachColourKey(-2286088, "06");
     r6.attachFacilities(heroes, BUSINESS_PARK);
+    r1.attachFacilities(crooks1, Civilians.WAREHOUSE);
     r6.attachMapCoordinates(2, 1);
     
     
@@ -85,6 +85,7 @@ public class Regions {
     r9.view.attachColourKey(-11093671, "09");
     r9.attachFacilities(heroes, CHEMICAL_PLANT);
     r9.attachFacilities(city, Civilians.CITY_JAIL);
+    r1.attachFacilities(crooks1, Civilians.WAREHOUSE);
     r9.attachMapCoordinates(2, 2);
     
   }

@@ -139,7 +139,6 @@ public abstract class MapInsetView extends UINode {
     
     renderOutline(selectedRegion(), surface, g, mapWRatio, mapHRatio);
     renderOutline(regionHovered   , surface, g, mapWRatio, mapHRatio);
-    
     //
     //  Then render any other widgets for each region-
     for (final Region n : regions) {
@@ -154,7 +153,6 @@ public abstract class MapInsetView extends UINode {
         x - 25, y + 25 + 15 + 5, 50, 5,
         Color.RED, Color.BLACK, crimeLevel, false, g
       );
-      
       //
       //  Render any facilities in the region-
       Batch <Place> built = new Batch();

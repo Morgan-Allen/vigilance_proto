@@ -174,7 +174,7 @@ public class DefaultGame extends RunGame {
     };
     final Batch <Base> hideouts = new Batch();
     
-    final Base base1 = world.baseFor(Crooks.THE_MADE_MEN);
+    final Base base1 = world.baseFor(Crooks.THE_MORETTI_FAMILY);
     final Person boss1 = new Person(Villains.MORETTI, world);
     base1.assignLeader(boss1);
     base1.finance.setSecretPercent(0);

@@ -15,7 +15,7 @@ public class Crooks {
   final static String IMG_DIR = "media assets/character icons/common/";
   
   
-  final public static Faction THE_MADE_MEN = new Faction(
+  final public static Faction THE_MORETTI_FAMILY = new Faction(
     "The Moretti Family", "faction_the_moretti_family", true
   );
   

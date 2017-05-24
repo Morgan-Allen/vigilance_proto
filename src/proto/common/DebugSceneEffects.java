@@ -25,7 +25,7 @@ public class DebugSceneEffects extends RunGame {
     World world = new World(this, savePath);
     DefaultGame.initDefaultWorld(world);
     
-    Base crooks = world.baseFor(Crooks.THE_MADE_MEN);
+    Base crooks = world.baseFor(Crooks.THE_MORETTI_FAMILY);
     Plot kidnap = PlotTypes.TYPE_KIDNAP.initPlot(crooks);
     kidnap.fillAndExpand();
     kidnap.printRoles();

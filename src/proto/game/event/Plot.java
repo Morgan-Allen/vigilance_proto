@@ -231,6 +231,18 @@ public abstract class Plot extends Event implements Assignment {
   }
   
   
+  public Series <Element> involvedOrClose(Step step, Place place) {
+    Batch <Element> all = new Batch();
+    for (Role r : step.involved) {
+      all.add(filling(r));
+    }
+    for (RoleEntry e : entries) if (e.element.place() == place) {
+      all.include(e.element);
+    }
+    return all;
+  }
+  
+  
   public Place from(Step step) {
     return location(step.from);
   }

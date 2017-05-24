@@ -419,7 +419,7 @@ public class Lead extends Task {
     //
     //  And iterate over over all the elements involved to generate suitable
     //  clues:
-    for (Element e : plot.involved(step)) {
+    for (Element e : plot.involvedOrClose(step, scene)) {
       float recognition = recognition(outcome, scene, e);
       Role role = plot.roleFor(e);
       //

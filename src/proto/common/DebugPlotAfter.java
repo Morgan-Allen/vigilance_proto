@@ -21,7 +21,7 @@ public class DebugPlotAfter extends RunGame {
     World world = new World(this, savePath);
     DefaultGame.initDefaultWorld(world);
     
-    Base crooks = world.baseFor(Crooks.THE_MADE_MEN);
+    Base crooks = world.baseFor(Crooks.THE_MORETTI_FAMILY);
     Plot plot = PlotTypes.TYPE_KIDNAP.initPlot(crooks);
     plot.fillAndExpand();
     crooks.plots.assignRootPlot(plot, 0);

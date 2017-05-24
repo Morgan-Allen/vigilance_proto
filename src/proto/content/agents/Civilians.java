@@ -131,6 +131,19 @@ public class Civilians {
   ;
   
   
+  final public static PlaceType WAREHOUSE = new PlaceType(
+    "Warehouse", "facility_warehouse",
+    "media assets/tech icons/icon_warehouse.png",
+    "",
+    0, BUILD_TIME_MEDIUM, URBAN_SCENE,
+    EMPLOYMENT, 0,
+    INCOME, 50,
+    Civilians.WORKER, 0,
+    Common.VENUE_INDUSTRIAL,
+    Common.VENUE_OFFICE,
+    Common.VENUE_SLUM
+  );
+  
   final public static PlaceType CITY_HALL = new PlaceType(
     "City Hall", "facility_city_hall",
     "media assets/tech icons/icon_city_hall.png",

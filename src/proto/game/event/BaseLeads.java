@@ -155,8 +155,16 @@ public class BaseLeads {
       Batch <Role> roles = new Batch();
       for (Clue c : clues) roles.include(c.role());
       
-      for (Role role : roles) {
-        Clue top = cluesFor(plot, role, true).first();
+      loop: for (Role role : roles) {
+        Series <Clue> roleClues = cluesFor(plot, role, true);
+        Clue top = roleClues.first();
+        
+        for (Clue c : roleClues) if (c.isConfirmation()) {
+          Place at = c.locationGiven();
+          if (at != null && at.region() == r) latest.add(c);
+          continue loop;
+        }
+        
         if (top != null && top.found().region() == r) latest.add(top);
       }
     }
