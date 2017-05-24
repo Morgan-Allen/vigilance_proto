@@ -7,6 +7,7 @@ import proto.game.person.*;
 import proto.game.scene.*;
 import proto.util.*;
 import static proto.game.event.Lead.*;
+import static proto.game.event.LeadType.*;
 
 
 
@@ -612,7 +613,7 @@ public abstract class Plot extends Event implements Assignment {
         );
         tipoff = step.pickFrom(clues);
         if (tipoff != null) {
-          file.recordClue(tipoff, LEAD_TIPOFF, time, at);
+          file.recordClue(tipoff, TIPOFF, time, at);
           tipsCount += 1;
         }
       }
@@ -628,9 +629,9 @@ public abstract class Plot extends Event implements Assignment {
         aim    = Clue.confirmAim    (this                                  ),
         forAt  = Clue.confirmSuspect(this, ROLE_SCENE , step, scene , scene);
       
-      file.recordClue(report, null, LEAD_REPORT, time, scene, effects, true );
-      file.recordClue(aim   ,       LEAD_REPORT, time, scene         , false);
-      file.recordClue(forAt ,       LEAD_REPORT, time, scene         , false);
+      file.recordClue(report, null, REPORT, time, scene, effects, true );
+      file.recordClue(aim   ,       REPORT, time, scene         , false);
+      file.recordClue(forAt ,       REPORT, time, scene         , false);
       
       effects.applyEffects(target.place());
       recordEffects(effects);

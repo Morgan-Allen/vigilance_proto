@@ -98,160 +98,10 @@ public class Lead extends Task {
   }
   
   
-  public static class Type {
-    
-    final public String name, info, tenseVerbs[];
-    final public Image icon;
-    
-    final public int ID;
-    final public int minHours;
-    final public int medium, focus, tense, profile;
-    final public float confidence;
-    final public int cluesMedia[];
-    
-    Type(
-      String name, int ID, String info, String iconPath, String tenseVerbs[],
-      int minHours, int medium, int focus, int tense, int profile,
-      float confidence, int... cluesMedia
-    ) {
-      this.name = name;
-      this.info = info;
-      this.icon = Kind.loadImage(iconPath);
-      this.ID   = ID  ;
-      this.tenseVerbs = tenseVerbs;
-      this.minHours   = minHours  ;
-      this.medium     = medium    ;
-      this.focus      = focus     ;
-      this.tense      = tense     ;
-      this.profile    = profile   ;
-      this.confidence = confidence;
-      this.cluesMedia = cluesMedia;
-      TYPE_B.add(this);
-    }
-    
-    public String toString() {
-      return name;
-    }
-  }
-  
-  final static String ICON_DIR = "media assets/ability icons/";
-  private static Batch <Type> TYPE_B = new Batch();
-  final public static Type
-    LEAD_SURVEIL_PERSON = new Type(
-      "Surveillance", 0,
-      "Surveil a suspect for clues to their activities and who they meet with.",
-      ICON_DIR+"icon_surveil.png",
-      new String[] { "Surveiled", "Surveilling", "Will Surveil" },
-      TIME_SHORT,
-      MEDIUM_SURVEIL, FOCUS_PERSON, TENSE_DURING, PROFILE_LOW,
-      CONFIDENCE_HIGH, PHYSICAL_MEDIA
-    ),
-    LEAD_SURVEIL_BUILDING = new Type(
-      "Surveillance", 1,
-      "Stake out a building to see who visits and who might be holed up.",
-      ICON_DIR+"icon_surveil.png",
-      new String[] { "Surveiled", "Surveilling", "Will Surveil" },
-      TIME_SHORT,
-      MEDIUM_SURVEIL, FOCUS_BUILDING, TENSE_DURING, PROFILE_LOW,
-      CONFIDENCE_MODERATE, PHYSICAL_MEDIA
-    ),
-    LEAD_QUESTION = new Type(
-      "Questioning", 2,
-      "Question a suspect for information on past dealings or future plans.",
-      ICON_DIR+"icon_question.png",
-      new String[] { "Questioned", "Questioning", "Will Question" },
-      TIME_SHORT,
-      MEDIUM_QUESTION, FOCUS_PERSON, TENSE_AFTER, PROFILE_HIGH,
-      CONFIDENCE_MODERATE, MEDIUM_ANY
-    ),
-    LEAD_WIRETAP = new Type(
-      "Wiretap", 3,
-      "Intercept suspicious communications to or from a structure.",
-      ICON_DIR+"icon_wiretap.png",
-      new String[] { "Wiretapped", "Wiretapping", "Will Wiretap" },
-      TIME_MEDIUM,
-      MEDIUM_WIRE, FOCUS_BUILDING, TENSE_DURING, PROFILE_LOW,
-      CONFIDENCE_HIGH, WIRED_MEDIA
-    ),
-    LEAD_PATROL = new Type(
-      "Patrol", 4,
-      "Patrol an area while keeping an eye out for suspicious activity.",
-      ICON_DIR+"icon_surveil.png",
-      new String[] { "Patrolled", "Patrolling", "Will Patrol" },
-      TIME_MEDIUM,
-      MEDIUM_SURVEIL, FOCUS_REGION, TENSE_DURING, PROFILE_LOW,
-      CONFIDENCE_MODERATE, PHYSICAL_MEDIA
-    ),
-    LEAD_SCAN = new Type(
-      "Frequency Scan", 5,
-      "Scan wireless frequencies in an area for fragments of information.",
-      ICON_DIR+"icon_scan.png",
-      new String[] { "Scanned", "Scanning", "Will Scan" },
-      TIME_MEDIUM,
-      MEDIUM_WIRE, FOCUS_REGION, TENSE_DURING, PROFILE_LOW,
-      CONFIDENCE_MODERATE, WIRED_MEDIA
-    ),
-    LEAD_CANVASS = new Type(
-      "Canvass", 6,
-      "Ask civilians or friendly contacts in an area for leads.",
-      ICON_DIR+"icon_question.png",
-      new String[] { "Canvassed", "Canvassing", "Will Canvass" },
-      TIME_LONG,
-      MEDIUM_QUESTION, FOCUS_REGION, TENSE_ANY, PROFILE_SUSPICIOUS,
-      CONFIDENCE_LOW, MEDIUM_ANY
-    ),
-    LEAD_SEARCH = new Type(
-      "Search", 7,
-      "Search a building for logs, records or forensic evidence.",
-      ICON_DIR+"icon_search.png",
-      new String[] { "Searched", "Searching", "Will Search" },
-      TIME_SHORT,
-      MEDIUM_SURVEIL, FOCUS_BUILDING, TENSE_AFTER, PROFILE_SUSPICIOUS,
-      CONFIDENCE_MODERATE, FORENSIC_MEDIA
-    ),
-    LEAD_TIPOFF = new Type(
-      "Tipoff", 8,
-      "_",
-      ICON_DIR+"icon_wiretap.png",
-      new String[] { "Tipped Off", "Tipping Off", "Will Tip Off" },
-      TIME_NONE,
-      MEDIUM_WIRE, FOCUS_ANY, TENSE_ANY, PROFILE_HIDDEN,
-      CONFIDENCE_LOW
-    ),
-    LEAD_REPORT = new Type(
-      "Report", 9,
-      "_",
-      ICON_DIR+"icon_database.png",
-      new String[] { "Reported", "Reporting", "Will Report" },
-      TIME_NONE,
-      MEDIUM_WIRE, FOCUS_ANY, TENSE_ANY, PROFILE_OBVIOUS,
-      CONFIDENCE_HIGH
-    ),
-    LEAD_GUARD = new Type(
-      "Guard", 10,
-      "Guard this suspect against criminal activity.",
-      ICON_DIR+"icon_guard_lead.png",
-      new String[] { "Guarded", "Guarding", "Will Guard" },
-      TIME_SHORT,
-      MEDIUM_ASSAULT, FOCUS_ANY, TENSE_DURING, PROFILE_OBVIOUS,
-      CONFIDENCE_HIGH, PHYSICAL_MEDIA
-    ),
-    LEAD_BUST = new Type(
-      "Bust", 11,
-      "Bust down the doors and unleash hell.",
-      ICON_DIR+"icon_guard_lead.png",
-      new String[] { "Busted", "Busting", "Will Bust" },
-      TIME_SHORT,
-      MEDIUM_ASSAULT, FOCUS_ANY, TENSE_DURING, PROFILE_OBVIOUS,
-      CONFIDENCE_HIGH, MEDIUM_ANY
-    ),
-    LEAD_TYPES[] = TYPE_B.toArray(Type.class);
-  
-  
   
   /**  Data fields, construction and save/load methods-
     */
-  final public Type type;
+  final public LeadType type;
   final public Element focus;
   
   private String lastContactID = "___";
@@ -264,7 +114,7 @@ public class Lead extends Task {
   
   
   
-  Lead(Base base, Type type, Element focus) {
+  Lead(Base base, LeadType type, Element focus) {
     super(base, Task.TIME_INDEF);
     
     this.type  = type ;
@@ -286,8 +136,8 @@ public class Lead extends Task {
   
   public Lead(Session s) throws Exception {
     super(s);
-    type          = LEAD_TYPES[s.loadInt()];
-    focus         = (Element) s.loadObject();
+    type          = (LeadType) s.loadObject();
+    focus         = (Element ) s.loadObject();
     lastContactID = s.loadString();
     contactTime   = s.loadInt();
     s.loadObjects(onceActive);
@@ -296,10 +146,10 @@ public class Lead extends Task {
   
   public void saveState(Session s) throws Exception {
     super.saveState(s);
-    s.saveInt   (type.ID      );
-    s.saveObject(focus        );
+    s.saveObject(type);
+    s.saveObject(focus);
     s.saveString(lastContactID);
-    s.saveInt   (contactTime  );
+    s.saveInt   (contactTime);
     s.saveObjects(onceActive);
   }
   

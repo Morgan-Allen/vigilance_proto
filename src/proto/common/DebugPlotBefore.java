@@ -36,7 +36,7 @@ public class DebugPlotBefore extends RunGame {
     int timeFound = world.timing.totalHours();
     Place placeFound = crime.hideout();
     CaseFile file = played.leads.caseFor(crime);
-    file.recordClue(tipoff, Lead.LEAD_TIPOFF, timeFound, placeFound);
+    file.recordClue(tipoff, LeadType.TIPOFF, timeFound, placeFound);
 
     GameSettings.noTipoffs = true;
     world.updateWorld(0);

@@ -34,7 +34,7 @@ public class DebugSceneEffects extends RunGame {
     Step heist = kidnap.mainHeist();
     
     Base  heroes = world.baseFor(Heroes.JANUS_INDUSTRIES);
-    Lead  guard  = heroes.leads.leadFor(target, Lead.LEAD_SURVEIL_PERSON);
+    Lead  guard  = heroes.leads.leadFor(target, LeadType.SURVEIL_PERSON);
     Scene scene  = kidnap.generateScene(heist, target, guard);
     
     world.enterScene(scene);

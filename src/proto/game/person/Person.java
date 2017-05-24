@@ -29,7 +29,7 @@ public class Person extends Element {
   final public PersonStats   stats   = new PersonStats  (this);
   final public PersonHealth  health  = new PersonHealth (this);
   final public PersonGear    gear    = new PersonGear   (this);
-
+  
   Side side;
   Base base;
   Place resides;

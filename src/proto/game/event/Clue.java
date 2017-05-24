@@ -31,10 +31,10 @@ public class Clue implements Session.Saveable {
   Element location  = null;
   int     nearRange = -1  ;
   
-  Lead.Type leadType  ;
-  Lead      source    ;
-  Place     placeFound;
-  int       timeFound ;
+  LeadType leadType  ;
+  Lead     source    ;
+  Place    placeFound;
+  int      timeFound ;
   
   
   
@@ -52,9 +52,9 @@ public class Clue implements Session.Saveable {
     location   = (Element) s.loadObject();
     nearRange  = s.loadInt();
     
-    leadType   = Lead.LEAD_TYPES[s.loadInt()];
-    source     = (Lead ) s.loadObject();
-    placeFound = (Place) s.loadObject();
+    leadType   = (LeadType) s.loadObject();
+    source     = (Lead    ) s.loadObject();
+    placeFound = (Place   ) s.loadObject();
     timeFound  = s.loadInt();
   }
   
@@ -72,7 +72,7 @@ public class Clue implements Session.Saveable {
     s.saveObject(location   );
     s.saveInt   (nearRange  );
     
-    s.saveInt   (leadType.ID);
+    s.saveObject(leadType   );
     s.saveObject(source     );
     s.saveObject(placeFound );
     s.saveInt   (timeFound  );
@@ -82,21 +82,21 @@ public class Clue implements Session.Saveable {
   
   /**  Basic access methods-
     */
-  public boolean isAim         () { return clueType == TYPE_AIM        ; }
-  public boolean isConfirmation() { return clueType == TYPE_MATCH      ; }
-  public boolean isTraitClue   () { return clueType == TYPE_TRAIT      ; }
-  public boolean isLocationClue() { return clueType == TYPE_LOCATION   ; }
-  public boolean isReport      () { return leadType == Lead.LEAD_REPORT; }
-  public boolean isTipoff      () { return leadType == Lead.LEAD_TIPOFF; }
+  public boolean isAim         () { return clueType == TYPE_AIM     ; }
+  public boolean isConfirmation() { return clueType == TYPE_MATCH   ; }
+  public boolean isTraitClue   () { return clueType == TYPE_TRAIT   ; }
+  public boolean isLocationClue() { return clueType == TYPE_LOCATION; }
+  public boolean isReport      () { return leadType == LeadType.REPORT; }
+  public boolean isTipoff      () { return leadType == LeadType.TIPOFF; }
   public boolean isEvidence    () { return ! (isReport() || isTipoff()); }
   
-  public Lead.Type leadType () { return leadType ; }
-  public Lead      source   () { return source   ; }
-  public int       clueType () { return clueType ; }
-  public Plot      plot     () { return plot     ; }
-  public Role      role     () { return role     ; }
-  public Step      step     () { return step     ; }
-  public float     getChance() { return getChance; }
+  public LeadType leadType () { return leadType ; }
+  public Lead     source   () { return source   ; }
+  public int      clueType () { return clueType ; }
+  public Plot     plot     () { return plot     ; }
+  public Role     role     () { return role     ; }
+  public Step     step     () { return step     ; }
+  public float    getChance() { return getChance; }
   
   public int     time        () { return timeFound ; }
   public Place   found       () { return placeFound; }
@@ -192,7 +192,7 @@ public class Clue implements Session.Saveable {
   }
   
   
-  public void confirmSource(Lead.Type type, int time, Place place) {
+  public void confirmSource(LeadType type, int time, Place place) {
     this.leadType   = type ;
     this.timeFound  = time ;
     this.placeFound = place;

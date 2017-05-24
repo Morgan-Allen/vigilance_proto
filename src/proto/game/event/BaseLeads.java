@@ -5,6 +5,7 @@ import proto.common.*;
 import proto.game.person.*;
 import proto.game.world.*;
 import proto.util.*;
+import static proto.game.event.LeadType.*;
 
 
 
@@ -289,7 +290,7 @@ public class BaseLeads {
   }
   
   
-  public Lead leadFor(Element focus, Lead.Type type) {
+  public Lead leadFor(Element focus, LeadType type) {
     for (Lead lead : leads) {
       if (lead.focus == focus && lead.type == type) {
         return lead;
@@ -318,27 +319,27 @@ public class BaseLeads {
       boolean canGuard = suspectIsVictim(suspect) && canFind;
       boolean canBust  = suspectIsBoss  (suspect) && canFind;
       
-      if (canFind ) all.add(leadFor(suspect, Lead.LEAD_SURVEIL_PERSON));
-      if (canMeet ) all.add(leadFor(suspect, Lead.LEAD_QUESTION      ));
-      if (canEnter) all.add(leadFor(scene  , Lead.LEAD_WIRETAP       ));
-      if (canGuard) all.add(leadFor(suspect, Lead.LEAD_GUARD         ));
-      if (canBust ) all.add(leadFor(suspect, Lead.LEAD_BUST          ));
+      if (canFind ) all.add(leadFor(suspect, SURVEIL_PERSON));
+      if (canMeet ) all.add(leadFor(suspect, QUESTION      ));
+      if (canEnter) all.add(leadFor(scene  , WIRETAP       ));
+      if (canGuard) all.add(leadFor(suspect, GUARD         ));
+      if (canBust ) all.add(leadFor(suspect, BUST          ));
     }
     
     if (focus.isPlace()) {
       boolean canGuard = suspectIsVictim(focus);
       boolean canBust  = suspectIsBoss  (focus);
-      all.add(leadFor(focus, Lead.LEAD_SURVEIL_BUILDING));
-      all.add(leadFor(focus, Lead.LEAD_WIRETAP         ));
-      all.add(leadFor(focus, Lead.LEAD_SEARCH          ));
-      if (canGuard) all.add(leadFor(focus, Lead.LEAD_GUARD));
-      if (canBust ) all.add(leadFor(focus, Lead.LEAD_BUST ));
+      all.add(leadFor(focus, SURVEIL_BUILDING));
+      all.add(leadFor(focus, WIRETAP         ));
+      all.add(leadFor(focus, SEARCH          ));
+      if (canGuard) all.add(leadFor(focus, GUARD));
+      if (canBust ) all.add(leadFor(focus, BUST ));
     }
     
     if (focus.isRegion()) {
-      all.add(leadFor(focus, Lead.LEAD_PATROL   ));
-      all.add(leadFor(focus, Lead.LEAD_SCAN     ));
-      all.add(leadFor(focus, Lead.LEAD_CANVASS  ));
+      all.add(leadFor(focus, PATROL ));
+      all.add(leadFor(focus, SCAN   ));
+      all.add(leadFor(focus, CANVASS));
       //all.add(leadFor(focus, Lead.LEAD_CRACKDOWN));
     }
     

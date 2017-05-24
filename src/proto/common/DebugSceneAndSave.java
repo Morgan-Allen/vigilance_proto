@@ -37,7 +37,7 @@ public class DebugSceneAndSave extends RunGame {
     
     Base heroes = world.baseFor(Heroes.JANUS_INDUSTRIES);
     Lead guarding = heroes.leads.leadFor(
-      plot.target(), Lead.LEAD_SURVEIL_PERSON
+      plot.target(), LeadType.SURVEIL_PERSON
     );
     
     int ID = 0;

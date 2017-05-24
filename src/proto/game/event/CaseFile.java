@@ -58,7 +58,7 @@ public class CaseFile implements Session.Saveable {
   }
   
   
-  public void recordClue(Clue clue, Lead.Type type, int time, Place place) {
+  public void recordClue(Clue clue, LeadType type, int time, Place place) {
     recordClue(clue, null, type, time, place, null, true);
   }
   
@@ -71,14 +71,14 @@ public class CaseFile implements Session.Saveable {
   
   
   public void recordClue(
-    Clue clue, Lead.Type type, int time, Place place, boolean report
+    Clue clue, LeadType type, int time, Place place, boolean report
   ) {
     recordClue(clue, null, type, time, place, null, report);
   }
   
   
   public void recordClue(
-    Clue clue, Lead source, Lead.Type type, int time, Place place,
+    Clue clue, Lead source, LeadType type, int time, Place place,
     EventEffects effects, boolean display
   ) {
     if (isRedundant(clue)) return;

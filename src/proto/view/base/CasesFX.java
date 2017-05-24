@@ -14,19 +14,19 @@ public class CasesFX {
   
   public static String longDescription(Clue clue, Base base) {
     
-    World     world     = base.world();
-    Lead      source    = clue.source();
-    Plot      plot      = clue.plot();
-    Role      role      = clue.role();
-    Step      step      = clue.step();
-    Element   match     = clue.match();
-    Trait     trait     = clue.trait();
-    Element   location  = clue.locationNear();
-    int       nearRange = clue.nearRange();
-    Lead.Type leadType  = clue.leadType();
-    Element   fills     = plot.filling(role);
-    Faction   faction   = plot.base().faction();
-    int       plotTime  = plot.timeScheduled(plot.mainHeist());
+    World    world     = base.world();
+    Lead     source    = clue.source();
+    Plot     plot      = clue.plot();
+    Role     role      = clue.role();
+    Step     step      = clue.step();
+    Element  match     = clue.match();
+    Trait    trait     = clue.trait();
+    Element  location  = clue.locationNear();
+    int      nearRange = clue.nearRange();
+    LeadType leadType  = clue.leadType();
+    Element  fills     = plot.filling(role);
+    Faction  faction   = plot.base().faction();
+    int      plotTime  = plot.timeScheduled(plot.mainHeist());
     
     StringBuffer desc = new StringBuffer();
     if (leadType != null) desc.append(leadType.name  );

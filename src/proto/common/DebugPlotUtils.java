@@ -72,8 +72,8 @@ public class DebugPlotUtils {
     boolean recordCorrect = true;
     Clue toPlace = Clue.locationClue(plot, roleP, step, place.region(), 0);
     Clue further = Clue.locationClue(plot, roleP, step, place.region(), 1);
-    file.recordClue(toPlace, Lead.LEAD_REPORT, time, place);
-    file.recordClue(further, Lead.LEAD_REPORT, time, place);
+    file.recordClue(toPlace, LeadType.REPORT, time, place);
+    file.recordClue(further, LeadType.REPORT, time, place);
     
     I.say("\nGenerated location clues...");
     I.say("  "+CasesFX.longDescription(toPlace, played));
@@ -90,8 +90,8 @@ public class DebugPlotUtils {
     
     Clue confirms = Clue.confirmSuspect(plot, roleP, step, place);
     Clue forTrait = Clue.traitClue     (plot, roleP, step, trait);
-    file.recordClue(confirms, Lead.LEAD_REPORT, time, place);
-    file.recordClue(forTrait, Lead.LEAD_REPORT, time, place);
+    file.recordClue(confirms, LeadType.REPORT, time, place);
+    file.recordClue(forTrait, LeadType.REPORT, time, place);
 
     I.say("\nGenerated trait clue after confirmation...");
     I.say("  "+CasesFX.longDescription(confirms, played));
