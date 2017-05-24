@@ -23,19 +23,19 @@ public class DebugPlotBefore extends RunGame {
     DefaultGame.initDefaultWorld(world);
     
     Base crooks = world.baseFor(Crooks.THE_MORETTI_FAMILY);
-    Plot crime = PlotTypes.TYPE_KIDNAP.initPlot(crooks);
-    crime.fillAndExpand();
-    crooks.plots.assignRootPlot(crime, 0);
-    Person organiser = crime.organiser();
-    Place  hideout   = crime.hideout  ();
+    Plot plot = DebugPlotUtils.assignRandomPlot(crooks, PlotTypes.ALL_TYPES);
+    plot.fillAndExpand();
+    crooks.plots.assignRootPlot(plot, 0);
+    Person organiser = plot.organiser();
+    Place  hideout   = plot.hideout  ();
     
     Base played = world.playerBase();
     Clue tipoff = Clue.confirmSuspect(
-      crime, Plot.ROLE_ORGANISER, crime.currentStep(), organiser, hideout
+      plot, Plot.ROLE_ORGANISER, plot.currentStep(), organiser, hideout
     );
     int timeFound = world.timing.totalHours();
-    Place placeFound = crime.hideout();
-    CaseFile file = played.leads.caseFor(crime);
+    Place placeFound = plot.hideout();
+    CaseFile file = played.leads.caseFor(plot);
     file.recordClue(tipoff, LeadType.TIPOFF, timeFound, placeFound);
 
     GameSettings.noTipoffs = true;

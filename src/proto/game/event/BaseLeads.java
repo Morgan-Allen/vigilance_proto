@@ -121,11 +121,15 @@ public class BaseLeads {
   /**  Helper methods for determining which plots and suspects should be tailed
     *  most urgently-
     */
-  public Series <Plot> activePlots() {
+  public Series <Plot> knownPlots() {
     Batch <Plot> known = new Batch();
     for (Clue c : cluesFor(null, null, null, null, false)) {
-      if (c.plot.complete()) continue;
-      known.include(c.plot);
+      if (! c.plot.complete()) {
+        known.include(c.plot);
+      }
+      else if (base.world().events.past().includes(c.plot)) {
+        known.include(c.plot);
+      }
     }
     return known;
   }
@@ -151,7 +155,7 @@ public class BaseLeads {
     //  active plot, if that most recent clue was found in the region.
     Batch <Clue> latest = new Batch();
     
-    for (Plot plot : activePlots()) {
+    for (Plot plot : knownPlots()) {
       Series <Clue> clues = cluesFor(plot, null, null, null, false);
       Batch <Role> roles = new Batch();
       for (Clue c : clues) roles.include(c.role());

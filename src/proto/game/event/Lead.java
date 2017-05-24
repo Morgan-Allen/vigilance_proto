@@ -288,6 +288,12 @@ public class Lead extends Task {
       else {
         continue;
       }
+      //
+      //  Either way, you have to take the risk of tipping off the perps
+      //  themselves:
+      if (setResult == -1) {
+        plot.takeSpooking(type.profile, e);
+      }
     }
     //
     //  We check separately for any element whose role is mentioned-
@@ -304,10 +310,6 @@ public class Lead extends Task {
       Clue confirms = Clue.confirmAim(plot);
       file.recordClue(confirms, this, time, scene);
     }
-    //
-    //  Either way, you have to take the risk of tipping off the perps
-    //  themselves:
-    if (setResult == -1) plot.takeSpooking(type.profile);
     //
     //  Reset for the next contact and return your result.
     contactTime = -1;

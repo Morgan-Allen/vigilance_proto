@@ -32,12 +32,9 @@ public class EventsView extends UINode {
     ViewUtils.ListDraw draw = new ViewUtils.ListDraw();
     int across = 10, down = 10;
     boolean hasCase = false;
-    draw.addEntry(
-      null, "OPEN CASES", 25, null
-    );
+    draw.addEntry(null, "OPEN CASES", 25, null);
     
-    for (Plot plot : player.leads.activePlots()) {
-      if (plot.complete()) continue;
+    for (Plot plot : player.leads.knownPlots()) {
       Image icon = plot.icon();
       if (icon == null) icon = MapView.ALERT_IMAGE;
       draw.addEntry(icon, CasesFX.nameFor(plot, player), 40, plot);
@@ -58,9 +55,7 @@ public class EventsView extends UINode {
       draw.addEntry(null, "    None", 25, null);
     }
     
-    draw.addEntry(
-      null, "ONGOING TASKS", 25, null
-    );
+    draw.addEntry( null, "ONGOING TASKS", 25, null);
     //  TODO:  Make this an interface for the relevant objects?
     class Upcoming { Object ref; float daysLeft; Image icon; }
     List <Upcoming> schedule = new List <Upcoming> () {

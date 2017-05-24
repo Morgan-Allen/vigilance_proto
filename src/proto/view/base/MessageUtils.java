@@ -64,6 +64,32 @@ public class MessageUtils {
   }
   
   
+  public static void presentColdCaseMessage(
+    MainView view, Plot cold, int plotState
+  ) {
+    String desc = "";
+    if (plotState == Plot.STATE_SPOOKED) desc =
+      "Word on the street is that "+cold.base().faction()+" have got wind of "+
+      "your investigation into "+CasesFX.nameFor(cold, view.player())+" and "+
+      "called off the operation.  The crime will not take place, but you "+
+      "won't catch the perps either.";
+    else if (plotState == Plot.STATE_SUCCESS) desc =
+      "Word on the street is "+cold.base().faction()+" pulled off a major "+
+      "heist, but the trail will be cold by now.";
+    else desc =
+      "Word on the street is "+cold.base().faction()+" were planning a major "+
+      "heist, but the trail will be cold by now.";
+    
+    view.queueMessage(new MessageView(
+      view, cold.icon(), "Plot Abandoned", desc, "Dismiss"
+    ) {
+      protected void whenClicked(String option, int optionID) {
+        mainView.dismissMessage(this);
+      }
+    });
+  }
+  
+  
   public static void presentBustMessage(
     MainView view, Scene scene, Lead lead, Plot plot
   ) {

@@ -6,6 +6,8 @@ import proto.game.world.*;
 import proto.game.person.*;
 import proto.game.scene.*;
 import proto.util.*;
+import proto.view.base.MessageUtils;
+
 import static proto.game.event.Lead.*;
 import static proto.game.event.LeadType.*;
 
@@ -66,6 +68,13 @@ public abstract class Plot extends Event implements Assignment {
     NEVER_SHOW[] = { ROLE_OBJECTIVE, ROLE_TIME },
     NEVER_TIP [] = { ROLE_MASTERMIND, ROLE_HQ, ROLE_TARGET, ROLE_SCENE };
   
+  final public static int
+    STATE_INIT    = -1,
+    STATE_ACTIVE  =  0,
+    STATE_SPOOKED =  2,
+    STATE_SUCCESS =  3,
+    STATE_FAILED  =  4;
+  
   
   /**  Data fields, construction and save/load methods-
     */
@@ -89,6 +98,7 @@ public abstract class Plot extends Event implements Assignment {
   Step current = null;
   int stepTimes[];
   
+  int state      = STATE_INIT;
   int tipsCount  = 0;
   int spookLevel = 0;
   
@@ -118,6 +128,7 @@ public abstract class Plot extends Event implements Assignment {
     stepTimes = new int[steps.size()];
     for (int i = 0; i < steps.size(); i++) stepTimes[i] = s.loadInt();
     
+    state      = s.loadInt();
     tipsCount  = s.loadInt();
     spookLevel = s.loadInt();
   }
@@ -140,6 +151,7 @@ public abstract class Plot extends Event implements Assignment {
     s.saveObject(current);
     for (int t : stepTimes) s.saveInt(t);
     
+    s.saveInt(state     );
     s.saveInt(tipsCount );
     s.saveInt(spookLevel);
   }
@@ -277,6 +289,12 @@ public abstract class Plot extends Event implements Assignment {
   
   /**  General update cycle and associated methods-
     */
+  public void beginEvent() {
+    super.beginEvent();
+    this.state = STATE_ACTIVE;
+  }
+  
+  
   public void updateEvent() {
     for (RoleEntry entry : entries) if (entry.supplies != null) {
       if (! entry.supplies.hasBegun()) {
@@ -285,17 +303,17 @@ public abstract class Plot extends Event implements Assignment {
     }
     if (! possible()) return;
     
-    boolean verbose = GameSettings.eventsVerbose;
+    boolean report = GameSettings.eventsVerbose;
     Base getsTipped = world.playerBase();
     
     if (current == null || complete(current)) {
       int time = world.timing.totalHours();
-      if (verbose) {
+      if (report) {
         I.say("\n\n\nUpdating plot: "+this);
       }
       
       if (current != null) {
-        if (verbose) {
+        if (report) {
           I.say("  Ended step: "+current.label());
         }
         checkForTipoffs(current, false, true, getsTipped);
@@ -312,19 +330,18 @@ public abstract class Plot extends Event implements Assignment {
         }
         
         checkForTipoffs(current, true, false, getsTipped);
-        if (verbose) {
+        if (report) {
           I.say("  Began step: "+current.label());
         }
       }
       else {
-        if (verbose) {
+        if (report) {
           I.say("  Plot completed.");
         }
         completeEvent();
       }
       
-      
-      if (verbose) {
+      if (report) {
         I.say("  Current Time: "+time);
         I.say("Current Step: "+current);
         printLocations();
@@ -340,7 +357,7 @@ public abstract class Plot extends Event implements Assignment {
   }
   
   
-  public void takeSpooking(int spookAmount) {
+  public void takeSpooking(int spookAmount, Element spooked) {
     spookLevel += spookAmount;
     float abortFactor = spookLevel * 1f / PROFILE_SUSPICIOUS;
     abortFactor = (abortFactor / entries.size()) - 1;
@@ -354,8 +371,44 @@ public abstract class Plot extends Event implements Assignment {
         I.say("  Spook Level: "+spookLevel);
         I.say("  Roll vs. Abort factor was: "+roll+" vs. "+abortFactor);
       }
+      
+      this.state = STATE_SPOOKED;
       completeEvent();
     }
+  }
+  
+  
+  public void completeEvent() {
+    if (state == STATE_ACTIVE) {
+      this.state = STATE_SUCCESS;
+    }
+    for (Person perp : involved) perp.removeAssignment(this);
+    involved.clear();
+    super.completeEvent();
+  }
+  
+  
+  public void completeAfterScene(Scene scene, EventEffects report) {
+    if (report.playerWon()) {
+      this.completeEvent();
+      this.state = STATE_FAILED;
+    }
+    else {
+      this.state = STATE_SUCCESS;
+    }
+    report.applyEffects(scene.site());
+  }
+  
+  
+  public boolean checkExpired(boolean complete) {
+    if (! complete) return false;
+    int timeExpires = timeComplete() + Lead.CLUE_EXPIRATION_TIME;
+    boolean expired = world.timing.totalHours() > timeExpires;
+    
+    if (expired) {
+      MessageUtils.presentColdCaseMessage(world.view(), this, state);
+    }
+    return expired;
   }
   
   
@@ -647,13 +700,6 @@ public abstract class Plot extends Event implements Assignment {
   }
   
   
-  public void completeEvent() {
-    for (Person perp : involved) perp.removeAssignment(this);
-    involved.clear();
-    super.completeEvent();
-  }
-  
-  
   public Scene generateScene(Step step, Element focus, Lead lead) {
     if (step.isAssault()) {
       return PlotUtils.generateHeistScene(this, step, focus, lead);
@@ -668,12 +714,6 @@ public abstract class Plot extends Event implements Assignment {
   public EventEffects generateEffects(Scene scene) {
     Lead lead = (Lead) scene.playerTask();
     return PlotUtils.generateSceneEffects(scene, this, lead);
-  }
-  
-  
-  public void completeAfterScene(Scene scene, EventEffects report) {
-    super.completeAfterScene(scene, report);
-    report.applyEffects(scene.site());
   }
   
   

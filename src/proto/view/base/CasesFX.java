@@ -108,6 +108,7 @@ public class CasesFX {
   
   
   public static String nameFor(Plot plot, Base base) {
+    //if (true) return plot.name();
     
     CaseFile  file      = base.leads.caseFor(plot);
     EventType type      = plot.type;
@@ -123,7 +124,7 @@ public class CasesFX {
       }
     }
     
-    String name = "Unknown Plot";
+    String name = "Unknown Plot "+file.caseID();
     if      (targKnown && aimKnown) name = type.name+" of "+plot.target();
     else if (targKnown            ) name += " (Target: "+plot.target()+")";
     else if (aimKnown             ) name = ""+type.name+" (Unknown Target)";

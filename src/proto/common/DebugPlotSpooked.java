@@ -32,46 +32,34 @@ public class DebugPlotSpooked extends RunGame {
   protected boolean runTests(World world, boolean afterLoad, boolean suite) {
     if (afterLoad) return false;
     
-    Plot crime = world.events.nextActivePlot();
-    Series <Element> involvedBefore = crime.allInvolved();
-    boolean allSame = true;
+    Plot plot = world.events.nextActivePlot();
+    Series <Element> involvedBefore = plot.allInvolved();
     
-    I.say("\n\nCrime generated: "+crime);
-    I.say("\nPerps involved at first:");
-    for (Element e : involvedBefore) {
-      I.say("  "+e+" ("+crime.roleFor(e)+")");
-    }
+    I.say("\n\nCrime generated: "+plot);
+    Element spooked = (Element) Rand.pickFrom(involvedBefore);
+    plot.takeSpooking(100, spooked);
     
-    crime.takeSpooking(100);
-    world.updateWorld(24);
+    I.say("\nCrime interrupted by spooking: "+plot.complete());
     
-    Series <Element> involvedAfter = crime.allInvolved();
-    I.say("\nPerps involved after spooking:");
+    world.updateWorld(Lead.CLUE_EXPIRATION_TIME + 24);
+    boolean expired = ! world.events.past().includes(plot);
     
-    int index = 0;
-    for (Element e : involvedAfter) {
-      I.say("  "+e+" ("+crime.roleFor(e)+")");
-      Element before = involvedBefore.atIndex(index);
-      
-      if (e != before) {
-        allSame = false;
-        I.add(" (=/= "+before+")");
-      }
-      else {
-        I.add(" (same)");
-      }
-      
-      if (++index >= involvedBefore.size()) break;
-    }
+    I.say("\nPast events are: "+world.events.past());
+    I.say("\nCrime has expired: "+expired);
     
-    if (allSame) {
-      I.say("\nFailed to update plot correctly!");
-    }
-    
-    return ! allSame;
+    return expired;
   }
   
 }
+
+
+
+
+
+
+
+
+
 
 
 

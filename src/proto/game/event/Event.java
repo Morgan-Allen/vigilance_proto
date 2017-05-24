@@ -20,8 +20,8 @@ public abstract class Event implements Session.Saveable {
   
   final World world;
   int eventID = -1;
-  int timeBegins = -1;
-  boolean scheduled, complete;
+  int timeBegins = -1, timeComplete = -1;
+  boolean scheduled;
   
   List <EventEffects> allEffects = new List();
   
@@ -34,23 +34,23 @@ public abstract class Event implements Session.Saveable {
   
   public Event(Session s) throws Exception {
     s.cacheInstance(this);
-    type       = (EventType) s.loadObject();
-    world      = (World    ) s.loadObject();
-    eventID    = s.loadInt();
-    timeBegins = s.loadInt ();
-    scheduled  = s.loadBool();
-    complete   = s.loadBool();
+    type         = (EventType) s.loadObject();
+    world        = (World    ) s.loadObject();
+    eventID      = s.loadInt ();
+    timeBegins   = s.loadInt ();
+    timeComplete = s.loadInt ();
+    scheduled    = s.loadBool();
     s.loadObjects(allEffects);
   }
   
   
   public void saveState(Session s) throws Exception {
-    s.saveObject (type      );
-    s.saveObject (world     );
-    s.saveInt    (eventID   );
-    s.saveInt    (timeBegins);
-    s.saveBool   (scheduled );
-    s.saveBool   (complete  );
+    s.saveObject(type        );
+    s.saveObject(world       );
+    s.saveInt   (eventID     );
+    s.saveInt   (timeBegins  );
+    s.saveInt   (timeComplete);
+    s.saveBool  (scheduled   );
     s.saveObjects(allEffects);
   }
   
@@ -88,6 +88,11 @@ public abstract class Event implements Session.Saveable {
   }
   
   
+  public int timeComplete() {
+    return timeComplete;
+  }
+  
+  
   public boolean scheduled() {
     return scheduled;
   }
@@ -100,7 +105,7 @@ public abstract class Event implements Session.Saveable {
   
   
   public boolean complete() {
-    return complete;
+    return timeComplete != -1;
   }
   
   
@@ -114,11 +119,16 @@ public abstract class Event implements Session.Saveable {
   }
   
   
+  public boolean checkExpired(boolean complete) {
+    return false;
+  }
+  
+  
   
   /**  Helping with scene configuration and after-effects:
     */
   public void completeEvent() {
-    complete = true;
+    timeComplete = world.timing.totalHours();
   }
   
   

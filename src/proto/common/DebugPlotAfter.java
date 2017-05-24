@@ -22,7 +22,7 @@ public class DebugPlotAfter extends RunGame {
     DefaultGame.initDefaultWorld(world);
     
     Base crooks = world.baseFor(Crooks.THE_MORETTI_FAMILY);
-    Plot plot = PlotTypes.TYPE_KIDNAP.initPlot(crooks);
+    Plot plot = DebugPlotUtils.assignRandomPlot(crooks, PlotTypes.ALL_TYPES);
     plot.fillAndExpand();
     crooks.plots.assignRootPlot(plot, 0);
     plot.advanceToStep(plot.mainHeist());

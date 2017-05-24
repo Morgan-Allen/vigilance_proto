@@ -56,6 +56,7 @@ public class Events {
   /**  Regular updates and event-generation-
     */
   void updateEvents() {
+    boolean report = GameSettings.eventsVerbose;
     final int time = world.timing.totalHours();
     
     for (Event event : coming) {
@@ -63,6 +64,7 @@ public class Events {
         coming.remove(event);
         active.add(event);
         event.beginEvent();
+        if (report) I.say("\nEvent began: "+event+" at time: "+time);
       }
     }
     
@@ -72,6 +74,13 @@ public class Events {
       }
       else {
         event.updateEvent();
+      }
+    }
+    
+    for (Event event : past) {
+      if (event.checkExpired(true)) {
+        past.remove(event);
+        if (report) I.say("\nEvent expired: "+event+" at time: "+time);
       }
     }
   }
@@ -84,6 +93,7 @@ public class Events {
   
   public void scheduleEvent(Event event, int delayHours) {
     
+    boolean report = GameSettings.eventsVerbose;
     int time = world.timing.totalHours();
     int ID   = coming.size() + 1;
     
@@ -93,15 +103,25 @@ public class Events {
     else {
       event.scheduleStart(event.timeBegins(), ID);
     }
-    
+
     coming.include(event);
+    if (report) {
+      I.say("\nScheduled "+event+" for time: "+event.timeBegins());
+      I.add(" at time: "+time);
+    }
   }
   
   
   public void closeEvent(Event event) {
+    boolean report = GameSettings.eventsVerbose;
+    
     coming.remove(event);
     active.remove(event);
     if (! past.includes(event)) past.addFirst(event);
+    
+    if (report) {
+      I.say("\nClosed event: "+event+" at "+world.timing.totalHours());
+    }
   }
   
   
