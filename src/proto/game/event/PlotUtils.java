@@ -134,7 +134,7 @@ public class PlotUtils {
     Base  base  = plot.base();
     World world = base.world();
     Place place = focus.place();
-    Batch <Element> involved = plot.allInvolved();
+    Series <Element> involved = plot.allInvolved();
     List <Person> forces = new List();
     
     final float dangerLevel = 0.5f;

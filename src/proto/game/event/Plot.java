@@ -482,7 +482,7 @@ public abstract class Plot extends Event implements Assignment {
   }
   
   
-  public Batch <Role> allRoles() {
+  public Series <Role> allRoles() {
     Batch <Role> all = new Batch();
     for (RoleEntry entry : entries) {
       all.include(entry.role);
@@ -491,7 +491,7 @@ public abstract class Plot extends Event implements Assignment {
   }
   
   
-  public Batch <Element> allInvolved() {
+  public Series <Element> allInvolved() {
     Batch <Element> involved = new Batch();
     for (RoleEntry entry : entries) {
       involved.include(entry.element);

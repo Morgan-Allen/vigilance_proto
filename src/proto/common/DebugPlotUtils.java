@@ -2,6 +2,7 @@
 
 package proto.common;
 import proto.game.world.*;
+import proto.content.events.PlotTypes;
 import proto.game.event.*;
 import proto.game.scene.*;
 import proto.game.person.*;
@@ -41,6 +42,15 @@ public class DebugPlotUtils {
     I.say("  Investigation before okay: "+bOK     );
     I.say("  Investigation after okay:  "+aOK     );
     I.say("  Plot-effect tests okay:    "+effectOK);
+  }
+  
+  
+  public static Plot assignRandomPlot(Base base, PlotType... types) {
+    PlotType type  = (PlotType) Rand.pickFrom(types);
+    Plot     crime = type.initPlot(base);
+    crime.fillAndExpand();
+    base.plots.assignRootPlot(crime, 0);
+    return crime;
   }
   
   
@@ -339,7 +349,6 @@ public class DebugPlotUtils {
       return false;
     }
   }
-  
   
   
   public static boolean runPlotToCompletion(World world) {
