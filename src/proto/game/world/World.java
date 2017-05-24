@@ -113,16 +113,10 @@ public class World implements Session.Saveable {
   
   
   
-  /**  Supplementary setup methods:
+  /**  Supplementary methods for bases and world-entry:
     */
-  public void attachRegions(Region... districts) {
-    this.regions = districts;
-  }
-  
-  
-  public void addBase(Base base, boolean played) {
-    bases.add(base);
-    if (played) this.played = base;
+  public Series <Element> inside() {
+    return elements;
   }
   
   
@@ -131,16 +125,13 @@ public class World implements Session.Saveable {
   }
   
   
-  
-  /**  General query methods-
-    */
-  public Series <Element> inside() {
-    return elements;
+  public Base playerBase() {
+    return played;
   }
   
   
-  public Base playerBase() {
-    return played;
+  public void setPlayerBase(Base base) {
+    this.played = base;
   }
   
   
@@ -160,6 +151,11 @@ public class World implements Session.Saveable {
   
   /**  Handling regions and large-scale distances-
     */
+  public void attachRegions(Region... districts) {
+    this.regions = districts;
+  }
+  
+  
   public Region[] regions() {
     return regions;
   }

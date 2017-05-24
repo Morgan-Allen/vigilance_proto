@@ -147,6 +147,12 @@ public class PlotKidnap extends Plot {
   }
   
   
+  private float cashGained(boolean estimate) {
+    Person ransomed = (Person) filling(ROLE_RANSOMS);
+    return ransomed.stats.levelFor(INVESTMENT) * 50;
+  }
+  
+  
   protected boolean checkSuccess(Step step) {
     return true;
   }
@@ -168,12 +174,6 @@ public class PlotKidnap extends Plot {
       target.setCaptive(false);
       base().finance.incPublicFunds((int) cashGained(false));
     }
-  }
-  
-  
-  private float cashGained(boolean estimate) {
-    Person ransomed = (Person) filling(ROLE_RANSOMS);
-    return ransomed.stats.levelFor(INVESTMENT) * 50;
   }
 }
 

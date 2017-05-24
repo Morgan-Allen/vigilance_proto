@@ -125,7 +125,7 @@ public class PlotAssassinate extends Plot {
   
   
   protected float ratePlotFor(Person mastermind) {
-    return mastermind.history.bondWith(target()) * -1000;
+    return mastermind.history.bondWith(target()) * -3;
   }
 
 

@@ -188,7 +188,12 @@ public class Base implements Session.Saveable {
   /**  Rendering and interface methods-
     */
   public String name() {
-    return "Base for "+faction.name;
+    return "Base: "+faction.name;
+  }
+  
+  
+  public String toString() {
+    return name();
   }
 }
 

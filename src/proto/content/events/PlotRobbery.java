@@ -152,6 +152,11 @@ public class PlotRobbery extends Plot {
     float baseFunds = base().finance.publicFunds();
     return cashGained(true) / (100 + baseFunds);
   }
+  
+  
+  private float cashGained(boolean estimate) {
+    return estimate ? 400 : (300 + Rand.index(201));
+  }
 
 
   protected boolean checkSuccess(Step step) {
@@ -163,11 +168,6 @@ public class PlotRobbery extends Plot {
     if (step == STEP_REPORT) {
       base().finance.incPublicFunds((int) cashGained(false));
     }
-  }
-  
-  
-  private float cashGained(boolean estimate) {
-    return estimate ? 400 : (300 + Rand.index(201));
   }
   
 }

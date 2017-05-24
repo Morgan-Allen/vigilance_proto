@@ -96,8 +96,7 @@ public class DefaultGame extends RunGame {
     //
     //  
     final Base base = world.baseFor(Heroes.JANUS_INDUSTRIES);
-    //final Faction owns = Heroes.JANUS_INDUSTRIES;
-    //final Base base = new Base(Facilities.MANOR, world, owns);
+    world.setPlayerBase(base);
     Person leader = new Person(Heroes.HERO_PHOBOS, world);
     base.assignLeader(leader);
     
@@ -146,7 +145,6 @@ public class DefaultGame extends RunGame {
     base.finance.incPublicFunds(2000);
     base.finance.incSecretFunds(200);
     base.finance.updateFinance();
-    world.addBase(base, true);
     
     if (report) {
       I.say("  Roster for "+base.faction());
@@ -172,14 +170,14 @@ public class DefaultGame extends RunGame {
       Crooks.GANGSTER, Crooks.GANGSTER, Crooks.HITMAN,
       Civilians.DOCTOR, Civilians.INVENTOR, Civilians.BROKER
     };
-    final Batch <Base> hideouts = new Batch();
+    final Batch <Base> crimeBases = new Batch();
     
     final Base base1 = world.baseFor(Crooks.THE_MORETTI_FAMILY);
     final Person boss1 = new Person(Villains.MORETTI, world);
     base1.assignLeader(boss1);
     base1.finance.setSecretPercent(0);
     base1.finance.incPublicFunds(100);
-    hideouts.add(base1);
+    crimeBases.add(base1);
     
     /*
     final Person boss2 = new Person(Villains.SNAKE_EYES, world);
@@ -189,8 +187,7 @@ public class DefaultGame extends RunGame {
     hideouts.add(base2);
     //*/
     
-    for (Base base : hideouts) {
-      world.addBase(base, false);
+    for (Base base : crimeBases) {
       base.addToRoster(base.leader());
       base.setGoonTypes(goonTypes);
       base.plots.assignPlotTypes(PlotTypes.ALL_TYPES);

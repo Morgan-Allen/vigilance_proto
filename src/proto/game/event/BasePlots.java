@@ -51,14 +51,18 @@ public class BasePlots {
       return null;
     }
     
+    final boolean report = GameSettings.eventsVerbose;
+    if (report) I.say("\nPicking new plot for "+base);
     Pick <Plot> pick = new Pick(0);
     
     for (PlotType type : plotTypes) {
       Plot sample = type.initPlot(base);
       sample.fillAndExpand();
       float rating = sample.ratePlotFor(base.leader());
-      pick.compare(sample, rating * (0.5f + Rand.num()));
+      if (report) I.say("  "+sample+": "+rating);
+      pick.compare(sample, rating * Rand.avgNums(2));
     }
+    if (report) I.say("  Picked: "+pick.result());
     
     return pick.result();
   }
