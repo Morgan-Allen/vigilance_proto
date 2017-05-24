@@ -191,6 +191,7 @@ public class DefaultGame extends RunGame {
       base.addToRoster(base.leader());
       base.setGoonTypes(goonTypes);
       base.plots.assignPlotTypes(PlotTypes.ALL_TYPES);
+      Series <Place> places = base.ownedFacilities();
       
       for (PersonType type : seniorTypes) {
         Person senior = Person.randomOfKind(type, world);
@@ -199,7 +200,9 @@ public class DefaultGame extends RunGame {
       
       for (Person p : base.roster()) {
         world.setInside(p, true);
-        base.HQ().setAttached(p, true);
+        Place home = (Place) Rand.pickFrom(places);
+        Place.setResident(p, home, true);
+        home.setAttached(p, true);
       }
       
       if (report) {

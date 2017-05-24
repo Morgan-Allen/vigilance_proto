@@ -182,6 +182,9 @@ public class World implements Session.Saveable {
   }
   
   
+  
+  /**  Assorted common batch-query methods:
+    */
   public Series <Person> persons() {
     Batch <Person> all = new Batch();
     for (Element e : inside()) if (e.isPerson()) {

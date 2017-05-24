@@ -185,6 +185,16 @@ public class Base implements Session.Saveable {
   
   
   
+  /**  Property listings:
+    */
+  public Series <Place> ownedFacilities() {
+    Batch <Place> owned = new Batch();
+    for (Place p : world.places()) if (p.base() == this) owned.add(p);
+    return owned;
+  }
+  
+  
+  
   /**  Rendering and interface methods-
     */
   public String name() {
