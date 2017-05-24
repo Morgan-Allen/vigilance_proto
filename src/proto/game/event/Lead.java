@@ -448,7 +448,7 @@ public class Lead extends Task {
   /**  Rendering, debug and interface methods-
     */
   public String activeInfo() {
-    return type.tenseVerbs[1]+" "+focus;
+    return type.name+": "+focus;
   }
   
   

@@ -13,6 +13,8 @@ import java.awt.Image;
 public class LeadType extends Index.Entry implements Session.Saveable {
   
   
+  /**  Static constants
+    */
   final static Index <LeadType> INDEX = new Index();
 
   final static String ICON_DIR = "media assets/ability icons/";
@@ -22,7 +24,6 @@ public class LeadType extends Index.Entry implements Session.Saveable {
       "Surveillance", "lead_surveil_person",
       "Surveil a suspect for clues to their activities and who they meet with.",
       ICON_DIR+"icon_surveil.png",
-      new String[] { "Surveiled", "Surveilling", "Will Surveil" },
       TIME_SHORT,
       MEDIUM_SURVEIL, FOCUS_PERSON, TENSE_DURING, PROFILE_LOW,
       CONFIDENCE_HIGH, PHYSICAL_MEDIA
@@ -31,7 +32,6 @@ public class LeadType extends Index.Entry implements Session.Saveable {
       "Surveillance", "lead_surveil_building",
       "Stake out a building to see who visits and who might be holed up.",
       ICON_DIR+"icon_surveil.png",
-      new String[] { "Surveiled", "Surveilling", "Will Surveil" },
       TIME_SHORT,
       MEDIUM_SURVEIL, FOCUS_BUILDING, TENSE_DURING, PROFILE_LOW,
       CONFIDENCE_MODERATE, PHYSICAL_MEDIA
@@ -40,7 +40,6 @@ public class LeadType extends Index.Entry implements Session.Saveable {
       "Questioning", "lead_question",
       "Question a suspect for information on past dealings or future plans.",
       ICON_DIR+"icon_question.png",
-      new String[] { "Questioned", "Questioning", "Will Question" },
       TIME_SHORT,
       MEDIUM_QUESTION, FOCUS_PERSON, TENSE_AFTER, PROFILE_HIGH,
       CONFIDENCE_MODERATE, MEDIUM_ANY
@@ -49,7 +48,6 @@ public class LeadType extends Index.Entry implements Session.Saveable {
       "Wiretap", "lead_wiretap",
       "Intercept suspicious communications to or from a structure.",
       ICON_DIR+"icon_wiretap.png",
-      new String[] { "Wiretapped", "Wiretapping", "Will Wiretap" },
       TIME_MEDIUM,
       MEDIUM_WIRE, FOCUS_BUILDING, TENSE_DURING, PROFILE_LOW,
       CONFIDENCE_HIGH, WIRED_MEDIA
@@ -58,7 +56,6 @@ public class LeadType extends Index.Entry implements Session.Saveable {
       "Patrol", "lead_patrol",
       "Patrol an area while keeping an eye out for suspicious activity.",
       ICON_DIR+"icon_surveil.png",
-      new String[] { "Patrolled", "Patrolling", "Will Patrol" },
       TIME_MEDIUM,
       MEDIUM_SURVEIL, FOCUS_REGION, TENSE_DURING, PROFILE_LOW,
       CONFIDENCE_MODERATE, PHYSICAL_MEDIA
@@ -67,7 +64,6 @@ public class LeadType extends Index.Entry implements Session.Saveable {
       "Frequency Scan", "lead_scan",
       "Scan wireless frequencies in an area for fragments of information.",
       ICON_DIR+"icon_scan.png",
-      new String[] { "Scanned", "Scanning", "Will Scan" },
       TIME_MEDIUM,
       MEDIUM_WIRE, FOCUS_REGION, TENSE_DURING, PROFILE_LOW,
       CONFIDENCE_MODERATE, WIRED_MEDIA
@@ -76,7 +72,6 @@ public class LeadType extends Index.Entry implements Session.Saveable {
       "Canvass", "lead_canvass",
       "Ask civilians or friendly contacts in an area for leads.",
       ICON_DIR+"icon_question.png",
-      new String[] { "Canvassed", "Canvassing", "Will Canvass" },
       TIME_LONG,
       MEDIUM_QUESTION, FOCUS_REGION, TENSE_ANY, PROFILE_SUSPICIOUS,
       CONFIDENCE_LOW, MEDIUM_ANY
@@ -85,7 +80,6 @@ public class LeadType extends Index.Entry implements Session.Saveable {
       "Search", "lead_search",
       "Search a building for logs, records or forensic evidence.",
       ICON_DIR+"icon_search.png",
-      new String[] { "Searched", "Searching", "Will Search" },
       TIME_SHORT,
       MEDIUM_SURVEIL, FOCUS_BUILDING, TENSE_AFTER, PROFILE_SUSPICIOUS,
       CONFIDENCE_MODERATE, FORENSIC_MEDIA
@@ -94,7 +88,6 @@ public class LeadType extends Index.Entry implements Session.Saveable {
       "Tipoff", "lead_tipoff",
       "_",
       ICON_DIR+"icon_wiretap.png",
-      new String[] { "Tipped Off", "Tipping Off", "Will Tip Off" },
       TIME_NONE,
       MEDIUM_WIRE, FOCUS_ANY, TENSE_ANY, PROFILE_HIDDEN,
       CONFIDENCE_LOW
@@ -103,7 +96,6 @@ public class LeadType extends Index.Entry implements Session.Saveable {
       "Report", "lead_report",
       "_",
       ICON_DIR+"icon_database.png",
-      new String[] { "Reported", "Reporting", "Will Report" },
       TIME_NONE,
       MEDIUM_WIRE, FOCUS_ANY, TENSE_ANY, PROFILE_OBVIOUS,
       CONFIDENCE_HIGH
@@ -112,7 +104,6 @@ public class LeadType extends Index.Entry implements Session.Saveable {
       "Guard", "lead_guard",
       "Guard this suspect against criminal activity.",
       ICON_DIR+"icon_guard_lead.png",
-      new String[] { "Guarded", "Guarding", "Will Guard" },
       TIME_SHORT,
       MEDIUM_ASSAULT, FOCUS_ANY, TENSE_DURING, PROFILE_OBVIOUS,
       CONFIDENCE_HIGH, PHYSICAL_MEDIA
@@ -121,14 +112,16 @@ public class LeadType extends Index.Entry implements Session.Saveable {
       "Bust", "lead_bust",
       "Bust down the doors and unleash hell.",
       ICON_DIR+"icon_guard_lead.png",
-      new String[] { "Busted", "Busting", "Will Bust" },
       TIME_SHORT,
       MEDIUM_ASSAULT, FOCUS_ANY, TENSE_DURING, PROFILE_OBVIOUS,
       CONFIDENCE_HIGH, MEDIUM_ANY
     );
   
   
-  final public String name, info, tenseVerbs[];
+  
+  /**  Data fields, construction and save/load methods-
+    */
+  final public String name, info;
   final public Image icon;
   
   final public int minHours;
@@ -139,7 +132,7 @@ public class LeadType extends Index.Entry implements Session.Saveable {
   
   LeadType(
     String name, String ID,
-    String info, String iconPath, String tenseVerbs[],
+    String info, String iconPath,
     int minHours, int medium, int focus, int tense, int profile,
     float confidence, int... cluesMedia
   ) {
@@ -147,7 +140,6 @@ public class LeadType extends Index.Entry implements Session.Saveable {
     this.name = name;
     this.info = info;
     this.icon = Kind.loadImage(iconPath);
-    this.tenseVerbs = tenseVerbs;
     this.minHours   = minHours  ;
     this.medium     = medium    ;
     this.focus      = focus     ;
@@ -168,10 +160,28 @@ public class LeadType extends Index.Entry implements Session.Saveable {
   }
   
   
+  
+  /**  Rendering, debug and interface methods-
+    */
   public String toString() {
     return name;
   }
+  
+  
+  public String verbName(Lead lead, Clue clue) {
+    
+    if (clue.step().medium == MEDIUM_WIRE && clue.isTraitClue()) {
+      return "Acoustic analysis";
+    }
+    if (clue.step().medium == MEDIUM_WIRE && clue.isLocationClue()) {
+      return "IP tracing";
+    }
+    
+    if (lead.type == SEARCH && clue.isTraitClue()) {
+      return "After some searching, trace analysis";
+    }
+    
+    return name;
+  }
 }
-
-
 

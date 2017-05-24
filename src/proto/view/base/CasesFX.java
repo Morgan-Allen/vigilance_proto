@@ -29,7 +29,7 @@ public class CasesFX {
     int      plotTime  = plot.timeScheduled(plot.mainHeist());
     
     StringBuffer desc = new StringBuffer();
-    if (leadType != null) desc.append(leadType.name  );
+    if (leadType != null) desc.append(leadType.verbName(source, clue));
     else                  desc.append("Investigation");
     
     if (source != null) {
