@@ -7,6 +7,7 @@ import proto.game.world.*;
 import proto.util.*;
 import static proto.game.person.PersonStats.*;
 import static proto.game.event.PlotUtils.*;
+import static proto.game.event.LeadType.*;
 
 
 
@@ -37,37 +38,37 @@ public class PlotKidnap extends Plot {
       "kidnap_initial_contacts", "Initial Contacts",
       "",
       ROLE_MASTERMIND, ROLE_HQ, ROLE_ORGANISER, ROLE_HIDEOUT, ROLE_TARGET,
-      Lead.MEDIUM_WIRE, 24
+      MEDIUM_WIRE, 24
     ),
     STEP_TAILING = Step.stepWith(
       "kidnap_tailing_target", "Tailing Target",
       "",
       ROLE_TAILS, ROLE_HIDEOUT, ROLE_TARGET, ROLE_SCENE, null,
-      Lead.MEDIUM_SURVEIL, 24
+      MEDIUM_SURVEIL, 24
     ),
     STEP_GRABS = Step.stepWith(
       "kidnap_grab_target", "Grab Target",
       "",
       ROLE_TAILS, ROLE_HIDEOUT, ROLE_TARGET, ROLE_SCENE, null,
-      Lead.MEDIUM_ASSAULT, 24, ROLE_GRABS
+      MEDIUM_ASSAULT, 24, ROLE_GRABS
     ),
     STEP_RANSOM_DEMAND = Step.stepWith(
       "kidnap_ransom_demand", "Ransom Demand",
       "",
       ROLE_ORGANISER, ROLE_HIDEOUT, ROLE_RANSOMS, ROLE_HOME, ROLE_TARGET,
-      Lead.MEDIUM_WIRE, 24
+      MEDIUM_WIRE, 24
     ),
     STEP_RANSOM_PAID = Step.stepWith(
       "kidnap_ransom_paid", "Ransom Paid",
       "",
       ROLE_RANSOMS, ROLE_HOME, ROLE_ORGANISER, ROLE_HIDEOUT, ROLE_TARGET,
-      Lead.MEDIUM_WIRE, 24
+      MEDIUM_WIRE, 24
     ),
     STEP_REPORT = Step.stepWith(
       "kidnap_reports_and_payoffs", "Reports And Payoffs",
       "",
       ROLE_ORGANISER, ROLE_HIDEOUT, ROLE_MASTERMIND, ROLE_HQ, null,
-      Lead.MEDIUM_WIRE, 24
+      MEDIUM_WIRE, 24
     );
   
   boolean returnedHostage;

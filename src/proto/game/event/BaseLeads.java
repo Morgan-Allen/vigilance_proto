@@ -312,40 +312,20 @@ public class BaseLeads {
   
   
   public Series <Lead> leadsFor(Element focus) {
+    
+    boolean canFind  = atKnownLocation(focus);
+    boolean canGuard = canFind && suspectIsVictim(focus);
+    boolean canBust  = canFind && suspectIsBoss  (focus);
+    
     final Batch <Lead> all = new Batch();
-    Place   scene    = lastKnownLocation(focus);
-    boolean canEnter = scene != null && scene.canEnter(base);
     
-    if (focus.isPerson()) {
-      Person  suspect  = (Person) focus;
-      boolean canFind  = scene == focus.place();
-      boolean canMeet  = canFind && canEnter;
-      boolean canGuard = suspectIsVictim(suspect) && canFind;
-      boolean canBust  = suspectIsBoss  (suspect) && canFind;
-      
-      if (canFind ) all.add(leadFor(suspect, SURVEIL_PERSON));
-      if (canMeet ) all.add(leadFor(suspect, QUESTION      ));
-      if (canEnter) all.add(leadFor(scene  , WIRETAP       ));
-      if (canGuard) all.add(leadFor(suspect, GUARD         ));
-      if (canBust ) all.add(leadFor(suspect, BUST          ));
+    if (canFind) for (LeadType type : LeadType.STANDARD_LEADS) {
+      if (type.canFollow(focus)) {
+        all.add(leadFor(focus, type));
+      }
     }
-    
-    if (focus.isPlace()) {
-      boolean canGuard = suspectIsVictim(focus);
-      boolean canBust  = suspectIsBoss  (focus);
-      all.add(leadFor(focus, SURVEIL_BUILDING));
-      all.add(leadFor(focus, WIRETAP         ));
-      all.add(leadFor(focus, SEARCH          ));
-      if (canGuard) all.add(leadFor(focus, GUARD));
-      if (canBust ) all.add(leadFor(focus, BUST ));
-    }
-    
-    if (focus.isRegion()) {
-      all.add(leadFor(focus, PATROL ));
-      all.add(leadFor(focus, SCAN   ));
-      all.add(leadFor(focus, CANVASS));
-      //all.add(leadFor(focus, Lead.LEAD_CRACKDOWN));
-    }
+    if (canGuard) all.add(leadFor(focus, LeadType.GUARD));
+    if (canBust ) all.add(leadFor(focus, LeadType.BUST ));
     
     return all;
   }

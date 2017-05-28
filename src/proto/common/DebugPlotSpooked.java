@@ -41,7 +41,7 @@ public class DebugPlotSpooked extends RunGame {
     
     I.say("\nCrime interrupted by spooking: "+plot.complete());
     
-    world.updateWorld(Lead.CLUE_EXPIRATION_TIME + 24);
+    world.updateWorld(LeadType.CLUE_EXPIRATION_TIME + 24);
     boolean expired = ! world.events.past().includes(plot);
     
     I.say("\nPast events are: "+world.events.past());

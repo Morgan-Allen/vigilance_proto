@@ -201,6 +201,7 @@ public class DefaultGame extends RunGame {
       for (Person p : base.roster()) {
         world.setInside(p, true);
         Place home = (Place) Rand.pickFrom(places);
+        if (p == base.leader()) home = base.HQ();
         Place.setResident(p, home, true);
         home.setAttached(p, true);
       }

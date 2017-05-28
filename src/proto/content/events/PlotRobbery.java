@@ -5,11 +5,11 @@ import proto.game.event.*;
 import proto.game.person.*;
 import proto.game.world.*;
 import proto.util.*;
-
-import proto.content.agents.Civilians;
-import proto.content.places.Facilities;
 import static proto.game.person.PersonStats.*;
 import static proto.game.event.PlotUtils.*;
+import static proto.game.event.LeadType.*;
+import proto.content.agents.Civilians;
+import proto.content.places.Facilities;
 
 
 
@@ -44,37 +44,37 @@ public class PlotRobbery extends Plot {
       "robbery_contacts", "Contacts",
       "",
       ROLE_MASTERMIND, ROLE_HQ, ROLE_ORGANISER, ROLE_HIDEOUT, null,
-      Lead.MEDIUM_WIRE, 24
+      MEDIUM_WIRE, 24
     ),
     STEP_CASING = Step.stepWith(
       "robbery_casing", "Casing",
       "",
       ROLE_CASING, ROLE_HIDEOUT, ROLE_TARGET, ROLE_SCENE, null,
-      Lead.MEDIUM_SURVEIL, 24
+      MEDIUM_SURVEIL, 24
     ),
     STEP_RESEARCH = Step.stepWith(
       "robbery_research", "Research",
       "",
       ROLE_HACKER, ROLE_HIDEOUT, ROLE_OFFICE, ROLE_OFFICE, null,
-      Lead.MEDIUM_MEET, 24
+      MEDIUM_MEETING, 24
     ),
     STEP_HEIST = Step.stepWith(
       "robbery_heist", "Heist",
       "",
       ROLE_CASING, ROLE_HIDEOUT, ROLE_TARGET, ROLE_SCENE, null,
-      Lead.MEDIUM_ASSAULT, 24, ROLE_CRACKER, ROLE_HACKER
+      MEDIUM_ASSAULT, 24, ROLE_CRACKER, ROLE_HACKER
     ),
     STEP_VALUATION = Step.stepWith(
       "robbery_valuation", "Valuation and Fencing",
       "",
       ROLE_ORGANISER, ROLE_HIDEOUT, ROLE_FENCE, ROLE_HIDEOUT, null,
-      Lead.MEDIUM_MEET, 24, ROLE_CASING, ROLE_CRACKER, ROLE_HACKER
+      MEDIUM_MEETING, 24, ROLE_CASING, ROLE_CRACKER, ROLE_HACKER
     ),
     STEP_REPORT = Step.stepWith(
       "robbery_report", "Report and Payoffs",
       "",
       ROLE_ORGANISER, ROLE_HIDEOUT, ROLE_MASTERMIND, ROLE_HQ, null,
-      Lead.MEDIUM_WIRE, 24
+      MEDIUM_WIRE, 24
     );
   
   final static PlaceType THEFT_VENUES[] = {

@@ -1,44 +1,4 @@
 
-    
-    //  TODO:  Use this to determine whether certain investigation options are
-    //  permitted!  It should be simpler than the current framework.
-    
-    //  Person, Place or Thing
-    //  Wiretap, Surveil, Search or Meeting
-    //  Trait or Location
-    //  Before, During or After
-    
-    //                   Attach   Reveal
-    
-    //  Wiretap Person   X        X
-    //  Wiretap Place    Yes      Location "IP Tracing", Trait "Acoustics"
-    //  Wiretap Thing    X        X
-    //  Wiretap Tense    During
-    
-    //  Surveil Person   Yes      Location, Trait
-    //  Surveil Place    Yes      Location, Trait
-    //  Surveil Thing    Yes      Location, Trait
-    //  Surveil Tense    During
-    
-    //  Search Person    X        Trait "Chem analysis/DNA/fibres", per item
-    //  Search Place     Yes      Trait "Chem analysis/DNA/fibres", per item
-    //  Search Thing     Yes      Trait "Chem analysis/DNA/fibres", per item
-    //  Search Tense     After
-    
-    //  Meeting Person   Yes      Location, Trait
-    //  Meeting Place    X        Location, Trait
-    //  Meeting Thing    X        Location, Trait
-    //  Meeting Tense    Before (if perp), During, After
-    
-    
-    //  Okay, this isn't actually too bad.  (You could also add relationships
-    //  and motives as a kind of clue.)  And you'll have to screen for past,
-    //  present and future.
-
-
-
-
-
 
 Update the map so that it looks better.
 

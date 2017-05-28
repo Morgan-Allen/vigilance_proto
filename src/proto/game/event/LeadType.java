@@ -1,8 +1,20 @@
 
 package proto.game.event;
 import proto.common.*;
+import proto.game.person.Attempt;
+import proto.game.person.Person;
+import proto.game.world.*;
 import proto.util.*;
 import static proto.game.event.Lead.*;
+import static proto.game.event.LeadType.MEDIUM_MEETING;
+import static proto.game.event.LeadType.MEDIUM_SEARCH;
+import static proto.game.event.LeadType.MEDIUM_SURVEIL;
+import static proto.game.event.LeadType.MEDIUM_WIRE;
+import static proto.game.person.PersonStats.ENGINEERING;
+import static proto.game.person.PersonStats.HIDE_RANGE;
+import static proto.game.person.PersonStats.PERSUADE;
+import static proto.game.person.PersonStats.QUESTION;
+import static proto.game.person.PersonStats.SIGHT_RANGE;
 
 import java.awt.Image;
 
@@ -15,108 +27,135 @@ public class LeadType extends Index.Entry implements Session.Saveable {
   
   /**  Static constants
     */
-  final static Index <LeadType> INDEX = new Index();
+  final public static int
+    //  The method by which a lead can be followed (and which contacts it can
+    //  pick up on)-
+    MEDIUM_WIRE     =  1,
+    MEDIUM_SURVEIL  =  2,
+    MEDIUM_SEARCH   =  3,
+    MEDIUM_MEETING  =  4,
+    MEDIUM_ASSAULT  =  5,
+    MEDIUM_NONE     = -1,
+    //  Whether this lead can pick up on past/present/future contacts-
+    TENSE_NONE      = -2,
+    TENSE_PAST      =  0,
+    TENSE_PRESENT   =  1,
+    TENSE_FUTURE    =  2,
+    TENSE_ANY       = -1,
+    //  How likely following a lead is to spook the perpetrator-
+    PROFILE_HIDDEN     = 0,
+    PROFILE_LOW        = 1,
+    PROFILE_SUSPICIOUS = 2,
+    PROFILE_HIGH       = 3,
+    PROFILE_OBVIOUS    = 4;
+  final public static float
+    //  Degrees of success in investigation-
+    RESULT_NONE    = -1,
+    RESULT_COLD    =  0,
+    RESULT_PARTIAL =  1,
+    RESULT_HOT     =  2,
+    //  How much a successful lead counts for, assuming perfect success-
+    CONFIDENCE_LOW      = 0.33f,
+    CONFIDENCE_MODERATE = 0.66f,
+    CONFIDENCE_HIGH     = 1.00f;
+  final public static int
+    //  Time taken to gather information-
+    TIME_NONE            = 0,
+    TIME_SHORT           = World.HOURS_PER_DAY / 8,
+    TIME_MEDIUM          = World.HOURS_PER_DAY / 2,
+    TIME_LONG            = World.HOURS_PER_DAY * 2,
+    CLUE_EXPIRATION_TIME = World.HOURS_PER_DAY * World.DAYS_PER_WEEK;
 
+  final public static String
+    MEDIUM_DESC[] = {null,
+      "Wire", "Surveil", "Search", "Meeting", "Assault", "None"
+    },
+    TENSE_DESC[] = {
+      "Past", "Present", "Future"
+    },
+    PROFILE_DESC[] = {
+      "Nil", "Low", "Moderate", "High", "BLATANT"
+    },
+    CONFIDENCE_DESC[] = {
+      "Weak", "Fair", "Strong"
+    };
+  
+  
+  final static Index <LeadType> INDEX = new Index();
+  
   final static String ICON_DIR = "media assets/ability icons/";
   
   final public static LeadType
-    SURVEIL_PERSON = new LeadType(
-      "Surveillance", "lead_surveil_person",
-      "Surveil a suspect for clues to their activities and who they meet with.",
+    SURVEIL = new LeadType(
+      "Surveillance", "lead_surveil",
+      "Stake out the premises to see who visits and who might be holed up.",
       ICON_DIR+"icon_surveil.png",
-      TIME_SHORT,
-      MEDIUM_SURVEIL, FOCUS_PERSON, TENSE_DURING, PROFILE_LOW,
-      CONFIDENCE_HIGH, PHYSICAL_MEDIA
+      TIME_SHORT, MEDIUM_SURVEIL, PROFILE_LOW, CONFIDENCE_MODERATE
     ),
-    SURVEIL_BUILDING = new LeadType(
-      "Surveillance", "lead_surveil_building",
-      "Stake out a building to see who visits and who might be holed up.",
-      ICON_DIR+"icon_surveil.png",
-      TIME_SHORT,
-      MEDIUM_SURVEIL, FOCUS_BUILDING, TENSE_DURING, PROFILE_LOW,
-      CONFIDENCE_MODERATE, PHYSICAL_MEDIA
-    ),
-    QUESTION = new LeadType(
-      "Questioning", "lead_question",
+    QUESTIONING = new LeadType(
+      "Questioning", "lead_questioning",
       "Question a suspect for information on past dealings or future plans.",
       ICON_DIR+"icon_question.png",
-      TIME_SHORT,
-      MEDIUM_QUESTION, FOCUS_PERSON, TENSE_AFTER, PROFILE_HIGH,
-      CONFIDENCE_MODERATE, MEDIUM_ANY
+      TIME_SHORT, MEDIUM_MEETING, PROFILE_HIGH, CONFIDENCE_MODERATE
     ),
     WIRETAP = new LeadType(
       "Wiretap", "lead_wiretap",
       "Intercept suspicious communications to or from a structure.",
       ICON_DIR+"icon_wiretap.png",
-      TIME_MEDIUM,
-      MEDIUM_WIRE, FOCUS_BUILDING, TENSE_DURING, PROFILE_LOW,
-      CONFIDENCE_HIGH, WIRED_MEDIA
+      TIME_MEDIUM, MEDIUM_WIRE, PROFILE_LOW, CONFIDENCE_HIGH
     ),
     PATROL = new LeadType(
       "Patrol", "lead_patrol",
       "Patrol an area while keeping an eye out for suspicious activity.",
       ICON_DIR+"icon_surveil.png",
-      TIME_MEDIUM,
-      MEDIUM_SURVEIL, FOCUS_REGION, TENSE_DURING, PROFILE_LOW,
-      CONFIDENCE_MODERATE, PHYSICAL_MEDIA
+      TIME_MEDIUM, MEDIUM_SURVEIL, PROFILE_LOW, CONFIDENCE_MODERATE
     ),
     SCAN = new LeadType(
       "Frequency Scan", "lead_scan",
       "Scan wireless frequencies in an area for fragments of information.",
       ICON_DIR+"icon_scan.png",
-      TIME_MEDIUM,
-      MEDIUM_WIRE, FOCUS_REGION, TENSE_DURING, PROFILE_LOW,
-      CONFIDENCE_MODERATE, WIRED_MEDIA
+      TIME_MEDIUM, MEDIUM_WIRE, PROFILE_LOW, CONFIDENCE_MODERATE
     ),
     CANVASS = new LeadType(
       "Canvass", "lead_canvass",
       "Ask civilians or friendly contacts in an area for leads.",
       ICON_DIR+"icon_question.png",
-      TIME_LONG,
-      MEDIUM_QUESTION, FOCUS_REGION, TENSE_ANY, PROFILE_SUSPICIOUS,
-      CONFIDENCE_LOW, MEDIUM_ANY
+      TIME_LONG, MEDIUM_MEETING, PROFILE_SUSPICIOUS, CONFIDENCE_LOW
     ),
     SEARCH = new LeadType(
       "Search", "lead_search",
       "Search a building for logs, records or forensic evidence.",
       ICON_DIR+"icon_search.png",
-      TIME_SHORT,
-      MEDIUM_SURVEIL, FOCUS_BUILDING, TENSE_AFTER, PROFILE_SUSPICIOUS,
-      CONFIDENCE_MODERATE, FORENSIC_MEDIA
+      TIME_SHORT, MEDIUM_SEARCH, PROFILE_SUSPICIOUS, CONFIDENCE_MODERATE
     ),
     TIPOFF = new LeadType(
       "Tipoff", "lead_tipoff",
       "_",
       ICON_DIR+"icon_wiretap.png",
-      TIME_NONE,
-      MEDIUM_WIRE, FOCUS_ANY, TENSE_ANY, PROFILE_HIDDEN,
-      CONFIDENCE_LOW
+      TIME_NONE, MEDIUM_NONE, PROFILE_HIDDEN, CONFIDENCE_LOW
     ),
     REPORT = new LeadType(
       "Report", "lead_report",
       "_",
       ICON_DIR+"icon_database.png",
-      TIME_NONE,
-      MEDIUM_WIRE, FOCUS_ANY, TENSE_ANY, PROFILE_OBVIOUS,
-      CONFIDENCE_HIGH
+      TIME_NONE, MEDIUM_NONE, PROFILE_OBVIOUS, CONFIDENCE_HIGH
     ),
     GUARD = new LeadType(
       "Guard", "lead_guard",
       "Guard this suspect against criminal activity.",
       ICON_DIR+"icon_guard_lead.png",
-      TIME_SHORT,
-      MEDIUM_ASSAULT, FOCUS_ANY, TENSE_DURING, PROFILE_OBVIOUS,
-      CONFIDENCE_HIGH, PHYSICAL_MEDIA
+      TIME_SHORT, MEDIUM_ASSAULT, PROFILE_OBVIOUS, CONFIDENCE_HIGH
     ),
     BUST = new LeadType(
       "Bust", "lead_bust",
       "Bust down the doors and unleash hell.",
       ICON_DIR+"icon_guard_lead.png",
-      TIME_SHORT,
-      MEDIUM_ASSAULT, FOCUS_ANY, TENSE_DURING, PROFILE_OBVIOUS,
-      CONFIDENCE_HIGH, MEDIUM_ANY
-    );
-  
+      TIME_SHORT, MEDIUM_ASSAULT, PROFILE_OBVIOUS, CONFIDENCE_HIGH
+    ),
+    
+    STANDARD_LEADS[] = {
+      SURVEIL, SEARCH, WIRETAP, QUESTIONING, GUARD, BUST
+    };
   
   
   /**  Data fields, construction and save/load methods-
@@ -125,16 +164,15 @@ public class LeadType extends Index.Entry implements Session.Saveable {
   final public Image icon;
   
   final public int minHours;
-  final public int medium, focus, tense, profile;
+  final public int medium, profile;
   final public float confidence;
-  final public int cluesMedia[];
   
   
   LeadType(
     String name, String ID,
     String info, String iconPath,
-    int minHours, int medium, int focus, int tense, int profile,
-    float confidence, int... cluesMedia
+    int minHours, int medium, int profile,
+    float confidence
   ) {
     super(INDEX, ID);
     this.name = name;
@@ -142,11 +180,8 @@ public class LeadType extends Index.Entry implements Session.Saveable {
     this.icon = Kind.loadImage(iconPath);
     this.minHours   = minHours  ;
     this.medium     = medium    ;
-    this.focus      = focus     ;
-    this.tense      = tense     ;
     this.profile    = profile   ;
     this.confidence = confidence;
-    this.cluesMedia = cluesMedia;
   }
   
   
@@ -161,6 +196,227 @@ public class LeadType extends Index.Entry implements Session.Saveable {
   
   
   
+  
+  /**  Tests and configuration:
+    */
+  //  NOTE:  This is a general summary of the behaviour of the various lead-
+  //  types and the information they can disclose.
+  //
+  //                   Attach   Reveal
+  //
+  //  Wiretap Person   X        X
+  //  Wiretap Place    Yes      Location "IP Tracing", Trait "Acoustics"
+  //  Wiretap Thing    X        X
+  //  Wiretap Detect   During, After (if advanced), Only Wired
+  //
+  //  Surveil Person   Yes      Location, Trait
+  //  Surveil Place    Yes      Location, Trait
+  //  Surveil Thing    Yes      Location, Trait
+  //  Surveil Detect   During, All except Wired
+  //
+  //  Search Person    X        Trait "Chem analysis/DNA/fibres", per item
+  //  Search Place     Yes      Trait "Chem analysis/DNA/fibres", per item
+  //  Search Thing     Yes      Trait "Chem analysis/DNA/fibres", per item
+  //  Search Detect    After, All except Wired
+  //
+  //  Meeting Person   Yes      Location, Trait
+  //  Meeting Place    X        Location, Trait
+  //  Meeting Thing    X        Location, Trait
+  //  Meeting Detect   Before (if perp), During, After, All actions
+  //
+  //  TODO:  What about Aims or mentioned elements?  Or motives?
+  
+  
+    /*
+    Place   scene    = lastKnownLocation(focus);
+    boolean canEnter = scene != null && scene.canEnter(base);
+    
+    if (focus.isPerson()) {
+      Person  suspect  = (Person) focus;
+      boolean canFind  = scene == focus.place();
+      boolean canMeet  = canFind && canEnter;
+      boolean canGuard = suspectIsVictim(suspect) && canFind;
+      boolean canBust  = suspectIsBoss  (suspect) && canFind;
+      
+      if (canFind ) all.add(leadFor(suspect, SURVEIL    ));
+      if (canMeet ) all.add(leadFor(suspect, QUESTIONING));
+      if (canEnter) all.add(leadFor(scene  , WIRETAP    ));
+      if (canGuard) all.add(leadFor(suspect, GUARD      ));
+      if (canBust ) all.add(leadFor(suspect, BUST       ));
+    }
+    
+    if (focus.isPlace()) {
+      boolean canGuard = suspectIsVictim(focus);
+      boolean canBust  = suspectIsBoss  (focus);
+      all.add(leadFor(focus, SURVEIL));
+      all.add(leadFor(focus, WIRETAP));
+      all.add(leadFor(focus, SEARCH ));
+      if (canGuard) all.add(leadFor(focus, GUARD));
+      if (canBust ) all.add(leadFor(focus, BUST ));
+    }
+    
+    if (focus.isRegion()) {
+      all.add(leadFor(focus, PATROL ));
+      all.add(leadFor(focus, SCAN   ));
+      all.add(leadFor(focus, CANVASS));
+      //all.add(leadFor(focus, Lead.LEAD_CRACKDOWN));
+    }
+    //*/
+  
+  public boolean canFollow(
+    Element target
+  ) {
+    
+    if (medium == MEDIUM_WIRE) {
+      if (target.isPlace ()) return true;
+    }
+    if (medium == MEDIUM_SURVEIL) {
+      return true;
+    }
+    if (medium == MEDIUM_SEARCH) {
+      if (target.isPlace()) return true;
+      if (target.isItem ()) return true;
+    }
+    if (medium == MEDIUM_MEETING) {
+      if (target.isPerson()) return true;
+    }
+    if (medium == MEDIUM_NONE) {
+      return false;
+    }
+    
+    //  TODO:  Differentiate between perps and victims here?
+    if (medium == MEDIUM_ASSAULT) {
+      if (target.isPlace ()) return true;
+      if (target.isPerson()) return true;
+    }
+    
+    return false;
+  }
+  
+  
+  public boolean canDetect(
+    Element involved, Step step, Plot plot, Element focus
+  ) {
+    int     tense = plot.tense(step);
+    Role    role  = plot.roleFor(focus);
+    boolean perp  = role.isPerp();
+    boolean wired = step.medium == MEDIUM_WIRE;
+    
+    if (medium == MEDIUM_WIRE) {
+      if (! wired) return false;
+      if (tense == TENSE_PRESENT) return true;
+    }
+    if (medium == MEDIUM_SURVEIL) {
+      if (wired) return false;
+      if (tense == TENSE_PRESENT) return true;
+    }
+    if (medium == MEDIUM_SEARCH) {
+      if (wired) return false;
+      if (tense == TENSE_PAST   ) return true;
+      if (tense == TENSE_PRESENT) return true;
+    }
+    if (medium == MEDIUM_MEETING) {
+      if (tense == TENSE_PAST   ) return true;
+      if (tense == TENSE_PRESENT) return true;
+      if (tense == TENSE_FUTURE && perp) return true;
+    }
+    if (medium == MEDIUM_NONE || medium == MEDIUM_ASSAULT) {
+      return true;
+    }
+    
+    return false;
+  }
+  
+  
+  public boolean canProvide(
+    Clue clue, Element involved
+  ) {
+    boolean trait    = clue.isTraitClue   ();
+    boolean location = clue.isLocationClue();
+    
+    if (medium == MEDIUM_WIRE) {
+      if (involved.isPlace()) return trait;
+    }
+    if (medium == MEDIUM_SURVEIL) {
+      return trait || location;
+    }
+    if (medium == MEDIUM_SEARCH) {
+      return trait;
+    }
+    if (medium == MEDIUM_MEETING) {
+      return trait || location;
+    }
+    if (medium == MEDIUM_NONE || medium == MEDIUM_ASSAULT) {
+      return true;
+    }
+    
+    return false;
+  }
+  
+  
+  public Attempt configFollowAttempt(
+    Element focus, Lead lead, Series <Person> attempting
+  ) {
+    Trait skill = null;
+    int range = 5, obstacle = 0;
+    Person perp = focus.isPerson() ? ((Person) focus) : null;
+    Place  site = focus.isPlace () ? ((Place ) focus) : null;
+    Region area = focus.isRegion() ? ((Region) focus) : null;
+    Base   base = focus.base();
+    
+    if (medium == MEDIUM_SURVEIL) {
+      skill = SIGHT_RANGE;
+      range = 10;
+      
+      if (perp != null) obstacle = perp.stats.levelFor(HIDE_RANGE);
+      if (site != null) obstacle = 2;
+      if (area != null) obstacle = 4;
+    }
+    
+    if (medium == MEDIUM_SEARCH) {
+      skill = SIGHT_RANGE;
+      range = 10;
+      
+      if (perp != null) obstacle = perp.stats.levelFor(HIDE_RANGE);
+      if (site != null) obstacle = 2;
+      if (area != null) obstacle = 4;
+    }
+    
+    if (medium == MEDIUM_WIRE) {
+      skill = ENGINEERING;
+      range = 10;
+      
+      if (perp != null) obstacle = perp.stats.levelFor(ENGINEERING);
+      if (site != null) obstacle = 5;
+      if (area != null) obstacle = 10;
+    }
+    
+    if (medium == MEDIUM_MEETING) {
+      skill = QUESTION;
+      range = 10;
+      
+      if (perp != null) obstacle = perp.stats.levelFor(PERSUADE);
+      if (site != null) obstacle = -1;
+      if (area != null) obstacle = 10;
+    }
+    
+    if (base != null && (focus == base.HQ() || focus == base.leader())) {
+      obstacle *= 2;
+    }
+    else if (perp != null && perp.isCriminal()) {
+      obstacle *= 1.5f;
+    }
+    
+    Attempt attempt = new Attempt(lead);
+    attempt.addTest(skill, range, obstacle);
+    attempt.setAssigned(attempting);
+    return attempt;
+  }
+  
+  
+  
+  
+  
   /**  Rendering, debug and interface methods-
     */
   public String toString() {
@@ -170,6 +426,21 @@ public class LeadType extends Index.Entry implements Session.Saveable {
   
   public String verbName(Lead lead, Clue clue) {
     
+    
+    if (medium == MEDIUM_WIRE) {
+      
+    }
+    if (medium == MEDIUM_SURVEIL) {
+      
+    }
+    if (medium == MEDIUM_SEARCH) {
+      
+    }
+    if (medium == MEDIUM_MEETING) {
+      
+    }
+    
+    /*
     if (clue.step().medium == MEDIUM_WIRE && clue.isTraitClue()) {
       return "Acoustic analysis";
     }
@@ -180,8 +451,59 @@ public class LeadType extends Index.Entry implements Session.Saveable {
     if (lead.type == SEARCH && clue.isTraitClue()) {
       return "After some searching, trace analysis";
     }
+    //*/
     
     return name;
   }
 }
 
+
+
+
+/*
+public boolean canDetect(
+  Step step, int tense, Plot plot, int time, Element involved
+) {
+  //
+  //  First check the tense-
+  if (tense != TENSE_ANY && type.tense != TENSE_ANY && tense != type.tense) {
+    return false;
+  }
+  if (tense == TENSE_FUTURE) {
+    int start = plot.startTime(step);
+    if (start < 0) return false;
+    int timeFromEnd = time - (start + step.hoursTaken);
+    if (timeFromEnd >= CLUE_EXPIRATION_TIME) return false;
+  }
+  //
+  //  Then, check the medium-
+  boolean matchMedium = false;
+  for (int medium : type.cluesMedia) {
+    if (medium == MEDIUM_ANY || medium == step.medium) {
+      matchMedium = true;
+      break;
+    }
+  }
+  if (! matchMedium) return false;
+  //
+  //  Then check the focus-
+  boolean matchFocus = false;
+  for (Element contacts : plot.involved(step)) {
+    if (focus.isPerson()) {
+      if (contacts.place() != focus.place()) continue;
+    }
+    if (focus.isPlace()) {
+      if (contacts.place() != focus) continue;
+    }
+    if (focus.isRegion()) {
+      if (! contacts.isPlace()) continue;
+      if (contacts.region() != focus) continue;
+    }
+    matchFocus = true;
+  }
+  if (! matchFocus) return false;
+  //
+  //  Then return true-
+  //return true;
+}
+//*/

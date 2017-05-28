@@ -47,9 +47,18 @@ public class Events {
   
   /**  General public access/query methods-
     */
-  public Series <Event> active() { return active; }
   public Series <Event> coming() { return coming; }
+  public Series <Event> active() { return active; }
   public Series <Event> past  () { return past  ; }
+  
+  
+  public Series <Event> allEvents() {
+    Batch <Event> all = new Batch();
+    Visit.appendTo(all, coming);
+    Visit.appendTo(all, active);
+    Visit.appendTo(all, past  );
+    return all;
+  }
   
   
   

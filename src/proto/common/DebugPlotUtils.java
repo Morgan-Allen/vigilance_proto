@@ -113,10 +113,10 @@ public class DebugPlotUtils {
     
     Pick <Lead> toFollow = new Pick();
     for (Lead lead : played.leads.leadsFor(place)) {
-      if (lead.type.medium == Lead.MEDIUM_ASSAULT){
+      if (lead.type.medium == LeadType.MEDIUM_ASSAULT){
         continue;
       }
-      if (lead.canDetect(step, plot.tense(step), plot, time)) {
+      if (lead.type.canDetect(place, step, plot, place)) {
         toFollow.compare(lead, Rand.num() + 0.5f);
       }
     }
@@ -129,7 +129,9 @@ public class DebugPlotUtils {
     
     Batch <Clue> possible = new Batch();
     for (Element e : plot.involved(step)) {
-      Visit.appendTo(possible, step.possibleClues(plot, e, step, played, true));
+      Visit.appendTo(possible, step.possibleClues(
+        plot, e, step, played, LeadType.TIPOFF
+      ));
     }
     for (Person agent : played.roster()) {
       agent.addAssignment(followed);
@@ -205,7 +207,7 @@ public class DebugPlotUtils {
     loop: while (! plot.complete()) {
       int  time    = world.timing.totalHours();
       Step doing   = plot.currentStep();
-      int  tenseDo = doing == null ? Lead.TENSE_NONE : plot.tense(doing);
+      int  tenseDo = doing == null ? LeadType.TENSE_NONE : plot.tense(doing);
       
       if (concise || verbose) {
         I.say("\n\n\nClues acquired:");
@@ -223,7 +225,7 @@ public class DebugPlotUtils {
         I.say("  Current time: "+time);
         I.say("  Ideal trail: "+I.list(bestTrail));
         I.say("\nCurrent step: "+doing);
-        I.add(" ["+Lead.TENSE_DESC[Nums.clamp(tenseDo, 3)]+"]");
+        I.add(" ["+LeadType.TENSE_DESC[Nums.clamp(tenseDo, 3)]+"]");
       }
       
       List <Lead> bestLeads = new List <Lead> () {
@@ -260,15 +262,15 @@ public class DebugPlotUtils {
         }
         
         for (Lead lead : played.leads.leadsFor(suspect)) {
-          if (lead.type.medium == Lead.MEDIUM_ASSAULT) {
+          if (lead.type.medium == LeadType.MEDIUM_ASSAULT) {
             if (shouldBust) { bustLead = lead; lead.noScene = false; }
             else continue;
           }
           float numDetects = 0, numSteps = plot.allSteps().size();
           for (Step step : plot.allSteps()) {
             int tense = plot.tense(step);
-            if (lead.canDetect(step, tense, plot, time)) {
-              if (tense == Lead.TENSE_DURING) numDetects += numSteps;
+            if (lead.type.canDetect(suspect, step, plot, suspect)) {
+              if (tense == LeadType.TENSE_PRESENT) numDetects += numSteps;
               else numDetects++;
             }
           }

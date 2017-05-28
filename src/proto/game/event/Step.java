@@ -75,22 +75,22 @@ public class Step extends Index.Entry implements Session.Saveable {
   /**  Assorted no-brainer access methods-
     */
   public boolean isAssault() {
-    return medium == Lead.MEDIUM_ASSAULT;
-  }
-  
-  
-  public boolean isPhysical() {
-    return Lead.isPhysical(medium);
+    return medium == LeadType.MEDIUM_ASSAULT;
   }
   
   
   public boolean isMeeting() {
-    return Lead.isSocial(medium);
+    return medium == LeadType.MEDIUM_MEETING;
+  }
+  
+  
+  public boolean isPhysical() {
+    return medium != LeadType.MEDIUM_WIRE;
   }
   
   
   public boolean isWired() {
-    return Lead.isWired(medium);
+    return medium == LeadType.MEDIUM_WIRE;
   }
   
   
@@ -104,16 +104,13 @@ public class Step extends Index.Entry implements Session.Saveable {
     */
   protected Series <Clue> addTraitClues(
     Plot plot, Element involved, Step step,
-    Base follows, boolean tipoff,
-    Batch <Clue> possible
+    Base follows, Batch <Clue> possible
   ) {
     //
     //  Wiretaps and mentions can't reliably reveal any descriptive features
     //  of the suspects involved, except as tipoffs.
     Role role = plot.roleFor(involved);
-    if (role == null || (medium == Lead.MEDIUM_WIRE && ! tipoff)) {
-      return possible;
-    }
+    if (role == null) return possible;
     
     if (involved.isPerson()) {
       Person p = (Person) involved;
@@ -145,8 +142,7 @@ public class Step extends Index.Entry implements Session.Saveable {
   
   protected Batch <Clue> addLocationClues(
     Plot plot, Element involved, Step step,
-    Base follows, boolean tipoff,
-    Batch <Clue> possible
+    Base follows, Batch <Clue> possible
   ) {
     Role role = plot.roleFor(involved);
     if (role == null || ! involved.isPlace()) return possible;
@@ -180,16 +176,18 @@ public class Step extends Index.Entry implements Session.Saveable {
   
   public Series <Clue> possibleClues(
     Plot plot, Element focus, Step step,
-    Base follows, boolean tipoff
+    Base follows, LeadType leadType
   ) {
     Batch <Clue> possible = new Batch();
     Batch <Clue> screened = new Batch();
     
-    addTraitClues   (plot, focus, step, follows, tipoff, possible);
-    addLocationClues(plot, focus, step, follows, tipoff, possible);
+    addTraitClues   (plot, focus, step, follows, possible);
+    addLocationClues(plot, focus, step, follows, possible);
     
     CaseFile file = follows.leads.caseFor(plot);
-    for (Clue clue : possible) if (! file.isRedundant(clue)) {
+    for (Clue clue : possible) {
+      if (! leadType.canProvide(clue, focus)) continue;
+      if (file.isRedundant(clue)) continue;
       screened.add(clue);
     }
     
@@ -221,7 +219,7 @@ public class Step extends Index.Entry implements Session.Saveable {
   public String toString() {
     StringBuffer s = new StringBuffer();
     s.append(label);
-    s.append(" ["+Lead.MEDIUM_DESC[medium]+"]");
+    s.append(" ["+LeadType.MEDIUM_DESC[medium]+"]");
     s.append(" ["+from+" -> "+goes+"] [");
     for (Role e : involved) {
       s.append("\n    "+e);

@@ -232,8 +232,8 @@ public abstract class Plot extends Event implements Assignment {
     int time = base.world().timing.totalHours();
     boolean begun = start >= 0;
     boolean done = time >= (start + step.hoursTaken);
-    if (begun) return done ? TENSE_AFTER : TENSE_DURING;
-    return TENSE_BEFORE;
+    if (begun) return done ? TENSE_FUTURE : TENSE_PRESENT;
+    return TENSE_PAST;
   }
   
   
@@ -358,20 +358,21 @@ public abstract class Plot extends Event implements Assignment {
   
   
   public void takeSpooking(int spookAmount, Element spooked) {
+    //
+    //  Increment the spook factor:
     spookLevel += spookAmount;
     float abortFactor = spookLevel * 1f / PROFILE_SUSPICIOUS;
     abortFactor = (abortFactor / entries.size()) - 1;
     float roll = Rand.num();
     //
     //  If the perps get too spooked, the plot may be cancelled, and any
-    //  further investigation will be wasting it's time...
+    //  further investigation will be wasting it's time.
     if (roll < abortFactor) {
       if (GameSettings.eventsVerbose) {
         I.say("\nParticipants were too spooked!  Cancelling plot: "+this);
         I.say("  Spook Level: "+spookLevel);
         I.say("  Roll vs. Abort factor was: "+roll+" vs. "+abortFactor);
       }
-      
       this.state = STATE_SPOOKED;
       completeEvent();
     }
@@ -402,7 +403,7 @@ public abstract class Plot extends Event implements Assignment {
   
   public boolean checkExpired(boolean complete) {
     if (! complete) return false;
-    int timeExpires = timeComplete() + Lead.CLUE_EXPIRATION_TIME;
+    int timeExpires = timeComplete() + LeadType.CLUE_EXPIRATION_TIME;
     boolean expired = world.timing.totalHours() > timeExpires;
     
     if (expired) {
@@ -662,7 +663,7 @@ public abstract class Plot extends Event implements Assignment {
         Clue     tipoff = null;
         
         Series <Clue> clues = step.possibleClues(
-          this, pick, step, follows, true
+          this, pick, step, follows, TIPOFF
         );
         tipoff = step.pickFrom(clues);
         if (tipoff != null) {
