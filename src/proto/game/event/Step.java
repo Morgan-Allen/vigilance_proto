@@ -99,6 +99,11 @@ public class Step extends Index.Entry implements Session.Saveable {
   }
   
   
+  public boolean involves(Role role) {
+    return Visit.arrayIncludes(involved, role);
+  }
+  
+  
   
   /**  Generating potential Clues-
     */
@@ -175,18 +180,18 @@ public class Step extends Index.Entry implements Session.Saveable {
   
   
   public Series <Clue> possibleClues(
-    Plot plot, Element focus, Step step,
+    Plot plot, Element involved, Element focus, Step step,
     Base follows, LeadType leadType
   ) {
     Batch <Clue> possible = new Batch();
     Batch <Clue> screened = new Batch();
     
-    addTraitClues   (plot, focus, step, follows, possible);
-    addLocationClues(plot, focus, step, follows, possible);
+    addTraitClues   (plot, involved, step, follows, possible);
+    addLocationClues(plot, involved, step, follows, possible);
     
     CaseFile file = follows.leads.caseFor(plot);
     for (Clue clue : possible) {
-      if (! leadType.canProvide(clue, focus)) continue;
+      if (! leadType.canProvide(clue, involved, focus)) continue;
       if (file.isRedundant(clue)) continue;
       screened.add(clue);
     }

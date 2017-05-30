@@ -32,7 +32,7 @@ public class MessageUtils {
       desc.append(CasesFX.longDescription(clue, player));
     }
     if (effects != null) {
-      Region region = clue.found().region();
+      Region region = effects.scene.region();
       float trust = effects.trustEffect, deter = effects.deterEffect;
       desc.append("\n"+region+" Trust "     +I.signNum((int) trust)+"%");
       desc.append("\n"+region+" Deterrence "+I.signNum((int) deter)+"%");

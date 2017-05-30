@@ -104,24 +104,6 @@ public class LeadType extends Index.Entry implements Session.Saveable {
       ICON_DIR+"icon_wiretap.png",
       TIME_MEDIUM, MEDIUM_WIRE, PROFILE_LOW, CONFIDENCE_HIGH
     ),
-    PATROL = new LeadType(
-      "Patrol", "lead_patrol",
-      "Patrol an area while keeping an eye out for suspicious activity.",
-      ICON_DIR+"icon_surveil.png",
-      TIME_MEDIUM, MEDIUM_SURVEIL, PROFILE_LOW, CONFIDENCE_MODERATE
-    ),
-    SCAN = new LeadType(
-      "Frequency Scan", "lead_scan",
-      "Scan wireless frequencies in an area for fragments of information.",
-      ICON_DIR+"icon_scan.png",
-      TIME_MEDIUM, MEDIUM_WIRE, PROFILE_LOW, CONFIDENCE_MODERATE
-    ),
-    CANVASS = new LeadType(
-      "Canvass", "lead_canvass",
-      "Ask civilians or friendly contacts in an area for leads.",
-      ICON_DIR+"icon_question.png",
-      TIME_LONG, MEDIUM_MEETING, PROFILE_SUSPICIOUS, CONFIDENCE_LOW
-    ),
     SEARCH = new LeadType(
       "Search", "lead_search",
       "Search a building for logs, records or forensic evidence.",
@@ -153,9 +135,8 @@ public class LeadType extends Index.Entry implements Session.Saveable {
       TIME_SHORT, MEDIUM_ASSAULT, PROFILE_OBVIOUS, CONFIDENCE_HIGH
     ),
     
-    STANDARD_LEADS[] = {
-      SURVEIL, SEARCH, WIRETAP, QUESTIONING, GUARD, BUST
-    };
+    STANDARD_LEADS[] = { SURVEIL, SEARCH, WIRETAP, QUESTIONING },
+    OTHER_LEADS   [] = { TIPOFF, REPORT, GUARD, BUST };
   
   
   /**  Data fields, construction and save/load methods-
@@ -227,48 +208,12 @@ public class LeadType extends Index.Entry implements Session.Saveable {
   //  TODO:  What about Aims or mentioned elements?  Or motives?
   
   
-    /*
-    Place   scene    = lastKnownLocation(focus);
-    boolean canEnter = scene != null && scene.canEnter(base);
-    
-    if (focus.isPerson()) {
-      Person  suspect  = (Person) focus;
-      boolean canFind  = scene == focus.place();
-      boolean canMeet  = canFind && canEnter;
-      boolean canGuard = suspectIsVictim(suspect) && canFind;
-      boolean canBust  = suspectIsBoss  (suspect) && canFind;
-      
-      if (canFind ) all.add(leadFor(suspect, SURVEIL    ));
-      if (canMeet ) all.add(leadFor(suspect, QUESTIONING));
-      if (canEnter) all.add(leadFor(scene  , WIRETAP    ));
-      if (canGuard) all.add(leadFor(suspect, GUARD      ));
-      if (canBust ) all.add(leadFor(suspect, BUST       ));
-    }
-    
-    if (focus.isPlace()) {
-      boolean canGuard = suspectIsVictim(focus);
-      boolean canBust  = suspectIsBoss  (focus);
-      all.add(leadFor(focus, SURVEIL));
-      all.add(leadFor(focus, WIRETAP));
-      all.add(leadFor(focus, SEARCH ));
-      if (canGuard) all.add(leadFor(focus, GUARD));
-      if (canBust ) all.add(leadFor(focus, BUST ));
-    }
-    
-    if (focus.isRegion()) {
-      all.add(leadFor(focus, PATROL ));
-      all.add(leadFor(focus, SCAN   ));
-      all.add(leadFor(focus, CANVASS));
-      //all.add(leadFor(focus, Lead.LEAD_CRACKDOWN));
-    }
-    //*/
-  
   public boolean canFollow(
     Element target
   ) {
     
     if (medium == MEDIUM_WIRE) {
-      if (target.isPlace ()) return true;
+      if (target.isPlace()) return true;
     }
     if (medium == MEDIUM_SURVEIL) {
       return true;
@@ -278,16 +223,13 @@ public class LeadType extends Index.Entry implements Session.Saveable {
       if (target.isItem ()) return true;
     }
     if (medium == MEDIUM_MEETING) {
-      if (target.isPerson()) return true;
-    }
-    if (medium == MEDIUM_NONE) {
-      return false;
+      if (target.isPerson()) {
+        return ((Person) target).isCivilian();
+      }
     }
     
-    //  TODO:  Differentiate between perps and victims here?
-    if (medium == MEDIUM_ASSAULT) {
-      if (target.isPlace ()) return true;
-      if (target.isPerson()) return true;
+    if (medium == MEDIUM_NONE || medium == MEDIUM_ASSAULT) {
+      return true;
     }
     
     return false;
@@ -297,31 +239,35 @@ public class LeadType extends Index.Entry implements Session.Saveable {
   public boolean canDetect(
     Element involved, Step step, Plot plot, Element focus
   ) {
-    int     tense = plot.tense(step);
-    Role    role  = plot.roleFor(focus);
-    boolean perp  = role.isPerp();
-    boolean wired = step.medium == MEDIUM_WIRE;
+    int     tense  = plot.tense(step);
+    Role    role   = plot.roleFor(focus);
+    boolean active = step.involves(role);
+    boolean wired  = step.medium == MEDIUM_WIRE;
     
     if (medium == MEDIUM_WIRE) {
-      if (! wired) return false;
+      if ((! wired) || (! active)) return false;
       if (tense == TENSE_PRESENT) return true;
     }
     if (medium == MEDIUM_SURVEIL) {
-      if (wired) return false;
+      if (wired || (! active)) return false;
       if (tense == TENSE_PRESENT) return true;
     }
     if (medium == MEDIUM_SEARCH) {
-      if (wired) return false;
+      if (wired || (! active)) return false;
       if (tense == TENSE_PAST   ) return true;
       if (tense == TENSE_PRESENT) return true;
     }
     if (medium == MEDIUM_MEETING) {
+      boolean known = ((Person) focus).history.bondWith(involved) > 0;
+      boolean perp  = active && role.isPerp();
+      if ((! known) && (! active)) return false;
       if (tense == TENSE_PAST   ) return true;
       if (tense == TENSE_PRESENT) return true;
       if (tense == TENSE_FUTURE && perp) return true;
     }
+    
     if (medium == MEDIUM_NONE || medium == MEDIUM_ASSAULT) {
-      return true;
+      return false;
     }
     
     return false;
@@ -329,7 +275,7 @@ public class LeadType extends Index.Entry implements Session.Saveable {
   
   
   public boolean canProvide(
-    Clue clue, Element involved
+    Clue clue, Element involved, Element focus
   ) {
     boolean trait    = clue.isTraitClue   ();
     boolean location = clue.isLocationClue();
@@ -346,6 +292,7 @@ public class LeadType extends Index.Entry implements Session.Saveable {
     if (medium == MEDIUM_MEETING) {
       return trait || location;
     }
+    
     if (medium == MEDIUM_NONE || medium == MEDIUM_ASSAULT) {
       return true;
     }
@@ -425,33 +372,29 @@ public class LeadType extends Index.Entry implements Session.Saveable {
   
   
   public String verbName(Lead lead, Clue clue) {
-    
+    boolean location = clue.isLocationClue();
+    boolean trait    = clue.isTraitClue   ();
     
     if (medium == MEDIUM_WIRE) {
-      
+      if (location) return "Wiretap IP Tracing";
+      if (trait   ) return "Wiretap Acoustics" ;
     }
     if (medium == MEDIUM_SURVEIL) {
-      
+      return "Surveillance";
     }
     if (medium == MEDIUM_SEARCH) {
-      
+      if (trait) {
+        String traceDesc  = "Traces";
+        String personDesc = Common.PERSON_TRACE_NAMES.get(clue.trait);
+        String venueDesc  = Common.VENUE_TRACE_NAMES .get(clue.trait);
+        if (personDesc != null) traceDesc = personDesc;
+        if (venueDesc  != null) traceDesc = venueDesc ;
+        return traceDesc+" found during Search";
+      }
     }
     if (medium == MEDIUM_MEETING) {
-      
+      return "Questioning";
     }
-    
-    /*
-    if (clue.step().medium == MEDIUM_WIRE && clue.isTraitClue()) {
-      return "Acoustic analysis";
-    }
-    if (clue.step().medium == MEDIUM_WIRE && clue.isLocationClue()) {
-      return "IP tracing";
-    }
-    
-    if (lead.type == SEARCH && clue.isTraitClue()) {
-      return "After some searching, trace analysis";
-    }
-    //*/
     
     return name;
   }
@@ -460,50 +403,7 @@ public class LeadType extends Index.Entry implements Session.Saveable {
 
 
 
-/*
-public boolean canDetect(
-  Step step, int tense, Plot plot, int time, Element involved
-) {
-  //
-  //  First check the tense-
-  if (tense != TENSE_ANY && type.tense != TENSE_ANY && tense != type.tense) {
-    return false;
-  }
-  if (tense == TENSE_FUTURE) {
-    int start = plot.startTime(step);
-    if (start < 0) return false;
-    int timeFromEnd = time - (start + step.hoursTaken);
-    if (timeFromEnd >= CLUE_EXPIRATION_TIME) return false;
-  }
-  //
-  //  Then, check the medium-
-  boolean matchMedium = false;
-  for (int medium : type.cluesMedia) {
-    if (medium == MEDIUM_ANY || medium == step.medium) {
-      matchMedium = true;
-      break;
-    }
-  }
-  if (! matchMedium) return false;
-  //
-  //  Then check the focus-
-  boolean matchFocus = false;
-  for (Element contacts : plot.involved(step)) {
-    if (focus.isPerson()) {
-      if (contacts.place() != focus.place()) continue;
-    }
-    if (focus.isPlace()) {
-      if (contacts.place() != focus) continue;
-    }
-    if (focus.isRegion()) {
-      if (! contacts.isPlace()) continue;
-      if (contacts.region() != focus) continue;
-    }
-    matchFocus = true;
-  }
-  if (! matchFocus) return false;
-  //
-  //  Then return true-
-  //return true;
-}
-//*/
+
+
+
+

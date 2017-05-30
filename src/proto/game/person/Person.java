@@ -124,7 +124,6 @@ public class Person extends Element {
     Person person = new Person(kind, world, name);
     person.stats.addTrait((Trait) Rand.pickFrom(Common.BUILD       ));
     person.stats.addTrait((Trait) Rand.pickFrom(Common.RACES       ));
-    person.stats.addTrait((Trait) Rand.pickFrom(Common.EYE_COLOURS ));
     person.stats.addTrait((Trait) Rand.pickFrom(Common.HAIR_COLOURS));
     person.stats.addTrait((Trait) Rand.pickFrom(Common.SEX         ));
     
@@ -142,6 +141,15 @@ public class Person extends Element {
   
   public Side side() {
     return side;
+  }
+  
+  
+  public Series <Trait> traits() {
+    Batch <Trait> all = new Batch();
+    for (Trait t : Common.PERSON_TRAITS) {
+      if (stats.levelFor(t) > 0) all.add(t);
+    }
+    return all;
   }
   
   

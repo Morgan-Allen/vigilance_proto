@@ -27,7 +27,6 @@ public class Villains {
       PERSUADE, 8 ,
       
       Common.HAIR_BROWN,
-      Common.EYES_GREY,
       Common.BUILD_SKINNY,
       Common.RACE_WHITE,
       Common.SEX_FEMALE
@@ -45,7 +44,6 @@ public class Villains {
       PERSUADE, 4 ,
       
       Common.HAIR_WHITE,
-      Common.EYES_GREEN,
       Common.BUILD_TALL,
       Common.RACE_WHITE,
       Common.SEX_MALE

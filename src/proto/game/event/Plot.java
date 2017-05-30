@@ -658,14 +658,15 @@ public abstract class Plot extends Event implements Assignment {
       
       if (pickRole != null && (tipsCount == 0 || sumWeights > Rand.num())) {
         Element  pick   = filling(pickRole);
-        Place    at     = pick.place();
+        Region   at     = pick.place().region();
         CaseFile file   = follows.leads.caseFor(this);
         Clue     tipoff = null;
         
         Series <Clue> clues = step.possibleClues(
-          this, pick, step, follows, TIPOFF
+          this, pick, pick, step, follows, TIPOFF
         );
         tipoff = step.pickFrom(clues);
+        
         if (tipoff != null) {
           file.recordClue(tipoff, TIPOFF, time, at);
           tipsCount += 1;
@@ -694,7 +695,7 @@ public abstract class Plot extends Event implements Assignment {
   
   
   public EventEffects generateEffects(Step step) {
-    EventEffects effects = new EventEffects();
+    EventEffects effects = new EventEffects(this, location(step.goes));
     float roughs = Rand.num() / 2, losses = Rand.num() / 2;
     effects.composeFromEvent(this, 0 + roughs, 1 - losses);
     return effects;
@@ -702,10 +703,11 @@ public abstract class Plot extends Event implements Assignment {
   
   
   public Scene generateScene(Step step, Element focus, Lead lead) {
-    if (step.isAssault()) {
+    Place scene = focus.place();
+    if (step.isAssault() && scene == location(step.goes)) {
       return PlotUtils.generateHeistScene(this, step, focus, lead);
     }
-    if (focus.place() == hideout() || focus.place() == HQ()) {
+    if (scene == hideout() || scene == HQ()) {
       return PlotUtils.generateHideoutScene(this, step, focus, lead);
     }
     return PlotUtils.generateSideScene(this, step, focus, lead);

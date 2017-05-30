@@ -1,6 +1,7 @@
 
 
 package proto.view.base;
+import proto.common.*;
 import proto.game.person.*;
 import proto.game.world.*;
 import proto.game.event.*;
@@ -71,7 +72,6 @@ public class CasePerpsView extends UINode {
     Base    player   = mainView.player();
     MapView parent   = mainView.mapView;
     Person  agent    = mainView.rosterView.selectedPerson();
-    Series <Clue> clues = player.leads.cluesFor(suspect, true);
     String hoverDesc = "";
     //
     //  Create a list-display, and render the header, latest clue, entries for
@@ -79,6 +79,15 @@ public class CasePerpsView extends UINode {
     ViewUtils.ListDraw draw = new ViewUtils.ListDraw();
     int across = 10, down = 10;
     draw.addEntry(suspect.icon(), suspect.name(), 25, null);
+    
+    String traitDesc = "";
+    for (Trait t : suspect.traits()) {
+      traitDesc += "("+t+") ";
+    }
+    draw.addEntry(null, traitDesc, 40, null);
+    
+    /*
+    Series <Clue> clues = player.leads.cluesFor(suspect, true);
     if (clues.empty()) {
       draw.addEntry(null, "No current leads on this suspect.", 100, "");
     }
@@ -87,6 +96,8 @@ public class CasePerpsView extends UINode {
       String desc = CasesFX.longDescription(first, player);
       draw.addEntry(null, desc, 100, first.plot());
     }
+    //*/
+    
     draw.addEntry(
       MapView.FILE_IMAGE, "View All Evidence", 20,
       MapView.PLOT_CLUES
@@ -153,7 +164,10 @@ public class CasePerpsView extends UINode {
     //
     //  Then render investigation options-
     draw.clearEntries();
-    draw.addEntry(null, "Options:", 20, null);
+    draw.addEntry(null, "Investigation Options:", 20, null);
+    if (! player.leads.atKnownLocation(suspect)) {
+      draw.addEntry(null, "    None- whereabouts unknown.", 20, null);
+    }
     draw.performVerticalDraw(across, down, this, surface, g);
     down = draw.down;
     
@@ -239,7 +253,12 @@ public class CasePerpsView extends UINode {
     
     if (suspect.isPlace()) {
       Place site = (Place) suspect;
-      for (Person p : site.residents()) {
+      Person leader = site.base().leader();
+      
+      if (leader != null && ! leader.isHero()) {
+        addAssociate(list, leader, null, "Owner");
+      }
+      for (Person p : site.residents()) if (p != leader) {
         addAssociate(list, p, null, "Resident");
       }
       for (Plot plot : player.leads.involvedIn(suspect, true)) {

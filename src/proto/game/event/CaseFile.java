@@ -53,38 +53,38 @@ public class CaseFile implements Session.Saveable {
   
   /**  Recording and transferring evidence-
     */
-  public void recordClue(Clue clue, Lead source, int time, Place place) {
-    recordClue(clue, source, null, time, place, null, true);
+  public void recordClue(Clue clue, Lead source, int time, Element found) {
+    recordClue(clue, source, null, time, found, null, true);
   }
   
   
-  public void recordClue(Clue clue, LeadType type, int time, Place place) {
-    recordClue(clue, null, type, time, place, null, true);
+  public void recordClue(Clue clue, LeadType type, int time, Element found) {
+    recordClue(clue, null, type, time, found, null, true);
   }
   
   
   public void recordClue(
-    Clue clue, Lead source, int time, Place place, boolean report
+    Clue clue, Lead source, int time, Element found, boolean report
   ) {
-    recordClue(clue, source, null, time, place, null, report);
+    recordClue(clue, source, null, time, found, null, report);
   }
   
   
   public void recordClue(
-    Clue clue, LeadType type, int time, Place place, boolean report
+    Clue clue, LeadType type, int time, Element found, boolean report
   ) {
-    recordClue(clue, null, type, time, place, null, report);
+    recordClue(clue, null, type, time, found, null, report);
   }
   
   
   public void recordClue(
-    Clue clue, Lead source, LeadType type, int time, Place place,
+    Clue clue, Lead source, LeadType type, int time, Element found,
     EventEffects effects, boolean display
   ) {
     if (isRedundant(clue)) return;
     
-    if (source != null) clue.confirmSource(source, time, place);
-    else                clue.confirmSource(type  , time, place);
+    if (source != null) clue.confirmSource(source, time, found);
+    else                clue.confirmSource(type  , time, found);
     clues.add(clue);
     base.leads.newClues.add(clue);
     

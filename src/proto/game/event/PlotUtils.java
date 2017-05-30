@@ -223,7 +223,7 @@ public class PlotUtils {
     
     world.council.scheduleTrial(plot, captives, evidence);
     
-    EventEffects effects = new EventEffects();
+    EventEffects effects = new EventEffects(plot, scene.site());
     effects.composeFromScene(scene);
     return effects;
   }

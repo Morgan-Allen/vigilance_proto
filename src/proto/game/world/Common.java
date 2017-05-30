@@ -279,18 +279,6 @@ public class Common {
     HAIR_GREY   = HAIR_COLOURS[4],
     HAIR_WHITE  = HAIR_COLOURS[5];
   final public static Trait
-    EYE_COLOURS[] = Trait.traitsWith(
-      "eyes", null,
-      "Eyes: Grey" ,
-      "Eyes: Green",
-      "Eyes: Brown",
-      "Eyes: Blue"
-    ),
-    EYES_GREY  = EYE_COLOURS[0],
-    EYES_GREEN = EYE_COLOURS[1],
-    EYES_BROWN = EYE_COLOURS[2],
-    EYES_BLUE  = EYE_COLOURS[3];
-  final public static Trait
     RACES[] = Trait.traitsWith(
       "race", null,
       "Race: Black"  ,
@@ -327,8 +315,17 @@ public class Common {
     SEX_MALE   = SEX[0],
     SEX_FEMALE = SEX[1];
   final public static Trait PERSON_TRAITS[] = (Trait[]) Visit.compose(
-    Trait.class, HAIR_COLOURS, EYE_COLOURS, RACES, BUILD, SEX
+    Trait.class, HAIR_COLOURS, RACES, BUILD, SEX
   );
+  final public static Table <Trait, String>
+    PERSON_TRACE_NAMES = new Table();
+  static {
+    final Table TN = PERSON_TRACE_NAMES;
+    for (Trait t : HAIR_COLOURS) TN.put(t, "Hair fibres");
+    for (Trait t : RACES       ) TN.put(t, "Skin flakes");
+    for (Trait t : BUILD       ) TN.put(t, "Footprints" );
+    for (Trait t : SEX         ) TN.put(t, "Facial hair");
+  }
   
   //
   //  Locations have a number of trace elements that can be inferred from
@@ -364,6 +361,22 @@ public class Common {
     VENUE_ACADEMIC   = VENUE_TRAITS[9 ],
     VENUE_DOMESTIC   = VENUE_TRAITS[10],
     VENUE_SECURITY   = VENUE_TRAITS[11];
+  
+  final public static Table <Trait, String>
+    VENUE_TRACE_NAMES = Table.make(
+      VENUE_RURAL     , "Grass stains" ,
+      VENUE_INDUSTRIAL, "Oil smears"   ,
+      VENUE_MEDICAL   , "Drug traces"  ,
+      VENUE_COMMERCIAL, "Used coupons" ,
+      VENUE_SLUM      , "Broken glass" ,
+      VENUE_OFFICE    , "Printer ink"  ,
+      VENUE_RITZY     , "Carpet fibres",
+      VENUE_CIVIC     , "Red tape"     ,
+      VENUE_SCIENTIFIC, "Fine reagents",
+      VENUE_ACADEMIC  , "Chalk dust"   ,
+      VENUE_DOMESTIC  , "Food crumbs"  ,
+      VENUE_SECURITY  , "Powder burns" 
+    );
   
 }
 

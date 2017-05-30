@@ -155,7 +155,9 @@ public class Lead extends Task {
       file.recordClue(confirms, this, time, scene);
     }
     else if (recognition > 0.33f) {
-      Series <Clue> possible = step.possibleClues(plot, e, step, base, type);
+      Series <Clue> possible = step.possibleClues(
+        plot, e, focus, step, base, type
+      );
       Clue gained = step.pickFrom(possible);
       if (gained != null) file.recordClue(gained, this, time, scene);
     }
@@ -181,7 +183,8 @@ public class Lead extends Task {
   
   
   protected Scene enteredScene(Step step, int tense, Plot plot, int time) {
-    if (noScene || tense != TENSE_PRESENT) {
+    Role sceneRole = plot.roleFor(focus.place());
+    if (noScene || tense != TENSE_PRESENT || ! step.involves(sceneRole)) {
       return null;
     }
     if (step.medium != MEDIUM_ASSAULT && type.medium != MEDIUM_ASSAULT) {
@@ -215,8 +218,8 @@ public class Lead extends Task {
       for (Step step : plot.allSteps()) {
         int tense = plot.tense(step);
         Series <Element> involved = plot.involvedOrClose(step, looks);
-        Scene scene = enteredScene(step, tense, plot, time);
         
+        Scene scene = enteredScene(step, tense, plot, time);
         if (scene != null) {
           MessageUtils.presentBustMessage(world.view(), scene, this, plot);
           base.world().enterScene(scene);

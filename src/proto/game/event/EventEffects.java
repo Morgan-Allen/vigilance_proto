@@ -16,6 +16,8 @@ public class EventEffects implements Session.Saveable {
   
   /**  Data fields, construction and save/load methods-
     */
+  public Event event;
+  public Place scene;
   public int outcomeState = Scene.STATE_INIT;
   public float forceRating, collateralRating, getawaysRating;
   public float trustEffect, deterEffect;
@@ -24,8 +26,9 @@ public class EventEffects implements Session.Saveable {
   public List <Person> casualties = new List();
   
   
-  public EventEffects() {
-    return;
+  public EventEffects(Event event, Place scene) {
+    this.event = event;
+    this.scene = scene;
   }
   
   

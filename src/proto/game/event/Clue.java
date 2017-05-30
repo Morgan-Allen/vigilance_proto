@@ -19,7 +19,7 @@ public class Clue implements Session.Saveable {
     TYPE_MATCH    = 1,
     TYPE_TRAIT    = 2,
     TYPE_LOCATION = 3;
-
+  
   int   clueType ;
   Plot  plot     ;
   Role  role     ;
@@ -33,7 +33,7 @@ public class Clue implements Session.Saveable {
   
   LeadType leadType  ;
   Lead     source    ;
-  Place    placeFound;
+  Element  placeFound;
   int      timeFound ;
   
   
@@ -54,7 +54,7 @@ public class Clue implements Session.Saveable {
     
     leadType   = (LeadType) s.loadObject();
     source     = (Lead    ) s.loadObject();
-    placeFound = (Place   ) s.loadObject();
+    placeFound = (Element ) s.loadObject();
     timeFound  = s.loadInt();
   }
   
@@ -99,7 +99,7 @@ public class Clue implements Session.Saveable {
   public float    getChance() { return getChance; }
   
   public int     time        () { return timeFound ; }
-  public Place   found       () { return placeFound; }
+  public Element found       () { return placeFound; }
   public Element match       () { return match     ; }
   public Trait   trait       () { return trait     ; }
   public Element locationNear() { return location  ; }
@@ -186,16 +186,16 @@ public class Clue implements Session.Saveable {
   }
   
   
-  public void confirmSource(Lead source, int time, Place place) {
+  public void confirmSource(Lead source, int time, Element found) {
     this.source = source;
-    confirmSource(source.type, time, place);
+    confirmSource(source.type, time, found);
   }
   
   
-  public void confirmSource(LeadType type, int time, Place place) {
+  public void confirmSource(LeadType type, int time, Element found) {
     this.leadType   = type ;
     this.timeFound  = time ;
-    this.placeFound = place;
+    this.placeFound = found;
   }
   
   

@@ -260,7 +260,7 @@ public class BaseLeads {
     
     if (suspect.isPerson()) {
       Person p = (Person) suspect;
-      address = p.isCivilian() ? p.resides() : null;
+      address = p.resides();
       if (p.place() == address) return address;
     }
     
@@ -311,26 +311,6 @@ public class BaseLeads {
   }
   
   
-  public Series <Lead> leadsFor(Element focus) {
-    
-    boolean canFind  = atKnownLocation(focus);
-    boolean canGuard = canFind && suspectIsVictim(focus);
-    boolean canBust  = canFind && suspectIsBoss  (focus);
-    
-    final Batch <Lead> all = new Batch();
-    
-    if (canFind) for (LeadType type : LeadType.STANDARD_LEADS) {
-      if (type.canFollow(focus)) {
-        all.add(leadFor(focus, type));
-      }
-    }
-    if (canGuard) all.add(leadFor(focus, LeadType.GUARD));
-    if (canBust ) all.add(leadFor(focus, LeadType.BUST ));
-    
-    return all;
-  }
-  
-  
   public boolean suspectIsVictim(Element suspect) {
     return suspectHasRole(suspect, Plot.ROLE_TARGET, Plot.ROLE_SCENE);
   }
@@ -360,9 +340,30 @@ public class BaseLeads {
       }
     }
     return false;
-
+  }
+  
+  
+  public Series <Lead> leadsFor(Element focus) {
+    
+    boolean canFind  = atKnownLocation(focus);
+    boolean canGuard = canFind && suspectIsVictim(focus);
+    boolean canBust  = canFind && suspectIsBoss  (focus);
+    
+    final Batch <Lead> all = new Batch();
+    
+    if (canFind) for (LeadType type : LeadType.STANDARD_LEADS) {
+      if (type.canFollow(focus)) {
+        all.add(leadFor(focus, type));
+      }
+    }
+    if (canGuard) all.add(leadFor(focus, LeadType.GUARD));
+    if (canBust ) all.add(leadFor(focus, LeadType.BUST ));
+    
+    return all;
   }
 }
+
+
 
 
 

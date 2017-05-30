@@ -130,7 +130,7 @@ public class DebugPlotUtils {
     Batch <Clue> possible = new Batch();
     for (Element e : plot.involved(step)) {
       Visit.appendTo(possible, step.possibleClues(
-        plot, e, step, played, LeadType.TIPOFF
+        plot, e, e, step, played, LeadType.TIPOFF
       ));
     }
     for (Person agent : played.roster()) {
