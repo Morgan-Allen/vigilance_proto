@@ -216,14 +216,15 @@ public class DefaultGame extends RunGame {
   
   public static void initDefaultBonds(World world) {
     boolean report = GameSettings.reportWorldInit;
-    Series <Person> civilians = world.civilians();
+    Series <Person> persons = world.persons();
     if (report) I.say("\nInitialising Bonds...");
     //
-    //  Establish random positive relationships between civilians in
-    //  neighbouring sectors:
-    for (Person p : civilians) {
+    //  Establish random positive relationships between random persons in
+    //  neighbouring sectors (aside from the heroes):
+    for (Person p : persons) {
+      if (p.isHero()) continue;
       Batch <Person> neighbours = new Batch();
-      for (Person o : civilians) if (o != p) {
+      for (Person o : persons) if (o != p) {
         if (world.distanceBetween(p.region(), o.region()) > 1) continue;
         neighbours.add(o);
       }
@@ -242,7 +243,7 @@ public class DefaultGame extends RunGame {
       Person boss = base.leader();
       
       Batch <Person> enemies = new Batch();
-      for (Person p : civilians) if (p != boss) {
+      for (Person p : persons) if (p != boss && p.isCivilian()) {
         if (Visit.arrayIncludes(Civilians.CIVIC_TYPES, p.kind())) {
           enemies.add(p);
         }
@@ -256,17 +257,10 @@ public class DefaultGame extends RunGame {
       }
     }
     //
-    //  
+    //  Then report the final result as needed:
     if (report) {
-      for (Person p : civilians) {
-        I.say("  Civilian "+p+" has Bonds:");
-        for (Element o : p.history.sortedBonds()) {
-          I.say("    "+o+" ("+p.history.bondWith(o)+")");
-        }
-      }
-      for (Base b : world.bases()) if (b.faction().criminal) {
-        Person p = b.leader();
-        I.say("  Boss "+p+" has Grudges:");
+      for (Person p : persons) {
+        I.say("  Person "+p+" has Bonds:");
         for (Element o : p.history.sortedBonds()) {
           I.say("    "+o+" ("+p.history.bondWith(o)+")");
         }

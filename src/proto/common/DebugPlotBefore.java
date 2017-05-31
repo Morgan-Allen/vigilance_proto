@@ -31,13 +31,13 @@ public class DebugPlotBefore extends RunGame {
     
     Base played = world.playerBase();
     Clue tipoff = Clue.confirmSuspect(
-      plot, Plot.ROLE_ORGANISER, plot.currentStep(), organiser, hideout
+      plot, Plot.ROLE_ORGANISER, plot.allSteps().first(), organiser, hideout
     );
     int timeFound = world.timing.totalHours();
     Place placeFound = plot.hideout();
     CaseFile file = played.leads.caseFor(plot);
     file.recordClue(tipoff, LeadType.TIPOFF, timeFound, placeFound);
-
+    
     GameSettings.noTipoffs = true;
     world.updateWorld(0);
     return world;

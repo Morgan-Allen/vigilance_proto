@@ -5,16 +5,7 @@ import proto.game.person.Attempt;
 import proto.game.person.Person;
 import proto.game.world.*;
 import proto.util.*;
-import static proto.game.event.Lead.*;
-import static proto.game.event.LeadType.MEDIUM_MEETING;
-import static proto.game.event.LeadType.MEDIUM_SEARCH;
-import static proto.game.event.LeadType.MEDIUM_SURVEIL;
-import static proto.game.event.LeadType.MEDIUM_WIRE;
-import static proto.game.person.PersonStats.ENGINEERING;
-import static proto.game.person.PersonStats.HIDE_RANGE;
-import static proto.game.person.PersonStats.PERSUADE;
-import static proto.game.person.PersonStats.QUESTION;
-import static proto.game.person.PersonStats.SIGHT_RANGE;
+import static proto.game.person.PersonStats.*;
 
 import java.awt.Image;
 
@@ -177,7 +168,6 @@ public class LeadType extends Index.Entry implements Session.Saveable {
   
   
   
-  
   /**  Tests and configuration:
     */
   //  NOTE:  This is a general summary of the behaviour of the various lead-
@@ -246,6 +236,7 @@ public class LeadType extends Index.Entry implements Session.Saveable {
     
     if (medium == MEDIUM_WIRE) {
       if ((! wired) || (! active)) return false;
+      if (tense == TENSE_PAST   ) return true;
       if (tense == TENSE_PRESENT) return true;
     }
     if (medium == MEDIUM_SURVEIL) {
@@ -253,16 +244,17 @@ public class LeadType extends Index.Entry implements Session.Saveable {
       if (tense == TENSE_PRESENT) return true;
     }
     if (medium == MEDIUM_SEARCH) {
-      if (wired || (! active)) return false;
-      if (tense == TENSE_PAST   ) return true;
-      if (tense == TENSE_PRESENT) return true;
+      boolean isHome = false;
+      if (involved.isPerson()) isHome = ((Person) involved).resides() == focus;
+      if (wired || ((! active) && (! isHome))) return false;
+      if (tense == TENSE_PAST) return true;
     }
     if (medium == MEDIUM_MEETING) {
       boolean known = ((Person) focus).history.bondWith(involved) > 0;
       boolean perp  = active && role.isPerp();
       if ((! known) && (! active)) return false;
-      if (tense == TENSE_PAST   ) return true;
-      if (tense == TENSE_PRESENT) return true;
+      if (tense == TENSE_PAST          ) return true;
+      if (tense == TENSE_PRESENT       ) return true;
       if (tense == TENSE_FUTURE && perp) return true;
     }
     
@@ -301,6 +293,9 @@ public class LeadType extends Index.Entry implements Session.Saveable {
   }
   
   
+  
+  /**  Configuring the skill-tests associated with following a lead:
+    */
   public Attempt configFollowAttempt(
     Element focus, Lead lead, Series <Person> attempting
   ) {
@@ -359,8 +354,6 @@ public class LeadType extends Index.Entry implements Session.Saveable {
     attempt.setAssigned(attempting);
     return attempt;
   }
-  
-  
   
   
   

@@ -161,6 +161,8 @@ public class BaseLeads {
       for (Clue c : clues) roles.include(c.role());
       
       loop: for (Role role : roles) {
+        if (Visit.arrayIncludes(Plot.NEVER_SHOW, role)) continue;
+        
         Series <Clue> roleClues = cluesFor(plot, role, true);
         Clue top = roleClues.first();
         
@@ -188,6 +190,13 @@ public class BaseLeads {
       matches.include(c.plot);
     }
     return matches;
+  }
+  
+  
+  public boolean suspectConfirmed(Element subject, Role role, Plot plot) {
+    Series <Clue> related = this.cluesFor(plot, subject, role, null, false);
+    for (Clue c : related) if (c.isConfirmation()) return true;
+    return false;
   }
   
   

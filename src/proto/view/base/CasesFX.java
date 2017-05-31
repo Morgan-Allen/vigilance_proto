@@ -1,5 +1,4 @@
 
-
 package proto.view.base;
 import proto.common.*;
 import proto.game.world.*;
@@ -27,6 +26,7 @@ public class CasesFX {
     Element  fills     = plot.filling(role);
     Faction  faction   = plot.base().faction();
     int      plotTime  = plot.timeScheduled(plot.mainHeist());
+    int      tense     = plot.tense(step);
     
     StringBuffer desc = new StringBuffer();
     if (leadType != null) desc.append(leadType.verbName(source, clue));
@@ -42,7 +42,7 @@ public class CasesFX {
       }
     }
     
-    desc.append(" at "+clue.found());
+    desc.append(" from "+clue.found());
     desc.append(" at "+world.timing.timeString(clue.time()));
     
     String perpDesc = "", pronDesc = "";
@@ -51,19 +51,20 @@ public class CasesFX {
     else if (fills.isPlace ()) pronDesc = "an unknown location";
     else if (fills.isItem  ()) pronDesc = "something";
     
+    String tenseDesc = "is";
+    if (tense == LeadType.TENSE_FUTURE) tenseDesc = "will be";
+    if (tense == LeadType.TENSE_PAST  ) tenseDesc = "was";
+    
     if (clue.isConfirmation()) {
       perpDesc = match.name();
     }
     if (clue.isTraitClue()) {
       if (fills.isPerson()) perpDesc = pronDesc+" with "+trait;
-      else                  perpDesc = pronDesc+" "     +trait;
+      else                  perpDesc = pronDesc+" with "+trait;
     }
     if (clue.isLocationClue()) {
       if (nearRange == 0) perpDesc = pronDesc+" at "  +location;
       else                perpDesc = pronDesc+" near "+location;
-    }
-    if (clue.isAim()) {
-      
     }
     
     Table <String, String> replacements = new Table();
@@ -71,6 +72,8 @@ public class CasesFX {
     replacements.put("<suspect>", perpDesc           );
     replacements.put("<plot>"   , nameFor(plot, base));
     replacements.put("<aim>"    , plot.type.name     );
+    replacements.put("<is>"     , tenseDesc          );
+    
     for (Role r : plot.allRoles()) {
       Series <Element> suspects = base.leads.suspectsFor(r, plot);
       String otherDesc = "";
@@ -124,13 +127,32 @@ public class CasesFX {
       }
     }
     
+    /*
+    String vowels[] = { "a", "b", "c", "d", "e" };
+    boolean useAn = false;
+    for (String vowel : vowels) {
+      if (type.name.toLowerCase().startsWith(vowel)) useAn = true;
+    }
+    String before = useAn ? "an" : "a";
+    //*/
+    
     String name = "Unknown Plot "+file.caseID();
     if      (targKnown && aimKnown) name = type.name+" of "+plot.target();
-    else if (targKnown            ) name += " (Target: "+plot.target()+")";
-    else if (aimKnown             ) name = ""+type.name+" (Unknown Target)";
+    else if (targKnown            ) name += " against "+plot.target()+"";
+    else if (aimKnown             ) name = type.name;
     return name;
   }
   
 }
+
+
+
+
+
+
+
+
+
+
 
 

@@ -50,8 +50,8 @@ public class CasePerpsView extends UINode {
     draw.addEntry(
       null, "SUSPECTS FOR "+role+" IN "+CasesFX.nameFor(plot, player), 40, null
     );
-    for (Element e : player.leads.suspectsFor(role, plot)) {
-      draw.addEntry(e.icon(), e.name(), 40, e);
+    for (Element suspect : player.leads.suspectsFor(role, plot)) {
+      draw.addEntry(suspect.icon(), labelFor(suspect), 40, suspect);
     }
     draw.performVerticalDraw(across, down, this, surface, g);
     down = draw.down;
@@ -60,7 +60,6 @@ public class CasePerpsView extends UINode {
     if (draw.clicked) {
       parent.setActiveFocus(draw.hovered, false);
     }
-    
     parent.infoArea.setScrollheight(down);
     return true;
   }
@@ -78,7 +77,7 @@ public class CasePerpsView extends UINode {
     //  each possible lead, and an option to view associates-
     ViewUtils.ListDraw draw = new ViewUtils.ListDraw();
     int across = 10, down = 10;
-    draw.addEntry(suspect.icon(), suspect.name(), 25, null);
+    draw.addEntry(suspect.icon(), labelFor(suspect), 25, null);
     
     String traitDesc = "";
     for (Trait t : suspect.traits()) {
@@ -86,7 +85,6 @@ public class CasePerpsView extends UINode {
     }
     draw.addEntry(null, traitDesc, 40, null);
     
-    /*
     Series <Clue> clues = player.leads.cluesFor(suspect, true);
     if (clues.empty()) {
       draw.addEntry(null, "No current leads on this suspect.", 100, "");
@@ -96,7 +94,6 @@ public class CasePerpsView extends UINode {
       String desc = CasesFX.longDescription(first, player);
       draw.addEntry(null, desc, 100, first.plot());
     }
-    //*/
     
     draw.addEntry(
       MapView.FILE_IMAGE, "View All Evidence", 20,
@@ -199,6 +196,16 @@ public class CasePerpsView extends UINode {
     return true;
   }
   
+  
+  private String labelFor(Element suspect) {
+    if (suspect.isPerson()) {
+      return suspect.name()+" ("+suspect.kind().name()+")";
+    }
+    if (suspect.isPlace()) {
+      return suspect.name();
+    }
+    return suspect.name();
+  }
 
   
   static class AssocResult {

@@ -18,16 +18,16 @@ public class PlotAssassinate extends Plot {
   final public static Role
     ROLE_MOLE = role(
       "assass_mole", "Mole", PERP,
-      "<suspect> is acting as a mole for <faction> while <step>."
+      "<suspect> <is> acting as a mole for <faction> while <step>."
     ),
     ROLE_SCOUTS = role(
       "assass_scouts", "Scouts", PERP,
-      "<suspect> was seen scouting for potential vantage points near "+
-      "<role_scene>."
+      "<suspect> <is> assigned to scout for potential vantage points near "+
+      "<role_target>."
     ),
     ROLE_SHOOTER = role(
       "assass_shooter", "Shooter", PERP,
-      "<suspect> is the shooter for <plot>."
+      "<suspect> <is> the shooter for <plot>."
     );
   
   
@@ -106,7 +106,7 @@ public class PlotAssassinate extends Plot {
     fillExpertRole(this, ACCURACY, aides, ROLE_SHOOTER         );
     fillExpertRole(this, REFLEXES, aides, ROLE_SCOUTS          );
     fillExpertRole(this, PERSUADE, aides, ROLE_MOLE, ROLE_SCENE);
-    Place hideout = chooseHideout(this, target.resides());
+    Place hideout = chooseHideout(this, target.resides(), base().HQ());
     assignRole      (hideout, ROLE_HIDEOUT                );
     assignTarget    (target , target.resides(), ROLE_SCENE);
     assignMastermind(base().leader(), base().HQ()         );

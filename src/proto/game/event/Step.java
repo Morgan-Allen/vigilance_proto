@@ -222,16 +222,13 @@ public class Step extends Index.Entry implements Session.Saveable {
   
   
   public String toString() {
-    StringBuffer s = new StringBuffer();
-    s.append(label);
-    s.append(" ["+LeadType.MEDIUM_DESC[medium]+"]");
-    s.append(" ["+from+" -> "+goes+"] [");
-    for (Role e : involved) {
-      s.append("\n    "+e);
-    }
-    s.append("\n  ]");
-    
-    return s.toString();
+    return label;
   }
 }
+
+
+
+
+
+
 

@@ -37,11 +37,16 @@ public class DebugPlotUtils {
     forE.world = forE.setupWorld();
     boolean effectOK = runPlotToCompletion(forE.world());
     
+    DebugPlotSpooked forS = new DebugPlotSpooked();
+    forS.world = forS.setupWorld();
+    boolean spooksOK = forS.runTests(forS.world, false, true);
+    
     I.say("\n\n\nPlot Testing Complete.");
     I.say("  Single lead tests okay:    "+leadOK  );
     I.say("  Investigation before okay: "+bOK     );
     I.say("  Investigation after okay:  "+aOK     );
     I.say("  Plot-effect tests okay:    "+effectOK);
+    I.say("  Spooking tests okay:       "+spooksOK);
   }
   
   

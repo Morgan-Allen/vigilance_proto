@@ -198,7 +198,6 @@ public class Lead extends Task {
     if (! super.updateAssignment()) return false;
     Series <Person> active = active();
     World   world  = base.world();
-    Place   looks  = focus.place();
     int     time   = world.timing.totalHours();
     float   result = RESULT_NONE;
     boolean report = GameSettings.eventsVerbose;
@@ -217,22 +216,24 @@ public class Lead extends Task {
       
       for (Step step : plot.allSteps()) {
         int tense = plot.tense(step);
-        Series <Element> involved = plot.involvedOrClose(step, looks);
+        Series <Element> involved = plot.involved(step);
         
         Scene scene = enteredScene(step, tense, plot, time);
-        if (scene != null) {
-          MessageUtils.presentBustMessage(world.view(), scene, this, plot);
-          base.world().enterScene(scene);
-          return true;
-        }
-        else {
+        if (scene == null) {
+          //  TODO:  Wait.  This might not work if the tense changes, and the
+          //  step then becomes detectable.
+          
           result = attemptFollow(step, tense, plot, active, time);
-          for (Element e : involved) {
+          if (result != RESULT_NONE) for (Element e : involved) {
             if (! type.canDetect(e, step, plot, focus)) continue;
             extractClues(e, step, plot, time, result);
           }
         }
-        
+        else {
+          MessageUtils.presentBustMessage(world.view(), scene, this, plot);
+          world.enterScene(scene);
+          return true;
+        }
       }
     }
     return true;

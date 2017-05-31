@@ -33,10 +33,10 @@ public class CaseRolesView extends UINode {
       Role role;
       Series <Clue> clues;
       Series <Element> suspects;
+      boolean confirmed = false;
     }
     List <RoleView> roles = new List <RoleView> () {
       protected float queuePriority(RoleView r) {
-        if (r.suspects.size() == 1) return 1;
         return 0;
       }
     };
@@ -46,6 +46,7 @@ public class CaseRolesView extends UINode {
       r.role     = role;
       r.suspects = player.leads.suspectsFor(role, plot);
       r.clues    = player.leads.cluesFor(plot, role, false);
+      for (Clue c : r.clues) if (c.isConfirmation()) r.confirmed = true;
       roles.queueAdd(r);
     }
     //
@@ -53,16 +54,15 @@ public class CaseRolesView extends UINode {
     //  confirmed suspect, and finally an option to review total evidence.
     int across = 10, down = 10;
     ViewUtils.ListDraw draw = new ViewUtils.ListDraw();
-    draw.addEntry(
-      null, "CASE FILE: "+CasesFX.nameFor(plot, player), 40, null
-    );
+    draw.addEntry(null, "CASE FILE: "+CasesFX.nameFor(plot, player), 40, null);
+    
     for (RoleView r : roles) {
-      Role role = r.role;
-      Image icon = null;
-      String desc = null;
-      Element match = r.suspects.size() == 1 ? r.suspects.first() : null;
+      Role    role      = r.role;
+      Element match     = r.confirmed ? r.suspects.first() : null;
       boolean canFollow = r.clues.size() > 0;
-      Object refers = null;
+      Image   icon      = null;
+      String  desc      = null;
+      Object  refers    = null;
       
       if (match != null) {
         icon = match.icon();
@@ -92,6 +92,7 @@ public class CaseRolesView extends UINode {
       MapView.FILE_IMAGE, "View All Evidence", 25,
       MapView.PLOT_CLUES
     );
+    //draw.addEntry(null, plot.currentStep().label(), 40, null);
     draw.performVerticalDraw(across, down, this, surface, g);
     down = draw.down;
     //

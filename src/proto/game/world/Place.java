@@ -187,7 +187,7 @@ public class Place extends Element {
   
   
   public String name() {
-    return kind().name();
+    return region().name()+" "+kind().name();
   }
   
   

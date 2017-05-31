@@ -183,7 +183,7 @@ public abstract class MapInsetView extends UINode {
         final Plot plot = c.plot();
         final Role role = c.role();
         Series <Element> suspects = played.leads.suspectsFor(role, plot);
-        final boolean confirmed = suspects.size() == 1;
+        final boolean confirmed = c.isConfirmation();
         final Element suspect   = suspects.first();
         final Object  refers    = confirmed ? suspect : role;
         

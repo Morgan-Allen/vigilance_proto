@@ -122,7 +122,7 @@ public class PlotKidnap extends Plot {
     fillExpertRole(this, BRAINS  , aides, ROLE_ORGANISER);
     fillExpertRole(this, REFLEXES, aides, ROLE_TAILS    );
     fillExpertRole(this, MUSCLE  , aides, ROLE_GRABS    );
-    Place hideout = chooseHideout(this, target.resides());
+    Place hideout = chooseHideout(this, target.resides(), base().HQ());
     assignRole      (ransoms.resides(), ROLE_HOME              );
     assignRole      (ransoms          , ROLE_RANSOMS, ROLE_HOME);
     assignRole      (hideout          , ROLE_HIDEOUT           );

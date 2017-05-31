@@ -129,7 +129,7 @@ public class PlotRobbery extends Plot {
     fillExpertRole(this, ENGINEERING, aides, ROLE_CRACKER  );
     fillExpertRole(this, ENGINEERING, aides, ROLE_HACKER   );
     fillExpertRole(this, INVESTMENT , aides, ROLE_FENCE    );
-    Place hideout = chooseHideout(this, target);
+    Place hideout = chooseHideout(this, target, base().HQ());
     assignRole      (office , ROLE_OFFICE        );
     assignRole      (hideout, ROLE_HIDEOUT       );
     assignTarget    (target , target, ROLE_SCENE );

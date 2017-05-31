@@ -15,13 +15,20 @@ public class PlotUtils {
   /**  Helper methods for filling Roles:
     */
   public static Place chooseHideout(
-    Plot plot, Place crimeScene
+    Plot plot, Place crimeScene, Place HQ
   ) {
     Pick <Place > pickH = new Pick();
     for (Place b : venuesNearby(plot, crimeScene, 1)) {
       if (b.isHQ() || b == crimeScene) continue;
       pickH.compare(b, Rand.num());
     }
+    
+    if (pickH.result() == HQ) {
+      I.say("Picked wrong hideout!");
+      I.say("  HQ is HQ? "+HQ.isHQ());
+      I.say("?");
+    }
+    
     return pickH.result();
   }
   

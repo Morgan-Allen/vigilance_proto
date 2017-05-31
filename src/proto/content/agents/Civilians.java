@@ -140,7 +140,6 @@ public class Civilians {
     INCOME, 50,
     Civilians.WORKER, 0,
     Common.VENUE_INDUSTRIAL,
-    Common.VENUE_OFFICE,
     Common.VENUE_SLUM
   );
   

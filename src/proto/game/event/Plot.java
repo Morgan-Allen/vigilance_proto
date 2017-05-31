@@ -343,7 +343,7 @@ public abstract class Plot extends Event implements Assignment {
       
       if (report) {
         I.say("  Current Time: "+time);
-        I.say("Current Step: "+current);
+        I.say("Current Step: "+descStep(current));
         printLocations();
       }
     }
@@ -358,20 +358,25 @@ public abstract class Plot extends Event implements Assignment {
   
   
   public void takeSpooking(int spookAmount, Element spooked) {
+    boolean report = GameSettings.eventsVerbose;
     //
     //  Increment the spook factor:
     spookLevel += spookAmount;
     float abortFactor = spookLevel * 1f / PROFILE_SUSPICIOUS;
     abortFactor = (abortFactor / entries.size()) - 1;
     float roll = Rand.num();
+    if (report) {
+      I.say("\nIncrementing spook level for "+this);
+      I.say("  Spook amount: "+spookAmount);
+      I.say("  Spook Level:  "+spookLevel );
+      I.say("  Roll vs. Abort factor was: "+roll+" vs. "+abortFactor);
+    }
     //
     //  If the perps get too spooked, the plot may be cancelled, and any
     //  further investigation will be wasting it's time.
     if (roll < abortFactor) {
-      if (GameSettings.eventsVerbose) {
-        I.say("\nParticipants were too spooked!  Cancelling plot: "+this);
-        I.say("  Spook Level: "+spookLevel);
-        I.say("  Roll vs. Abort factor was: "+roll+" vs. "+abortFactor);
+      if (report) {
+        I.say("  Participants were too spooked!  Cancelling plot: "+this);
       }
       this.state = STATE_SPOOKED;
       completeEvent();
@@ -734,7 +739,7 @@ public abstract class Plot extends Event implements Assignment {
   public void printSteps() {
     I.say("\nSteps are:");
     for (Step c : steps) {
-      I.say("  "+c);
+      I.say("  "+descStep(c));
     }
   }
   
@@ -744,6 +749,20 @@ public abstract class Plot extends Event implements Assignment {
     for (RoleEntry entry : entries) {
       I.say("  "+entry.element+" ("+entry.role+") -> "+entry.element.place());
     }
+  }
+  
+  
+  public String descStep(Step step) {
+    StringBuffer s = new StringBuffer();
+    s.append(step.label);
+    s.append(" ["+LeadType.MEDIUM_DESC[step.medium]+"]");
+    s.append(" ["+filling(step.from)+" ("+step.from+")");
+    s.append(" -> "+filling(step.goes)+" ("+step.goes+")] [");
+    for (Role e : step.involved) {
+      s.append("\n    "+filling(e)+" ("+e+")");
+    }
+    s.append("\n  ]");
+    return s.toString();
   }
   
   
