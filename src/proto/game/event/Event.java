@@ -137,7 +137,7 @@ public abstract class Event implements Session.Saveable {
   }
   
   
-  public EventEffects generateEffects(Step step) {
+  public EventEffects generateEffects() {
     return new EventEffects(this, null);
   }
   

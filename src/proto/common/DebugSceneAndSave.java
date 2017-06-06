@@ -49,9 +49,7 @@ public class DebugSceneAndSave extends RunGame {
       ID++;
     }
     
-    Step heist = plot.mainHeist();
-    plot.advanceToStep(heist);
-    Scene scene = plot.generateScene(heist, plot.target(), guarding);
+    Scene scene = plot.generateScene(plot.target(), guarding);
     world.enterScene(scene);
     
     return world;

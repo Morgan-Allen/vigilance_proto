@@ -1,5 +1,22 @@
 
 
+I want a simpler interface, just for the case itself.
+
+I want a limitation to locations and full descriptions.  All you really care
+about is the headquarters, hideout and target, plus faction, time and aim.
+
+I want to exhaust the number of leads pretty fast.  (Per location.)
+  Search.
+  Wiretap.
+  Surveil.
+  Undercover.
+
+Don't bother with steps (or make it a minor aspect.)
+
+
+
+
+
 Update the map so that it looks better.
 
 Pare down the list of facilities to what's essential.
@@ -14,9 +31,13 @@ Cut construction down to 6 months or so, and increase lead-following to 1 week.
 
 You need to give each agent some unique flavour, based on costume.
   *  Phobos has free ultrasound and stealth/mobility.
+     Bonus to surveillance/search.
   *  Deimos has rapid fire/double-tap and heavy armour.
+     Bonus to busts/reports.
   *  Black Swift has sidekicks and melee mastery.
+     Bonus to guarding/tipoffs.
   *  Dr. Yang has disguise and misdirection/false alarm.
+     Bonus to questioning/wiretap.
 
 Add some reluctance, initiative and motives for agents- agents should
 auto-assign themselves to leads and other tasks.

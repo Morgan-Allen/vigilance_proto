@@ -108,13 +108,13 @@ public class Lead extends Task {
   
   
   protected float attemptFollow(
-    Step step, int tense, Plot plot, Series <Person> follow, int time
+    int tense, Plot plot, Series <Person> follow, int time
   ) {
     //
     //  First, check to see whether anything has actually changed here (i.e,
     //  avoid granting cumulative 'random' info over time.)  If it hasn't,
     //  just return.
-    String contactID = plot.eventID+"_"+step.uniqueID()+"_"+tense;
+    String contactID = plot.eventID+"_"+tense;
     if (contactTime == -1 && ! contactID.equals(lastContactID)) {
       lastContactID = contactID;
       contactTime   = time;
@@ -134,7 +134,7 @@ public class Lead extends Task {
   
   
   protected void extractClues(
-    Element e, Step step, Plot plot, int time, float outcome
+    Element e, Plot plot, int time, float outcome
   ) {
     CaseFile file  = base.leads.caseFor(plot);
     Place    scene = focus.place();
@@ -151,46 +151,31 @@ public class Lead extends Task {
     //  partial clue, and if it's weaker still, we get no clue at all.
     float recognition = recognition(outcome, scene, e);
     if (recognition > 0.66f) {
-      Clue confirms = Clue.confirmSuspect(plot, role, step, e, e.place());
+      Clue confirms = Clue.confirmSuspect(plot, role, e, e.place());
       file.recordClue(confirms, this, time, scene);
     }
     else if (recognition > 0.33f) {
-      Series <Clue> possible = step.possibleClues(
-        plot, e, focus, step, base, type
+      Series <Clue> possible = ClueUtils.possibleClues(
+        plot, e, focus, base, type
       );
-      Clue gained = step.pickFrom(possible);
+      Clue gained = ClueUtils.pickFrom(possible);
       if (gained != null) file.recordClue(gained, this, time, scene);
     }
     else {
       return;
     }
-    //
-    //  We check separately for any element whose role is mentioned-
-    float recogMention = recognition(outcome, scene, null);
-    if (step.mentions != null && recogMention > 0.5f) {
-      Element match = plot.filling(step.mentions);
-      Clue confirms = Clue.confirmSuspect(plot, step.mentions, step, match);
-      file.recordClue(confirms, this, time, scene);
-    }
-    //
-    //  And for the overall objective of the plot-
-    float recogAim = recognition(outcome, scene, null);
-    if (step.canLeakAim() && recogAim > 0.5f) {
-      Clue confirms = Clue.confirmAim(plot);
-      file.recordClue(confirms, this, time, scene);
-    }
   }
   
   
-  protected Scene enteredScene(Step step, int tense, Plot plot, int time) {
+  protected Scene enteredScene(int tense, Plot plot, int time) {
     Role sceneRole = plot.roleFor(focus.place());
-    if (noScene || tense != TENSE_PRESENT || ! step.involves(sceneRole)) {
+    if (noScene || tense != TENSE_PRESENT || sceneRole == null) {
       return null;
     }
-    if (step.medium != MEDIUM_ASSAULT && type.medium != MEDIUM_ASSAULT) {
+    if (type.medium != MEDIUM_ASSAULT) {
       return null;
     }
-    return plot.generateScene(step, focus, this);
+    return plot.generateScene(focus, this);
   }
   
   
@@ -213,27 +198,24 @@ public class Lead extends Task {
     //  focus of your investigation, and see if any new information pops up...
     for (Event event : world.events.allEvents()) if (event.isPlot()) {
       Plot plot = (Plot) event;
+      int tense = plot.tense();
+      Series <Element> involved = plot.allInvolved();
       
-      for (Step step : plot.allSteps()) {
-        int tense = plot.tense(step);
-        Series <Element> involved = plot.involved(step);
+      Scene scene = enteredScene(tense, plot, time);
+      if (scene == null) {
+        //  TODO:  Wait.  This might not work if the tense changes, and the
+        //  step then becomes detectable.
         
-        Scene scene = enteredScene(step, tense, plot, time);
-        if (scene == null) {
-          //  TODO:  Wait.  This might not work if the tense changes, and the
-          //  step then becomes detectable.
-          
-          result = attemptFollow(step, tense, plot, active, time);
-          if (result != RESULT_NONE) for (Element e : involved) {
-            if (! type.canDetect(e, step, plot, focus)) continue;
-            extractClues(e, step, plot, time, result);
-          }
+        result = attemptFollow(tense, plot, active, time);
+        if (result != RESULT_NONE) for (Element e : involved) {
+          if (! type.canDetect(e, plot, focus)) continue;
+          extractClues(e, plot, time, result);
         }
-        else {
-          MessageUtils.presentBustMessage(world.view(), scene, this, plot);
-          world.enterScene(scene);
-          return true;
-        }
+      }
+      else {
+        MessageUtils.presentBustMessage(world.view(), scene, this, plot);
+        world.enterScene(scene);
+        return true;
       }
     }
     return true;

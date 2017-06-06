@@ -21,6 +21,8 @@ public class DebugPlotUtils {
   
   public static void runPlotsDebugSuite() {
     
+    GameSettings.eventsVerbose = true;
+    
     DebugPlotBefore forL = new DebugPlotBefore();
     forL.world = forL.setupWorld();
     boolean leadOK = runSingleLeadTests(forL.world());
@@ -68,15 +70,14 @@ public class DebugPlotUtils {
     
     Plot     plot  = world.events.nextActivePlot();
     int      time  = world.timing.totalHours();
-    Step     step  = plot.currentStep();
-    Place    place = plot.goes(step);
+    Place    place = plot.location(Plot.ROLE_TARGET);
     CaseFile file  = played.leads.caseFor(plot);
     Role     roleP = plot.roleFor(place);
     Trait    trait = (Trait) Rand.pickFrom(place.traits());
     
     boolean recordCorrect = true;
-    Clue toPlace = Clue.locationClue(plot, roleP, step, place.region(), 0);
-    Clue further = Clue.locationClue(plot, roleP, step, place.region(), 1);
+    Clue toPlace = Clue.locationClue(plot, roleP, place.region(), 0);
+    Clue further = Clue.locationClue(plot, roleP, place.region(), 1);
     file.recordClue(toPlace, LeadType.REPORT, time, place);
     file.recordClue(further, LeadType.REPORT, time, place);
     
@@ -93,8 +94,8 @@ public class DebugPlotUtils {
     }
     file.wipeRecord();
     
-    Clue confirms = Clue.confirmSuspect(plot, roleP, step, place);
-    Clue forTrait = Clue.traitClue     (plot, roleP, step, trait);
+    Clue confirms = Clue.confirmSuspect(plot, roleP, place);
+    Clue forTrait = Clue.traitClue     (plot, roleP, trait);
     file.recordClue(confirms, LeadType.REPORT, time, place);
     file.recordClue(forTrait, LeadType.REPORT, time, place);
 
@@ -114,14 +115,13 @@ public class DebugPlotUtils {
     played.leads.extractNewClues();
     if (! recordCorrect) return false;
     I.say("  Clues were recorded correctly.");
-    I.say("  Current step is: "+step);
     
     Pick <Lead> toFollow = new Pick();
     for (Lead lead : played.leads.leadsFor(place)) {
       if (lead.type.medium == LeadType.MEDIUM_ASSAULT){
         continue;
       }
-      if (lead.type.canDetect(place, step, plot, place)) {
+      if (lead.type.canDetect(place, plot, place)) {
         toFollow.compare(lead, Rand.num() + 0.5f);
       }
     }
@@ -133,9 +133,9 @@ public class DebugPlotUtils {
     followed.setResult = 0.5f;
     
     Batch <Clue> possible = new Batch();
-    for (Element e : plot.involved(step)) {
-      Visit.appendTo(possible, step.possibleClues(
-        plot, e, e, step, played, LeadType.TIPOFF
+    for (Element e : plot.allInvolved()) {
+      Visit.appendTo(possible, ClueUtils.possibleClues(
+        plot, e, e, played, LeadType.TIPOFF
       ));
     }
     for (Person agent : played.roster()) {
@@ -211,25 +211,15 @@ public class DebugPlotUtils {
     
     loop: while (! plot.complete()) {
       int  time    = world.timing.totalHours();
-      Step doing   = plot.currentStep();
-      int  tenseDo = doing == null ? LeadType.TENSE_NONE : plot.tense(doing);
+      int  tenseDo = plot.tense();
       
       if (concise || verbose) {
         I.say("\n\n\nClues acquired:");
         for (Clue clue : played.leads.extractNewClues()) {
           I.say("  "+clue.role()+" "+clue+" ("+clue.leadType()+")");
         }
-      }
-      
-      if (concise) {
         I.say("\n\n\nUpdating Investigation into "+plot);
-        I.say("  Current time: "+time+", step: "+doing.label());
-      }
-      if (verbose) {
-        I.say("\n\n\nUpdating Investigation into "+plot);
-        I.say("  Current time: "+time);
-        I.say("  Ideal trail: "+I.list(bestTrail));
-        I.say("\nCurrent step: "+doing);
+        I.say("  Current time: "+time+", tense: "+tenseDo);
         I.add(" ["+LeadType.TENSE_DESC[Nums.clamp(tenseDo, 3)]+"]");
       }
       
@@ -241,12 +231,19 @@ public class DebugPlotUtils {
       Lead bustLead = null;
       
       for (Element suspect : plot.allInvolved()) {
+        Batch <Lead> perpLeads = new Batch();
+        
         for (Lead lead : played.leads.leadsFor(suspect)) {
+          perpLeads.add(lead);
+        }
+        for (Lead lead : played.leads.leadsFor(suspect.place())) {
+          perpLeads.add(lead);
+        }
+        for (Lead lead : perpLeads) {
           lead.leadRating = 0;
           lead.noScene = true;
         }
-      }
-      for (Element suspect : plot.allInvolved()) {
+        
         float evidence = played.leads.evidenceAgainst(suspect, plot, false);
         if (evidence <= 0) continue;
         
@@ -266,20 +263,20 @@ public class DebugPlotUtils {
           }
         }
         
-        for (Lead lead : played.leads.leadsFor(suspect)) {
+        for (Lead lead : perpLeads) {
           if (lead.type.medium == LeadType.MEDIUM_ASSAULT) {
             if (shouldBust) { bustLead = lead; lead.noScene = false; }
             else continue;
           }
-          float numDetects = 0, numSteps = plot.allSteps().size();
-          for (Step step : plot.allSteps()) {
-            int tense = plot.tense(step);
-            if (lead.type.canDetect(suspect, step, plot, suspect)) {
-              if (tense == LeadType.TENSE_PRESENT) numDetects += numSteps;
-              else numDetects++;
-            }
+          float numDetects = 0;
+          
+          int tense = plot.tense();
+          if (lead.type.canDetect(suspect, plot, suspect)) {
+            if (tense == LeadType.TENSE_PRESENT) numDetects += 10;
+            else numDetects++;
           }
-          if ((numDetects /= numSteps) > 0) {
+          
+          if (numDetects > 0) {
             float rating =  1 - Nums.min(1, Nums.abs(1 - evidence));
             rating       *= Nums.max(0.5f, trailIndex) * numDetects;
             lead.leadRating = Nums.max(rating, lead.leadRating);
@@ -292,6 +289,9 @@ public class DebugPlotUtils {
       
       if (verbose) {
         I.say("\n  Best Leads:");
+        
+        //  TODO:  Print how long this lead has gone on for.
+        
         if (bestLeads.empty()) {
           I.say("    None");
         }

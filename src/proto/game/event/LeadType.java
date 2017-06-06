@@ -227,12 +227,12 @@ public class LeadType extends Index.Entry implements Session.Saveable {
   
   
   public boolean canDetect(
-    Element involved, Step step, Plot plot, Element focus
+    Element involved, Plot plot, Element focus
   ) {
-    int     tense  = plot.tense(step);
+    int     tense  = plot.tense();
     Role    role   = plot.roleFor(focus);
-    boolean active = step.involves(role);
-    boolean wired  = step.medium == MEDIUM_WIRE;
+    boolean active = role != null;
+    boolean wired  = true;
     
     if (medium == MEDIUM_WIRE) {
       if ((! wired) || (! active)) return false;

@@ -17,7 +17,6 @@ public class CasesFX {
     Lead     source    = clue.source();
     Plot     plot      = clue.plot();
     Role     role      = clue.role();
-    Step     step      = clue.step();
     Element  match     = clue.match();
     Trait    trait     = clue.trait();
     Element  location  = clue.locationNear();
@@ -25,8 +24,8 @@ public class CasesFX {
     LeadType leadType  = clue.leadType();
     Element  fills     = plot.filling(role);
     Faction  faction   = plot.base().faction();
-    int      plotTime  = plot.timeScheduled(plot.mainHeist());
-    int      tense     = plot.tense(step);
+    int      plotTime  = plot.timeBegins();
+    int      tense     = plot.tense();
     
     StringBuffer desc = new StringBuffer();
     if (leadType != null) desc.append(leadType.verbName(source, clue));
@@ -82,9 +81,9 @@ public class CasesFX {
       replacements.put("<"+r.entryKey()+">", otherDesc);
     }
     
-    String stepDesc = step.descTemplate();
-    stepDesc = replaceKeywords(stepDesc, replacements);
-    replacements.put("<step>", stepDesc);
+    //String stepDesc = step.descTemplate();
+    //stepDesc = replaceKeywords(stepDesc, replacements);
+    //replacements.put("<step>", stepDesc);
     replacements.put("<time>", world.timing.timeString(plotTime));
     
     String roleDesc = replaceKeywords(role.descTemplate, replacements);

@@ -24,14 +24,12 @@ public class DebugPlotBefore extends RunGame {
     
     Base crooks = world.baseFor(Crooks.THE_MORETTI_FAMILY);
     Plot plot = DebugPlotUtils.assignRandomPlot(crooks, PlotTypes.ALL_TYPES);
-    plot.fillAndExpand();
-    crooks.plots.assignRootPlot(plot, 0);
     Person organiser = plot.organiser();
     Place  hideout   = plot.hideout  ();
     
     Base played = world.playerBase();
     Clue tipoff = Clue.confirmSuspect(
-      plot, Plot.ROLE_ORGANISER, plot.allSteps().first(), organiser, hideout
+      plot, Plot.ROLE_ORGANISER, organiser, hideout
     );
     int timeFound = world.timing.totalHours();
     Place placeFound = plot.hideout();

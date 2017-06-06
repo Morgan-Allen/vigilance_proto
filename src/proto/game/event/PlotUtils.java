@@ -120,23 +120,23 @@ public class PlotUtils {
   /**  Helper methods for dealing with perps before and after a scene:
     */
   public static Scene generateHideoutScene(
-    Plot plot, Step step, Element focus, Task lead
+    Plot plot, Element focus, Task lead
   ) {
     //  TODO:  This should change later!
-    return generateHeistScene(plot, step, focus, lead);
+    return generateHeistScene(plot, focus, lead);
   }
   
   
   public static Scene generateSideScene(
-    Plot plot, Step step, Element focus, Task lead
+    Plot plot, Element focus, Task lead
   ) {
     //  TODO:  This should change later!
-    return generateHeistScene(plot, step, focus, lead);
+    return generateHeistScene(plot, focus, lead);
   }
   
   
   public static Scene generateHeistScene(
-    Plot plot, Step step, Element focus, Task lead
+    Plot plot, Element focus, Task lead
   ) {
     Base  base  = plot.base();
     World world = base.world();
@@ -216,9 +216,8 @@ public class PlotUtils {
       if (p.isCriminal() && p.currentScene() == scene && scene.wasWon()) {
         CaseFile  file = player.leads.caseFor(plot);
         Role      role = plot.roleFor(p);
-        Step      step = plot.currentStep();
         Place     site = scene.site();
-        Clue redHanded = Clue.confirmSuspect(plot, role, step, p, site);
+        Clue redHanded = Clue.confirmSuspect(plot, role, p, site);
         file.recordClue(redHanded, lead, time, site, false);
         captives.add(p);
         evidence.add(file);

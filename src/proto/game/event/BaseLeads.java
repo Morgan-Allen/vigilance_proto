@@ -221,7 +221,7 @@ public class BaseLeads {
     Element subject, Plot plot, boolean confirmedOnly
   ) {
     CaseFile file = caseFor(plot);
-    Role role = plot.roleFor(subject);
+    Role     role = plot.roleFor(subject);
     float evidence = 0;
     
     for (Clue c : file.clues) {

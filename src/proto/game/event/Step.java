@@ -7,10 +7,10 @@ import proto.util.*;
 
 
 
+/*
 public class Step extends Index.Entry implements Session.Saveable {
   
   /**  Data fields and save/load methods-
-    */
   final static Index <Step> INDEX = new Index();
   
   String label;
@@ -43,7 +43,6 @@ public class Step extends Index.Entry implements Session.Saveable {
   
   
   /**  Factory methods for convenience:
-    */
   public static Step stepWith(
     String ID, String label, String descTemplate,
     Role acting, Role from, Role subject, Role goes,
@@ -73,7 +72,6 @@ public class Step extends Index.Entry implements Session.Saveable {
   
   
   /**  Assorted no-brainer access methods-
-    */
   public boolean isAssault() {
     return medium == LeadType.MEDIUM_ASSAULT;
   }
@@ -106,7 +104,6 @@ public class Step extends Index.Entry implements Session.Saveable {
   
   
   /**  Generating potential Clues-
-    */
   protected Series <Clue> addTraitClues(
     Plot plot, Element involved, Step step,
     Base follows, Batch <Clue> possible
@@ -168,7 +165,6 @@ public class Step extends Index.Entry implements Session.Saveable {
   
   
   //  TODO:  Not sure I like this.  Think about it again.
-  //*
   protected boolean canLeakAim() {
     for (Role main : Plot.KNOWS_AIM) {
       if (main == mentions) return true;
@@ -176,7 +172,6 @@ public class Step extends Index.Entry implements Session.Saveable {
     }
     return false;
   }
-  //*/
   
   
   public Series <Clue> possibleClues(
@@ -210,7 +205,6 @@ public class Step extends Index.Entry implements Session.Saveable {
   
   
   /**  Rendering, debug and interface methods-
-    */
   public String label() {
     return label;
   }
@@ -226,6 +220,31 @@ public class Step extends Index.Entry implements Session.Saveable {
   }
 }
 
+
+
+  
+  
+  public void printSteps() {
+    I.say("\nSteps are:");
+    for (Step c : steps) {
+      I.say("  "+descStep(c));
+    }
+  }
+  
+  
+  public String descStep(Step step) {
+    StringBuffer s = new StringBuffer();
+    s.append(step.label);
+    s.append(" ["+LeadType.MEDIUM_DESC[step.medium]+"]");
+    s.append(" ["+filling(step.from)+" ("+step.from+")");
+    s.append(" -> "+filling(step.goes)+" ("+step.goes+")] [");
+    for (Role e : step.involved) {
+      s.append("\n    "+filling(e)+" ("+e+")");
+    }
+    s.append("\n  ]");
+    return s.toString();
+  }
+//*/
 
 
 
