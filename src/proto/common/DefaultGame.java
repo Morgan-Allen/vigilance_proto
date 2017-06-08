@@ -9,7 +9,6 @@ import proto.game.person.*;
 import proto.game.world.*;
 import proto.game.event.*;
 import proto.util.*;
-import java.awt.EventQueue;
 
 
 
@@ -27,18 +26,18 @@ public class DefaultGame extends RunGame {
   
   protected World setupWorld() {
     this.world = new World(this, savePath);
-    initDefaultWorld(world);
+    initDefaultWorld(world, true);
     return world;
   }
   
   
-  public static void initDefaultWorld(World world) {
-    DefaultGame.initDefaultTime   (world);
-    DefaultGame.initDefaultRegions(world);
-    DefaultGame.initDefaultBase   (world);
-    DefaultGame.initDefaultCrime  (world);
-    DefaultGame.initDefaultBonds  (world);
-    DefaultGame.initDefaultPlots  (world);
+  public static void initDefaultWorld(World world, boolean withPlots) {
+    initDefaultTime   (world);
+    initDefaultRegions(world);
+    initDefaultBase   (world);
+    initDefaultCrime  (world);
+    initDefaultBonds  (world);
+    if (withPlots) initDefaultPlots(world);
   }
   
   

@@ -161,7 +161,7 @@ public abstract class Plot extends Event implements Assignment {
       time   = base.world().timing.totalHours(),
       begins = timeBegins(),
       ends   = timeComplete();
-    if (begins == -1 || begins < time) return LeadType.TENSE_FUTURE;
+    if (begins == -1 || begins > time) return LeadType.TENSE_FUTURE;
     if (ends   != -1 && ends   < time) return LeadType.TENSE_PAST  ;
     return LeadType.TENSE_PRESENT;
   }
@@ -401,6 +401,7 @@ public abstract class Plot extends Event implements Assignment {
   
   
   protected abstract boolean fillRoles();
+  protected abstract int calcHoursDuration();
   protected abstract float ratePlotFor(Person mastermind);
   
 
@@ -437,6 +438,7 @@ public abstract class Plot extends Event implements Assignment {
     */
   public void fillAndExpand() {
     fillRoles();
+    this.duration = calcHoursDuration();
   }
   
   
@@ -466,13 +468,13 @@ public abstract class Plot extends Event implements Assignment {
     boolean begins, boolean ends, Base follows
   ) {
     int time = world.timing.totalHours();
-    Element involved[] = allInvolved().toArray(Element.class);
+    Role involved[] = allRoles().toArray(Role.class);
     
     if (begins && tipsCount < 2) {
       float tipWeights[] = new float[involved.length], sumWeights = 0;
       
       for (int i = involved.length; i-- > 0;) {
-        Role    focusRole = roleFor(involved[i]);
+        Role    focusRole = involved[i];
         Element focus     = filling(focusRole);
         Place   at        = focus.place();
         float   trust     = at.region().currentValue(Region.TRUST);

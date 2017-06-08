@@ -280,7 +280,7 @@ public class Clue implements Session.Saveable {
       else return "is "+match;
     }
     if (isTraitClue()) {
-      return "has "+trait;
+      return "is "+trait;
     }
     if (isLocationClue()) {
       if (nearRange == 0) return "in "+location;

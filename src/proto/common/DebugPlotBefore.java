@@ -20,7 +20,7 @@ public class DebugPlotBefore extends RunGame {
   
   protected World setupWorld() {
     World world = new World(this, savePath);
-    DefaultGame.initDefaultWorld(world);
+    DefaultGame.initDefaultWorld(world, false);
     
     Base crooks = world.baseFor(Crooks.THE_MORETTI_FAMILY);
     Plot plot = DebugPlotUtils.assignRandomPlot(crooks, PlotTypes.ALL_TYPES);
@@ -41,7 +41,7 @@ public class DebugPlotBefore extends RunGame {
     return world;
   }
   
-  
+  /*
   protected boolean runTests(World world, boolean afterLoad, boolean suite) {
     if (afterLoad) return false;
     
@@ -52,6 +52,7 @@ public class DebugPlotBefore extends RunGame {
     );
     return false;
   }
+  //*/
   
 }
 

@@ -231,7 +231,7 @@ public class World implements Session.Saveable {
     if (events.active().empty()) hoursGone = RunGame.FAST_HOURS_PER_REAL_SECOND;
     hoursGone *= realSeconds;
     
-    Event next = events.nextComing();
+    Event next = events.nextEvent();
     if (next != null) {
       float startGap = next.timeBegins() - timing.totalHours();
       hoursGone = Nums.max(startGap + 0.5f, hoursGone);

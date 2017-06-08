@@ -69,12 +69,13 @@ public class BasePlots {
   
   
   public void assignRootPlot(Plot newPlot, int delayHours) {
+    Events events = base.world().events;
     if (rootPlot != null) {
-      base.world().events.closeEvent(rootPlot);
+      events.closeEvent(rootPlot);
     }
     if (newPlot != null) {
       this.rootPlot = newPlot;
-      base.world().events.scheduleEvent(rootPlot, delayHours);
+      events.scheduleEvent(rootPlot, delayHours);
     }
   }
   

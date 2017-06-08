@@ -27,7 +27,7 @@ public class DebugSceneAndSave extends RunGame {
   
   protected World setupWorld() {
     this.world = new World(this, savePath);
-    DefaultGame.initDefaultWorld(world);
+    DefaultGame.initDefaultWorld(world, false);
     
     Base crooks = world.baseFor(Crooks.THE_MORETTI_FAMILY);
     Plot plot = PlotTypes.TYPE_KIDNAP.initPlot(crooks);

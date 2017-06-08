@@ -81,10 +81,11 @@ public class CaseFile implements Session.Saveable {
     Clue clue, Lead source, LeadType type, int time, Element found,
     EventEffects effects, boolean display
   ) {
-    if (isRedundant(clue)) return;
-    
     if (source != null) clue.confirmSource(source, time, found);
     else                clue.confirmSource(type  , time, found);
+    
+    if (isRedundant(clue)) return;
+    
     clues.add(clue);
     base.leads.newClues.add(clue);
     

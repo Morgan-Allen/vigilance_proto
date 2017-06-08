@@ -17,7 +17,7 @@ public class DebugCampaign extends RunGame {
   
   protected World setupWorld() {
     World world = new World(this, savePath);
-    DefaultGame.initDefaultWorld(world);
+    DefaultGame.initDefaultWorld(world, false);
     return world;
   }
   

@@ -114,6 +114,15 @@ public class Lead extends Task {
     //  First, check to see whether anything has actually changed here (i.e,
     //  avoid granting cumulative 'random' info over time.)  If it hasn't,
     //  just return.
+    boolean report = GameSettings.leadsVerbose;
+    if (report) {
+      I.say("\nAttempting to follow "+plot);
+      I.say("  Contact ID:   "+lastContactID);
+      I.say("  Contact time: "+contactTime  );
+      I.say("  Min. Hours:   "+type.minHours);
+      I.say("  Current time: "+time         );
+    }
+    
     String contactID = plot.eventID+"_"+tense;
     if (contactTime == -1 && ! contactID.equals(lastContactID)) {
       lastContactID = contactID;
@@ -139,6 +148,7 @@ public class Lead extends Task {
     CaseFile file  = base.leads.caseFor(plot);
     Place    scene = focus.place();
     Role     role  = plot.roleFor(e);
+    boolean report = GameSettings.leadsVerbose;
     //
     //  Whatever happens, you have to take the risk of tipping off the perps
     //  themselves:
@@ -150,6 +160,11 @@ public class Lead extends Task {
     //  the suspect and their current location.  If it's weaker, we get a
     //  partial clue, and if it's weaker still, we get no clue at all.
     float recognition = recognition(outcome, scene, e);
+    
+    if (report) {
+      I.say("Recognition was: "+recognition);
+    }
+    
     if (recognition > 0.66f) {
       Clue confirms = Clue.confirmSuspect(plot, role, e, e.place());
       file.recordClue(confirms, this, time, scene);

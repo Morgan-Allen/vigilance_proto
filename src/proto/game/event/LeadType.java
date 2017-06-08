@@ -201,7 +201,9 @@ public class LeadType extends Index.Entry implements Session.Saveable {
   public boolean canFollow(
     Element target
   ) {
+    //return target.isPlace();
     
+    //*
     if (medium == MEDIUM_WIRE) {
       if (target.isPlace()) return true;
     }
@@ -223,6 +225,7 @@ public class LeadType extends Index.Entry implements Session.Saveable {
     }
     
     return false;
+    //*/
   }
   
   
@@ -273,7 +276,7 @@ public class LeadType extends Index.Entry implements Session.Saveable {
     boolean location = clue.isLocationClue();
     
     if (medium == MEDIUM_WIRE) {
-      if (involved.isPlace()) return trait;
+      if (involved.isPlace()) return trait || location;
     }
     if (medium == MEDIUM_SURVEIL) {
       return trait || location;

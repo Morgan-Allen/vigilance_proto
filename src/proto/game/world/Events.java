@@ -159,7 +159,7 @@ public class Events {
   }
   
   
-  public Event nextComing() {
+  public Event nextEvent() {
     return nextEvent(null, true, false, MODE_ANY);
   }
   

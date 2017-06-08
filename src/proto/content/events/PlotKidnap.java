@@ -86,6 +86,11 @@ public class PlotKidnap extends Plot {
   }
   
   
+  protected int calcHoursDuration() {
+    return World.HOURS_PER_DAY * 7;
+  }
+  
+  
   protected float ratePlotFor(Person mastermind) {
     float baseFunds = base().finance.publicFunds();
     return cashGained(true) / (100 + baseFunds);

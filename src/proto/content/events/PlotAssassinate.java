@@ -13,6 +13,7 @@ import static proto.game.event.LeadType.*;
 
 public class PlotAssassinate extends Plot {
   
+  
   /**  Data fields, construction and save/load methods-
     */
   public PlotAssassinate(PlotType type, Base base) {
@@ -55,6 +56,11 @@ public class PlotAssassinate extends Plot {
     //
     //  And finally return-
     return true;
+  }
+  
+  
+  protected int calcHoursDuration() {
+    return World.HOURS_PER_DAY * 7;
   }
   
   

@@ -23,7 +23,7 @@ public class DebugSceneEffects extends RunGame {
   
   protected World setupWorld() {
     World world = new World(this, savePath);
-    DefaultGame.initDefaultWorld(world);
+    DefaultGame.initDefaultWorld(world, false);
     
     Base crooks = world.baseFor(Crooks.THE_MORETTI_FAMILY);
     Plot kidnap = PlotTypes.TYPE_KIDNAP.initPlot(crooks);
