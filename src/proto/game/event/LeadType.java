@@ -38,13 +38,13 @@ public class LeadType extends Index.Entry implements Session.Saveable {
     PROFILE_LOW        = 1,
     PROFILE_SUSPICIOUS = 2,
     PROFILE_HIGH       = 3,
-    PROFILE_OBVIOUS    = 4;
-  final public static float
+    PROFILE_OBVIOUS    = 4,
     //  Degrees of success in investigation-
     RESULT_NONE    = -1,
     RESULT_COLD    =  0,
     RESULT_PARTIAL =  1,
-    RESULT_HOT     =  2,
+    RESULT_HOT     =  2;
+  final public static float
     //  How much a successful lead counts for, assuming perfect success-
     CONFIDENCE_LOW      = 0.33f,
     CONFIDENCE_MODERATE = 0.66f,
@@ -201,9 +201,8 @@ public class LeadType extends Index.Entry implements Session.Saveable {
   public boolean canFollow(
     Element target
   ) {
-    //return target.isPlace();
-    
-    //*
+    return target.isPlace();
+    /*
     if (medium == MEDIUM_WIRE) {
       if (target.isPlace()) return true;
     }
@@ -223,7 +222,6 @@ public class LeadType extends Index.Entry implements Session.Saveable {
     if (medium == MEDIUM_NONE || medium == MEDIUM_ASSAULT) {
       return true;
     }
-    
     return false;
     //*/
   }
@@ -233,8 +231,9 @@ public class LeadType extends Index.Entry implements Session.Saveable {
     Element involved, Plot plot, Element focus
   ) {
     int     tense  = plot.tense();
-    Role    role   = plot.roleFor(focus);
-    boolean active = role != null;
+    Role    roleE  = plot.roleFor(involved);
+    Role    roleF  = plot.roleFor(focus);
+    boolean active = roleE != null;
     boolean wired  = true;
     
     if (medium == MEDIUM_WIRE) {
@@ -253,8 +252,10 @@ public class LeadType extends Index.Entry implements Session.Saveable {
       if (tense == TENSE_PAST) return true;
     }
     if (medium == MEDIUM_MEETING) {
-      boolean known = ((Person) focus).history.bondWith(involved) > 0;
-      boolean perp  = active && role.isPerp();
+      //  TODO:  This might have to be turned into something that queries all
+      //         residents.
+      boolean known = false;// focus.history.bondWith(involved) > 0;
+      boolean perp  = active && roleE.isPerp();
       if ((! known) && (! active)) return false;
       if (tense == TENSE_PAST          ) return true;
       if (tense == TENSE_PRESENT       ) return true;

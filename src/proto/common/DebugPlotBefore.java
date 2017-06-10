@@ -41,18 +41,17 @@ public class DebugPlotBefore extends RunGame {
     return world;
   }
   
-  /*
+  
   protected boolean runTests(World world, boolean afterLoad, boolean suite) {
     if (afterLoad) return false;
     
     GameSettings.noTipoffs = true;
     Plot plot = world.events.nextActivePlot();
     if (plot != null) return DebugPlotUtils.enterPlotDebugLoop(
-      world, plot, ! suite, suite, plot.organiser(), plot.target()
+      world, plot, ! suite, suite, plot.hideout(), plot.scene()
     );
     return false;
   }
-  //*/
   
 }
 

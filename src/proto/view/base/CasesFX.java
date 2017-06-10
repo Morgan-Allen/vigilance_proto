@@ -31,6 +31,7 @@ public class CasesFX {
     if (leadType != null) desc.append(leadType.verbName(source, clue));
     else                  desc.append("Investigation");
     
+    /*
     if (source != null) {
       desc.append(" by ");
       Series <Person> did = source.onceActive();
@@ -40,6 +41,7 @@ public class CasesFX {
         else desc.append(", "+p);
       }
     }
+    //*/
     
     desc.append(" from "+clue.found());
     desc.append(" at "+world.timing.timeString(clue.time()));

@@ -66,14 +66,16 @@ public abstract class Plot extends Event implements Assignment {
     ),
     KNOWS_AIM [] = { ROLE_MASTERMIND, ROLE_ORGANISER },
     NEVER_SHOW[] = { ROLE_OBJECTIVE, ROLE_TIME },
-    NEVER_TIP [] = { ROLE_MASTERMIND, ROLE_HQ, ROLE_TARGET, ROLE_SCENE };
+    NEVER_TIP [] = { ROLE_MASTERMIND, ROLE_HQ, ROLE_TARGET, ROLE_SCENE },
+    CORE_ROLES[] = { ROLE_HQ, ROLE_HIDEOUT, ROLE_SCENE };
   
   final public static int
     STATE_INIT    = -1,
     STATE_ACTIVE  =  0,
-    STATE_SPOOKED =  2,
-    STATE_SUCCESS =  3,
-    STATE_FAILED  =  4;
+    STATE_SUCCESS =  1,
+    STATE_FAILED  =  2,
+    STATE_CLOSED  =  3,
+    STATE_SPOOKED =  4;
   
   
   /**  Data fields, construction and save/load methods-
@@ -98,6 +100,9 @@ public abstract class Plot extends Event implements Assignment {
   int duration   = -1;
   int tipsCount  = 0;
   int spookLevel = 0;
+  
+  Table <String, String> leadResults = null;
+  
   
   
   protected Plot(PlotType type, Base base) {
@@ -124,6 +129,14 @@ public abstract class Plot extends Event implements Assignment {
     duration   = s.loadInt();
     tipsCount  = s.loadInt();
     spookLevel = s.loadInt();
+    
+    int numA = s.loadInt();
+    if (numA != -1) {
+      leadResults = new Table();
+      for (int i = numA; i-- > 0;) {
+        leadResults.put(s.loadString(), s.loadString());
+      }
+    }
   }
   
   
@@ -144,12 +157,21 @@ public abstract class Plot extends Event implements Assignment {
     s.saveInt(duration  );
     s.saveInt(tipsCount );
     s.saveInt(spookLevel);
+    
+    if (leadResults == null) s.saveInt(-1);
+    else {
+      s.saveInt(leadResults.size());
+      for (String key : leadResults.keySet()) {
+        s.saveString(key);
+        s.saveString(leadResults.get(key));
+      }
+    }
   }
   
   
   
-  /**  Queueing and executing sub-events and generating clues for
-    *  investigation-
+  /**  Queueing and executing sub-events and storing results for attempts at
+    *  investigation.
     */
   public Element targetElement(Person p) {
     return location(roleFor(p));
@@ -164,6 +186,38 @@ public abstract class Plot extends Event implements Assignment {
     if (begins == -1 || begins > time) return LeadType.TENSE_FUTURE;
     if (ends   != -1 && ends   < time) return LeadType.TENSE_PAST  ;
     return LeadType.TENSE_PRESENT;
+  }
+  
+  
+  String leadKey(Lead lead) {
+    return eventID+"_"+tense()+"_"+lead.type.uniqueID();
+  }
+  
+  
+  void cacheLeadResult(Lead lead, int timeStart, int outcome) {
+    if (leadResults == null) leadResults = new Table();
+    leadResults.put(leadKey(lead), timeStart+"_"+outcome);
+  }
+  
+  
+  String[] cachedLeadResult(String leadKey) {
+    if (leadResults == null) return null;
+    String raw = leadResults.get(leadKey);
+    return raw == null ? null : raw.split("_");
+  }
+  
+  
+  public int timeStarted(Lead lead) {
+    String result[] = cachedLeadResult(leadKey(lead));
+    if (result == null) return -1;
+    return Integer.parseInt(result[0]);
+  }
+  
+  
+  public int outcome(Lead lead) {
+    String result[] = cachedLeadResult(leadKey(lead));
+    if (result == null) return LeadType.RESULT_NONE;
+    return Integer.parseInt(result[1]);
   }
   
   

@@ -22,10 +22,6 @@ public class Lead extends Task {
   final public LeadType type;
   final public Element focus;
   
-  private String lastContactID = "___";
-  private int contactTime = -1;
-  private List <Person> onceActive = new List();
-  
   public float leadRating = 0;
   public float setResult = -1;
   public boolean noScene = false;
@@ -45,21 +41,15 @@ public class Lead extends Task {
   
   public Lead(Session s) throws Exception {
     super(s);
-    type          = (LeadType) s.loadObject();
-    focus         = (Element ) s.loadObject();
-    lastContactID = s.loadString();
-    contactTime   = s.loadInt();
-    s.loadObjects(onceActive);
+    type  = (LeadType) s.loadObject();
+    focus = (Element ) s.loadObject();
   }
   
   
   public void saveState(Session s) throws Exception {
     super.saveState(s);
-    s.saveObject(type);
+    s.saveObject(type );
     s.saveObject(focus);
-    s.saveString(lastContactID);
-    s.saveInt   (contactTime);
-    s.saveObjects(onceActive);
   }
   
   
@@ -73,7 +63,6 @@ public class Lead extends Task {
   
   public void setAssigned(Person p, boolean is) {
     super.setAssigned(p, is);
-    onceActive.include(p);
   }
   
   
@@ -82,34 +71,20 @@ public class Lead extends Task {
   }
   
   
-  public Series <Person> onceActive() {
-    return onceActive;
-  }
-  
-  
   
   /**  Extraction and screening of clues related to the case:
     */
-  protected float recognition(float attemptResult, Place scene, Element e) {
-    //
-    //  We assign a higher probability of recognition if the suspect is
-    //  present on-site, if the skill-test went well, and based on a random
-    //  roll.
-    float recognition;
-    if (setResult > 0) {
-      recognition = setResult;
-    }
-    else {
-      recognition = e == null ? 0 : (e.place() == scene ? 0.5f : -0.5f);
-      recognition = (recognition + attemptResult + Rand.num()) / 3;
-    }
-    return recognition;
-  }
-  
-  
+  /*
   protected float attemptFollow(
     int tense, Plot plot, Series <Person> follow, int time
   ) {
+    
+    //  The attempt-key is:  plot_ID + tense + lead_type_ID + base_ID !
+    
+    //  The plot stores the number of accumulated hours.  Once that exceeds a
+    //  certain limit, you compute the outcome.
+    
+    
     //
     //  First, check to see whether anything has actually changed here (i.e,
     //  avoid granting cumulative 'random' info over time.)  If it hasn't,
@@ -140,10 +115,28 @@ public class Lead extends Task {
     contactTime = -1;
     return outcome;
   }
+  //*/
+  
+  
+  protected float recognition(float attemptResult, Place scene, Element e) {
+    //
+    //  We assign a higher probability of recognition if the suspect is
+    //  present on-site, if the skill-test went well, and based on a random
+    //  roll.
+    float recognition;
+    if (setResult > 0) {
+      recognition = setResult;
+    }
+    else {
+      recognition = e == null ? 0 : (e.place() == scene ? 0.5f : -0.5f);
+      recognition = (recognition + attemptResult + Rand.num()) / 3;
+    }
+    return recognition;
+  }
   
   
   protected void extractClues(
-    Element e, Plot plot, int time, float outcome
+    Element e, Plot plot, int time, int outcome
   ) {
     CaseFile file  = base.leads.caseFor(plot);
     Place    scene = focus.place();
@@ -199,7 +192,7 @@ public class Lead extends Task {
     Series <Person> active = active();
     World   world  = base.world();
     int     time   = world.timing.totalHours();
-    float   result = RESULT_NONE;
+    int     result = RESULT_NONE;
     boolean report = GameSettings.eventsVerbose;
     //
     //  Remember to close the lead if it's impossible to follow.
@@ -212,16 +205,26 @@ public class Lead extends Task {
     //  Continuously monitor for events of interest connected to the current
     //  focus of your investigation, and see if any new information pops up...
     for (Event event : world.events.allEvents()) if (event.isPlot()) {
-      Plot plot = (Plot) event;
-      int tense = plot.tense();
+      Plot plot      = (Plot) event;
+      int  tense     = plot.tense();
+      int  startTime = plot.timeStarted(this);
       Series <Element> involved = plot.allInvolved();
       
       Scene scene = enteredScene(tense, plot, time);
       if (scene == null) {
-        //  TODO:  Wait.  This might not work if the tense changes, and the
-        //  step then becomes detectable.
         
-        result = attemptFollow(tense, plot, active, time);
+        if (startTime == -1) {
+          startTime = time;
+          plot.cacheLeadResult(this, time, RESULT_NONE);
+        }
+        
+        if (time - startTime > type.minHours) {
+          attempt = configAttempt(active);
+          if (setResult > 0) result = RESULT_PARTIAL;
+          else result = attempt.performAttempt(1) * RESULT_HOT;
+          plot.cacheLeadResult(this, startTime, result);
+        }
+        
         if (result != RESULT_NONE) for (Element e : involved) {
           if (! type.canDetect(e, plot, focus)) continue;
           extractClues(e, plot, time, result);

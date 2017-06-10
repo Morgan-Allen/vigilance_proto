@@ -355,8 +355,8 @@ public class BaseLeads {
   public Series <Lead> leadsFor(Element focus) {
     
     boolean canFind  = atKnownLocation(focus);
-    boolean canGuard = canFind && suspectIsVictim(focus);
-    boolean canBust  = canFind && suspectIsBoss  (focus);
+    boolean canGuard = canFind && suspectIsVictim(focus) && focus.isPlace();
+    boolean canBust  = canFind && suspectIsBoss  (focus) && focus.isPlace();
     
     final Batch <Lead> all = new Batch();
     

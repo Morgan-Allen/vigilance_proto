@@ -27,14 +27,14 @@ public class DebugPlotUtils {
     forL.world = forL.setupWorld();
     boolean leadOK = runSingleLeadTests(forL.world());
     
+    DebugPlotBefore dpb = new DebugPlotBefore();
+    dpb.world = dpb.setupWorld();
+    boolean beforeOK = dpb.runTests(dpb.world, false, true);
+    
     /*
     DebugPlotAfter forE = new DebugPlotAfter();
     forE.world = forE.setupWorld();
     boolean effectOK = runPlotToCompletion(forE.world());
-    
-    DebugPlotSpooked forS = new DebugPlotSpooked();
-    forS.world = forS.setupWorld();
-    boolean spooksOK = forS.runTests(forS.world, false, true);
     
     I.say("  Plot-effect tests okay:    "+effectOK);
     I.say("  Spooking tests okay:       "+spooksOK);
@@ -42,6 +42,7 @@ public class DebugPlotUtils {
     
     I.say("\n\n\nPlot Testing Complete.");
     I.say("  Single lead tests okay:    "+leadOK  );
+    I.say("  Plot before okay:          "+beforeOK);
   }
   
   
@@ -194,15 +195,7 @@ public class DebugPlotUtils {
       //  of the roles associated with the plot.
       for (Role role : roles) {
         Series <Element> suspects = played.leads.suspectsFor(role, plot);
-        I.say("\n"+suspects.size()+" Suspects for role: "+role);
-        int sID = 0;
-        if (suspects.empty()) {
-          I.say("  <None>");
-        }
-        else for (Element e : suspects) {
-          if (++sID > 3) { I.say("  ...etc."); break; }
-          I.say("  "+e);
-        }
+        printSuspects(suspects, role);
         if (suspects.size() < world.inside().size()) {
           I.say("  Suspects were narrowed!");
         }
@@ -254,172 +247,108 @@ public class DebugPlotUtils {
     I.say("  Deterrence: "+deterB+" -> "+deterA);
     return true;
   }
+  
+  
+  public static boolean enterPlotDebugLoop(
+    World world, Plot plot, boolean askToLoop, boolean concise,
+    Element... bestTrail
+  ) {
+    
+    I.say("\n\nENTERING DEBUG LOOP FOR "+plot);
+    //
+    //  Your task is to pursue leads on a particular known or suspected target
+    //  until you narrow down their identity to a single suspect.  (Ideally,
+    //  you want to narrow down the headquarters as well)- but that might not
+    //  be possible until right at the end.
+    GameSettings.noTipoffs = true;
+    
+    Base     played    = world.playerBase();
+    Element  first     = bestTrail[0];
+    Role     firstRole = plot.roleFor(first);
+    Role     lastRole  = plot.roleFor((Element) Visit.last(bestTrail));
+    Clue     tip       = Clue.confirmSuspect(plot, firstRole, first);
+    CaseFile file      = played.leads.caseFor(plot);
+    boolean  foundLast = false;
+    file.recordClue(tip, LeadType.TIPOFF, 0, first.region());
+    
+    while (true) {
+      I.say("\nTime is now: "+world.timing.totalHours());
+      if (plot.complete()) {
+        I.say("Plot is complete: "+plot);
+        break;
+      }
+      
+      I.say("Plot is not complete: "+plot);
+      I.say("Will assess potential leads.");
+      
+      Pick <Lead> pick = new Pick();
+      
+      for (Role r : Plot.CORE_ROLES) {
+        Series <Element> suspects = played.leads.suspectsFor(r, plot);
+        printSuspects(suspects, r);
+        
+        if (suspects.size() > 1) {
+          I.say("  No definite suspect for "+r);
+          continue;
+        }
+        Element place = plot.location(r);
+        
+        for (Lead l : played.leads.leadsFor(place)) {
+          if (l.type.medium == LeadType.MEDIUM_ASSAULT) {
+            I.say("  Don't want to assault: "+l);
+            continue;
+          }
+          if (plot.outcome(l) != LeadType.RESULT_NONE) {
+            I.say("  Already obtained result: "+l);
+            continue;
+          }
+          I.say("  Assessing lead: "+l);
+          pick.compare(l, Rand.num());
+        }
+        
+        if (r == lastRole) foundLast = true;
+      }
+      
+      if (foundLast) {
+        I.say("\nSuccessfully found intended target!");
+        break;
+      }
+      
+      Lead followed = pick.result();
+      if (followed == null) {
+        I.say("\nNo suitable lead found.");
+        break;
+      }
+      
+      I.say("\nPicked lead: "+followed);
+      
+      for (Person p : played.roster()) {
+        p.addAssignment(followed);
+      }
+      
+      while (plot.outcome(followed) == LeadType.RESULT_NONE) {
+        world.updateWorld(6);
+      }
+    }
+    
+    return foundLast;
+  }
+  
+  
+  private static void printSuspects(Series <Element> suspects, Role role) {
+    I.say("\n"+suspects.size()+" Suspects for role: "+role);
+    int sID = 0;
+    if (suspects.empty()) {
+      I.say("  <None>");
+    }
+    else for (Element e : suspects) {
+      if (++sID > 3) { I.say("  ...etc."); break; }
+      I.say("  "+e);
+    }
+  }
+  
 }
 
 
 
-
-
-
-
-
-
-/*
-public static boolean enterPlotDebugLoop(
-  World world, Plot plot,
-  boolean askToLoop, boolean concise,
-  Element... bestTrail
-) {
-  Base played = world.playerBase();
-  Scene bust = null;
-  boolean verbose = ! concise;
-  
-  loop: while (! plot.complete()) {
-    int  time    = world.timing.totalHours();
-    int  tenseDo = plot.tense();
-    
-    if (concise || verbose) {
-      I.say("\n\n\nClues acquired:");
-      for (Clue clue : played.leads.extractNewClues()) {
-        I.say("  "+clue.role()+" "+clue+" ("+clue.leadType()+")");
-      }
-      I.say("\n\n\nUpdating Investigation into "+plot);
-      I.say("  Current time: "+time+", tense: "+tenseDo);
-      I.add(" ["+LeadType.TENSE_DESC[Nums.clamp(tenseDo, 3)]+"]");
-    }
-    
-    List <Lead> bestLeads = new List <Lead> () {
-      protected float queuePriority(Lead r) {
-        return 0 - r.leadRating;
-      }
-    };
-    Lead bustLead = null;
-    
-    for (Element suspect : plot.allInvolved()) {
-      Batch <Lead> perpLeads = new Batch();
-      
-      for (Lead lead : played.leads.leadsFor(suspect)) {
-        perpLeads.add(lead);
-      }
-      for (Lead lead : played.leads.leadsFor(suspect.place())) {
-        perpLeads.add(lead);
-      }
-      for (Lead lead : perpLeads) {
-        lead.leadRating = 0;
-        lead.noScene = true;
-      }
-      
-      float evidence = played.leads.evidenceAgainst(suspect, plot, false);
-      if (evidence <= 0) continue;
-      
-      int     trailIndex = 1 + Visit.indexOf(suspect, bestTrail);
-      boolean shouldBust = suspect == Visit.last(bestTrail);
-      Role    role       = plot.roleFor(suspect);
-      Place   lastKnown  = played.leads.lastKnownLocation(suspect);
-      Place   location   = suspect.place();
-      
-      if (verbose) {
-        I.say("\n  "+suspect+" ("+role+")");
-        I.say("  Last Seen: "+lastKnown+"  At: "+location);
-        I.say("  Should Bust? "+shouldBust);
-        I.say("  Evidence Rating: "+evidence+"  Trail ID: "+trailIndex);
-        for (Clue clue : played.leads.cluesFor(plot, role, true)) {
-          I.say("    "+clue+" ("+clue.leadType()+")");
-        }
-      }
-      
-      for (Lead lead : perpLeads) {
-        if (lead.type.medium == LeadType.MEDIUM_ASSAULT) {
-          if (shouldBust) { bustLead = lead; lead.noScene = false; }
-          else continue;
-        }
-        float numDetects = 0;
-        
-        int tense = plot.tense();
-        if (lead.type.canDetect(suspect, plot, suspect)) {
-          if (tense == LeadType.TENSE_PRESENT) numDetects += 10;
-          else numDetects++;
-        }
-        
-        if (numDetects > 0) {
-          float rating =  1 - Nums.min(1, Nums.abs(1 - evidence));
-          rating       *= Nums.max(0.5f, trailIndex) * numDetects;
-          lead.leadRating = Nums.max(rating, lead.leadRating);
-          lead.setResult  = 100f;
-          bestLeads.include(lead);
-        }
-      }
-    }
-    bestLeads.queueSort();
-    
-    if (verbose) {
-      I.say("\n  Best Leads:");
-      
-      //  TODO:  Print how long this lead has gone on for.
-      
-      if (bestLeads.empty()) {
-        I.say("    None");
-      }
-      else for (Lead lead : bestLeads) {
-        I.say("    "+lead.activeInfo()+" ("+lead.leadRating+")");
-      }
-    }
-    
-    List <Person> agents = new List();
-    Visit.appendTo(agents, played.roster());
-    
-    for (Person agent : agents) {
-      agent.clearAssignments();
-    }
-    if (bustLead != null) for (Person agent : agents) {
-      agent.addAssignment(bustLead);
-    }
-    else while (! (agents.empty() || bestLeads.empty())) {
-      Lead lead = bestLeads.removeFirst();
-      Person agent = agents.removeFirst();
-      agent.addAssignment(lead);
-    }
-    
-    if (verbose || concise) {
-      I.say("\n  Assignments:");
-      for (Person agent : played.roster()) {
-        Assignment a = agent.topAssignment();
-        if (a == null) continue;
-        I.say("    "+agent+" -> "+a.activeInfo());
-      }
-    }
-    
-    if (askToLoop) {
-      while (true) {
-        I.say("\n  Proceed? ");
-        I.add("(y/Yes, n/No, s/Save, f/Finish Loop, r/Reevaluate, p/Play)");
-        I.say("    ");
-        String response = I.listen().toUpperCase().substring(0, 1);
-        if      (response.equals("N")) System.exit(0);
-        else if (response.equals("S")) world.performSave();
-        if      (response.equals("F")) { askToLoop = false; break; }
-        else if (response.equals("R")) continue loop;
-        else if (response.equals("P")) return false;
-        else if (response.equals("Y")) break;
-      }
-    }
-    
-    world.updateWorld(6);
-    
-    if (world.activeScene() != null) {
-      bust = world.activeScene();
-      break;
-    }
-  }
-  
-  if (bust != null) {
-    I.say("\n\nINVESTIGATION SUCCEEDED: "+bust);
-    return true;
-  }
-  else {
-    I.say("\n\nINVESTIGATION FAILED: "+plot.complete());
-    return false;
-  }
-}
-//*/
 
