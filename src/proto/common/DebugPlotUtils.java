@@ -21,7 +21,6 @@ public class DebugPlotUtils {
   
   
   public static void runPlotsDebugSuite() {
-    //GameSettings.eventsVerbose = true;
     
     DebugPlotBefore forL = new DebugPlotBefore();
     forL.world = forL.setupWorld();
@@ -31,18 +30,20 @@ public class DebugPlotUtils {
     dpb.world = dpb.setupWorld();
     boolean beforeOK = dpb.runTests(dpb.world, false, true);
     
-    /*
     DebugPlotAfter forE = new DebugPlotAfter();
     forE.world = forE.setupWorld();
     boolean effectOK = runPlotToCompletion(forE.world());
     
-    I.say("  Plot-effect tests okay:    "+effectOK);
-    I.say("  Spooking tests okay:       "+spooksOK);
-    //*/
+    DebugPlotSpooked forS = new DebugPlotSpooked();
+    forS.world = forS.setupWorld();
+    boolean spooksOK = forS.runTests(forS.world, false, true);
+    
     
     I.say("\n\n\nPlot Testing Complete.");
     I.say("  Single lead tests okay:    "+leadOK  );
     I.say("  Plot before okay:          "+beforeOK);
+    I.say("  Plot-effect tests okay:    "+effectOK);
+    I.say("  Spooking tests okay:       "+spooksOK);
   }
   
   
@@ -178,7 +179,10 @@ public class DebugPlotUtils {
         I.say("  "+clue.role()+": "+clue+" ("+clue.leadType()+")");
         
         Clue match = null;
-        for (Clue p : possible) {
+        if (clue.isConfirmation()) {
+          match = clue;
+        }
+        else for (Clue p : possible) {
           if (p.makesRedundant(clue) && clue.makesRedundant(p)) match = p;
         }
         
@@ -272,13 +276,9 @@ public class DebugPlotUtils {
     file.recordClue(tip, LeadType.TIPOFF, 0, first.region());
     
     while (true) {
-      I.say("\nTime is now: "+world.timing.totalHours());
-      if (plot.complete()) {
-        I.say("Plot is complete: "+plot);
-        break;
-      }
+      int time = world.timing.totalHours();
       
-      I.say("Plot is not complete: "+plot);
+      I.say("\n\nTime is now: "+time);
       I.say("Will assess potential leads.");
       
       Pick <Lead> pick = new Pick();
@@ -295,11 +295,9 @@ public class DebugPlotUtils {
         
         for (Lead l : played.leads.leadsFor(place)) {
           if (l.type.medium == LeadType.MEDIUM_ASSAULT) {
-            I.say("  Don't want to assault: "+l);
             continue;
           }
           if (plot.outcome(l) != LeadType.RESULT_NONE) {
-            I.say("  Already obtained result: "+l);
             continue;
           }
           I.say("  Assessing lead: "+l);
@@ -309,6 +307,10 @@ public class DebugPlotUtils {
         if (r == lastRole) foundLast = true;
       }
       
+      if (plot.complete()) {
+        I.say("Plot is complete: "+plot);
+        break;
+      }
       if (foundLast) {
         I.say("\nSuccessfully found intended target!");
         break;
@@ -321,14 +323,25 @@ public class DebugPlotUtils {
       }
       
       I.say("\nPicked lead: "+followed);
-      
       for (Person p : played.roster()) {
         p.addAssignment(followed);
       }
+      followed.setResult = 0.5f;
       
       while (plot.outcome(followed) == LeadType.RESULT_NONE) {
         world.updateWorld(6);
+        time = world.timing.totalHours();
+        
+        Series <Clue> clues = played.leads.extractNewClues();
+        if (! clues.empty()) {
+          I.say("\nClues extracted:");
+          for (Clue c : clues) I.say("  "+c.role()+" "+c);
+        }
+        
+        if (plot.complete()) break;
       }
+      
+      I.say("\nOutcome for lead: "+plot.outcome(followed)+", time: "+time);
     }
     
     return foundLast;

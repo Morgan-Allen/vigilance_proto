@@ -74,126 +74,13 @@ public class Lead extends Task {
   
   /**  Extraction and screening of clues related to the case:
     */
-  /*
-  protected float attemptFollow(
-    int tense, Plot plot, Series <Person> follow, int time
-  ) {
-    
-    //  The attempt-key is:  plot_ID + tense + lead_type_ID + base_ID !
-    
-    //  The plot stores the number of accumulated hours.  Once that exceeds a
-    //  certain limit, you compute the outcome.
-    
-    
-    //
-    //  First, check to see whether anything has actually changed here (i.e,
-    //  avoid granting cumulative 'random' info over time.)  If it hasn't,
-    //  just return.
-    boolean report = GameSettings.leadsVerbose;
-    if (report) {
-      I.say("\nAttempting to follow "+plot);
-      I.say("  Contact ID:   "+lastContactID);
-      I.say("  Contact time: "+contactTime  );
-      I.say("  Min. Hours:   "+type.minHours);
-      I.say("  Current time: "+time         );
-    }
-    
-    String contactID = plot.eventID+"_"+tense;
-    if (contactTime == -1 && ! contactID.equals(lastContactID)) {
-      lastContactID = contactID;
-      contactTime   = time;
-    }
-    if (contactTime == -1 || (time - contactTime) < type.minHours) {
-      return RESULT_NONE;
-    }
-    //
-    //  Then perform the actual skill-test needed to ensure success:
-    attempt = configAttempt(follow);
-    int outcome = setResult > 0 ? 1 : attempt.performAttempt(1);
-    //
-    //  Reset for the next contact and return your result.
-    contactTime = -1;
-    return outcome;
-  }
-  //*/
-  
-  
-  protected float recognition(float attemptResult, Place scene, Element e) {
-    //
-    //  We assign a higher probability of recognition if the suspect is
-    //  present on-site, if the skill-test went well, and based on a random
-    //  roll.
-    float recognition;
-    if (setResult > 0) {
-      recognition = setResult;
-    }
-    else {
-      recognition = e == null ? 0 : (e.place() == scene ? 0.5f : -0.5f);
-      recognition = (recognition + attemptResult + Rand.num()) / 3;
-    }
-    return recognition;
-  }
-  
-  
-  protected void extractClues(
-    Element e, Plot plot, int time, int outcome
-  ) {
-    CaseFile file  = base.leads.caseFor(plot);
-    Place    scene = focus.place();
-    Role     role  = plot.roleFor(e);
-    boolean report = GameSettings.leadsVerbose;
-    //
-    //  Whatever happens, you have to take the risk of tipping off the perps
-    //  themselves:
-    if (setResult == -1) {
-      plot.takeSpooking(type.profile, e);
-    }
-    //
-    //  If recognition is strong, we get an exact confirmation of the role of
-    //  the suspect and their current location.  If it's weaker, we get a
-    //  partial clue, and if it's weaker still, we get no clue at all.
-    float recognition = recognition(outcome, scene, e);
-    
-    if (report) {
-      I.say("Recognition was: "+recognition);
-    }
-    
-    if (recognition > 0.66f) {
-      Clue confirms = Clue.confirmSuspect(plot, role, e, e.place());
-      file.recordClue(confirms, this, time, scene);
-    }
-    else if (recognition > 0.33f) {
-      Series <Clue> possible = ClueUtils.possibleClues(
-        plot, e, focus, base, type
-      );
-      Clue gained = ClueUtils.pickFrom(possible);
-      if (gained != null) file.recordClue(gained, this, time, scene);
-    }
-    else {
-      return;
-    }
-  }
-  
-  
-  protected Scene enteredScene(int tense, Plot plot, int time) {
-    Role sceneRole = plot.roleFor(focus.place());
-    if (noScene || tense != TENSE_PRESENT || sceneRole == null) {
-      return null;
-    }
-    if (type.medium != MEDIUM_ASSAULT) {
-      return null;
-    }
-    return plot.generateScene(focus, this);
-  }
-  
-  
   public boolean updateAssignment() {
     if (! super.updateAssignment()) return false;
     Series <Person> active = active();
     World   world  = base.world();
     int     time   = world.timing.totalHours();
     int     result = RESULT_NONE;
-    boolean report = GameSettings.eventsVerbose;
+    boolean report = GameSettings.leadsVerbose;
     //
     //  Remember to close the lead if it's impossible to follow.
     if (! base.leads.atKnownLocation(focus)) {
@@ -209,34 +96,104 @@ public class Lead extends Task {
       int  tense     = plot.tense();
       int  startTime = plot.timeStarted(this);
       Series <Element> involved = plot.allInvolved();
-      
       Scene scene = enteredScene(tense, plot, time);
+      //
+      //  If no scene has been generated, we attempt to follow suspects and
+      //  extract clues-
       if (scene == null) {
-        
+        //
+        //  If you haven't started following the plot yet, store your current
+        //  starting time and a null result.
         if (startTime == -1) {
           startTime = time;
           plot.cacheLeadResult(this, time, RESULT_NONE);
+          if (report) I.say("\nBegan following lead: "+this);
         }
-        
+        //
+        //  If you've followed the suspect for long enough, obtain a result and
+        //  store it-
         if (time - startTime > type.minHours) {
           attempt = configAttempt(active);
           if (setResult > 0) result = RESULT_PARTIAL;
-          else result = attempt.performAttempt(1) * RESULT_HOT;
+          else result = attempt.performAttempt(1) * RESULT_PARTIAL;
           plot.cacheLeadResult(this, startTime, result);
+          if (report) I.say("\nFinished following lead: "+this);
         }
-        
+        //
+        //  If a result has been generated, attempt to extract clues for each
+        //  of the participants:
         if (result != RESULT_NONE) for (Element e : involved) {
           if (! type.canDetect(e, plot, focus)) continue;
-          extractClues(e, plot, time, result);
+          if (report) I.say("\nExtracting clues on "+e);
+          extractClues(e, plot, time, result, report);
         }
       }
+      //
+      //  If a scene has been generated, enter it instead-
       else {
+        if (report) I.say("\nWill enter generated scene!- "+scene);
         MessageUtils.presentBustMessage(world.view(), scene, this, plot);
         world.enterScene(scene);
         return true;
       }
     }
     return true;
+  }
+  
+  
+  protected Scene enteredScene(int tense, Plot plot, int time) {
+    Role sceneRole = plot.roleFor(focus.place());
+    if (noScene || tense != TENSE_PRESENT || sceneRole == null) {
+      return null;
+    }
+    if (type.medium != MEDIUM_ASSAULT) {
+      return null;
+    }
+    return plot.generateScene(focus, this);
+  }
+  
+  
+  protected void extractClues(
+    Element e, Plot plot, int time, float checkResult, boolean report
+  ) {
+    CaseFile file  = base.leads.caseFor(plot);
+    Place    scene = focus.place();
+    Role     role  = plot.roleFor(e);
+    //
+    //  If no fixed result was specified, we average the check result with a
+    //  random value and a bonus for tailing the perp directly:
+    if (setResult == -1) {
+      plot.takeSpooking(type.profile, e);
+      checkResult = (checkResult + Rand.num() + (e == focus ? 1 : 0)) / 3f;
+    }
+    //
+    //  If a fixed result has been specified, we don't spook the perps and use
+    //  that value instead:
+    else {
+      checkResult = e == focus ? 1 : setResult;
+    }
+    if (report) {
+      I.say("\nChecking to recognise "+e+" as "+role+" for "+plot);
+      I.say("  Check result was: "+checkResult);
+    }
+    //
+    //  If recognition is strong, we get an exact confirmation of the role of
+    //  the suspect and their current location.  If it's weaker, we get a
+    //  partial clue, and if it's weaker still, we get no clue at all.
+    if (checkResult >= 0.66f) {
+      Clue confirms = Clue.confirmSuspect(plot, role, e, e.place());
+      file.recordClue(confirms, this, time, scene);
+    }
+    else if (checkResult >= 0.33f) {
+      Series <Clue> possible = ClueUtils.possibleClues(
+        plot, e, focus, base, type
+      );
+      Clue gained = ClueUtils.pickFrom(possible);
+      if (gained != null) file.recordClue(gained, this, time, scene);
+    }
+    else {
+      return;
+    }
   }
   
   

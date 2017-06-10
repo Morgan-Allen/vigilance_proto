@@ -230,32 +230,33 @@ public class LeadType extends Index.Entry implements Session.Saveable {
   public boolean canDetect(
     Element involved, Plot plot, Element focus
   ) {
-    int     tense  = plot.tense();
-    Role    roleE  = plot.roleFor(involved);
-    Role    roleF  = plot.roleFor(focus);
-    boolean active = roleE != null;
-    boolean wired  = true;
+    int     tense   = plot.tense();
+    Role    roleE   = plot.roleFor(involved);
+    Place   hideout = plot.hideout();
+    boolean active  = roleE != null;
     
     if (medium == MEDIUM_WIRE) {
-      if ((! wired) || (! active)) return false;
+      if ((! active)) return false;
       if (tense == TENSE_PAST   ) return true;
       if (tense == TENSE_PRESENT) return true;
     }
     if (medium == MEDIUM_SURVEIL) {
-      if (wired || (! active)) return false;
+      if ((! active)) return false;
       if (tense == TENSE_PRESENT) return true;
     }
     if (medium == MEDIUM_SEARCH) {
       boolean isHome = false;
+      boolean site   = involved.place() == hideout && focus == hideout;
       if (involved.isPerson()) isHome = ((Person) involved).resides() == focus;
-      if (wired || ((! active) && (! isHome))) return false;
-      if (tense == TENSE_PAST) return true;
+      if (((! active) && (! isHome))) return false;
+      if (tense == TENSE_PAST           ) return true;
+      if (tense == TENSE_PRESENT && site) return true;
     }
     if (medium == MEDIUM_MEETING) {
       //  TODO:  This might have to be turned into something that queries all
       //         residents.
       boolean known = false;// focus.history.bondWith(involved) > 0;
-      boolean perp  = active && roleE.isPerp();
+      boolean perp  = focus == hideout;
       if ((! known) && (! active)) return false;
       if (tense == TENSE_PAST          ) return true;
       if (tense == TENSE_PRESENT       ) return true;
