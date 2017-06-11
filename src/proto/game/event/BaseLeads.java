@@ -127,7 +127,7 @@ public class BaseLeads {
       if (! c.plot.complete()) {
         known.include(c.plot);
       }
-      else if (base.world().events.past().includes(c.plot)) {
+      else if (base.world().events.recent().includes(c.plot)) {
         known.include(c.plot);
       }
     }

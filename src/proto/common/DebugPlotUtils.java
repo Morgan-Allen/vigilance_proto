@@ -40,12 +40,17 @@ public class DebugPlotUtils {
     forS.world = forS.setupWorld();
     boolean spooksOK = forS.runTests(forS.world, false, true);
     
+    DebugPlotFindHQ forHQ = new DebugPlotFindHQ();
+    forHQ.world = forHQ.setupWorld();
+    boolean foundHQ = forHQ.runTests(forHQ.world, false, true);
+    
     I.say("\n\n\nPlot Testing Complete.");
     I.say("  Single lead tests okay:    "+leadOK  );
     I.say("  Plot before okay:          "+beforeOK);
     I.say("  Plot after okay:           "+afterOK );
     I.say("  Plot-effect tests okay:    "+effectOK);
     I.say("  Spooking tests okay:       "+spooksOK);
+    I.say("  HQ detection okay:         "+foundHQ );
   }
   
   
@@ -153,7 +158,7 @@ public class DebugPlotUtils {
         if (r == lastRole) foundLast = true;
       }
       
-      if (plot.checkExpired(plot.complete())) {
+      if (plot.expired()) {
         if (report) I.say("Plot is expired: "+plot);
         break;
       }
@@ -189,6 +194,8 @@ public class DebugPlotUtils {
           I.say("\nClues extracted:");
           for (Clue c : clues) I.say("  "+c.role()+" "+c);
         }
+        
+        if (plot.expired()) break;
       }
       
       if (report) {

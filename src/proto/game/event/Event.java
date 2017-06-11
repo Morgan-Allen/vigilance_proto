@@ -119,7 +119,7 @@ public abstract class Event implements Session.Saveable {
   }
   
   
-  public boolean checkExpired(boolean complete) {
+  public boolean checkExpiry(boolean complete) {
     return false;
   }
   

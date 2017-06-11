@@ -295,14 +295,19 @@ public abstract class Plot extends Event implements Assignment {
   }
   
   
-  public boolean checkExpired(boolean complete) {
-    if (! complete) return false;
-    int timeExpires = timeComplete() + LeadType.CLUE_EXPIRATION_TIME;
-    boolean expired = world.timing.totalHours() > timeExpires;
-    
-    if (expired && this.state == Plot.STATE_SPOOKED) {
+  public boolean checkExpiry(boolean complete) {
+    if (! expired()) return false;
+    if (this.state == Plot.STATE_SPOOKED) {
       MessageUtils.presentColdCaseMessage(world.view(), this, state);
     }
+    return true;
+  }
+  
+  
+  public boolean expired() {
+    if (! complete()) return false;
+    int timeExpires = timeComplete() + LeadType.CLUE_EXPIRATION_TIME;
+    boolean expired = world.timing.totalHours() > timeExpires;
     return expired;
   }
   

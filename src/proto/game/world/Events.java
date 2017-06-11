@@ -22,7 +22,7 @@ public class Events {
   final World world;
   List <Event> coming = new List();
   List <Event> active = new List();
-  List <Event> past   = new List();
+  List <Event> recent = new List();
   
   
   Events(World world) {
@@ -33,14 +33,14 @@ public class Events {
   void loadState(Session s) throws Exception {
     s.loadObjects(coming);
     s.loadObjects(active);
-    s.loadObjects(past  );
+    s.loadObjects(recent);
   }
   
   
   void saveState(Session s) throws Exception {
     s.saveObjects(coming);
     s.saveObjects(active);
-    s.saveObjects(past  );
+    s.saveObjects(recent);
   }
   
   
@@ -49,14 +49,14 @@ public class Events {
     */
   public Series <Event> coming() { return coming; }
   public Series <Event> active() { return active; }
-  public Series <Event> past  () { return past  ; }
+  public Series <Event> recent() { return recent; }
   
   
   public Series <Event> allEvents() {
     Batch <Event> all = new Batch();
     Visit.appendTo(all, coming);
     Visit.appendTo(all, active);
-    Visit.appendTo(all, past  );
+    Visit.appendTo(all, recent);
     return all;
   }
   
@@ -86,9 +86,9 @@ public class Events {
       }
     }
     
-    for (Event event : past) {
-      if (event.checkExpired(true)) {
-        past.remove(event);
+    for (Event event : recent) {
+      if (event.checkExpiry(true)) {
+        recent.remove(event);
         if (report) I.say("\nEvent expired: "+event+" at time: "+time);
       }
     }
@@ -126,7 +126,7 @@ public class Events {
     
     coming.remove(event);
     active.remove(event);
-    if (! past.includes(event)) past.addFirst(event);
+    if (! recent.includes(event)) recent.addFirst(event);
     
     if (report) {
       I.say("\nClosed event: "+event+" at "+world.timing.totalHours());
