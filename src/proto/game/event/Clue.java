@@ -193,9 +193,8 @@ public class Clue implements Session.Saveable {
   
   
   public boolean makesRedundant(Clue other) {
-    if (plot     != other.plot    ) return false;
-    if (role     != other.role    ) return false;
-    if (leadType != other.leadType) return false;
+    if (plot != other.plot) return false;
+    if (role != other.role) return false;
     
     if (isConfirmation()) {
       if (match.isPlace() && other.isLocationClue()) return true;
@@ -223,6 +222,17 @@ public class Clue implements Session.Saveable {
     }
     
     return false;
+  }
+  
+  
+  public boolean matches(Clue other) {
+    if (plot      != other.plot     ) return false;
+    if (role      != other.role     ) return false;
+    if (clueType  != other.clueType ) return false;
+    if (trait     != other.trait    ) return false;
+    if (location  != other.location ) return false;
+    if (nearRange != other.nearRange) return false;
+    return true;
   }
   
 

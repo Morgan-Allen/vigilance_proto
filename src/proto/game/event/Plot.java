@@ -300,7 +300,7 @@ public abstract class Plot extends Event implements Assignment {
     int timeExpires = timeComplete() + LeadType.CLUE_EXPIRATION_TIME;
     boolean expired = world.timing.totalHours() > timeExpires;
     
-    if (expired) {
+    if (expired && this.state == Plot.STATE_SPOOKED) {
       MessageUtils.presentColdCaseMessage(world.view(), this, state);
     }
     return expired;
