@@ -135,10 +135,9 @@ public class SceneTypeUnits extends SceneType {
   public Scenery generateScenery(
     World world, int wide, int high, boolean testing
   ) {
-    Scenery gen = new Scenery(wide, high);
+    Scenery gen = new Scenery(wide, high, testing);
     gen.gridW = wide / resolution;
     gen.gridH = high / resolution;
-    gen.setupScene(testing);
     populateWithAreas  (world, gen, testing);
     insertWallsAndDoors(world, gen, testing);
     return gen;

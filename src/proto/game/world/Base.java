@@ -92,6 +92,7 @@ public class Base implements Session.Saveable {
     for (Person p : roster) {
       p.updateOnBase();
     }
+    
     finance .updateFinance ();
     stocks  .updateCrafting();
     training.updateTraining();

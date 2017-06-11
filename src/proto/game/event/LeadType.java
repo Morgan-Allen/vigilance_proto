@@ -1,8 +1,8 @@
 
+
 package proto.game.event;
 import proto.common.*;
-import proto.game.person.Attempt;
-import proto.game.person.Person;
+import proto.game.person.*;
 import proto.game.world.*;
 import proto.util.*;
 import static proto.game.person.PersonStats.*;
@@ -56,7 +56,7 @@ public class LeadType extends Index.Entry implements Session.Saveable {
     TIME_MEDIUM          = World.HOURS_PER_DAY / 2,
     TIME_LONG            = World.HOURS_PER_DAY * 2,
     CLUE_EXPIRATION_TIME = World.HOURS_PER_DAY * World.DAYS_PER_WEEK;
-
+  
   final public static String
     MEDIUM_DESC[] = {null,
       "Wire", "Surveil", "Search", "Meeting", "Assault", "None"
@@ -83,9 +83,10 @@ public class LeadType extends Index.Entry implements Session.Saveable {
       ICON_DIR+"icon_surveil.png",
       TIME_SHORT, MEDIUM_SURVEIL, PROFILE_LOW, CONFIDENCE_MODERATE
     ),
-    QUESTIONING = new LeadType(
-      "Questioning", "lead_questioning",
-      "Question a suspect for information on past dealings or future plans.",
+    CANVASS = new LeadType(
+      "Canvass", "lead_canvass",
+      "Canvass contacts in the area for information on past dealings or "+
+      "future plans.",
       ICON_DIR+"icon_question.png",
       TIME_SHORT, MEDIUM_MEETING, PROFILE_HIGH, CONFIDENCE_MODERATE
     ),
@@ -97,7 +98,8 @@ public class LeadType extends Index.Entry implements Session.Saveable {
     ),
     SEARCH = new LeadType(
       "Search", "lead_search",
-      "Search a building for logs, records or forensic evidence.",
+      "Search a building for forensic evidence on activities or the "+
+      "inhabitants' whereabouts.",
       ICON_DIR+"icon_search.png",
       TIME_SHORT, MEDIUM_SEARCH, PROFILE_SUSPICIOUS, CONFIDENCE_MODERATE
     ),
@@ -115,18 +117,25 @@ public class LeadType extends Index.Entry implements Session.Saveable {
     ),
     GUARD = new LeadType(
       "Guard", "lead_guard",
-      "Guard this suspect against criminal activity.",
+      "Guard this facility against criminal activity.",
       ICON_DIR+"icon_guard_lead.png",
       TIME_SHORT, MEDIUM_ASSAULT, PROFILE_OBVIOUS, CONFIDENCE_HIGH
     ),
     BUST = new LeadType(
       "Bust", "lead_bust",
-      "Bust down the doors and unleash hell.",
+      "Bust down the doors and bring perps to justice.",
       ICON_DIR+"icon_guard_lead.png",
       TIME_SHORT, MEDIUM_ASSAULT, PROFILE_OBVIOUS, CONFIDENCE_HIGH
     ),
-    
-    STANDARD_LEADS[] = { SURVEIL, SEARCH, WIRETAP, QUESTIONING },
+    //  NOTE:  This is used exclusively to record busts on headquarters and
+    //  masterminds, to ensure that these events are noted correctly while
+    //  screening for later suspects in the same role.
+    MAJOR_BUST = new LeadType(
+      "Major Bust", "lead_major_bust",
+      "", ICON_DIR+"icon_guard_lead.png",
+      TIME_SHORT, MEDIUM_ASSAULT, PROFILE_OBVIOUS, CONFIDENCE_HIGH
+    ),
+    STANDARD_LEADS[] = { SURVEIL, SEARCH, WIRETAP, CANVASS },
     OTHER_LEADS   [] = { TIPOFF, REPORT, GUARD, BUST };
   
   
@@ -170,8 +179,9 @@ public class LeadType extends Index.Entry implements Session.Saveable {
   
   /**  Tests and configuration:
     */
-  //  NOTE:  This is a general summary of the behaviour of the various lead-
+  //  TODO:  This is a general summary of the behaviour of the various lead-
   //  types and the information they can disclose.
+  //    ...Include aims and motives too?
   //
   //                   Attach   Reveal
   //
@@ -194,36 +204,12 @@ public class LeadType extends Index.Entry implements Session.Saveable {
   //  Meeting Place    X        Location, Trait
   //  Meeting Thing    X        Location, Trait
   //  Meeting Detect   Before (if perp), During, After, All actions
-  //
-  //  TODO:  What about Aims or mentioned elements?  Or motives?
   
   
   public boolean canFollow(
     Element target
   ) {
     return target.isPlace();
-    /*
-    if (medium == MEDIUM_WIRE) {
-      if (target.isPlace()) return true;
-    }
-    if (medium == MEDIUM_SURVEIL) {
-      return true;
-    }
-    if (medium == MEDIUM_SEARCH) {
-      if (target.isPlace()) return true;
-      if (target.isItem ()) return true;
-    }
-    if (medium == MEDIUM_MEETING) {
-      if (target.isPerson()) {
-        return ((Person) target).isCivilian();
-      }
-    }
-    
-    if (medium == MEDIUM_NONE || medium == MEDIUM_ASSAULT) {
-      return true;
-    }
-    return false;
-    //*/
   }
   
   
@@ -232,35 +218,24 @@ public class LeadType extends Index.Entry implements Session.Saveable {
   ) {
     int     tense   = plot.tense();
     Role    roleE   = plot.roleFor(involved);
-    Place   hideout = plot.hideout();
     boolean active  = roleE != null;
     
+    if ((! active) || (! involved.isPlace())) return false;
+    
     if (medium == MEDIUM_WIRE) {
-      if ((! active)) return false;
       if (tense == TENSE_PAST   ) return true;
       if (tense == TENSE_PRESENT) return true;
     }
     if (medium == MEDIUM_SURVEIL) {
-      if ((! active)) return false;
       if (tense == TENSE_PRESENT) return true;
     }
     if (medium == MEDIUM_SEARCH) {
-      boolean isHome = false;
-      boolean site   = involved.place() == hideout && focus == hideout;
-      if (involved.isPerson()) isHome = ((Person) involved).resides() == focus;
-      if (((! active) && (! isHome))) return false;
-      if (tense == TENSE_PAST           ) return true;
-      if (tense == TENSE_PRESENT && site) return true;
+      if (tense == TENSE_PAST   ) return true;
+      if (tense == TENSE_PRESENT) return true;
     }
     if (medium == MEDIUM_MEETING) {
-      //  TODO:  This might have to be turned into something that queries all
-      //         residents.
-      boolean known = false;// focus.history.bondWith(involved) > 0;
-      boolean perp  = focus == hideout;
-      if ((! known) && (! active)) return false;
-      if (tense == TENSE_PAST          ) return true;
-      if (tense == TENSE_PRESENT       ) return true;
-      if (tense == TENSE_FUTURE && perp) return true;
+      if (tense == TENSE_PAST   ) return true;
+      if (tense == TENSE_PRESENT) return true;
     }
     
     if (medium == MEDIUM_NONE || medium == MEDIUM_ASSAULT) {
@@ -278,10 +253,10 @@ public class LeadType extends Index.Entry implements Session.Saveable {
     boolean location = clue.isLocationClue();
     
     if (medium == MEDIUM_WIRE) {
-      if (involved.isPlace()) return trait || location;
+      return trait || location;
     }
     if (medium == MEDIUM_SURVEIL) {
-      return trait || location;
+      return location;
     }
     if (medium == MEDIUM_SEARCH) {
       return trait;
@@ -348,7 +323,7 @@ public class LeadType extends Index.Entry implements Session.Saveable {
     }
     
     if (base != null && (focus == base.HQ() || focus == base.leader())) {
-      obstacle *= 2;
+      obstacle *= 2.5f;
     }
     else if (perp != null && perp.isCriminal()) {
       obstacle *= 1.5f;
@@ -391,16 +366,12 @@ public class LeadType extends Index.Entry implements Session.Saveable {
       }
     }
     if (medium == MEDIUM_MEETING) {
-      return "Questioning";
+      return "Canvassing";
     }
     
     return name;
   }
 }
-
-
-
-
 
 
 

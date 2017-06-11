@@ -82,8 +82,7 @@ public class DebugSceneXML extends RunGame {
     World world = new World(this, savePath);
     
     if (FILE_TEST_SCENE == null) {
-      Scene scene = new Scene(world, 2, 2);
-      scene.setupScene(true);
+      Scene scene = new Scene(world, 2, 2, true);
       world.enterScene(scene);
       return world;
     }

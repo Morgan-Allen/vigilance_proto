@@ -201,18 +201,37 @@ public class BaseLeads {
   
   
   public Series <Element> suspectsFor(Role role, Plot plot) {
-    Series <Clue> related = cluesFor(plot, null, role, null, false);
-    Batch <Element> matches = new Batch();
-    
-    for (Clue c : related) if (c.isConfirmation()) {
-      matches.add(c.match);
-      return matches;
+    //
+    //  NOTE:  In the event that we're looking for suspects for the role of
+    //  headquarters or mastermind, we include clues from ALL plots, as these
+    //  should be persistent between multiple plots.
+    boolean allPlots = Visit.arrayIncludes(Plot.PERSIST_ROLES, role);
+    Series <Clue> related = cluesFor(allPlots ? null : plot, role, true);
+    Element singleMatch = null;
+    List <Element> matches = new List();
+    Visit.appendTo(matches, base.world().inside());
+    //
+    //  ...However, for persistent roles we skip clues for different bases, and
+    //  any evidence collected before an earlier assault (which could trigger
+    //  the move to different headquarters or picking a new mastermind.)
+    for (Clue c : related) {
+      if (allPlots && c.plot != plot) {
+        if (c.plot.base() != plot.base()) continue;
+        if (c.leadType == LeadType.MAJOR_BUST) break;
+      }
+      //
+      //  Finally, note that any exact confirmations of the suspect for a role
+      //  will return a single match.  Otherwise, we screen out any matches
+      //  that don't fit with a given clue.
+      if (c.isConfirmation()) {
+        singleMatch = c.match();
+        break;
+      }
+      for (ListEntry <Element> l = matches; (l = l.nextEntry()) != matches;) {
+        if (! c.matchesSuspect(l.refers)) matches.removeEntry(l);
+      }
     }
-    
-    search: for (Element e : base.world().inside()) {
-      for (Clue c : related) if (! c.matchesSuspect(e)) continue search;
-      matches.add(e);
-    }
+    if (singleMatch != null) { matches.clear(); matches.add(singleMatch); }
     return matches;
   }
   

@@ -46,10 +46,17 @@ public class Scene extends Scenery implements Assignment {
   Stack <Action> actionStack = new Stack();
   
   
-  public Scene(World world, int wide, int high) {
-    super(wide, high);
+  public Scene(World world, int wide, int high, boolean forTesting) {
+    super(wide, high, forTesting);
     this.world = world;
     vision.setupFog(wide, high);
+  }
+  
+  
+  protected void setupScene(boolean forTesting) {
+    this.state      = STATE_SETUP;
+    this.forTesting = forTesting;
+    super.setupScene(forTesting);
   }
   
   
@@ -221,13 +228,6 @@ public class Scene extends Scenery implements Assignment {
   
   /**  Supplementary population methods for use during initial setup-
     */
-  public void setupScene(boolean forTesting) {
-    this.state      = STATE_SETUP;
-    this.forTesting = forTesting;
-    super.setupScene(forTesting);
-  }
-  
-  
   public boolean enterScene(Person p, int x, int y) {
     Tile location = tileAt(x, y);
     if (location == null) return false;

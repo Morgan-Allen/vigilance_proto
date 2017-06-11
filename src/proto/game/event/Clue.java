@@ -193,8 +193,9 @@ public class Clue implements Session.Saveable {
   
   
   public boolean makesRedundant(Clue other) {
-    if (plot != other.plot) return false;
-    if (role != other.role) return false;
+    if (plot     != other.plot    ) return false;
+    if (role     != other.role    ) return false;
+    if (leadType != other.leadType) return false;
     
     if (isConfirmation()) {
       if (match.isPlace() && other.isLocationClue()) return true;

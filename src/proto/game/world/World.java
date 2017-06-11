@@ -267,7 +267,6 @@ public class World implements Session.Saveable {
   
   
   public void exitFromScene(Scene mission) {
-    if (this.activeScene != mission) I.complain(mission+" is not active!");
     I.say("EXITING SCENE: "+activeScene);
     this.activeScene = null;
   }

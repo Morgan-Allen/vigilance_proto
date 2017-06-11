@@ -91,9 +91,8 @@ public abstract class SceneType extends Index.Entry implements
   ) {
     int     wide  = clampSize(prefWide, minWide, maxWide);
     int     high  = clampSize(prefHigh, minHigh, maxHigh);
-    Scene   scene = new Scene(world, wide, high);
+    Scene   scene = new Scene(world, wide, high, testing);
     Scenery gen   = generateScenery(world, wide, high, testing);
-    scene.setupScene(testing);
     applyScenery(scene, gen, 0, 0, N, testing);
     return scene;
   }

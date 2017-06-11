@@ -102,8 +102,7 @@ public class DebugSceneGrid extends RunGame {
     DefaultGame.initDefaultWorld(world, false);
     //
     //  Generate the scene-
-    final Scene mission = new Scene(world, 12, 12);
-    mission.setupScene(true);
+    final Scene mission = new Scene(world, 12, 12, true);
     //*
     SceneType sceneType = GRID_TEST_SCENE;
     Scenery   gen       = sceneType.generateScenery(world, 8, 8, true);

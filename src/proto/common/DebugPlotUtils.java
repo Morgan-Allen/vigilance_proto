@@ -2,8 +2,6 @@
 
 package proto.common;
 import proto.game.world.*;
-import proto.content.agents.Crooks;
-import proto.content.events.PlotTypes;
 import proto.game.event.*;
 import proto.game.scene.*;
 import proto.game.person.*;
@@ -30,6 +28,10 @@ public class DebugPlotUtils {
     dpb.world = dpb.setupWorld();
     boolean beforeOK = dpb.runTests(dpb.world, false, true);
     
+    DebugPlotAfter dpa = new DebugPlotAfter();
+    dpa.world = dpa.setupWorld();
+    boolean afterOK = dpa.runTests(dpa.world, false, true);
+    
     DebugPlotAfter forE = new DebugPlotAfter();
     forE.world = forE.setupWorld();
     boolean effectOK = runPlotToCompletion(forE.world());
@@ -38,10 +40,10 @@ public class DebugPlotUtils {
     forS.world = forS.setupWorld();
     boolean spooksOK = forS.runTests(forS.world, false, true);
     
-    
     I.say("\n\n\nPlot Testing Complete.");
     I.say("  Single lead tests okay:    "+leadOK  );
     I.say("  Plot before okay:          "+beforeOK);
+    I.say("  Plot after okay:           "+afterOK );
     I.say("  Plot-effect tests okay:    "+effectOK);
     I.say("  Spooking tests okay:       "+spooksOK);
   }
@@ -253,12 +255,13 @@ public class DebugPlotUtils {
   }
   
   
-  public static boolean enterPlotDebugLoop(
-    World world, Plot plot, boolean askToLoop, boolean concise,
+  public static boolean enterLeadFollowingLoop(
+    World world, Plot plot, boolean autoWin,
+    boolean askToLoop, int verbosity,
     Element... bestTrail
   ) {
-    
-    I.say("\n\nENTERING DEBUG LOOP FOR "+plot);
+    boolean report = verbosity > 0;
+    if (report) I.say("\n\nENTERING DEBUG LOOP FOR "+plot);
     //
     //  Your task is to pursue leads on a particular known or suspected target
     //  until you narrow down their identity to a single suspect.  (Ideally,
@@ -278,17 +281,19 @@ public class DebugPlotUtils {
     while (true) {
       int time = world.timing.totalHours();
       
-      I.say("\n\nTime is now: "+time);
-      I.say("Will assess potential leads.");
+      if (report) {
+        I.say("\n\nTime is now: "+time);
+        I.say("Will assess potential leads.");
+      }
       
       Pick <Lead> pick = new Pick();
       
       for (Role r : Plot.CORE_ROLES) {
         Series <Element> suspects = played.leads.suspectsFor(r, plot);
-        printSuspects(suspects, r);
+        if (report) printSuspects(suspects, r);
         
         if (suspects.size() > 1) {
-          I.say("  No definite suspect for "+r);
+          if (report) I.say("  No definite suspect for "+r);
           continue;
         }
         Element place = plot.location(r);
@@ -300,7 +305,7 @@ public class DebugPlotUtils {
           if (plot.outcome(l) != LeadType.RESULT_NONE) {
             continue;
           }
-          I.say("  Assessing lead: "+l);
+          if (report) I.say("  Assessing lead: "+l);
           pick.compare(l, Rand.num());
         }
         
@@ -308,32 +313,38 @@ public class DebugPlotUtils {
       }
       
       if (plot.complete()) {
-        I.say("Plot is complete: "+plot);
+        if (report) I.say("Plot is complete: "+plot);
         break;
       }
       if (foundLast) {
-        I.say("\nSuccessfully found intended target!");
+        if (report) I.say("\nSuccessfully found intended target!");
         break;
       }
       
       Lead followed = pick.result();
       if (followed == null) {
-        I.say("\nNo suitable lead found.");
+        if (report) I.say("\nNo suitable lead found.");
         break;
       }
       
-      I.say("\nPicked lead: "+followed);
+      if (report) I.say("\nPicked lead: "+followed);
       for (Person p : played.roster()) {
         p.addAssignment(followed);
       }
-      followed.setResult = 0.5f;
+      
+      if (autoWin) {
+        followed.setResult = 0.5f;
+      }
+      else {
+        followed.setResult = -1;
+      }
       
       while (plot.outcome(followed) == LeadType.RESULT_NONE) {
         world.updateWorld(6);
         time = world.timing.totalHours();
         
         Series <Clue> clues = played.leads.extractNewClues();
-        if (! clues.empty()) {
+        if (report && ! clues.empty()) {
           I.say("\nClues extracted:");
           for (Clue c : clues) I.say("  "+c.role()+" "+c);
         }
@@ -341,14 +352,16 @@ public class DebugPlotUtils {
         if (plot.complete()) break;
       }
       
-      I.say("\nOutcome for lead: "+plot.outcome(followed)+", time: "+time);
+      if (report) {
+        I.say("\nOutcome for lead: "+plot.outcome(followed)+", time: "+time);
+      }
     }
     
     return foundLast;
   }
   
   
-  private static void printSuspects(Series <Element> suspects, Role role) {
+  public static void printSuspects(Series <Element> suspects, Role role) {
     I.say("\n"+suspects.size()+" Suspects for role: "+role);
     int sID = 0;
     if (suspects.empty()) {
@@ -359,6 +372,19 @@ public class DebugPlotUtils {
       I.say("  "+e);
     }
   }
+  
+  
+  /*
+  I.say("\nGetting possible clues for HQ:");
+  for (Lead l : played.leads.leadsFor(HQ)) {
+    I.say("  "+l);
+    for (Clue c : ClueUtils.possibleClues(
+      instigated, HQ, hideout, played, l.type
+    )) {
+      I.say("    "+c);
+    }
+  }
+  //*/
   
 }
 

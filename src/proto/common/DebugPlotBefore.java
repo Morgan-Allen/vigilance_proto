@@ -47,8 +47,8 @@ public class DebugPlotBefore extends RunGame {
     
     GameSettings.noTipoffs = true;
     Plot plot = world.events.nextActivePlot();
-    if (plot != null) return DebugPlotUtils.enterPlotDebugLoop(
-      world, plot, ! suite, suite, plot.hideout(), plot.scene()
+    if (plot != null) return DebugPlotUtils.enterLeadFollowingLoop(
+      world, plot, true, ! suite, suite ? 1 : 2, plot.hideout(), plot.scene()
     );
     return false;
   }

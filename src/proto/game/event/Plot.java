@@ -64,10 +64,11 @@ public abstract class Plot extends Event implements Assignment {
       "role_scene", "Scene", SCENE,
       "<suspect> is the scene for <plot>."
     ),
-    KNOWS_AIM [] = { ROLE_MASTERMIND, ROLE_ORGANISER },
-    NEVER_SHOW[] = { ROLE_OBJECTIVE, ROLE_TIME },
-    NEVER_TIP [] = { ROLE_MASTERMIND, ROLE_HQ, ROLE_TARGET, ROLE_SCENE },
-    CORE_ROLES[] = { ROLE_HQ, ROLE_HIDEOUT, ROLE_SCENE };
+    KNOWS_AIM    [] = { ROLE_MASTERMIND, ROLE_ORGANISER },
+    NEVER_SHOW   [] = { ROLE_OBJECTIVE, ROLE_TIME },
+    NEVER_TIP    [] = { ROLE_MASTERMIND, ROLE_HQ, ROLE_TARGET, ROLE_SCENE },
+    CORE_ROLES   [] = { ROLE_HQ, ROLE_HIDEOUT, ROLE_SCENE },
+    PERSIST_ROLES[] = { ROLE_HQ, ROLE_MASTERMIND };
   
   final public static int
     STATE_INIT    = -1,

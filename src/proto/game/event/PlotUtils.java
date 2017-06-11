@@ -116,6 +116,21 @@ public class PlotUtils {
   }
   
   
+  public static Place selectNewHQFor(Base base) {
+    Place oldHQ = base.HQ();
+    Pick <Place> pick = new Pick();
+    
+    for (Place p : base.world().places()) {
+      if (p.base() != base || p == oldHQ) continue;
+      pick.compare(p, Rand.num());
+    }
+    
+    Place newHQ = pick.result();
+    base.assignHQ(newHQ);
+    return newHQ;
+  }
+  
+  
   
   /**  Helper methods for dealing with perps before and after a scene:
     */
@@ -183,11 +198,13 @@ public class PlotUtils {
   public static EventEffects generateSceneEffects(
     Scene scene, Plot plot, Lead lead
   ) {
-    World world = scene.world();
-    Base player = world.playerBase();
+    World    world  = scene.world();
+    Base     player = world.playerBase();
+    int      time   = world.timing.totalHours();
+    CaseFile file   = player.leads.caseFor(plot);
+    Place    site   = scene.site();
     Batch <Person  > captives = new Batch();
     Batch <CaseFile> evidence = new Batch();
-    int time = world.timing.totalHours();
     
     I.say("Generating scene effects after: "+plot);
     
@@ -214,13 +231,26 @@ public class PlotUtils {
       p.health.updateHealth(0);
       
       if (p.isCriminal() && p.currentScene() == scene && scene.wasWon()) {
-        CaseFile  file = player.leads.caseFor(plot);
-        Role      role = plot.roleFor(p);
-        Place     site = scene.site();
-        Clue redHanded = Clue.confirmSuspect(plot, role, p, site);
-        file.recordClue(redHanded, lead, time, site, false);
-        captives.add(p);
-        evidence.add(file);
+        //
+        //  Anyone caught red-handed at the scene will have evidence recorded
+        //  as such-
+        Role role = plot.roleFor(p);
+        if (role != null) {
+          Clue redHanded = Clue.confirmSuspect(plot, role, p, site);
+          file.recordClue(redHanded, lead, time, site, false);
+          captives.add(p);
+          evidence.add(file);
+        }
+        //
+        //  If the mastermind has been deposed, clear the base's HQ and record
+        //  the event (with a slight offset to ensure it comes ahead of other
+        //  clues.)  Then select a new HQ!
+        if (p == plot.base.leader()) {
+          Place HQ = p.base().HQ();
+          Clue busted = Clue.confirmSuspect(plot, Plot.ROLE_HQ, HQ, site);
+          file.recordClue(busted, LeadType.MAJOR_BUST, time + 1, site);
+          selectNewHQFor(p.base());
+        }
       }
       if (p.isCivilian() && p.isCaptive() && ! p.isCriminal()) {
         p.setCaptive(false);
@@ -233,6 +263,9 @@ public class PlotUtils {
     effects.composeFromScene(scene);
     return effects;
   }
+  
+  
+  
   
 }
 

@@ -77,14 +77,14 @@ public class CaseFile implements Session.Saveable {
   }
   
   
-  public void recordClue(
+  public boolean recordClue(
     Clue clue, Lead source, LeadType type, int time, Element found,
     EventEffects effects, boolean display
   ) {
     if (source != null) clue.confirmSource(source, time, found);
     else                clue.confirmSource(type  , time, found);
     
-    if (isRedundant(clue)) return;
+    if (isRedundant(clue)) return false;
     
     clues.add(clue);
     base.leads.newClues.add(clue);
@@ -92,6 +92,7 @@ public class CaseFile implements Session.Saveable {
     if (display) {
       MessageUtils.presentClueMessage(base.world().view(), clue, effects);
     }
+    return true;
   }
   
   

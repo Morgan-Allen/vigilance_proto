@@ -13,22 +13,6 @@ public class Scenery implements Session.Saveable, TileConstants {
   
   /**  Data fields, constructors and save/load methods-
     */
-  /*
-  final static byte
-    MARK_NONE     = -1,
-    MARK_INIT     =  0,
-    MARK_OUTSIDE  =  1,
-    MARK_OUT_WALL =  2,
-    MARK_WALLS    =  3,
-    MARK_WINDOW   =  4,
-    MARK_DOORS    =  5,
-    MARK_FLOOR    =  6,
-    MARK_PROP     =  7,
-    MARK_CORRIDOR =  8,
-    MARKUP_TYPES  =  9
-  ;
-  //*/
-  
   int wide, high;
   Tile tiles[][] = new Tile[0][0];
   Prop fills[][] = new Prop[1][2];
@@ -71,10 +55,18 @@ public class Scenery implements Session.Saveable, TileConstants {
   }
   
   
-  
-  public Scenery(int wide, int high) {
+  public Scenery(int wide, int high, boolean forTesting) {
     this.wide = wide;
     this.high = high;
+    this.setupScene(forTesting);
+  }
+  
+  
+  protected void setupScene(boolean forTesting) {
+    initTiling(wide, high);
+    for (Coord c : Visit.grid(0, 0, wide, high, 1)) {
+      tiles[c.x][c.y] = new Tile(this, c.x, c.y);
+    }
   }
   
   
@@ -206,11 +198,9 @@ public class Scenery implements Session.Saveable, TileConstants {
   }
   
   
-  public void setupScene(boolean forTesting) {
-    initTiling(wide, high);
-    for (Coord c : Visit.grid(0, 0, wide, high, 1)) {
-      tiles[c.x][c.y] = new Tile(this, c.x, c.y);
-    }
+  protected void tearDownScene() {
+    tiles = new Tile[1][0];
+    fills = new Prop[1][0];
   }
   
   
