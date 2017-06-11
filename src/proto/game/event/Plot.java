@@ -90,7 +90,8 @@ public abstract class Plot extends Event implements Assignment {
     
     Role role, location;
     Element element;
-    Plot supplies;
+    Plot supplies = null;
+    int numClues = 0;
     
     public String toString() {
       return element+" ("+role+")";
@@ -122,6 +123,7 @@ public abstract class Plot extends Event implements Assignment {
       entry.location = (Role   ) s.loadObject();
       entry.element  = (Element) s.loadObject();
       entry.supplies = (Plot   ) s.loadObject();
+      entry.numClues = s.loadInt();
       entries.add(entry);
     }
     s.loadObjects(involved);
@@ -151,6 +153,7 @@ public abstract class Plot extends Event implements Assignment {
       s.saveObject(entry.location);
       s.saveObject(entry.element );
       s.saveObject(entry.supplies);
+      s.saveInt   (entry.numClues);
     }
     s.saveObjects(involved);
     
@@ -219,6 +222,18 @@ public abstract class Plot extends Event implements Assignment {
     String result[] = cachedLeadResult(leadKey(lead));
     if (result == null) return LeadType.RESULT_NONE;
     return Integer.parseInt(result[1]);
+  }
+  
+  
+  void incCluesCount(Role role, int inc) {
+    RoleEntry e = entryFor(null, role);
+    if (e != null) e.numClues += inc;
+  }
+  
+  
+  public int numCluesFor(Role role) {
+    RoleEntry e = entryFor(null, role);
+    return e == null ? 0 : e.numClues;
   }
   
   

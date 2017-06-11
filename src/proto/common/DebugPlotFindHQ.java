@@ -66,7 +66,12 @@ public class DebugPlotFindHQ extends RunGame {
         break;
       }
     }
-    
+    //
+    //  At most one clue should be granted on the HQ for each plot, and one
+    //  should not be enough:
+    if (plotsTried < 2) {
+      I.say("\nToo few attempts required to find HQ!");
+    }
     //
     //  After identifying the HQ, conduct a bust and make sure that any earlier
     //  clues on the HQ are disregarded:

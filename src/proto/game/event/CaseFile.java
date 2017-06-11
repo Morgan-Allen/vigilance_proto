@@ -88,6 +88,7 @@ public class CaseFile implements Session.Saveable {
     
     clues.add(clue);
     base.leads.newClues.add(clue);
+    clue.plot().incCluesCount(clue.role(), 1);
     
     if (display) {
       MessageUtils.presentClueMessage(base.world().view(), clue, effects);

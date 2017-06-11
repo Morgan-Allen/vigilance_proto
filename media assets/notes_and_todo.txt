@@ -1,18 +1,9 @@
 
 
+
 I want a simpler interface, just for the case itself.
 
-I want a limitation to locations and full descriptions.  All you really care
-about is the headquarters, hideout and target, plus faction, time and aim.
-
-I want to exhaust the number of leads pretty fast.  (Per location.)
-  Search.
-  Wiretap.
-  Surveil.
-  Undercover.
-
-Don't bother with steps (or make it a minor aspect.)
-
+Use the state of the plot to determine stages, instead of tense?
 
 
 

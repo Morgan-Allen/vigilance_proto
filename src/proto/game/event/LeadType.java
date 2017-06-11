@@ -5,6 +5,7 @@ import proto.common.*;
 import proto.game.person.*;
 import proto.game.world.*;
 import proto.util.*;
+import static proto.game.event.Plot.*;
 import static proto.game.person.PersonStats.*;
 
 import java.awt.Image;
@@ -217,11 +218,27 @@ public class LeadType extends Index.Entry implements Session.Saveable {
     Element involved, Plot plot, Element focus
   ) {
     int     tense   = plot.tense();
-    Role    roleE   = plot.roleFor(involved);
-    boolean active  = roleE != null;
-    
-    if ((! active) || (! involved.isPlace())) return false;
-    
+    Role    roleF   = plot.roleFor(focus);
+    Role    roleI   = plot.roleFor(involved);
+    boolean active  = roleI != null;
+    //
+    //  We add a simple constraint that disallows direct leads from
+    //  non-hideouts to eachother, and only allow leads from actively involved
+    //  locations:
+    if ((! active) || (! involved.isPlace())) {
+      return false;
+    }
+    if (roleF != ROLE_HIDEOUT && roleI != ROLE_HIDEOUT && roleI != roleF) {
+      return false;
+    }
+    //
+    //  And we forbid any single plot from granting more than one clue about
+    //  the headquarters:
+    if (roleI == ROLE_HQ && plot.numCluesFor(ROLE_HQ) > 0) {
+      return false;
+    }
+    //
+    //  Different media allow for different detection styles:
     if (medium == MEDIUM_WIRE) {
       if (tense == TENSE_PAST   ) return true;
       if (tense == TENSE_PRESENT) return true;
@@ -237,11 +254,9 @@ public class LeadType extends Index.Entry implements Session.Saveable {
       if (tense == TENSE_PAST   ) return true;
       if (tense == TENSE_PRESENT) return true;
     }
-    
     if (medium == MEDIUM_NONE || medium == MEDIUM_ASSAULT) {
       return false;
     }
-    
     return false;
   }
   
