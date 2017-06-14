@@ -147,6 +147,8 @@ public abstract class MapInsetView extends UINode {
     
     renderOutline(selectedRegion(), surface, g, mapWRatio, mapHRatio);
     renderOutline(regionHovered   , surface, g, mapWRatio, mapHRatio);
+    renderBorderConnections(regionHovered, surface, g, mapWRatio, mapHRatio);
+    
     //
     //  Then render any other widgets for each region-
     for (final Region n : regions) {
@@ -166,8 +168,6 @@ public abstract class MapInsetView extends UINode {
       
       //
       //  Render any facilities in the region-
-      //Batch <Place> built = new Batch();
-      //for (Place p : n.buildSlots()) if (p != null) built.add(p);
       int offF = 5 + ((n.buildSlots().length * 35) / -2);
       Image alertIcon = MapView.ALERT_IMAGE;
       int slotID = 0;
@@ -250,6 +250,25 @@ public abstract class MapInsetView extends UINode {
       w = (int) (r.outline.getWidth (null) / mapWRatio),
       h = (int) (r.outline.getHeight(null) / mapHRatio);
     g.drawImage(r.outline, x, y, w, h, null);
+  }
+  
+  
+  private void renderBorderConnections(
+    Region n, Surface surface, Graphics2D g, float mapWRatio, float mapHRatio
+  ) {
+    if (n == null || n.kind().view.outline == null) return;
+    if (! GameSettings.viewRegionsNear) return;
+    RegionAssets r = n.kind().view;
+    g.setColor(Color.WHITE);
+    for (RegionType b : n.kind().bordering()) {
+      RegionAssets rB = b.view;
+      g.drawLine(
+        (int) ((r .centerX / mapWRatio) + vx),
+        (int) ((r .centerY / mapHRatio) + vy),
+        (int) ((rB.centerX / mapWRatio) + vx),
+        (int) ((rB.centerY / mapHRatio) + vy)
+      );
+    }
   }
   
   

@@ -41,7 +41,7 @@ public class Regions {
     
     r1.attachFacilities(heroes, STEEL_MILL);
     r1.attachFacilities(crooks1, Civilians.WAREHOUSE);
-    r1.attachMapCoordinates(0, 0);
+    r1.setBordering(SECTOR02, SECTOR04, SECTOR05);
     
     final RegionType r2 = SECTOR02;
     r2.attachName("Nolan Bay");
@@ -49,14 +49,14 @@ public class Regions {
     
     r2.attachFacilities(heroes, UNION_OFFICE);
     r2.attachFacilities(crooks1, Civilians.WAREHOUSE);
-    r2.attachMapCoordinates(1, 0);
+    r2.setBordering(SECTOR01, SECTOR03, SECTOR05, SECTOR06);
     
     final RegionType r3 = SECTOR03;
     r3.attachName("Goyer Point");
     r3.view.attachColourKey(-65354, "03");
     
     r3.attachFacilities(heroes, MANOR, SOUP_KITCHEN);
-    r3.attachMapCoordinates(2, 0);
+    r3.setBordering(SECTOR02, SECTOR06);
     
     
     final RegionType r4 = SECTOR04;
@@ -65,14 +65,14 @@ public class Regions {
     
     r4.attachFacilities(crooks1, LOUNGE);
     r4.attachFacilities(city, COMMUNITY_COLLEGE);
-    r4.attachMapCoordinates(0, 1);
+    r4.setBordering(SECTOR01, SECTOR05, SECTOR07, SECTOR08);
     
     final RegionType r5 = SECTOR05;
     r5.attachName("Bantam West");
     r5.view.attachColourKey(-486371, "05");
     
     r5.attachFacilities(city, CITY_PARK, Civilians.CITY_HALL);
-    r5.attachMapCoordinates(1, 1);
+    r5.setBordering(SECTOR01, SECTOR02, SECTOR04, SECTOR06, SECTOR08, SECTOR09);
     
     final RegionType r6 = SECTOR06;
     r6.attachName("Bantam Hill");
@@ -80,22 +80,22 @@ public class Regions {
     
     r6.attachFacilities(heroes, BUSINESS_PARK);
     r6.attachFacilities(crooks1, Civilians.WAREHOUSE);
-    r6.attachMapCoordinates(2, 1);
+    r6.setBordering(SECTOR02, SECTOR03, SECTOR05, SECTOR09);
     
     
     final RegionType r7 = SECTOR07;
-    r7.attachName("Lower Bantam");
-    r7.view.attachColourKey(-4628394, "07");
+    r7.attachName("NYMROD Central");
+    r7.view.attachColourKey(-11111239, "07");
     
-    r7.attachFacilities(city, Civilians.PENTHOUSE);
-    r7.attachMapCoordinates(0, 2);
+    r7.attachFacilities(heroes, TECH_STARTUP);
+    r7.setBordering(SECTOR04, SECTOR08);
     
     final RegionType r8 = SECTOR08;
-    r8.attachName("NYMROD Central");
-    r8.view.attachColourKey(-11111239, "08");
+    r8.attachName("Lower Bantam");
+    r8.view.attachColourKey(-4628394, "08");
     
-    r8.attachFacilities(heroes, TECH_STARTUP);
-    r8.attachMapCoordinates(1, 2);
+    r8.attachFacilities(city, Civilians.PENTHOUSE);
+    r8.setBordering(SECTOR04, SECTOR05, SECTOR07, SECTOR09);
     
     final RegionType r9 = SECTOR09;
     r9.attachName("New Salem");
@@ -104,7 +104,7 @@ public class Regions {
     r9.attachFacilities(heroes, CHEMICAL_PLANT);
     r9.attachFacilities(city, Civilians.CITY_JAIL);
     r9.attachFacilities(crooks1, Civilians.WAREHOUSE);
-    r9.attachMapCoordinates(2, 2);
+    r9.setBordering(SECTOR05, SECTOR06, SECTOR08);
     
   }
 }

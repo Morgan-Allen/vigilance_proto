@@ -14,8 +14,8 @@ public class RegionType extends Kind {
     */
   String nameUsed;
   final public RegionAssets view = new RegionAssets();
-  float mapX, mapY;
   
+  RegionType bordering[];
   int     maxFacilities     = 4    ;
   float   defaultTrust      = 25   ;
   float   defaultDeterrence = 25   ;
@@ -46,6 +46,14 @@ public class RegionType extends Kind {
     }
   }
   
+  public void setBordering(RegionType... others) {
+    this.bordering = others;
+  }
+  
+  public RegionType[] bordering() {
+    return bordering;
+  }
+  
   
   
   /**  Attached supplementary media and graphics data-
@@ -53,18 +61,6 @@ public class RegionType extends Kind {
   public void attachName(String name) {
     this.nameUsed = name;
   }
-  
-  
-  public void attachMapCoordinates(float mapX, float mapY) {
-    this.mapX = mapX;
-    this.mapY = mapY;
-  }
-  
-  
-  public Vec2D mapCoords() {
-    return new Vec2D(mapX, mapY);
-  }
-  
   
   public String name() {
     return nameUsed;

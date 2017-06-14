@@ -29,6 +29,8 @@ public class World implements Session.Saveable {
   String savePath;
   
   Region regions[];
+  Table <String, Integer> distCache = new Table();
+  
   Base played;
   List <Base> bases = new List();
   List <Element> elements = new List();
@@ -168,8 +170,35 @@ public class World implements Session.Saveable {
   
   
   public float distanceBetween(Region a, Region b) {
-    RegionType ka = a.kind(), kb = b.kind();
-    return Nums.max(Nums.abs(ka.mapX - kb.mapX), Nums.abs(ka.mapY - kb.mapY));
+    
+    String key = a.kind().uniqueID()+"_"+b.kind().uniqueID();
+    Integer dist = distCache.get(key);
+    if (dist != null) return dist;
+    
+    Table <RegionType, RegionType> used = new Table();
+    Batch <RegionType> frontier = new Batch();
+    frontier.add(a.kind());
+    used.put(a.kind(), a.kind());
+    
+    dist = 0;
+    search: while (! frontier.empty()) {
+      Batch nextGen = new Batch();
+      for (RegionType f : frontier) {
+        if (f == b.kind()) {
+          break search;
+        }
+        for (RegionType near : f.bordering) {
+          if (used.containsKey(near)) continue;
+          used.put(near, near);
+          nextGen.add(near);
+        }
+      }
+      dist += 1;
+      frontier = nextGen;
+    }
+    
+    distCache.put(key, dist);
+    return dist;
   }
   
   
