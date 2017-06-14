@@ -18,7 +18,7 @@ public class PlotUtils {
     Plot plot, Place crimeScene, Place HQ
   ) {
     Pick <Place > pickH = new Pick();
-    for (Place b : venuesNearby(plot, crimeScene, 1)) {
+    for (Place b : venuesNearby(crimeScene, 1)) {
       if (b.isHQ() || b == crimeScene) continue;
       pickH.compare(b, Rand.num());
     }
@@ -105,14 +105,23 @@ public class PlotUtils {
   }
   
   
+  
+  /**  Additional helper methods-
+    */
   public static Series <Place> venuesNearby(
-    Plot plot, Place target, int maxDist
+    Place target, int maxDist
   ) {
     final Batch <Place> venues = new Batch();
-    for (Region r : plot.world.regionsInRange(target.region(), maxDist)) {
+    for (Region r : target.world().regionsInRange(target.region(), maxDist)) {
       for (Place p : r.buildSlots()) if (p != null) venues.include(p);
     }
     return venues;
+  }
+  
+  
+  public static Place chooseTipoffSite(Element source) {
+    Series <Place> near = venuesNearby(source.place(), 1);
+    return (Place) Rand.pickFrom(near);
   }
   
   

@@ -40,7 +40,7 @@ public class CaseCluesView extends UINode {
     if (focus instanceof Element) {
       Element suspect = (Element) focus;
       header = "EVIDENCE ON "+suspect.name();
-      clues = player.leads.cluesFor(suspect, true);
+      clues = player.leads.cluesAssociated(suspect);
       forSuspect = true;
     }
     if (clues == null) return false;

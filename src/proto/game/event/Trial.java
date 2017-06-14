@@ -72,7 +72,7 @@ public class Trial extends Event {
   
   public float rateEvidence(Person p) {
     float sumEvidence = 0;
-    for (Plot plot : conducts.leads.involvedIn(p, true)) {
+    for (Plot plot : conducts.leads.plotsAssociated(p, true)) {
       sumEvidence += conducts.leads.evidenceAgainst(p, plot, true);
     }
     return 1 - (1f / (1 + sumEvidence));

@@ -178,6 +178,9 @@ public class RegionView extends UINode {
       else if (draw.clicked && owner != player) {
         presentRivalMessage(region, slotID);
       }
+      else if (draw.clicked && built == player.HQ()) {
+        presentOwnHQMessage(region, built);
+      }
       else if (draw.clicked && owner == player) {
         presentDemolishDialog(region, slotID);
       }
@@ -217,6 +220,23 @@ public class RegionView extends UINode {
       "This structure is owned by a rival crime boss.  Look for any signs of "+
       "criminal involvement on their part, and build a case toward forcing "+
       "them out of business.",
+      "Cancel"
+    ) {
+      protected void whenClicked(String option, int optionID) {
+        if (optionID == 0) {
+          mainView.dismissMessage(this);
+        }
+      }
+    };
+    mainView.queueMessage(dialog);
+  }
+  
+  
+  void presentOwnHQMessage(final Region d, final Place built) {
+    final MessageView dialog = new MessageView(
+      this, null, "Headquarters",
+      "This structure is the current headquarters for your organisation, and "+
+      "cannot be demolished.",
       "Cancel"
     ) {
       protected void whenClicked(String option, int optionID) {

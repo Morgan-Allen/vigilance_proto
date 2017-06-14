@@ -571,7 +571,6 @@ public abstract class Plot extends Event implements Assignment {
       
       if (pickRole != null && (tipsCount == 0 || sumWeights > Rand.num())) {
         Element  pick   = filling(pickRole);
-        Region   at     = pick.place().region();
         CaseFile file   = follows.leads.caseFor(this);
         Clue     tipoff = null;
         
@@ -581,7 +580,8 @@ public abstract class Plot extends Event implements Assignment {
         tipoff = ClueUtils.pickFrom(clues);
         
         if (tipoff != null) {
-          file.recordClue(tipoff, TIPOFF, time, at);
+          Place source = PlotUtils.chooseTipoffSite(pick);
+          file.recordClue(tipoff, TIPOFF, time, source);
           tipsCount += 1;
         }
       }

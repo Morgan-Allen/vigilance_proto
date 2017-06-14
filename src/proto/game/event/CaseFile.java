@@ -53,32 +53,32 @@ public class CaseFile implements Session.Saveable {
   
   /**  Recording and transferring evidence-
     */
-  public void recordClue(Clue clue, Lead source, int time, Element found) {
+  public void recordClue(Clue clue, Lead source, int time, Place found) {
     recordClue(clue, source, null, time, found, null, true);
   }
   
   
-  public void recordClue(Clue clue, LeadType type, int time, Element found) {
+  public void recordClue(Clue clue, LeadType type, int time, Place found) {
     recordClue(clue, null, type, time, found, null, true);
   }
   
   
   public void recordClue(
-    Clue clue, Lead source, int time, Element found, boolean report
+    Clue clue, Lead source, int time, Place found, boolean report
   ) {
     recordClue(clue, source, null, time, found, null, report);
   }
   
   
   public void recordClue(
-    Clue clue, LeadType type, int time, Element found, boolean report
+    Clue clue, LeadType type, int time, Place found, boolean report
   ) {
     recordClue(clue, null, type, time, found, null, report);
   }
   
   
   public boolean recordClue(
-    Clue clue, Lead source, LeadType type, int time, Element found,
+    Clue clue, Lead source, LeadType type, int time, Place found,
     EventEffects effects, boolean display
   ) {
     if (source != null) clue.confirmSource(source, time, found);

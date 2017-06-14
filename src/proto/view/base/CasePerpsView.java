@@ -160,14 +160,9 @@ public class CasePerpsView extends UINode {
       }
     }
     if (hoverDesc.length() == 0) {
-      Series <Clue> clues = player.leads.cluesFor(suspect, true);
+      Series <Clue> clues = player.leads.cluesAssociated(suspect);
       if (clues.empty()) {
-        if (suspect.isPerson()) {
-          hoverDesc = "No current leads on this individual.";
-        }
-        if (suspect.isPlace()) {
-          hoverDesc = "No current leads on this facility.";
-        }
+        hoverDesc = "No current associated leads.";
       }
       else {
         Clue first = clues.first();
@@ -244,8 +239,8 @@ public class CasePerpsView extends UINode {
       for (Element e : perp.history.sortedBonds()) if (e.isPerson()) {
         addAssociate(list, e, null, HistoryView.bondDescription(perp, e));
       }
-      for (Plot plot : player.leads.involvedIn(suspect, true)) {
-        addAssociate(list, null, plot, "Suspect In");
+      for (Plot plot : player.leads.plotsAssociated(suspect, false)) {
+        addAssociate(list, null, plot, "Associated with");
       }
     }
     
@@ -259,8 +254,8 @@ public class CasePerpsView extends UINode {
       for (Person p : site.residents()) if (p != leader) {
         addAssociate(list, p, null, "Resident");
       }
-      for (Plot plot : player.leads.involvedIn(suspect, true)) {
-        addAssociate(list, null, plot, "Scene For");
+      for (Plot plot : player.leads.plotsAssociated(suspect, false)) {
+        addAssociate(list, null, plot, "Associated with");
       }
     }
     

@@ -149,50 +149,31 @@ public class BaseLeads {
   }
   
   
-  public Series <Clue> latestPlotClues(Region r) {
-    //
-    //  Returns the most recent clue on the identity of participants in any
-    //  active plot, if that most recent clue was found in the region.
-    Batch <Clue> latest = new Batch();
-    
-    for (Plot plot : knownPlots()) {
-      Series <Clue> clues = cluesFor(plot, null, null, null, false);
-      Batch <Role> roles = new Batch();
-      for (Clue c : clues) roles.include(c.role());
-      
-      loop: for (Role role : roles) {
-        if (Visit.arrayIncludes(Plot.NEVER_SHOW, role)) continue;
-        
-        Series <Clue> roleClues = cluesFor(plot, role, true);
-        Clue top = roleClues.first();
-        
-        for (Clue c : roleClues) if (c.isConfirmation()) {
-          Place at = c.locationGiven();
-          if (at != null && at.region() == r) latest.add(c);
-          continue loop;
-        }
-        
-        if (top != null && top.found().region() == r) latest.add(top);
-      }
+  public Series <Clue> cluesAssociated(Element p) {
+    Batch <Clue> associated = new Batch();
+    for (Clue c : cluesFor((Plot) null, true)) {
+      if (c.match() == p) associated.add(c);
+      if (c.found() == p) associated.add(c);
     }
-    
-    return latest;
+    return associated;
   }
   
   
-  
-  /**  Helper methods specific to individual suspects...
-    */
-  public Series <Plot> involvedIn(Element subject, boolean confirmedOnly) {
+  public Series <Plot> plotsAssociated(Element subject, boolean confirmedOnly) {
     Batch <Plot> matches = new Batch();
-    for (Clue c : cluesFor(null, subject, null, null, false)) {
-      if (confirmedOnly && ! c.isConfirmation()) continue;
+    for (Clue c : cluesAssociated(subject)) {
+      if (confirmedOnly) {
+        if (c.match() != subject || ! c.isConfirmation()) continue;
+      }
       matches.include(c.plot);
     }
     return matches;
   }
   
   
+  
+  /**  Helper methods specific to individual suspects...
+    */
   public boolean suspectConfirmed(Element subject, Role role, Plot plot) {
     Series <Clue> related = this.cluesFor(plot, subject, role, null, false);
     for (Clue c : related) if (c.isConfirmation()) return true;

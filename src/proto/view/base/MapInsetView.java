@@ -189,7 +189,7 @@ public abstract class MapInsetView extends UINode {
           button.attachOverlay(RegionView.IN_PROGRESS);
         }
         
-        if (slot != null && played.leads.suspectIsUrgent(slot)) {
+        if (slot != null && played.leads.cluesAssociated(slot).size() > 0) {
           ImageButton alert = new ImageButton(
             alertIcon, new Box2D(x + offF - vx, y + vy - 150, 30, 30), this
           ) {
