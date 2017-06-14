@@ -126,6 +126,8 @@ public class Trial extends Event {
   public void beginEvent() {
     super.beginEvent();
     
+    Person boss = null;
+    
     for (Person p : accused) {
       float evidence = rateEvidence(p);
       if (Rand.num() < evidence) {
@@ -137,12 +139,19 @@ public class Trial extends Event {
       
       boolean isBoss = p.base().leader() == p;
       if (isBoss) {
+        boss = p;
         p.history.incBond(prosecutes, -0.5f);
         p.history.incBond(defends   , 0.25f);
       }
     }
     
     MessageUtils.presentSentenceMessage(world.view(), this);
+    
+    if (boss != null) {
+      PlotUtils.wipeFactionAssets(boss.base());
+      MessageUtils.presentBossSentenceMessage(world.view(), this, boss);
+    }
+    
     completeEvent();
   }
   
@@ -154,14 +163,6 @@ public class Trial extends Event {
     return "Trial for "+plot.organiser();
   }
 }
-
-
-
-
-
-
-
-
 
 
 

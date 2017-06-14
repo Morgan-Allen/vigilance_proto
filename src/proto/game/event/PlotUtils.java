@@ -125,9 +125,19 @@ public class PlotUtils {
       pick.compare(p, Rand.num());
     }
     
+    if (pick.empty()) return null;
+    
     Place newHQ = pick.result();
     base.assignHQ(newHQ);
     return newHQ;
+  }
+  
+  
+  public static void wipeFactionAssets(Base base) { 
+    for (Place p : base.world().places()) {
+      if (p.base() != base || p == base.HQ()) continue;
+      p.setBase(null);
+    }
   }
   
   

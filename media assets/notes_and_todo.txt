@@ -1,21 +1,44 @@
 
 
-
-I want a simpler interface, just for the case itself.
-
-Use the state of the plot to determine stages, instead of tense?
-
-
-
-
-Update the map so that it looks better.
-
 Pare down the list of facilities to what's essential.
+  Player (possibly as upgrades to existing districts):
+   Slum-
+    Factory
+    Chemical Plant
+    Swifts Dojo
+   Business-
+    Business Complex
+    Startup vs. Union Office
+    Research Lab
+   Civic-
+    Library
+    Hospital
+    Soup Kitchen
+  
+  Non-player:
+   Slum-
+    Warehouse / Docks
+    Casino
+    Tenements
+   Business-
+    Penthouse
+    Memorial Park
+   Civic-
+    Bank
+    Museum
+    City Hall
+    Prison
 
 You need to create adjacency-effects for different facilities, and allow their
 effects to spill over into nearby districts.
 
 Cut construction down to 6 months or so, and increase lead-following to 1 week.
+
+
+
+I want a simpler interface for the cases themselves.
+
+Use the state of the plot to determine stages, instead of tense?
 
 
 

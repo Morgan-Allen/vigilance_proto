@@ -164,6 +164,26 @@ public class MessageUtils {
   }
   
   
+  public static void presentBossSentenceMessage(
+    MainView view, Trial concluded, Person boss
+  ) {
+    StringBuffer s = new StringBuffer();
+    s.append(boss+" has been convicted.");
+    
+    view.queueMessage(new MessageView(
+      view, MapView.TRIAL_IMAGE,
+      boss+" has been convicted of a major crime- as a result, the territory "+
+      "they controlled is now available for development.  This might be a "+
+      "good time to invest in new businesses or public amenities.",
+      "Dismiss"
+    ) {
+      protected void whenClicked(String option, int optionID) {
+        mainView.dismissMessage(this);
+      }
+    });
+  }
+  
+  
   public static void presentReleaseMessage(
     MainView view, Person person
   ) {
