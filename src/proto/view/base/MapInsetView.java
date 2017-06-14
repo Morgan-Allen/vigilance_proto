@@ -22,6 +22,7 @@ public abstract class MapInsetView extends UINode {
     */
   BufferedImage mapImage;
   BufferedImage keyImage;
+  BufferedImage outlines;
   RegionAssets attached[];
   
   private static RegionType lastRegionType;
@@ -32,9 +33,12 @@ public abstract class MapInsetView extends UINode {
   }
   
   
-  public void loadMapImages(String mapImageName, String keyImageName) {
+  public void loadMapImages(
+    String mapImageName, String keyImageName, String outlinesName
+  ) {
     mapImage = (BufferedImage) Kind.loadImage(mapImageName);
     keyImage = (BufferedImage) Kind.loadImage(keyImageName);
+    outlines = (BufferedImage) Kind.loadImage(outlinesName);
   }
   
   
@@ -68,15 +72,18 @@ public abstract class MapInsetView extends UINode {
       attached[i] = nations[i].kind().view;
     }
     
-    int imgWide = keyImage.getWidth(), imgHigh = keyImage.getHeight();
-    int pixVals[] = keyImage.getRGB(0, 0, imgWide, imgHigh, null, 0, imgWide);
-    int fills = new Color(1, 1, 1, 0.5f).getRGB();
+    int imgWide    = keyImage.getWidth(), imgHigh = keyImage.getHeight();
+    int pixVals[]  = keyImage.getRGB(0, 0, imgWide, imgHigh, null, 0, imgWide);
+    int lineVals[] = outlines.getRGB(0, 0, imgWide, imgHigh, null, 0, imgWide);
     
     for (Coord c : Visit.grid(0, 0, imgWide, imgHigh, 1)) {
       int pixVal = pixVals[(c.y * imgWide) + c.x];
       for (RegionAssets r : attached) if (r.colourKey == pixVal) {
         if (r.bounds == null) { r.bounds = new Box2D(c.x, c.y, 0, 0); }
         else r.bounds.include(c.x, c.y, 0);
+        r.sumX += c.x;
+        r.sumY += c.y;
+        r.numPix += 1;
         break;
       }
     }
@@ -86,11 +93,12 @@ public abstract class MapInsetView extends UINode {
       r.outline  = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
       r.outlineX = (int) r.bounds.xpos();
       r.outlineY = (int) r.bounds.ypos();
-      r.centerX  = r.outlineX + (w / 2);
-      r.centerY  = r.outlineY + (h / 2);
+      r.centerX  = r.sumX / r.numPix;
+      r.centerY  = r.sumY / r.numPix;
     }
     for (Coord c : Visit.grid(0, 0, imgWide, imgHigh, 1)) {
-      int pixVal = pixVals[(c.y * imgWide) + c.x];
+      int pixVal = pixVals [(c.y * imgWide) + c.x];
+      int fills  = lineVals[(c.y * imgWide) + c.x];
       for (RegionAssets r : attached) {
         if (r.colourKey != pixVal || r.outline == null) continue;
         r.outline.setRGB(c.x - r.outlineX, c.y - r.outlineY, fills);
@@ -145,12 +153,14 @@ public abstract class MapInsetView extends UINode {
       int x = (int) ((n.kind().view.centerX / mapWRatio) + vx);
       int y = (int) ((n.kind().view.centerY / mapHRatio) + vy);
       
-      g.setColor(Color.LIGHT_GRAY);
-      g.drawString(n.kind().name(), x - 25, y + 25 + 15);
+      //g.setColor(Color.RED);
+      //g.drawRect(x - 10, y - 10, 20, 20);
+      g.setColor(Color.WHITE);
+      g.drawString(n.kind().name(), x - 25, y);
       
       float crimeLevel = n.currentValue(Region.VIOLENCE) / 100f;
       ViewUtils.renderStatBar(
-        x - 25, y + 25 + 15 + 5, 50, 5,
+        x - 25, y + 5, 50, 5,
         Color.RED, Color.BLACK, crimeLevel, false, g
       );
       //
@@ -158,10 +168,11 @@ public abstract class MapInsetView extends UINode {
       Batch <Place> built = new Batch();
       for (Place p : n.buildSlots()) if (p != null) built.add(p);
       int offF = 5 + ((built.size() * 35) / -2);
+      Image alertIcon = MapView.ALERT_IMAGE;
       
       for (final Place slot : built) {
         final ImageButton button = new ImageButton(
-          slot.icon(), new Box2D(x + offF - vx, y - (70 + vy), 30, 30), this
+          slot.icon(), new Box2D(x + offF - vx, y + vy - 125, 30, 30), this
         ) {
           protected void whenClicked() {
             mainView.mapView.setActiveFocus(slot, true);
@@ -171,47 +182,23 @@ public abstract class MapInsetView extends UINode {
         if (slot.buildProgress() < 1) {
           button.attachOverlay(RegionView.IN_PROGRESS);
         }
+        
+        if (played.leads.suspectIsUrgent(slot)) {
+          ImageButton alert = new ImageButton(
+            alertIcon, new Box2D(x + offF - vx, y + vy - 150, 30, 30), this
+          ) {
+            protected void whenClicked() {}
+          };
+          button.toggled = false;
+          alert.renderNow(surface, g);
+        }
         button.renderNow(surface, g);
+        
         offF += 30 + 5;
       }
       //
-      //  Render the latest relevant clues for the region-
-      Series <Clue> latest = played.leads.latestPlotClues(n);
-      int offS = (latest.size() * 50) / -2;
-      
-      for (Clue c : latest) {
-        final Plot plot = c.plot();
-        final Role role = c.role();
-        Series <Element> suspects = played.leads.suspectsFor(role, plot);
-        final boolean confirmed = c.isConfirmation();
-        final Element suspect   = suspects.first();
-        final Object  refers    = confirmed ? suspect : role;
-        
-        Image alertIcon = MapView.ALERT_IMAGE;
-        Image perpIcon  = confirmed ? suspect.icon() : MapView.MYSTERY_IMAGE;
-        
-        ImageButton button = new ImageButton(
-          alertIcon, new Box2D(x + offS - vx, y - (25 + vy), 50, 50), this
-        ) {
-          protected void whenClicked() {
-            if (confirmed) {
-              mainView.mapView.setActiveFocus(refers, true);
-            }
-            else {
-              mainView.mapView.setActiveFocus(plot  , true );
-              mainView.mapView.setActiveFocus(refers, false);
-            }
-          }
-        };
-        button.refers = refers;
-        button.renderNow(surface, g);
-        
-        g.drawImage(perpIcon, x + offS + 25, y, 25, 25, null);
-        offS += 50;
-      }
-      //
       //  Then render any current visitors to the region-
-      ViewUtils.renderAssigned(visitors(n), x + 25, y + 75, this, surface, g);
+      ViewUtils.renderAssigned(visitors(n), x + 25, y + 35, this, surface, g);
     }
     
     return true;

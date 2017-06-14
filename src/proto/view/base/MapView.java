@@ -61,7 +61,8 @@ public class MapView extends UINode {
     };
     mapView.loadMapImages(
       MainView.MAPS_DIR+"city_map.png",
-      MainView.MAPS_DIR+"city_districts_key.png"
+      MainView.MAPS_DIR+"city_districts_key.png",
+      MainView.MAPS_DIR+"city_districts_outline.png"
     );
     addChildren(mapView);
     

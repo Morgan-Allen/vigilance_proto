@@ -12,7 +12,9 @@ public class RegionType extends Kind {
   
   /**  Data fields, constructors and save/load methods-
     */
+  String nameUsed;
   final public RegionAssets view = new RegionAssets();
+  float mapX, mapY;
   
   int     maxFacilities     = 4    ;
   float   defaultTrust      = 25   ;
@@ -22,7 +24,6 @@ public class RegionType extends Kind {
   
   Batch <PlaceType> defaultFacilities = new Batch();
   Batch <Faction  > defaultOwners     = new Batch();
-  float mapX, mapY;
   
   
   public RegionType(String name, String ID) {
@@ -46,6 +47,14 @@ public class RegionType extends Kind {
   }
   
   
+  
+  /**  Attached supplementary media and graphics data-
+    */
+  public void attachName(String name) {
+    this.nameUsed = name;
+  }
+  
+  
   public void attachMapCoordinates(float mapX, float mapY) {
     this.mapX = mapX;
     this.mapY = mapY;
@@ -54,6 +63,11 @@ public class RegionType extends Kind {
   
   public Vec2D mapCoords() {
     return new Vec2D(mapX, mapY);
+  }
+  
+  
+  public String name() {
+    return nameUsed;
   }
   
 }

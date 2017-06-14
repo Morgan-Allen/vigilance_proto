@@ -16,6 +16,8 @@ public class RegionAssets {
   
   int colourKey;
   Box2D bounds = null;
+  int sumX, sumY, numPix;
+  
   BufferedImage outline;
   int outlineX, outlineY, centerX, centerY;
   

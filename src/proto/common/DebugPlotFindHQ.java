@@ -21,7 +21,6 @@ public class DebugPlotFindHQ extends RunGame {
   protected World setupWorld() {
     World world = new World(this, savePath);
     DefaultGame.initDefaultWorld(world, false);
-    
     return world;
   }
   
