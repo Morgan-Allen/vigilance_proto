@@ -153,37 +153,43 @@ public abstract class MapInsetView extends UINode {
       int x = (int) ((n.kind().view.centerX / mapWRatio) + vx);
       int y = (int) ((n.kind().view.centerY / mapHRatio) + vy);
       
-      //g.setColor(Color.RED);
-      //g.drawRect(x - 10, y - 10, 20, 20);
       g.setColor(Color.WHITE);
       g.drawString(n.kind().name(), x - 25, y);
       
-      float crimeLevel = n.currentValue(Region.VIOLENCE) / 100f;
+      float crimeLevel = 0;
+      crimeLevel += n.currentValue(Region.VIOLENCE  ) / 200f;
+      crimeLevel += n.currentValue(Region.CORRUPTION) / 200f;
       ViewUtils.renderStatBar(
         x - 25, y + 5, 50, 5,
         Color.RED, Color.BLACK, crimeLevel, false, g
       );
+      
       //
       //  Render any facilities in the region-
-      Batch <Place> built = new Batch();
-      for (Place p : n.buildSlots()) if (p != null) built.add(p);
-      int offF = 5 + ((built.size() * 35) / -2);
+      //Batch <Place> built = new Batch();
+      //for (Place p : n.buildSlots()) if (p != null) built.add(p);
+      int offF = 5 + ((n.buildSlots().length * 35) / -2);
       Image alertIcon = MapView.ALERT_IMAGE;
+      int slotID = 0;
       
-      for (final Place slot : built) {
+      for (final Place slot : n.buildSlots()) {
+        
         final ImageButton button = new ImageButton(
-          slot.icon(), new Box2D(x + offF - vx, y + vy - 125, 30, 30), this
+          slot == null ? RegionView.NOT_BUILT : slot.icon(),
+          new Box2D(x + offF - vx, y + vy - 125, 30, 30), this
         ) {
           protected void whenClicked() {
+            if (slot == null) return;
             mainView.mapView.setActiveFocus(slot, true);
           }
         };
-        button.refers = slot;
-        if (slot.buildProgress() < 1) {
+        button.valid = slot != null;
+        button.refers = "slot_"+slotID;
+        if (slot != null && slot.buildProgress() < 1) {
           button.attachOverlay(RegionView.IN_PROGRESS);
         }
         
-        if (played.leads.suspectIsUrgent(slot)) {
+        if (slot != null && played.leads.suspectIsUrgent(slot)) {
           ImageButton alert = new ImageButton(
             alertIcon, new Box2D(x + offF - vx, y + vy - 150, 30, 30), this
           ) {

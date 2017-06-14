@@ -44,10 +44,51 @@ public class RegionView extends UINode {
     
     Region.Stat hovered = null;
     int across = 10, down = 10;
+    Region.Stat ref = null;
     
+    //
+    //  First render the name of the region:
     g.setColor(Color.WHITE);
     g.drawString(region.kind().name(), vx + across + 0, vy + down + 0);
-    down = 30;
+    down += 20;
+    
+    //
+    //  Then render deterrence:
+    ref = Region.DETERRENCE;
+    g.setColor(Color.WHITE);
+    if (surface.tryHover(vx + 20, vy + down - 10, 120, 20, ref, this)) {
+      hovered = ref;
+      g.setColor(Color.YELLOW);
+    }
+    g.drawString("Deterrence:", vx + across + 20, vy + down);
+    
+    float deterLevel = region.longTermValue(Region.DETERRENCE) / 100f;
+    ViewUtils.renderStatBar(
+      vx + across + 100, vy + down - 10,
+      180, 10, Color.YELLOW, Color.DARK_GRAY, deterLevel, false, g
+    );
+    down += 20;
+    
+    //
+    //  Then render trust:
+    ref = Region.TRUST;
+    g.setColor(Color.WHITE);
+    if (surface.tryHover(vx + 20, vy + down - 10, 120, 20, ref, this)) {
+      hovered = ref;
+      g.setColor(Color.YELLOW);
+    }
+    g.drawString("Trust:", vx + across + 20, vy + down);
+    
+    float trustLevel = region.longTermValue(Region.TRUST) / 100f;
+    ViewUtils.renderStatBar(
+      vx + across + 100, vy + down - 10,
+     180, 10, Color.BLUE, Color.DARK_GRAY, trustLevel, false, g
+    );
+    down += 20;
+    
+    //
+    //  Then render other civic stats:
+    down = 70;
     
     for (Region.Stat stat : Region.CIVIC_STATS) {
       if (surface.tryHover(vx, vy + down - 10, 120, 20, stat, this)) {
@@ -60,20 +101,6 @@ public class RegionView extends UINode {
       g.drawString(""+current+"/10", vx + 120, vy + down);
       down += 20;
     }
-    
-    down = 30;
-    for (Region.Stat stat : Region.SOCIAL_STATS) {
-      if (surface.tryHover(vx + 160, vy + down - 10, 120, 20, stat, this)) {
-        hovered = stat;
-        g.setColor(Color.YELLOW);
-      }
-      else g.setColor(Color.WHITE);
-      g.drawString(stat+": ", vx + 160, vy + down);
-      int current = (int) region.currentValue(stat);
-      g.drawString(""+current, vx + 250, vy + down);
-      down += 20;
-    }
-    
     
     Region.IncomeReport r = region.incomeReport(player);
     String sumDescs[] = {
@@ -91,15 +118,21 @@ public class RegionView extends UINode {
       r.profit
     };
     
-    down += 10;
+    down = 70;
     for (int i : Visit.range(0, descVals.length)) {
-      g.drawString(""+sumDescs[i]    , vx + across + 20 , vy + down);
-      g.drawString(""+descVals[i]+"m", vx + across + 160, vy + down);
+      if (surface.tryHover(vx + 160, vy + down - 10, 120, 20, null, this)) {
+        hovered = null;
+        g.setColor(Color.YELLOW);
+      }
+      else g.setColor(Color.WHITE);
+      g.drawString(""+sumDescs[i]    , vx + across + 160, vy + down);
+      g.drawString(""+descVals[i]+"m", vx + across + 240, vy + down);
       down += 20;
     }
-    g.drawRect(vx + across + 20, vy + down - 36, 240, 0);
+    g.drawRect(vx + across + 20, vy + down - 36, 270, 0);
     
     
+    g.setColor(Color.WHITE);
     g.drawString("Facilities", vx + across + 10, vy + down + 10);
     down += 15;
     
@@ -136,11 +169,17 @@ public class RegionView extends UINode {
         hoverDesc = "Vacant Site (click to begin construction)";
       }
       
-      if (draw.clicked && owner == player) {
-        presentDemolishDialog(region, slotID);
+      if (draw.clicked && owner == player.world().council.city()) {
+        presentCivicMessage(region, slotID);
       }
-      if (draw.clicked && owner == null) {
+      else if (draw.clicked && owner == null) {
         presentBuildOptions(region, slotID);
+      }
+      else if (draw.clicked && owner != player) {
+        presentRivalMessage(region, slotID);
+      }
+      else if (draw.clicked && owner == player) {
+        presentDemolishDialog(region, slotID);
       }
     }
     
@@ -152,6 +191,41 @@ public class RegionView extends UINode {
     
     parent.infoArea.setScrollheight(down);
     return true;
+  }
+  
+  
+  void presentCivicMessage(final Region d, final int slotID) {
+    final MessageView dialog = new MessageView(
+      this, null, "Civic Structure",
+      "This structure is owned by the city council, and cannot be demolished "+
+      "or refurbished.",
+      "Cancel"
+    ) {
+      protected void whenClicked(String option, int optionID) {
+        if (optionID == 0) {
+          mainView.dismissMessage(this);
+        }
+      }
+    };
+    mainView.queueMessage(dialog);
+  }
+  
+  
+  void presentRivalMessage(final Region d, final int slotID) {
+    final MessageView dialog = new MessageView(
+      this, null, "Civic Structure",
+      "This structure is owned by a rival crime boss.  Look for any signs of "+
+      "criminal involvement on their part, and build a case toward forcing "+
+      "them out of business.",
+      "Cancel"
+    ) {
+      protected void whenClicked(String option, int optionID) {
+        if (optionID == 0) {
+          mainView.dismissMessage(this);
+        }
+      }
+    };
+    mainView.queueMessage(dialog);
   }
   
   

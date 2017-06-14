@@ -78,9 +78,9 @@ public class Region extends Element {
     ),
     TRUST = new Stat(
       "Trust", 5,
-      "Trust improves the likelihood of tipoffs from local sources, which "+
-      "are vital to most investigations.  Boost it by protecting civilians, "+
-      "minimising use of force, and building public amenities."
+      "Trust improves the likelihood of tipoffs from local sources and helps "+
+      "law enforcement turn a blind eye to your activities.  Boost it by "+
+      "protecting civilians, minimising use of force and funding charities."
     ),
     CORRUPTION = new Stat(
       "Corruption", 6,

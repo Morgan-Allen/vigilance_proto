@@ -15,14 +15,14 @@ public class Facilities {
   
   final public static PlaceType MANOR = new PlaceType(
     "Manor", "base_type_manor",
-    null, "",
+    "media assets/tech icons/icon_mansion.png", "",
     0, BUILD_TIME_NONE, MANSION_SCENE,
     Common.VENUE_IS_HQ, Common.VENUE_RITZY, Common.VENUE_CIVIC
   );
   
   final public static PlaceType LOUNGE = new PlaceType(
     "Lounge", "base_type_lounge",
-    null, "",
+    "media assets/tech icons/icon_lounge.png", "",
     0, BUILD_TIME_NONE, MANSION_SCENE,
     Common.VENUE_IS_HQ, Common.VENUE_RITZY, Common.VENUE_SLUM
   );

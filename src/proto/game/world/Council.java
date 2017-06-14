@@ -187,6 +187,11 @@ public class Council {
   }
   
   
+  public Base city() {
+    return city;
+  }
+  
+  
   
   /**  Handling sentencing:
     */

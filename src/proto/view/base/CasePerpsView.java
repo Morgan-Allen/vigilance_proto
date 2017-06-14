@@ -84,48 +84,12 @@ public class CasePerpsView extends UINode {
       traitDesc += "("+t+") ";
     }
     draw.addEntry(null, traitDesc, 40, null);
-    
-    Series <Clue> clues = player.leads.cluesFor(suspect, true);
-    if (clues.empty()) {
-      draw.addEntry(null, "No current leads on this suspect.", 100, "");
-    }
-    else {
-      Clue first = clues.first();
-      String desc = CasesFX.longDescription(first, player);
-      draw.addEntry(null, desc, 100, first.plot());
-    }
-    
-    draw.addEntry(
-      MapView.FILE_IMAGE, "View All Evidence", 20,
-      MapView.PLOT_CLUES
-    );
     draw.performVerticalDraw(across, down, this, surface, g);
     down = draw.down;
     //
-    //  Specify hover-information and click-behaviours:
-    if (draw.hovered instanceof Plot) {
-      Plot plot = (Plot) draw.hovered;
-      hoverDesc = "Click to see more information on this plot.";
-      if (draw.clicked) {
-        parent.setActiveFocus(plot, false);
-      }
-    }
-    else if (draw.hovered == MapView.PLOT_CLUES) {
-      hoverDesc = "Review all evidence assembled on this suspect.";
-      if (draw.clicked) {
-        parent.setActiveFocus(MapView.PLOT_CLUES, false);
-      }
-    }
-    else if (draw.hovered instanceof Place) {
-      hoverDesc = "View this location.";
-      if (draw.clicked) {
-        parent.setActiveFocus(draw.hovered, false);
-      }
-    }
-    //
     //  Then render associates:
     draw.clearEntries();
-    draw.addEntry(null, "Association:", 20, null);
+    draw.addEntry(null, "Associates:", 20, null);
     draw.performVerticalDraw(across, down, this, surface, g);
     down = draw.down;
     draw.clearEntries();
@@ -165,8 +129,19 @@ public class CasePerpsView extends UINode {
     if (! player.leads.atKnownLocation(suspect)) {
       draw.addEntry(null, "    None- whereabouts unknown.", 20, null);
     }
+    draw.addEntry(
+      MapView.FILE_IMAGE, "View All Evidence", 20,
+      MapView.PLOT_CLUES
+    );
     draw.performVerticalDraw(across, down, this, surface, g);
     down = draw.down;
+    
+    if (draw.hovered == MapView.PLOT_CLUES) {
+      hoverDesc = "Review all evidence assembled on this suspect.";
+      if (draw.clicked) {
+        parent.setActiveFocus(MapView.PLOT_CLUES, false);
+      }
+    }
     
     draw.clearEntries();
     for (Lead lead : player.leads.leadsFor(suspect)) {
@@ -184,6 +159,22 @@ public class CasePerpsView extends UINode {
         else agent.addAssignment(lead);
       }
     }
+    if (hoverDesc.length() == 0) {
+      Series <Clue> clues = player.leads.cluesFor(suspect, true);
+      if (clues.empty()) {
+        if (suspect.isPerson()) {
+          hoverDesc = "No current leads on this individual.";
+        }
+        if (suspect.isPlace()) {
+          hoverDesc = "No current leads on this facility.";
+        }
+      }
+      else {
+        Clue first = clues.first();
+        hoverDesc = CasesFX.longDescription(first, player);
+      }
+    }
+    
     //
     //  Then render hover-information and set the final scroll-height:
     down += 5;
