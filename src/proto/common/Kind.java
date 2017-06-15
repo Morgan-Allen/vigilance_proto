@@ -66,6 +66,7 @@ public class Kind extends Index.Entry implements Session.Saveable {
   boolean blockSight;
   int blockLevel;
   
+  Trait kindTrait;
   Table <Object, Integer> traitLevels = new Table();
   Trait    baseTraits  [] = new Trait   [0];
   ItemType baseEquipped[] = new ItemType[0];
@@ -78,6 +79,7 @@ public class Kind extends Index.Entry implements Session.Saveable {
     this.name        = name;
     this.defaultInfo = info;
     this.type        = type;
+    this.kindTrait = new Trait(name, "trait_"+uniqueID, null, info);
   }
   
   

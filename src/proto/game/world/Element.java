@@ -22,6 +22,7 @@ public class Element implements Session.Saveable {
   World world;
   Element attachedTo;
   List <Element> attached = new List();
+  int uniqueID = -1;
   
   
   protected Element(Kind kind, World world) {
@@ -38,6 +39,7 @@ public class Element implements Session.Saveable {
     world      = (World  ) s.loadObject();
     attachedTo = (Element) s.loadObject();
     s.loadObjects(attached);
+    uniqueID = s.loadInt();
   }
   
   
@@ -47,6 +49,7 @@ public class Element implements Session.Saveable {
     s.saveObject(world);
     s.saveObject(attachedTo);
     s.saveObjects(attached);
+    s.saveInt(uniqueID);
   }
   
   
@@ -60,6 +63,11 @@ public class Element implements Session.Saveable {
   
   public Kind kind() {
     return kind;
+  }
+  
+  
+  public int ID() {
+    return uniqueID;
   }
   
   

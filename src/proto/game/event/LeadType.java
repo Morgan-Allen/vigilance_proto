@@ -181,8 +181,10 @@ public class LeadType extends Index.Entry implements Session.Saveable {
   /**  Tests and configuration:
     */
   //  TODO:  This is a general summary of the behaviour of the various lead-
-  //  types and the information they can disclose.
-  //    ...Include aims and motives too?
+  //  types and the information they can disclose, as it SHOULD be.
+  //  
+  //  Assume you will know the aim of a plot as soon as you know about any non-
+  //  standard role or the identity of the target.
   //
   //                   Attach   Reveal
   //
@@ -218,13 +220,13 @@ public class LeadType extends Index.Entry implements Session.Saveable {
     Element involved, Plot plot, Element focus
   ) {
     int     tense   = plot.tense();
-    Role    roleF   = plot.roleFor(focus);
-    Role    roleI   = plot.roleFor(involved);
-    boolean active  = roleI != null;
+    Role    roleF   = plot.roleFor(focus   .place());
+    Role    roleI   = plot.roleFor(involved.place());
+    boolean active  = roleI != null && roleF != null;
     //
     //  We add a simple constraint that disallows direct leads from
     //  non-hideouts to eachother, and only allow leads from actively involved
-    //  locations:
+    //  locations.
     if ((! active) || (! involved.isPlace())) {
       return false;
     }
@@ -333,8 +335,8 @@ public class LeadType extends Index.Entry implements Session.Saveable {
       range = 10;
       
       if (perp != null) obstacle = perp.stats.levelFor(PERSUADE);
-      if (site != null) obstacle = -1;
-      if (area != null) obstacle = 10;
+      if (site != null) obstacle = 10;
+      if (area != null) obstacle = 15;
     }
     
     if (base != null && (focus == base.HQ() || focus == base.leader())) {

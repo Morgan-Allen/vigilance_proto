@@ -194,7 +194,7 @@ public abstract class Plot extends Event implements Assignment {
   
   
   String leadKey(Lead lead) {
-    return eventID+"_"+tense()+"_"+lead.type.uniqueID();
+    return eventID+"_"+tense()+"_"+lead.type.uniqueID()+"_"+lead.focus.ID();
   }
   
   
@@ -247,6 +247,13 @@ public abstract class Plot extends Event implements Assignment {
       }
     }
     if (! possible()) return;
+    
+    for (RoleEntry e : entries) {
+      if (e.role.isPerp() && e.element.isPerson()) {
+        Person perp = (Person) e.element;
+        perp.addAssignment(this);
+      }
+    }
     
     if (this.state != STATE_ACTIVE) {
       this.state = STATE_ACTIVE;

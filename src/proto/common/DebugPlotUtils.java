@@ -122,7 +122,7 @@ public class DebugPlotUtils {
     Clue     tip       = Clue.confirmSuspect(plot, firstRole, first);
     CaseFile file      = played.leads.caseFor(plot);
     boolean  foundLast = false;
-    file.recordClue(tip, LeadType.TIPOFF, 0, first.region());
+    file.recordClue(tip, LeadType.TIPOFF, 0, first.place());
     
     while (true) {
       int time = world.timing.totalHours();

@@ -33,6 +33,8 @@ public class World implements Session.Saveable {
   
   Base played;
   List <Base> bases = new List();
+  
+  int nextID = 0;
   List <Element> elements = new List();
   
   final public Timing  timing  = new Timing (this);
@@ -63,6 +65,7 @@ public class World implements Session.Saveable {
     regions = (Region[]) s.loadObjectArray(Region.class);
     played  = (Base    ) s.loadObject();
     s.loadObjects(bases);
+    nextID = s.loadInt();
     s.loadObjects(elements);
     
     events .loadState(s);
@@ -78,6 +81,7 @@ public class World implements Session.Saveable {
     s.saveObjectArray(regions);
     s.saveObject(played);
     s.saveObjects(bases);
+    s.saveInt(nextID);
     s.saveObjects(elements);
     
     events .saveState(s);
@@ -123,6 +127,9 @@ public class World implements Session.Saveable {
   
   
   public void setInside(Element e, boolean is) {
+    if (is && e.uniqueID == -1) {
+      e.uniqueID = nextID++;
+    }
     elements.toggleMember(e, is);
   }
   

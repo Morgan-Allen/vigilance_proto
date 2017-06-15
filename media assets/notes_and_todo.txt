@@ -1,5 +1,38 @@
 
 
+
+You need to add some intelligence to goons motions/patrol patterns, and to
+distribute them more evenly about the map.
+
+You need to give each agent some unique flavour, based on costume.
+  *  Phobos has free ultrasound and stealth/mobility.
+     Bonus to surveillance/search.
+  *  Deimos has rapid fire/double-tap and heavy armour.
+     Bonus to busts/reports.
+  *  Black Swift has sidekicks and melee mastery.
+     Bonus to guarding/tipoffs.
+  *  Dr. Yang has disguise and misdirection/false alarm.
+     Bonus to questioning/wiretap.
+Scenes should generate procedurally in random ways using corner/mid/inside
+segments.
+
+Prefer hideouts in industrial/slum/disused areas, or if owned by the plot's
+faction.  And add medium-descriptions to roles, to determine if specific leads
+can tune in or not.
+
+
+
+
+Add the full tech tree and range of gadgets.
+
+You need to create some alternative henchmen for different villains and their
+factions.
+
+Add some reluctance, initiative and motives for agents- agents should
+auto-assign themselves to leads and other tasks.
+
+    
+
 Pare down the list of facilities to what's essential.
   Player (possibly as upgrades to existing districts):
    Slum-
@@ -35,41 +68,11 @@ effects to spill over into nearby districts.
 Cut construction down to 6 months or so, and increase lead-following to 1 week.
 
 
-
 I want a simpler interface for the cases themselves.
 
 Use the state of the plot to determine stages, instead of tense?
 
 
-
-
-You need to give each agent some unique flavour, based on costume.
-  *  Phobos has free ultrasound and stealth/mobility.
-     Bonus to surveillance/search.
-  *  Deimos has rapid fire/double-tap and heavy armour.
-     Bonus to busts/reports.
-  *  Black Swift has sidekicks and melee mastery.
-     Bonus to guarding/tipoffs.
-  *  Dr. Yang has disguise and misdirection/false alarm.
-     Bonus to questioning/wiretap.
-
-Add some reluctance, initiative and motives for agents- agents should
-auto-assign themselves to leads and other tasks.
-
-
-
-You need to create some alternative henchmen for different villains and their
-factions.
-
-You need to add some intelligence to their motions/patrol patterns, and to
-distribute them more evenly about the map.
-
-Add the full tech tree and range of gadgets.
-
-
-
-Scenes should generate procedurally in random ways using corner/mid/inside
-segments.
 
 You might add a UI for building up scenes.
 

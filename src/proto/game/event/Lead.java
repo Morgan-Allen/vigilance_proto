@@ -80,11 +80,11 @@ public class Lead extends Task {
     World   world  = base.world();
     int     time   = world.timing.totalHours();
     int     result = RESULT_NONE;
-    boolean report = GameSettings.leadsVerbose;
+    boolean report = GameSettings.leadsVerbose || true;
     //
     //  Remember to close the lead if it's impossible to follow.
     if (! base.leads.atKnownLocation(focus)) {
-      MessageUtils.presentColdTrailMessage(world.view(), this);
+      MessageUtils.presentMissingPerpMessage(world.view(), this);
       setCompleted(false);
       return true;
     }
@@ -109,6 +109,10 @@ public class Lead extends Task {
           plot.cacheLeadResult(this, time, RESULT_NONE);
           if (report) I.say("\nBegan following lead: "+this);
         }
+        
+        I.say("\nUpdating lead: "+this);
+        I.say("  Current time: "+(time - startTime)+"/"+type.minHours);
+        
         //
         //  If you've followed the suspect for long enough, obtain a result and
         //  store it-
@@ -122,10 +126,17 @@ public class Lead extends Task {
         //
         //  If a result has been generated, attempt to extract clues for each
         //  of the participants:
-        if (result != RESULT_NONE) for (Element e : involved) {
-          if (! type.canDetect(e, plot, focus)) continue;
-          if (report) I.say("\nExtracting clues on "+e);
-          extractClues(e, plot, time, result, report);
+        if (result != RESULT_NONE) {
+          Series <Clue> gathered = new Batch();
+          for (Element e : involved) {
+            if (! type.canDetect(e, plot, focus)) continue;
+            if (report) I.say("\nExtracting clues on "+e);
+            extractClues(e, plot, time, result, gathered, report);
+          }
+          if (result == RESULT_COLD || gathered.empty()) {
+            MessageUtils.presentNoResultsMessage(world.view(), this);
+          }
+          setCompleted(result == RESULT_COLD ? false : true);
         }
       }
       //
@@ -154,7 +165,9 @@ public class Lead extends Task {
   
   
   protected void extractClues(
-    Element e, Plot plot, int time, float checkResult, boolean report
+    Element e, Plot plot, int time,
+    float checkResult, Series <Clue> record,
+    boolean report
   ) {
     CaseFile file  = base.leads.caseFor(plot);
     Place    scene = focus.place();
@@ -183,16 +196,17 @@ public class Lead extends Task {
     if (checkResult >= 0.66f) {
       Clue confirms = Clue.confirmSuspect(plot, role, e, e.place());
       file.recordClue(confirms, this, time, scene);
+      record.add(confirms);
     }
     else if (checkResult >= 0.33f) {
       Series <Clue> possible = ClueUtils.possibleClues(
         plot, e, focus, base, type
       );
       Clue gained = ClueUtils.pickFrom(possible);
-      if (gained != null) file.recordClue(gained, this, time, scene);
-    }
-    else {
-      return;
+      if (gained != null) {
+        file.recordClue(gained, this, time, scene);
+        record.add(gained);
+      }
     }
   }
   

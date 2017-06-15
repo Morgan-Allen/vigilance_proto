@@ -18,6 +18,7 @@ public class PlotUtils {
     Plot plot, Place crimeScene, Place HQ
   ) {
     Pick <Place > pickH = new Pick();
+    
     for (Place b : venuesNearby(crimeScene, 1)) {
       if (b.isHQ() || b == crimeScene) continue;
       pickH.compare(b, Rand.num());
@@ -189,7 +190,6 @@ public class PlotUtils {
       if      (perp.isCriminal()) forceSum += perp.stats.powerLevel();
       else if (perp.isCivilian()) perp.setCaptive(true);
     }
-    if (forces.empty()) return null;
     
     while (forceSum < forceLimit && forces.size() < (forceLimit * 2)) {
       PersonType ofGoon = (PersonType) Rand.pickFrom(GOONS);
@@ -199,6 +199,8 @@ public class PlotUtils {
       forceSum += power;
       forces.add(goon);
     }
+    
+    if (forces.empty()) return null;
     
     Scene scene = place.kind().sceneType().generateScene(world);
     scene.entry.provideInProgressEntry(forces);

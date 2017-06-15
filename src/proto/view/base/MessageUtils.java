@@ -49,7 +49,23 @@ public class MessageUtils {
   }
   
   
-  public static void presentColdTrailMessage(
+  public static void presentNoResultsMessage(
+    MainView view, Lead lead
+  ) {
+    view.queueMessage(new MessageView(
+      view, lead.icon(), "Cold Trail",
+      lead+" appears to have yielded no new information.  Perhaps a different "+
+      "approach is in order?",
+      "Dismiss"
+    ) {
+      protected void whenClicked(String option, int optionID) {
+        mainView.dismissMessage(this);
+      }
+    });
+  }
+  
+  
+  public static void presentMissingPerpMessage(
     MainView view, Lead lead
   ) {
     view.queueMessage(new MessageView(
@@ -101,9 +117,25 @@ public class MessageUtils {
       else if (p == did.last()) desc.append(" and "+p);
       else desc.append(", "+p);
     }
-    desc.append(" interrupted ");
-    desc.append(plot.toString());
-    desc.append(".");
+    
+    if (scene.site() == plot.scene()) {
+      desc.append(" interrupted ");
+      desc.append(plot.toString());
+      desc.append(".");
+    }
+    else if (scene.site() == plot.hideout()) {
+      desc.append(" conducted a bust on a hideout for ");
+      desc.append(plot.base().faction());
+      desc.append(".");
+    }
+    else if (scene.site() == plot.HQ()) {
+      desc.append(" conducted a bust on the headquarters of ");
+      desc.append(plot.base().faction());
+      desc.append(".");
+    }
+    else {
+      desc.append("interrupted a crime in progress...");
+    }
     
     view.queueMessage(new MessageView(
       view, null, "Busted: "+plot.type.name, desc.toString(),
