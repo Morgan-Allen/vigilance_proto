@@ -54,7 +54,7 @@ public class TaskTrain extends Task {
   
   
   public Element targetElement(Person p) {
-    return base;
+    return base.HQ();
   }
   
   
@@ -210,8 +210,13 @@ public class TaskTrain extends Task {
   }
   
   
+  public float taskDaysRemaining(Person p) {
+    return trainingTimeLeft(p, trainNow) * 1f / World.HOURS_PER_DAY;
+  }
+  
+  
   public String activeInfo() {
-    return "Learning technique: "+trainNow;
+    return "Learning "+trainNow;
   }
   
   

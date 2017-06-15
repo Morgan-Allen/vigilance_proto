@@ -85,10 +85,8 @@ public class PlaceType extends Kind {
   }
   
   
-  public Place createRoom(Base base, int slotID) {
-    Place place = new Place(this, slotID, base.world);
-    place.setOwner(base);
-    return place;
+  public boolean isHQ() {
+    return baseLevel(Common.VENUE_IS_HQ) > 0;
   }
   
   
@@ -102,15 +100,11 @@ public class PlaceType extends Kind {
   
   public String defaultInfo() {
     final StringBuffer s = new StringBuffer();
-    
     s.append(name());
     s.append("\n\n");
     s.append(super.defaultInfo());
     s.append("\n\n");
-    s.append("Build cost: "+buildCost+" ("+(buildTime / 7)+" weeks to build)");
-    s.append("\n");
     s.append(statInfo());
-    
     return s.toString();
   }
   

@@ -1,6 +1,7 @@
 
 
 package proto.view.base;
+import proto.common.*;
 import proto.game.person.*;
 import proto.game.world.*;
 import proto.game.event.*;
@@ -21,10 +22,10 @@ public class CasePerpsView extends UINode {
   
   
   protected boolean renderTo(Surface surface, Graphics2D g) {
-    CasesView parent = mainView.casesView;
+    MapView parent = mainView.mapView;
     Object focus = parent.activeFocus;
-    if (focus instanceof Plot.Role) {
-      return renderSuspects((Plot.Role) focus, surface, g);
+    if (focus instanceof Role) {
+      return renderSuspects((Role) focus, surface, g);
     }
     else if (parent.activeFocus instanceof Element) {
       return renderSuspect((Element) focus, surface, g);
@@ -33,11 +34,11 @@ public class CasePerpsView extends UINode {
   }
   
   
-  boolean renderSuspects(Plot.Role role, Surface surface, Graphics2D g) {
+  boolean renderSuspects(Role role, Surface surface, Graphics2D g) {
     //
     //  Extract basic game-references first:
     Base player = mainView.player();
-    CasesView parent = mainView.casesView;
+    MapView parent = mainView.mapView;
     Object focus = parent.priorFocus();
     if (! (focus instanceof Plot)) return false;
     Plot plot = (Plot) focus;
@@ -47,20 +48,19 @@ public class CasePerpsView extends UINode {
     ViewUtils.ListDraw draw = new ViewUtils.ListDraw();
     int across = 10, down = 10;
     draw.addEntry(
-      null, "SUSPECTS FOR "+role+" IN "+CaseFX.nameFor(plot, player), 40, null
+      null, "SUSPECTS FOR "+role+" IN "+CasesFX.nameFor(plot, player), 40, null
     );
-    for (Element e : player.leads.suspectsFor(role, plot)) {
-      draw.addEntry(e.icon(), e.name(), 40, e);
+    for (Element suspect : player.leads.suspectsFor(role, plot)) {
+      draw.addEntry(suspect.icon(), labelFor(suspect), 40, suspect);
     }
-    draw.performDraw(across, down, this, surface, g);
+    draw.performVerticalDraw(across, down, this, surface, g);
     down = draw.down;
     //
     //  If one is selected, zoom to that element:
     if (draw.clicked) {
       parent.setActiveFocus(draw.hovered, false);
     }
-    
-    parent.casesArea.setScrollheight(down);
+    parent.infoArea.setScrollheight(down);
     return true;
   }
   
@@ -68,98 +68,200 @@ public class CasePerpsView extends UINode {
   boolean renderSuspect(Element suspect, Surface surface, Graphics2D g) {
     //
     //  Extract basic game-references first:
-    Base player = mainView.player();
-    CasesView parent = mainView.casesView;
-    Person agent = mainView.rosterView.selectedPerson();
-    Series <Clue> clues = player.leads.cluesFor(suspect, true);
-    Place lastSeen = player.leads.lastKnownLocation(suspect);
-    boolean atSeen = player.leads.atKnownLocation(suspect);
+    Base    player   = mainView.player();
+    MapView parent   = mainView.mapView;
+    Person  agent    = mainView.rosterView.selectedPerson();
+    String hoverDesc = "";
     //
     //  Create a list-display, and render the header, latest clue, entries for
     //  each possible lead, and an option to view associates-
     ViewUtils.ListDraw draw = new ViewUtils.ListDraw();
     int across = 10, down = 10;
-    draw.addEntry(
-      suspect.icon(), suspect.name(), 40, null
-    );
-    if (clues.empty()) {
-      draw.addEntry(null, "No current leads on this suspect.", 100, "");
-    }
-    else {
-      Clue first = clues.first();
-      String desc = CaseFX.longDescription(first, player);
-      draw.addEntry(null, desc, 100, first.plot());
-    }
+    draw.addEntry(suspect.icon(), labelFor(suspect), 25, null);
     
-    String descAt = null;
-    if (atSeen && lastSeen != null && lastSeen != suspect) {
-      descAt = "Currently At: "+lastSeen;
+    String traitDesc = "";
+    for (Trait t : suspect.traits()) {
+      traitDesc += "("+t+") ";
     }
-    else if (! atSeen) {
-      descAt = "Whereabouts unknown.";
-      if (lastSeen != null) descAt += " Last Seen: "+lastSeen;
-    }
-    if (descAt != null) {
-      draw.addEntry(CasesView.MYSTERY_IMAGE, descAt, 40, null);
-    }
-    
-    for (Lead lead : player.leads.leadsFor(suspect)) {
-      draw.addEntry(lead.icon(), lead.choiceInfo(agent), 20, lead);
-    }
-    draw.addEntry(
-      CasesView.MYSTERY_IMAGE, "View Associates", 20,
-      CasesView.PERP_LINKS
-    );
-    draw.addEntry(
-      CasesView.FILE_IMAGE, "View All Evidence", 20,
-      CasesView.PLOT_CLUES
-    );
-    draw.performDraw(across, down, this, surface, g);
+    draw.addEntry(null, traitDesc, 40, null);
+    draw.performVerticalDraw(across, down, this, surface, g);
     down = draw.down;
     //
-    //  Then given suitable tool-tips and click-reponses for any encountered
-    //  list-elements:
-    String hoverDesc = "";
+    //  Then render associates:
+    draw.clearEntries();
+    draw.addEntry(null, "Associates:", 20, null);
+    draw.performVerticalDraw(across, down, this, surface, g);
+    down = draw.down;
+    draw.clearEntries();
+    for (AssocResult r : getAssociates(suspect, player)) {
+      if (r.associate != null) {
+        draw.addEntry(r.associate.icon(), null, 40, r);
+      }
+      if (r.plot != null) {
+        draw.addEntry(r.plot.icon(), null, 40, r);
+      }
+    }
+    draw.performHorizontalDraw(across, down, this, surface, g);
+    down = draw.down;
+    //
+    //  Then give suitable tool-tips and click-responses for associates:
+    if (draw.hovered instanceof AssocResult) {
+      AssocResult a = (AssocResult) draw.hovered;
+      if (a.associate != null) {
+        hoverDesc = a.associate.name()+" ("+a.label+")";
+        hoverDesc += "\n\nClick to view this associate.";
+        if (draw.clicked) {
+          parent.setActiveFocus(a.associate, false);
+        }
+      }
+      if (a.plot != null) {
+        hoverDesc = a.label+" "+CasesFX.nameFor(a.plot, player);
+        hoverDesc += "\n\nClick to view this case.";
+        if (draw.clicked) {
+          parent.setActiveFocus(a.plot, false);
+        }
+      }
+    }
+    //
+    //  Then render investigation options-
+    draw.clearEntries();
+    draw.addEntry(null, "Investigation Options:", 20, null);
+    if (! player.leads.atKnownLocation(suspect)) {
+      draw.addEntry(null, "    None- whereabouts unknown.", 20, null);
+    }
+    draw.addEntry(
+      MapView.FILE_IMAGE, "View All Evidence", 20,
+      MapView.PLOT_CLUES
+    );
+    draw.performVerticalDraw(across, down, this, surface, g);
+    down = draw.down;
+    
+    if (draw.hovered == MapView.PLOT_CLUES) {
+      hoverDesc = "Review all evidence assembled on this suspect.";
+      if (draw.clicked) {
+        parent.setActiveFocus(MapView.PLOT_CLUES, false);
+      }
+    }
+    
+    draw.clearEntries();
+    for (Lead lead : player.leads.leadsFor(suspect)) {
+      draw.addEntry(lead.icon(), null, 60, lead);
+    }
+    draw.performHorizontalDraw(across, down, this, surface, g);
+    down = draw.down;
+    //
+    //  Then give suitable tool-tips and click-responses for leads:
     if (draw.hovered instanceof Lead) {
       Lead lead = (Lead) draw.hovered;
-      hoverDesc = lead.testInfo(agent);
+      hoverDesc = lead.choiceInfo(agent)+"\n\n"+lead.testInfo(agent);
       if (draw.clicked) {
         if (agent.assignments().includes(lead)) agent.removeAssignment(lead);
         else agent.addAssignment(lead);
       }
     }
-    else if (draw.hovered instanceof Plot) {
-      Plot plot = (Plot) draw.hovered;
-      hoverDesc = "Click to see more information on this plot.";
-      if (draw.clicked) {
-        parent.setActiveFocus(plot, false);
+    if (hoverDesc.length() == 0) {
+      Series <Clue> clues = player.leads.cluesAssociated(suspect);
+      if (clues.empty()) {
+        hoverDesc = "No current associated leads.";
+      }
+      else {
+        Clue first = clues.first();
+        hoverDesc = CasesFX.longDescription(first, player);
       }
     }
-    else if (draw.hovered == CasesView.PERP_LINKS) {
-      hoverDesc = "View persons and places associated with this suspect.";
-      if (draw.clicked) {
-        parent.setActiveFocus(CasesView.PERP_LINKS, false);
-      }
-    }
-    else if (draw.hovered == CasesView.PLOT_CLUES) {
-      hoverDesc = "Review all evidence assembled on this suspect.";
-      if (draw.clicked) {
-        parent.setActiveFocus(CasesView.PLOT_CLUES, false);
-      }
-    }
+    
+    //
+    //  Then render hover-information and set the final scroll-height:
+    down += 5;
     g.setColor(Color.LIGHT_GRAY);
     ViewUtils.drawWrappedString(
       hoverDesc, g, vx + across, vy + down, vw - (across + 10), 150
     );
     down += 150;
-    
-    parent.casesArea.setScrollheight(down);
+    parent.infoArea.setScrollheight(down);
     return true;
   }
   
+  
+  private String labelFor(Element suspect) {
+    if (suspect.isPerson()) {
+      return suspect.name()+" ("+suspect.kind().name()+")";
+    }
+    if (suspect.isPlace()) {
+      return suspect.name();
+    }
+    return suspect.name();
+  }
+
+  
+  static class AssocResult {
+    Element associate;
+    Plot    plot;
+    String  label;
+  }
+  
+  
+  private Element lastAssoc = null;
+  private List <AssocResult> assocs;
+  
+  
+  private boolean addAssociate(List list, Element a, Plot p, String label) {
+    if (a == null && p == null) return false;
+    AssocResult r = new AssocResult();
+    r.associate = a;
+    r.plot      = p;
+    r.label     = label;
+    list.add(r);
+    return true;
+  }
+  
+  
+  private Series <AssocResult> getAssociates(Element suspect, Base player) {
+    if (lastAssoc == suspect && assocs != null) return assocs;
+    
+    lastAssoc = suspect;
+    List <AssocResult> list = assocs = new List();
+
+    Place   lastSeen = player.leads.lastKnownLocation(suspect);
+    boolean atSeen   = player.leads.atKnownLocation(suspect);
+    
+    if (suspect.isPerson()) {
+      Person perp = (Person) suspect;
+      if (lastSeen != null && lastSeen != perp.resides()) {
+        String desc = atSeen ? "Current Location" : "Last Known Location";
+        addAssociate(list, lastSeen, null, desc);
+      }
+      if (addAssociate(list, perp.resides(), null, "Residence")) {
+        for (Person p : perp.resides().residents()) if (p != perp) {
+          addAssociate(list, p, null, HistoryView.bondDescription(perp, p));
+        }
+      }
+      for (Element e : perp.history.sortedBonds()) if (e.isPerson()) {
+        addAssociate(list, e, null, HistoryView.bondDescription(perp, e));
+      }
+      for (Plot plot : player.leads.plotsAssociated(suspect, false)) {
+        addAssociate(list, null, plot, "Associated with");
+      }
+    }
+    
+    if (suspect.isPlace()) {
+      Place site = (Place) suspect;
+      Person leader = site.base().leader();
+      
+      if (leader != null && ! leader.isHero()) {
+        addAssociate(list, leader, null, "Owner");
+      }
+      for (Person p : site.residents()) if (p != leader) {
+        addAssociate(list, p, null, "Resident");
+      }
+      for (Plot plot : player.leads.plotsAssociated(suspect, false)) {
+        addAssociate(list, null, plot, "Associated with");
+      }
+    }
+    
+    return list;
+  }
 }
-
-
 
 
 

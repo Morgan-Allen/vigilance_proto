@@ -7,7 +7,7 @@ import proto.util.*;
 
 
 
-public class Base extends Place {
+public class Base implements Session.Saveable {
   
   
   /**  Data fields, constructors and save/load methods-
@@ -16,9 +16,11 @@ public class Base extends Place {
     MAX_FACILITIES = 12,
     SLOTS_WIDE     = 3 ;
   
+  final World world;
+  final Faction faction;
   
-  Faction faction = null;
   Person leader = null;
+  List <Person> roster = new List();
   List <PersonType> goonTypes = new List();
   
   final public BaseFinance  finance  = new BaseFinance (this);
@@ -27,21 +29,23 @@ public class Base extends Place {
   final public BaseLeads    leads    = new BaseLeads   (this);
   final public BasePlots    plots    = new BasePlots   (this);
   
-  Place rooms[] = new Place[MAX_FACILITIES];
+  Place HQ = null;
   List <Object> knownTech = new List();
   
   
-  public Base(PlaceType kind, World world, Faction faction) {
-    super(kind, 0, world);
+  public Base(World world, Faction faction) {
+    this.world = world;
     this.faction = faction;
   }
   
   
   public Base(Session s) throws Exception {
-    super(s);
+    s.cacheInstance(this);
     
+    world   = (World  ) s.loadObject();
     faction = (Faction) s.loadObject();
-    leader  = (Person) s.loadObject();
+    leader  = (Person ) s.loadObject();
+    s.loadObjects(roster   );
     s.loadObjects(goonTypes);
     
     finance .loadState(s);
@@ -50,18 +54,17 @@ public class Base extends Place {
     leads   .loadState(s);
     plots   .loadState(s);
     
-    for (int n = 0 ; n < MAX_FACILITIES; n++) {
-      rooms[n] = (Place) s.loadObject();
-    }
+    HQ = (Place) s.loadObject();
     s.loadObjects(knownTech);
   }
   
   
   public void saveState(Session s) throws Exception {
-    super.saveState(s);
     
+    s.saveObject(world  );
     s.saveObject(faction);
     s.saveObject(leader );
+    s.saveObjects(roster   );
     s.saveObjects(goonTypes);
     
     finance .saveState(s);
@@ -70,9 +73,7 @@ public class Base extends Place {
     leads   .saveState(s);
     plots   .saveState(s);
     
-    for (int n = 0 ; n < MAX_FACILITIES; n++) {
-      s.saveObject(rooms[n]);
-    }
+    s.saveObject(HQ);
     s.saveObjects(knownTech);
   }
   
@@ -84,15 +85,14 @@ public class Base extends Place {
   public World world() { return world; }
   
   
+  
   /**  Regular updates and life-cycle methods:
     */
   void updateBase() {
-    for (Person p : residents()) {
+    for (Person p : roster) {
       p.updateOnBase();
     }
-    for (Place r : rooms) if (r != null) {
-      r.updatePlace();
-    }
+    
     finance .updateFinance ();
     stocks  .updateCrafting();
     training.updateTraining();
@@ -105,26 +105,23 @@ public class Base extends Place {
   /**  Roster modification-
     */
   public void addToRoster(Person person) {
-    Place.setResident(person, this, true);
+    roster.include(person);
     person.setBase(this);
   }
   
   
-  public void setLeader(Person leader) {
+  public void assignLeader(Person leader) {
     this.leader = leader;
   }
   
   
-  public float organisationRank(Element p) {
-    if (p == leader || p == this) return 2;
-    if (p.isPerson() && ((Person) p).resides() == this) return 1;
-    if (p.isPlace () && ((Place ) p).owner  () == this) return 1;
-    return 0;
+  public void assignHQ(Place HQ) {
+    this.HQ = HQ;
   }
   
   
   public Series <Person> roster() {
-    return residents();
+    return roster;
   }
   
   
@@ -133,8 +130,13 @@ public class Base extends Place {
   }
   
   
+  public Place HQ() {
+    return HQ;
+  }
+  
+  
   public Person firstOfKind(Kind kind) {
-    for (Person p : residents()) if (p.kind() == kind) return p;
+    for (Person p : roster) if (p.kind() == kind) return p;
     return null;
   }
   
@@ -146,11 +148,6 @@ public class Base extends Place {
   
   public void setGoonTypes(PersonType... types) {
     for (PersonType type: types) goonTypes.add(type);
-  }
-  
-  
-  public Access accessLevel(Base base) {
-    return base == this ? Access.GRANTED : Access.SECRET;
   }
   
   
@@ -175,72 +172,39 @@ public class Base extends Place {
   
   
   
-  /**  Construction and salvage-
+  /**  Ongoing tasks-
     */
-  public boolean canConstruct(PlaceType print, int slot) {
-    if (rooms[slot] != null) return false;
-    if (print.buildCost > finance.publicFunds()) return false;
-    return true;
+  public Series <Task> activeAgentTasks() {
+    Batch <Task> tasks = new Batch();
+    for (Person p : roster()) {
+      for (Assignment a : p.assignments()) if (a instanceof Task) {
+        tasks.include((Task) a);
+      }
+    }
+    return tasks;
   }
   
   
-  public float buildRate(PlaceType print) {
-    float rate = 1f, numBuilding = 0;
-    for (Place r : rooms) if (r.buildProgress() < 1) numBuilding++;
-    if (numBuilding == 0) return 1;
-    return rate / (numBuilding * print.buildTime);
-  }
   
-  
-  public int buildETA(int slot) {
-    Place room = rooms[slot];
-    if (room == null) return -1;
-    return Nums.ceil((1 - room.buildProgress()) / buildRate(room.kind()));
-  }
-  
-  
-  public void addFacility(PlaceType print, int slot, float progress) {
-    if (print == null) { rooms[slot] = null; return; }
-    Place room = rooms[slot];
-    if (room == null) room = rooms[slot] = print.createRoom(this, slot);
-    room.setBuildProgress(progress);
-  }
-  
-  
-  public void beginConstruction(PlaceType print, int slot) {
-    finance.incPublicFunds(0 - print.buildCost);
-    addFacility(print, slot, 0);
-  }
-  
-  
-  public void beginSalvage(int slot) {
-    Place room = rooms[slot];
-    if (room == null) return;
-    finance.incPublicFunds(room.kind().buildCost / 2);
-    addFacility(null, slot, 1);
-  }
-  
-  
-  public Place[] rooms() {
-    return rooms;
+  /**  Property listings:
+    */
+  public Series <Place> ownedFacilities() {
+    Batch <Place> owned = new Batch();
+    for (Place p : world.places()) if (p.base() == this) owned.add(p);
+    return owned;
   }
   
   
   
   /**  Rendering and interface methods-
     */
-  public int rosterIndex(Person p) {
-    return residents().indexOf(p);
-  }
-  
-  
-  public Person atRosterIndex(int i) {
-    return residents().atIndex(i);
-  }
-  
-  
   public String name() {
-    return kind().name();
+    return "Base: "+faction.name;
+  }
+  
+  
+  public String toString() {
+    return name();
   }
 }
 

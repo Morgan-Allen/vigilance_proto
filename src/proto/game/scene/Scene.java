@@ -18,7 +18,6 @@ public class Scene extends Scenery implements Assignment {
   /**  Data fields, constructors and save/load methods-
     */
   final public static int
-    STATE_TEST   = -2,
     STATE_INIT   = -1,
     STATE_SETUP  =  0,
     STATE_BEGUN  =  1,
@@ -43,14 +42,21 @@ public class Scene extends Scenery implements Assignment {
   final public SceneEntry  entry  = new SceneEntry (this);
   final public SceneVision vision = new SceneVision(this);
   
-  boolean playerTurn;
+  boolean playerTurn, forTesting;
   Stack <Action> actionStack = new Stack();
   
   
-  public Scene(World world, int wide, int high) {
-    super(wide, high);
+  public Scene(World world, int wide, int high, boolean forTesting) {
+    super(wide, high, forTesting);
     this.world = world;
     vision.setupFog(wide, high);
+  }
+  
+  
+  protected void setupScene(boolean forTesting) {
+    this.state      = STATE_SETUP;
+    this.forTesting = forTesting;
+    super.setupScene(forTesting);
   }
   
   
@@ -74,6 +80,7 @@ public class Scene extends Scenery implements Assignment {
     entry .loadState(s);
     vision.loadState(s);
     playerTurn = s.loadBool();
+    forTesting = s.loadBool();
     s.loadObjects(actionStack);
     
     view().loadState(s);
@@ -98,6 +105,7 @@ public class Scene extends Scenery implements Assignment {
     entry .saveState(s);
     vision.saveState(s);
     s.saveBool(playerTurn);
+    s.saveBool(forTesting);
     s.saveObjects(actionStack);
     
     view().saveState(s);
@@ -220,12 +228,6 @@ public class Scene extends Scenery implements Assignment {
   
   /**  Supplementary population methods for use during initial setup-
     */
-  public void setupScene(boolean forTesting) {
-    this.state = forTesting ? STATE_TEST : STATE_SETUP;
-    super.setupScene(forTesting);
-  }
-  
-  
   public boolean enterScene(Person p, int x, int y) {
     Tile location = tileAt(x, y);
     if (location == null) return false;
@@ -270,6 +272,7 @@ public class Scene extends Scenery implements Assignment {
   /**  Regular updates and life cycle:
     */
   public void beginScene() {
+    if (state >= STATE_BEGUN) return;
     this.state = STATE_BEGUN;
     
     I.say("\nBEGINNING SCENE...");
@@ -281,6 +284,8 @@ public class Scene extends Scenery implements Assignment {
   
   
   public void updateScene() {
+    if (state < STATE_BEGUN) beginScene();
+    
     boolean skipUpdate = playerTeam.empty() && othersTeam.empty();
     if (skipUpdate || GameSettings.pauseScene || complete()) return;
     
@@ -393,8 +398,8 @@ public class Scene extends Scenery implements Assignment {
   
   /**  End-mission resolution-FX on the larger world:
     */
-  int checkCompletionStatus() {
-    if (state == STATE_TEST) return state;
+  public int checkCompletionStatus() {
+    if (forTesting) return STATE_BEGUN;
     
     boolean heroUp = false, criminalUp = false;
     for (Person p : playerTeam) if (p.isHero()) {

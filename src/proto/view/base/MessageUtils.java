@@ -21,18 +21,18 @@ public class MessageUtils {
     
     if (clue.isReport()) {
       header.append("CRIME REPORT: "+clue.plot().name());
-      desc.append(CaseFX.longDescription(clue, player));
+      desc.append(CasesFX.longDescription(clue, player));
     }
     else if (clue.isTipoff()) {
       header.append("TIPOFF");
-      desc.append(CaseFX.longDescription(clue, player));
+      desc.append(CasesFX.longDescription(clue, player));
     }
     else {
       header.append("EVIDENCE FOUND");
-      desc.append(CaseFX.longDescription(clue, player));
+      desc.append(CasesFX.longDescription(clue, player));
     }
     if (effects != null) {
-      Region region = clue.place().region();
+      Region region = effects.scene.region();
       float trust = effects.trustEffect, deter = effects.deterEffect;
       desc.append("\n"+region+" Trust "     +I.signNum((int) trust)+"%");
       desc.append("\n"+region+" Deterrence "+I.signNum((int) deter)+"%");
@@ -49,20 +49,93 @@ public class MessageUtils {
   }
   
   
+  public static void presentNoResultsMessage(
+    MainView view, Lead lead
+  ) {
+    view.queueMessage(new MessageView(
+      view, lead.icon(), "Cold Trail",
+      lead+" appears to have yielded no new information.  Perhaps a different "+
+      "approach is in order?",
+      "Dismiss"
+    ) {
+      protected void whenClicked(String option, int optionID) {
+        mainView.dismissMessage(this);
+      }
+    });
+  }
+  
+  
+  public static void presentMissingPerpMessage(
+    MainView view, Lead lead
+  ) {
+    view.queueMessage(new MessageView(
+      view, lead.icon(), "Target Lost",
+      "The location of "+lead.focus+" is no longer known.",
+      "Dismiss"
+    ) {
+      protected void whenClicked(String option, int optionID) {
+        mainView.dismissMessage(this);
+      }
+    });
+  }
+  
+  
+  public static void presentColdCaseMessage(
+    MainView view, Plot cold, int plotState
+  ) {
+    String desc = "";
+    if (plotState == Plot.STATE_SPOOKED) desc =
+      "Word on the street is that "+cold.base().faction()+" have got wind of "+
+      "your investigation into "+CasesFX.nameFor(cold, view.player())+" and "+
+      "called off the operation.  The crime will not take place, but you "+
+      "won't catch the perps either.";
+    else if (plotState == Plot.STATE_SUCCESS) desc =
+      "Word on the street is "+cold.base().faction()+" pulled off a major "+
+      "heist, but the trail will be cold by now.";
+    else desc =
+      "Word on the street is "+cold.base().faction()+" were planning a major "+
+      "heist, but the trail will be cold by now.";
+    
+    view.queueMessage(new MessageView(
+      view, cold.icon(), "Plot Abandoned", desc, "Dismiss"
+    ) {
+      protected void whenClicked(String option, int optionID) {
+        mainView.dismissMessage(this);
+      }
+    });
+  }
+  
+  
   public static void presentBustMessage(
     MainView view, Scene scene, Lead lead, Plot plot
   ) {
     StringBuffer desc = new StringBuffer();
     
-    Series <Person> did = lead.assigned();
+    Series <Person> did = scene.playerTeam();
     for (Person p : did) {
       if (p == did.first()) desc.append(""+p);
       else if (p == did.last()) desc.append(" and "+p);
       else desc.append(", "+p);
     }
-    desc.append(" interrupted ");
-    desc.append(plot.toString());
-    desc.append(".");
+    
+    if (scene.site() == plot.scene()) {
+      desc.append(" interrupted ");
+      desc.append(plot.toString());
+      desc.append(".");
+    }
+    else if (scene.site() == plot.hideout()) {
+      desc.append(" conducted a bust on a hideout for ");
+      desc.append(plot.base().faction());
+      desc.append(".");
+    }
+    else if (scene.site() == plot.HQ()) {
+      desc.append(" conducted a bust on the headquarters of ");
+      desc.append(plot.base().faction());
+      desc.append(".");
+    }
+    else {
+      desc.append("interrupted a crime in progress...");
+    }
     
     view.queueMessage(new MessageView(
       view, null, "Busted: "+plot.type.name, desc.toString(),
@@ -85,7 +158,7 @@ public class MessageUtils {
     s.append(" are scheduled for trial in "+days+" days time.");
     
     view.queueMessage(new MessageView(
-      view, CasesView.TRIAL_IMAGE, "Trial Scheduled", s.toString(),
+      view, MapView.TRIAL_IMAGE, "Trial Scheduled", s.toString(),
       "Dismiss"
     ) {
       protected void whenClicked(String option, int optionID) {
@@ -113,7 +186,27 @@ public class MessageUtils {
     }
     
     view.queueMessage(new MessageView(
-      view, CasesView.TRIAL_IMAGE, "Trial Concluded", s.toString(),
+      view, MapView.TRIAL_IMAGE, "Trial Concluded", s.toString(),
+      "Dismiss"
+    ) {
+      protected void whenClicked(String option, int optionID) {
+        mainView.dismissMessage(this);
+      }
+    });
+  }
+  
+  
+  public static void presentBossSentenceMessage(
+    MainView view, Trial concluded, Person boss
+  ) {
+    StringBuffer s = new StringBuffer();
+    s.append(boss+" has been convicted.");
+    
+    view.queueMessage(new MessageView(
+      view, MapView.TRIAL_IMAGE,
+      boss+" has been convicted of a major crime- as a result, the territory "+
+      "they controlled is now available for development.  This might be a "+
+      "good time to invest in new businesses or public amenities.",
       "Dismiss"
     ) {
       protected void whenClicked(String option, int optionID) {
@@ -130,7 +223,7 @@ public class MessageUtils {
     s.append(person+" has been released after serving their sentence.");
     
     view.queueMessage(new MessageView(
-      view, CasesView.TRIAL_IMAGE, "Trial Concluded", s.toString(),
+      view, MapView.TRIAL_IMAGE, "Trial Concluded", s.toString(),
       "Dismiss"
     ) {
       protected void whenClicked(String option, int optionID) {

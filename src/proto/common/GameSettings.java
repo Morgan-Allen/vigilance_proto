@@ -33,7 +33,9 @@ public class GameSettings {
     pauseScene      = false,
     debugLineSight  = false,
     viewSceneBlocks = false,
-    eventsVerbose   = false
+    viewRegionsNear = false,
+    eventsVerbose   = false,
+    leadsVerbose    = false
   ;
   
 }

@@ -26,11 +26,12 @@ public class EquipmentView extends UINode {
   protected boolean renderTo(Surface surface, Graphics2D g) {
     if (! super.renderTo(surface, g)) return false;
     
-    Person person = this.mainView.rosterView.selectedPerson();
-    if (person == null) return false;
+    Person person = mainView.rosterView.selectedPerson();
+    Base   played = mainView.player();
+    renderCraftOptions (surface, g, person);
+    renderCraftingQueue(surface, g        );
+    renderFinanceReport(surface, g, played);
     
-    renderCraftOptions(surface, g, person);
-    renderCraftingQueue(surface, g);
     return true;
   }
   
@@ -197,6 +198,31 @@ public class EquipmentView extends UINode {
       );
       down += 20;
     }
+  }
+  
+  
+  protected void renderFinanceReport(Surface surface, Graphics2D g, Base base) {
+    int down = 10, across = vw - 320;
+    StringBuffer s = new StringBuffer();
+    
+    final BaseFinance BF = base.finance;
+    int margin = BF.publicIncome() - BF.publicExpense();
+    s.append("\n\nJanus Industries");
+    s.append("\n  Total Income: " +BF.publicIncome ());
+    s.append("\n  Total Expense: "+BF.publicExpense());
+    s.append("\n  Public Funds: " +BF.publicFunds  ());
+    s.append(" ("+I.signNum(margin)+" per month)");
+    
+    s.append("\n\nProject Vigil");
+    s.append("\n  Total Income: " +BF.secretIncome ());
+    s.append(" ("+BF.secretPercent()+"% of revenue)");
+    s.append("\n  Total Expense: "+BF.secretExpense());
+    s.append("\n  Secret Funds: " +BF.secretFunds  ());
+    
+    g.setColor(Color.WHITE);
+    ViewUtils.drawWrappedString(
+      s.toString(), g, vx + across, vy + down, 320, vh - 20
+    );
   }
   
 }

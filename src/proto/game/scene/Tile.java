@@ -154,10 +154,8 @@ public class Tile implements Session.Saveable, TileConstants {
     if (other == null) return Kind.BLOCK_NONE;
     int block  = blockageVal(dir);
     int opaque = opacityVal (dir);
-    if (other != null) {
-      block  = Nums.max(block , other.blockageVal(CENTRE));
-      opaque = Nums.max(opaque, other.opacityVal (CENTRE));
-    }
+    block  = Nums.max(block , other.blockageVal(CENTRE));
+    opaque = Nums.max(opaque, other.opacityVal (CENTRE));
     if (opaque == 0 && block > 0) block--;
     return block;
   }

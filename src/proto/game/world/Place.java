@@ -24,7 +24,6 @@ public class Place extends Element {
     super(kind, world);
     this.slotID        = slotID;
     this.buildProgress = 1.0f;
-    
     for (Trait t : kind.baseTraits()) setProperty(t, true);
   }
   
@@ -62,12 +61,17 @@ public class Place extends Element {
   }
   
   
-  public Base owner() {
+  public float buildDaysRemaining() {
+    return kind().buildTime * (1f - buildProgress);
+  }
+  
+  
+  public Base base() {
     return owner;
   }
   
   
-  public void setOwner(Base owns) {
+  public void setBase(Base owns) {
     this.owner = owns;
   }
   
@@ -84,6 +88,11 @@ public class Place extends Element {
   
   public boolean hasProperty(Trait trait) {
     return properties.includes(trait);
+  }
+  
+  
+  public Series <Trait> traits() {
+    return properties;
   }
   
   
@@ -110,6 +119,7 @@ public class Place extends Element {
         Person resides = Person.randomOfKind((PersonType) type, world);
         world.setInside(resides, true);
         setAttached(resides, true);
+        resides.setBase(base());
         Place.setResident(resides, this, true);
       }
     }
@@ -177,7 +187,7 @@ public class Place extends Element {
   
   
   public String name() {
-    return kind().name();
+    return region().name()+" "+kind().name();
   }
   
   

@@ -12,15 +12,18 @@ public class RegionType extends Kind {
   
   /**  Data fields, constructors and save/load methods-
     */
+  String nameUsed;
   final public RegionAssets view = new RegionAssets();
   
-  int     maxFacilities     = 3    ;
+  RegionType bordering[];
+  int     maxFacilities     = 4    ;
   float   defaultTrust      = 25   ;
   float   defaultDeterrence = 25   ;
   int     baseFunding       = 75   ;
   boolean defaultMember     = true ;
-  PlaceType defaultFacilities[];
-  float mapX, mapY;
+  
+  Batch <PlaceType> defaultFacilities = new Batch();
+  Batch <Faction  > defaultOwners     = new Batch();
   
   
   public RegionType(String name, String ID) {
@@ -36,19 +39,31 @@ public class RegionType extends Kind {
   
   /**  Assigning default stats and facilities-
     */
-  public void attachDefaultFacilities(PlaceType... facilities) {
-    this.defaultFacilities = facilities;
+  public void attachFacilities(Faction owner, PlaceType... facilities) {
+    for (PlaceType p : facilities) {
+      defaultFacilities.add(p);
+      defaultOwners.add(owner);
+    }
+  }
+  
+  public void setBordering(RegionType... others) {
+    this.bordering = others;
+  }
+  
+  public RegionType[] bordering() {
+    return bordering;
   }
   
   
-  public void attachMapCoordinates(float mapX, float mapY) {
-    this.mapX = mapX;
-    this.mapY = mapY;
+  
+  /**  Attached supplementary media and graphics data-
+    */
+  public void attachName(String name) {
+    this.nameUsed = name;
   }
   
-  
-  public Vec2D mapCoords() {
-    return new Vec2D(mapX, mapY);
+  public String name() {
+    return nameUsed;
   }
   
 }

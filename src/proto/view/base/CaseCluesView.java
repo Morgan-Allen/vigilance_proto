@@ -23,7 +23,7 @@ public class CaseCluesView extends UINode {
     //
     //  Extract basic game-references first:
     Base player = mainView.player();
-    CasesView parent = mainView.casesView;
+    MapView parent = mainView.mapView;
     Object focus = parent.priorFocus();
     boolean forPlot = false, forSuspect = false;
     //
@@ -33,14 +33,14 @@ public class CaseCluesView extends UINode {
     Series <Clue> clues = null;
     if (focus instanceof Plot) {
       Plot plot = (Plot) focus;
-      header = "EVIDENCE FOR "+CaseFX.nameFor(plot, player);
+      header = "EVIDENCE FOR "+CasesFX.nameFor(plot, player);
       clues = player.leads.cluesFor(plot, true);
       forPlot = true;
     }
     if (focus instanceof Element) {
       Element suspect = (Element) focus;
       header = "EVIDENCE ON "+suspect.name();
-      clues = player.leads.cluesFor(suspect, true);
+      clues = player.leads.cluesAssociated(suspect);
       forSuspect = true;
     }
     if (clues == null) return false;
@@ -53,9 +53,9 @@ public class CaseCluesView extends UINode {
       null, header, 25, null
     );
     for (Clue clue : clues) {
-      draw.addEntry(null, CaseFX.longDescription(clue, player), 100, clue);
+      draw.addEntry(null, CasesFX.longDescription(clue, player), 100, clue);
     }
-    draw.performDraw(across, down, this, surface, g);
+    draw.performVerticalDraw(across, down, this, surface, g);
     down = draw.down;
     
     if (draw.hovered != null) {
@@ -65,11 +65,8 @@ public class CaseCluesView extends UINode {
       }
     }
     
-    parent.casesArea.setScrollheight(down);
+    parent.infoArea.setScrollheight(down);
     return true;
   }
-  
 }
-
-
 

@@ -144,6 +144,18 @@ public abstract class Visit <T> implements Iterable <T>, Iterator <T> {
   }
   
   
+  public static int[] range(int max) {
+    return range(0, max);
+  }
+  
+  
+  public static int[] range(int min, int max) {
+    final int range[] = new int[max - min];
+    for (int n = min, i = 0; n < max; n++, i++) range[i] = n;
+    return range;
+  }
+  
+  
   
   /**  Couple of list-utility methods-
     */
@@ -160,6 +172,15 @@ public abstract class Visit <T> implements Iterable <T>, Iterator <T> {
   
   public static void appendTo(Series to, Object... from) {
     for (Object o : from) to.add(o);
+  }
+  
+  
+  public static Object[] appendTo(Object[] a, Class arrClass, Object... from) {
+    int size = a.length + from.length, i = 0;
+    Object newA[] = (Object[]) Array.newInstance(arrClass, size);
+    for (Object o : a   ) newA[i++] = o;
+    for (Object o : from) newA[i++] = o;
+    return newA;
   }
   
   

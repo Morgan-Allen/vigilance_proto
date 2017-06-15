@@ -55,12 +55,6 @@ public class PersonActions {
   }
   
   
-  public boolean captive() {
-    //  TODO:  Add some nuance here!
-    return person.isCivilian();// && side == Side.VILLAINS;
-  }
-  
-  
   public Series <Ability> listAbilities() {
     List <Ability> all = new List();
     all.add(Common.MOVE);
@@ -129,7 +123,7 @@ public class PersonActions {
   
   
   public boolean canTakeAction() {
-    if (person.currentScene() == null) return false;
+    if (person.currentScene() == null || person.isCaptive()) return false;
     if (nextAction != null && nextAction.used.delayed()) return false;
     return person.health.conscious() && actionPoints > 0 && ! turnDone;
   }
@@ -141,6 +135,8 @@ public class PersonActions {
   
   
   boolean onTurnStart() {
+    I.say("  "+person+" started action turn...");
+    
     actionPoints = person.stats.maxActionPoints();
     nextAction   = null;
     turnDone     = false;

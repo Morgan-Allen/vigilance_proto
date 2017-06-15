@@ -196,24 +196,29 @@ public class ActionsView extends UINode {
     s.append("\n  Press S to save, R to reload.");
     if (surface.isPressed('s')) world.performSave();
     if (surface.isPressed('r')) world.reloadFromSave();
-    
+
+    if (GameSettings.pauseScene) {
+      s.append("\n  Press P to unpause");
+      if (surface.isPressed('p')) GameSettings.pauseScene = false;
+    }
+    else {
+      s.append("\n  Press P to pause");
+      if (surface.isPressed('p')) GameSettings.pauseScene = true;
+    }
     if (GameSettings.debugScene) {
-      if (GameSettings.pauseScene) {
-        s.append("\n  Press P to unpause");
-        if (surface.isPressed('p')) GameSettings.pauseScene = false;
-      }
-      else {
-        s.append("\n  Press P to pause");
-        if (surface.isPressed('p')) GameSettings.pauseScene = true;
-      }
       s.append(", E to exit debug mode.");
       if (surface.isPressed('e')) GameSettings.debugScene = false;
-      s.append("\n  Press Z to un/zoom.");
-      if (surface.isPressed('z')) {
-        SceneView SV = scene.view();
-        boolean inZoom = SV.tileSize == SceneView.MAX_TILE_SIZE;
-        SV.tileSize = inZoom ? SceneView.MIN_TILE_SIZE : SceneView.MAX_TILE_SIZE;
-      }
+    }
+    else {
+      s.append(", E to enter debug mode.");
+      if (surface.isPressed('e')) GameSettings.debugScene = true;
+    }
+    
+    s.append("\n  Press Z to un/zoom.");
+    if (surface.isPressed('z')) {
+      SceneView SV = scene.view();
+      boolean inZoom = SV.tileSize == SceneView.MAX_TILE_SIZE;
+      SV.tileSize = inZoom ? SceneView.MIN_TILE_SIZE : SceneView.MAX_TILE_SIZE;
     }
     
     return s.toString();

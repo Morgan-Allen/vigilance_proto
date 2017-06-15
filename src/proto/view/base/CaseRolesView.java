@@ -24,27 +24,29 @@ public class CaseRolesView extends UINode {
     //
     //  First, obtain basic references to relevant game objects-
     Base player = mainView.player();
-    CasesView parent = mainView.casesView;
+    MapView parent = mainView.mapView;
     Plot plot = (Plot) parent.activeFocus;
     //
     //  Then sort of the roles involved in the crime based on quality of
     //  information-
     class RoleView {
-      Plot.Role role;
+      Role role;
       Series <Clue> clues;
       Series <Element> suspects;
+      boolean confirmed = false;
     }
     List <RoleView> roles = new List <RoleView> () {
       protected float queuePriority(RoleView r) {
-        if (r.suspects.size() == 1) return 1;
         return 0;
       }
     };
-    for (Plot.Role role : player.leads.knownRolesFor(plot)) {
+    for (Role role : player.leads.knownRolesFor(plot)) {
+      if (Visit.arrayIncludes(Plot.NEVER_SHOW, role)) continue;
       RoleView r = new RoleView();
-      r.role = role;
+      r.role     = role;
       r.suspects = player.leads.suspectsFor(role, plot);
-      r.clues = player.leads.cluesFor(plot, role, false);
+      r.clues    = player.leads.cluesFor(plot, role, false);
+      for (Clue c : r.clues) if (c.isConfirmation()) r.confirmed = true;
       roles.queueAdd(r);
     }
     //
@@ -52,16 +54,15 @@ public class CaseRolesView extends UINode {
     //  confirmed suspect, and finally an option to review total evidence.
     int across = 10, down = 10;
     ViewUtils.ListDraw draw = new ViewUtils.ListDraw();
-    draw.addEntry(
-      null, "CASE FILE: "+CaseFX.nameFor(plot, player), 40, null
-    );
+    draw.addEntry(null, "CASE FILE: "+CasesFX.nameFor(plot, player), 40, null);
+    
     for (RoleView r : roles) {
-      Plot.Role role = r.role;
-      Image icon = null;
-      String desc = null;
-      Element match = r.suspects.size() == 1 ? r.suspects.first() : null;
+      Role    role      = r.role;
+      Element match     = r.confirmed ? r.suspects.first() : null;
       boolean canFollow = r.clues.size() > 0;
-      Object refers = null;
+      Image   icon      = null;
+      String  desc      = null;
+      Object  refers    = null;
       
       if (match != null) {
         icon = match.icon();
@@ -69,13 +70,15 @@ public class CaseRolesView extends UINode {
         refers = match;
       }
       else {
-        icon = CasesView.MYSTERY_IMAGE;
+        icon = MapView.MYSTERY_IMAGE;
         desc = role+": Unknown";
         refers = canFollow ? role : null;
         
         if (r.clues.size() > 0) {
           desc += "\n  ";
-          for (Clue c : r.clues) desc += CaseFX.shortDescription(c, player)+" ";
+          for (Clue c : r.clues) {
+            desc += CasesFX.shortDescription(c, player)+" ";
+          }
           if (! canFollow) desc += "\n  (numerous suspects)";
           else desc += "\n  ("+r.suspects.size()+" suspects)";
         }
@@ -86,28 +89,29 @@ public class CaseRolesView extends UINode {
       draw.addEntry(icon, desc, 40, refers);
     }
     draw.addEntry(
-      CasesView.FILE_IMAGE, "View All Evidence", 25,
-      CasesView.PLOT_CLUES
+      MapView.FILE_IMAGE, "View All Evidence", 25,
+      MapView.PLOT_CLUES
     );
-    draw.performDraw(across, down, this, surface, g);
+    //draw.addEntry(null, plot.currentStep().label(), 40, null);
+    draw.performVerticalDraw(across, down, this, surface, g);
     down = draw.down;
     //
     //  Then given suitable tool-tips and click-reponses for any encountered
     //  list-elements:
     Object hovered = draw.hovered;
     String hoverDesc = "";
-    if (hovered == CasesView.PLOT_CLUES) {
+    if (hovered == MapView.PLOT_CLUES) {
       hoverDesc = "Review all evidence assembled on this case.";
       if (draw.clicked) {
-        parent.setActiveFocus(CasesView.PLOT_CLUES, false);
+        parent.setActiveFocus(MapView.PLOT_CLUES, false);
       }
     }
-    else if (hovered instanceof Plot.Role) {
-      Plot.Role role = (Plot.Role) hovered;
+    else if (hovered instanceof Role) {
+      Role role = (Role) hovered;
       Series <Clue> clues = player.leads.cluesFor(plot, role, true);
       Clue top = clues.first();
       if (top != null) {
-        hoverDesc = "\nLatest Evidence:  "+CaseFX.longDescription(top, player);
+        hoverDesc = "\nLatest Evidence:  "+CasesFX.longDescription(top, player);
       }
       else {
         hoverDesc = "\nNo Evidence";
@@ -123,7 +127,7 @@ public class CaseRolesView extends UINode {
       Series <Clue> clues = player.leads.cluesFor(plot, element, true);
       Clue top = clues.first();
       if (top != null) {
-        hoverDesc = "\nLatest Evidence:  "+CaseFX.longDescription(top, player);
+        hoverDesc = "\nLatest Evidence:  "+CasesFX.longDescription(top, player);
       }
       else {
         hoverDesc = "\nNo Evidence";
@@ -138,13 +142,10 @@ public class CaseRolesView extends UINode {
     );
     down += 150;
     
-    parent.casesArea.setScrollheight(down);
+    parent.infoArea.setScrollheight(down);
     return true;
   }
 }
-
-
-
 
 
 

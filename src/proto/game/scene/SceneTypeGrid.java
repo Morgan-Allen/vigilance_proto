@@ -74,9 +74,7 @@ public class SceneTypeGrid extends SceneType {
   public Scenery generateScenery(
     World world, boolean testing
   ) {
-    Scenery gen = new Scenery(wide, high);
-    gen.setupScene(testing);
-    
+    Scenery gen = new Scenery(wide, high, testing);
     for (Placing p : placings) {
       int propDir = (p.facing + gen.facing) % 8;
       if (p.type == floors) propDir = N;

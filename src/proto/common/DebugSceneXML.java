@@ -82,8 +82,7 @@ public class DebugSceneXML extends RunGame {
     World world = new World(this, savePath);
     
     if (FILE_TEST_SCENE == null) {
-      Scene scene = new Scene(world, 2, 2);
-      scene.setupScene(true);
+      Scene scene = new Scene(world, 2, 2, true);
       world.enterScene(scene);
       return world;
     }
@@ -91,8 +90,7 @@ public class DebugSceneXML extends RunGame {
     int     pS     = SCENE_XML.getInt("prefSize");
     Scene   scene  = FILE_TEST_SCENE.generateScene(world, pS, pS, true);
     Faction owns   = Heroes.JANUS_INDUSTRIES;
-    Base    player = new Base(Facilities.MANOR, world, owns);
-    world.addBase(player, true);
+    Base    player = world.baseFor(owns);
     
     Tile.printWallsMask(scene);
     
@@ -106,6 +104,7 @@ public class DebugSceneXML extends RunGame {
       if (kind.type() != Kind.TYPE_PERSON) continue;
       
       Person agent = new Person(kind, world, kind.name);
+      agent.setBase(player);
       agent.addAssignment(scene);
       scene.enterScene(agent, startX, startY);
       toSelect = agent;

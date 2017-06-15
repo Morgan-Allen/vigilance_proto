@@ -9,7 +9,6 @@ import proto.game.person.*;
 import proto.game.world.*;
 import proto.game.event.*;
 import proto.util.*;
-import java.awt.EventQueue;
 
 
 
@@ -27,17 +26,18 @@ public class DefaultGame extends RunGame {
   
   protected World setupWorld() {
     this.world = new World(this, savePath);
-    initDefaultWorld(world);
+    initDefaultWorld(world, true);
     return world;
   }
   
   
-  public static void initDefaultWorld(World world) {
-    DefaultGame.initDefaultTime   (world);
-    DefaultGame.initDefaultRegions(world);
-    DefaultGame.initDefaultBase   (world);
-    DefaultGame.initDefaultCrime  (world);
-    DefaultGame.initDefaultBonds  (world);
+  public static void initDefaultWorld(World world, boolean withPlots) {
+    initDefaultTime   (world);
+    initDefaultRegions(world);
+    initDefaultBase   (world);
+    initDefaultCrime  (world);
+    initDefaultBonds  (world);
+    if (withPlots) initDefaultPlots(world);
   }
   
   
@@ -61,10 +61,15 @@ public class DefaultGame extends RunGame {
       if (report) {
         I.say("  "+region);
         for (Place p : region.buildSlots()) if (p != null) {
-          I.say("    "+p+" residents:");
+          I.say("    "+p+" "+(p.isHQ() ? " (HQ)" : ""));
+          I.add(" ("+p.base().faction().name+")");
           for (Person r : p.residents()) {
-            I.say("      "+r);
+            I.say("      Resident: "+r);
           }
+        }
+        for (Region.Stat stat : Region.CIVIC_STATS) {
+          float level = region.currentValue(stat);
+          if (report) I.say("  "+stat.name+": "+level);
         }
       }
     }
@@ -76,7 +81,7 @@ public class DefaultGame extends RunGame {
     if (report) I.say("\nInitialising Base...");
     //
     //  TODO:  Move this out to the region-types definitions?
-    final Faction city = Civilians.THE_CITY_COUNCIL;
+    final Base city = world.baseFor(Civilians.THE_CITY_COUNCIL);
     for (Region r : world.regions()) for (Place b : r.buildSlots()) {
       if (b == null) continue;
       if (b.kind == Civilians.CITY_HALL) {
@@ -86,17 +91,15 @@ public class DefaultGame extends RunGame {
         world.council.assignPrison(b);
       }
     }
-    final Base hall = new Base(Civilians.CITY_HALL, world, city);
-    world.regionFor(Regions.SECTOR04).setAttached(hall, true);
-    world.council.assignCityHall(hall);
+    world.council.assignCity(city);
     //
     //  
-    final Faction owns = Heroes.JANUS_INDUSTRIES;
-    final Base base = new Base(Facilities.MANOR, world, owns);
+    final Base base = world.baseFor(Heroes.JANUS_INDUSTRIES);
+    world.setPlayerBase(base);
     Person leader = new Person(Heroes.HERO_PHOBOS, world);
-    base.setLeader(leader);
+    base.assignLeader(leader);
     
-    Place.setResident(leader, base, true);
+    Place.setResident(leader, base.HQ(), true);
     base.addToRoster(leader);
     base.addToRoster(new Person(Heroes.HERO_NIGHT_SWIFT, world));
     base.addToRoster(new Person(Heroes.HERO_DEIMOS     , world));
@@ -105,11 +108,9 @@ public class DefaultGame extends RunGame {
     for (Person p : base.roster()) for (Person o : base.roster()) {
       if (p != o) p.history.incBond(o, 0.2f);
     }
-    world.regionFor(Regions.SECTOR03).setAttached(base, true);
-    
     for (Person p : base.roster()) {
       world.setInside(p, true);
-      base.setAttached(p, true);
+      base.HQ().setAttached(p, true);
     }
     
     final PlaceType buildTechs[] = {
@@ -123,12 +124,6 @@ public class DefaultGame extends RunGame {
       Facilities.SOUP_KITCHEN
     };
     for (Object t : buildTechs) base.addTech(t);
-    
-    for (Region r : world.regions()) {
-      for (Place built : r.buildSlots()) if (built != null) {
-        built.setOwner(base);
-      }
-    }
     
     final ItemType craftTechs[] = {
       Weapons.WING_BLADES,
@@ -149,10 +144,9 @@ public class DefaultGame extends RunGame {
     base.finance.incPublicFunds(2000);
     base.finance.incSecretFunds(200);
     base.finance.updateFinance();
-    world.addBase(base, true);
     
     if (report) {
-      I.say("  Roster for "+owns);
+      I.say("  Roster for "+base.faction());
       for (Person p : base.roster()) I.say("    "+p);
       I.say("  Known technologies:");
       for (Object o : base.knownTech()) I.say("    "+o);
@@ -175,16 +169,14 @@ public class DefaultGame extends RunGame {
       Crooks.GANGSTER, Crooks.GANGSTER, Crooks.HITMAN,
       Civilians.DOCTOR, Civilians.INVENTOR, Civilians.BROKER
     };
+    final Batch <Base> crimeBases = new Batch();
     
-    final Faction owns = Crooks.THE_MADE_MEN;
-    final Batch <Base> hideouts = new Batch();
+    final Base base1 = world.baseFor(Crooks.THE_MORETTI_FAMILY);
     final Person boss1 = new Person(Villains.MORETTI, world);
-    final Base base1 = new Base(Facilities.LOUNGE, world, owns);
-    world.regionFor(Regions.SECTOR04).setAttached(base1, true);
-    base1.setLeader(boss1);
+    base1.assignLeader(boss1);
     base1.finance.setSecretPercent(0);
     base1.finance.incPublicFunds(100);
-    hideouts.add(base1);
+    crimeBases.add(base1);
     
     /*
     final Person boss2 = new Person(Villains.SNAKE_EYES, world);
@@ -194,11 +186,11 @@ public class DefaultGame extends RunGame {
     hideouts.add(base2);
     //*/
     
-    for (Base base : hideouts) {
-      world.addBase(base, false);
+    for (Base base : crimeBases) {
       base.addToRoster(base.leader());
       base.setGoonTypes(goonTypes);
       base.plots.assignPlotTypes(PlotTypes.ALL_TYPES);
+      Series <Place> places = base.ownedFacilities();
       
       for (PersonType type : seniorTypes) {
         Person senior = Person.randomOfKind(type, world);
@@ -207,7 +199,10 @@ public class DefaultGame extends RunGame {
       
       for (Person p : base.roster()) {
         world.setInside(p, true);
-        base.setAttached(p, true);
+        Place home = (Place) Rand.pickFrom(places);
+        if (p == base.leader()) home = base.HQ();
+        Place.setResident(p, home, true);
+        home.setAttached(p, true);
       }
       
       if (report) {
@@ -220,14 +215,15 @@ public class DefaultGame extends RunGame {
   
   public static void initDefaultBonds(World world) {
     boolean report = GameSettings.reportWorldInit;
-    Series <Person> civilians = world.civilians();
+    Series <Person> persons = world.persons();
     if (report) I.say("\nInitialising Bonds...");
     //
-    //  Establish random positive relationships between civilians in
-    //  neighbouring sectors:
-    for (Person p : civilians) {
+    //  Establish random positive relationships between random persons in
+    //  neighbouring sectors (aside from the heroes):
+    for (Person p : persons) {
+      if (p.isHero()) continue;
       Batch <Person> neighbours = new Batch();
-      for (Person o : civilians) if (o != p) {
+      for (Person o : persons) if (o != p) {
         if (world.distanceBetween(p.region(), o.region()) > 1) continue;
         neighbours.add(o);
       }
@@ -246,7 +242,7 @@ public class DefaultGame extends RunGame {
       Person boss = base.leader();
       
       Batch <Person> enemies = new Batch();
-      for (Person p : civilians) if (p != boss) {
+      for (Person p : persons) if (p != boss && p.isCivilian()) {
         if (Visit.arrayIncludes(Civilians.CIVIC_TYPES, p.kind())) {
           enemies.add(p);
         }
@@ -260,24 +256,38 @@ public class DefaultGame extends RunGame {
       }
     }
     //
-    //  
+    //  Then report the final result as needed:
     if (report) {
-      for (Person p : civilians) {
-        I.say("  Civilian "+p+" has Bonds:");
-        for (Element o : p.history.sortedBonds()) {
-          I.say("    "+o+" ("+p.history.bondWith(o)+")");
-        }
-      }
-      for (Base b : world.bases()) if (b.faction().criminal) {
-        Person p = b.leader();
-        I.say("  Boss "+p+" has Grudges:");
+      for (Person p : persons) {
+        I.say("  Person "+p+" has Bonds:");
         for (Element o : p.history.sortedBonds()) {
           I.say("    "+o+" ("+p.history.bondWith(o)+")");
         }
       }
     }
   }
+  
+  
+  public static void initDefaultPlots(World world) {
+    final Batch <Plot> plots = new Batch();
+    
+    for (Base base : world.bases()) if (base.faction().criminal) {
+      Plot root = base.plots.generateNextPlot();
+      plots.add(root);
+    }
+    
+    Plot first = (Plot) Rand.pickFrom(plots);
+    first.base().plots.assignRootPlot(first, 24);
+    
+    for (Plot plot : plots) if (plot != first) {
+      int delay = Rand.index(GameSettings.MIN_PLOT_THINKING_TIME);
+      plot.base().plots.assignRootPlot(plot, 48 + delay);
+    }
+  }
+  
 }
+
+
 
 
 

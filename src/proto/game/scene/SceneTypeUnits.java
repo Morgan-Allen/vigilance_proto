@@ -135,10 +135,9 @@ public class SceneTypeUnits extends SceneType {
   public Scenery generateScenery(
     World world, int wide, int high, boolean testing
   ) {
-    Scenery gen = new Scenery(wide, high);
+    Scenery gen = new Scenery(wide, high, testing);
     gen.gridW = wide / resolution;
     gen.gridH = high / resolution;
-    gen.setupScene(testing);
     populateWithAreas  (world, gen, testing);
     insertWallsAndDoors(world, gen, testing);
     return gen;
@@ -222,11 +221,13 @@ public class SceneTypeUnits extends SceneType {
       }
       if (pick.empty()) break;
       
+      /*
       I.say("\nPossible placements were: ");
       for (SpacePick s : possible) {
         I.say("  "+s.unit+" at "+s.tx+"|"+s.ty+", face: "+s.facing);
       }
       I.say("");
+      //*/
       //
       //  Having pick the most promising option, we apply the furnishings to
       //  the scene:

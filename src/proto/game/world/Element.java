@@ -22,6 +22,7 @@ public class Element implements Session.Saveable {
   World world;
   Element attachedTo;
   List <Element> attached = new List();
+  int uniqueID = -1;
   
   
   protected Element(Kind kind, World world) {
@@ -38,6 +39,7 @@ public class Element implements Session.Saveable {
     world      = (World  ) s.loadObject();
     attachedTo = (Element) s.loadObject();
     s.loadObjects(attached);
+    uniqueID = s.loadInt();
   }
   
   
@@ -47,6 +49,7 @@ public class Element implements Session.Saveable {
     s.saveObject(world);
     s.saveObject(attachedTo);
     s.saveObjects(attached);
+    s.saveInt(uniqueID);
   }
   
   
@@ -60,6 +63,16 @@ public class Element implements Session.Saveable {
   
   public Kind kind() {
     return kind;
+  }
+  
+  
+  public int ID() {
+    return uniqueID;
+  }
+  
+  
+  public Base base() {
+    return null;
   }
   
   
@@ -107,7 +120,6 @@ public class Element implements Session.Saveable {
   public boolean isItem  () { return type == Kind.TYPE_ITEM  ; }
   public boolean isProp  () { return type == Kind.TYPE_PROP  ; }
   public boolean isClue  () { return type == Kind.TYPE_CLUE  ; }
-  public boolean isBase  () { return this instanceof Base    ; }
   
   
   
@@ -128,14 +140,19 @@ public class Element implements Session.Saveable {
   }
   
   
+  public boolean isHQ() {
+    return base() != null && base().HQ() == this;
+  }
+  
+  
   public Place resides() {
     return null;
   }
   
   
-  final static Batch NO_TRAITS = new Batch();
+  final static Batch <Trait> NO_TRAITS = new Batch();
   
-  public Series <Object> traits() {
+  public Series <Trait> traits() {
     return NO_TRAITS;
   }
   

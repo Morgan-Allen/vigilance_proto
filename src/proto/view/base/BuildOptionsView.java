@@ -93,8 +93,8 @@ public class BuildOptionsView extends MessageView {
     //
     //  If confirmed, begin construction.
     if (optionID == 0 && selected != null) {
-      final Base base = region.world().playerBase();
-      region.setupFacility(selected, slotID, base, false);
+      final Base base = mainView.player();
+      region.setupFacility(selected, slotID, base.faction(), false);
       mainView.dismissMessage(this);
     }
     //

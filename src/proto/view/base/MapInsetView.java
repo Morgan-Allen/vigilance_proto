@@ -22,6 +22,7 @@ public abstract class MapInsetView extends UINode {
     */
   BufferedImage mapImage;
   BufferedImage keyImage;
+  BufferedImage outlines;
   RegionAssets attached[];
   
   private static RegionType lastRegionType;
@@ -32,9 +33,12 @@ public abstract class MapInsetView extends UINode {
   }
   
   
-  public void loadMapImages(String mapImageName, String keyImageName) {
+  public void loadMapImages(
+    String mapImageName, String keyImageName, String outlinesName
+  ) {
     mapImage = (BufferedImage) Kind.loadImage(mapImageName);
     keyImage = (BufferedImage) Kind.loadImage(keyImageName);
+    outlines = (BufferedImage) Kind.loadImage(outlinesName);
   }
   
   
@@ -43,20 +47,19 @@ public abstract class MapInsetView extends UINode {
       mapW  = mapImage.getWidth (),
       mapH  = mapImage.getHeight(),
       selfW = relBounds.xdim(),
-      selfH = relBounds.ydim(),
-      relW  = mapW / selfW,
-      relH  = mapH / selfH
+      selfH = relBounds.ydim()
     ;
     
-    if (relW < relH) {
-      float shrink = selfW * ((relH / relW) - 1);
-      relBounds.incWide(0 - shrink);
-      relBounds.incX   (shrink / 2);
-    }
-    if (relH < relW) {
-      float shrink = selfH * ((relW / relH) - 1);
+    if (selfW < selfH) {
+      float shrink = selfH - selfW;
       relBounds.incHigh(0 - shrink);
       relBounds.incY   (shrink / 2);
+    }
+    
+    if (selfH < selfW) {
+      float shrink = selfW - selfH;
+      relBounds.incWide(0 - shrink);
+      relBounds.incX   (shrink / 2);
     }
   }
   
@@ -69,15 +72,18 @@ public abstract class MapInsetView extends UINode {
       attached[i] = nations[i].kind().view;
     }
     
-    int imgWide = keyImage.getWidth(), imgHigh = keyImage.getHeight();
-    int pixVals[] = keyImage.getRGB(0, 0, imgWide, imgHigh, null, 0, imgWide);
-    int fills = new Color(1, 1, 1, 0.5f).getRGB();
+    int imgWide    = keyImage.getWidth(), imgHigh = keyImage.getHeight();
+    int pixVals[]  = keyImage.getRGB(0, 0, imgWide, imgHigh, null, 0, imgWide);
+    int lineVals[] = outlines.getRGB(0, 0, imgWide, imgHigh, null, 0, imgWide);
     
     for (Coord c : Visit.grid(0, 0, imgWide, imgHigh, 1)) {
       int pixVal = pixVals[(c.y * imgWide) + c.x];
       for (RegionAssets r : attached) if (r.colourKey == pixVal) {
         if (r.bounds == null) { r.bounds = new Box2D(c.x, c.y, 0, 0); }
         else r.bounds.include(c.x, c.y, 0);
+        r.sumX += c.x;
+        r.sumY += c.y;
+        r.numPix += 1;
         break;
       }
     }
@@ -87,11 +93,12 @@ public abstract class MapInsetView extends UINode {
       r.outline  = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
       r.outlineX = (int) r.bounds.xpos();
       r.outlineY = (int) r.bounds.ypos();
-      r.centerX  = r.outlineX + (w / 2);
-      r.centerY  = r.outlineY + (h / 2);
+      r.centerX  = r.sumX / r.numPix;
+      r.centerY  = r.sumY / r.numPix;
     }
     for (Coord c : Visit.grid(0, 0, imgWide, imgHigh, 1)) {
-      int pixVal = pixVals[(c.y * imgWide) + c.x];
+      int pixVal = pixVals [(c.y * imgWide) + c.x];
+      int fills  = lineVals[(c.y * imgWide) + c.x];
       for (RegionAssets r : attached) {
         if (r.colourKey != pixVal || r.outline == null) continue;
         r.outline.setRGB(c.x - r.outlineX, c.y - r.outlineY, fills);
@@ -104,8 +111,9 @@ public abstract class MapInsetView extends UINode {
   /**  Actual rendering methods-
     */
   protected boolean renderTo(Surface surface, Graphics2D g) {
-    Region regions[] = mainView.world().regions();
-    Base played = mainView.world().playerBase();
+    Region  regions[] = mainView.world().regions();
+    Base    played    = mainView.world().playerBase();
+    
     attachOutlinesFor(regions);
     if (selectedRegion() == null) setSelectedRegion(regions[0]);
     //
@@ -127,7 +135,6 @@ public abstract class MapInsetView extends UINode {
     if (mouseInMap && mX >= 0 && mX < imgWide && mY >= 0 && mY < imgHigh) {
       pixVal = ((BufferedImage) keyImage).getRGB(mX, mY);
     }
-    
     ///if (I.used60Frames) I.say("Pixel value is: "+pixVal);
     
     for (Region n : regions) if (n.kind().view.colourKey == pixVal) {
@@ -140,53 +147,77 @@ public abstract class MapInsetView extends UINode {
     
     renderOutline(selectedRegion(), surface, g, mapWRatio, mapHRatio);
     renderOutline(regionHovered   , surface, g, mapWRatio, mapHRatio);
+    renderBorderConnections(regionHovered, surface, g, mapWRatio, mapHRatio);
     
-    for (Region n : regions) {
+    //
+    //  Then render any other widgets for each region-
+    for (final Region n : regions) {
       int x = (int) ((n.kind().view.centerX / mapWRatio) + vx);
       int y = (int) ((n.kind().view.centerY / mapHRatio) + vy);
       
-      g.setColor(Color.LIGHT_GRAY);
-      g.drawString(n.kind().name(), x - 25, y + 25 + 15);
+      g.setColor(Color.WHITE);
+      g.drawString(n.kind().name(), x - 25, y);
       
-      float crimeLevel = n.currentValue(Region.VIOLENCE) / 100f;
+      float crimeLevel = 0;
+      crimeLevel += n.currentValue(Region.VIOLENCE  ) / 200f;
+      crimeLevel += n.currentValue(Region.CORRUPTION) / 200f;
       ViewUtils.renderStatBar(
-        x - 25, y + 25 + 15 + 5, 50, 5,
+        x - 25, y + 5, 50, 5,
         Color.RED, Color.BLACK, crimeLevel, false, g
       );
       
-      Series <Element> suspects = played.leads.activeSuspectsForRegion(n);
-      int off = (suspects.size() * 50) / -2;
-      for (final Element suspect : suspects) {
-        Image alertImage = CasesView.FILE_IMAGE;
-        if (played.leads.suspectIsUrgent(suspect)) {
-          alertImage = CasesView.ALERT_IMAGE;
-        }
-        ImageButton button = new ImageButton(
-          alertImage, new Box2D(x + off - vx, y - (25 + vy), 50, 50), this
+      //
+      //  Render any facilities in the region-
+      int offF = 5 + ((n.buildSlots().length * 35) / -2);
+      Image alertIcon = MapView.ALERT_IMAGE;
+      int slotID = 0;
+      
+      for (final Place slot : n.buildSlots()) {
+        
+        final ImageButton button = new ImageButton(
+          slot == null ? RegionView.NOT_BUILT : slot.icon(),
+          new Box2D(x + offF - vx, y + vy - 125, 30, 30), this
         ) {
           protected void whenClicked() {
-            mainView.switchToTab(mainView.casesView);
-            mainView.casesView.setActiveFocus(suspect, true);
+            if (slot == null) return;
+            mainView.mapView.setActiveFocus(slot, true);
           }
         };
-        button.toggled = suspect == mainView.casesView.activeFocus;
-        button.refers = suspect;
+        button.valid = slot != null;
+        button.refers = "slot_"+slotID;
+        if (slot != null && slot.buildProgress() < 1) {
+          button.attachOverlay(RegionView.IN_PROGRESS);
+        }
+        
+        if (slot != null && played.leads.cluesAssociated(slot).size() > 0) {
+          ImageButton alert = new ImageButton(
+            alertIcon, new Box2D(x + offF - vx, y + vy - 150, 30, 30), this
+          ) {
+            protected void whenClicked() {}
+          };
+          button.toggled = false;
+          alert.renderNow(surface, g);
+        }
         button.renderNow(surface, g);
         
-        g.drawImage(suspect.icon(), x + off + 25, y, 25, 25, null);
-        off += 50;
+        offF += 30 + 5;
       }
-      
-      ViewUtils.renderAssigned(visitors(n), x + 25, y + 75, this, surface, g);
+      //
+      //  Then render any current visitors to the region-
+      ViewUtils.renderAssigned(visitors(n), x + 25, y + 35, this, surface, g);
     }
     
     return true;
   }
   
   
+  
+  /**  Additional helper methods-
+    */
   private Series <Person> visitors(Region located) {
     final Batch <Person> visitors = new Batch();
     final Series <Person> roster = mainView.world().playerBase().roster();
+    
     for (Person p : roster) {
       final Assignment a = p.topAssignment();
       if (a != null && a.targetElement(p).region() == located) {
@@ -197,6 +228,14 @@ public abstract class MapInsetView extends UINode {
       }
     }
     return visitors;
+  }
+  
+  
+  void presentBuildOptions(
+    Region d, int slotID
+  ) {
+    final BuildOptionsView options = new BuildOptionsView(mainView, d, slotID);
+    mainView.queueMessage(options);
   }
   
   
@@ -214,6 +253,28 @@ public abstract class MapInsetView extends UINode {
   }
   
   
+  private void renderBorderConnections(
+    Region n, Surface surface, Graphics2D g, float mapWRatio, float mapHRatio
+  ) {
+    if (n == null || n.kind().view.outline == null) return;
+    if (! GameSettings.viewRegionsNear) return;
+    RegionAssets r = n.kind().view;
+    g.setColor(Color.WHITE);
+    for (RegionType b : n.kind().bordering()) {
+      RegionAssets rB = b.view;
+      g.drawLine(
+        (int) ((r .centerX / mapWRatio) + vx),
+        (int) ((r .centerY / mapHRatio) + vy),
+        (int) ((rB.centerX / mapWRatio) + vx),
+        (int) ((rB.centerY / mapHRatio) + vy)
+      );
+    }
+  }
+  
+  
+  
+  /**  Handling region-selection:
+    */
   protected abstract void onRegionSelect(Region region);
   
   

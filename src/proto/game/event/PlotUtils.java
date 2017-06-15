@@ -15,19 +15,27 @@ public class PlotUtils {
   /**  Helper methods for filling Roles:
     */
   public static Place chooseHideout(
-    Plot plot, Place crimeScene
+    Plot plot, Place crimeScene, Place HQ
   ) {
     Pick <Place > pickH = new Pick();
-    for (Place b : venuesNearby(plot, crimeScene, 1)) {
-      if (b.isBase() || b == crimeScene) continue;
+    
+    for (Place b : venuesNearby(crimeScene, 1)) {
+      if (b.isHQ() || b == crimeScene) continue;
       pickH.compare(b, Rand.num());
     }
+    
+    if (pickH.result() == HQ) {
+      I.say("Picked wrong hideout!");
+      I.say("  HQ is HQ? "+HQ.isHQ());
+      I.say("?");
+    }
+    
     return pickH.result();
   }
   
   
   public static void fillExpertRole(
-    Plot plot, Trait trait, Series <Person> candidates, Plot.Role role
+    Plot plot, Trait trait, Series <Person> candidates, Role role
   ) {
     fillExpertRole(plot, trait, candidates, role, Plot.ROLE_HIDEOUT);
   }
@@ -35,7 +43,7 @@ public class PlotUtils {
   
   public static void fillExpertRole(
     Plot plot, Trait trait, Series <Person> candidates,
-    Plot.Role role, Plot.Role placing
+    Role role, Role placing
   ) {
     Pick <Person> pick = new Pick();
     for (Person p : candidates) {
@@ -50,13 +58,13 @@ public class PlotUtils {
   
   public static void fillInsideRole(
     Plot plot, Place target,
-    Plot.Role role, Plot.Role placing
+    Role role, Role placing
   ) {
     Pick <Person> pick = new Pick();
     for (Person p : target.residents()) {
       if (p.isCaptive() || ! p.health.conscious()) continue;
       if (plot.entryFor(p, null) != null) continue;
-      pick.compare(p, 0 - p.history.bondWith(target.owner()));
+      pick.compare(p, 0 - p.history.bondWith(target.base().leader()));
     }
     if (pick.empty()) return;
     plot.assignRole(pick.result(), role, placing);
@@ -65,7 +73,7 @@ public class PlotUtils {
   
   public static void fillItemRole(
     Plot plot, ItemType type, World world,
-    Plot.Role role, Plot.Role placing
+    Role role, Role placing
   ) {
     plot.assignRole(new Item(type, world), role, placing);
   }
@@ -98,14 +106,48 @@ public class PlotUtils {
   }
   
   
+  
+  /**  Additional helper methods-
+    */
   public static Series <Place> venuesNearby(
-    Plot plot, Place target, int maxDist
+    Place target, int maxDist
   ) {
     final Batch <Place> venues = new Batch();
-    for (Region r : plot.world.regionsInRange(target.region(), maxDist)) {
+    for (Region r : target.world().regionsInRange(target.region(), maxDist)) {
       for (Place p : r.buildSlots()) if (p != null) venues.include(p);
     }
     return venues;
+  }
+  
+  
+  public static Place chooseTipoffSite(Element source) {
+    Series <Place> near = venuesNearby(source.place(), 1);
+    return (Place) Rand.pickFrom(near);
+  }
+  
+  
+  public static Place selectNewHQFor(Base base) {
+    Place oldHQ = base.HQ();
+    Pick <Place> pick = new Pick();
+    
+    for (Place p : base.world().places()) {
+      if (p.base() != base || p == oldHQ) continue;
+      pick.compare(p, Rand.num());
+    }
+    
+    if (pick.empty()) return null;
+    
+    Place newHQ = pick.result();
+    base.assignHQ(newHQ);
+    return newHQ;
+  }
+  
+  
+  public static void wipeFactionAssets(Base base) { 
+    for (Place p : base.world().places()) {
+      if (p.base() != base || p == base.HQ()) continue;
+      p.setBase(null);
+    }
   }
   
   
@@ -113,46 +155,41 @@ public class PlotUtils {
   /**  Helper methods for dealing with perps before and after a scene:
     */
   public static Scene generateHideoutScene(
-    Plot plot, Step step, Element focus, Task lead
+    Plot plot, Element focus, Task lead
   ) {
     //  TODO:  This should change later!
-    return generateHeistScene(plot, step, focus, lead);
+    return generateHeistScene(plot, focus, lead);
   }
   
   
   public static Scene generateSideScene(
-    Plot plot, Step step, Element focus, Task lead
+    Plot plot, Element focus, Task lead
   ) {
     //  TODO:  This should change later!
-    return generateHeistScene(plot, step, focus, lead);
+    return generateHeistScene(plot, focus, lead);
   }
   
   
   public static Scene generateHeistScene(
-    Plot plot, Step step, Element focus, Task lead
+    Plot plot, Element focus, Task lead
   ) {
     Base  base  = plot.base();
     World world = base.world();
     Place place = focus.place();
-    Series <Element> involved = plot.involved(step);
-    
-    if (! involved.includes(focus)) {
-      I.say("Step: "+step+" does not involve: "+focus);
-      return null;
-    }
+    Series <Element> involved = plot.allInvolved();
+    List <Person> forces = new List();
     
     final float dangerLevel = 0.5f;
     final PersonType GOONS[] = base.goonTypes().toArray(PersonType.class);
     float forceLimit = dangerLevel * 10, forceSum = 0;
     
-    final List <Person> forces = new List();
     for (Element e : involved) {
       if (e == null || e.place() != place || ! e.isPerson()) continue;
       Person perp = (Person) e;
       forces.add(perp);
-      if (perp.isCriminal()) forceSum += perp.stats.powerLevel();
+      if      (perp.isCriminal()) forceSum += perp.stats.powerLevel();
+      else if (perp.isCivilian()) perp.setCaptive(true);
     }
-    if (forces.empty()) return null;
     
     while (forceSum < forceLimit && forces.size() < (forceLimit * 2)) {
       PersonType ofGoon = (PersonType) Rand.pickFrom(GOONS);
@@ -163,9 +200,16 @@ public class PlotUtils {
       forces.add(goon);
     }
     
+    if (forces.empty()) return null;
+    
     Scene scene = place.kind().sceneType().generateScene(world);
     scene.entry.provideInProgressEntry(forces);
-    scene.entry.provideBorderEntry(lead.assigned());
+    
+    Batch <Person> onSite = new Batch();
+    for (Person p : lead.base.roster()) {
+      if (p.place() == place) onSite.add(p);
+    }
+    scene.entry.provideBorderEntry(onSite);
     scene.assignMissionParameters(place, lead, plot);
     
     return scene;
@@ -175,11 +219,13 @@ public class PlotUtils {
   public static EventEffects generateSceneEffects(
     Scene scene, Plot plot, Lead lead
   ) {
-    World world = scene.world();
-    Base player = world.playerBase();
+    World    world  = scene.world();
+    Base     player = world.playerBase();
+    int      time   = world.timing.totalHours();
+    CaseFile file   = player.leads.caseFor(plot);
+    Place    site   = scene.site();
     Batch <Person  > captives = new Batch();
     Batch <CaseFile> evidence = new Batch();
-    int time = world.timing.totalHours();
     
     I.say("Generating scene effects after: "+plot);
     
@@ -206,22 +252,41 @@ public class PlotUtils {
       p.health.updateHealth(0);
       
       if (p.isCriminal() && p.currentScene() == scene && scene.wasWon()) {
-        CaseFile  file = player.leads.caseFor(plot);
-        Plot.Role role = plot.roleFor(p);
-        Place     site = scene.site();
-        Clue redHanded = Clue.confirmSuspect(plot, role, p, site);
-        file.recordClue(redHanded, lead, time, site, false);
-        captives.add(p);
-        evidence.add(file);
+        //
+        //  Anyone caught red-handed at the scene will have evidence recorded
+        //  as such-
+        Role role = plot.roleFor(p);
+        if (role != null) {
+          Clue redHanded = Clue.confirmSuspect(plot, role, p, site);
+          file.recordClue(redHanded, lead, time, site, false);
+          captives.add(p);
+          evidence.add(file);
+        }
+        //
+        //  If the mastermind has been deposed, clear the base's HQ and record
+        //  the event (with a slight offset to ensure it comes ahead of other
+        //  clues.)  Then select a new HQ!
+        if (p == plot.base.leader()) {
+          Place HQ = p.base().HQ();
+          Clue busted = Clue.confirmSuspect(plot, Plot.ROLE_HQ, HQ, site);
+          file.recordClue(busted, LeadType.MAJOR_BUST, time + 1, site);
+          selectNewHQFor(p.base());
+        }
+      }
+      if (p.isCivilian() && p.isCaptive() && ! p.isCriminal()) {
+        p.setCaptive(false);
       }
     }
     
     world.council.scheduleTrial(plot, captives, evidence);
     
-    EventEffects effects = new EventEffects();
+    EventEffects effects = new EventEffects(plot, scene.site());
     effects.composeFromScene(scene);
     return effects;
   }
+  
+  
+  
   
 }
 

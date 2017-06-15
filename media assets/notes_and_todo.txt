@@ -1,32 +1,80 @@
 
 
 
-*  You may have to use Facts as outcomes for lead-investigation, rather than
-   linking simply to Objects.
+You need to add some intelligence to goons motions/patrol patterns, and to
+distribute them more evenly about the map.
+
+You need to give each agent some unique flavour, based on costume.
+  *  Phobos has free ultrasound and stealth/mobility.
+     Bonus to surveillance/search.
+  *  Deimos has rapid fire/double-tap and heavy armour.
+     Bonus to busts/reports.
+  *  Black Swift has sidekicks and melee mastery.
+     Bonus to guarding/tipoffs.
+  *  Dr. Yang has disguise and misdirection/false alarm.
+     Bonus to questioning/wiretap.
+Scenes should generate procedurally in random ways using corner/mid/inside
+segments.
+
+Prefer hideouts in industrial/slum/disused areas, or if owned by the plot's
+faction.  And add medium-descriptions to roles, to determine if specific leads
+can tune in or not.
 
 
-Vigilance.
-
-The train/build/craft loop needs better representation.
-
-Employment:  Engineering projects complete faster
-Health:      Medical projects complete faster
-Education:   Research projects complete faster
-Diversions:  Morale is recovered more quickly
-
-Yes, excellent.
 
 
+Add the full tech tree and range of gadgets.
 
-Assassinations, Kidnappings, Robberies,
-Data Hacks, Smugglings, Bombings,
-Breakouts, Busts, Petty Crime.
+You need to create some alternative henchmen for different villains and their
+factions.
 
-Warehouse/Docks.  Factory.  Chemical Plant.
-Tenements.  Brothel/Bar.  Church.
+Add some reluctance, initiative and motives for agents- agents should
+auto-assign themselves to leads and other tasks.
 
-Museum.  Bank.  City Hall/Courthouse.
-Penthouse.  Lounge.  Casino.
+    
 
-Corporate Office.  Shopping Mall.  Funhouse.
-Police Barracks.  Prison Yard.  Army Base.
+Pare down the list of facilities to what's essential.
+  Player (possibly as upgrades to existing districts):
+   Slum-
+    Factory
+    Chemical Plant
+    Swifts Dojo
+   Business-
+    Business Complex
+    Startup vs. Union Office
+    Research Lab
+   Civic-
+    Library
+    Hospital
+    Soup Kitchen
+  
+  Non-player:
+   Slum-
+    Warehouse / Docks
+    Casino
+    Tenements
+   Business-
+    Penthouse
+    Memorial Park
+   Civic-
+    Bank
+    Museum
+    City Hall
+    Prison
+
+You need to create adjacency-effects for different facilities, and allow their
+effects to spill over into nearby districts.
+
+Cut construction down to 6 months or so, and increase lead-following to 1 week.
+
+
+I want a simpler interface for the cases themselves.
+
+Use the state of the plot to determine stages, instead of tense?
+
+
+
+You might add a UI for building up scenes.
+
+
+

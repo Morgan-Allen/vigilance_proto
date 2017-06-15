@@ -2,7 +2,8 @@
 
 package proto.game.world;
 import proto.common.*;
-import proto.game.person.Person;
+import proto.game.event.*;
+import proto.game.person.*;
 import proto.game.scene.*;
 import proto.util.*;
 import proto.view.common.MainView;
@@ -28,8 +29,12 @@ public class World implements Session.Saveable {
   String savePath;
   
   Region regions[];
+  Table <String, Integer> distCache = new Table();
+  
   Base played;
   List <Base> bases = new List();
+  
+  int nextID = 0;
   List <Element> elements = new List();
   
   final public Timing  timing  = new Timing (this);
@@ -60,6 +65,7 @@ public class World implements Session.Saveable {
     regions = (Region[]) s.loadObjectArray(Region.class);
     played  = (Base    ) s.loadObject();
     s.loadObjects(bases);
+    nextID = s.loadInt();
     s.loadObjects(elements);
     
     events .loadState(s);
@@ -75,6 +81,7 @@ public class World implements Session.Saveable {
     s.saveObjectArray(regions);
     s.saveObject(played);
     s.saveObjects(bases);
+    s.saveInt(nextID);
     s.saveObjects(elements);
     
     events .saveState(s);
@@ -112,29 +119,18 @@ public class World implements Session.Saveable {
   
   
   
-  /**  Supplementary setup methods:
+  /**  Supplementary methods for bases and world-entry:
     */
-  public void attachRegions(Region... districts) {
-    this.regions = districts;
-  }
-  
-  
-  public void addBase(Base base, boolean played) {
-    bases.add(base);
-    if (played) this.played = base;
+  public Series <Element> inside() {
+    return elements;
   }
   
   
   public void setInside(Element e, boolean is) {
+    if (is && e.uniqueID == -1) {
+      e.uniqueID = nextID++;
+    }
     elements.toggleMember(e, is);
-  }
-  
-  
-  
-  /**  General query methods-
-    */
-  public Series <Element> inside() {
-    return elements;
   }
   
   
@@ -143,9 +139,16 @@ public class World implements Session.Saveable {
   }
   
   
+  public void setPlayerBase(Base base) {
+    this.played = base;
+  }
+  
+  
   public Base baseFor(Faction faction) {
     for (Base b : bases) if (b.faction == faction) return b;
-    return null;
+    Base base = new Base(this, faction);
+    bases.add(base);
+    return base;
   }
   
   
@@ -157,6 +160,11 @@ public class World implements Session.Saveable {
   
   /**  Handling regions and large-scale distances-
     */
+  public void attachRegions(Region... districts) {
+    this.regions = districts;
+  }
+  
+  
   public Region[] regions() {
     return regions;
   }
@@ -169,8 +177,35 @@ public class World implements Session.Saveable {
   
   
   public float distanceBetween(Region a, Region b) {
-    RegionType ka = a.kind(), kb = b.kind();
-    return Nums.max(Nums.abs(ka.mapX - kb.mapX), Nums.abs(ka.mapY - kb.mapY));
+    
+    String key = a.kind().uniqueID()+"_"+b.kind().uniqueID();
+    Integer dist = distCache.get(key);
+    if (dist != null) return dist;
+    
+    Table <RegionType, RegionType> used = new Table();
+    Batch <RegionType> frontier = new Batch();
+    frontier.add(a.kind());
+    used.put(a.kind(), a.kind());
+    
+    dist = 0;
+    search: while (! frontier.empty()) {
+      Batch nextGen = new Batch();
+      for (RegionType f : frontier) {
+        if (f == b.kind()) {
+          break search;
+        }
+        for (RegionType near : f.bordering) {
+          if (used.containsKey(near)) continue;
+          used.put(near, near);
+          nextGen.add(near);
+        }
+      }
+      dist += 1;
+      frontier = nextGen;
+    }
+    
+    distCache.put(key, dist);
+    return dist;
   }
   
   
@@ -180,6 +215,18 @@ public class World implements Session.Saveable {
       matches.add(r);
     }
     return matches;
+  }
+  
+  
+  
+  /**  Assorted common batch-query methods:
+    */
+  public Series <Person> persons() {
+    Batch <Person> all = new Batch();
+    for (Element e : inside()) if (e.isPerson()) {
+      all.add((Person) e);
+    }
+    return all;
   }
   
   
@@ -193,9 +240,18 @@ public class World implements Session.Saveable {
   }
   
   
+  public Series <Place> places() {
+    Batch <Place> all = new Batch();
+    for (Element e : inside()) if (e.isPlace()) {
+      all.add((Place) e);
+    }
+    return all;
+  }
+  
+  
   public Series <Place> publicPlaces() {
     Batch <Place> all = new Batch();
-    for (Element e : inside()) if (e.isPlace() && ! e.isBase()) {
+    for (Element e : inside()) if (e.isPlace() && ! e.isHQ()) {
       Place p = (Place) e;
       all.add(p);
     }
@@ -206,6 +262,21 @@ public class World implements Session.Saveable {
   
   /**  Regular updates and activity cycle:
     */
+  public void updateWorldInRealTime(float realSeconds) {
+    float hoursGone = RunGame.SLOW_HOURS_PER_REAL_SECOND;
+    if (events.active().empty()) hoursGone = RunGame.FAST_HOURS_PER_REAL_SECOND;
+    hoursGone *= realSeconds;
+    
+    Event next = events.nextEvent();
+    if (next != null) {
+      float startGap = next.timeBegins() - timing.totalHours();
+      hoursGone = Nums.max(startGap + 0.5f, hoursGone);
+    }
+    
+    updateWorld(hoursGone);
+  }
+  
+  
   public void updateWorld(float hoursGone) {
     timing.updateTiming(hoursGone);
     for (Region d : regions) {
@@ -227,11 +298,11 @@ public class World implements Session.Saveable {
   public void enterScene(Scene mission) {
     I.say("ENTERING SCENE: "+mission);
     this.activeScene = mission;
+    if (mission != null) mission.beginScene();
   }
   
   
   public void exitFromScene(Scene mission) {
-    if (this.activeScene != mission) I.complain(mission+" is not active!");
     I.say("EXITING SCENE: "+activeScene);
     this.activeScene = null;
   }
@@ -244,9 +315,6 @@ public class World implements Session.Saveable {
     return view;
   }
 }
-
-
-
 
 
 

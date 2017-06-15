@@ -23,23 +23,20 @@ public class MainView extends UINode {
   ;
   
   private World world;
-  SceneView  sceneView ;
-  UINode     mainUI    ;
+  SceneView sceneView;
+  UINode    mainUI   ;
+  
   final public RosterView rosterView;
-  
-  
+  final public BasicInfoBar basicBar;
   UINode tabsNode;
   UINode tabButtons[], tabContent[];
   UINode currentTab = null;
+  final UINode optionsButton;
   
   final public EquipmentView equipView  ;
   final public TrainingView  trainView  ;
-  final public CasesView     casesView  ;
-  final public InvestingView investView ;
+  final public MapView       mapView    ;
   final public HistoryView   historyView;
-  
-  final public ProgressOptionsView progOptions;
-  final public StatsReadoutView    mainReadout;
   
   final public Image selectCircle, selectSquare;
   
@@ -71,25 +68,27 @@ public class MainView extends UINode {
     ));
     mainUI.addChildren(rosterView);
     
-    //  Add views for each tab:
-    final Box2D tabSubBounds = new Box2D(0, 25, fullWide, fullHigh - 145);
-    casesView = new CasesView (mainUI, tabSubBounds);
-    investView  = new InvestingView(mainUI, tabSubBounds);
-    equipView   = new EquipmentView(mainUI, tabSubBounds);
-    trainView   = new TrainingView (mainUI, tabSubBounds);
-    historyView = new HistoryView  (mainUI, tabSubBounds);
-    tabContent = new UINode[] {
-      casesView, investView, equipView, trainView
-    };
+    basicBar = new BasicInfoBar(mainUI, new Box2D(
+      0, fullHigh - 145, fullWide, 25
+    ));
+    mainUI.addChildren(basicBar);
     
     tabsNode = new UINode(mainUI, new Box2D(0, 0, fullWide, 25));
     Box2D blank = new Box2D();
     final String tabNames[] = {
-      "Mission Control", "Investments", "Armory", "Training & Outfit"
+      "City Map", "Spending", "Outfit & Regimen"
     };
-    tabButtons = new UINode[tabContent.length];
-    int butW = (int) (tabsNode.relBounds.xdim() / tabButtons.length);
+    tabButtons = new UINode[tabNames.length];
     
+    //  Add views for each tab:
+    final Box2D tabSubBounds = new Box2D(0, 25, fullWide, fullHigh - 160);
+    mapView     = new MapView      (mainUI, tabSubBounds);
+    equipView   = new EquipmentView(mainUI, tabSubBounds);
+    trainView   = new TrainingView (mainUI, tabSubBounds);
+    historyView = new HistoryView  (mainUI, tabSubBounds);
+    tabContent  = new UINode[] { mapView, equipView, trainView };
+    
+    int butW = (int) ((fullWide - 210) / tabButtons.length);
     for (int i = tabContent.length; i-- > 0;) {
       final UINode content = tabContent[i], button;
       button = tabButtons[i] = new StringButton(tabNames[i], blank, tabsNode) {
@@ -97,22 +96,21 @@ public class MainView extends UINode {
           switchToTab(content);
         }
       };
-      button.relBounds.set(butW * i, 0, butW, 25);
+      button.relBounds.set(0 + (butW * i), 0, butW, 25);
       content.visible = false;
     }
+    mainUI  .addChildren(tabContent);
     mainUI  .addChildren(tabsNode  );
     tabsNode.addChildren(tabButtons);
-    mainUI  .addChildren(tabContent);
+    switchToTab(mapView);
     
-    switchToTab(casesView);
-    
-    progOptions = new ProgressOptionsView(mainUI, new Box2D(
-      (fullWide / 2) - 100, fullHigh - 170, 200, 50
-    ));
-    mainReadout = new StatsReadoutView(mainUI, new Box2D(
-      0, fullHigh - 170, (fullWide / 2) - 100, 50
-    ));
-    mainUI.addChildren(progOptions, mainReadout);
+    optionsButton = new StringButton("Game Options", blank, tabsNode) {
+      protected void whenClicked() {
+        showOptionsPane();
+      }
+    };
+    optionsButton.relBounds.set(fullWide - 205, 0, 200, 25);
+    tabsNode.addChildren(optionsButton);
     
     selectCircle  = Kind.loadImage(ACTS_DIR+"select_circle.png");
     selectSquare  = Kind.loadImage(MNUI_DIR+"select_square.png");
@@ -153,10 +151,22 @@ public class MainView extends UINode {
   }
   
   
+  public void setMonitoring(boolean start) {
+    RunGame game = mainView.game();
+    if (start) {
+      mapView.showEventsFocus();
+      switchToTab(mapView);
+      game.setPaused(false);
+    }
+    else game.setPaused(true);
+  }
+  
+  
   
   /**  Various custom popup-presentation methods:
     */
   public void queueMessage(UINode message) {
+    if (messageQueue.includes(message)) return;
     messageQueue.add(message);
     game().setPaused(true);
   }
@@ -164,6 +174,7 @@ public class MainView extends UINode {
   
   public void dismissMessage(UINode message) {
     messageQueue.remove(message);
+    setChild(message, false);
   }
   
   
@@ -176,6 +187,34 @@ public class MainView extends UINode {
   public void hideClickMenu(ClickMenu menu) {
     setChild(menu, false);
     this.clickMenu = null;
+  }
+  
+  
+  public void showOptionsPane() {
+    MessageView optionsPane = new MessageView(
+      this, null, "Game Options", "",
+      "Save Progress",
+      "Reload Game",
+      "Save and Quit",
+      "Cancel"
+    ) {
+      protected void whenClicked(String option, int optionID) {
+        if (optionID == 0) {
+          world().performSave();
+          dismissMessage(this);
+        }
+        if (optionID == 1) {
+          world().reloadFromSave();
+        }
+        if (optionID == 2) {
+          world().performSaveAndQuit();
+        }
+        if (optionID == 3) {
+          dismissMessage(this);
+        }
+      }
+    };
+    queueMessage(optionsPane);
   }
   
   

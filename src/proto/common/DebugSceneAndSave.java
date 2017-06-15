@@ -27,18 +27,16 @@ public class DebugSceneAndSave extends RunGame {
   
   protected World setupWorld() {
     this.world = new World(this, savePath);
-    DefaultGame.initDefaultWorld(world);
+    DefaultGame.initDefaultWorld(world, false);
     
-    Base crooks = world.baseFor(Crooks.THE_MADE_MEN);
+    Base crooks = world.baseFor(Crooks.THE_MORETTI_FAMILY);
     Plot plot = PlotTypes.TYPE_KIDNAP.initPlot(crooks);
     plot.fillAndExpand();
     plot.printRoles();
     crooks.plots.assignRootPlot(plot, 0);
     
     Base heroes = world.baseFor(Heroes.JANUS_INDUSTRIES);
-    Lead guarding = heroes.leads.leadFor(
-      plot.target(), Lead.LEAD_SURVEIL_PERSON
-    );
+    Lead guarding = heroes.leads.leadFor(plot.target(), LeadType.SURVEIL);
     
     int ID = 0;
     for (Person p : heroes.roster()) {
@@ -51,9 +49,7 @@ public class DebugSceneAndSave extends RunGame {
       ID++;
     }
     
-    Step heist = plot.mainHeist();
-    plot.advanceToStep(heist);
-    Scene scene = plot.generateScene(heist, plot.target(), guarding);
+    Scene scene = plot.generateScene(plot.target(), guarding);
     world.enterScene(scene);
     
     return world;

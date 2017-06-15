@@ -7,14 +7,15 @@ import proto.util.*;
 
 
 
+/*
 public class Step extends Index.Entry implements Session.Saveable {
   
   /**  Data fields and save/load methods-
-    */
   final static Index <Step> INDEX = new Index();
   
   String label;
-  Plot.Role
+  String descTemplate;
+  Role
     involved[],
     acting  ,
     subject ,
@@ -25,9 +26,8 @@ public class Step extends Index.Entry implements Session.Saveable {
   int hoursTaken;
   
   
-  private Step(String ID, String label) {
+  private Step(String ID) {
     super(INDEX, ID);
-    this.label = label;
   }
   
   
@@ -43,24 +43,27 @@ public class Step extends Index.Entry implements Session.Saveable {
   
   
   /**  Factory methods for convenience:
-    */
   public static Step stepWith(
-    String ID, String label,
-    Plot.Role acting, Plot.Role from, Plot.Role subject, Plot.Role goes,
-    Plot.Role mentions, int medium, int hoursTaken, Plot.Role... others
+    String ID, String label, String descTemplate,
+    Role acting, Role from, Role subject, Role goes,
+    Role mentions, int medium, int hoursTaken, Role... others
   ) {
-    Step s = new Step(ID, label);
-    s.medium     = medium;
+    Step s = new Step(ID);
+    
+    s.label        = label       ;
+    s.descTemplate = descTemplate;
+    
+    s.medium     = medium    ;
     s.hoursTaken = hoursTaken;
     
-    Batch <Plot.Role> involved = new Batch();
+    Batch <Role> involved = new Batch();
     involved.include(s.acting  = acting );
     involved.include(s.from    = from   );
     involved.include(s.subject = subject);
     involved.include(s.goes    = goes   );
-    for (Plot.Role role : others) involved.include(role);
+    for (Role role : others) involved.include(role);
     
-    s.involved = involved.toArray(Plot.Role.class);
+    s.involved = involved.toArray(Role.class);
     s.mentions = mentions;
     
     return s;
@@ -69,24 +72,23 @@ public class Step extends Index.Entry implements Session.Saveable {
   
   
   /**  Assorted no-brainer access methods-
-    */
   public boolean isAssault() {
-    return medium == Lead.MEDIUM_ASSAULT;
-  }
-  
-  
-  public boolean isPhysical() {
-    return Lead.isPhysical(medium);
+    return medium == LeadType.MEDIUM_ASSAULT;
   }
   
   
   public boolean isMeeting() {
-    return Lead.isSocial(medium);
+    return medium == LeadType.MEDIUM_MEETING;
+  }
+  
+  
+  public boolean isPhysical() {
+    return medium != LeadType.MEDIUM_WIRE;
   }
   
   
   public boolean isWired() {
-    return Lead.isWired(medium);
+    return medium == LeadType.MEDIUM_WIRE;
   }
   
   
@@ -95,26 +97,28 @@ public class Step extends Index.Entry implements Session.Saveable {
   }
   
   
+  public boolean involves(Role role) {
+    return Visit.arrayIncludes(involved, role);
+  }
+  
+  
   
   /**  Generating potential Clues-
-    */
-  //*
   protected Series <Clue> addTraitClues(
-    Plot plot, Element involved, Lead lead, Batch <Clue> possible
+    Plot plot, Element involved, Step step,
+    Base follows, Batch <Clue> possible
   ) {
     //
     //  Wiretaps and mentions can't reliably reveal any descriptive features
-    //  of the suspects involved.
-    Plot.Role role = plot.roleFor(involved);
-    if (role == null || medium == Lead.MEDIUM_WIRE) {
-      return possible;
-    }
+    //  of the suspects involved, except as tipoffs.
+    Role role = plot.roleFor(involved);
+    if (role == null) return possible;
     
     if (involved.isPerson()) {
       Person p = (Person) involved;
       for (Trait t : Common.PERSON_TRAITS) {
         if (p.stats.levelFor(t) <= 0) continue;
-        Clue forTrait = Clue.traitClue(plot, role, t);
+        Clue forTrait = Clue.traitClue(plot, role, step, t);
         possible.add(forTrait);
       }
     }
@@ -123,14 +127,14 @@ public class Step extends Index.Entry implements Session.Saveable {
       Place p = (Place) involved;
       for (Trait t : Common.VENUE_TRAITS) {
         if (! p.hasProperty(t)) continue;
-        Clue forTrait = Clue.traitClue(plot, role, t);
+        Clue forTrait = Clue.traitClue(plot, role, step, t);
         possible.add(forTrait);
       }
     }
     
     if (involved.isItem()) {
       Item p = (Item) involved;
-      Clue match = Clue.confirmSuspect(plot, role, p, p.place());
+      Clue match = Clue.confirmSuspect(plot, role, step, p, p.place());
       possible.add(match);
     }
     
@@ -139,9 +143,10 @@ public class Step extends Index.Entry implements Session.Saveable {
   
   
   protected Batch <Clue> addLocationClues(
-    Plot plot, Element involved, Lead lead, Batch <Clue> possible
+    Plot plot, Element involved, Step step,
+    Base follows, Batch <Clue> possible
   ) {
-    Plot.Role role = plot.roleFor(involved);
+    Role role = plot.roleFor(involved);
     if (role == null || ! involved.isPlace()) return possible;
     
     World world = plot.base.world();
@@ -150,7 +155,8 @@ public class Step extends Index.Entry implements Session.Saveable {
     
     for (Region near : around) {
       int range = (int) world.distanceBetween(at, near);
-      Clue clue = Clue.locationClue(plot, role, near, range);
+      Clue clue = Clue.locationClue(plot, role, step, near, range);
+      clue.setGetChance(1f / ((1 + range) * (1 + range)));
       possible.add(clue);
     }
     
@@ -158,8 +164,9 @@ public class Step extends Index.Entry implements Session.Saveable {
   }
   
   
+  //  TODO:  Not sure I like this.  Think about it again.
   protected boolean canLeakAim() {
-    for (Plot.Role main : Plot.MAIN_ROLES) {
+    for (Role main : Plot.KNOWS_AIM) {
       if (main == mentions) return true;
       if (Visit.arrayIncludes(involved, main)) return true;
     }
@@ -168,36 +175,78 @@ public class Step extends Index.Entry implements Session.Saveable {
   
   
   public Series <Clue> possibleClues(
-    Plot plot, Element focus, Lead lead
+    Plot plot, Element involved, Element focus, Step step,
+    Base follows, LeadType leadType
   ) {
     Batch <Clue> possible = new Batch();
-    addTraitClues   (plot, focus, lead, possible);
-    addLocationClues(plot, focus, lead, possible);
-    return possible;
+    Batch <Clue> screened = new Batch();
+    
+    addTraitClues   (plot, involved, step, follows, possible);
+    addLocationClues(plot, involved, step, follows, possible);
+    
+    CaseFile file = follows.leads.caseFor(plot);
+    for (Clue clue : possible) {
+      if (! leadType.canProvide(clue, involved, focus)) continue;
+      if (file.isRedundant(clue)) continue;
+      screened.add(clue);
+    }
+    
+    return screened;
+  }
+  
+  
+  public Clue pickFrom(Series <Clue> possible) {
+    Clue band[] = possible.toArray(Clue.class);
+    float weights[] = new float[band.length];
+    for (int i = band.length; i-- > 0;) weights[i] = band[i].getChance();
+    return (Clue) Rand.pickFrom(band, weights);
   }
   
   
   
   /**  Rendering, debug and interface methods-
-    */
   public String label() {
     return label;
   }
   
   
+  public String descTemplate() {
+    return descTemplate;
+  }
+  
+  
   public String toString() {
-    StringBuffer s = new StringBuffer();
-    s.append(label);
-    s.append(" ["+Lead.MEDIUM_DESC[medium]+"]");
-    s.append(" ["+from+" -> "+goes+"] [");
-    for (Plot.Role e : involved) {
-      s.append("\n    "+e);
-    }
-    s.append("\n  ]");
-    
-    return s.toString();
+    return label;
   }
 }
+
+
+
+  
+  
+  public void printSteps() {
+    I.say("\nSteps are:");
+    for (Step c : steps) {
+      I.say("  "+descStep(c));
+    }
+  }
+  
+  
+  public String descStep(Step step) {
+    StringBuffer s = new StringBuffer();
+    s.append(step.label);
+    s.append(" ["+LeadType.MEDIUM_DESC[step.medium]+"]");
+    s.append(" ["+filling(step.from)+" ("+step.from+")");
+    s.append(" -> "+filling(step.goes)+" ("+step.goes+")] [");
+    for (Role e : step.involved) {
+      s.append("\n    "+filling(e)+" ("+e+")");
+    }
+    s.append("\n  ]");
+    return s.toString();
+  }
+//*/
+
+
 
 
 

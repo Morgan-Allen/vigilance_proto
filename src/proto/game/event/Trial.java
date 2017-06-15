@@ -65,9 +65,14 @@ public class Trial extends Event {
   }
   
   
+  public void addToAccused(Person person) {
+    accused.add(person);
+  }
+  
+  
   public float rateEvidence(Person p) {
     float sumEvidence = 0;
-    for (Plot plot : conducts.leads.involvedIn(p, true)) {
+    for (Plot plot : conducts.leads.plotsAssociated(p, true)) {
       sumEvidence += conducts.leads.evidenceAgainst(p, plot, true);
     }
     return 1 - (1f / (1 + sumEvidence));
@@ -98,6 +103,16 @@ public class Trial extends Event {
   }
   
   
+  public Person defends() {
+    return defends;
+  }
+  
+  
+  public Person prosecutes() {
+    return prosecutes;
+  }
+  
+  
   public boolean involves(Plot plot, Person accused) {
     if (plot != null && plot != this.plot) return false;
     if (accused != null && ! this.accused.includes(accused)) return false;
@@ -111,6 +126,8 @@ public class Trial extends Event {
   public void beginEvent() {
     super.beginEvent();
     
+    Person boss = null;
+    
     for (Person p : accused) {
       float evidence = rateEvidence(p);
       if (Rand.num() < evidence) {
@@ -122,12 +139,19 @@ public class Trial extends Event {
       
       boolean isBoss = p.base().leader() == p;
       if (isBoss) {
+        boss = p;
         p.history.incBond(prosecutes, -0.5f);
         p.history.incBond(defends   , 0.25f);
       }
     }
     
     MessageUtils.presentSentenceMessage(world.view(), this);
+    
+    if (boss != null) {
+      PlotUtils.wipeFactionAssets(boss.base());
+      MessageUtils.presentBossSentenceMessage(world.view(), this, boss);
+    }
+    
     completeEvent();
   }
   
@@ -139,14 +163,6 @@ public class Trial extends Event {
     return "Trial for "+plot.organiser();
   }
 }
-
-
-
-
-
-
-
-
 
 
 

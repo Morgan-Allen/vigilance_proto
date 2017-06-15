@@ -28,7 +28,7 @@ public class Council {
     TRIAL_SENTENCE_AVG = World.DAYS_PER_WEEK * World.WEEKS_PER_YEAR;
   
   final World world;
-  Base cityHall;
+  Base city;
   List <Place> courts  = new List();
   List <Place> prisons = new List();
   
@@ -46,7 +46,7 @@ public class Council {
   
   
   void loadState(Session s) throws Exception {
-    cityHall = (Base) s.loadObject();
+    city = (Base) s.loadObject();
     s.loadObjects(courts );
     s.loadObjects(prisons);
     
@@ -61,7 +61,7 @@ public class Council {
   
   
   void saveState(Session s) throws Exception {
-    s.saveObject(cityHall);
+    s.saveObject (city   );
     s.saveObjects(courts );
     s.saveObjects(prisons);
     
@@ -77,8 +77,8 @@ public class Council {
   
   /**  Regular updates and initial setup-
     */
-  public void assignCityHall(Base city) {
-    this.cityHall = city;
+  public void assignCity(Base city) {
+    this.city = city;
   }
   
   
@@ -128,7 +128,7 @@ public class Council {
     }
     
     for (CaseFile f : evidence) {
-      CaseFile m = cityHall.leads.caseFor(f.subject());
+      CaseFile m = city.leads.caseFor(f.subject());
       m.updateCluesFrom(f);
     }
     
@@ -138,7 +138,7 @@ public class Council {
       p.setCaptive(true);
     }
     
-    Trial trial = new Trial(world, cityHall);
+    Trial trial = new Trial(world, city);
     Person defends = pickOfficial(), prosecutes = pickOfficial(defends);
     trial.assignParties(plot, defends, prosecutes, captive);
     world.events.scheduleEvent(trial, daysDelay * World.HOURS_PER_DAY);
@@ -187,17 +187,23 @@ public class Council {
   }
   
   
+  public Base city() {
+    return city;
+  }
+  
+  
   
   /**  Handling sentencing:
     */
   public void applySentence(Person accused, float durationMult) {
     Sentence s = new Sentence();
-    s.jailed = accused;
+    s.jailed     = accused;
     s.timeStarts = world.timing.totalHours();
-    s.timeEnds = (int) ((Rand.num() + 0.5f) + TRIAL_SENTENCE_AVG);
-    s.timeEnds *= World.HOURS_PER_DAY * durationMult;
-    s.timeEnds += s.timeStarts;
+    s.timeEnds   = (int) ((Rand.num() + 0.5f) * TRIAL_SENTENCE_AVG);
+    s.timeEnds   *= World.HOURS_PER_DAY * durationMult;
+    s.timeEnds   += s.timeStarts;
     sentences.put(accused, s);
+    accused.setCaptive(true);
   }
   
   
@@ -206,7 +212,7 @@ public class Council {
     for (Place prison : prisons) {
       pick.compare(prison, 0 - prison.residents().size());
     }
-    if (pick.empty()) return cityHall;
+    if (pick.empty()) return city.HQ();
     return pick.result();
   }
   
@@ -214,7 +220,7 @@ public class Council {
   public void releasePrisoner(Person p) {
     if (p.resides() == null) return;
     Place.setResident(p, p.resides(), false);
-    if (p.base() != null) Place.setResident(p, p.base(), true);
+    if (p.base() != null) Place.setResident(p, p.base().HQ(), true);
     sentences.remove(p);
     p.setCaptive(false);
   }

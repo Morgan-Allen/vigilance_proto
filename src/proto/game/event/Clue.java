@@ -19,20 +19,21 @@ public class Clue implements Session.Saveable {
     TYPE_MATCH    = 1,
     TYPE_TRAIT    = 2,
     TYPE_LOCATION = 3;
-
-  int       clueType;
-  Plot      plot    ;
-  Plot.Role role    ;
+  
+  int   clueType ;
+  Plot  plot     ;
+  Role  role     ;
+  float getChance;
   
   Element match     = null;
   Trait   trait     = null;
   Element location  = null;
   int     nearRange = -1  ;
   
-  Lead.Type leadType  ;
-  Lead      source    ;
-  Place     placeFound;
-  int       timeFound ;
+  LeadType leadType  ;
+  Lead     source    ;
+  Place    placeFound;
+  int      timeFound ;
   
   
   
@@ -40,17 +41,18 @@ public class Clue implements Session.Saveable {
     s.cacheInstance(this);
     
     clueType   = s.loadInt();
-    plot       = (Plot     ) s.loadObject();
-    role       = (Plot.Role) s.loadObject();
+    plot       = (Plot) s.loadObject();
+    role       = (Role) s.loadObject();
+    getChance  = s.loadFloat();
     
     match      = (Element) s.loadObject();
     trait      = (Trait  ) s.loadObject();
     location   = (Element) s.loadObject();
     nearRange  = s.loadInt();
     
-    leadType   = Lead.LEAD_TYPES[s.loadInt()];
-    source     = (Lead ) s.loadObject();
-    placeFound = (Place) s.loadObject();
+    leadType   = (LeadType) s.loadObject();
+    source     = (Lead    ) s.loadObject();
+    placeFound = (Place   ) s.loadObject();
     timeFound  = s.loadInt();
   }
   
@@ -60,17 +62,44 @@ public class Clue implements Session.Saveable {
     s.saveInt   (clueType   );
     s.saveObject(plot       );
     s.saveObject(role       );
+    s.saveFloat (getChance  );
     
     s.saveObject(match      );
     s.saveObject(trait      );
     s.saveObject(location   );
     s.saveInt   (nearRange  );
     
-    s.saveInt   (leadType.ID);
+    s.saveObject(leadType   );
     s.saveObject(source     );
     s.saveObject(placeFound );
     s.saveInt   (timeFound  );
   }
+  
+  
+  
+  /**  Basic access methods-
+    */
+  public boolean isAim         () { return clueType == TYPE_AIM     ; }
+  public boolean isConfirmation() { return clueType == TYPE_MATCH   ; }
+  public boolean isTraitClue   () { return clueType == TYPE_TRAIT   ; }
+  public boolean isLocationClue() { return clueType == TYPE_LOCATION; }
+  public boolean isReport      () { return leadType == LeadType.REPORT; }
+  public boolean isTipoff      () { return leadType == LeadType.TIPOFF; }
+  public boolean isEvidence    () { return ! (isReport() || isTipoff()); }
+  
+  public LeadType leadType () { return leadType ; }
+  public Lead     source   () { return source   ; }
+  public int      clueType () { return clueType ; }
+  public Plot     plot     () { return plot     ; }
+  public Role     role     () { return role     ; }
+  public float    getChance() { return getChance; }
+  
+  public int     time        () { return timeFound ; }
+  public Place   found       () { return placeFound; }
+  public Element match       () { return match     ; }
+  public Trait   trait       () { return trait     ; }
+  public Element locationNear() { return location  ; }
+  public int     nearRange   () { return nearRange ; }
   
   
   
@@ -80,7 +109,8 @@ public class Clue implements Session.Saveable {
   
   
   public static Clue locationClue(
-    Plot plot, Plot.Role role, Element location, int nearRange
+    Plot plot, Role role,
+    Element location, int nearRange
   ) {
     Clue c = new Clue();
     c.plot      = plot;
@@ -88,24 +118,28 @@ public class Clue implements Session.Saveable {
     c.clueType  = TYPE_LOCATION;
     c.location  = location;
     c.nearRange = nearRange;
+    c.getChance = 1;
     return c;
   }
   
   
   public static Clue traitClue(
-    Plot plot, Plot.Role role, Trait trait
+    Plot plot, Role role,
+    Trait trait
   ) {
     Clue c = new Clue();
-    c.plot     = plot;
-    c.role     = role;
-    c.clueType = TYPE_TRAIT;
-    c.trait    = trait;
+    c.plot      = plot;
+    c.role      = role;
+    c.clueType  = TYPE_TRAIT;
+    c.trait     = trait;
+    c.getChance = 1;
     return c;
   }
   
   
   public static Clue confirmSuspect(
-    Plot plot, Plot.Role role, Element match, Place at
+    Plot plot, Role role,
+    Element match, Place at
   ) {
     Clue c = new Clue();
     c.plot      = plot;
@@ -114,12 +148,14 @@ public class Clue implements Session.Saveable {
     c.match     = match;
     c.location  = at;
     c.nearRange = at != null ? 0 : -1;
+    c.getChance = 1;
     return c;
   }
   
   
   public static Clue confirmSuspect(
-    Plot plot, Plot.Role role, Element match
+    Plot plot, Role role,
+    Element match
   ) {
     return confirmSuspect(plot, role, match, null);
   }
@@ -127,23 +163,32 @@ public class Clue implements Session.Saveable {
   
   public static Clue confirmAim(Plot plot) {
     Clue c = new Clue();
-    c.plot     = plot;
-    c.role     = Plot.ROLE_OBJECTIVE;
-    c.clueType = TYPE_AIM;
+    c.plot      = plot;
+    c.role      = Plot.ROLE_OBJECTIVE;
+    c.clueType  = TYPE_AIM;
+    c.getChance = 1;
     return c;
   }
   
   
-  public void confirmSource(Lead source, int time, Place place) {
-    this.source = source;
-    confirmSource(source.type, time, place);
+  
+  /**  Assigning get-chance, confirming sources and checking redundancy-
+    */
+  public void setGetChance(float chance) {
+    this.getChance = chance;
   }
   
   
-  public void confirmSource(Lead.Type type, int time, Place place) {
+  public void confirmSource(Lead source, int time, Place found) {
+    this.source = source;
+    confirmSource(source.type, time, found);
+  }
+  
+  
+  public void confirmSource(LeadType type, int time, Place found) {
     this.leadType   = type ;
     this.timeFound  = time ;
-    this.placeFound = place;
+    this.placeFound = found;
   }
   
   
@@ -152,6 +197,8 @@ public class Clue implements Session.Saveable {
     if (role != other.role) return false;
     
     if (isConfirmation()) {
+      if (match.isPlace() && other.isLocationClue()) return true;
+      if (other.isTraitClue()) return true;
       if (location == other.location && match == other.match) return true;
     }
     
@@ -178,29 +225,16 @@ public class Clue implements Session.Saveable {
   }
   
   
+  public boolean matches(Clue other) {
+    if (plot      != other.plot     ) return false;
+    if (role      != other.role     ) return false;
+    if (clueType  != other.clueType ) return false;
+    if (trait     != other.trait    ) return false;
+    if (location  != other.location ) return false;
+    if (nearRange != other.nearRange) return false;
+    return true;
+  }
   
-  /**  Other basic access methods-
-    */
-  public boolean isAim         () { return clueType == TYPE_AIM        ; }
-  public boolean isConfirmation() { return clueType == TYPE_MATCH      ; }
-  public boolean isTraitClue   () { return clueType == TYPE_TRAIT      ; }
-  public boolean isLocationClue() { return clueType == TYPE_LOCATION   ; }
-  public boolean isReport      () { return leadType == Lead.LEAD_REPORT; }
-  public boolean isTipoff      () { return leadType == Lead.LEAD_TIPOFF; }
-  public boolean isEvidence    () { return ! (isReport() || isTipoff()); }
-  
-  public Lead.Type leadType() { return leadType; }
-  public Lead      source  () { return source  ; }
-  public int       clueType() { return clueType; }
-  public Plot      plot    () { return plot    ; }
-  public Plot.Role role    () { return role    ; }
-  
-  public int     time        () { return timeFound ; }
-  public Place   place       () { return placeFound; }
-  public Element match       () { return match     ; }
-  public Trait   trait       () { return trait     ; }
-  public Element locationNear() { return location  ; }
-  public int     nearRange   () { return nearRange ; }
 
 
   /**  Evaluation of possible suspects-
@@ -253,10 +287,11 @@ public class Clue implements Session.Saveable {
     */
   public String toString() {
     if (isConfirmation()) {
-      return "is "+match+" at "+location;
+      if (match.isPerson()) return "is "+match+" at "+location;
+      else return "is "+match;
     }
     if (isTraitClue()) {
-      return "has "+trait;
+      return "is "+trait;
     }
     if (isLocationClue()) {
       if (nearRange == 0) return "in "+location;

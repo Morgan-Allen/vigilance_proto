@@ -19,13 +19,10 @@ public class DebugPlotAfter extends RunGame {
   
   protected World setupWorld() {
     World world = new World(this, savePath);
-    DefaultGame.initDefaultWorld(world);
+    DefaultGame.initDefaultWorld(world, false);
     
-    Base crooks = world.baseFor(Crooks.THE_MADE_MEN);
-    Plot plot = PlotTypes.TYPE_KIDNAP.initPlot(crooks);
-    plot.fillAndExpand();
-    crooks.plots.assignRootPlot(plot, 0);
-    plot.advanceToStep(plot.mainHeist());
+    Base crooks = world.baseFor(Crooks.THE_MORETTI_FAMILY);
+    DebugPlotUtils.assignRandomPlot(crooks, PlotTypes.ALL_TYPES);
     
     GameSettings.noTipoffs = true;
     world.updateWorld(0);
@@ -37,11 +34,15 @@ public class DebugPlotAfter extends RunGame {
     if (afterLoad) return false;
     
     GameSettings.noTipoffs = true;
-    Plot plot = world.events.latestPlot();
-    if (plot != null) return DebugPlotUtils.enterPlotDebugLoop(
-      world, plot, ! suite, suite, plot.scene(), plot.organiser()
+    Plot plot = world.events.nextActivePlot();
+    if (plot == null) return false;
+    
+    while (! plot.complete()) world.updateWorld(24);
+    
+    return DebugPlotUtils.enterLeadFollowingLoop(
+      world, plot, true, ! suite, suite ? 0 : 1,
+      plot.scene(), plot.hideout()
     );
-    return false;
   }
 }
 

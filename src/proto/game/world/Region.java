@@ -78,9 +78,9 @@ public class Region extends Element {
     ),
     TRUST = new Stat(
       "Trust", 5,
-      "Trust improves the likelihood of tipoffs from local sources, which "+
-      "are vital to most investigations.  Boost it by protecting civilians, "+
-      "minimising use of force, and building public amenities."
+      "Trust improves the likelihood of tipoffs from local sources and lets "+
+      "law enforcement turn a blind eye to your activities.  Boost it by "+
+      "protecting civilians, minimising use of force and funding charities."
     ),
     CORRUPTION = new Stat(
       "Corruption", 6,
@@ -189,35 +189,38 @@ public class Region extends Element {
   }
   
   
-  private int incomeFor(Base base, boolean positive) {
-    int total = 0;
-    
-    if (positive && ! base.faction().criminal) {
-      float crime = 0;
-      crime += currentValue(VIOLENCE  ) / 100f;
-      crime += currentValue(CORRUPTION) / 100f;
-      total += kind().baseFunding * (1 - Nums.clamp(crime, 0, 1));
-    }
+  public static class IncomeReport {
+    public Base base;
+    public int
+      income,
+      expense,
+      lossViolence,
+      lossCorruption,
+      incomeAfterLoss,
+      profit;
+  }
+  
+  public IncomeReport incomeReport(Base base) {
+    IncomeReport r = new IncomeReport();
     
     for (Place slot : buildSlots) {
-      if (slot == null || slot.owner() != base) continue;
+      if (slot == null || slot.base() != base) continue;
       if (slot.buildProgress() < 1) continue;
       
       final int inc = slot.kind().incomeFrom(this);
-      if (positive) total += Nums.max(inc, 0      );
-      else          total += Nums.max(0  , 0 - inc);
+      r.income  += Nums.max(inc, 0      );
+      r.expense += Nums.max(0  , 0 - inc);
     }
-    return total;
-  }
-  
-  
-  public int incomeFor(Base base) {
-    return incomeFor(base, true);
-  }
-  
-  
-  public int expensesFor(Base base) {
-    return incomeFor(base, false);
+    
+    if (! base.faction().criminal) {
+      r.lossViolence   = (int) (r.income * currentValue(VIOLENCE  ) / 100f);
+      r.lossCorruption = (int) (r.income * currentValue(CORRUPTION) / 100f);
+    }
+    
+    r.base            = base;
+    r.incomeAfterLoss = r.income - (r.lossViolence + r.lossCorruption);
+    r.profit          = r.incomeAfterLoss - r.expense;
+    return r;
   }
   
   
@@ -271,7 +274,7 @@ public class Region extends Element {
       world.setInside(oldPlace, false);
     }
     
-    buildSlots[slotFor(oldPlace)] = newPlace;
+    buildSlots[slotID] = newPlace;
     
     if (newPlace != null) {
       setAttached(newPlace, true);
@@ -282,20 +285,20 @@ public class Region extends Element {
   
   
   public Place setupFacility(
-    PlaceType print, int slotID, Base owns, boolean complete
+    PlaceType print, int slotID, Faction faction, boolean complete
   ) {
     final Place place = new Place(print, slotID, world);
+    Base owns = world.baseFor(faction);
+    place.setBase(owns);
+    
     if (complete || owns == null) {
-      place.setOwner(owns);
       place.setBuildProgress(1);
       place.updateResidents();
     }
     else {
-      place.setOwner(owns);
       owns.finance.incPublicFunds(0 - place.kind().buildCost);
       place.setBuildProgress(0);
     }
-    
     return replaceFacility(place, slotID);
   }
   
@@ -304,12 +307,14 @@ public class Region extends Element {
   /**  Updates and life-cycle:
     */
   public void initialiseRegion() {
-    
-    final PlaceType DF[] = kind().defaultFacilities;
-    for (int i = 0; i < buildSlots.length; i++) {
-      if (DF == null || i >= DF.length) break;
-      setupFacility(DF[i], i, null, true);
+    for (int i : Visit.range(0, buildSlots.length)) {
+      PlaceType p = kind().defaultFacilities.atIndex(i);
+      Faction   f = kind().defaultOwners    .atIndex(i);
+      if (p == null || f == null) continue;
+      Place built = setupFacility(p, i, f, true);
+      if (p.isHQ()) built.base().assignHQ(built);
     }
+    
     updateStats(0);
     
     incLevel(Region.TRUST     , kind().defaultTrust     , true);
@@ -333,7 +338,7 @@ public class Region extends Element {
     
     for (Place slot : buildSlots) if (slot != null) {
       final PlaceType built = slot.kind();
-      final Base      owns  = slot.owner();
+      final Base      owns  = slot.base();
       final float     prog  = slot.buildProgress();
       
       if (built == null) {

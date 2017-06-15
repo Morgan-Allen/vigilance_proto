@@ -1,6 +1,7 @@
 
 
 package proto.game.event;
+import proto.game.person.Person;
 import proto.game.world.*;
 import proto.common.*;
 import proto.util.*;
@@ -44,22 +45,38 @@ public class BasePlots {
   
   
   public Plot generateNextPlot() {
+    
+    Person leader = base.leader();
+    if (leader == null || leader.isCaptive() || ! leader.health.conscious()) {
+      return null;
+    }
+    
+    final boolean report = GameSettings.eventsVerbose;
+    if (report) I.say("\nPicking new plot for "+base);
     Pick <Plot> pick = new Pick(0);
     
     for (PlotType type : plotTypes) {
       Plot sample = type.initPlot(base);
       sample.fillAndExpand();
       float rating = sample.ratePlotFor(base.leader());
-      pick.compare(sample, rating * (0.5f + Rand.num()));
+      if (report) I.say("  "+sample+": "+rating);
+      pick.compare(sample, rating * Rand.avgNums(2));
     }
+    if (report) I.say("  Picked: "+pick.result());
     
     return pick.result();
   }
   
   
-  public void assignRootPlot(Plot master, int delayHours) {
-    this.rootPlot = master;
-    base.world().events.scheduleEvent(rootPlot, delayHours);
+  public void assignRootPlot(Plot newPlot, int delayHours) {
+    Events events = base.world().events;
+    if (rootPlot != null) {
+      events.closeEvent(rootPlot);
+    }
+    if (newPlot != null) {
+      this.rootPlot = newPlot;
+      events.scheduleEvent(rootPlot, delayHours);
+    }
   }
   
   
@@ -68,12 +85,12 @@ public class BasePlots {
       return;
     }
     if (rootPlot == null || rootPlot.complete()) {
-      rootPlot = generateNextPlot();
+      Plot newPlot = generateNextPlot();
       int delay = (int) Rand.range(
         GameSettings.MIN_PLOT_THINKING_TIME,
         GameSettings.MAX_PLOT_THINKING_TIME
       );
-      if (rootPlot != null) assignRootPlot(rootPlot, delay);
+      assignRootPlot(newPlot, delay);
     }
   }
   

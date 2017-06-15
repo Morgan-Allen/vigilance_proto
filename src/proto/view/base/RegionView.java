@@ -3,8 +3,8 @@
 package proto.view.base;
 import proto.common.*;
 import proto.game.event.*;
+import proto.game.person.*;
 import proto.game.world.*;
-
 import proto.util.*;
 import proto.view.common.*;
 
@@ -26,31 +26,70 @@ public class RegionView extends UINode {
     );
   
   
-  final MapInsetView mapRefers;
-  
-  
-  public RegionView(UINode parent, MapInsetView map, Box2D viewBounds) {
+  public RegionView(UINode parent, Box2D viewBounds) {
     super(parent, viewBounds);
-    this.mapRefers = map;
   }
   
   
-
+  
   /**  Actual rendering methods-
     */
   protected boolean renderTo(Surface surface, Graphics2D g) {
     
-    final Region region = mapRefers.selectedRegion();
-    if (region == null) {
-      //  TODO:  Render some help-text instead!
-      return false;
-    }
-    
-    g.drawString(region.kind().name(), vx + 20, vy + 20);
+    MapInsetView mapRefers = mainView.mapView.mapView;
+    Region  region = mapRefers.selectedRegion();
+    Base    player = mainView.player();
+    MapView parent = mainView.mapView;
+    if (region == null) return false;
     
     Region.Stat hovered = null;
+    int across = 10, down = 10;
+    Region.Stat ref = null;
     
-    int down = 50;
+    //
+    //  First render the name of the region:
+    g.setColor(Color.WHITE);
+    g.drawString(region.kind().name(), vx + across + 0, vy + down + 0);
+    down += 20;
+    
+    //
+    //  Then render deterrence:
+    ref = Region.DETERRENCE;
+    g.setColor(Color.WHITE);
+    if (surface.tryHover(vx + 20, vy + down - 10, 120, 20, ref, this)) {
+      hovered = ref;
+      g.setColor(Color.YELLOW);
+    }
+    g.drawString("Deterrence:", vx + across + 20, vy + down);
+    
+    float deterLevel = region.longTermValue(Region.DETERRENCE) / 100f;
+    ViewUtils.renderStatBar(
+      vx + across + 100, vy + down - 10,
+      180, 10, Color.YELLOW, Color.DARK_GRAY, deterLevel, false, g
+    );
+    down += 20;
+    
+    //
+    //  Then render trust:
+    ref = Region.TRUST;
+    g.setColor(Color.WHITE);
+    if (surface.tryHover(vx + 20, vy + down - 10, 120, 20, ref, this)) {
+      hovered = ref;
+      g.setColor(Color.YELLOW);
+    }
+    g.drawString("Trust:", vx + across + 20, vy + down);
+    
+    float trustLevel = region.longTermValue(Region.TRUST) / 100f;
+    ViewUtils.renderStatBar(
+      vx + across + 100, vy + down - 10,
+     180, 10, Color.BLUE, Color.DARK_GRAY, trustLevel, false, g
+    );
+    down += 20;
+    
+    //
+    //  Then render other civic stats:
+    down = 70;
+    
     for (Region.Stat stat : Region.CIVIC_STATS) {
       if (surface.tryHover(vx, vy + down - 10, 120, 20, stat, this)) {
         hovered = stat;
@@ -63,102 +102,176 @@ public class RegionView extends UINode {
       down += 20;
     }
     
-    down = 50;
-    for (Region.Stat stat : Region.SOCIAL_STATS) {
-      if (surface.tryHover(vx + 160, vy + down - 10, 120, 20, stat, this)) {
-        hovered = stat;
+    Region.IncomeReport r = region.incomeReport(player);
+    String sumDescs[] = {
+      "Revenue:",
+      "Violence:",
+      "Corruption:",
+      "Expenses:",
+      "Total Profit:"
+    };
+    Object descVals[] = {
+      r.income,
+      0 - r.lossViolence,
+      0 - r.lossCorruption,
+      0 - r.expense,
+      r.profit
+    };
+    
+    down = 70;
+    for (int i : Visit.range(0, descVals.length)) {
+      if (surface.tryHover(vx + 160, vy + down - 10, 120, 20, null, this)) {
+        hovered = null;
         g.setColor(Color.YELLOW);
       }
       else g.setColor(Color.WHITE);
-      g.drawString(stat+": ", vx + 160, vy + down);
-      int current = (int) region.currentValue(stat);
-      g.drawString(""+current, vx + 250, vy + down);
+      g.drawString(""+sumDescs[i]    , vx + across + 160, vy + down);
+      g.drawString(""+descVals[i]+"m", vx + across + 240, vy + down);
       down += 20;
     }
+    g.drawRect(vx + across + 20, vy + down - 36, 270, 0);
     
-    renderFacilities(region, surface, g);
     
+    g.setColor(Color.WHITE);
+    g.drawString("Facilities", vx + across + 10, vy + down + 10);
+    down += 15;
+    
+    ViewUtils.ListDraw draw = new ViewUtils.ListDraw();
+    for (Integer slotID : Visit.range(0, region.maxFacilities())) {
+      Place p = region.buildSlot(slotID);
+      Image icon = p == null ? NOT_BUILT : p.icon();
+      Object entry = draw.addEntry(icon, null, 60, slotID);
+      if (p != null && p.buildProgress() < 1) {
+        draw.attachOverlay(entry, IN_PROGRESS);
+      }
+    }
+    draw.performHorizontalDraw(across + 20, down, this, surface, g);
+    down = draw.down + 10;
+    
+    
+    String hoverDesc = "";
     if (hovered != null) {
-      g.setColor(Color.LIGHT_GRAY);
-      String desc = hovered.description;
-      ViewUtils.drawWrappedString(
-        desc, g, vx + 25, vy + 190, 275, 500
-      );
+      hoverDesc = hovered.description;
+    }
+    else if (draw.hovered instanceof Integer) {
+      int   slotID = (Integer) draw.hovered;
+      Place built  = region.buildSlot(slotID);
+      Base  owner  = built == null ? null : built.base();
+      
+      if (built != null) {
+        float prog = built.buildProgress();
+        hoverDesc = "";
+        hoverDesc += built.kind().defaultInfo();
+        hoverDesc += "\nInvestor: "+built.base().faction().name;
+        if (prog < 1) hoverDesc += " ("+((int) (prog * 100))+"% complete)";
+      }
+      else {
+        hoverDesc = "Vacant Site (click to begin construction)";
+      }
+      
+      if (draw.clicked && owner == player.world().council.city()) {
+        presentCivicMessage(region, slotID);
+      }
+      else if (draw.clicked && owner == null) {
+        presentBuildOptions(region, slotID);
+      }
+      else if (draw.clicked && owner != player) {
+        presentRivalMessage(region, slotID);
+      }
+      else if (draw.clicked && built == player.HQ()) {
+        presentOwnHQMessage(region, built);
+      }
+      else if (draw.clicked && owner == player) {
+        presentDemolishDialog(region, slotID);
+      }
     }
     
-    g.setColor(Color.DARK_GRAY);
-    g.drawRect(vx, vy, vw, vh);
+    g.setColor(Color.LIGHT_GRAY);
+    ViewUtils.drawWrappedString(
+      hoverDesc, g, vx + across, vy + down, 275, 250
+    );
+    down += 250;
     
+    parent.infoArea.setScrollheight(down);
     return true;
   }
   
   
-  void renderFacilities(
-    final Region d, final Surface surface, final Graphics2D g
-  ) {
-    final int maxF = d.maxFacilities();
-    int across = 25, down = 125;
-    int hoverSlotID = -1;
-    
-    for (int n = 0; n < maxF; n++) {
-      final Place     slot  = d.buildSlot(n);
-      final PlaceType built = slot == null ? null : slot.kind();
-      final float     prog  = slot == null ? 0 : slot.buildProgress();
-      final int slotID = n;
-      
-      Image icon = null;
-      if (built == null) {
-        icon = NOT_BUILT;
-      }
-      else {
-        icon = built.icon();
-      }
-      
-      final ImageButton button = new ImageButton(
-        icon, new Box2D(across, down, 60, 60), this
-      ) {
-        protected void whenClicked() {
-          presentBuildOptions(d, slotID, surface, g);
+  void presentCivicMessage(final Region d, final int slotID) {
+    final MessageView dialog = new MessageView(
+      this, null, "Civic Structure",
+      "This structure is owned by the city council, and cannot be demolished "+
+      "or refurbished.",
+      "Cancel"
+    ) {
+      protected void whenClicked(String option, int optionID) {
+        if (optionID == 0) {
+          mainView.dismissMessage(this);
         }
-      };
-      button.refers = built+"_slot_"+slotID;
-      if (prog < 1 && built != null) button.attachOverlay(IN_PROGRESS);
-      button.renderNow(surface, g);
-      if (surface.wasHovered(button.refers)) hoverSlotID = n;
-      
-      across += 60 + 10;
-    }
-    
-    if (hoverSlotID != -1 && d.buildSlot(hoverSlotID) == null) {
-      g.setColor(Color.LIGHT_GRAY);
-      String desc = "Vacant Site\n  (Click to begin construction)";
-      ViewUtils.drawWrappedString(
-        desc, g, vx + 25, vy + 190, 275, 500
-      );
-    }
-    else if (hoverSlotID != -1) {
-      g.setColor(Color.LIGHT_GRAY);
-      
-      final Place     slot  = d.buildSlot(hoverSlotID);
-      final PlaceType built = slot.kind();
-      final Base      owns  = slot.owner();
-      final float     prog  = slot.buildProgress();
-      
-      String desc = "";
-      desc += built.defaultInfo();
-      desc += "\nInvestor: "+owns.faction().name;
-      if (prog < 1) desc += " ("+((int) (prog * 100))+"% complete)";
-      
-      ViewUtils.drawWrappedString(
-        desc, g, vx + 25, vy + 190, 275, 500
-      );
-    }
+      }
+    };
+    mainView.queueMessage(dialog);
   }
   
   
-  void presentBuildOptions(
-    Region d, int slotID, Surface surface, Graphics2D g
-  ) {
+  void presentRivalMessage(final Region d, final int slotID) {
+    final MessageView dialog = new MessageView(
+      this, null, "Civic Structure",
+      "This structure is owned by a rival crime boss.  Look for any signs of "+
+      "criminal involvement on their part, and build a case toward forcing "+
+      "them out of business.",
+      "Cancel"
+    ) {
+      protected void whenClicked(String option, int optionID) {
+        if (optionID == 0) {
+          mainView.dismissMessage(this);
+        }
+      }
+    };
+    mainView.queueMessage(dialog);
+  }
+  
+  
+  void presentOwnHQMessage(final Region d, final Place built) {
+    final MessageView dialog = new MessageView(
+      this, null, "Headquarters",
+      "This structure is the current headquarters for your organisation, and "+
+      "cannot be demolished.",
+      "Cancel"
+    ) {
+      protected void whenClicked(String option, int optionID) {
+        if (optionID == 0) {
+          mainView.dismissMessage(this);
+        }
+      }
+    };
+    mainView.queueMessage(dialog);
+  }
+  
+  
+  void presentDemolishDialog(final Region d, final int slotID) {
+    final MessageView dialog = new MessageView(
+      this, null, "Confirm Demolition?",
+      "In order to begin construction of new facilities, you will have to "+
+      "demolish the current structure.  Are you sure you want to do this?",
+      "Proceed",
+      "Cancel"
+    ) {
+      protected void whenClicked(String option, int optionID) {
+        if (optionID == 0) {
+          mainView.dismissMessage(this);
+          presentBuildOptions(d, slotID);
+        }
+        if (optionID == 1) {
+          mainView.dismissMessage(this);
+        }
+      }
+    };
+    mainView.queueMessage(dialog);
+  }
+  
+  
+  void presentBuildOptions(Region d, int slotID) {
     final BuildOptionsView options = new BuildOptionsView(mainView, d, slotID);
     mainView.queueMessage(options);
   }

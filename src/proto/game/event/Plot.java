@@ -6,6 +6,10 @@ import proto.game.world.*;
 import proto.game.person.*;
 import proto.game.scene.*;
 import proto.util.*;
+import proto.view.base.MessageUtils;
+
+import static proto.game.event.Lead.*;
+import static proto.game.event.LeadType.*;
 
 
 
@@ -14,8 +18,6 @@ public abstract class Plot extends Event implements Assignment {
   
   /**  Role-definitions-
     */
-  final static Index <Role> ROLES_INDEX = new Index <Role> ();
-  
   final public static String
     ASPECT = "Aspect",
     PERP   = "Perp"  ,
@@ -23,65 +25,58 @@ public abstract class Plot extends Event implements Assignment {
     SCENE  = "Scene" ,
     VICTIM = "Victim";
   
-  public static class Role extends Index.Entry implements Session.Saveable {
-    
-    final public String name;
-    final public String category;
-    
-    Role(String ID, String name, String category) {
-      super(ROLES_INDEX, ID);
-      this.name = name;
-      this.category = category;
-    }
-    
-    public static Role loadConstant(Session s) throws Exception {
-      return ROLES_INDEX.loadEntry(s.input());
-    }
-    
-    public void saveState(Session s) throws Exception {
-      ROLES_INDEX.saveEntry(this, s.output());
-    }
-    
-    public String toString() {
-      return name;
-    }
-    
-    public boolean isAspect() {
-      return category == ASPECT;
-    }
-    
-    public boolean isPerp() {
-      return category == PERP;
-    }
-    
-    public boolean isItem() {
-      return category == ITEM;
-    }
-    
-    public boolean isScene() {
-      return category == SCENE;
-    }
-    
-    public boolean isVictim() {
-      return category == VICTIM;
-    }
-  }
-  
-  public static Role role(String ID, String name, String category) {
-    return new Role(ID, name, category);
+  public static Role role(
+    String ID, String name, String category, String descTemplate
+  ) {
+    return new Role(ID, name, category, descTemplate);
   }
   
   final public static Role
-    ROLE_OBJECTIVE  = new Role("role_objective" , "Objective" , ASPECT),
-    ROLE_TIME       = new Role("role_time"      , "Time"      , ASPECT),
-    ROLE_MASTERMIND = new Role("role_mastermind", "Mastermind", PERP  ),
-    ROLE_HQ         = new Role("role_hq"        , "HQ"        , SCENE ),
-    ROLE_ORGANISER  = new Role("role_organiser" , "Organiser" , PERP  ),
-    ROLE_HIDEOUT    = new Role("role_hideout"   , "Hideout"   , SCENE ),
-    ROLE_TARGET     = new Role("role_target"    , "Target"    , VICTIM),
-    ROLE_SCENE      = new Role("role_scene"     , "Scene"     , SCENE ),
-    
-    MAIN_ROLES[] = { ROLE_MASTERMIND, ROLE_ORGANISER, ROLE_TARGET };
+    ROLE_OBJECTIVE = role(
+      "role_objective", "Objective", ASPECT,
+      "<faction> are planning <aim>."
+    ),
+    ROLE_TIME = role(
+      "role_time", "Time", ASPECT,
+      "<plot> is scheduled for <time>."
+    ),
+    ROLE_MASTERMIND = role(
+      "role_mastermind", "Mastermind", PERP,
+      "<suspect> is the mastermind for <plot>."
+    ),
+    ROLE_HQ = role(
+      "role_hq", "HQ", SCENE,
+      "<suspect> is the headquarters for <faction>."
+    ),
+    ROLE_ORGANISER = role(
+      "role_organiser", "Organiser", PERP,
+      "<suspect> is the organiser for <plot>."
+    ),
+    ROLE_HIDEOUT = role(
+      "role_hideout", "Hideout", SCENE,
+      "<suspect> is the hideout for a crew involved in <plot>."
+    ),
+    ROLE_TARGET = role(
+      "role_target", "Target", VICTIM,
+      "<suspect> is the target of <plot>."
+    ),
+    ROLE_SCENE = role(
+      "role_scene", "Scene", SCENE,
+      "<suspect> is the scene for <plot>."
+    ),
+    KNOWS_AIM    [] = { ROLE_MASTERMIND, ROLE_ORGANISER },
+    NEVER_SHOW   [] = { ROLE_OBJECTIVE, ROLE_TIME },
+    NEVER_TIP    [] = { ROLE_MASTERMIND, ROLE_HQ, ROLE_TARGET, ROLE_SCENE },
+    CORE_ROLES   [] = { ROLE_HQ, ROLE_HIDEOUT, ROLE_SCENE },
+    PERSIST_ROLES[] = { ROLE_HQ, ROLE_MASTERMIND };
+  
+  final public static int
+    STATE_INIT    = -1,
+    STATE_ACTIVE  =  0,
+    STATE_SUCCESS =  1,
+    STATE_FAILED  =  2,
+    STATE_CLOSED  =  3,
+    STATE_SPOOKED =  4;
   
   
   /**  Data fields, construction and save/load methods-
@@ -95,17 +90,21 @@ public abstract class Plot extends Event implements Assignment {
     
     Role role, location;
     Element element;
-    Plot supplies;
+    Plot supplies = null;
+    int numClues = 0;
     
     public String toString() {
       return element+" ("+role+")";
     }
   }
   
-  List <Step> steps = new List();
-  Step current = null;
-  int stepTimes[];
+  int state      = STATE_INIT;
+  int duration   = -1;
+  int tipsCount  = 0;
   int spookLevel = 0;
+  
+  Table <String, String> leadResults = null;
+  
   
   
   protected Plot(PlotType type, Base base) {
@@ -120,19 +119,27 @@ public abstract class Plot extends Event implements Assignment {
     
     for (int n = s.loadInt(); n-- > 0;) {
       RoleEntry entry = new RoleEntry();
-      entry.role     = (Plot.Role) s.loadObject();
-      entry.location = (Plot.Role) s.loadObject();
-      entry.element  = (Element  ) s.loadObject();
-      entry.supplies = (Plot     ) s.loadObject();
+      entry.role     = (Role   ) s.loadObject();
+      entry.location = (Role   ) s.loadObject();
+      entry.element  = (Element) s.loadObject();
+      entry.supplies = (Plot   ) s.loadObject();
+      entry.numClues = s.loadInt();
       entries.add(entry);
     }
     s.loadObjects(involved);
     
-    s.loadObjects(steps);
-    current = (Step) s.loadObject();
-    stepTimes = new int[steps.size()];
-    for (int i = 0; i < steps.size(); i++) stepTimes[i] = s.loadInt();
+    state      = s.loadInt();
+    duration   = s.loadInt();
+    tipsCount  = s.loadInt();
     spookLevel = s.loadInt();
+    
+    int numA = s.loadInt();
+    if (numA != -1) {
+      leadResults = new Table();
+      for (int i = numA; i-- > 0;) {
+        leadResults.put(s.loadString(), s.loadString());
+      }
+    }
   }
   
   
@@ -146,124 +153,87 @@ public abstract class Plot extends Event implements Assignment {
       s.saveObject(entry.location);
       s.saveObject(entry.element );
       s.saveObject(entry.supplies);
+      s.saveInt   (entry.numClues);
     }
     s.saveObjects(involved);
     
-    s.saveObjects(steps);
-    s.saveObject(current);
-    for (int t : stepTimes) s.saveInt(t);
+    s.saveInt(state     );
+    s.saveInt(duration  );
+    s.saveInt(tipsCount );
     s.saveInt(spookLevel);
-  }
-  
-  
-  
-  /**  Queueing and executing sub-events and generating clues for
-    *  investigation-
-    */
-  protected void queueSteps(Step... steps) {
-    this.steps     = new List();
-    this.stepTimes = new int[steps.length];
-    this.current   = null;
     
-    check: for (Step s : steps) if (s != null) {
-      for (Role r : s.involved) if (filling(r) == null) {
-        I.say("  Could not fill role!");
-        continue check;
-      }
-      this.steps.add(s);
-    }
-    for (int i = steps.length; i-- > 0;) stepTimes[i] = -1;
-  }
-  
-  
-  public Step currentStep() {
-    return current;
-  }
-  
-  
-  public Series <Step> allSteps() {
-    return steps;
-  }
-  
-  
-  public Step mainHeist() {
-    for (Step s : steps) {
-      if (s.subject != ROLE_TARGET        ) continue;
-      if (s.medium  != Lead.MEDIUM_ASSAULT) continue;
-      return s;
-    }
-    return null;
-  }
-  
-  
-  public int startTime(Step step) {
-    return stepTimes[steps.indexOf(step)];
-  }
-  
-
-  public boolean begun(Step step) {
-    return startTime(step) >= 0;
-  }
-  
-  
-  public boolean complete(Step step) {
-    if (! begun(step)) return false;
-    int time = base.world().timing.totalHours();
-    return time >= startTime(step) + step.hoursTaken;
-  }
-  
-  
-  public int timeScheduled(Step step) {
-    if (current == null) return -1;
-    int time = -1;
-    for (Step s : steps) {
-      if (time == -1) time = startTime(step);
-      time += s.hoursTaken;
-      if (s == step) break;
-    }
-    return time;
-  }
-  
-  
-  public int tense(Step step) {
-    int start = startTime(step);
-    if (start == -1) return Lead.TENSE_NONE;
-    int time = base.world().timing.totalHours();
-    boolean begun = start >= 0;
-    boolean done = time >= (start + step.hoursTaken);
-    if (begun) return done ? Lead.TENSE_AFTER : Lead.TENSE_DURING;
-    return Lead.TENSE_BEFORE;
-  }
-  
-  
-  public Series <Element> involved(Step step) {
-    Batch <Element> all = new Batch();
-    for (Role r : step.involved) all.add(filling(r));
-    return all;
-  }
-  
-  
-  public Place from(Step step) {
-    return location(step.from);
-  }
-  
-  
-  public Place goes(Step step) {
-    return location(step.goes);
-  }
-  
-  
-  public Place goes(Person p, Step step) {
-    Role role = roleFor(p);
-    if (Visit.arrayIncludes(step.involved, role)) {
-      if (step.isWired()) {
-        return (role == step.subject) ? goes(step) : from(step);
-      }
-      else {
-        return goes(step);
+    if (leadResults == null) s.saveInt(-1);
+    else {
+      s.saveInt(leadResults.size());
+      for (String key : leadResults.keySet()) {
+        s.saveString(key);
+        s.saveString(leadResults.get(key));
       }
     }
-    return location(role);
+  }
+  
+  
+  
+  /**  Queueing and executing sub-events and storing results for attempts at
+    *  investigation.
+    */
+  public Element targetElement(Person p) {
+    return location(roleFor(p));
+  }
+  
+  
+  public int tense() {
+    int
+      time   = base.world().timing.totalHours(),
+      begins = timeBegins(),
+      ends   = timeComplete();
+    if (begins == -1 || begins > time) return LeadType.TENSE_FUTURE;
+    if (ends   != -1 && ends   < time) return LeadType.TENSE_PAST  ;
+    return LeadType.TENSE_PRESENT;
+  }
+  
+  
+  String leadKey(Lead lead) {
+    return eventID+"_"+tense()+"_"+lead.type.uniqueID()+"_"+lead.focus.ID();
+  }
+  
+  
+  void cacheLeadResult(Lead lead, int timeStart, int outcome) {
+    if (leadResults == null) leadResults = new Table();
+    leadResults.put(leadKey(lead), timeStart+"_"+outcome);
+  }
+  
+  
+  String[] cachedLeadResult(String leadKey) {
+    if (leadResults == null) return null;
+    String raw = leadResults.get(leadKey);
+    return raw == null ? null : raw.split("_");
+  }
+  
+  
+  public int timeStarted(Lead lead) {
+    String result[] = cachedLeadResult(leadKey(lead));
+    if (result == null) return -1;
+    return Integer.parseInt(result[0]);
+  }
+  
+  
+  public int outcome(Lead lead) {
+    String result[] = cachedLeadResult(leadKey(lead));
+    if (result == null) return LeadType.RESULT_NONE;
+    return Integer.parseInt(result[1]);
+  }
+  
+  
+  void incCluesCount(Role role, int inc) {
+    RoleEntry e = entryFor(null, role);
+    if (e != null) e.numClues += inc;
+  }
+  
+  
+  public int numCluesFor(Role role) {
+    RoleEntry e = entryFor(null, role);
+    return e == null ? 0 : e.numClues;
   }
   
   
@@ -278,78 +248,89 @@ public abstract class Plot extends Event implements Assignment {
     }
     if (! possible()) return;
     
-    boolean verbose = GameSettings.eventsVerbose;
-    
-    if (current == null || complete(current)) {
-      int time = world.timing.totalHours();
-      if (verbose) {
-        I.say("\n\n\nUpdating plot: "+this);
-      }
-      
-      if (current != null) {
-        if (verbose) {
-          I.say("  Ended step: "+current.label());
-        }
-        checkForTipoffs(current, false, true);
-        boolean success = checkSuccess(current);
-        onCompletion(current, success);
-      }
-      if (current != steps.last()) {
-        int nextIndex = current == null ? 0 : (steps.indexOf(current) + 1);
-        current = steps.atIndex(nextIndex);
-        stepTimes[steps.indexOf(current)] = time;
-        checkForTipoffs(current, true, false);
-        if (verbose) {
-          I.say("  Began step: "+current.label());
-        }
-      }
-      else {
-        if (verbose) {
-          I.say("  Plot completed.");
-        }
-        completeEvent();
-      }
-      
-      for (Element e : involved(current)) if (e.isPerson()) {
-        ((Person) e).addAssignment(this);
-      }
-      for (Person p : assigned()) {
-        Place goes = goes(p, current);
-        if (goes != null) goes.setAttached(p, true);
-      }
-      
-      if (verbose) {
-        I.say("  Current Time: "+time);
-        I.say("Current Step: "+current);
-        printLocations();
+    for (RoleEntry e : entries) {
+      if (e.role.isPerp() && e.element.isPerson()) {
+        Person perp = (Person) e.element;
+        perp.addAssignment(this);
       }
     }
-  }
-  
-  
-  public void advanceToStep(Step step) {
-    current = step;
-    stepTimes[steps.indexOf(step)] = world.timing.totalHours();
-    printSteps();
-  }
-  
-  
-  public void takeSpooking(int spookAmount) {
-    spookLevel += spookAmount;
-    float abortFactor = spookLevel * 1f / Lead.PROFILE_SUSPICIOUS;
-    abortFactor = (abortFactor / entries.size()) - 1;
-    float roll = Rand.num();
-    //
-    //  If the perps get too spooked, the plot may be cancelled, and any
-    //  further investigation will be wasting it's time...
-    if (roll < abortFactor) {
-      if (GameSettings.eventsVerbose) {
-        I.say("\nParticipants were too spooked!  Cancelling plot: "+this);
-        I.say("  Spook Level: "+spookLevel);
-        I.say("  Roll vs. Abort factor was: "+roll+" vs. "+abortFactor);
-      }
+    
+    if (this.state != STATE_ACTIVE) {
+      this.state = STATE_ACTIVE;
+      checkForTipoffs(true, false, base.world().playerBase());
+    }
+    
+    int time = base.world().timing.totalHours();
+    if (time >= timeBegins() + duration) {
       completeEvent();
     }
+  }
+  
+  
+  public void takeSpooking(int spookAmount, Element spooked) {
+    boolean report = GameSettings.eventsVerbose;
+    //
+    //  Increment the spook factor:
+    spookLevel += spookAmount;
+    float abortFactor = spookLevel * 1f / PROFILE_SUSPICIOUS;
+    abortFactor = (abortFactor / entries.size()) - 1;
+    float roll = Rand.num();
+    if (report) {
+      I.say("\nIncrementing spook level for "+this);
+      I.say("  Spook amount: "+spookAmount);
+      I.say("  Spook Level:  "+spookLevel );
+      I.say("  Roll vs. Abort factor was: "+roll+" vs. "+abortFactor);
+    }
+    //
+    //  If the perps get too spooked, the plot may be cancelled, and any
+    //  further investigation will be wasting it's time.
+    if (roll < abortFactor) {
+      if (report) {
+        I.say("  Participants were too spooked!  Cancelling plot: "+this);
+      }
+      this.state = STATE_SPOOKED;
+      completeEvent();
+    }
+  }
+  
+  
+  public void completeEvent() {
+    if (state == STATE_ACTIVE) {
+      checkForTipoffs(false, true, base.world().playerBase());
+      this.state = STATE_SUCCESS;
+    }
+    for (Person perp : involved) perp.removeAssignment(this);
+    involved.clear();
+    super.completeEvent();
+  }
+  
+  
+  public void completeAfterScene(Scene scene, EventEffects report) {
+    if (report.playerWon()) {
+      this.completeEvent();
+      this.state = STATE_FAILED;
+    }
+    else {
+      this.state = STATE_SUCCESS;
+    }
+    report.applyEffects(scene.site());
+  }
+  
+  
+  public boolean checkExpiry(boolean complete) {
+    if (! expired()) return false;
+    if (this.state == Plot.STATE_SPOOKED) {
+      MessageUtils.presentColdCaseMessage(world.view(), this, state);
+    }
+    return true;
+  }
+  
+  
+  public boolean expired() {
+    if (! complete()) return false;
+    int timeExpires = timeComplete() + LeadType.CLUE_EXPIRATION_TIME;
+    boolean expired = world.timing.totalHours() > timeExpires;
+    return expired;
   }
   
   
@@ -404,12 +385,6 @@ public abstract class Plot extends Event implements Assignment {
   
   public Base base() {
     return base;
-  }
-  
-  
-  public Element targetElement(Person p) {
-    if (current == null) return location(roleFor(p));
-    return goes(p, current);
   }
   
   
@@ -483,7 +458,16 @@ public abstract class Plot extends Event implements Assignment {
   }
   
   
-  public Batch <Element> allInvolved() {
+  public Series <Role> allRoles() {
+    Batch <Role> all = new Batch();
+    for (RoleEntry entry : entries) {
+      all.include(entry.role);
+    }
+    return all;
+  }
+  
+  
+  public Series <Element> allInvolved() {
     Batch <Element> involved = new Batch();
     for (RoleEntry entry : entries) {
       involved.include(entry.element);
@@ -499,9 +483,8 @@ public abstract class Plot extends Event implements Assignment {
   
   
   protected abstract boolean fillRoles();
+  protected abstract int calcHoursDuration();
   protected abstract float ratePlotFor(Person mastermind);
-  protected abstract boolean checkSuccess(Step step);
-  protected abstract void onCompletion(Step step, boolean success);
   
 
   
@@ -537,6 +520,7 @@ public abstract class Plot extends Event implements Assignment {
     */
   public void fillAndExpand() {
     fillRoles();
+    this.duration = calcHoursDuration();
   }
   
   
@@ -562,63 +546,91 @@ public abstract class Plot extends Event implements Assignment {
   
   /**  Generating reports, tipoffs, actual scenes, and other after-effects:
     */
-  protected void checkForTipoffs(Step step, boolean begins, boolean ends) {
+  protected void checkForTipoffs(
+    boolean begins, boolean ends, Base follows
+  ) {
+    int time = world.timing.totalHours();
+    Role involved[] = allRoles().toArray(Role.class);
     
-    Role    focusRole = (Role) Rand.pickFrom(step.involved);
-    Element focus     = filling(focusRole);
-    Place   at        = focus.place();
-    float   trust     = at.region().currentValue(Region.TRUST);
-    float   tipChance = trust / (10f * (1 + base.organisationRank(focus)));
-    Base    player    = world.playerBase();
-    int     time      = world.timing.totalHours();
-    
-    if (GameSettings.freeTipoffs) tipChance = 1;
-    if (GameSettings.noTipoffs  ) tipChance = 0;
-    
-    if (begins && Rand.num() < tipChance) {
-      Clue tipoff = Clue.confirmSuspect(this, focusRole, focus, at);
-      CaseFile file = player.leads.caseFor(this);
-      file.recordClue(tipoff, Lead.LEAD_TIPOFF, time, at);
+    if (begins && tipsCount < 2) {
+      float tipWeights[] = new float[involved.length], sumWeights = 0;
+      
+      for (int i = involved.length; i-- > 0;) {
+        Role    focusRole = involved[i];
+        Element focus     = filling(focusRole);
+        Place   at        = focus.place();
+        float   trust     = at.region().currentValue(Region.TRUST);
+        float   tipChance = trust / 100f;
+        
+        if (Visit.arrayIncludes(NEVER_TIP, focusRole)) tipChance = 0;
+        else if (GameSettings.freeTipoffs) tipChance = 1;
+        else if (GameSettings.noTipoffs  ) tipChance = 0;
+        else if (focusRole.isPerp  ()    ) tipChance /= 2;
+        else if (focusRole.isScene ()    ) tipChance /= 2;
+        else if (focusRole.isItem  ()    ) tipChance /= 2;
+        else if (focusRole.isVictim()    ) tipChance += 0.25f;
+        
+        sumWeights += tipWeights[i] = Nums.max(0, tipChance);
+      }
+      
+      Role pickRole = (Role) Rand.pickFrom(involved, tipWeights);
+      if (sumWeights == 0) pickRole = null;
+      
+      if (pickRole != null && (tipsCount == 0 || sumWeights > Rand.num())) {
+        Element  pick   = filling(pickRole);
+        CaseFile file   = follows.leads.caseFor(this);
+        Clue     tipoff = null;
+        
+        Series <Clue> clues = ClueUtils.possibleClues(
+          this, pick, pick, follows, TIPOFF
+        );
+        tipoff = ClueUtils.pickFrom(clues);
+        
+        if (tipoff != null) {
+          Place source = PlotUtils.chooseTipoffSite(pick);
+          file.recordClue(tipoff, TIPOFF, time, source);
+          tipsCount += 1;
+        }
+      }
     }
     
-    if (ends && step == mainHeist()) {
-      EventEffects effects = generateEffects(step);
+    if (ends) {
+      EventEffects effects = generateEffects();
       Element  target = target();
       Place    scene  = target.place();
-      Clue     report = Clue.confirmSuspect(this, ROLE_TARGET, target, scene);
-      Clue     aim    = Clue.confirmAim(this);
-      CaseFile file   = player.leads.caseFor(this);
-      file.recordClue(aim   , Lead.LEAD_REPORT, time, scene, false);
-      file.recordClue(report, Lead.LEAD_REPORT, time, scene       );
+      CaseFile file   = follows.leads.caseFor(this);
+      Clue 
+        report = Clue.confirmSuspect(this, ROLE_TARGET, target, scene),
+        aim    = Clue.confirmAim    (this                            ),
+        forAt  = Clue.confirmSuspect(this, ROLE_SCENE , scene , scene);
+      
+      file.recordClue(report, null, REPORT, time, scene, effects, true );
+      file.recordClue(aim   ,       REPORT, time, scene         , false);
+      file.recordClue(forAt ,       REPORT, time, scene         , false);
+      
       effects.applyEffects(target.place());
       recordEffects(effects);
     }
   }
   
   
-  public EventEffects generateEffects(Step step) {
-    EventEffects effects = new EventEffects();
+  public EventEffects generateEffects() {
+    EventEffects effects = new EventEffects(this, location(ROLE_TARGET));
     float roughs = Rand.num() / 2, losses = Rand.num() / 2;
     effects.composeFromEvent(this, 0 + roughs, 1 - losses);
     return effects;
   }
   
   
-  public void completeEvent() {
-    for (Person perp : involved) perp.removeAssignment(this);
-    involved.clear();
-    super.completeEvent();
-  }
-  
-  
-  public Scene generateScene(Step step, Element focus, Lead lead) {
-    if (step.isAssault()) {
-      return PlotUtils.generateHeistScene(this, step, focus, lead);
+  public Scene generateScene(Element focus, Lead lead) {
+    Place scene = focus.place();
+    if (scene == location(ROLE_TARGET)) {
+      return PlotUtils.generateHeistScene(this, focus, lead);
     }
-    if (focus.place() == hideout() || focus.place() == HQ()) {
-      return PlotUtils.generateHideoutScene(this, step, focus, lead);
+    if (scene == hideout() || scene == HQ()) {
+      return PlotUtils.generateHideoutScene(this, focus, lead);
     }
-    return PlotUtils.generateSideScene(this, step, focus, lead);
+    return PlotUtils.generateSideScene(this, focus, lead);
   }
   
   
@@ -628,34 +640,20 @@ public abstract class Plot extends Event implements Assignment {
   }
   
   
-  public void completeAfterScene(Scene scene, EventEffects report) {
-    super.completeAfterScene(scene, report);
-    report.applyEffects(scene.site());
-  }
-  
-  
   
   /**  Rendering, debug and interface methods-
     */
   public void printRoles() {
     I.say("\nRoles are: ");
-    for (Plot.RoleEntry entry : entries) {
+    for (RoleEntry entry : entries) {
       I.say("  "+entry);
-    }
-  }
-  
-  
-  public void printSteps() {
-    I.say("\nSteps are:");
-    for (Step c : steps) {
-      I.say("  "+c);
     }
   }
   
   
   public void printLocations() {
     I.say("\nLocations: ");
-    for (Plot.RoleEntry entry : entries) {
+    for (RoleEntry entry : entries) {
       I.say("  "+entry.element+" ("+entry.role+") -> "+entry.element.place());
     }
   }

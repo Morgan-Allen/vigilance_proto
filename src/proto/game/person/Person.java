@@ -29,7 +29,7 @@ public class Person extends Element {
   final public PersonStats   stats   = new PersonStats  (this);
   final public PersonHealth  health  = new PersonHealth (this);
   final public PersonGear    gear    = new PersonGear   (this);
-
+  
   Side side;
   Base base;
   Place resides;
@@ -124,7 +124,6 @@ public class Person extends Element {
     Person person = new Person(kind, world, name);
     person.stats.addTrait((Trait) Rand.pickFrom(Common.BUILD       ));
     person.stats.addTrait((Trait) Rand.pickFrom(Common.RACES       ));
-    person.stats.addTrait((Trait) Rand.pickFrom(Common.EYE_COLOURS ));
     person.stats.addTrait((Trait) Rand.pickFrom(Common.HAIR_COLOURS));
     person.stats.addTrait((Trait) Rand.pickFrom(Common.SEX         ));
     
@@ -142,6 +141,15 @@ public class Person extends Element {
   
   public Side side() {
     return side;
+  }
+  
+  
+  public Series <Trait> traits() {
+    Batch <Trait> all = new Batch();
+    for (Trait t : Common.PERSON_TRAITS) {
+      if (stats.levelFor(t) > 0) all.add(t);
+    }
+    return all;
   }
   
   
@@ -303,10 +311,24 @@ public class Person extends Element {
   /**  Regular updates and life-cycle-
     */
   public void updateOnBase() {
+    //
+    //  Remove any completed assignments:
     for (Assignment a : assignments) {
       if (a.complete()) { removeAssignment(a); continue; }
     }
-
+    //
+    //  And either move to whatever location the top assignment requires you to
+    //  be, or return home if possible.
+    Assignment top = topAssignment();
+    Place goes = top == null ? null : top.targetElement(this).place();
+    if (goes != null) {
+      goes.place().setAttached(this, true);
+    }
+    else if (base.HQ() != null) {
+      base.HQ().setAttached(this, true);
+    }
+    //
+    //  Update health and stats:
     float numWeeks = world().timing.hoursInTick();
     health.updateHealth(numWeeks);
     if (health.alive()) {
@@ -375,15 +397,14 @@ public class Person extends Element {
   /**  Interface, rendering and debug methods-
     */
   public String name() {
-    if (isHero() || isVillain()) return name;
-    return name+" ("+kind.name()+")";
+    return name;
   }
   
   
   public String confidenceDescription() {
     if (! health .alive     ()) return "Dead"       ;
     if (! health .conscious ()) return "Unconscious";
-    if (  actions.captive   ()) return "Captive"    ;
+    if (          isCaptive ()) return "Captive"    ;
     if (  mind   .retreating()) return "Retreating" ;
     
     float confidence = mind.confidence(), wariness = mind.wariness();
@@ -407,22 +428,6 @@ public class Person extends Element {
     return;
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

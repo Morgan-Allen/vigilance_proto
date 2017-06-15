@@ -126,7 +126,7 @@ public class TaskCraft extends Task {
   
   
   public Element targetElement(Person p) {
-    return base;
+    return base.HQ();
   }
 
 
@@ -155,6 +155,11 @@ public class TaskCraft extends Task {
     int total = base.stocks.numStored(made);
     info += "  ("+total+")";
     return info;
+  }
+  
+  
+  public float taskDaysRemaining(Person p) {
+    return craftingTime() * 1f / World.HOURS_PER_DAY;
   }
   
   

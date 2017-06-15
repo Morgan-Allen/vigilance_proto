@@ -18,7 +18,8 @@ public abstract class RunGame extends JFrame implements ActionListener {
     */
   final public static int
     FRAME_RATE                 = 25,
-    GAME_HOURS_PER_REAL_SECOND = 8 ;
+    SLOW_HOURS_PER_REAL_SECOND = 8,
+    FAST_HOURS_PER_REAL_SECOND = 24 * 8;
   
   String savePath;
   Surface surface;
@@ -68,8 +69,7 @@ public abstract class RunGame extends JFrame implements ActionListener {
       world.activeScene().updateScene();
     }
     else if (world != null && ! paused) {
-      float hoursGap = GAME_HOURS_PER_REAL_SECOND * 1f / FRAME_RATE;
-      world.updateWorld(hoursGap);
+      world.updateWorldInRealTime(1f / FRAME_RATE);
     }
     if (surface != null) {
       surface.repaint();

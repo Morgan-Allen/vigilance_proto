@@ -301,7 +301,6 @@ public abstract class Ability extends Trait {
     //  TODO:  YOU NEED TO INCLUDE VOLLEY EFFECTS FROM EQUIPMENT, CONDITIONS,
     //  DELAYED AND PASSIVE ABILITIES, AT BOTH THE ORIGIN AND TARGET!
     applyTriggerEffects(newAction, false, false, true);
-    
     final int costAP = costAP(newAction);
     
     if (costAP > acting.actions.currentAP()) {
@@ -551,7 +550,7 @@ public abstract class Ability extends Trait {
     rating *= 10f / (10 + at.scene.distance(acts.location, at));
     
     //  TODO:  Include a rating for hit-chance, assuming that a Volley is
-    //  involved?  (Maybe base on brains?)
+    //  involved.
     return rating;
   }
   
