@@ -160,7 +160,7 @@ public class SceneFromXML implements TileConstants {
       int minCount = getInt(u, "minCount", -1);
       int maxCount = getInt(u, "maxCount", -1);
       
-      if (wallType == -1) wallType = SceneTypeUnits.WALL_NONE      ;
+      if (wallType == -1) wallType = SceneTypeUnits.WALL_EXTERIOR  ;
       if (priority == -1) priority = SceneTypeUnits.PRIORITY_MEDIUM;
       if (exactDir == -1) exactDir = N;
       

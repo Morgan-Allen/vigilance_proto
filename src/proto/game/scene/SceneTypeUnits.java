@@ -139,7 +139,7 @@ public class SceneTypeUnits extends SceneType {
     gen.gridW = wide / resolution;
     gen.gridH = high / resolution;
     populateWithAreas  (world, gen, testing);
-    insertWallsAndDoors(world, gen, testing);
+    //insertWallsAndDoors(world, gen, testing);
     return gen;
   }
   
@@ -244,6 +244,8 @@ public class SceneTypeUnits extends SceneType {
     Unit unit, Scenery g, Scenery typeGen,
     int tX, int tY, int facing, boolean testing
   ) {
+    //
+    //  
     Box2D bound = unit.type.borderBounds(
       g, typeGen, tX, tY, facing, resolution
     );
@@ -263,6 +265,8 @@ public class SceneTypeUnits extends SceneType {
   }
   
   
+  
+  /*
   void insertWallsAndDoors(World world, Scenery g, boolean testing) {
     //
     //  We visit every point in the grid, then visit all adjacent points and
@@ -372,6 +376,7 @@ public class SceneTypeUnits extends SceneType {
     if (at == null) return true;
     return at.blockageVal(CENTRE) > 0 || at.opaque();
   }
+  //*/
   
 }
 

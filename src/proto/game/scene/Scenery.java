@@ -18,7 +18,9 @@ public class Scenery implements Session.Saveable, TileConstants {
   Prop fills[][] = new Prop[1][2];
   List <Prop> props = new List();
   
-  int gridW, gridH, offX, offY, facing;
+  
+  //  TODO:  These aren't actually being saved and loaded.  Should they be?
+  int gridW, gridH, offX, offY, facing, resolution;
   List <Wall> walls = new List();
   List <Room> rooms = new List();
   List <Room> corridors = new List();
@@ -44,7 +46,7 @@ public class Scenery implements Session.Saveable, TileConstants {
   
   static class Room {
     SceneType type;
-    Object unit;
+    SceneTypeUnits.Unit unit;
     int ID;
     int minX, minY, wide, high;
     

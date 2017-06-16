@@ -1,8 +1,7 @@
 
 
 
-You need to add some intelligence to goons motions/patrol patterns, and to
-distribute them more evenly about the map.
+You need to add some intelligence to goons' motions/patrol patterns.
 
 You need to give each agent some unique flavour, based on costume.
   *  Phobos has free ultrasound and stealth/mobility.

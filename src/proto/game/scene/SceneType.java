@@ -93,6 +93,12 @@ public abstract class SceneType extends Index.Entry implements
     int     high  = clampSize(prefHigh, minHigh, maxHigh);
     Scene   scene = new Scene(world, wide, high, testing);
     Scenery gen   = generateScenery(world, wide, high, testing);
+    //
+    //  Copy over all rooms, and all scenery:
+    for (Scenery.Room room : gen.rooms) {
+      Box2D bounds = borderBounds(scene, gen, 0, 0, N, room.wide);
+      scene.recordRoom(room, bounds);
+    }
     applyScenery(scene, gen, 0, 0, N, testing);
     return scene;
   }

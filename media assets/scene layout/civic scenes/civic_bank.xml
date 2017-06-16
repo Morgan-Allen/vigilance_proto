@@ -482,19 +482,43 @@
   <unit typeID = "stairs_unit"   x = "2" y = "1" dir = "S" />
   <unit typeID = "hall_unit"     x = "2" y = "2" dir = "N" />
   
-  <unit typeID = "civic_outside.unit_marble_parking" x = "0" y = "4" dir = "N"/>
-  <unit typeID = "civic_outside.unit_marble_parking" x = "1" y = "4" dir = "N"/>
-  <unit typeID = "civic_outside.unit_marble_steps"   x = "2" y = "4" dir = "N"/>
-  <unit typeID = "civic_outside.unit_marble_steps"   x = "3" y = "4" dir = "N"/>
-  <unit typeID = "civic_outside.unit_marble_parking" x = "4" y = "4" dir = "N"/>
-  <unit typeID = "civic_outside.unit_marble_parking" x = "5" y = "4" dir = "N"/>
+  <unit typeID = "civic_outside.unit_marble_parking" x = "0" y = "4" dir = "N"
+    wall = "WALL_NONE"
+  />
+  <unit typeID = "civic_outside.unit_marble_parking" x = "1" y = "4" dir = "N"
+    wall = "WALL_NONE"
+  />
+  <unit typeID = "civic_outside.unit_marble_steps"   x = "2" y = "4" dir = "N"
+    wall = "WALL_NONE"
+  />
+  <unit typeID = "civic_outside.unit_marble_steps"   x = "3" y = "4" dir = "N"
+    wall = "WALL_NONE"
+  />
+  <unit typeID = "civic_outside.unit_marble_parking" x = "4" y = "4" dir = "N"
+    wall = "WALL_NONE"
+  />
+  <unit typeID = "civic_outside.unit_marble_parking" x = "5" y = "4" dir = "N"
+    wall = "WALL_NONE"
+  />
   
-  <unit typeID = "civic_outside.unit_street_a" x = "0" y = "5" dir = "N"/>
-  <unit typeID = "civic_outside.unit_street_a" x = "1" y = "5" dir = "N"/>
-  <unit typeID = "civic_outside.unit_street_b" x = "2" y = "5" dir = "N"/>
-  <unit typeID = "civic_outside.unit_street_a" x = "3" y = "5" dir = "N"/>
-  <unit typeID = "civic_outside.unit_street_b" x = "4" y = "5" dir = "N"/>
-  <unit typeID = "civic_outside.unit_street_b" x = "5" y = "5" dir = "N"/>
+  <unit typeID = "civic_outside.unit_street_a" x = "0" y = "5" dir = "N"
+    wall = "WALL_NONE"
+  />
+  <unit typeID = "civic_outside.unit_street_a" x = "1" y = "5" dir = "N"
+    wall = "WALL_NONE"
+  />
+  <unit typeID = "civic_outside.unit_street_b" x = "2" y = "5" dir = "N"
+    wall = "WALL_NONE"
+  />
+  <unit typeID = "civic_outside.unit_street_a" x = "3" y = "5" dir = "N"
+    wall = "WALL_NONE"
+  />
+  <unit typeID = "civic_outside.unit_street_b" x = "4" y = "5" dir = "N"
+    wall = "WALL_NONE"
+  />
+  <unit typeID = "civic_outside.unit_street_b" x = "5" y = "5" dir = "N"
+    wall = "WALL_NONE"
+  />
 </scene>
 
 

@@ -203,7 +203,7 @@ public class PlotUtils {
     if (forces.empty()) return null;
     
     Scene scene = place.kind().sceneType().generateScene(world);
-    scene.entry.provideInProgressEntry(forces);
+    scene.entry.provideInProgressEntry(forces, Nums.ceil(forces.size() / 4f));
     
     Batch <Person> onSite = new Batch();
     for (Person p : lead.base.roster()) {

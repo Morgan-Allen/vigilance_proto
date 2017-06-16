@@ -282,9 +282,15 @@
   unitsWide = "3"
   unitsHigh = "3"
 >
-  <unit typeID = "unit_alley"         x = "0" y = "0" dir = "N" />
-  <unit typeID = "unit_alley"         x = "1" y = "0" dir = "N" />
-  <unit typeID = "unit_alley"         x = "2" y = "0" dir = "N" />
+  <unit typeID = "unit_alley"         x = "0" y = "0" dir = "N" 
+    wall = "WALL_NONE"
+  />
+  <unit typeID = "unit_alley"         x = "1" y = "0" dir = "N" 
+    wall = "WALL_NONE"
+  />
+  <unit typeID = "unit_alley"         x = "2" y = "0" dir = "N" 
+    wall = "WALL_NONE"
+  />
   
   <unit typeID = "unit_corner_seats"  x = "0" y = "1" dir = "N" />
   <unit typeID = "unit_entrance"      x = "1" y = "1" dir = "N" />

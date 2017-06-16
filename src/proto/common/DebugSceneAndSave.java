@@ -36,7 +36,7 @@ public class DebugSceneAndSave extends RunGame {
     crooks.plots.assignRootPlot(plot, 0);
     
     Base heroes = world.baseFor(Heroes.JANUS_INDUSTRIES);
-    Lead guarding = heroes.leads.leadFor(plot.target(), LeadType.SURVEIL);
+    Lead guarding = heroes.leads.leadFor(plot.scene(), LeadType.SURVEIL);
     
     int ID = 0;
     for (Person p : heroes.roster()) {
@@ -48,6 +48,8 @@ public class DebugSceneAndSave extends RunGame {
       p.addAssignment(guarding);
       ID++;
     }
+    
+    world.updateWorld(1);
     
     Scene scene = plot.generateScene(plot.target(), guarding);
     world.enterScene(scene);
