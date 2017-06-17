@@ -266,6 +266,127 @@ public class SceneTypeUnits extends SceneType {
   
   
   
+  
+  final static char
+    UNIT_CORNER = 'C',
+    UNIT_WALL   = 'W',
+    UNIT_BEND   = 'B',
+    UNIT_INNER  = 'I';
+  
+  final static Object RAW_WINGS_MAP[] = {
+      0, 0,
+      0, 1, UNIT_CORNER, N,
+      
+      0, 0,
+      1, 0, UNIT_CORNER, E,
+      
+      1, 0,
+      0, 0, UNIT_CORNER, S,
+      
+      0, 1,
+      0, 0, UNIT_CORNER, W,
+      
+      0, 0,
+      1, 1, UNIT_WALL, N,
+      
+      1, 0,
+      1, 0, UNIT_WALL, E,
+      
+      1, 1,
+      0, 0, UNIT_WALL, S,
+      
+      0, 1,
+      0, 1, UNIT_WALL, W,
+      
+      0, 1,
+      1, 1, UNIT_BEND, N,
+      
+      1, 0,
+      1, 1, UNIT_BEND, E,
+      
+      1, 1,
+      1, 0, UNIT_BEND, S,
+      
+      1, 1,
+      0, 1, UNIT_BEND, W,
+      
+      1, 1,
+      1, 1, UNIT_INNER, N
+  };
+  final static Object[][] WINGS_MAP = Visit.splitByDivision(
+    RAW_WINGS_MAP, RAW_WINGS_MAP.length / 6
+  );
+  
+  
+  public static class Wing {
+    public int dir;
+    public char unitType;
+    public int x, y;
+  }
+  
+  
+  public Series <Box2D> constructWingBounds(
+    Scenery area, int resolution
+  ) {
+    int gridW = area.wide / resolution, gridH = area.high / resolution;
+    int w = (int) (gridW * (1 + Rand.num()) / 2);
+    int h = (int) (gridH * (1 + Rand.num()) / 2);
+    int x = Rand.index(gridW - w);
+    int y = Rand.index(gridH - h);
+    
+    Series <Box2D> bounds = new Batch();
+    
+    int r = resolution;
+    Box2D bound = new Box2D(x * r, y * r, w * r, h * r);
+    bound.expandBy(-2);
+    bounds.add(bound);
+    
+    return bounds;
+  }
+  
+  
+  public Series <Wing> constructWings(
+    Scenery area, int resolution, Series <Box2D> bounds
+  ) {
+    int gridW = area.wide / resolution, gridH = area.high / resolution;
+    int samples[] = new int[4];
+    
+    Batch <Wing> wings = new Batch();
+    for (Coord c : Visit.grid(0, 0, gridW, gridH, 1)) {
+      
+      int i = 0;
+      for (Coord t : Visit.grid(0, 0, 2, 2, 1)) {
+        int sx = (c.x + t.x) * resolution;
+        int sy = (c.y + t.y) * resolution;
+        boolean inBounds = false;
+        for (Box2D b : bounds) if (b.contains(sx, sy)) inBounds = true;
+        samples[i++] = inBounds ? 1 : 0;
+      }
+      
+      for (Object[] map : WINGS_MAP) {
+        boolean match = true;
+        i = 4;
+        while (i-- > 0) if (((Integer) map[i]) != samples[i]) match = false;
+        
+        if (match) {
+          Wing wing = new Wing();
+          wing.unitType = (Character) map[4];
+          wing.dir      = (Integer  ) map[5];
+          wing.x        = c.x;
+          wing.y        = c.y;
+          wings.add(wing);
+        }
+      }
+    }
+    
+    return wings;
+  }
+  
+  
+  
+  
+  
+  
   /*
   void insertWallsAndDoors(World world, Scenery g, boolean testing) {
     //
