@@ -325,27 +325,101 @@ public class SceneTypeUnits extends SceneType {
   }
   
   
-  public Series <Box2D> constructWingBounds(
-    Scenery area, int resolution
+  public Series <Box2D> generateWingBounds(
+    Scenery scene, int resolution,
+    float coverFraction, int maxUnitsWide
   ) {
-    int gridW = area.wide / resolution, gridH = area.high / resolution;
+    int r = resolution, gridW = scene.wide / r, gridH = scene.high / r;
+    float areaNeeded = scene.wide * scene.high * coverFraction;
+    Box2D sceneBound = new Box2D(0, 0, scene.wide, scene.high);
+    
+    class WingWall extends Vec2D {
+      int dir, len;
+    }
+    class WingArea extends Box2D {
+      void addWalls(Series <WingWall> walls, int dir) {
+        WingWall w;
+        for (int d : T_ADJACENT) if (d != dir) {
+          w = new WingWall();
+          w.dir = d;
+          w.len = (d == N || d == S) ? (int) xdim() : (int) ydim();
+          if (d == N) w.set(xpos(), ymax());
+          if (d == E) w.set(xmax(), ymax());
+          if (d == S) w.set(xmax(), ypos());
+          if (d == W) w.set(xpos(), ypos());
+          walls.add(w);
+        }
+      }
+      void extend(int dir, int amount) {
+        if (dir == N)   incHigh(amount);
+        if (dir == E)   incWide(amount);
+        if (dir == S) { incHigh(amount); incY(-amount); }
+        if (dir == W) { incWide(amount); incX(-amount); }
+      }
+    }
+    
+    Series <WingArea> areas = new Batch();
+    List <WingWall> walls = new List();
+    float totalArea = 0;
+    
     int w = (int) (gridW * (1 + Rand.num()) / 2);
     int h = (int) (gridH * (1 + Rand.num()) / 2);
-    int x = Rand.index(gridW - w);
-    int y = Rand.index(gridH - h);
+    int x = Rand.index(gridW + 1 - w);
+    int y = Rand.index(gridH + 1 - h);
     
-    Series <Box2D> bounds = new Batch();
+    WingArea init = new WingArea();
+    init.set(x * r, y * r, w * r, h * r);
+    init.expandBy(-2);
+    init.addWalls(walls, -1);
+    areas.add(init);
+    totalArea += init.area();
     
-    int r = resolution;
-    Box2D bound = new Box2D(x * r, y * r, w * r, h * r);
-    bound.expandBy(-2);
-    bounds.add(bound);
+    while (totalArea < areaNeeded && walls.size() > 0) {
+      //
+      //  Pick one of the existing areas, pick a side, and extend it.
+      WingWall parent = (WingWall) Rand.pickFrom(walls);
+      walls.remove(parent);
+      if (parent.len <= resolution) continue;
+      
+      WingArea area = new WingArea();
+      area.set(parent.x, parent.y, 0, 0);
+      int d = parent.dir, l = parent.len;
+      int extend = ((d == N || d == S) ? scene.high : scene.wide) / 2;
+      area.extend((d + 2) % 8, l);
+      
+      while (extend-- > 0) {
+        area.extend(d, resolution);
+        boolean overlaps = false;
+        for (WingArea other : areas) {
+          if (other.overlaps(area)) {
+            overlaps = true;
+            break;
+          }
+          if (! area.containedBy(sceneBound)) {
+            overlaps = true;
+            break;
+          }
+        }
+        if (overlaps) {
+          area.extend(d, -resolution);
+          break;
+        }
+      }
+      totalArea += area.area();
+      //
+      //  If there's room for expansion here, add this wing to the list and
+      //  increment total space consumed-
+      if (area.area() > 0) {
+        areas.add(area);
+        area.addWalls(walls, d);
+      }
+    }
     
-    return bounds;
+    return (Series) areas;
   }
   
   
-  public Series <Wing> constructWings(
+  public Series <Wing> generateWings(
     Scenery area, int resolution, Series <Box2D> bounds
   ) {
     int gridW = area.wide / resolution, gridH = area.high / resolution;

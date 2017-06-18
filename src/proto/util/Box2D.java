@@ -340,7 +340,9 @@ public class Box2D {
   
   
   public String toString() {
-    return "[xy: "+xpos+"|"+ypos+" wh: "+xdim+"|"+ydim+"]";
+    return
+      "[xy: "+xpos+" - "+xmax+"|"+ypos+" - "+ymax+" wh: "+xdim+"|"+ydim+"]"
+    ;
   }
 }
 
