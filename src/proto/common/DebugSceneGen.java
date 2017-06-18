@@ -13,15 +13,17 @@ public class DebugSceneGen {
   
   
   /*
-  World world = new World();
-  Place park = new Place(Facilities.BUSINESS_PARK, 0, world);
-  SceneType root = park.kind().sceneType();
-  root.generateScene(world, 32, 32, true);
   //*/
   
   
   public static void main(String args[]) {
     
+    World world = new World();
+    Place park = new Place(Facilities.BUSINESS_PARK, 0, world);
+    SceneType root = park.kind().sceneType();
+    root.generateScene(world, 32, 32, true);
+    
+    /*
     World world = new World();
     Scene scene = new Scene(world, 32, 32, true);
     SceneTypeUnits type = (SceneTypeUnits) Facilities.BUSINESS_PARK.sceneType();
@@ -45,6 +47,17 @@ public class DebugSceneGen {
       wings = type.generateWings(scene, 8, bounds);
       printWings(wings, dim);
     }
+    //*/
+    
+    //
+    //  Okay.  Having done all this, the next step would be to annotate sub-
+    //  scenes based on their type- corner, wall, bend, etc.- and have those
+    //  slot into position within the structure.  Keep the quotas, but mold it
+    //  to fit the larger structure.
+    
+    //  So you have separate settings for the floorplan and for the sub-units,
+    //  which should allow you, in theory, to incorporate fixed elements as
+    //  well...
   }
   
   
@@ -65,9 +78,6 @@ public class DebugSceneGen {
       }
     }
   }
-  
 }
-
-
 
 

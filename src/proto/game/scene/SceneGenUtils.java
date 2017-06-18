@@ -27,6 +27,8 @@ public class SceneGenUtils implements TileConstants {
     boolean valid;
   }
   
+  
+  /*
   static abstract class Tiling {
     abstract void tile(Wall wall, Coord at, int dir);
   }
@@ -66,6 +68,7 @@ public class SceneGenUtils implements TileConstants {
       }
     }
   }
+  //*/
   
   
   /*

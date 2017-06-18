@@ -219,6 +219,13 @@ public class Kind extends Index.Entry implements Session.Saveable {
   }
   
   
+  public static Object loadObject(String label, Class from) {
+    try { return from.getField(label).get(null); }
+    catch (Exception e) {}
+    return null;
+  }
+  
+  
   public static int loadField(String label) {
     return loadField(label, Kind.class);
   }

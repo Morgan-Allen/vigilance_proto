@@ -37,6 +37,9 @@ public abstract class SceneType extends Index.Entry implements
   float propWeights[];
   SceneType kidTypes[] = new SceneType[0];
   
+  Object cornering[] = SceneTypeUnits.INTERIOR;
+  boolean exterior = false;
+  
   
   public SceneType(
     String name, String ID, Object... args
@@ -182,6 +185,8 @@ public abstract class SceneType extends Index.Entry implements
       return false;
     }
     
+    int cornerID = 0;
+    
     for (Coord c : Visit.perimeter(0, 0, gen.wide, gen.high)) {
       temp.setTo(c);
       rotateCoord(gen, temp, facing);
@@ -193,17 +198,14 @@ public abstract class SceneType extends Index.Entry implements
       if (c.x != gx && c.y != gy) {
         continue;
       }
-      //
-      //  Check to ensure that no doors or windows are blocked.
-      //
-      //  TODO:  In future, you may want to implement a more jigsaw-esque
-      //  approach, depending on the wall-types specs for a grid-unit.
-      boolean isDoor = gen.tileAt(gx, gy).hasWall(dir);
-      Tile    at     = within.tileAt(tx, ty);
-      boolean blockT = at == null ? true  : (at.blocked() || at.opaque());
-      if (isDoor && blockT) {
-        return false;
-      }
+      
+      Box2D wing = within.wingUnder(tx, ty);
+      int wingID = wing == null ? 0 : 1;
+      if (exterior) wingID = 1 - wingID;
+      int needID = (Integer) cornering[cornerID];
+      
+      if (wingID != needID) return false;
+      cornerID++;
     }
     
     return true;

@@ -46,13 +46,15 @@
 
 
 <scene
-  name   = "Corner Seats"
-  ID     = "unit_corner_seats"
-  wide   = "8"
-  high   = "8"
-  wall   = "slum_common.wall"
-  door   = "slum_common.door"
-  window = "slum_common.window"
+  name      = "Corner Seats"
+  ID        = "unit_corner_seats"
+  wide      = "8"
+  high      = "8"
+  wall      = "slum_common.wall"
+  door      = "slum_common.door"
+  window    = "slum_common.window"
+  cornering = "CORNER_NORTH"
+  exterior  = "false"
 >
   <grid
     1 = "slum_common.floor"
@@ -86,13 +88,15 @@
 </scene>
 
 <scene
-  name   = "Main Entrance"
-  ID     = "unit_entrance"
-  wide   = "8"
-  high   = "8"
-  wall   = "slum_common.wall"
-  door   = "slum_common.door"
-  window = "slum_common.window"
+  name      = "Main Entrance"
+  ID        = "unit_entrance"
+  wide      = "8"
+  high      = "8"
+  wall      = "slum_common.wall"
+  door      = "slum_common.door"
+  window    = "slum_common.window"
+  cornering = "WALL_NORTH"
+  exterior  = "false"
 >
   <grid
     1 = "slum_common.floor"
@@ -127,13 +131,15 @@
 
 
 <scene
-  name   = "Main Bar"
-  ID     = "unit_main_bar"
-  wide   = "8"
-  high   = "8"
-  wall   = "slum_common.wall"
-  door   = "slum_common.door"
-  window = "slum_common.window"
+  name      = "Main Bar"
+  ID        = "unit_main_bar"
+  wide      = "8"
+  high      = "8"
+  wall      = "slum_common.wall"
+  door      = "slum_common.door"
+  window    = "slum_common.window"
+  cornering = "CORNER_EAST"
+  exterior  = "false"
 >
   <grid
     1 = "slum_common.floor"
@@ -169,13 +175,15 @@
 </scene>
 
 <scene
-  name   = "Toilets"
-  ID     = "unit_toilets"
-  wide   = "8"
-  high   = "8"
-  wall   = "slum_common.wall"
-  door   = "slum_common.door"
-  window = "slum_common.window"
+  name      = "Toilets"
+  ID        = "unit_toilets"
+  wide      = "8"
+  high      = "8"
+  wall      = "slum_common.wall"
+  door      = "slum_common.door"
+  window    = "slum_common.window"
+  cornering = "CORNER_WEST"
+  exterior  = "false"
 >
   <grid
     1 = "slum_common.floor"
@@ -210,13 +218,15 @@
 </scene>
 
 <scene
-  name   = "Pool Area"
-  ID     = "unit_pool_area"
-  wide   = "8"
-  high   = "8"
-  wall   = "slum_common.wall"
-  door   = "slum_common.door"
-  window = "slum_common.window"
+  name      = "Pool Area"
+  ID        = "unit_pool_area"
+  wide      = "8"
+  high      = "8"
+  wall      = "slum_common.wall"
+  door      = "slum_common.door"
+  window    = "slum_common.window"
+  cornering = "WALL_SOUTH"
+  exterior  = "false"
 >
   <grid
     1 = "slum_common.floor"
@@ -247,14 +257,16 @@
 </scene>
 
 <scene
-  name   = "Alley"
-  ID     = "unit_alley"
-  wide   = "8"
-  high   = "8"
-  wall   = "slum_common.wall"
-  door   = "slum_common.door"
-  window = "slum_common.window"
-  floor  = "slum_outside.asphalt"
+  name      = "Alley"
+  ID        = "unit_alley"
+  wide      = "8"
+  high      = "8"
+  wall      = "slum_common.wall"
+  door      = "slum_common.door"
+  window    = "slum_common.window"
+  floor     = "slum_outside.asphalt"
+  cornering = "WALL_SOUTH"
+  exterior  = "true"
 >
   <grid
    1 = "slum_outside.pavement"

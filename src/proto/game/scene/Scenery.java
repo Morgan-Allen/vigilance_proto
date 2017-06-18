@@ -18,43 +18,21 @@ public class Scenery implements Session.Saveable, TileConstants {
   Prop fills[][] = new Prop[1][2];
   List <Prop> props = new List();
   
-  
-  //  TODO:  These aren't actually being saved and loaded.  Should they be?
-  int gridW, gridH, offX, offY, facing, resolution;
-  List <Wall> walls = new List();
-  List <Room> rooms = new List();
-  List <Room> corridors = new List();
-  
-  
-  //  TODO:  Do I need these, really?  Now that I'm leveraging scenery directly?
-  //*
-  static class WallPiece extends Coord {
-    int facing;
-    Prop wall;
-    WallPiece(int xp, int yp, int f) { super(xp, yp); facing = f; }
-  }
-  
-  static class Wall {
-    boolean indoor;
-    int facing;
-    Room side1, side2;
-    int wallTypeDiff;
-    
-    Batch <WallPiece> pieces = new Batch();
-  }
-  //*/
-  
   static class Room {
+    
     SceneType type;
     SceneTypeUnits.Unit unit;
     int ID;
     int minX, minY, wide, high;
     
-    Batch <Wall> walls = new Batch();
-    Wall floor = new Wall(), ceiling = new Wall();
-    
     public String toString() { return "R["+unit+"]"; }
   }
+  
+  int gridW, gridH, offX, offY, facing, resolution;
+  List <Box2D> wings     = new List();
+  List <Room > rooms     = new List();
+  List <Room > corridors = new List();
+  
   
   
   public Scenery(int wide, int high, boolean forTesting) {
@@ -103,6 +81,18 @@ public class Scenery implements Session.Saveable, TileConstants {
   
   /**  Helper methods for hierarchical composition-
     */
+  Box2D wingUnder(int x, int y) {
+    for (Box2D wing : wings) if (wing.contains(x, y)) return wing;
+    return null;
+  }
+  
+  
+  public void attachWings(Series <Box2D> wings) {
+    this.wings.clear();
+    Visit.appendTo(this.wings, wings);
+  }
+  
+  
   Room areaUnder(int x, int y) {
     Tile under = tileAt(x, y);
     return under == null ? null : under.room;

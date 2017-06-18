@@ -149,8 +149,9 @@ public class SceneFromXML implements TileConstants {
     for (XML u : unitXML) {
       SceneType type = sceneWithID(u.value("typeID"), file, basePath);
       if (type == null) continue;
-      int wallType = Kind.loadField(u.value("wall"    ), SceneTypeUnits.class);
-      int priority = Kind.loadField(u.value("priority"), SceneTypeUnits.class);
+      
+      Class fieldSource = SceneTypeUnits.class;
+      int priority = Kind.loadField (u.value("priority" ), fieldSource);
       
       int exactX   = getInt(u, "x", -1);
       int exactY   = getInt(u, "y", -1);
@@ -160,25 +161,27 @@ public class SceneFromXML implements TileConstants {
       int minCount = getInt(u, "minCount", -1);
       int maxCount = getInt(u, "maxCount", -1);
       
-      if (wallType == -1) wallType = SceneTypeUnits.WALL_EXTERIOR  ;
       if (priority == -1) priority = SceneTypeUnits.PRIORITY_MEDIUM;
       if (exactDir == -1) exactDir = N;
       
       SceneTypeUnits.Unit unit = SceneTypeUnits.unit(
-        type, wallType,
+        type,
         exactX, exactY, exactDir,
         priority, percent, minCount, maxCount
       );
       if (unit != null) units.add(unit);
     }
     
-    int unitSize = sceneNode.getInt("unitSize");
-    int maxUW    = getInt(sceneNode, "maxUnitsWide",  8);
-    int maxUH    = getInt(sceneNode, "maxUnitsHigh",  8);
-    int minUW    = getInt(sceneNode, "minUnitsWide",  2);
-    int minUH    = getInt(sceneNode, "minUnitsHigh",  2);
-    int unitsH   = getInt(sceneNode, "unitsHigh"   , -1);
-    int unitsW   = getInt(sceneNode, "unitsWide"   , -1);
+    int     unitSize = sceneNode.getInt("unitSize");
+    int     maxUW    = getInt(sceneNode, "maxUnitsWide",  8);
+    int     maxUH    = getInt(sceneNode, "maxUnitsHigh",  8);
+    int     minUW    = getInt(sceneNode, "minUnitsWide",  2);
+    int     minUH    = getInt(sceneNode, "minUnitsHigh",  2);
+    int     unitsH   = getInt(sceneNode, "unitsHigh"   , -1);
+    int     unitsW   = getInt(sceneNode, "unitsWide"   , -1);
+    String  cornerID = sceneNode.value  ("cornering");
+    boolean exterior = sceneNode.getBool("exterior" );
+    
     PropType
       floor  = propWithID(floorID , file, basePath),
       wall   = propWithID(wallID  , file, basePath),
@@ -194,6 +197,13 @@ public class SceneFromXML implements TileConstants {
       wall, door, window, floor,
       units.toArray(SceneTypeUnits.Unit.class)
     );
+    
+    Object cornering = Kind.loadObject(cornerID, SceneTypeUnits.class);
+    if (cornering == null) cornering = SceneTypeUnits.INTERIOR;
+    
+    sceneType.cornering = (Object[]) cornering;
+    sceneType.exterior  = exterior;
+    
     return sceneType;
   }
   
@@ -203,24 +213,32 @@ public class SceneFromXML implements TileConstants {
   ) {
     //
     //  First load up the basic stats for this scene-type:
-    String name     = sceneNode.value ("name"  );
-    int    wide     = sceneNode.getInt("wide"  );
-    int    high     = sceneNode.getInt("high"  );
-    String floorID  = sceneNode.value ("floor" );
-    String wallID   = sceneNode.value ("wall"  );
-    String doorID   = sceneNode.value ("door"  );
-    String windowID = sceneNode.value ("window");
+    String  name     = sceneNode.value  ("name"     );
+    int     wide     = sceneNode.getInt ("wide"     );
+    int     high     = sceneNode.getInt ("high"     );
+    String  floorID  = sceneNode.value  ("floor"    );
+    String  wallID   = sceneNode.value  ("wall"     );
+    String  doorID   = sceneNode.value  ("door"     );
+    String  windowID = sceneNode.value  ("window"   );
+    String  cornerID = sceneNode.value  ("cornering");
+    boolean exterior = sceneNode.getBool("exterior" );
     
     PropType
       floor  = propWithID(floorID , file, basePath),
       wall   = propWithID(wallID  , file, basePath),
       door   = propWithID(doorID  , file, basePath),
       window = propWithID(windowID, file, basePath);
+    
+    Object cornering = Kind.loadObject(cornerID, SceneTypeUnits.class);
+    if (cornering == null) cornering = SceneTypeUnits.INTERIOR;
+    
     SceneTypeGrid sceneType = new SceneTypeGrid(name, ID, wide, high);
-    sceneType.floors  = floor ;
-    sceneType.borders = wall  ;
-    sceneType.door    = door  ;
-    sceneType.window  = window;
+    sceneType.floors    = floor;
+    sceneType.borders   = wall;
+    sceneType.door      = door;
+    sceneType.window    = window;
+    sceneType.cornering = (Object[]) cornering;
+    sceneType.exterior  = exterior;
     
     for (XML gridXML : sceneNode.allChildrenMatching("grid")) {
       //

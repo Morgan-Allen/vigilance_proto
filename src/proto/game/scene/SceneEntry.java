@@ -59,10 +59,8 @@ public class SceneEntry implements TileConstants {
   public void provideInProgressEntry(
     Series <Person> forces, int numPods
   ) {
-    
     I.say("Scene is: "+scene.hashCode()+"/"+scene.getClass());
     I.say("Total rooms: "+scene.rooms.size());
-    
     //
     //  We divide up the forces among numPods different pods, and place those
     //  at various points around the map:
@@ -92,10 +90,8 @@ public class SceneEntry implements TileConstants {
           if (dist < 8) continue search;
           rating += dist / 8f;
         }
-
-        if (room.unit.wallType == SceneTypeUnits.WALL_NONE    ) rating /= 2;
-        if (room.unit.wallType == SceneTypeUnits.WALL_INTERIOR) rating /= 2;
         
+        if (room.unit.exterior) rating /= 2;
         rating *= 0.5f + Rand.avgNums(2);
         pickEntry.compare(open, rating);
       }
