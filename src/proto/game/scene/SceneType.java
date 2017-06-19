@@ -101,7 +101,7 @@ public abstract class SceneType extends Index.Entry implements
   ) {
     int     wide  = clampSize(prefWide, minWide, maxWide);
     int     high  = clampSize(prefHigh, minHigh, maxHigh);
-    Scene   scene = new Scene(world, wide, high, testing);
+    Scene   scene = new Scene(this, world, wide, high, testing);
     Scenery gen   = generateScenery(world, wide, high, testing);
     //
     //  Copy over all wings, rooms, and scenery:
@@ -109,7 +109,7 @@ public abstract class SceneType extends Index.Entry implements
       Box2D bounds = borderBounds(scene, gen, 0, 0, N, room.wide);
       scene.recordRoom(room, bounds);
     }
-    scene.attachWings(gen.wings());
+    scene.setupWingsGrid(gen.resolution, gen.wings());
     applyScenery(scene, gen, 0, 0, N, testing);
     return scene;
   }
@@ -159,7 +159,7 @@ public abstract class SceneType extends Index.Entry implements
   }
   
   
-  Box2D borderBounds(
+  public Box2D borderBounds(
     Scenery within, Scenery gen, int offX, int offY, int facing, int resolution
   ) {
     Box2D bound = null;
@@ -185,7 +185,7 @@ public abstract class SceneType extends Index.Entry implements
   }
   
 
-  boolean checkBordering(
+  public boolean checkBordering(
     Scenery within, Scenery gen, int offX, int offY, int facing, int resolution
   ) {
     if (borderBounds(within, gen, offX, offY, facing, resolution) == null) {
@@ -194,10 +194,16 @@ public abstract class SceneType extends Index.Entry implements
     
     Coord c = new Coord();
     int cornerID = 0;
+    boolean allMatch = true;
     
-    for (int y = 0; y < 2; y++) for (int x = 0; x < 2; x++) {
-      c.x = x * gen.wide;
-      c.y = y * gen.high;
+    //I.say("\nChecking bordering...");
+    
+    for (int y = -1; y < 2; y++) for (int x = -1; x < 2; x++) {
+      int needID = (Integer) cornering[cornerID++];
+      if (needID == SceneTypeUnits.X) continue;
+      
+      c.x = (x * gen.wide) + (resolution / 2);
+      c.y = (y * gen.high) + (resolution / 2);
       rotateCoord(gen, c, facing);
       c.x += offX;
       c.y += offY;
@@ -205,13 +211,12 @@ public abstract class SceneType extends Index.Entry implements
       Box2D wing = within.wingUnder(c.x, c.y);
       int wingID = wing == null ? 0 : 1;
       if (exterior) wingID = 1 - wingID;
-      int needID = (Integer) cornering[cornerID];
       
-      if (wingID != needID) return false;
-      cornerID++;
+      //I.say("  "+x+"|"+y+" Need/Got: "+needID+"/"+wingID);
+      if (wingID != needID) allMatch = false; //I.add(" wrong!"); }
     }
     
-    return true;
+    return allMatch;
   }
   
   

@@ -21,48 +21,68 @@ public class SceneTypeUnits extends SceneType {
     UNIT_WALL   = 'W',
     UNIT_BEND   = 'B',
     UNIT_INNER  = 'I';
+  
+  //  NOTE:
+  //    1 - this corner-coordinate should be filled by a wing.
+  //    0 - this coordinate should be empty.
+  //    X - this coordinate should be skipped when checking corners.
+  final static Integer X = -1;
   final static Object RAW_UNITS_CORNERING_MAP[] = {
-      0, 0,
-      0, 1, UNIT_CORNER, N,
       
-      0, 0,
-      1, 0, UNIT_CORNER, E,
+      0, 0, X,
+      0, 1, 1,
+      X, 1, 1, UNIT_CORNER, N,
       
-      1, 0,
-      0, 0, UNIT_CORNER, S,
+      X, 0, 0,
+      1, 1, 0,
+      1, 1, X, UNIT_CORNER, E,
       
-      0, 1,
-      0, 0, UNIT_CORNER, W,
+      1, 1, X,
+      1, 1, 0,
+      X, 0, 0, UNIT_CORNER, S,
       
-      0, 0,
-      1, 1, UNIT_WALL, N,
+      X, 1, 1,
+      0, 1, 1,
+      0, 0, X, UNIT_CORNER, W,
       
-      1, 0,
-      1, 0, UNIT_WALL, E,
+      X, 0, X,
+      1, 1, 1,
+      1, 1, 1, UNIT_WALL, N,
       
-      1, 1,
-      0, 0, UNIT_WALL, S,
+      1, 1, X,
+      1, 1, 0,
+      1, 1, X, UNIT_WALL, E,
       
-      0, 1,
-      0, 1, UNIT_WALL, W,
+      1, 1, 1,
+      1, 1, 1,
+      X, 0, X, UNIT_WALL, S,
       
-      0, 1,
-      1, 1, UNIT_BEND, N,
+      X, 1, 1,
+      0, 1, 1,
+      X, 1, 1, UNIT_WALL, W,
       
-      1, 0,
-      1, 1, UNIT_BEND, E,
+      0, 1, 1,
+      1, 1, 1,
+      1, 1, 1, UNIT_BEND, N,
       
-      1, 1,
-      1, 0, UNIT_BEND, S,
+      1, 1, 0,
+      1, 1, 1,
+      1, 1, 1, UNIT_BEND, E,
       
-      1, 1,
-      0, 1, UNIT_BEND, W,
+      1, 1, 1,
+      1, 1, 1,
+      1, 1, 0, UNIT_BEND, S,
       
-      1, 1,
-      1, 1, UNIT_INNER, N
+      1, 1, 1,
+      1, 1, 1,
+      0, 1, 1, UNIT_BEND, W,
+      
+      1, 1, 1,
+      1, 1, 1,
+      1, 1, 1, UNIT_INNER, N,
   };
   final static Object[][] UNITS_CORNERING_MAP = Visit.splitByDivision(
-    RAW_UNITS_CORNERING_MAP, RAW_UNITS_CORNERING_MAP.length / 6
+    RAW_UNITS_CORNERING_MAP, RAW_UNITS_CORNERING_MAP.length / 11
   );
   final public static Object
     CORNER_NORTH[] = UNITS_CORNERING_MAP[0 ],
@@ -177,19 +197,22 @@ public class SceneTypeUnits extends SceneType {
   public Scenery generateScenery(
     World world, int wide, int high, boolean testing
   ) {
-    Scenery gen = new Scenery(wide, high, testing);
-    gen.setGridResolution(resolution);
-    
+    Scenery gen = new Scenery(this, wide, high, testing);
     Series <Wing> wings = generateWings(gen, resolution, 0.5f, 3);
-    gen.attachWings(wings);
-    populateWithAreas(world, gen, testing);
+    
+    gen.setupWingsGrid(resolution, wings);
+    populateWithAreas(world, gen, testing, false);
     
     return gen;
   }
   
   
-  public void populateWithAreas(World world, Scenery g, boolean testing) {
-    I.say("\nPopulating areas for "+this);
+  public void populateWithAreas(
+    World world, Scenery g, boolean testing, boolean report
+  ) {
+    if (report) {
+      I.say("\nPopulating areas for "+this);
+    }
     //
     //  We apply all units with exact positions in a separate pass first:
     for (Unit unit : units) {
@@ -261,8 +284,10 @@ public class SceneTypeUnits extends SceneType {
             pick.compare(s, rating);
             possible.add(s);
             
-            I.say("\nCan place "+unit.type+" at "+c+", facing: "+face);
-            I.say("  rating: "+rating);
+            if (report) {
+              I.say("\nCan place "+unit.type+" at "+c+", facing: "+face);
+              I.say("  rating: "+rating);
+            }
           }
         }
       }
@@ -276,7 +301,9 @@ public class SceneTypeUnits extends SceneType {
       counts  [s.unit.ID]++;
       typeGens[s.unit.ID] = null;
       
-      I.say("\nWILL PLACE "+s.unit+" at "+s.tx+"|"+s.ty+", facing: "+s.facing);
+      if (report) {
+        I.say("\nPLACED "+s.unit+" at "+s.tx+"|"+s.ty+", facing: "+s.facing);
+      }
     }
   }
   
@@ -355,7 +382,6 @@ public class SceneTypeUnits extends SceneType {
     
     Wing init = new Wing();
     init.set(x * r, y * r, w * r, h * r);
-    init.expandBy(-2);
     init.addWalls(walls, -1);
     areas.add(init);
     totalArea += init.area();
@@ -403,49 +429,6 @@ public class SceneTypeUnits extends SceneType {
     
     return (Series) areas;
   }
-  
-  
-  
-  /*
-  public Series <Wing> generateWings(
-    Scenery area, int resolution, Series <Box2D> bounds
-  ) {
-    int gridW = area.wide / resolution, gridH = area.high / resolution;
-    int samples[] = new int[4];
-    
-    Batch <Wing> wings = new Batch();
-    for (Coord c : Visit.grid(0, 0, gridW, gridH, 1)) {
-      
-      int i = 0;
-      for (Coord t : Visit.grid(0, 0, 2, 2, 1)) {
-        int sx = (c.x + t.x) * resolution;
-        int sy = (c.y + t.y) * resolution;
-        boolean inBounds = false;
-        for (Box2D b : bounds) if (b.contains(sx, sy)) inBounds = true;
-        samples[i++] = inBounds ? 1 : 0;
-      }
-      
-      for (Object[] map : UNITS_CORNERING_MAP) {
-        boolean match = true;
-        i = 4;
-        while (i-- > 0) if (((Integer) map[i]) != samples[i]) match = false;
-        
-        if (match) {
-          Wing wing = new Wing();
-          wing.unitType = (Character) map[4];
-          wing.dir      = (Integer  ) map[5];
-          wing.x        = c.x;
-          wing.y        = c.y;
-          wings.add(wing);
-        }
-      }
-    }
-    
-    return wings;
-  }
-  //*/
-  
-  
   
   
   

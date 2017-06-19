@@ -14,6 +14,7 @@ public class Scenery implements Session.Saveable, TileConstants {
   
   /**  Data fields, constructors and save/load methods-
     */
+  SceneType type;
   int wide, high;
   Tile tiles[][] = new Tile[0][0];
   Prop fills[][] = new Prop[1][2];
@@ -31,13 +32,16 @@ public class Scenery implements Session.Saveable, TileConstants {
   
   int gridW, gridH, resolution;
   int offX, offY, facing;
+  
+  Wing wingsPattern[][];
   List <Wing> wings     = new List();
   List <Room> rooms     = new List();
   List <Room> corridors = new List();
   
   
   
-  public Scenery(int wide, int high, boolean forTesting) {
+  public Scenery(SceneType type, int wide, int high, boolean forTesting) {
+    this.type = type;
     this.wide = wide;
     this.high = high;
     this.setupScene(forTesting);
@@ -83,10 +87,25 @@ public class Scenery implements Session.Saveable, TileConstants {
   
   /**  Helper methods for hierarchical composition-
     */
-  public void setGridResolution(int resolution) {
+  public void setupWingsGrid(int resolution, Series <Wing> wings) {
     this.resolution = resolution;
     this.gridW      = wide / resolution;
     this.gridH      = high / resolution;
+    this.wingsPattern = new Wing[gridW][gridH];
+    
+    this.wings.clear();
+    Visit.appendTo(this.wings, wings);
+    
+    for (Coord c : Visit.grid(0, 0, gridW, gridH, 1)) {
+      int tx = (int) ((c.x + 0.5f) * resolution);
+      int ty = (int) ((c.y + 0.5f) * resolution);
+      
+      wingsPattern[c.x][c.y] = null;
+      for (Wing w : wings) if (w.contains(tx, ty)) {
+        wingsPattern[c.x][c.y] = w;
+        break;
+      }
+    }
   }
   
   
@@ -98,14 +117,8 @@ public class Scenery implements Session.Saveable, TileConstants {
   
   
   public Wing wingUnder(int x, int y) {
-    for (Wing wing : wings) if (wing.contains(x, y)) return wing;
-    return null;
-  }
-  
-  
-  public void attachWings(Series <Wing> wings) {
-    this.wings.clear();
-    Visit.appendTo(this.wings, wings);
+    if (x < 0 || y < 0 || x >= wide || y >= high) return null;
+    return wingsPattern[x / resolution][y / resolution];
   }
   
   
@@ -137,6 +150,11 @@ public class Scenery implements Session.Saveable, TileConstants {
   
   /**  Supplemental query methods-
     */
+  public SceneType type() {
+    return type;
+  }
+  
+  
   public int wide() {
     return wide;
   }

@@ -316,7 +316,7 @@
   <unit typeID = "unit_corner_seats" />
   
   <comment>  The alley-piece isn't being inserted correctly!  </comment>
-  <unit_ typeID = "unit_alley" />
+  <unit typeID = "unit_alley" />
   
   <unit
     typeID = "unit_entrance"

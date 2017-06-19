@@ -46,17 +46,19 @@ public class Scene extends Scenery implements Assignment {
   Stack <Action> actionStack = new Stack();
   
   
-  public Scene(World world, int wide, int high, boolean forTesting) {
-    super(wide, high, forTesting);
+  public Scene(
+    SceneType type, World world, int wide, int high, boolean testing
+  ) {
+    super(type, wide, high, testing);
     this.world = world;
     vision.setupFog(wide, high);
   }
   
   
-  protected void setupScene(boolean forTesting) {
+  protected void setupScene(boolean testing) {
     this.state      = STATE_SETUP;
-    this.forTesting = forTesting;
-    super.setupScene(forTesting);
+    this.forTesting = testing;
+    super.setupScene(testing);
   }
   
   
