@@ -64,7 +64,7 @@ public class SceneTypeUnits extends SceneType {
   final static Object[][] UNITS_CORNERING_MAP = Visit.splitByDivision(
     RAW_UNITS_CORNERING_MAP, RAW_UNITS_CORNERING_MAP.length / 6
   );
-  final static Object
+  final public static Object
     CORNER_NORTH[] = UNITS_CORNERING_MAP[0 ],
     CORNER_EAST [] = UNITS_CORNERING_MAP[1 ],
     CORNER_SOUTH[] = UNITS_CORNERING_MAP[2 ],
@@ -178,10 +178,9 @@ public class SceneTypeUnits extends SceneType {
     World world, int wide, int high, boolean testing
   ) {
     Scenery gen = new Scenery(wide, high, testing);
-    gen.gridW = wide / resolution;
-    gen.gridH = high / resolution;
+    gen.setGridResolution(resolution);
     
-    Series <Box2D> wings = generateWingBounds(gen, resolution, 0.5f, 3);
+    Series <Wing> wings = generateWings(gen, resolution, 0.5f, 3);
     gen.attachWings(wings);
     populateWithAreas(world, gen, testing);
     
@@ -203,7 +202,7 @@ public class SceneTypeUnits extends SceneType {
       Scenery scenery = unit.type.generateScenery(world, testing);
       unit.type.applyScenery(g, scenery, tX, tY, unit.exactDir, testing);
       
-      if (g.areaUnder(tX, tY) != null) continue;
+      if (g.roomUnder(tX, tY) != null) continue;
       insertRoom(unit, g, scenery, tX, tY, unit.exactDir, testing);
     }
     //
@@ -243,7 +242,7 @@ public class SceneTypeUnits extends SceneType {
         for (Coord c : Visit.grid(0, 0, g.gridW, g.gridH, 1)) {
           int tX = g.offX + (c.x * resolution);
           int tY = g.offY + (c.y * resolution);
-          if (g.areaUnder(tX, tY) != null) continue;
+          if (g.roomUnder(tX, tY) != null) continue;
           
           for (int face : T_ADJACENT) {
             if (! type.checkBordering(g, typeGen, tX, tY, face, resolution)) {
@@ -261,11 +260,13 @@ public class SceneTypeUnits extends SceneType {
             s.facing = face;
             pick.compare(s, rating);
             possible.add(s);
+            
+            I.say("\nCan place "+unit.type+" at "+c+", facing: "+face);
+            I.say("  rating: "+rating);
           }
         }
       }
       if (pick.empty()) break;
-      
       //
       //  Having pick the most promising option, we apply the furnishings to
       //  the scene:
@@ -274,6 +275,8 @@ public class SceneTypeUnits extends SceneType {
       insertRoom(s.unit, g, typeGen, s.tx, s.ty, s.facing, testing);
       counts  [s.unit.ID]++;
       typeGens[s.unit.ID] = null;
+      
+      I.say("\nWILL PLACE "+s.unit+" at "+s.tx+"|"+s.ty+", facing: "+s.facing);
     }
   }
   
@@ -304,14 +307,36 @@ public class SceneTypeUnits extends SceneType {
   
   
   
-  public static class Wing {
-    public int dir;
-    public char unitType;
-    public int x, y;
+  public static class WingWall extends Vec2D {
+    int dir, len;
   }
   
   
-  public Series <Box2D> generateWingBounds(
+  public static class Wing extends Box2D {
+    void addWalls(Series <WingWall> walls, int dir) {
+      WingWall w;
+      for (int d : T_ADJACENT) if (d != dir) {
+        w = new WingWall();
+        w.dir = d;
+        w.len = (d == N || d == S) ? (int) xdim() : (int) ydim();
+        if (d == N) w.set(xpos(), ymax());
+        if (d == E) w.set(xmax(), ymax());
+        if (d == S) w.set(xmax(), ypos());
+        if (d == W) w.set(xpos(), ypos());
+        walls.add(w);
+      }
+    }
+    void extend(int dir, int amount) {
+      if (dir == N)   incHigh(amount);
+      if (dir == E)   incWide(amount);
+      if (dir == S) { incHigh(amount); incY(-amount); }
+      if (dir == W) { incWide(amount); incX(-amount); }
+    }
+  }
+  
+  
+  
+  public Series <Wing> generateWings(
     Scenery scene, int resolution,
     float coverFraction, int maxUnitsWide
   ) {
@@ -319,32 +344,7 @@ public class SceneTypeUnits extends SceneType {
     float areaNeeded = scene.wide * scene.high * coverFraction;
     Box2D sceneBound = new Box2D(0, 0, scene.wide, scene.high);
     
-    class WingWall extends Vec2D {
-      int dir, len;
-    }
-    class WingArea extends Box2D {
-      void addWalls(Series <WingWall> walls, int dir) {
-        WingWall w;
-        for (int d : T_ADJACENT) if (d != dir) {
-          w = new WingWall();
-          w.dir = d;
-          w.len = (d == N || d == S) ? (int) xdim() : (int) ydim();
-          if (d == N) w.set(xpos(), ymax());
-          if (d == E) w.set(xmax(), ymax());
-          if (d == S) w.set(xmax(), ypos());
-          if (d == W) w.set(xpos(), ypos());
-          walls.add(w);
-        }
-      }
-      void extend(int dir, int amount) {
-        if (dir == N)   incHigh(amount);
-        if (dir == E)   incWide(amount);
-        if (dir == S) { incHigh(amount); incY(-amount); }
-        if (dir == W) { incWide(amount); incX(-amount); }
-      }
-    }
-    
-    Series <WingArea> areas = new Batch();
+    Series <Wing> areas = new Batch();
     List <WingWall> walls = new List();
     float totalArea = 0;
     
@@ -353,7 +353,7 @@ public class SceneTypeUnits extends SceneType {
     int x = Rand.index(gridW + 1 - w);
     int y = Rand.index(gridH + 1 - h);
     
-    WingArea init = new WingArea();
+    Wing init = new Wing();
     init.set(x * r, y * r, w * r, h * r);
     init.expandBy(-2);
     init.addWalls(walls, -1);
@@ -367,7 +367,7 @@ public class SceneTypeUnits extends SceneType {
       walls.remove(parent);
       if (parent.len <= resolution) continue;
       
-      WingArea area = new WingArea();
+      Wing area = new Wing();
       area.set(parent.x, parent.y, 0, 0);
       int d = parent.dir, l = parent.len;
       int extend = ((d == N || d == S) ? scene.high : scene.wide) / 2;
@@ -376,7 +376,7 @@ public class SceneTypeUnits extends SceneType {
       while (extend-- > 0) {
         area.extend(d, resolution);
         boolean overlaps = false;
-        for (WingArea other : areas) {
+        for (Wing other : areas) {
           if (other.overlaps(area)) {
             overlaps = true;
             break;

@@ -288,30 +288,49 @@
 
 
 <scene
-  name      = "Bar Scene Assembled"
-  ID        = "scene_assembled"
-  unitSize  = "8"
-  unitsWide = "3"
-  unitsHigh = "3"
+  name         = "Bar Scene Assembled"
+  ID           = "scene_assembled"
+  unitSize     = "8"
+  maxUnitsWide = "4"
+  maxUnitsHigh = "4"
 >
-  <unit typeID = "unit_alley"         x = "0" y = "0" dir = "N" 
-    wall = "WALL_NONE"
-  />
-  <unit typeID = "unit_alley"         x = "1" y = "0" dir = "N" 
-    wall = "WALL_NONE"
-  />
-  <unit typeID = "unit_alley"         x = "2" y = "0" dir = "N" 
-    wall = "WALL_NONE"
-  />
-  
-  <unit typeID = "unit_corner_seats"  x = "0" y = "1" dir = "N" />
-  <unit typeID = "unit_entrance"      x = "1" y = "1" dir = "N" />
-  <unit typeID = "unit_main_bar"      x = "2" y = "1" dir = "N" />
-  <unit typeID = "unit_toilets"       x = "0" y = "2" dir = "N" />
-  <unit typeID = "unit_pool_area"     x = "1" y = "2" dir = "N" />
-  <unit typeID = "unit_corner_seats"  x = "2" y = "2" dir = "S" />
+  <unit typeID = "unit_entrance"  minCount = "1" priority = "PRIORITY_HIGH" />
+  <unit typeID = "unit_corner_seats"  percent = "25" />
+  <unit typeID = "unit_main_bar"      percent = "25" />
+  <unit typeID = "unit_toilets"       percent = "25" />
+  <unit typeID = "unit_pool_area"     percent = "25" />
+  <unit typeID = "unit_alley"         percent = "30" />
 </scene>
 
+
+
+
+<scene
+  name         = "Bar Scene Simple"
+  ID           = "scene_simple"
+  unitSize     = "8"
+  maxUnitsWide = "4"
+  maxUnitsHigh = "4"
+>
+  <unit typeID = "unit_pool_area" />
+  <unit typeID = "unit_corner_seats" />
+  
+  <comment>  The alley-piece isn't being inserted correctly!  </comment>
+  <unit_ typeID = "unit_alley" />
+  
+  <unit
+    typeID = "unit_entrance"
+    minCount = "1" maxCount = "1" priority = "PRIORITY_HIGH"
+  />
+  <unit
+    typeID = "unit_toilets"
+    minCount = "1" maxCount = "1" priority = "PRIORITY_HIGH"
+  />
+  <unit
+    typeID = "unit_main_bar"
+    maxCount = "1" minCount = "1" priority = "PRIORITY_HIGH"
+  />
+</scene>
 
 
 

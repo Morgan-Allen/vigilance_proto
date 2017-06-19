@@ -5,6 +5,7 @@ import proto.common.*;
 import proto.game.person.*;
 import proto.game.world.*;
 import proto.util.*;
+import proto.game.scene.SceneTypeUnits.*;
 
 
 
@@ -28,10 +29,11 @@ public class Scenery implements Session.Saveable, TileConstants {
     public String toString() { return "R["+unit+"]"; }
   }
   
-  int gridW, gridH, offX, offY, facing, resolution;
-  List <Box2D> wings     = new List();
-  List <Room > rooms     = new List();
-  List <Room > corridors = new List();
+  int gridW, gridH, resolution;
+  int offX, offY, facing;
+  List <Wing> wings     = new List();
+  List <Room> rooms     = new List();
+  List <Room> corridors = new List();
   
   
   
@@ -81,30 +83,54 @@ public class Scenery implements Session.Saveable, TileConstants {
   
   /**  Helper methods for hierarchical composition-
     */
-  Box2D wingUnder(int x, int y) {
-    for (Box2D wing : wings) if (wing.contains(x, y)) return wing;
+  public void setGridResolution(int resolution) {
+    this.resolution = resolution;
+    this.gridW      = wide / resolution;
+    this.gridH      = high / resolution;
+  }
+  
+  
+  public void setUnitParameters(int offX, int offY, int facing) {
+    this.offX   = offX;
+    this.offY   = offY;
+    this.facing = facing;
+  }
+  
+  
+  public Wing wingUnder(int x, int y) {
+    for (Wing wing : wings) if (wing.contains(x, y)) return wing;
     return null;
   }
   
   
-  public void attachWings(Series <Box2D> wings) {
+  public void attachWings(Series <Wing> wings) {
     this.wings.clear();
     Visit.appendTo(this.wings, wings);
   }
   
   
-  Room areaUnder(int x, int y) {
+  public Series <Wing> wings() {
+    return wings;
+  }
+  
+  
+  public Room roomUnder(int x, int y) {
     Tile under = tileAt(x, y);
     return under == null ? null : under.room;
   }
   
   
-  void recordRoom(Room area, Box2D bounds) {
+  public void recordRoom(Room area, Box2D bounds) {
     for (Coord c : Visit.grid(bounds)) {
       Tile under = tileAt(c.x, c.y);
       if (under != null) under.room = area;
     }
     rooms.include(area);
+  }
+  
+  
+  public Series <Room> rooms() {
+    return rooms;
   }
   
   

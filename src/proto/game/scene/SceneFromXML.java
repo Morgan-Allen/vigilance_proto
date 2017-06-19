@@ -200,9 +200,7 @@ public class SceneFromXML implements TileConstants {
     
     Object cornering = Kind.loadObject(cornerID, SceneTypeUnits.class);
     if (cornering == null) cornering = SceneTypeUnits.INTERIOR;
-    
-    sceneType.cornering = (Object[]) cornering;
-    sceneType.exterior  = exterior;
+    sceneType.attachUnitParameters((Object[]) cornering, exterior);
     
     return sceneType;
   }
@@ -229,16 +227,15 @@ public class SceneFromXML implements TileConstants {
       door   = propWithID(doorID  , file, basePath),
       window = propWithID(windowID, file, basePath);
     
+    SceneTypeGrid sceneType = new SceneTypeGrid(name, ID, wide, high);
+    sceneType.floors  = floor;
+    sceneType.borders = wall;
+    sceneType.door    = door;
+    sceneType.window  = window;
+    
     Object cornering = Kind.loadObject(cornerID, SceneTypeUnits.class);
     if (cornering == null) cornering = SceneTypeUnits.INTERIOR;
-    
-    SceneTypeGrid sceneType = new SceneTypeGrid(name, ID, wide, high);
-    sceneType.floors    = floor;
-    sceneType.borders   = wall;
-    sceneType.door      = door;
-    sceneType.window    = window;
-    sceneType.cornering = (Object[]) cornering;
-    sceneType.exterior  = exterior;
+    sceneType.attachUnitParameters((Object[]) cornering, exterior);
     
     for (XML gridXML : sceneNode.allChildrenMatching("grid")) {
       //

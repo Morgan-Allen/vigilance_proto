@@ -3,8 +3,8 @@
 package proto.common;
 import proto.game.world.*;
 import proto.game.scene.*;
-import proto.content.places.*;
 import proto.util.*;
+import static proto.common.DebugSceneGrid.*;
 import static proto.game.scene.SceneTypeUnits.*;
 
 
@@ -12,72 +12,91 @@ import static proto.game.scene.SceneTypeUnits.*;
 public class DebugSceneGen {
   
   
-  /*
-  //*/
+  final public static SceneType GEN_TEST_UNIT = new SceneTypeGrid(
+    "gen test unit", "type_gen_test_unit",
+    null,
+    new PropType[] {
+      KIND_COLUMN     ,
+      KIND_DOOR       ,
+      KIND_WINDOW     ,
+    },
+    8, 8, new byte[][] {
+      { 0, 0, 0, 0, 0, 0, 0, 0 },
+      { 0, 1, 1, 2, 1, 3, 1, 0 },
+      { 0, 1, 0, 0, 0, 0, 1, 1 },
+      { 0, 2, 0, 0, 0, 0, 0, 0 },
+      { 0, 1, 0, 0, 0, 0, 0, 0 },
+      { 0, 3, 0, 0, 0, 0, 0, 0 },
+      { 0, 1, 1, 0, 0, 0, 0, 0 },
+      { 0, 0, 1, 0, 0, 0, 0, 0 },
+    }
+  ).attachUnitParameters(SceneTypeUnits.CORNER_NORTH, false);
+  
+  final public static SceneTypeUnits GEN_TEST_SCENE = new SceneTypeUnits(
+    "gen test scene", "type_gen_test_scene",
+    8,
+    2, 4, 2, 4,
+    null, null, null, null,
+    unit(GEN_TEST_UNIT, -1, -1, -1, PRIORITY_HIGH, 50, -1, -1)
+  );
+  
+  final static SceneType GEN_TEST_XML_SCENE = SceneFromXML.sceneWithID(
+    "scene_simple", "slum_bar.xml", "media assets/scene layout/slum scenes/"
+  );
+  
+  
   
   
   public static void main(String args[]) {
     
     World world = new World();
-    Place park = new Place(Facilities.BUSINESS_PARK, 0, world);
-    SceneType root = park.kind().sceneType();
-    root.generateScene(world, 32, 32, true);
-    
-    /*
-    World world = new World();
     Scene scene = new Scene(world, 32, 32, true);
-    SceneTypeUnits type = (SceneTypeUnits) Facilities.BUSINESS_PARK.sceneType();
+    SceneTypeUnits type = (SceneTypeUnits) GEN_TEST_XML_SCENE;
     
-    Series <Box2D> bounds = new Batch();
-    bounds.add(new Box2D( 2,  2, 20, 20));
-    bounds.add(new Box2D( 2,  2, 28, 12));
+    Series <Wing> bounds = new Batch();
+    Wing wa = new Wing(), wb = new Wing();
+    wa.set( 2,  2, 20, 20);
+    wb.set( 2,  2, 28, 12);
+    bounds.add(wa);
+    bounds.add(wb);
     
     I.say("\nConstructed bounds are:");
     for (Box2D b : bounds) I.say("  "+b);
     
-    Series <Wing> wings = type.generateWings(scene, 8, bounds);
-    int dim = 32 / 8;
-    printWings(wings, dim);
+    scene.attachWings(bounds);
+    scene.setGridResolution(8);
+    printWings(scene, 8);
     
-    for (int i = 3; i-- > 0;) {
-      bounds = type.generateWingBounds(scene, 8, 0.5f, 3);
-      I.say("\nGenerated bounds are:");
-      for (Box2D b : bounds) I.say("  "+b);
-      
-      wings = type.generateWings(scene, 8, bounds);
-      printWings(wings, dim);
-    }
-    //*/
-    
-    //
-    //  Okay.  Having done all this, the next step would be to annotate sub-
-    //  scenes based on their type- corner, wall, bend, etc.- and have those
-    //  slot into position within the structure.  Keep the quotas, but mold it
-    //  to fit the larger structure.
-    
-    //  So you have separate settings for the floorplan and for the sub-units,
-    //  which should allow you, in theory, to incorporate fixed elements as
-    //  well...
+    type.populateWithAreas(world, scene, true);
+    Tile.printWallsMask(scene);
   }
   
   
-  private static void printWings(Series <Wing> wings, int dim) {
-    Object grid[][] = new Object[dim][dim];
-    for (Wing wing : wings) grid[wing.x][wing.y] = wing;
+  private static void printWings(Scenery scene, int resolution) {
+    
+    int dimX = scene.wide() / resolution;
+    int dimY = scene.high() / resolution;
     
     I.say("\nPrinting wings...");
-    for (int y = dim; y-- > 0;) {
+    for (int y = 0; y < dimY; y++) {
       I.say("  ");
-      for (int x = 0; x < dim; x++) {
-        Wing wing = (Wing) grid[x][y];
+      for (int x = 0; x < dimX; x++) {
+        Wing wing = scene.wingUnder(
+          (int) ((x + 0.5f) * resolution),
+          (int) ((y + 0.5f) * resolution)
+        );
         
-        if (wing == null) I.add("___");
-        else I.add(""+wing.dir+"_"+wing.unitType);
+        if (wing == null) I.add("__");
+        else I.add("[]");
         
         I.add(" ");
       }
     }
   }
 }
+
+
+
+
 
 

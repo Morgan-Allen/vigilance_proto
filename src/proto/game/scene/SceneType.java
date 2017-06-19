@@ -69,6 +69,13 @@ public abstract class SceneType extends Index.Entry implements
   }
   
   
+  public SceneType attachUnitParameters(Object[] cornering, boolean exterior) {
+    this.cornering = cornering;
+    this.exterior  = exterior;
+    return this;
+  }
+  
+  
   public static SceneType loadConstant(Session s) throws Exception {
     return INDEX.loadEntry(s.input());
   }
@@ -97,11 +104,12 @@ public abstract class SceneType extends Index.Entry implements
     Scene   scene = new Scene(world, wide, high, testing);
     Scenery gen   = generateScenery(world, wide, high, testing);
     //
-    //  Copy over all rooms, and all scenery:
+    //  Copy over all wings, rooms, and scenery:
     for (Scenery.Room room : gen.rooms) {
       Box2D bounds = borderBounds(scene, gen, 0, 0, N, room.wide);
       scene.recordRoom(room, bounds);
     }
+    scene.attachWings(gen.wings());
     applyScenery(scene, gen, 0, 0, N, testing);
     return scene;
   }
@@ -176,30 +184,25 @@ public abstract class SceneType extends Index.Entry implements
     return bound;
   }
   
-  
+
   boolean checkBordering(
     Scenery within, Scenery gen, int offX, int offY, int facing, int resolution
   ) {
-    Coord temp = new Coord();
     if (borderBounds(within, gen, offX, offY, facing, resolution) == null) {
       return false;
     }
     
+    Coord c = new Coord();
     int cornerID = 0;
     
-    for (Coord c : Visit.perimeter(0, 0, gen.wide, gen.high)) {
-      temp.setTo(c);
-      rotateCoord(gen, temp, facing);
-      int tx = temp.x + offX, ty = temp.y + offY, gx = c.x, gy = c.y, dir = 0;
-      if (c.x < 0          ) { gx++; dir = W; }
-      if (c.y < 0          ) { gy++; dir = S; }
-      if (c.x >= resolution) { gx--; dir = E; }
-      if (c.y >= resolution) { gy--; dir = N; }
-      if (c.x != gx && c.y != gy) {
-        continue;
-      }
+    for (int y = 0; y < 2; y++) for (int x = 0; x < 2; x++) {
+      c.x = x * gen.wide;
+      c.y = y * gen.high;
+      rotateCoord(gen, c, facing);
+      c.x += offX;
+      c.y += offY;
       
-      Box2D wing = within.wingUnder(tx, ty);
+      Box2D wing = within.wingUnder(c.x, c.y);
       int wingID = wing == null ? 0 : 1;
       if (exterior) wingID = 1 - wingID;
       int needID = (Integer) cornering[cornerID];
@@ -216,6 +219,7 @@ public abstract class SceneType extends Index.Entry implements
     Scenery within, Scenery gen, int offX, int offY, int facing,
     boolean testing
   ) {
+    gen.setUnitParameters(offX, offY, facing);
     Coord temp = new Coord();
     for (Prop prop : gen.props()) {
       Tile at = prop.origin();
