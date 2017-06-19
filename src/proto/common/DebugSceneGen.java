@@ -60,7 +60,7 @@ public class DebugSceneGen {
   );
   
   final static SceneType GEN_TEST_XML_SCENE = SceneFromXML.sceneWithID(
-    "scene_simple", "slum_bar.xml", "media assets/scene layout/slum scenes/"
+    "full_scene", "test_scene.xml", "media assets/testing/"
   );
   
   

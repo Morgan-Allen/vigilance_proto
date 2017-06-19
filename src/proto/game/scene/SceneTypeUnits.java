@@ -80,6 +80,10 @@ public class SceneTypeUnits extends SceneType {
       1, 1, 1,
       1, 1, 1,
       1, 1, 1, UNIT_INNER, N,
+      
+      X, X, X,
+      X, 1, X,
+      X, X, X, UNIT_INNER, N,
   };
   final static Object[][] UNITS_CORNERING_MAP = Visit.splitByDivision(
     RAW_UNITS_CORNERING_MAP, RAW_UNITS_CORNERING_MAP.length / 11
@@ -100,7 +104,8 @@ public class SceneTypeUnits extends SceneType {
     BEND_SOUTH  [] = UNITS_CORNERING_MAP[10],
     BEND_WEST   [] = UNITS_CORNERING_MAP[11],
     
-    INTERIOR    [] = UNITS_CORNERING_MAP[12];
+    INTERIOR    [] = UNITS_CORNERING_MAP[12],
+    ANY         [] = UNITS_CORNERING_MAP[13];
   
   
   public static char corneringType(Unit unit) {

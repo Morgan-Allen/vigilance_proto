@@ -294,28 +294,8 @@
   maxUnitsWide = "4"
   maxUnitsHigh = "4"
 >
-  <unit typeID = "unit_entrance"  minCount = "1" priority = "PRIORITY_HIGH" />
-  <unit typeID = "unit_corner_seats"  percent = "25" />
-  <unit typeID = "unit_main_bar"      percent = "25" />
-  <unit typeID = "unit_toilets"       percent = "25" />
-  <unit typeID = "unit_pool_area"     percent = "25" />
-  <unit typeID = "unit_alley"         percent = "30" />
-</scene>
-
-
-
-
-<scene
-  name         = "Bar Scene Simple"
-  ID           = "scene_simple"
-  unitSize     = "8"
-  maxUnitsWide = "4"
-  maxUnitsHigh = "4"
->
   <unit typeID = "unit_pool_area" />
   <unit typeID = "unit_corner_seats" />
-  
-  <comment>  The alley-piece isn't being inserted correctly!  </comment>
   <unit typeID = "unit_alley" />
   
   <unit
