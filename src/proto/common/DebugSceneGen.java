@@ -5,6 +5,7 @@ import proto.game.world.*;
 import proto.game.scene.*;
 import proto.util.*;
 import static proto.common.DebugSceneGrid.*;
+import static proto.game.scene.Scenery.*;
 import static proto.game.scene.SceneTypeUnits.*;
 
 
@@ -30,8 +31,8 @@ public class DebugSceneGen {
       { 0, 1, 1, 0, 0, 0, 0, 0 },
       { 0, 0, 1, 0, 0, 0, 0, 0 },
     }
-  ).attachUnitParameters(SceneTypeUnits.CORNER_NORTH, false);
-
+  ).attachUnitParameters(SceneTypeUnits.CORNER_NORTH, false, false);
+  
   final public static SceneType GEN_TEST_UNIT_B = new SceneTypeGrid(
     "gen test unit B", "type_gen_test_unit_b",
     null,
@@ -48,7 +49,7 @@ public class DebugSceneGen {
       { 0, 1, 0, 0, 0, 0, 0, 0 },
       { 0, 0, 0, 0, 0, 0, 0, 0 },
     }
-  ).attachUnitParameters(SceneTypeUnits.WALL_EAST, true);
+  ).attachUnitParameters(SceneTypeUnits.WALL_EAST, true, false);
   
   final public static SceneTypeUnits GEN_TEST_SCENE = new SceneTypeUnits(
     "gen test scene", "type_gen_test_scene",
@@ -66,24 +67,23 @@ public class DebugSceneGen {
   
   public static void main(String args[]) {
     World world = new World();
-    Scene scene = new Scene(GEN_TEST_SCENE, world, 32, 32, true);
+    Scene scene = new Scene(GEN_TEST_SCENE, world, 48, 48, true);
     int resolution = 8;
     //
     //  First, we have a series of reports/tests based on a fixed layout of
     //  building-wings, intended to ensure that corner-fitting is correctly
     //  recognised for potential sub-units.
     Series <Wing> bounds = new Batch();
-    Wing wa = new Wing(), wb = new Wing();
-    wa.set( 0,  0, 24, 24);
-    wb.set( 0,  0, 32, 16);
-    bounds.add(wa);
-    bounds.add(wb);
+    bounds.add(new Wing( 0,  0, 24, 24));
+    bounds.add(new Wing( 0,  0, 32, 16));
+    bounds.add(new Wing(32, 16, 16, 32));
     
     I.say("\nConstructed bounds are:");
     for (Box2D b : bounds) I.say("  "+b);
     
     scene.setupWingsGrid(resolution, bounds);
     printWings(scene, resolution);
+    printIslands(scene);
     
     I.say("\nChecking for border-fitting...");
     Scenery subunitA = GEN_TEST_UNIT_A.generateScenery(world, true);
@@ -133,6 +133,7 @@ public class DebugSceneGen {
     
     type.populateWithAreas(world, scene, true, false);
     Tile.printWallsMask(scene);
+    printIslands(scene);
   }
   
   
@@ -157,7 +158,22 @@ public class DebugSceneGen {
       }
     }
   }
+  
+  
+  private static void printIslands(Scenery scene) {
+    I.say("\nExterior islands are:");
+    for (Island island : scene.islands()) if (island.exterior()) {
+      I.say("  "+island+": ");
+      for (Coord c : island.gridPoints()) {
+        I.add(c+" ");
+      }
+    }
+  }
+  
 }
+
+
+
 
 
 

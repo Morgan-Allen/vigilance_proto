@@ -181,6 +181,7 @@ public class SceneFromXML implements TileConstants {
     int     unitsW   = getInt(sceneNode, "unitsWide"   , -1);
     String  cornerID = sceneNode.value  ("cornering");
     boolean exterior = sceneNode.getBool("exterior" );
+    boolean entrance = sceneNode.getBool("entrance" );
     
     PropType
       floor  = propWithID(floorID , file, basePath),
@@ -200,7 +201,7 @@ public class SceneFromXML implements TileConstants {
     
     Object cornering = Kind.loadObject(cornerID, SceneTypeUnits.class);
     if (cornering == null) cornering = SceneTypeUnits.INTERIOR;
-    sceneType.attachUnitParameters((Object[]) cornering, exterior);
+    sceneType.attachUnitParameters((Object[]) cornering, exterior, entrance);
     
     return sceneType;
   }
@@ -220,6 +221,7 @@ public class SceneFromXML implements TileConstants {
     String  windowID = sceneNode.value  ("window"   );
     String  cornerID = sceneNode.value  ("cornering");
     boolean exterior = sceneNode.getBool("exterior" );
+    boolean entrance = sceneNode.getBool("entrance" );
     
     PropType
       floor  = propWithID(floorID , file, basePath),
@@ -235,7 +237,7 @@ public class SceneFromXML implements TileConstants {
     
     Object cornering = Kind.loadObject(cornerID, SceneTypeUnits.class);
     if (cornering == null) cornering = SceneTypeUnits.INTERIOR;
-    sceneType.attachUnitParameters((Object[]) cornering, exterior);
+    sceneType.attachUnitParameters((Object[]) cornering, exterior, entrance);
     
     for (XML gridXML : sceneNode.allChildrenMatching("grid")) {
       //

@@ -29,21 +29,21 @@ public class SceneTypeUnits extends SceneType {
   final static Integer X = -1;
   final static Object RAW_UNITS_CORNERING_MAP[] = {
       
-      0, 0, X,
+      X, 0, X,
       0, 1, 1,
       X, 1, 1, UNIT_CORNER, N,
       
-      X, 0, 0,
+      X, 0, X,
       1, 1, 0,
       1, 1, X, UNIT_CORNER, E,
       
       1, 1, X,
       1, 1, 0,
-      X, 0, 0, UNIT_CORNER, S,
+      X, 0, X, UNIT_CORNER, S,
       
       X, 1, 1,
       0, 1, 1,
-      0, 0, X, UNIT_CORNER, W,
+      X, 0, X, UNIT_CORNER, W,
       
       X, 0, X,
       1, 1, 1,
@@ -277,8 +277,12 @@ public class SceneTypeUnits extends SceneType {
               continue;
             }
             
+            int connectBonus = entranceCheck(type, g, c, face, false);
+            if (connectBonus == -1) continue;
+            
             float rating = unit.priority * 1f / PRIORITY_MEDIUM;
             rating += Nums.max(0, unit.minCount - count);
+            rating += connectBonus > 0 ? 2 : 0;
             rating += Rand.num() / 2;
             
             SpacePick s = new SpacePick();
@@ -286,11 +290,13 @@ public class SceneTypeUnits extends SceneType {
             s.ty     = tY  ;
             s.unit   = unit;
             s.facing = face;
+            
             pick.compare(s, rating);
             possible.add(s);
             
             if (report) {
               I.say("\nCan place "+unit.type+" at "+c+", facing: "+face);
+              I.say("  connect bonus: "+connectBonus);
               I.say("  rating: "+rating);
             }
           }
@@ -313,20 +319,18 @@ public class SceneTypeUnits extends SceneType {
   }
   
   
-  void insertRoom(
+  private Room insertRoom(
     Unit unit, Scenery g, Scenery typeGen,
     int tX, int tY, int facing, boolean testing
   ) {
     //
-    //  
+    //  First, apply this subunit-type within the parent scenery-
     Box2D bound = unit.type.borderBounds(
       g, typeGen, tX, tY, facing, resolution
     );
     unit.type.applyScenery(g, typeGen, tX, tY, facing, testing);
     //
-    //  And mark out a room within the grid with the appropriate attributes,
-    //  before incrementing the type's placement counter and clearing the
-    //  scenery-
+    //  And mark out a room within the grid with the appropriate attributes-
     Room area = new Room();
     area.unit = unit;
     area.ID   = g.rooms.size();
@@ -335,16 +339,58 @@ public class SceneTypeUnits extends SceneType {
     area.wide = (int) bound.xdim();
     area.high = (int) bound.ydim();
     g.recordRoom(area, bound);
+    //
+    //  And finally, check for the provision of an entrance within the scene:
+    Coord gridPoint = new Coord(tX / resolution, tY / resolution);
+    entranceCheck(unit.type, g, gridPoint, facing, true);
+    return area;
+  }
+  
+  
+  private int entranceCheck(
+    SceneType type, Scenery g, Coord c, int face, boolean createEntrance
+  ) {
+    if (type.exterior || ! type.entrance) return 0;
+    
+    //I.say("...");
+    
+    //  NOTE:  Another nonsense bullshit facing hack.  Get rid of 'em!
+    int dir = (face + 6) % 8;
+    Island other = g.islandUnderGrid(c.x + T_X[dir], c.y + T_Y[dir]);
+    Island under = g.islandUnderGrid(c.x           , c.y           );
+    
+    if (under == null || other == null || other == under) return -1;
+    if (g.islandHasEntrance(under, other)               ) return  0;
+    
+    if (createEntrance) {
+      Room room = g.roomUnderGrid(c.x, c.y);
+      g.setAsEntrance(room, under);
+      g.setAsEntrance(room, other);
+    }
+    
+    return 1;
   }
   
   
   
+  /**  Methods for generating the overall structure of the scene, that sub-
+    *  units can slot into afterward, along with associated support-classes.
+    */
   public static class WingWall extends Vec2D {
     int dir, len;
   }
   
   
   public static class Wing extends Box2D {
+    
+    public Wing() {
+      return;
+    }
+    
+    public Wing(int x, int y, int w, int h) {
+      super(x, y, w, h);
+    }
+    
     void addWalls(Series <WingWall> walls, int dir) {
       WingWall w;
       for (int d : T_ADJACENT) if (d != dir) {
@@ -358,6 +404,7 @@ public class SceneTypeUnits extends SceneType {
         walls.add(w);
       }
     }
+    
     void extend(int dir, int amount) {
       if (dir == N)   incHigh(amount);
       if (dir == E)   incWide(amount);
@@ -365,7 +412,6 @@ public class SceneTypeUnits extends SceneType {
       if (dir == W) { incWide(amount); incX(-amount); }
     }
   }
-  
   
   
   public Series <Wing> generateWings(
@@ -436,6 +482,10 @@ public class SceneTypeUnits extends SceneType {
   }
   
   
+  
+  
+  //  TODO:  Consider deleting these, along with the SceneGenUtils and even
+  //  SceneTypeCorridors class?
   
   /*
   void insertWallsAndDoors(World world, Scenery g, boolean testing) {

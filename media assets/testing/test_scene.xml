@@ -48,6 +48,32 @@
 </scene>
 
 <scene
+  name      = "Corner Entrance"
+  ID        = "unit_corner_entrance"
+  wide      = "8"
+  high      = "8"
+  wall      = "wall"
+  door      = "door"
+  cornering = "CORNER_NORTH"
+  exterior  = "false"
+  entrance  = "true"
+>
+  <grid
+    1 = "table_big"
+    2 = "column"
+  >
+    [-  -  -  -] _/ _/ [- -
+    [_  .  .  .  .  .  .  .
+    .  [/  .  .  .  .  2  .
+    .  [/  .  .  .  .  .  .
+    [   .  .  1  .  .  .  .
+    [   .  .  .  .  .  .  .
+    [   2  .  .  .  .  .  .
+    [   .  .  .  .  .  .  .
+  </grid>
+</scene>
+
+<scene
   name      = "Bend Unit"
   ID        = "unit_bend"
   wide      = "8"
@@ -127,6 +153,7 @@
   wall      = "wall"
   cornering = "WALL_NORTH"
   exterior  = "false"
+  entrance  = "true"
 >
   <grid
     1 = "table_big"
@@ -136,7 +163,7 @@
     .  .  .] .  . [.  .  .
     .  .  .] .  . [.  .  .
     .  .  .] .  . [.  .  .
-    .  .  .] .  . [.  .  .
+    .  .  .] _/ _/ [. .  .
     .  .  2  .  .  2  .  .
     .  .  .  .  .  .  .  .
     .  .  .  .  .  .  .  .
@@ -159,9 +186,9 @@
     .  .  .  .  .  .  .  .
     .  .  .  .  .  .  .  .
     .  .  2  .  .  2  .  .
+    .  .  2  .  .  .  .  .
+    .  .  .  .  2  .  .  .
     .  .  .  .  .  .  .  .
-    .  .  .  .  .  .  .  .
-    .  .  2  .  .  2  .  .
     .  .  .  .  .  .  .  .
     .  .  .  .  .  .  .  .
   </grid>
@@ -179,10 +206,13 @@
   <unit typeID = "unit_bend" />
   <unit typeID = "unit_wall" />
   <unit typeID = "unit_inner" />
+  
+  <unit typeID = "unit_corner_entrance" />
   <unit
     typeID = "unit_entrance"
     minCount = "1" maxCount = "1" priority = "PRIORITY_HIGH"
   />
+  
   <unit
     typeID = "unit_exterior"
     priority = "PRIORITY_LOW"

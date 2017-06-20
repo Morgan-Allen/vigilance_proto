@@ -20,23 +20,43 @@ public class Scenery implements Session.Saveable, TileConstants {
   Prop fills[][] = new Prop[1][2];
   List <Prop> props = new List();
   
-  static class Room {
+  public static class Room {
     
     SceneType type;
     SceneTypeUnits.Unit unit;
+    
     int ID;
     int minX, minY, wide, high;
     
+    Batch <Island> entranceFor = new Batch();
+    
     public String toString() { return "R["+unit+"]"; }
+  }
+  
+  public static class Island {
+    boolean exterior;
+    
+    Batch <Coord > gridPoints = new Batch();
+    Batch <Island> neighbours = new Batch();
+    Batch <Room  > entrances  = new Batch();
+
+    public boolean exterior() { return exterior; }
+    public Series <Coord> gridPoints() { return gridPoints; }
+    
+    public String toString() {
+      String prefix = exterior ? "Exterior" : "Interior";
+      return prefix+"["+gridPoints.first()+"+"+(gridPoints.size() - 1)+"]";
+    }
   }
   
   int gridW, gridH, resolution;
   int offX, offY, facing;
   
-  Wing wingsPattern[][];
-  List <Wing> wings     = new List();
-  List <Room> rooms     = new List();
-  List <Room> corridors = new List();
+  Wing   wingsPattern  [][];
+  Island islandsPattern[][];
+  List <Wing  > wings   = new List();
+  List <Room  > rooms   = new List();
+  List <Island> islands = new List();
   
   
   
@@ -88,10 +108,12 @@ public class Scenery implements Session.Saveable, TileConstants {
   /**  Helper methods for hierarchical composition-
     */
   public void setupWingsGrid(int resolution, Series <Wing> wings) {
+    
     this.resolution = resolution;
     this.gridW      = wide / resolution;
     this.gridH      = high / resolution;
-    this.wingsPattern = new Wing[gridW][gridH];
+    this.wingsPattern   = new Wing  [gridW][gridH];
+    this.islandsPattern = new Island[gridW][gridH];
     
     this.wings.clear();
     Visit.appendTo(this.wings, wings);
@@ -99,12 +121,54 @@ public class Scenery implements Session.Saveable, TileConstants {
     for (Coord c : Visit.grid(0, 0, gridW, gridH, 1)) {
       int tx = (int) ((c.x + 0.5f) * resolution);
       int ty = (int) ((c.y + 0.5f) * resolution);
-      
       wingsPattern[c.x][c.y] = null;
       for (Wing w : wings) if (w.contains(tx, ty)) {
         wingsPattern[c.x][c.y] = w;
         break;
       }
+    }
+    
+    boolean mark[][] = new boolean[gridW][gridH];
+    Box2D limit = new Box2D(-0.5f, -0.5f, gridW, gridH);
+    
+    for (Coord c : Visit.grid(0, 0, gridW, gridH, 1)) {
+      if (mark[c.x][c.y]) continue;
+      Wing under = wingUnderGrid(c.x, c.y);
+      
+      Island island = new Island();
+      List <Coord> frontier = new List();
+      
+      Coord init = new Coord(c);
+      island.gridPoints.add(init);
+      frontier.add(init);
+      mark[init.x][init.y] = true;
+      
+      while (! frontier.empty()) {
+        Coord i = frontier.removeFirst();
+        
+        for (int dir : T_ADJACENT) {
+          Coord n = new Coord(i.x + T_X[dir], i.y + T_Y[dir]);
+          if (! limit.contains(n)) continue;
+          if (mark[n.x][n.y]) continue;
+          
+          Wing   underN = wingUnderGrid  (n.x, n.y);
+          Island underI = islandUnderGrid(n.x, n.y);
+          
+          if (underI != null && underI != island) {
+            island.neighbours.include(underI);
+            underI.neighbours.include(island);
+          }
+          
+          if ((under == null) != (underN == null)) continue;
+          island.gridPoints.add(n);
+          frontier.addLast(n);
+          mark[n.x][n.y] = true;
+        }
+      }
+      
+      island.exterior = under == null;
+      islands.add(island);
+      for (Coord p : island.gridPoints) islandsPattern[p.x][p.y] = island;
     }
   }
   
@@ -116,9 +180,32 @@ public class Scenery implements Session.Saveable, TileConstants {
   }
   
   
+  public Island islandUnder(int x, int y) {
+    if (x < 0 || y < 0 || x >= wide || y >= high) return null;
+    return islandsPattern[x / resolution][y / resolution];
+  }
+  
+  
+  public Island islandUnderGrid(int gx, int gy) {
+    if (gx < 0 || gy < 0 || gx >= gridW || gy >= gridH) return null;
+    return islandsPattern[gx][gy];
+  }
+  
+  
+  public Series <Island> islands() {
+    return islands;
+  }
+  
+  
   public Wing wingUnder(int x, int y) {
     if (x < 0 || y < 0 || x >= wide || y >= high) return null;
     return wingsPattern[x / resolution][y / resolution];
+  }
+  
+  
+  public Wing wingUnderGrid(int gx, int gy) {
+    if (gx < 0 || gy < 0 || gx >= gridW || gy >= gridH) return null;
+    return wingsPattern[gx][gy];
   }
   
   
@@ -133,6 +220,12 @@ public class Scenery implements Session.Saveable, TileConstants {
   }
   
   
+  public Room roomUnderGrid(int gx, int gy) {
+    int hr = resolution / 2;
+    return roomUnder((gx * resolution ) + hr, (gy * resolution) + hr);
+  }
+  
+  
   public void recordRoom(Room area, Box2D bounds) {
     for (Coord c : Visit.grid(bounds)) {
       Tile under = tileAt(c.x, c.y);
@@ -144,6 +237,20 @@ public class Scenery implements Session.Saveable, TileConstants {
   
   public Series <Room> rooms() {
     return rooms;
+  }
+  
+  
+  public void setAsEntrance(Room room, Island island) {
+    room.entranceFor.include(island);
+    island.entrances.include(room);
+  }
+  
+  
+  public boolean islandHasEntrance(Island island, Island other) {
+    for (Room r : island.entrances) {
+      if (r.entranceFor.includes(other)) return true;
+    }
+    return false;
   }
   
   

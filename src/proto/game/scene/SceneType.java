@@ -38,7 +38,7 @@ public abstract class SceneType extends Index.Entry implements
   SceneType kidTypes[] = new SceneType[0];
   
   Object cornering[] = SceneTypeUnits.INTERIOR;
-  boolean exterior = false;
+  boolean exterior = false, entrance = false;
   
   
   public SceneType(
@@ -69,9 +69,12 @@ public abstract class SceneType extends Index.Entry implements
   }
   
   
-  public SceneType attachUnitParameters(Object[] cornering, boolean exterior) {
+  public SceneType attachUnitParameters(
+    Object[] cornering, boolean exterior, boolean entrance
+  ) {
     this.cornering = cornering;
-    this.exterior  = exterior;
+    this.exterior  = exterior ;
+    this.entrance  = entrance ;
     return this;
   }
   
