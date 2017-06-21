@@ -17,21 +17,24 @@ public abstract class SceneType extends Index.Entry implements
   final static Index <SceneType> INDEX = new Index <SceneType> ();
   
   final public static Object
-    BORDERS  = "Borders"  ,
-    FLOORS   = "Floors"   ,
-    DOOR     = "Wall"     ,
-    WINDOW   = "Window"   ,
-    PROP     = "Prop"     ,
-    CHILD    = "Child"    ,
-    MIN_WIDE = "Min. Wide",
-    MAX_WIDE = "Max. Wide",
-    MIN_HIGH = "Min. High",
-    MAX_HIGH = "Max. High"
+    BORDERS    = "Borders"  ,
+    FLOORS     = "Floors"   ,
+    DOOR       = "Wall"     ,
+    WINDOW     = "Window"   ,
+    PROP       = "Prop"     ,
+    CHILD      = "Child"    ,
+    MIN_WIDE   = "Min. Wide",
+    MAX_WIDE   = "Max. Wide",
+    MIN_HIGH   = "Min. High",
+    MAX_HIGH   = "Max. High",
+    RESOLUTION = "Resolution"
   ;
   
   final String name;
   
   int minWide = -1, maxWide = -1, minHigh = -1, maxHigh = -1;
+  int resolution = 8;
+  
   PropType borders, door, window, floors;
   PropType props[];
   float propWeights[];
@@ -52,16 +55,17 @@ public abstract class SceneType extends Index.Entry implements
     
     for (int i = 0; i < args.length; i += 2) try {
       final Object label = args[i], val = args[i + 1];
-      if (label == BORDERS ) borders =  (PropType ) val;
-      if (label == FLOORS  ) floors  =  (PropType ) val;
-      if (label == DOOR    ) door    =  (PropType ) val;
-      if (label == WINDOW  ) window  =  (PropType ) val;
-      if (label == PROP    ) propB .add((PropType ) val);
-      if (label == CHILD   ) childB.add((SceneType) val);
-      if (label == MIN_WIDE) minWide =  (Integer  ) val;
-      if (label == MAX_WIDE) maxWide =  (Integer  ) val;
-      if (label == MIN_HIGH) minHigh =  (Integer  ) val;
-      if (label == MAX_HIGH) maxHigh =  (Integer  ) val;
+      if (label == BORDERS   ) borders    =  (PropType ) val;
+      if (label == FLOORS    ) floors     =  (PropType ) val;
+      if (label == DOOR      ) door       =  (PropType ) val;
+      if (label == WINDOW    ) window     =  (PropType ) val;
+      if (label == PROP      ) propB    .add((PropType ) val);
+      if (label == CHILD     ) childB   .add((SceneType) val);
+      if (label == MIN_WIDE  ) minWide    =  (Integer  ) val;
+      if (label == MAX_WIDE  ) maxWide    =  (Integer  ) val;
+      if (label == MIN_HIGH  ) minHigh    =  (Integer  ) val;
+      if (label == MAX_HIGH  ) maxHigh    =  (Integer  ) val;
+      if (label == RESOLUTION) resolution = (Integer) val;
     } catch (Exception e) { I.report(e); }
     
     props    = propB .toArray(PropType.class);
@@ -102,6 +106,9 @@ public abstract class SceneType extends Index.Entry implements
   public Scene generateScene(
     World world, int prefWide, int prefHigh, boolean testing
   ) {
+    //  TODO:  Clamping apparently makes no effort at ensuring that resolution
+    //  requirements are met.
+    
     int     wide  = clampSize(prefWide, minWide, maxWide);
     int     high  = clampSize(prefHigh, minHigh, maxHigh);
     Scene   scene = new Scene(this, world, wide, high, testing);
@@ -120,6 +127,7 @@ public abstract class SceneType extends Index.Entry implements
   
   private int clampSize(int prefSize, int minSize, int maxSize) {
     int size = prefSize;
+    size = (int) Nums.round(size, resolution, true);
     if (maxSize > 0 && maxSize < size) size = maxSize;
     if (minSize > 0 && minSize > size) size = minSize;
     return size;

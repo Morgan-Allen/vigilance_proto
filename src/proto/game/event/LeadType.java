@@ -99,8 +99,7 @@ public class LeadType extends Index.Entry implements Session.Saveable {
     ),
     SEARCH = new LeadType(
       "Search", "lead_search",
-      "Search a building for forensic evidence on activities or the "+
-      "inhabitants' whereabouts.",
+      "Search a building for forensic evidence on past activities.",
       ICON_DIR+"icon_search.png",
       TIME_SHORT, MEDIUM_SEARCH, PROFILE_SUSPICIOUS, CONFIDENCE_MODERATE
     ),

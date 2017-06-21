@@ -13,7 +13,8 @@ public class SceneEntry implements TileConstants {
   final Scene scene;
   
   static class Pod {
-    Tile startPoint = null;
+    Coord gridPoint = null;
+    Tile tilePoint = null;
     //Tile patrolPoints[] = new Tile[0];
     List <Person> assigned = new List();
   }
@@ -37,22 +38,39 @@ public class SceneEntry implements TileConstants {
   }
   
   
-  public void provideBorderEntry(Series <Person> forces) {
-    //  TODO:  Try and pick a point that's free of obstruction and not too
-    //  close to any enemy pods.
-    
+  public boolean provideBorderEntry(Series <Person> forces) {
+    Pick <Coord> gridPoint = new Pick();
+    //
+    //  We try and find an entry point that's unobstructed and not too close
+    //  to any enemy pods:
+    for (Coord c : Visit.perimeter(1, 1, scene.gridW - 2, scene.gridH - 2)) {
+      Scenery.Island under = scene.islandUnderGrid(c.x, c.y);
+      
+      if (under != null && ! under.exterior()) continue;
+      float dist = 0;
+      for (Pod other : pods) {
+        dist += other.gridPoint.axisDistance(c);
+      }
+      
+      gridPoint.compare(new Coord(c), dist * (1 + Rand.num()));
+    }
+    if (gridPoint.empty()) return false;
+    //
+    //  Then we insert the team around that point:
     Pod pod = new Pod();
+    pod.gridPoint = gridPoint.result();
+    pod.tilePoint = scene.gridMidpoint(pod.gridPoint);
     pods.add(pod);
-    
-    int across = (scene.wide() - (forces.size())) / 2;
-    pod.startPoint = scene.tileAt(across, 0);
+    int sx = pod.tilePoint.x, sy = pod.tilePoint.y;
     
     for (Person p : forces) {
       p.addAssignment(scene);
       p.mind.setDoing(PersonMind.STATE_ACTIVE);
       pod.assigned.add(p);
-      scene.enterScene(p, across++, 0);
+      Tile t = findEntryPoint(sx, sy, p);
+      scene.enterScene(p, t.x, t.y);
     }
+    return true;
   }
   
   
@@ -86,7 +104,7 @@ public class SceneEntry implements TileConstants {
         float rating = 1;
         
         for (Pod other : pods) {
-          float dist = scene.distance(open, other.startPoint);
+          float dist = scene.distance(open, other.tilePoint);
           if (dist < 8) continue search;
           rating += dist / 8f;
         }
@@ -96,12 +114,14 @@ public class SceneEntry implements TileConstants {
         pickEntry.compare(open, rating);
       }
       if (pickEntry.empty()) continue;
-      pod.startPoint = pickEntry.result();
+      
+      pod.tilePoint = pickEntry.result();
+      pod.gridPoint  = new Coord(scene.gridPoint(pod.tilePoint));
       //
       //  TODO:  Goons on-base should be unwary by default- not necessarily so
       //  on a heist.
       for (Person p : pod.assigned) {
-        Tile entry = findEntryPoint(pod.startPoint.x, pod.startPoint.y, p);
+        Tile entry = findEntryPoint(pod.tilePoint.x, pod.tilePoint.y, p);
         if (entry == null) continue;
         p.addAssignment(scene);
         p.mind.setDoing(PersonMind.STATE_UNAWARE);

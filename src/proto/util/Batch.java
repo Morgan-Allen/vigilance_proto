@@ -170,9 +170,10 @@ public class Batch <K> implements Series <K> {
     */
   final public String toString() {
     final StringBuffer sB = new StringBuffer("( ");
+    int i = 0;
     for (K t : this) {
       sB.append(t);
-      if (t != last()) sB.append(", ");
+      if (++i < size) sB.append(", ");
     }
     sB.append(" )");
     return sB.toString();

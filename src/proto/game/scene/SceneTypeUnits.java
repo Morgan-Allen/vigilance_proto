@@ -121,7 +121,6 @@ public class SceneTypeUnits extends SceneType {
   
   /**  Data fields and construction methods-
     */
-  final int resolution;
   final Unit units[];
   
   
@@ -134,10 +133,11 @@ public class SceneTypeUnits extends SceneType {
   ) {
     super(
       name, ID,
-      MIN_WIDE, minUnitsW * resolution,
-      MAX_WIDE, maxUnitsW * resolution,
-      MIN_HIGH, minUnitsH * resolution,
-      MAX_HIGH, maxUnitsH * resolution
+      RESOLUTION, resolution,
+      MIN_WIDE  , minUnitsW * resolution,
+      MAX_WIDE  , maxUnitsW * resolution,
+      MIN_HIGH  , minUnitsH * resolution,
+      MAX_HIGH  , maxUnitsH * resolution
     );
     this.resolution = resolution;
     this.units      = units     ;
@@ -302,7 +302,7 @@ public class SceneTypeUnits extends SceneType {
       }
       if (pick.empty()) break;
       //
-      //  Having pick the most promising option, we apply the furnishings to
+      //  Having picked the most promising option, we apply the furnishings to
       //  the scene:
       SpacePick s       = pick.result();
       Scenery   typeGen = typeGens[s.unit.ID];

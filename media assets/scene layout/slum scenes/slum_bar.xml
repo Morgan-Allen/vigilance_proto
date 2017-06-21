@@ -97,6 +97,7 @@
   window    = "slum_common.window"
   cornering = "WALL_NORTH"
   exterior  = "false"
+  entrance  = "true"
 >
   <grid
     1 = "slum_common.floor"
@@ -140,6 +141,7 @@
   window    = "slum_common.window"
   cornering = "CORNER_EAST"
   exterior  = "false"
+  entrance  = "true"
 >
   <grid
     1 = "slum_common.floor"
@@ -299,8 +301,7 @@
   <unit typeID = "unit_alley" />
   
   <unit
-    typeID = "unit_entrance"
-    minCount = "1" maxCount = "1" priority = "PRIORITY_HIGH"
+    typeID = "unit_entrance" maxCount = "1" priority = "PRIORITY_HIGH"
   />
   <unit
     typeID = "unit_toilets"
@@ -311,9 +312,6 @@
     maxCount = "1" minCount = "1" priority = "PRIORITY_HIGH"
   />
 </scene>
-
-
-
 
 
 
