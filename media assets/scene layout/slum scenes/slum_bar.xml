@@ -308,8 +308,7 @@
     minCount = "1" maxCount = "1" priority = "PRIORITY_HIGH"
   />
   <unit
-    typeID = "unit_main_bar"
-    maxCount = "1" minCount = "1" priority = "PRIORITY_HIGH"
+    typeID = "unit_main_bar" minCount = "1"
   />
 </scene>
 

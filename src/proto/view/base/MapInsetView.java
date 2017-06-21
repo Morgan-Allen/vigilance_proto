@@ -169,7 +169,6 @@ public abstract class MapInsetView extends UINode {
       //
       //  Render any facilities in the region-
       int offF = 5 + ((n.buildSlots().length * 35) / -2);
-      Image alertIcon = MapView.ALERT_IMAGE;
       int slotID = 0;
       
       for (final Place slot : n.buildSlots()) {
@@ -190,6 +189,11 @@ public abstract class MapInsetView extends UINode {
         }
         
         if (slot != null && played.leads.cluesAssociated(slot).size() > 0) {
+          
+          boolean urgent = played.leads.suspectIsUrgent(slot);
+          Image alertIcon = MapView.CLUE_IMAGE;
+          if (urgent) alertIcon = MapView.ALERT_IMAGE;
+          
           ImageButton alert = new ImageButton(
             alertIcon, new Box2D(x + offF - vx, y + vy - 150, 30, 30), this
           ) {
@@ -198,8 +202,8 @@ public abstract class MapInsetView extends UINode {
           button.toggled = false;
           alert.renderNow(surface, g);
         }
-        button.renderNow(surface, g);
         
+        button.renderNow(surface, g);
         offF += 30 + 5;
       }
       //

@@ -325,7 +325,7 @@ public class BaseLeads {
   }
   
   
-  public boolean suspectIsBoss(Element suspect) {
+  public boolean suspectIsPerp(Element suspect) {
     return suspectHasRole(suspect,
       Plot.ROLE_ORGANISER, Plot.ROLE_MASTERMIND,
       Plot.ROLE_HIDEOUT  , Plot.ROLE_HQ
@@ -334,14 +334,14 @@ public class BaseLeads {
   
   
   public boolean suspectIsUrgent(Element suspect) {
-    return suspectIsVictim(suspect) || suspectIsBoss(suspect);
+    return suspectIsVictim(suspect) || suspectIsPerp(suspect);
   }
   
   
   private boolean suspectHasRole(Element suspect, Role... roles) {
     for (Clue clue : this.cluesFor(suspect, true)) {
       Plot plot = clue.plot();
-      if (plot.complete()) continue;
+      if (plot.complete() || ! clue.isConfirmation()) continue;
       
       for (Role r : roles) {
         Element fills = plot.filling(r);
@@ -356,7 +356,7 @@ public class BaseLeads {
     
     boolean canFind  = focus.isPlace() && atKnownLocation(focus);
     boolean canGuard = canFind && suspectIsVictim(focus);
-    boolean canBust  = canFind && suspectIsBoss  (focus);
+    boolean canBust  = canFind && suspectIsPerp  (focus);
     
     final Batch <Lead> all = new Batch();
     

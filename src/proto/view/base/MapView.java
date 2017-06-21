@@ -22,6 +22,7 @@ public class MapView extends UINode {
     IMG_DIR = "media assets/city map/";
   final static Image
     ALERT_IMAGE   = Kind.loadImage(IMG_DIR+"alert_symbol.png"  ),
+    CLUE_IMAGE    = Kind.loadImage(IMG_DIR+"clue_symbol.png"   ),
     MYSTERY_IMAGE = Kind.loadImage(IMG_DIR+"mystery_symbol.png"),
     FILE_IMAGE    = Kind.loadImage(IMG_DIR+"file_image.png"    ),
     TRIAL_IMAGE   = Kind.loadImage(IMG_DIR+"trial_image.png"   ),
@@ -39,14 +40,14 @@ public class MapView extends UINode {
   CaseCluesView cluesView ;
   CasePerpsView perpsView ;
   RegionView    regionView;
-
+  
   UINode focusViews[], activeFocusView;
   StringButton backButton, eventsButton;
   
   Object activeFocus = null;
   List <Object> focusStack = new List();
   
-
+  
   
   public MapView(final UINode parent, Box2D viewBounds) {
     super(parent, viewBounds);

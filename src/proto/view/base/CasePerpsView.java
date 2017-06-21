@@ -10,6 +10,7 @@ import proto.util.*;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Image;
 
 
 
@@ -155,8 +156,11 @@ public class CasePerpsView extends UINode {
       Lead lead = (Lead) draw.hovered;
       hoverDesc = lead.choiceInfo(agent)+"\n\n"+lead.testInfo(agent);
       if (draw.clicked) {
+        presentRosterPickMenu(lead, surface);
+        /*
         if (agent.assignments().includes(lead)) agent.removeAssignment(lead);
         else agent.addAssignment(lead);
+        //*/
       }
     }
     if (hoverDesc.length() == 0) {
@@ -180,6 +184,33 @@ public class CasePerpsView extends UINode {
     down += 150;
     parent.infoArea.setScrollheight(down);
     return true;
+  }
+  
+  
+  private void presentRosterPickMenu(final Lead lead, Surface s) {
+    Series <Person> available = mainView.player().roster();
+    int atX = s.mouseX(), atY = s.mouseY();
+    
+    //  TODO:  There's a problem here:  You need to be able to keep picking
+    //  members until you're done, and a separate button is needed for that.
+    
+    ClickMenu menu = new ClickMenu <Person> (available, atX, atY, mainView) {
+      
+      protected Image imageFor(Person option) {
+        return option.icon();
+      }
+      
+      protected String labelFor(Person option) {
+        return option.name();
+      }
+      
+      protected void whenPicked(Person option, int optionID) {
+        if (option.assignments().includes(lead)) option.removeAssignment(lead);
+        else option.addAssignment(lead);
+        mainView.rosterView.setSelectedPerson(option);
+      }
+    };
+    mainView.showClickMenu(menu);
   }
   
   
