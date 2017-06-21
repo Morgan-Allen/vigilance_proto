@@ -273,16 +273,14 @@ public class SceneTypeUnits extends SceneType {
           if (g.roomUnder(tX, tY) != null) continue;
           
           for (int face : T_ADJACENT) {
-            if (! type.checkBordering(g, typeGen, tX, tY, face, resolution)) {
-              continue;
-            }
-            
-            int connectBonus = entranceCheck(type, g, c, face, false);
-            if (connectBonus == -1) continue;
+            int borderCheck = type.borderingCheck(
+              g, typeGen, tX, tY, face, resolution
+            );
+            if (borderCheck == -1) continue;
             
             float rating = unit.priority * 1f / PRIORITY_MEDIUM;
             rating += Nums.max(0, unit.minCount - count);
-            rating += connectBonus > 0 ? 2 : 0;
+            rating += borderCheck > 0 ? 2 : 0;
             rating += Rand.num() / 2;
             
             SpacePick s = new SpacePick();
@@ -296,7 +294,7 @@ public class SceneTypeUnits extends SceneType {
             
             if (report) {
               I.say("\nCan place "+unit.type+" at "+c+", facing: "+face);
-              I.say("  connect bonus: "+connectBonus);
+              I.say("  borderCheck: "+borderCheck);
               I.say("  rating: "+rating);
             }
           }
@@ -323,14 +321,11 @@ public class SceneTypeUnits extends SceneType {
     Unit unit, Scenery g, Scenery typeGen,
     int tX, int tY, int facing, boolean testing
   ) {
-    //
-    //  First, apply this subunit-type within the parent scenery-
     Box2D bound = unit.type.borderBounds(
       g, typeGen, tX, tY, facing, resolution
     );
-    unit.type.applyScenery(g, typeGen, tX, tY, facing, testing);
     //
-    //  And mark out a room within the grid with the appropriate attributes-
+    //  First, mark out a room within the scene with appropriate attributes-
     Room area = new Room();
     area.unit = unit;
     area.ID   = g.rooms.size();
@@ -340,35 +335,9 @@ public class SceneTypeUnits extends SceneType {
     area.high = (int) bound.ydim();
     g.recordRoom(area, bound);
     //
-    //  And finally, check for the provision of an entrance within the scene:
-    Coord gridPoint = new Coord(tX / resolution, tY / resolution);
-    entranceCheck(unit.type, g, gridPoint, facing, true);
+    //  Then apply this subunit-type within the parent scenery, and return-
+    unit.type.applyScenery(g, typeGen, tX, tY, facing, testing);
     return area;
-  }
-  
-  
-  private int entranceCheck(
-    SceneType type, Scenery g, Coord c, int face, boolean createEntrance
-  ) {
-    if (type.exterior || ! type.entrance) return 0;
-    
-    //I.say("...");
-    
-    //  NOTE:  Another nonsense bullshit facing hack.  Get rid of 'em!
-    int dir = (face + 6) % 8;
-    Island other = g.islandUnderGrid(c.x + T_X[dir], c.y + T_Y[dir]);
-    Island under = g.islandUnderGrid(c.x           , c.y           );
-    
-    if (under == null || other == null || other == under) return -1;
-    if (g.islandHasEntrance(under, other)               ) return  0;
-    
-    if (createEntrance) {
-      Room room = g.roomUnderGrid(c.x, c.y);
-      g.setAsEntrance(room, under);
-      g.setAsEntrance(room, other);
-    }
-    
-    return 1;
   }
   
   

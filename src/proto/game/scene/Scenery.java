@@ -28,7 +28,7 @@ public class Scenery implements Session.Saveable, TileConstants {
     int ID;
     int minX, minY, wide, high;
     
-    Batch <Island> entranceFor = new Batch();
+    Batch <Island> bridgeFor = new Batch();
     
     public String toString() { return "R["+unit+"]"; }
   }
@@ -38,7 +38,7 @@ public class Scenery implements Session.Saveable, TileConstants {
     
     Batch <Coord > gridPoints = new Batch();
     Batch <Island> neighbours = new Batch();
-    Batch <Room  > entrances  = new Batch();
+    Batch <Room  > bridges    = new Batch();
 
     public boolean exterior() { return exterior; }
     public Series <Coord> gridPoints() { return gridPoints; }
@@ -241,14 +241,14 @@ public class Scenery implements Session.Saveable, TileConstants {
   
   
   public void setAsEntrance(Room room, Island island) {
-    room.entranceFor.include(island);
-    island.entrances.include(room);
+    room.bridgeFor.include(island);
+    island.bridges.include(room);
   }
   
   
-  public boolean islandHasEntrance(Island island, Island other) {
-    for (Room r : island.entrances) {
-      if (r.entranceFor.includes(other)) return true;
+  public boolean hasBridgeBetween(Island island, Island other) {
+    for (Room r : island.bridges) {
+      if (r.bridgeFor.includes(other)) return true;
     }
     return false;
   }

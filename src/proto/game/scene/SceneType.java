@@ -3,7 +3,7 @@
 package proto.game.scene;
 import proto.common.*;
 import proto.game.world.*;
-import proto.game.person.*;
+import proto.game.scene.Scenery.*;
 import proto.util.*;
 
 
@@ -188,12 +188,15 @@ public abstract class SceneType extends Index.Entry implements
   }
   
 
-  public boolean checkBordering(
+  public int borderingCheck(
     Scenery within, Scenery gen, int offX, int offY, int facing, int resolution
   ) {
     if (borderBounds(within, gen, offX, offY, facing, resolution) == null) {
-      return false;
+      return -1;
     }
+    
+    int entranceCheck = entranceCheck(within, offX, offY, facing, false);
+    if (entranceCheck == -1) return -1;
     
     Coord c = new Coord();
     int cornerID = 0;
@@ -219,7 +222,7 @@ public abstract class SceneType extends Index.Entry implements
       if (wingID != needID) allMatch = false; //I.add(" wrong!"); }
     }
     
-    return allMatch;
+    return allMatch ? entranceCheck : -1;
   }
   
   
@@ -227,6 +230,8 @@ public abstract class SceneType extends Index.Entry implements
     Scenery within, Scenery gen, int offX, int offY, int facing,
     boolean testing
   ) {
+    //
+    //  Set up parameters for the subunit, and copy over any interior props:
     gen.setUnitParameters(offX, offY, facing);
     Coord temp = new Coord();
     for (Prop prop : gen.props()) {
@@ -240,6 +245,33 @@ public abstract class SceneType extends Index.Entry implements
       prop.exitScene();
       prop.enterScene(within, temp.x + offX, temp.y + offY, newFace);
     }
+    //
+    //  And finally, check for the provision of an entrance within the scene:
+    entranceCheck(within, offX, offY, facing, true);
+  }
+  
+  
+  private int entranceCheck(
+    Scenery g, int offX, int offY, int face, boolean createEntrance
+  ) {
+    if (exterior || ! entrance) return 0;
+    
+    int gx  = (offX + 1) / g.resolution;
+    int gy  = (offY + 1) / g.resolution;
+    int dir = (face + 6) % 8;  //  NOTE:  Another hack, blech.
+    Island other = g.islandUnderGrid(gx + T_X[dir], gy + T_Y[dir]);
+    Island under = g.islandUnderGrid(gx           , gy           );
+    
+    if (under == null || other == null || other == under) return -1;
+    if (g.hasBridgeBetween(under, other)                ) return  0;
+    
+    if (createEntrance) {
+      Room room = g.roomUnderGrid(gx, gy);
+      g.setAsEntrance(room, under);
+      g.setAsEntrance(room, other);
+    }
+    
+    return 1;
   }
   
   
@@ -250,13 +282,6 @@ public abstract class SceneType extends Index.Entry implements
     return name;
   }
 }
-
-
-
-
-
-
-
 
 
 

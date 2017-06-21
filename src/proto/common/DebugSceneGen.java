@@ -112,13 +112,12 @@ public class DebugSceneGen {
       int     f    = (Integer) c[2];
       boolean need = (Boolean) c[3];
       Scenery unit = (Scenery) c[4];
-      boolean okay = unit.type().checkBordering(scene, unit, x, y, f, 8);
+      boolean okay = unit.type().borderingCheck(scene, unit, x, y, f, 8) != -1;
       I.say("  Okay at "+x+"|"+y+", face: "+f+": "+okay+", should be: "+need);
       
       allFitChecksMet &= need == okay;
     }
     I.say("\nAll border-checks met? "+allFitChecksMet+"\n\n");
-    
     //
     //  Then generate a fully random scene and view the walls layout:
     SceneTypeUnits type = (SceneTypeUnits) GEN_TEST_XML_SCENE;
