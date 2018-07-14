@@ -1,6 +1,7 @@
 
 
 package proto.game.scene;
+
 import proto.common.*;
 import proto.game.person.*;
 import proto.game.world.*;
@@ -22,7 +23,7 @@ public class Prop extends Element implements TileConstants {
   int facing = TileConstants.N;
   
   
-  Prop(PropType kind, World world) {
+  public Prop(PropType kind, World world) {
     super(kind, world);
   }
   
@@ -41,6 +42,9 @@ public class Prop extends Element implements TileConstants {
   }
   
   
+  
+  /**  Common access methods-
+    */
   public PropType kind() {
     return (PropType) kind;
   }
@@ -53,6 +57,16 @@ public class Prop extends Element implements TileConstants {
   
   public int facing() {
     return facing;
+  }
+  
+  
+  public void setOrigin(Tile origin) {
+    this.origin = origin;
+  }
+  
+  
+  public void setFacing(int facing) {
+    this.facing = facing;
   }
   
   
@@ -203,7 +217,7 @@ public class Prop extends Element implements TileConstants {
   
   /**  Rendering, debug and interface methods-
     */
-  public void renderTo(Scene scene, SceneView view, Surface s, Graphics2D g) {
+  public void renderTo(Scene scene, SceneView view, Surface s, Graphics2D g, Color tint) {
     int truW = kind().wide(), truH = kind().high();
     float midX = origin.x, midY = origin.y, scale = kind().spriteScale();
     float w = Nums.max(1, truW), h = Nums.max(1, truH);
@@ -230,6 +244,12 @@ public class Prop extends Element implements TileConstants {
         float radius = Nums.min(Nums.max(w, h), 3) / 4f;
         Color c = t == origin ? Color.RED : Color.YELLOW;
         view.renderColor(t.x, t.y, radius, radius, true, c, g);
+      }
+    }
+    if (tint != null) {
+      for (Tile t : tilesUnder(kind(), scene, origin.x, origin.y, facing, 0)) {
+        if (t == null) continue;
+        view.renderColor(t.x, t.y, 1, 1, true, tint, g);
       }
     }
   }

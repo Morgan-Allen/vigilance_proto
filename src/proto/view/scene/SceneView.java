@@ -175,7 +175,7 @@ public class SceneView extends UINode implements TileConstants {
     }
     propsShown.queueSort();
     for (Prop prop : propsShown) {
-      prop.renderTo(scene, this, surface, g);
+      prop.renderTo(scene, this, surface, g, null);
     }
     //
     //  Render enemy-sight on top of objects but beneath persons- but ONLY if

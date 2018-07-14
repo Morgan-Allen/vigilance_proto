@@ -65,7 +65,7 @@ public abstract class SceneType extends Index.Entry implements
       if (label == MAX_WIDE  ) maxWide    =  (Integer  ) val;
       if (label == MIN_HIGH  ) minHigh    =  (Integer  ) val;
       if (label == MAX_HIGH  ) maxHigh    =  (Integer  ) val;
-      if (label == RESOLUTION) resolution = (Integer) val;
+      if (label == RESOLUTION) resolution =  (Integer  ) val;
     } catch (Exception e) { I.report(e); }
     
     props    = propB .toArray(PropType.class);
