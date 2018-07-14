@@ -102,8 +102,8 @@ public class Facilities {
     "Tech Startup", "facility_tech_startup",
     "media assets/tech icons/icon_tech_startup.png",
     "Entrepreneurs, hackers and gurus can come together under one roof to "+
-    "kickstart great ideas.  If only they could make that seed funding last "+
-    "longer...",
+    "kickstart great inventions.  If only they could make that seed funding "+
+    "last longer...",
     1200, BUILD_TIME_SHORT, URBAN_SCENE,
     EMPLOYMENT, 1,
     EDUCATION, 1,

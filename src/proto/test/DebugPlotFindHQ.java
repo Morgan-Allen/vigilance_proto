@@ -1,10 +1,12 @@
 
 
-package proto.common;
+package proto.test;
 import proto.game.world.*;
 import proto.game.event.*;
 import proto.game.scene.*;
 import proto.util.*;
+import proto.common.DefaultGame;
+import proto.common.RunGame;
 import proto.content.agents.*;
 import proto.content.events.*;
 

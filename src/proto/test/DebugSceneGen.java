@@ -1,11 +1,12 @@
 
 
-package proto.common;
+package proto.test;
 import proto.game.world.*;
 import proto.game.scene.*;
 import proto.util.*;
-import static proto.common.DebugSceneGrid.*;
+
 import static proto.game.scene.Scenery.*;
+import static proto.test.DebugSceneGrid.*;
 import static proto.game.scene.SceneTypeUnits.*;
 
 

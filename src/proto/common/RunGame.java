@@ -19,11 +19,12 @@ public abstract class RunGame extends JFrame implements ActionListener {
   final public static int
     FRAME_RATE                 = 25,
     SLOW_HOURS_PER_REAL_SECOND = 8,
-    FAST_HOURS_PER_REAL_SECOND = 24 * 8;
+    FAST_HOURS_PER_REAL_SECOND = 24 * 8
+  ;
   
-  String savePath;
-  Surface surface;
-  World world;
+  protected String savePath;
+  protected Surface surface;
+  protected World world;
   boolean paused = true;
   
   
@@ -107,6 +108,11 @@ public abstract class RunGame extends JFrame implements ActionListener {
   
   protected boolean runTests(World world, boolean afterLoad, boolean suite) {
     return true;
+  }
+  
+  
+  public void assignWorld(World world) {
+    this.world = world;
   }
   
   

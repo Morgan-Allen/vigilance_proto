@@ -1,7 +1,9 @@
 
 
-package proto.common;
+package proto.test;
 import proto.game.world.*;
+import proto.common.DefaultGame;
+import proto.common.RunGame;
 import proto.game.event.*;
 import proto.util.*;
 

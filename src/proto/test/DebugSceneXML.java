@@ -1,11 +1,13 @@
 
 
-package proto.common;
+package proto.test;
 import proto.game.person.*;
 import proto.game.scene.*;
 import proto.game.world.*;
 import proto.util.*;
-
+import proto.common.GameSettings;
+import proto.common.Kind;
+import proto.common.RunGame;
 import proto.content.agents.*;
 import proto.content.items.*;
 import proto.content.places.*;
@@ -103,7 +105,7 @@ public class DebugSceneXML extends RunGame {
       Kind kind = Kind.kindWithID(typeID);
       if (kind.type() != Kind.TYPE_PERSON) continue;
       
-      Person agent = new Person(kind, world, kind.name);
+      Person agent = new Person(kind, world, kind.name());
       agent.setBase(player);
       agent.addAssignment(scene);
       scene.enterScene(agent, startX, startY);

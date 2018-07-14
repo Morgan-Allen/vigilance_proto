@@ -1,7 +1,8 @@
 
 
-package proto.common;
+package proto.test;
 import proto.game.world.*;
+import proto.common.*;
 import proto.game.event.*;
 import proto.game.scene.*;
 import proto.game.person.*;
@@ -21,28 +22,28 @@ public class DebugPlotUtils {
   public static void runPlotsDebugSuite() {
     
     DebugPlotSingleLead forL = new DebugPlotSingleLead();
-    forL.world = forL.setupWorld();
-    boolean leadOK = forL.runTests(forL.world, false, true);
+    forL.assignWorld(forL.setupWorld());
+    boolean leadOK = forL.runTests(forL.world(), false, true);
     
     DebugPlotBefore dpb = new DebugPlotBefore();
-    dpb.world = dpb.setupWorld();
-    boolean beforeOK = dpb.runTests(dpb.world, false, true);
+    dpb.assignWorld(dpb.setupWorld());
+    boolean beforeOK = dpb.runTests(dpb.world(), false, true);
     
     DebugPlotAfter dpa = new DebugPlotAfter();
-    dpa.world = dpa.setupWorld();
-    boolean afterOK = dpa.runTests(dpa.world, false, true);
+    dpa.assignWorld(dpa.setupWorld());
+    boolean afterOK = dpa.runTests(dpa.world(), false, true);
     
     DebugPlotAfter forE = new DebugPlotAfter();
-    forE.world = forE.setupWorld();
+    forE.assignWorld(forE.setupWorld());
     boolean effectOK = runPlotToCompletion(forE.world());
     
     DebugPlotSpooked forS = new DebugPlotSpooked();
-    forS.world = forS.setupWorld();
-    boolean spooksOK = forS.runTests(forS.world, false, true);
+    forS.assignWorld(forS.setupWorld());
+    boolean spooksOK = forS.runTests(forS.world(), false, true);
     
     DebugPlotFindHQ forHQ = new DebugPlotFindHQ();
-    forHQ.world = forHQ.setupWorld();
-    boolean foundHQ = forHQ.runTests(forHQ.world, false, true);
+    forHQ.assignWorld(forHQ.setupWorld());
+    boolean foundHQ = forHQ.runTests(forHQ.world(), false, true);
     
     I.say("\n\n\nPlot Testing Complete.");
     I.say("  Single lead tests okay:    "+leadOK  );

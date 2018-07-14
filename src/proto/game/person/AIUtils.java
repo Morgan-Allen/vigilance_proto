@@ -105,6 +105,47 @@ public class AIUtils implements TileConstants {
   }
   
   
+  static Action bestSeizeAction(Person person, Element target, Scene scene) {
+    return bestMotionToward(target, person, scene);
+  }
+  
+  
+  static Action bestPatrolMotion(Person person, Scene scene) {
+    //
+    //  TODO:  It might help to record the next patrol point persistently.
+    
+    //  In essence, all the wings of a structure should provide a viable patrol
+    //  route.
+    Object point = person.mind.patrolPoints().first();
+    
+    if (point == null) {
+      for (Scenery.Room room : scene.rooms()) {
+        
+      }
+    }
+    
+    return null;
+  }
+  
+  
+  static Action bestInvestigateAction(
+    Person person, Series <Person> foes, Scene scene
+  ) {
+    Pick <Tile> traces = new Pick();
+    for (Person foe : foes) {
+      Tile trace = scene.vision.lastSeen(foe, person.side());
+      if (trace == null) continue;
+      if (scene.vision.degreeOfSight(person, trace, false) <= 0) continue;
+      float dist = scene.distance(trace, person);
+      traces.compare(trace, 0 - dist);
+    }
+    if (traces.empty()) return null;
+    
+    Tile goes = traces.result();
+    return bestMotionToward(goes, person, scene);
+  }
+  
+  
   static Action bestMotionToward(Object point, Person acting, Scene scene) {
     Tile at = scene.tileUnder(point);
     if (at == null) return null;

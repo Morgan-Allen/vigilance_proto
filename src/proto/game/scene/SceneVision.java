@@ -96,6 +96,11 @@ public class SceneVision implements TileConstants {
   }
   
   
+  public Tile lastSeen(Person foe, Person.Side side) {
+    return allMaps[side.ordinal()].lastSeen.get(foe);
+  }
+  
+  
   
   /**  Helper methods for determining visibility for persons-
     */

@@ -22,6 +22,7 @@ public class PersonMind {
   int   AIstate    = STATE_INIT;
   float confidence = 1.0f;
   float wariness   = 0.0f;
+  List <Object> patrolPoints = new List();
   
   
   PersonMind(Person person) {
@@ -33,6 +34,7 @@ public class PersonMind {
     AIstate    = s.loadInt  ();
     confidence = s.loadFloat();
     wariness   = s.loadFloat();
+    s.loadObjects(patrolPoints);
   }
   
   
@@ -40,6 +42,7 @@ public class PersonMind {
     s.saveInt   (AIstate   );
     s.saveFloat (confidence);
     s.saveFloat (wariness  );
+    s.saveObjects(patrolPoints);
   }
   
   
@@ -68,6 +71,16 @@ public class PersonMind {
   
   public boolean retreating() {
     return isDoing(STATE_RETREAT);
+  }
+  
+  
+  public Series <Object> patrolPoints() {
+    return patrolPoints;
+  }
+  
+  
+  public void togglePatrolPoint(Object point, boolean is) {
+    patrolPoints.toggleMember(point, is);
   }
   
   

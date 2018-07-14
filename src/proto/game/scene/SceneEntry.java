@@ -15,7 +15,6 @@ public class SceneEntry implements TileConstants {
   static class Pod {
     Coord gridPoint = null;
     Tile tilePoint = null;
-    //Tile patrolPoints[] = new Tile[0];
     List <Person> assigned = new List();
   }
   
