@@ -27,7 +27,7 @@ public class EditorView extends UINode implements TileConstants {
   Prop placing = null;
   
   
-  EditorView(SceneView parent) {
+  public EditorView(SceneView parent) {
     super(parent);
     this.parent = parent;
   }
@@ -41,8 +41,6 @@ public class EditorView extends UINode implements TileConstants {
     String desc = description(surface);
     g.setColor(Color.LIGHT_GRAY);
     ViewUtils.drawWrappedString(desc, g, vx, vy, vw, vh);
-    
-    
     
     return true;
   }
@@ -88,7 +86,7 @@ public class EditorView extends UINode implements TileConstants {
   }
   
   
-  boolean previewPropPlacement(
+  public boolean previewPropPlacement(
     Object hovered, Tile at, Surface surface, Graphics2D g
   ) {
     final World  world  = mainView.world();
@@ -99,7 +97,6 @@ public class EditorView extends UINode implements TileConstants {
       boolean canPlace = Prop.hasSpace(
         scene, placing.kind(), at.x, at.y, placing.facing()
       );
-      
       if (canPlace && surface.mouseClicked()) {
         placing.enterScene(scene, at.x, at.y, placing.facing());
       }

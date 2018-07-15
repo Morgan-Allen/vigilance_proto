@@ -5,6 +5,7 @@ import proto.common.*;
 import proto.game.world.*;
 import proto.game.person.*;
 import proto.game.scene.*;
+import proto.editor.*;
 import proto.util.*;
 import proto.view.common.*;
 
@@ -42,6 +43,7 @@ public class SceneView extends UINode implements TileConstants {
   
   
   final ActionsView actionsView;
+  final EditorView  editorView ;
   
   Vec3D zoomPoint = new Vec3D();
   Tile hoverTile, zoomTile;
@@ -64,6 +66,9 @@ public class SceneView extends UINode implements TileConstants {
     
     actionsView = new ActionsView(this);
     setChild(actionsView, true);
+    
+    editorView = new EditorView(this);
+    setChild(editorView, true);
   }
   
   
@@ -143,8 +148,15 @@ public class SceneView extends UINode implements TileConstants {
   /**  Overrides for ancestor methods-
     */
   protected void updateAndRender(Surface surface, Graphics2D g) {
+    
     final Box2D b = this.relBounds;
     actionsView.relBounds.set(0, 0, b.xdim() / 4f, b.ydim());
+    editorView .relBounds.set(0, 0, b.xdim() / 4f, b.ydim());
+    
+    Editor editor = editorView.editor();
+    actionsView.visible = editor == null;
+    editorView .visible = editor != null;
+    
     super.updateAndRender(surface, g);
   }
   
@@ -258,28 +270,35 @@ public class SceneView extends UINode implements TileConstants {
         renderSprite(hoverTile.x, hoverTile.y, 1, 1, 0, hoverBox, g);
       }
       
-      final Ability ability = actionsView.selectAbility;
-      if (ability == Common.MOVE && ! hoverTile.blocked()) {
-        renderCoverIndicators(hoverTile, scene, surface, g);
+      if (actionsView.visible) {
+        
+        final Ability ability = actionsView.selectAbility;
+        if (ability == Common.MOVE && ! hoverTile.blocked()) {
+          renderCoverIndicators(hoverTile, scene, surface, g);
+        }
+        
+        Object hovered = topObjectAt(hoverTile);
+        boolean canDoAction = false;
+        
+        if (actionsView.previewActionDelivery(hovered, hoverTile, surface, g)) {
+          canDoAction = true;
+        }
+        if (surface.mouseClicked()) {
+          if (done == null && canDoAction) {
+            actionsView.confirmActionChoice(actionsView.selectAction);
+          }
+          else {
+            Person pickP = null;
+            if (hovered instanceof Person) pickP = (Person) hovered;
+            if (pickP != null) setSelection(pickP, true);
+            else setZoomPoint(hoverTile);
+          }
+        }
       }
       
-      Object hovered = topObjectAt(hoverTile);
-      boolean canDoAction = false;
-      
-      if (actionsView.previewActionDelivery(hovered, hoverTile, surface, g)) {
-        canDoAction = true;
-      }
-      
-      if (surface.mouseClicked()) {
-        if (done == null && canDoAction) {
-          actionsView.confirmActionChoice(actionsView.selectAction);
-        }
-        else {
-          Person pickP = null;
-          if (hovered instanceof Person) pickP = (Person) hovered;
-          if (pickP != null) setSelection(pickP, true);
-          else setZoomPoint(hoverTile);
-        }
+      if (editorView.visible) {
+        Object hovered = topObjectAt(hoverTile);
+        editorView.previewPropPlacement(hovered, hoverTile, surface, g);
       }
     }
     //

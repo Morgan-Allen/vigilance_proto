@@ -63,7 +63,7 @@ public class SceneFromXML implements TileConstants {
   }
   
   
-  static PropType propFromXML(
+  public static PropType propFromXML(
     String ID, String file, String basePath, XML fileXML
   ) {
     String   key    = uniqueID(ID, file, basePath);

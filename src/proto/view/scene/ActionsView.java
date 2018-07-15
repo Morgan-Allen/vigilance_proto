@@ -93,9 +93,9 @@ public class ActionsView extends UINode {
     if (scene.complete() && ! GameSettings.debugScene) return "";
     
     final StringBuffer s = new StringBuffer();
-    final Person   p      = sceneView.selectedPerson();
-    final Ability  a      = selectAbility;
-    final Action   action = scene.currentAction();
+    final Person  p      = sceneView.selectedPerson();
+    final Ability a      = selectAbility;
+    final Action  action = scene.currentAction();
     
     if (p != null) {
       s.append("\nSelection: "+p.name()+" ("+p.side().name().toLowerCase()+")");

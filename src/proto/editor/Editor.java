@@ -25,19 +25,19 @@ public class Editor extends RunGame {
   };
   
   
-  
-  String propsPath;
-  XML propsXML;
+  String propsPath = "media assets/testing/";
+  String propsFile = "test_props.xml";
+  XML    propsXML  = XML.load(propsPath+""+propsFile);
   List <PropType> propTypes = new List();
-  
-  
   
   
   protected World setupWorld() {
     
-    //  TODO:  You still need to load and parse the list of potential
-    //  prop-types...
-    
+    for (XML node : propsXML.allChildrenMatching("prop")) {
+      String ID = node.value("ID");
+      PropType type = SceneFromXML.propFromXML(ID, propsFile, propsPath, propsXML);
+      propTypes.add(type);
+    }
     
     World world = new World(this, savePath);
     Scene scene = new Scene(BLANK_SCENE, world, 16, 16, true);
@@ -46,7 +46,14 @@ public class Editor extends RunGame {
   }
   
   
+  void exportToXML(Scene scene, String outPath) {
+    
+  }
+  
+  
 }
+
+
 
 
 
