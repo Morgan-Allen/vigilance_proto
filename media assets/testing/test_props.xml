@@ -1,0 +1,30 @@
+
+
+<prop
+  ID         = "wall"
+  sprite     = "test tiles/tile_wall.png"
+  high       = "0"
+  subtype    = "SUBTYPE_WALLING"
+/>
+
+<prop
+  ID         = "floor"
+  sprite     = "test tiles/tile_floor.png"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_NONE"
+/>
+
+<prop
+  ID         = "table_big"
+  sprite     = "test tiles/tile_big_table.png"
+  high       = "2"
+  wide       = "3"
+  blockSight = "false"
+/>
+
+<prop
+  ID         = "column"
+  sprite     = "test tiles/tile_column.png"
+  subtype    = "SUBTYPE_WALLING"
+  blockLevel = "BLOCK_FULL"
+/>

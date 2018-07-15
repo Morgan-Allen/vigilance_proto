@@ -203,9 +203,9 @@ public class SceneTypeUnits extends SceneType {
     World world, int wide, int high, boolean testing
   ) {
     Scenery gen = new Scenery(this, wide, high, testing);
-    Series <Wing> wings = generateWings(gen, resolution, 0.5f, 3);
+    Series <Wing> wings = generateWings(gen, 0.5f, 3);
     
-    gen.setupWingsGrid(resolution, wings);
+    gen.setupWingsGrid(wings);
     populateWithAreas(world, gen, testing, false);
     
     return gen;
@@ -384,8 +384,7 @@ public class SceneTypeUnits extends SceneType {
   
   
   public Series <Wing> generateWings(
-    Scenery scene, int resolution,
-    float coverFraction, int maxUnitsWide
+    Scenery scene, float coverFraction, int maxUnitsWide
   ) {
     int r = resolution, gridW = scene.wide / r, gridH = scene.high / r;
     float areaNeeded = scene.wide * scene.high * coverFraction;

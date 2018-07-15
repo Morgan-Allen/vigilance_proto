@@ -25,6 +25,7 @@ public class EditorView extends UINode implements TileConstants {
   
   final SceneView parent;
   Prop placing = null;
+  int defaultFacing = N;
   
   
   public EditorView(SceneView parent) {
@@ -35,6 +36,9 @@ public class EditorView extends UINode implements TileConstants {
   
   
   protected boolean renderTo(Surface surface, Graphics2D g) {
+    
+    GameSettings.debugScene = true;
+    GameSettings.pauseScene = true;
     
     g.setColor(new Color(0, 0, 0, 0.66f));
     g.fillRect(vx, vy, vw, vh);
@@ -61,25 +65,36 @@ public class EditorView extends UINode implements TileConstants {
     
     final StringBuffer s = new StringBuffer();
     
-    s.append("\nAvailable props:");
+    s.append("\n  Available props:");
     char key = '1';
-    
-    
     for (PropType type : editor.propTypes) {
-      
       s.append("\n    "+type.name()+" ("+key+")");
-      
-      if (surface.isPressed(key) && placing.kind() != type) {
+      if (surface.isPressed(key) && (placing == null || placing.kind() != type)) {
         placing = new Prop(type, world);
+        placing.setFacing(defaultFacing);
       }
-      
       key += 1;
     }
     
-    s.append("\n    Press R to rotate, click to place");
+    s.append("\n");
+    
+    s.append("\n  Press R to rotate, click to place");
     if (surface.isPressed('r') && placing != null) {
-      int facing = (placing.facing() + 2) % 8;
+      int facing = defaultFacing = (placing.facing() + 2) % 8;
       placing.setFacing(facing);
+    }
+    s.append("\n  Press D to deselect");
+    if (surface.isPressed('d')) {
+      placing = null;
+    }
+    s.append("\n  Press Z to un/zoom");
+    if (surface.isPressed('z')) {
+      parent.setTileZoom(! parent.tileZoomed());
+    }
+    
+    s.append("\n\n  Press X to export");
+    if (surface.isPressed('x')) {
+      editor.exportToXML(scene);
     }
     
     return s.toString();
@@ -99,12 +114,17 @@ public class EditorView extends UINode implements TileConstants {
       );
       if (canPlace && surface.mouseClicked()) {
         placing.enterScene(scene, at.x, at.y, placing.facing());
+        placing = new Prop(placing.kind(), world);
+        placing.setFacing(defaultFacing);
       }
       else {
         Color tint = canPlace ? PLACE_OKAY : PLACE_BAD;
         placing.setOrigin(at);
         placing.renderTo(scene, parent, surface, g, tint);
       }
+    }
+    else if (surface.mouseClicked()) {
+      parent.setZoomPoint(at);
     }
     
     return true;

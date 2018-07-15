@@ -16,7 +16,7 @@ import java.awt.Graphics2D;
 public class ActionsView extends UINode {
   
   
-  final SceneView sceneView;
+  final SceneView parent;
   
   Ability selectAbility;
   Action  selectAction;
@@ -25,7 +25,7 @@ public class ActionsView extends UINode {
   
   ActionsView(SceneView parent) {
     super(parent);
-    this.sceneView = parent;
+    this.parent = parent;
   }
   
   
@@ -39,7 +39,7 @@ public class ActionsView extends UINode {
     Scene scene = agent.currentScene();
     agent.actions.assignAction(action);
     scene.pushNextAction(action);
-    sceneView.setZoomPoint(scene.tileUnder(action.target));
+    parent.setZoomPoint(scene.tileUnder(action.target));
     clearChoices();
     
     if (! agent.actions.canTakeAction()) {
@@ -49,10 +49,10 @@ public class ActionsView extends UINode {
   
   
   void jumpToNextAgent(Person current) {
-    final Scene scene = sceneView.scene();
+    final Scene scene = parent.scene();
     for (Person p : scene.playerTeam()) if (p.actions.canTakeAction()) {
-      sceneView.setSelection(p, false);
-      sceneView.setZoomPoint(p.exactPosition());
+      parent.setSelection(p, false);
+      parent.setZoomPoint(p.exactPosition());
       break;
     }
   }
@@ -76,9 +76,9 @@ public class ActionsView extends UINode {
     //  Then try jumping to the next agent on the team once a given action is
     //  completed, after a short delay-
     if (delayToJump > 0) {
-      Action taken = sceneView.scene().currentAction();
+      Action taken = parent.scene().currentAction();
       if (taken == null && --delayToJump <= 0) {
-        jumpToNextAgent(sceneView.selectedPerson());
+        jumpToNextAgent(parent.selectedPerson());
       }
     }
     return true;
@@ -93,7 +93,7 @@ public class ActionsView extends UINode {
     if (scene.complete() && ! GameSettings.debugScene) return "";
     
     final StringBuffer s = new StringBuffer();
-    final Person  p      = sceneView.selectedPerson();
+    final Person  p      = parent.selectedPerson();
     final Ability a      = selectAbility;
     final Action  action = scene.currentAction();
     
@@ -154,7 +154,7 @@ public class ActionsView extends UINode {
           boolean canUse = r.minCostAP() <= PA.currentAP();
           if (canUse) s.append(" ("+key+") AP: "+r.minCostAP());
           if (surface.isPressed(key) && canUse) {
-            sceneView.setSelection(p, false);
+            parent.setSelection(p, false);
             setActiveAbility(r);
           }
           key++;
@@ -185,7 +185,7 @@ public class ActionsView extends UINode {
           }
           s.append("\n  Cancel (X)");
           if (surface.isPressed('x')) {
-            sceneView.setSelection(p, false);
+            parent.setSelection(p, false);
           }
         }
       }
@@ -216,9 +216,7 @@ public class ActionsView extends UINode {
     
     s.append("\n  Press Z to un/zoom.");
     if (surface.isPressed('z')) {
-      SceneView SV = scene.view();
-      boolean inZoom = SV.tileSize == SceneView.MAX_TILE_SIZE;
-      SV.tileSize = inZoom ? SceneView.MIN_TILE_SIZE : SceneView.MAX_TILE_SIZE;
+      parent.setTileZoom(! parent.tileZoomed());
     }
     
     return s.toString();
@@ -232,7 +230,7 @@ public class ActionsView extends UINode {
     Object hovered, Tile at, Surface surface, Graphics2D g
   ) {
     final Scene scene = mainView.world().activeScene();
-    final Person selected = sceneView.selectedPerson();
+    final Person selected = parent.selectedPerson();
     if (selectAbility == null || selected == null) return false;
     
     StringBuffer failLog = new StringBuffer();
@@ -245,11 +243,11 @@ public class ActionsView extends UINode {
     if (selectAction != null) {
       int costAP = selectAction.used.costAP(selectAction);
       selectAction.used.FX.previewAction(selectAction, scene, g);
-      sceneView.renderString(at.x, at.y - 0.5f, "AP: "+costAP, Color.GREEN, g);
+      parent.renderString(at.x, at.y - 0.5f, "AP: "+costAP, Color.GREEN, g);
       return true;
     }
     else {
-      sceneView.renderString(at.x, at.y - 0.5f, ""+failLog, Color.RED, g);
+      parent.renderString(at.x, at.y - 0.5f, ""+failLog, Color.RED, g);
       return false;
     }
   }

@@ -149,7 +149,9 @@ public class Prop extends Element implements TileConstants {
   
   
   public boolean enterScene(Scenery scene, int x, int y, int facing) {
-    if (origin != null) I.complain("Already in scene!");
+    if (origin != null && (origin.x != x || origin.y != y)) {
+      I.complain("Already in scene!");
+    }
     this.origin = scene.tileAt(x, y);
     this.facing = facing;
     if (origin == null) I.complain("Origin outside bounds!");

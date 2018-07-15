@@ -69,7 +69,6 @@ public class DebugSceneGen {
   public static void main(String args[]) {
     World world = new World();
     Scene scene = new Scene(GEN_TEST_SCENE, world, 48, 48, true);
-    int resolution = 8;
     //
     //  First, we have a series of reports/tests based on a fixed layout of
     //  building-wings, intended to ensure that corner-fitting is correctly
@@ -82,8 +81,8 @@ public class DebugSceneGen {
     I.say("\nConstructed bounds are:");
     for (Box2D b : bounds) I.say("  "+b);
     
-    scene.setupWingsGrid(resolution, bounds);
-    printWings(scene, resolution);
+    scene.setupWingsGrid(bounds);
+    printWings(scene);
     printIslands(scene);
     
     I.say("\nChecking for border-fitting...");
@@ -106,7 +105,9 @@ public class DebugSceneGen {
       1, 3, W, true , subunitB,
     }, 10);
     
+    int resolution = scene.type().resolution();
     boolean allFitChecksMet = true;
+    
     for (Object c[] : checkFitsArgs) {
       int     x    = resolution * (Integer) c[0];
       int     y    = resolution * (Integer) c[1];
@@ -123,13 +124,13 @@ public class DebugSceneGen {
     //  Then generate a fully random scene and view the walls layout:
     SceneTypeUnits type = (SceneTypeUnits) GEN_TEST_XML_SCENE;
     scene  = new Scene(GEN_TEST_XML_SCENE, world, 32, 32, true);
-    bounds = type.generateWings(scene, resolution, 0.66f, 3);
+    bounds = type.generateWings(scene, 0.66f, 3);
     
     I.say("Generated bounds are:");
     for (Box2D b : bounds) I.say("  "+b);
     
-    scene.setupWingsGrid(resolution, bounds);
-    printWings(scene, resolution);
+    scene.setupWingsGrid(bounds);
+    printWings(scene);
     
     type.populateWithAreas(world, scene, true, false);
     Tile.printWallsMask(scene);
@@ -137,8 +138,9 @@ public class DebugSceneGen {
   }
   
   
-  private static void printWings(Scenery scene, int resolution) {
+  private static void printWings(Scenery scene) {
     
+    int resolution = scene.type().resolution();
     int dimX = scene.wide() / resolution;
     int dimY = scene.high() / resolution;
     

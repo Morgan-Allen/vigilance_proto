@@ -113,6 +113,16 @@ public class SceneView extends UINode implements TileConstants {
   }
   
   
+  public void setTileZoom(boolean zoomed) {
+    this.tileSize = zoomed ? MAX_TILE_SIZE : MIN_TILE_SIZE;
+  }
+  
+  
+  public boolean tileZoomed() {
+    return tileSize == MAX_TILE_SIZE;
+  }
+  
+  
   public void setSelection(Person acting, boolean keepActiveAbility) {
     final Person old = selectedPerson;
     this.selectedPerson = acting;

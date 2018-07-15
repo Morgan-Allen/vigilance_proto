@@ -59,7 +59,7 @@ public class SceneFromXML implements TileConstants {
   
   
   private static String uniqueID(String ID, String file, String basePath) {
-    return (basePath+file).toLowerCase()+"\\"+ID;
+    return ((basePath+""+file).replace(".xml", ""))+"."+ID;
   }
   
   
@@ -172,7 +172,7 @@ public class SceneFromXML implements TileConstants {
       if (unit != null) units.add(unit);
     }
     
-    int     unitSize = sceneNode.getInt("unitSize");
+    int     unitSize = getInt(sceneNode, "unitSize"    ,  8);
     int     maxUW    = getInt(sceneNode, "maxUnitsWide",  8);
     int     maxUH    = getInt(sceneNode, "maxUnitsHigh",  8);
     int     minUW    = getInt(sceneNode, "minUnitsWide",  2);
@@ -182,13 +182,12 @@ public class SceneFromXML implements TileConstants {
     String  cornerID = sceneNode.value  ("cornering");
     boolean exterior = sceneNode.getBool("exterior" );
     boolean entrance = sceneNode.getBool("entrance" );
-    
     PropType
       floor  = propWithID(floorID , file, basePath),
       wall   = propWithID(wallID  , file, basePath),
       door   = propWithID(doorID  , file, basePath),
-      window = propWithID(windowID, file, basePath);
-    
+      window = propWithID(windowID, file, basePath)
+    ;
     if (unitsW != -1) maxUW = minUW = unitsW;
     if (unitsH != -1) maxUH = minUH = unitsH;
     
@@ -259,7 +258,8 @@ public class SceneFromXML implements TileConstants {
       char wallChars[] = {'-',']','_','['}, dirChars[] = {'n','e','s','w'};
       //
       //  Then populate the scene while iterating over possible grid positions-
-      for (Coord c : Visit.grid(0, 0, high, wide, 1)) try {
+      for (int x = 0; x < wide; x++) for (int y = 0; y < high; y++) try {
+      //for (Coord c : Visit.grid(0, 0, high, wide, 1)) try {
         //
         //  We skip over any empty positions, and check to see if there's a
         //  numeric type index present, along with markers for doors and
@@ -270,6 +270,12 @@ public class SceneFromXML implements TileConstants {
         int typeIndex = parseIndex(token) - 1;
         PropType placed = null;
         //
+        //  If the first character is a '+' sign, then this prop belongs to the
+        //  same tile as the last one, and we should decrement the counter...
+        if (token.charAt(0) == '+') {
+          y -= 1;
+        }
+        //
         //  For each wall-marker present, we generate a wall-prop with the
         //  correct facing (and as a door or window if appropriate):
         for (int i = 4; i-- > 0;) {
@@ -278,7 +284,7 @@ public class SceneFromXML implements TileConstants {
           PropType type = wall;
           if (portI == 0) type = door;
           if (portI == 1) type = window;
-          sceneType.attachPlacing(type, c.y, c.x, dir);
+          sceneType.attachPlacing(type, y, x, dir);
         }
         //
         //  If a numeric type-index was detected, we check if a particular
@@ -288,12 +294,12 @@ public class SceneFromXML implements TileConstants {
           if (dir == -1) dir = N;
           else dir = T_ADJACENT[dir];
           placed = types[typeIndex];
-          sceneType.attachPlacing(placed, c.y, c.x, dir);
+          sceneType.attachPlacing(placed, y, x, dir);
         }
         //
         //  Finally, include flooring (if you haven't already):
         if (placed == null || placed != floor) {
-          sceneType.attachPlacing(floor, c.y, c.x, N);
+          sceneType.attachPlacing(floor, y, x, N);
         }
       }
       catch (Exception e) { I.report(e); break; }
@@ -324,16 +330,27 @@ public class SceneFromXML implements TileConstants {
   
   
   private static int parseIndex(String token) {
-    StringBuffer s = new StringBuffer();
-    for (char c : token.toCharArray()) {
+    boolean foundNum = false;
+    int mul = 0;
+    for (int i = 0; i < token.length(); i++) {
+      char c = token.charAt(i);
       if (c < '0' || c > '9') continue;
-      s.append(c);
+      mul *= 10;
+      mul += c - '0';
+      foundNum = true;
     }
-    token = s.toString();
-    if (s.length() == 0) return -1;
-    return Integer.parseInt(token);
+    return foundNum ? mul : -1;
   }
 }
+
+
+
+
+
+
+
+
+
 
 
 

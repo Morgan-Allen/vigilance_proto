@@ -9,7 +9,7 @@
 
 <prop
   ID         = "table_big"
-  sprite     = "test tiles/tile_table_big.png"
+  sprite     = "test tiles/tile_big_table.png"
   high       = "2"
   wide       = "3"
   blockSight = "false"

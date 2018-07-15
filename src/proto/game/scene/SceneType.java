@@ -103,6 +103,11 @@ public abstract class SceneType extends Index.Entry implements
   }
   
   
+  public int resolution() {
+    return resolution;
+  }
+  
+  
   public Scene generateScene(
     World world, int prefWide, int prefHigh, boolean testing
   ) {
@@ -119,7 +124,8 @@ public abstract class SceneType extends Index.Entry implements
       Box2D bounds = borderBounds(scene, gen, 0, 0, N, room.wide);
       scene.recordRoom(room, bounds);
     }
-    scene.setupWingsGrid(gen.resolution, gen.wings());
+    
+    scene.setupWingsGrid(gen.wings());
     applyScenery(scene, gen, 0, 0, N, testing);
     return scene;
   }
@@ -264,8 +270,8 @@ public abstract class SceneType extends Index.Entry implements
   ) {
     if (exterior || ! entrance) return 0;
     
-    int gx  = (offX + 1) / g.resolution;
-    int gy  = (offY + 1) / g.resolution;
+    int gx  = (offX + 1) / g.type.resolution;
+    int gy  = (offY + 1) / g.type.resolution;
     int dir = (face + 6) % 8;  //  NOTE:  Another hack, blech.
     Island other = g.islandUnderGrid(gx + T_X[dir], gy + T_Y[dir]);
     Island under = g.islandUnderGrid(gx           , gy           );

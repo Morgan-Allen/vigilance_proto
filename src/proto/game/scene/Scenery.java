@@ -49,7 +49,7 @@ public class Scenery implements Session.Saveable, TileConstants {
     }
   }
   
-  int gridW, gridH, resolution;
+  int gridW, gridH;//, resolution;
   int offX, offY, facing;
   
   Wing   wingsPattern  [][];
@@ -107,11 +107,10 @@ public class Scenery implements Session.Saveable, TileConstants {
   
   /**  Helper methods for hierarchical composition-
     */
-  public void setupWingsGrid(int resolution, Series <Wing> wings) {
+  public void setupWingsGrid(Series <Wing> wings) {
     
-    this.resolution     = resolution;
-    this.gridW          = Nums.ceil(wide * 1f / resolution);
-    this.gridH          = Nums.ceil(high * 1f / resolution);
+    this.gridW          = Nums.ceil(wide * 1f / type.resolution);
+    this.gridH          = Nums.ceil(high * 1f / type.resolution);
     this.wingsPattern   = new Wing  [gridW][gridH];
     this.islandsPattern = new Island[gridW][gridH];
     
@@ -119,8 +118,8 @@ public class Scenery implements Session.Saveable, TileConstants {
     Visit.appendTo(this.wings, wings);
     
     for (Coord c : Visit.grid(0, 0, gridW, gridH, 1)) {
-      int tx = (int) ((c.x + 0.5f) * resolution);
-      int ty = (int) ((c.y + 0.5f) * resolution);
+      int tx = (int) ((c.x + 0.5f) * type.resolution);
+      int ty = (int) ((c.y + 0.5f) * type.resolution);
       wingsPattern[c.x][c.y] = null;
       for (Wing w : wings) if (w.contains(tx, ty)) {
         wingsPattern[c.x][c.y] = w;
@@ -186,7 +185,7 @@ public class Scenery implements Session.Saveable, TileConstants {
   
   
   public Coord gridPoint(int x, int y) {
-    return new Coord(x / resolution, y / resolution);
+    return new Coord(x / type.resolution, y / type.resolution);
   }
   
   
@@ -196,14 +195,14 @@ public class Scenery implements Session.Saveable, TileConstants {
   
   
   public Tile gridMidpoint(int gx, int gy) {
-    int hr = resolution / 2;
-    return tileAt((gx * resolution ) + hr, (gy * resolution) + hr);
+    int hr = type.resolution / 2;
+    return tileAt((gx * type.resolution) + hr, (gy * type.resolution) + hr);
   }
   
   
   public Island islandUnder(int x, int y) {
     if (x < 0 || y < 0 || x >= wide || y >= high) return null;
-    return islandsPattern[x / resolution][y / resolution];
+    return islandsPattern[x / type.resolution][y / type.resolution];
   }
   
   
@@ -220,7 +219,7 @@ public class Scenery implements Session.Saveable, TileConstants {
   
   public Wing wingUnder(int x, int y) {
     if (x < 0 || y < 0 || x >= wide || y >= high) return null;
-    return wingsPattern[x / resolution][y / resolution];
+    return wingsPattern[x / type.resolution][y / type.resolution];
   }
   
   
