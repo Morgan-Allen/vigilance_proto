@@ -17,11 +17,6 @@ public class XML {
     verbose      = false,
     extraVerbose = false;
   
-  public static void main(String args[]) {
-    verbose = true;
-    XML.load("media/Help/TutorialScript.xml");
-  }
-  
   
   final static XML NULL_NODE = new XML().compile(0);
   
@@ -108,6 +103,11 @@ public class XML {
     */
   public static XML load(String fileName) {
     return new XML(fileName);
+  }
+  
+  
+  public static XML blank() {
+    return new XML();
   }
   
   
