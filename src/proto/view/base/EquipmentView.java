@@ -26,7 +26,7 @@ public class EquipmentView extends UINode {
   protected boolean renderTo(Surface surface, Graphics2D g) {
     if (! super.renderTo(surface, g)) return false;
     
-    Person person = mainView.rosterView.selectedPerson();
+    Person person = mainView.selectedPerson();
     Base   played = mainView.player();
     renderCraftOptions (surface, g, person);
     renderCraftingQueue(surface, g        );

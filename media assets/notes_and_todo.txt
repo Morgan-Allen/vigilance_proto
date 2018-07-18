@@ -1,79 +1,102 @@
 
 
-
-You need to add some intelligence to goons' motions/patrol patterns.
-
-You need to give each agent some unique flavour, based on costume.
-  *  Phobos has free ultrasound and stealth/mobility.
-     Bonus to surveillance/search.
-  *  Deimos has rapid fire/double-tap and heavy armour.
-     Bonus to busts/reports.
-  *  Black Swift has sidekicks and melee mastery.
-     Bonus to guarding/tipoffs.
-  *  Dr. Yang has disguise and misdirection/false alarm.
-     Bonus to questioning/wiretap.
-Scenes should generate procedurally in random ways using corner/mid/inside
-segments.
-
-Prefer hideouts in industrial/slum/disused areas, or if owned by the plot's
-faction.  And add medium-descriptions to roles, to determine if specific leads
-can tune in or not.
-
-
-
-
-Add the full tech tree and range of gadgets.
-
-You need to create some alternative henchmen for different villains and their
-factions.
-
-Add some reluctance, initiative and motives for agents- agents should
-auto-assign themselves to leads and other tasks.
-
-    
-
-Pare down the list of facilities to what's essential.
-  Player (possibly as upgrades to existing districts):
-   Slum-
-    Factory
-    Chemical Plant
-    Swifts Dojo
-   Business-
-    Business Complex
-    Startup vs. Union Office
-    Research Lab
-   Civic-
-    Library
-    Hospital
-    Soup Kitchen
+* What is the advantage of solving plots anyway?
   
-  Non-player:
-   Slum-
-    Warehouse / Docks
-    Casino
-    Tenements
-   Business-
-    Penthouse
-    Memorial Park
-   Civic-
-    Bank
-    Museum
-    City Hall
-    Prison
+  It's the only way you can have troops there (including police) in time
+  to catch the perps.  Otherwise the crime just goes ahead and fucks up
+  the joint.
+  
+  (You will also have the opportunity to raid their hideout instead,
+  which prevents the crime from happening entirely, though there's less
+  evidence for involvement.)
+  
+  So while there's an ongoing case, idle agents will present themselves
+  for assignment.  And you'll receive a report on what the results turn
+  out to be.
+  
+  Once you narrow down a distinct location, you'll have a chance to go
+  on a strike mission.
+  
+  If there are no ongoing cases, your agents will have the opportunity
+  to train, socialise, engage with petty crime, rest & recover or
+  research new techs and policy initiatives.
+  
+  Yeah.  That will work.
+  
 
-You need to create adjacency-effects for different facilities, and allow their
-effects to spill over into nearby districts.
+*  More intelligent objectives for goons on a map.
+*  Motion in 3 dimensions?  Hmm.  Long term plan- multiple floors should
+   do the trick at least.
 
-Cut construction down to 6 months or so, and increase lead-following to 1 week.
+*  Simplified XP system and more distinctive abilities for heroes (but
+   training still matters a great deal.)
+
+*  A Tactical Map where you can review crimes levels and open cases.
+*  Steadily escalating threat-levels due to top-level factions (OSIRIS,
+   Phalanx or the Mons.)
+*  More fully-featured plot generation, and streamlined clue-detection
+   with a range of current cases for display.
+
+*  A Day Office where you can review policy & research initiatives and 
+   invest in city development projects.
 
 
-I want a simpler interface for the cases themselves.
+Phobos:    Stealth, motion and ultrasound to reveal hidden targets.
+Deimos:    Armour & firepower, sticky bombs to break down obstacles.
+Redwing:   Can distract & taunt foes, guard allies & civilians.
 
-Use the state of the plot to determine stages, instead of tense?
+Pythia:    Strictly case work, research & forensics.
+Alamo:     Long-range sniping ability & stealth, medical care.
+Dr. Yang:  Disguise & undercover work, ability to short out security.
+
+Banshee:   Superb ultrasound/phase abilities, stun power and life drain.
+Imago:     Superb disguise ability, healing/regen and TK ability.
+Metal J:   Superb firepower and armour, some hacking.
+
+Civilians:    Worker/Domestic , Engineer/Doctor    , Official/Socialite
+Police:       Officer/Mech Off, SWAT Team/SWAT Mech, Undercover/Lab Div
+The Swifts:   Swift Scout     , Raptor             , Bird's Eye
 
 
+Rank And File:
 
-You might add a UI for building up scenes.
+Mobsters:     Bruiser, Mobster, Assassin (basic types, but they work)
+The Meme:     Copycat, Gas Man           (spread laugh-gas to convert/kill)
+El Cruce:     Soldado, Berserker         (drug-fueled brutality)
+Wicker Man:   White Knight, Torchbearer  (fire and fear)
+Chlora:       Beloved/Hybrid, Awakened   (can infect civilians, fast melee)
+Deep Blue:    Cryo Drone, Mainframe      (slow/trap targets, hack)
+Schrodinger:  Operative/Phaser, Spectre  (hack infrastructure, pass walls)
+OSIRIS:       Immortal/Sleeper           (infiltrate government & society)
+
+Agitators:    El Cruce, The Meme, Wicker Man  Street drugs and petty anarchism.
+Mobsters:     Snake Eyes, The Quack, Moretti  Threats, business and corruption.
+Scientists:   Chlora, Deep Blue, Schrodinger  High technology and white crime.
+Ancients:     OSIRIS                          The looming external threat.
+Auxiliary:    Moebius, Dragon, Kat/Mamba, Judy, Madam Yin.
+
+Remember the original X-Com only had 8-10 alien types and 14-16 units in total.
+
+So use the categories above and you are grand and dandy.  (That, plus the various bosses.)
+
+Vigilantes:   Phobos, Deimos, Redwing
+              Dr. Yang, Alamo, Pythia
+              Banshee, Imago, Metal Jacket
+Civilians:    Worker/Domestic , Engineer/Doctor    , Official/Socialite
+Police:       Officer/Mech Off, SWAT Team/SWAT Mech, Undercover/Lab Div
+The Swifts:   Swift Scout     , Raptor             , Bird's Eye
+
+Nemeses:
+  Phobos       <-> OSIRIS
+  Deimos       <-> The Meme
+  The Swift    <-> El Cruce
+  Alamo        <-> El Cruce
+  Pythia       <-> Wicker Man
+  Banshee      <-> Wicker Man
+  Dr. Yang     <-> Schrodinger
+  Imago        <-> Chlora
+  Metal Jacket <-> Deep Blue
+  Mobsters all hate eachother.
 
 
 

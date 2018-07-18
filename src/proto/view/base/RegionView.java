@@ -5,8 +5,9 @@ import proto.common.*;
 import proto.game.event.*;
 import proto.game.person.*;
 import proto.game.world.*;
-import proto.util.*;
 import proto.view.common.*;
+import proto.view.world.*;
+import proto.util.*;
 
 import java.awt.Image;
 import java.awt.Color;
@@ -36,10 +37,10 @@ public class RegionView extends UINode {
     */
   protected boolean renderTo(Surface surface, Graphics2D g) {
     
-    MapInsetView mapRefers = mainView.mapView.mapView;
+    MapInsetView mapRefers = mainView.mapView().mapView;
     Region  region = mapRefers.selectedRegion();
     Base    player = mainView.player();
-    MapView parent = mainView.mapView;
+    MapView parent = mainView.mapView();
     if (region == null) return false;
     
     Region.Stat hovered = null;

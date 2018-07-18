@@ -1,6 +1,6 @@
 
 
-package proto.view.base;
+package proto.view.world;
 import proto.common.*;
 import proto.game.world.*;
 import proto.game.event.*;
@@ -174,18 +174,18 @@ public abstract class MapInsetView extends UINode {
       for (final Place slot : n.buildSlots()) {
         
         final ImageButton button = new ImageButton(
-          slot == null ? RegionView.NOT_BUILT : slot.icon(),
+          slot == null ? MapView.NOT_BUILT : slot.icon(),
           new Box2D(x + offF - vx, y + vy - 125, 30, 30), this
         ) {
           protected void whenClicked() {
             if (slot == null) return;
-            mainView.mapView.setActiveFocus(slot, true);
+            mainView.mapView().setActiveFocus(slot, true);
           }
         };
         button.valid = slot != null;
         button.refers = "slot_"+slotID;
         if (slot != null && slot.buildProgress() < 1) {
-          button.attachOverlay(RegionView.IN_PROGRESS);
+          button.attachOverlay(MapView.IN_PROGRESS);
         }
         
         if (slot != null && played.leads.cluesAssociated(slot).size() > 0) {
@@ -238,8 +238,9 @@ public abstract class MapInsetView extends UINode {
   void presentBuildOptions(
     Region d, int slotID
   ) {
-    final BuildOptionsView options = new BuildOptionsView(mainView, d, slotID);
-    mainView.queueMessage(options);
+    //  TODO:  See about restoring this later...
+    //final BuildOptionsView options = new BuildOptionsView(mainView, d, slotID);
+    //mainView.queueMessage(options);
   }
   
   

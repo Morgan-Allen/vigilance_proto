@@ -1,5 +1,6 @@
 
-package proto.view.base;
+
+package proto.view.world;
 import proto.common.*;
 import proto.game.world.*;
 import proto.game.person.*;
@@ -20,21 +21,27 @@ public class MapView extends UINode {
     */
   final static String
     IMG_DIR = "media assets/city map/";
-  final static Image
+  final public static Image
     ALERT_IMAGE   = Kind.loadImage(IMG_DIR+"alert_symbol.png"  ),
     CLUE_IMAGE    = Kind.loadImage(IMG_DIR+"clue_symbol.png"   ),
     MYSTERY_IMAGE = Kind.loadImage(IMG_DIR+"mystery_symbol.png"),
     FILE_IMAGE    = Kind.loadImage(IMG_DIR+"file_image.png"    ),
     TRIAL_IMAGE   = Kind.loadImage(IMG_DIR+"trial_image.png"   ),
-    JAILED_IMAGE  = Kind.loadImage(IMG_DIR+"jailed_image.png"  );
+    JAILED_IMAGE  = Kind.loadImage(IMG_DIR+"jailed_image.png"  ),
+    NOT_BUILT = Kind.loadImage(
+      "media assets/tech icons/state_not_built.png"
+    ),
+    IN_PROGRESS = Kind.loadImage(
+      "media assets/tech icons/state_in_progress.png"
+    );
   final static Object
     ALL_EVENTS  = "all-cases",
     PLOT_CLUES = "plot-clues";
   
   
-  MapInsetView mapView;
-  ScrollArea infoArea;
-  
+  final public MapInsetView mapView;
+  final public ScrollArea infoArea;
+  /*
   EventsView    eventsView;
   CaseRolesView rolesView ;
   CaseCluesView cluesView ;
@@ -46,6 +53,7 @@ public class MapView extends UINode {
   
   Object activeFocus = null;
   List <Object> focusStack = new List();
+  //*/
   
   
   
@@ -57,7 +65,7 @@ public class MapView extends UINode {
       10, 10, fullWide - 360, fullHigh - 20
     )) {
       protected void onRegionSelect(Region region) {
-        setActiveFocus(region, true);
+        //setActiveFocus(region, true);
       }
     };
     mapView.loadMapImages(
@@ -69,6 +77,9 @@ public class MapView extends UINode {
     
     Box2D casesBound  = new Box2D(fullWide - 340, 35, 340, fullHigh - 35);
     Box2D scrollBound = new Box2D(0             ,  0, 320, fullHigh - 35);
+    
+    infoArea = new ScrollArea(this, casesBound);
+    /*
     infoArea = new ScrollArea(this, casesBound);
     addChildren(infoArea);
     UINode scrollKid = new UINode(infoArea, scrollBound) {};
@@ -99,12 +110,33 @@ public class MapView extends UINode {
       eventsView, rolesView, cluesView, perpsView, regionView
     };
     scrollKid.addChildren(focusViews);
+    //*/
     
-    showEventsFocus();
+    //showEventsFocus();
   }
   
   
-
+  
+  
+  public void showEventsFocus() {
+    //  TODO:  Restore this...
+    //setActiveFocus(ALL_EVENTS, true);
+  }
+  
+  
+  public void setActiveFocus(Object focus, boolean wipeStack) {
+    //  TODO:  Restore this...
+  }
+  
+  
+  public Object priorFocus() {
+    //  TODO:  Restore this...
+    return null;
+  }
+  
+  
+  
+  /*
   public Object priorFocus() {
     return focusStack.atIndex(focusStack.size() - 2);
   }
@@ -163,6 +195,7 @@ public class MapView extends UINode {
     this.activeFocus = before;
     setActiveFocus(before, false);
   }
+  //*/
 }
 
 

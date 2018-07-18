@@ -6,7 +6,6 @@ import proto.game.person.*;
 import proto.game.world.*;
 import proto.view.common.*;
 import proto.util.*;
-
 import java.awt.Image;
 
 
@@ -199,7 +198,7 @@ public class TaskCraft extends Task {
         }
         if (optionID == 1) {
           for (Person p : active) p.removeAssignment(craftTask);
-          view.switchToTab(view.equipView);
+          view.switchToTab(MainView.TAB_EQUIP);
           view.dismissMessage(this);
         }
       }

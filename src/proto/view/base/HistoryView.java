@@ -40,7 +40,7 @@ public class HistoryView extends UINode {
   protected boolean renderTo(Surface surface, Graphics2D g) {
     if (! super.renderTo(surface, g)) return false;
     
-    Person person = this.mainView.rosterView.selectedPerson();
+    Person person = this.mainView.selectedPerson();
     if (person == null) return false;
 
     g.setColor(Color.WHITE);
@@ -57,7 +57,7 @@ public class HistoryView extends UINode {
       if (hoverP) {
         g.drawImage(mainView.selectCircle, vx + 5, vy + down + 5, 40, 40, null);
         if (surface.mouseClicked()) {
-          mainView.rosterView.setSelectedPerson(other);
+          mainView.setSelectedPerson(other);
         }
       }
       

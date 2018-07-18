@@ -252,7 +252,7 @@ public class TaskTrain extends Task {
         }
         if (optionID == 1) {
           p.removeAssignment(trainTask);
-          view.switchToTab(view.trainView);
+          view.switchToTab(MainView.TAB_TRAIN);
           view.dismissMessage(this);
         }
       }

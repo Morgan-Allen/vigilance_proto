@@ -6,6 +6,7 @@ import proto.game.event.*;
 import proto.game.scene.*;
 import proto.game.person.*;
 import proto.view.common.*;
+import proto.view.world.*;
 import proto.util.*;
 
 

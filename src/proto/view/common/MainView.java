@@ -6,6 +6,7 @@ import proto.game.person.*;
 import proto.util.*;
 import proto.view.scene.*;
 import proto.view.base.*;
+import proto.view.world.*;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -21,11 +22,17 @@ public class MainView extends UINode {
     ACTS_DIR = "media assets/action view/",
     MNUI_DIR = "media assets/main UI/"
   ;
+  final public static int
+    TAB_EQUIP = 1,
+    TAB_TRAIN = 2,
+    TAB_PSYCH = 3
+  ;
   
   private World world;
   SceneView sceneView;
   UINode    mainUI   ;
   
+  /*
   final public RosterView rosterView;
   final public BasicInfoBar basicBar;
   UINode tabsNode;
@@ -37,8 +44,11 @@ public class MainView extends UINode {
   final public TrainingView  trainView  ;
   final public MapView       mapView    ;
   final public HistoryView   historyView;
+  //*/
   
   final public Image selectCircle, selectSquare;
+  
+  MapView mapView;
   
   UINode messageShown = null;
   List <UINode> messageQueue = new List();
@@ -63,6 +73,10 @@ public class MainView extends UINode {
     ));
     addChildren(sceneView, mainUI);
     
+    final Box2D tabSubBounds = new Box2D(0, 25, fullWide, fullHigh - 160);
+    mapView     = new MapView      (mainUI, tabSubBounds);
+    
+    /*
     rosterView = new RosterView(mainUI, new Box2D(
       0, fullHigh - 120, fullWide, 120
     ));
@@ -111,6 +125,7 @@ public class MainView extends UINode {
     };
     optionsButton.relBounds.set(fullWide - 205, 0, 200, 25);
     tabsNode.addChildren(optionsButton);
+    //*/
     
     selectCircle  = Kind.loadImage(ACTS_DIR+"select_circle.png");
     selectSquare  = Kind.loadImage(MNUI_DIR+"select_square.png");
@@ -119,6 +134,11 @@ public class MainView extends UINode {
   
   public SceneView sceneView() {
     return sceneView;
+  }
+  
+  
+  public MapView mapView() {
+    return mapView;
   }
   
   
@@ -137,10 +157,18 @@ public class MainView extends UINode {
   }
   
   
+  public Person selectedPerson() {
+    //  TODO:  Restore this...
+    return null;
+  }
+  
+  
   
   /**  Switching tabs:
     */
-  public void switchToTab(UINode content) {
+  public void switchToTab(int tabID) {
+    //  TODO:  Restore this...
+    /*
     int index = Visit.indexOf(content, tabContent);
     for (int i = tabButtons.length; i-- > 0;) {
       ((StringButton) tabButtons[i]).toggled = i == index;
@@ -148,6 +176,12 @@ public class MainView extends UINode {
     for (UINode c : tabContent) {
       c.visible = c == content;
     }
+    //*/
+  }
+  
+  
+  public void setSelectedPerson(Person agent) {
+    //  TODO:  Restore this...
   }
   
   
@@ -155,7 +189,7 @@ public class MainView extends UINode {
     RunGame game = mainView.game();
     if (start) {
       mapView.showEventsFocus();
-      switchToTab(mapView);
+      //switchToTab(mapView);
       game.setPaused(false);
     }
     else game.setPaused(true);

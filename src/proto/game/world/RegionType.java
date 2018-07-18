@@ -3,7 +3,8 @@
 package proto.game.world;
 import proto.common.*;
 import proto.util.*;
-import proto.view.base.*;
+//import proto.view.base.*;
+import proto.view.world.*;
 
 
 

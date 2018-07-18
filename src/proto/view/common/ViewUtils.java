@@ -211,7 +211,7 @@ public class ViewUtils {
       if (hovered) {
         g.drawOval(x, y, 20, 20);
         if (surface.mouseClicked()) {
-          parent.rosterView.setSelectedPerson(p);
+          parent.setSelectedPerson(p);
         }
       }
       x -= moveX;

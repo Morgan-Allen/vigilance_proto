@@ -9,7 +9,13 @@ import proto.util.*;
 
 
 public class Editor extends RunGame {
-
+  
+  
+  //  TODO:  Load these attributes from an XML definition file themselves, and
+  //  refresh whenever the underlying file is changed!
+  
+  //  TODO:  You need to allow scrolling through longer lists of objects in
+  //  the editor view.  And you need to allow for object deletion.
   
   String basePath   = "media assets/testing/";
   String propsFile  = "test_props.xml";
@@ -18,7 +24,8 @@ public class Editor extends RunGame {
   String outSceneID = "test_scene";
   
   List <PropType> propTypes = new List();
-
+  
+  
   
   public static void main(String args[]) {
     runGame(new Editor(), "");

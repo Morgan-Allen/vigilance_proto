@@ -49,7 +49,7 @@ public class TrainingView extends UINode {
   protected boolean renderTo(Surface surface, Graphics2D g) {
     if (! super.renderTo(surface, g)) return false;
     
-    Person person = this.mainView.rosterView.selectedPerson();
+    Person person = this.mainView.selectedPerson();
     if (person == null) return false;
     
     renderTraining (surface, g, person);
