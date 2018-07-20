@@ -164,12 +164,14 @@ public class ViewUtils {
           Assignment a = (Assignment) e.refers;
           Base player = within.mainView.player();
           
+          /*
           if (a.assigningBase() == player) renderAssigned(
             a.assigned(),
             vx + (vertical ? (across + vw - 20) : (across + downEach)),
             vy + down + downEach + 10,
             within, surface, g
           );
+          //*/
         }
         
         if (vertical) {
@@ -191,6 +193,7 @@ public class ViewUtils {
   
   /**  Rendering persons and stats-
     */
+  /*
   public static void renderAssigned(
     Series <Person> assigned, int atX, int atY,
     UINode within, Surface surface, Graphics2D g
@@ -217,6 +220,7 @@ public class ViewUtils {
       x -= moveX;
     }
   }
+  //*/
   
   
   public static void renderStatBar(

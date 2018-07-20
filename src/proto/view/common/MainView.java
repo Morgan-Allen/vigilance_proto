@@ -54,6 +54,8 @@ public class MainView extends UINode {
   List <UINode> messageQueue = new List();
   ClickMenu clickMenu = null;
   
+  Person selectedPerson = null;
+  
   
   
   
@@ -73,8 +75,8 @@ public class MainView extends UINode {
     ));
     addChildren(sceneView, mainUI);
     
-    final Box2D tabSubBounds = new Box2D(0, 25, fullWide, fullHigh - 160);
-    mapView     = new MapView      (mainUI, tabSubBounds);
+    mapView = new MapView(mainUI, new Box2D(0, 0, fullWide, fullHigh));
+    mainUI.addChildren(mapView);
     
     /*
     rosterView = new RosterView(mainUI, new Box2D(
@@ -157,12 +159,6 @@ public class MainView extends UINode {
   }
   
   
-  public Person selectedPerson() {
-    //  TODO:  Restore this...
-    return null;
-  }
-  
-  
   
   /**  Switching tabs:
     */
@@ -180,8 +176,13 @@ public class MainView extends UINode {
   }
   
   
+  public Person selectedPerson() {
+    return selectedPerson;
+  }
+  
+  
   public void setSelectedPerson(Person agent) {
-    //  TODO:  Restore this...
+    this.selectedPerson = agent;
   }
   
   

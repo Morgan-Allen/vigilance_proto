@@ -16,7 +16,8 @@ public class DefaultGame extends RunGame {
   
   
   final public static String
-    DEFAULT_SAVE_PATH = "saves/main_save.vgl";
+    DEFAULT_SAVE_PATH = "saves/main_save.vgl"
+  ;
   
   
   public static void main(String args[]) {
@@ -283,6 +284,8 @@ public class DefaultGame extends RunGame {
       int delay = Rand.index(GameSettings.MIN_PLOT_THINKING_TIME);
       plot.base().plots.assignRootPlot(plot, 48 + delay);
     }
+    
+    world.updateWorld(0);
   }
   
 }

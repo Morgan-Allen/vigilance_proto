@@ -23,6 +23,9 @@ public class PersonActions {
   Object lastTarget;
   float turnMoveRoll;
   
+  int timePoints;
+  boolean timeDone;
+  
   
   PersonActions(Person person) {
     this.person = person;
@@ -35,6 +38,8 @@ public class PersonActions {
     lastTarget   = s.loadObject();
     nextAction   = (Action) s.loadObject();
     turnMoveRoll = s.loadFloat();
+    timePoints   = s.loadInt();
+    timeDone     = s.loadBool();
   }
   
   
@@ -43,7 +48,9 @@ public class PersonActions {
     s.saveBool  (turnDone    );
     s.saveObject(lastTarget  );
     s.saveObject(nextAction  );
-    s.saveFloat(turnMoveRoll );
+    s.saveFloat (turnMoveRoll);
+    s.saveInt   (timePoints  );
+    s.saveBool  (timeDone    );
   }
   
   
@@ -254,7 +261,28 @@ public class PersonActions {
     nextAction.used.applyOnNoticing(person, seen, doing);
   }
   
+  
+  
+  /**  Time points on the strategic map-
+    */
+  public int currentTP() {
+    return timePoints;
+  }
+  
+  
+  public void modifyTP(int modifier) {
+    timePoints += modifier;
+  }
+  
+  
+  public void setTimePoints(int TP) {
+    timePoints = TP;
+  }
+  
 }
+
+
+
 
 
 

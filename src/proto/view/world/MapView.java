@@ -39,8 +39,10 @@ public class MapView extends UINode {
     PLOT_CLUES = "plot-clues";
   
   
-  final public MapInsetView mapView;
+  final public MapInsetView mapInset;
   final public ScrollArea infoArea;
+  final public TasksView tasksView;
+  
   /*
   EventsView    eventsView;
   CaseRolesView rolesView ;
@@ -61,22 +63,23 @@ public class MapView extends UINode {
     super(parent, viewBounds);
     
     int fullWide = (int) viewBounds.xdim(), fullHigh = (int) viewBounds.ydim();
-    mapView = new MapInsetView(this, new Box2D(
-      10, 10, fullWide - 360, fullHigh - 20
-    )) {
+    mapInset = new MapInsetView(this, new Box2D(0, 0, fullWide, fullHigh)) {
       protected void onRegionSelect(Region region) {
         //setActiveFocus(region, true);
       }
     };
-    mapView.loadMapImages(
+    mapInset.loadMapImages(
       MainView.MAPS_DIR+"city_map.png",
       MainView.MAPS_DIR+"city_districts_key.png",
       MainView.MAPS_DIR+"city_districts_outline.png"
     );
-    addChildren(mapView);
+    addChildren(mapInset);
+    
+    tasksView = new TasksView(this, new Box2D());
+    addChildren(tasksView);
     
     Box2D casesBound  = new Box2D(fullWide - 340, 35, 340, fullHigh - 35);
-    Box2D scrollBound = new Box2D(0             ,  0, 320, fullHigh - 35);
+    //Box2D scrollBound = new Box2D(0             ,  0, 320, fullHigh - 35);
     
     infoArea = new ScrollArea(this, casesBound);
     /*
@@ -116,6 +119,18 @@ public class MapView extends UINode {
   }
   
   
+  protected void updateAndRender(Surface surface, Graphics2D g) {
+    final Box2D b = this.relBounds;
+    tasksView.relBounds.set(0, 0, b.xdim() / 4f, b.ydim());
+    super.updateAndRender(surface, g);
+    
+    Coord at = new Coord(surface.mouseX(), surface.mouseY());
+    if (tasksView.previewTaskDelivery(mapInset.hovered, at, surface, g)) {
+      if (surface.mouseClicked()) {
+        tasksView.confirmTask(mapInset.hovered);
+      }
+    }
+  }
   
   
   public void showEventsFocus() {

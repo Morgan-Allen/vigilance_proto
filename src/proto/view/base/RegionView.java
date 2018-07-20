@@ -37,7 +37,7 @@ public class RegionView extends UINode {
     */
   protected boolean renderTo(Surface surface, Graphics2D g) {
     
-    MapInsetView mapRefers = mainView.mapView().mapView;
+    MapInsetView mapRefers = mainView.mapView().mapInset;
     Region  region = mapRefers.selectedRegion();
     Base    player = mainView.player();
     MapView parent = mainView.mapView();

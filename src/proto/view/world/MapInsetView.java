@@ -27,6 +27,8 @@ public abstract class MapInsetView extends UINode {
   
   private static RegionType lastRegionType;
   
+  Object hovered = null;
+  
   
   public MapInsetView(UINode parent, Box2D viewBounds) {
     super(parent, viewBounds);
@@ -114,6 +116,8 @@ public abstract class MapInsetView extends UINode {
     Region  regions[] = mainView.world().regions();
     Base    played    = mainView.world().playerBase();
     
+    this.hovered = null;
+    
     attachOutlinesFor(regions);
     if (selectedRegion() == null) setSelectedRegion(regions[0]);
     //
@@ -139,6 +143,7 @@ public abstract class MapInsetView extends UINode {
     
     for (Region n : regions) if (n.kind().view.colourKey == pixVal) {
       regionHovered = n;
+      hovered = n;
     }
     if (regionHovered != null && surface.mouseClicked()) {
       setSelectedRegion(regionHovered);
@@ -181,6 +186,11 @@ public abstract class MapInsetView extends UINode {
             if (slot == null) return;
             mainView.mapView().setActiveFocus(slot, true);
           }
+          
+          protected void whenHovered() {
+            super.whenHovered();
+            hovered = this;
+          }
         };
         button.valid = slot != null;
         button.refers = "slot_"+slotID;
@@ -208,7 +218,22 @@ public abstract class MapInsetView extends UINode {
       }
       //
       //  Then render any current visitors to the region-
-      ViewUtils.renderAssigned(visitors(n), x + 25, y + 35, this, surface, g);
+      int px = x + 25 - 20, py = y + 35 - 20;
+      g.setColor(Color.YELLOW);
+      
+      for (Person p : visitors(n)) {
+        boolean userHover = surface.tryHover(px, py, 20, 20, p, this);
+        g.drawImage(p.kind().sprite(), px, py, 20, 20, null);
+        
+        if (userHover) {
+          this.hovered = p;
+          g.drawOval(px, py, 20, 20);
+          if (surface.mouseClicked()) {
+            mainView.setSelectedPerson(p);
+          }
+        }
+        px -= 20;
+      }
     }
     
     return true;

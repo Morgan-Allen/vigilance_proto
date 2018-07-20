@@ -230,7 +230,7 @@ public class ActionsView extends UINode {
     Object hovered, Tile at, Surface surface, Graphics2D g
   ) {
     final Scene scene = mainView.world().activeScene();
-    final Person selected = parent.selectedPerson();
+    final Person selected = mainView.selectedPerson();
     if (selectAbility == null || selected == null) return false;
     
     StringBuffer failLog = new StringBuffer();
