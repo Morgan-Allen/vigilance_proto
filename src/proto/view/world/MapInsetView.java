@@ -189,7 +189,7 @@ public abstract class MapInsetView extends UINode {
           
           protected void whenHovered() {
             super.whenHovered();
-            hovered = this;
+            hovered = slot;
           }
         };
         button.valid = slot != null;

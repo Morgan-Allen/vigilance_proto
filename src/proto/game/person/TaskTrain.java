@@ -66,10 +66,9 @@ public class TaskTrain extends Task {
   public boolean updateAssignment() {
     if (! super.updateAssignment()) return false;
     
-    float timeHours = base.world().timing.hoursInTick();
     for (Person p : active()) {
       final int oldLevel = p.stats.levelFor(trainNow);
-      advanceTraining(p, timeHours);
+      advanceTraining(p, 1);
       final int newLevel = p.stats.levelFor(trainNow);
       if (newLevel > oldLevel) {
         p.stats.updateStats(0);
@@ -98,12 +97,12 @@ public class TaskTrain extends Task {
   }
   
   
-  void advanceTraining(Person person, float timeHours) {
+  void advanceTraining(Person person, float numDays) {
     if (trainNow == null) return;
     final int level = person.stats.levelFor(trainNow);
     float xpGain = trainNow.xpRequired(level);
-    float trainTime = trainingTime(person, trainNow);
-    xpGain *= timeHours / trainTime;
+    float trainTime = trainingTimeDays(person, trainNow);
+    xpGain *= numDays / trainTime;
     person.stats.gainXP(trainNow, xpGain);
     
     final int newLevel = person.stats.levelFor(trainNow);
@@ -161,7 +160,7 @@ public class TaskTrain extends Task {
   }
   
   
-  public static int trainingTime(Person person, Ability trained) {
+  public static int trainingTimeDays(Person person, Ability trained) {
     float trainBonus = trainBonus(person, trained);
     if (trainBonus <= -1) return -1;
     int defaultTime = GameSettings.DEF_ABILITY_TRAIN_TIME;
@@ -172,7 +171,7 @@ public class TaskTrain extends Task {
   
   public static int trainingTimeLeft(Person person, Ability trained) {
     float xp = person.stats.xpLevelFor(trained);
-    return (int) (trainingTime(person, trained) * (1 - xp));
+    return (int) (trainingTimeDays(person, trained) * (1 - xp));
   }
   
   

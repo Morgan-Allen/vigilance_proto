@@ -38,7 +38,7 @@ public class ItemType extends Kind {
   final public int slotType;
   final public int buildCost;
   final public Object craftArgs[];
-  final public int craftTime;
+  final public int craftDays;
   
   final public int properties;
   final Ability abilities[];
@@ -66,7 +66,7 @@ public class ItemType extends Kind {
     this.slotType   = slotType;
     this.buildCost  = buildCost;
     this.craftArgs  = craftArgs;
-    this.craftTime  = (int) (World.HOURS_PER_DAY * (1 + (buildCost / 50f)));
+    this.craftDays  = (int) (1 * (1 + (buildCost / 50f)));
     this.properties = properties;
     this.abilities  = abilities;
   }

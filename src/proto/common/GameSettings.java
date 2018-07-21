@@ -11,12 +11,13 @@ public class GameSettings {
   ;
   
   final public static int
-    WEEK_IN_HOURS = World.HOURS_PER_DAY * World.DAYS_PER_WEEK,
-    DEF_ABILITY_TRAIN_TIME = WEEK_IN_HOURS * 1,
-    MIN_PLOT_THINKING_TIME = WEEK_IN_HOURS * 1,
-    MAX_PLOT_THINKING_TIME = WEEK_IN_HOURS * 2,
+    ///WEEK_IN_HOURS = World.HOURS_PER_DAY * World.DAYS_PER_WEEK,
+    DEF_ABILITY_TRAIN_TIME = World.DAYS_PER_WEEK * 1,
+    MIN_PLOT_THINKING_TIME = World.DAYS_PER_WEEK * 1,
+    MAX_PLOT_THINKING_TIME = World.DAYS_PER_WEEK * 2,
     MIN_PLOT_STEP_DELAY    = World.HOURS_PER_DAY * 1,
-    MAX_PLOT_STEP_DELAY    = World.HOURS_PER_DAY * 2
+    MAX_PLOT_STEP_DELAY    = World.HOURS_PER_DAY * 2,
+    TIME_POINTS_PER_DAY    = 12
   ;
   
   public static boolean

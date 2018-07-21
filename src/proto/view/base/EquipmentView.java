@@ -82,8 +82,7 @@ public class EquipmentView extends UINode {
     else {
       down += 10;
       
-      float craftTime = selectedItem.craftingTime(person);
-      craftTime *= 1f / World.HOURS_PER_DAY;
+      float craftTime = selectedItem.craftingTimeDays(person);
       String desc = selectedItem.made().defaultInfo();
       desc += "\n  "+selectedItem.testInfo(person);
       desc += "\n  Cost: "+selectedItem.made().buildCost;
@@ -160,7 +159,7 @@ public class EquipmentView extends UINode {
     for (TaskCraft task : base.stocks.craftingTasks()) {
       if (task.assigned().empty()) continue;
       ItemType made = task.made();
-      float craftTime = task.craftingTime(), prog = task.craftingProgress();
+      float craftTime = task.craftingTimeDays(), prog = task.craftingProgress();
       
       for (int order = 1; order <= task.numOrders(); order++) {
         arrival a = new arrival();

@@ -156,6 +156,8 @@ public class DefaultGame extends RunGame {
         I.say("    "+t+" ("+base.stocks.numStored(t)+")");
       }
     }
+    
+    world.view().setSelectedPerson(base.roster().first());
   }
   
   

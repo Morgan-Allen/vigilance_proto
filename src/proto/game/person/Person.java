@@ -328,11 +328,13 @@ public class Person extends Element {
       base.HQ().setAttached(this, true);
     }
     //
+    //  Replenish your current time-points:
+    actions.setTimePoints(GameSettings.TIME_POINTS_PER_DAY);
+    //
     //  Update health and stats:
-    float numWeeks = world().timing.hoursInTick();
-    health.updateHealth(numWeeks);
+    health.updateHealth(1);
     if (health.alive()) {
-      stats.updateStats(numWeeks);
+      stats.updateStats(1);
     }
   }
   

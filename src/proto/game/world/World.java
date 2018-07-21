@@ -262,6 +262,7 @@ public class World implements Session.Saveable {
   
   /**  Regular updates and activity cycle:
     */
+  /*
   public void updateWorldInRealTime(float realSeconds) {
     float hoursGone = RunGame.SLOW_HOURS_PER_REAL_SECOND;
     if (events.active().empty()) hoursGone = RunGame.FAST_HOURS_PER_REAL_SECOND;
@@ -275,10 +276,11 @@ public class World implements Session.Saveable {
     
     updateWorld(hoursGone);
   }
+  //*/
   
   
-  public void updateWorld(float hoursGone) {
-    timing.updateTiming(hoursGone);
+  public void updateWorld(int numDays) {
+    timing.advanceDays(numDays);
     for (Region d : regions) {
       d.updateRegion();
     }

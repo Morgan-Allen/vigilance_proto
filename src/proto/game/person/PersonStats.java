@@ -249,7 +249,7 @@ public class PersonStats {
   
   /**  Regular updates-
     */
-  void updateStats(float numWeeks) {
+  void updateStats(float numDays) {
     
     //  These are all assumed to have averages of 5, ranging from 0 to 10.
     updateStat(MUSCLE  , -1, false);

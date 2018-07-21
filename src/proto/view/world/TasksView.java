@@ -1,13 +1,11 @@
 
 
-
 package proto.view.world;
 import proto.common.*;
 import proto.game.world.*;
 import proto.game.person.*;
 import proto.game.scene.*;
 import proto.view.common.*;
-import proto.view.scene.SceneView;
 import proto.util.*;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -16,7 +14,6 @@ import java.awt.Graphics2D;
 
 
 public class TasksView extends UINode {
-  
   
   
   public TasksView(UINode parent, Box2D bounds) {
@@ -34,7 +31,7 @@ public class TasksView extends UINode {
     }
     
     void performTask(Person acting, Element focus, World world) {
-      return;
+      acting.actions.modifyTP(0 - costTP);
     }
     
     boolean canTarget(
@@ -59,7 +56,7 @@ public class TasksView extends UINode {
       }
       
       void performTask(Person acting, Element focus, World world) {
-        return;
+        super.performTask(acting, focus, world);
       }
     },
     TASK_FORENSICS = new MapTask("Forensics", 6) {
@@ -73,7 +70,7 @@ public class TasksView extends UINode {
       }
       
       void performTask(Person acting, Element focus, World world) {
-        return;
+        super.performTask(acting, focus, world);
       }
     },
     TASK_WIRETAP = new MapTask("Wiretap", 8) {
@@ -87,7 +84,7 @@ public class TasksView extends UINode {
       }
       
       void performTask(Person acting, Element focus, World world) {
-        return;
+        super.performTask(acting, focus, world);
       }
     },
     TASK_QUESTION = new MapTask("Question", 4) {
@@ -101,7 +98,7 @@ public class TasksView extends UINode {
       }
       
       void performTask(Person acting, Element focus, World world) {
-        return;
+        super.performTask(acting, focus, world);
       }
     },
     ALL_TASKS[] = { TASK_SURVEIL, TASK_WIRETAP, TASK_QUESTION, TASK_FORENSICS }
@@ -110,6 +107,7 @@ public class TasksView extends UINode {
   
   MapTask activeTask;
   Person activePerson;
+  String selectMessage;
   
   
   void setActiveTask(MapTask task, Person active) {
@@ -171,6 +169,23 @@ public class TasksView extends UINode {
           key++;
         }
       }
+      if (activeTask == null) {
+        s.append("\n    Pass Time (x)");
+        if (surface.isPressed('x')) {
+          active.actions.setTimePoints(0);
+          moveToNextAgent();
+        }
+      }
+    }
+    
+    if (activeTask != null) {
+      s.append("\n\nTask Selected: "+activeTask.name);
+      s.append("\n  ");
+      s.append(selectMessage);
+      s.append("\n  Press X to cancel");
+      if (surface.isPressed('x')) {
+        setActiveTask(null, null);
+      }
     }
     
     return s.toString();
@@ -183,16 +198,23 @@ public class TasksView extends UINode {
   boolean previewTaskDelivery(
     Object hovered, Coord at, Surface surface, Graphics2D g
   ) {
-    final World world = mainView.world();
-    final Person selected = mainView.selectedPerson();
     if (activeTask == null) return false;
     
+    final World world = mainView.world();
     StringBuffer failLog = new StringBuffer();
-    if (activeTask.canTarget(activePerson, (Element) hovered, world, failLog)) {
+    
+    if (! (hovered instanceof Element)) {
+      failLog.append("Invalid target");
+      selectMessage = failLog.toString();
+      return false;
+    }
+    else if (activeTask.canTarget(activePerson, (Element) hovered, world, failLog)) {
+      selectMessage = "Can target: "+hovered+"\n  click to confirm";
       return true;
     }
     else {
-      //parent.renderString(at.x, at.y - 0.5f, ""+failLog, Color.RED, g);
+      if (failLog.length() == 0) failLog.append("Invalid target");
+      selectMessage = failLog.toString();
       return false;
     }
   }
@@ -200,7 +222,25 @@ public class TasksView extends UINode {
   
   void confirmTask(Object focus) {
     final World world = mainView.world();
+    
     activeTask.performTask(activePerson, (Element) focus, world);
+    activeTask   = null;
+    activePerson = null;
+    moveToNextAgent();
+  }
+  
+  
+  void moveToNextAgent() {
+    final World world = mainView.world();
+    final Base played = mainView.player();
+    Person nextUp = played.nextFreeAgent();
+    
+    if (nextUp != null) {
+      mainView.setSelectedPerson(nextUp);
+    }
+    else {
+      world.updateWorld(1);
+    }
   }
   
 }

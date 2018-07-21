@@ -248,7 +248,7 @@ public class PersonHealth {
   }
   
   
-  public void updateHealth(float numWeeks) {
+  public void updateHealth(float numDays) {
     //
     //  Note:  This is called regularly outside of Scenes, when an agent is
     //  back at base.
@@ -256,17 +256,20 @@ public class PersonHealth {
       return;
     }
     
-    numWeeks /= World.DAYS_PER_WEEK * World.HOURS_PER_DAY;
-    int maxHealth = maxHealth();
+    float regen       = numDays / (World.DAYS_PER_WEEK * FULL_HEAL_WEEKS);
+    float stressRegen = numDays / (World.DAYS_PER_WEEK * 1);
+    int   maxHealth   = maxHealth();
     float wakeLevel   = maxHealth * WAKEUP_PERCENT    / 100f;
     float bruiseLevel = maxHealth * HP_BRUISE_PERCENT / 100f;
-    float regen = maxHealth * numWeeks * 2f / FULL_HEAL_WEEKS;
+    regen *= maxHealth;
     
     if (totalHarm > 0) {
       totalHarm = Nums.max(0, totalHarm - regen);
       injury    = Nums.max(injury, totalHarm);
     }
-    else injury = Nums.max(0, injury - regen);
+    else {
+      injury = Nums.max(0, injury - regen);
+    }
     
     if (state == State.CRITICAL || state == State.CRIPPLED) {
       conscious = false;
@@ -283,9 +286,10 @@ public class PersonHealth {
         setState(State.BRUISED);
       }
     }
+    
     if (conscious()) {
       stun = 0;
-      stress = Nums.max(0, stress - (int) (WEEK_STRESS_DECAY * numWeeks));
+      stress = Nums.max(0, stress - (int) stressRegen);
     }
   }
   

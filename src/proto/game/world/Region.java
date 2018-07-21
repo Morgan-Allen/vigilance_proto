@@ -414,7 +414,6 @@ public class Region extends Element {
   
   
   public void updateRegion() {
-    if (! world.timing.dayIsUp()) return;
     updateStats(1);
   }
   

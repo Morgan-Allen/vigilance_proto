@@ -185,6 +185,19 @@ public class Base implements Session.Saveable {
   }
   
   
+  public Person nextFreeAgent() {
+    for (Person p : roster()) {
+      if (p.actions.currentTP() > 0) return p;
+    }
+    return null;
+  }
+  
+  
+  public boolean hasFreeAgent() {
+    return nextFreeAgent() != null;
+  }
+  
+  
   
   /**  Property listings:
     */

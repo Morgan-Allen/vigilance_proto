@@ -32,10 +32,11 @@ public class Timing {
   
   
   final World world;
-
-  float hoursInTick, timeHours = 0;
+  
+  //float hoursInTick, timeHours = 0;
   int timeDays = 0, daysMonth = 0, monthsYear = 0, timeYears = 0;
-  boolean dayIsUp, monthIsUp;
+  //boolean dayIsUp, monthIsUp;
+  boolean monthIsUp;
   
   
   Timing(World world) {
@@ -44,25 +45,25 @@ public class Timing {
   
   
   void loadState(Session s) throws Exception {
-    hoursInTick = s.loadFloat();
-    timeHours   = s.loadFloat();
+    //hoursInTick = s.loadFloat();
+    //timeHours   = s.loadFloat();
     timeDays    = s.loadInt  ();
     daysMonth   = s.loadInt  ();
     monthsYear  = s.loadInt  ();
     timeYears   = s.loadInt  ();
-    dayIsUp     = s.loadBool ();
+    //dayIsUp     = s.loadBool ();
     monthIsUp   = s.loadBool ();
   }
   
   
   void saveState(Session s) throws Exception {
-    s.saveFloat(hoursInTick);
-    s.saveFloat(timeHours  );
+    //s.saveFloat(hoursInTick);
+    //s.saveFloat(timeHours  );
     s.saveInt  (timeDays   );
     s.saveInt  (daysMonth  );
     s.saveInt  (monthsYear );
     s.saveInt  (timeYears  );
-    s.saveBool (dayIsUp    );
+    //s.saveBool (dayIsUp    );
     s.saveBool (monthIsUp  );
   }
   
@@ -71,7 +72,7 @@ public class Timing {
   /**  Regular updates and initial setup-
     */
   public void setStartDate(int days, int month, int year) {
-    this.timeHours  = 0;
+    //this.timeHours  = 0;
     this.timeDays   = 0;
     this.daysMonth  = days  - 1;
     this.monthsYear = month - 1;
@@ -79,6 +80,23 @@ public class Timing {
   }
   
   
+  public void advanceDays(int numDays) {
+    timeDays += numDays;
+    daysMonth += numDays;
+    
+    while (daysMonth > daysInMonth()) {
+      daysMonth -= daysInMonth();
+      monthsYear++;
+      monthIsUp = true;
+      if (monthsYear >= 12) {
+        monthsYear = 0;
+        timeYears++;
+      }
+    }
+  }
+  
+  
+  /*
   public void updateTiming(float hoursGone) {
     hoursInTick = hoursGone;
     timeHours += hoursInTick;
@@ -102,6 +120,7 @@ public class Timing {
       }
     }
   }
+  //*/
   
   
   int daysInMonth() {
@@ -130,6 +149,7 @@ public class Timing {
   }
   
   
+  /*
   public int timeHours() {
     return (int) timeHours;
   }
@@ -138,16 +158,19 @@ public class Timing {
   public int timeMinutes() {
     return (int) ((timeHours % 1) * World.MINUTES_PER_HOUR);
   }
+  //*/
   
   
   public int totalHours() {
-    return (timeDays * 24) + (int) (timeHours);
+    return (timeDays * 24);// + (int) (timeHours);
   }
   
   
+  /*
   public boolean dayIsUp() {
     return dayIsUp;
   }
+  //*/
   
   
   public boolean monthIsUp() {
@@ -155,24 +178,28 @@ public class Timing {
   }
   
   
+  /*
   public float hoursInTick() {
     return hoursInTick;
   }
+  //*/
   
   
   
   /**  Rendering, debug and interface methods-
     */
   public String currentTimeString() {
-    int minutes = timeMinutes();
-    int hours   = timeHours  ();
+    //int minutes = timeMinutes();
+    //int hours   = timeHours  ();
     int day     = dayInMonth ();
     int month   = monthInYear();
     int year    = timeYears  ();
-    String hourString = ""+I.lengthen(hours  , 2, true);
-    String minsString = ""+I.lengthen(minutes, 2, true);
+    //String hourString = ""+I.lengthen(hours  , 2, true);
+    //String minsString = ""+I.lengthen(minutes, 2, true);
+    //String monthName = Timing.MONTH_NAMES[month];
+    //return hourString+":"+minsString+", "+monthName+" "+day+", "+year;
     String monthName = Timing.MONTH_NAMES[month];
-    return hourString+":"+minsString+", "+monthName+" "+day+", "+year;
+    return monthName+" "+day+", "+year;
   }
   
   

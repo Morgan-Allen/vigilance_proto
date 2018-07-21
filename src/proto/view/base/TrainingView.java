@@ -165,10 +165,9 @@ public class TrainingView extends UINode {
       across = 10;
       
       float xp = person.stats.xpLevelFor(hovered);
-      int trainTime = TaskTrain.trainingTime(person, hovered);
-      trainTime /= World.HOURS_PER_DAY;
-      int costAP = hovered.minCostAP();
-      int level = person.stats.levelFor(hovered);
+      int trainTime = TaskTrain.trainingTimeDays(person, hovered);
+      int costAP    = hovered.minCostAP();
+      int level     = person.stats.levelFor(hovered);
       
       String desc = hovered.name;
       desc += " ("+hovered.levelDesc(level + 1)+")";

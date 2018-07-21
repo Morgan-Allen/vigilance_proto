@@ -52,11 +52,11 @@ public class TaskCraft extends Task {
   
   protected void advanceCrafting() {
     if (progress == 0) attempt = configAttempt(active());
-    int craftTime = craftingTime(attempt);
+    int craftTime = craftingTimeDays(attempt);
     if (craftTime == -1) return;
     
     if (progress == 0) base.finance.incSecretFunds(0 - made.buildCost);
-    progress += base.world().timing.hoursInTick() / craftTime;
+    progress += 1f / craftTime;
     
     if (progress >= 1) {
       progress = 0;
@@ -103,21 +103,21 @@ public class TaskCraft extends Task {
   }
   
   
-  public int craftingTime(Person... extra) {
+  public int craftingTimeDays(Person... extra) {
     final Batch <Person> all = new Batch();
     Visit.appendTo(all, active());
     for (Person p : extra) all.include(p);
     Attempt sample = configAttempt(all);
-    return craftingTime(sample);
+    return craftingTimeDays(sample);
   }
   
   
-  int craftingTime(Attempt attempt) {
+  int craftingTimeDays(Attempt attempt) {
     if (attempt == null) return -1;
-    if (active().empty()) return made.craftTime;
+    if (active().empty()) return made.craftDays;
     float craftChance = attempt.testChance();
     if (craftChance <= 0) return -1;
-    int baseTime = made.craftTime;
+    int baseTime = made.craftDays;
     baseTime *= 4 - (craftChance * 3);
     baseTime /= 1 + attempt.speedBonus;
     return baseTime;
@@ -158,7 +158,7 @@ public class TaskCraft extends Task {
   
   
   public float taskDaysRemaining(Person p) {
-    return craftingTime() * 1f / World.HOURS_PER_DAY;
+    return craftingTimeDays() * (1 - progress);
   }
   
   
